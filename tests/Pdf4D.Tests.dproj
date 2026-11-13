@@ -48,7 +48,7 @@
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;..\src\Resources;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -86,6 +86,12 @@
         <DCCReference Include="..\src\Common\Pdf4D.Common.Log.Tests.pas"/>
         <DCCReference Include="..\src\IO\Pdf4D.IO.RandomAccessRead.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Utf8.Tests.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.GlyphList.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Afm.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.CMap.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Fonts.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfDocEncoding.Tests.pas"/>

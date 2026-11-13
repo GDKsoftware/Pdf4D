@@ -30,6 +30,19 @@ src/Encryption/Pdf4D.Encryption.UnicodeData.pas.
 Copyright (c) 1991-2024 Unicode, Inc. All rights reserved.
 Distributed under the Unicode License v3, https://www.unicode.org/license.txt
 
+Includes the Adobe Font Metrics (AFM) files of the 14 standard PDF fonts, as resources in src/Resources, with their
+MustRead.html (src/Resources/afm-MustRead.html). Copyright Adobe Systems Incorporated. See licenses/Adobe-AFM.txt.
+
+Includes the Adobe CMaps for PDF fonts, as resources in src/Resources.
+Copyright 1990-2009 Adobe Systems Incorporated. See licenses/Adobe-CMap-BSD.txt.
+
+Includes the Adobe Glyph List and the Zapf Dingbats Glyph List, as resources in src/Resources.
+Copyright Adobe Systems Incorporated. See licenses/Adobe-GlyphList-BSD.txt.
+
+Includes the font LiberationSans-Regular.ttf (Liberation Sans), as a resource in src/Resources.
+Digitized data copyright (c) 2010 Google Corporation; copyright (c) 2012 Red Hat, Inc.
+Licensed under the SIL Open Font License 1.1, see licenses/OFL-1.1-LiberationSans.txt.
+
 The test fonts in tests/fonts (see tests/fonts/manifest.csv for the source of each file) are
 not part of the Pdf4D library and are only used by the tests:
 - LiberationSans-Regular.ttf, JosefinSans-Italic.ttf, FoglihtenNo07.otf and SourceSansProBold.otf

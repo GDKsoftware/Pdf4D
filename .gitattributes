@@ -8,3 +8,6 @@ tests/fonts/manifest.csv text eol=lf
 tests/fonts/*.ttf binary
 tests/fonts/*.otf binary
 tests/fonts/*.pfb binary
+src/Resources/*.res binary
+src/Resources/resources.csv text eol=lf
+src/Resources/afm-MustRead.html -text

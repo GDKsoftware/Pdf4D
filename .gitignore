@@ -10,6 +10,7 @@ __recovery/
 *.tds
 *.dsk
 *.res
+!src/Resources/*.res
 *.~*
 Win32/
 Win64/
