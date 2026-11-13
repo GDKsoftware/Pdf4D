@@ -16,6 +16,8 @@ type
   EPdfInvalidPasswordException = class(EPdfException);
   EPdfUnsupportedFeatureException = class(EPdfException);
   EPdfLimitExceededException = class(EPdfException);
+  // The file cannot be opened (it does not exist, it is locked, or access is denied)
+  EPdfFileException = class(EPdfException);
 
   TPdfLogEvent = reference to procedure(const Level: TPdfLogLevel; const Message: string);
 

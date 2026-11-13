@@ -12,6 +12,35 @@ Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0
 
 Early development. The repository currently holds the conventions and the test harness. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
 
+## Usage
+
+```delphi
+uses
+  Pdf4D.Api.Document,
+  Pdf4D.Api.Document.Interfaces,
+  Pdf4D.Api.Page.Interfaces;
+
+begin
+  const Document = TPdfDocument.Load('invoice.pdf');
+  Writeln(Document.Info.Title, ', ', Document.PageCount, ' pages');
+
+  for var Page in Document.Pages do
+  begin
+    Writeln(Page.Index, ': ', Page.MediaBox.Width:0:0, ' x ', Page.MediaBox.Height:0:0);
+  end;
+
+  for var Attachment in Document.Attachments do
+  begin
+    Writeln(Attachment.FileName, ': ', Length(Attachment.Data), ' bytes');
+  end;
+end;
+```
+
+The interfaces keep the document alive: a page, an outline item, a field or an attachment stays valid after the
+`IPdfDocument` reference is released, and the file is closed when the last reference is gone. A file that cannot be
+opened or parsed raises an `EPdfException` descendant. `CosDocument` and the `CosObject` functions give access to the
+inner layer; what they return is valid only while an interface of the document is alive.
+
 ## Building and testing
 
 ```powershell

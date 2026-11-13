@@ -68,7 +68,19 @@ uses
   Pdf4D.Model.PageLabels.Tests in '..\src\Model\Pdf4D.Model.PageLabels.Tests.pas',
   Pdf4D.Model.Outline.Tests in '..\src\Model\Pdf4D.Model.Outline.Tests.pas',
   Pdf4D.Model.EmbeddedFile.Tests in '..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas',
-  Pdf4D.Model.Navigation.Golden.Tests in '..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas';
+  Pdf4D.Model.Navigation.Golden.Tests in '..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas',
+  Pdf4D.Api.Document.Interfaces in '..\src\Api\Pdf4D.Api.Document.Interfaces.pas',
+  Pdf4D.Api.Page.Interfaces in '..\src\Api\Pdf4D.Api.Page.Interfaces.pas',
+  Pdf4D.Api.Outline.Interfaces in '..\src\Api\Pdf4D.Api.Outline.Interfaces.pas',
+  Pdf4D.Api.Field.Interfaces in '..\src\Api\Pdf4D.Api.Field.Interfaces.pas',
+  Pdf4D.Api.Attachment.Interfaces in '..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas',
+  Pdf4D.Api.DocumentHandle in '..\src\Api\Pdf4D.Api.DocumentHandle.pas',
+  Pdf4D.Api.Page in '..\src\Api\Pdf4D.Api.Page.pas',
+  Pdf4D.Api.OutlineItem in '..\src\Api\Pdf4D.Api.OutlineItem.pas',
+  Pdf4D.Api.Field in '..\src\Api\Pdf4D.Api.Field.pas',
+  Pdf4D.Api.Attachment in '..\src\Api\Pdf4D.Api.Attachment.pas',
+  Pdf4D.Api.Document in '..\src\Api\Pdf4D.Api.Document.pas',
+  Pdf4D.Api.Document.Tests in '..\src\Api\Pdf4D.Api.Document.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

@@ -48,7 +48,7 @@
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -140,6 +140,18 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Page.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Outline.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Field.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Page.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.OutlineItem.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Field.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Document.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
