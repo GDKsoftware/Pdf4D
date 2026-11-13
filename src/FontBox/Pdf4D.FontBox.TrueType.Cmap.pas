@@ -36,6 +36,9 @@ type
     const MaximumLoggedBadGlyphIds = 10;
     const EmptyCode = -1;
     const MultipleCodes = Low(Integer);
+    const NoGlyphsMessage = 'subtable has no glyphs';
+    const InvalidCharacterCodeMessage = 'Invalid character code 0x%X';
+    const Format8InvalidCodeMessage = '[Sub Format 8] Invalid character code %d';
 
   private
     type
@@ -60,10 +63,12 @@ type
 
     function GetCharCode(const GID: Integer): Integer;
     procedure BuildGlyphIdToCharacterCodeLookup(const MaxGlyphId: Integer);
+    procedure TryBuildGlyphIdToCharacterCodeLookup(const Cmap: TCmapTable; const MaxGlyphId: Integer);
+    procedure CopyFrom(const Cmap: TCmapTable; const Source: TCmapSubtable);
     procedure AddMultipleMapping(const GlyphId, CharacterCode: Integer);
     procedure MapCharacter(const CharacterCode, GlyphId: Integer);
 
-    procedure ProcessFormat0(const Data: TTTFDataStream);
+    procedure ProcessFormat0(const Cmap: TCmapTable; const Data: TTTFDataStream);
     procedure ProcessFormat2(const Cmap: TCmapTable; const Data: TTTFDataStream; const NumGlyphs: Integer);
     procedure ReadFormat2Entries(const Cmap: TCmapTable; const Data: TTTFDataStream; const NumGlyphs: Integer; const SubHeaders: TArray<TSubHeader>;
                                  const StartGlyphIndexOffset: Int64);
@@ -119,13 +124,17 @@ type
     const EncodingUnicode20Full = 4;
 
     // Mappings and array entries that all subtables of one cmap table may produce together
-    const MaximumWork = 4194304;
+    const MaximumWork = 1500000;
+    const MaximumLoggedUnsupportedFormats = 3;
+    const UnsupportedFormat14Message = 'Format 14 cmap table is not supported and will be ignored';
 
   private
     FSubtables: TObjectList<TCmapSubtable>;
     FHost: TTTFTableHost;
     FRemainingWork: Int64;
     FWorkLimitLogged: Boolean;
+    FReadSubtables: TDictionary<Int64, TCmapSubtable>;
+    FUnsupportedFormatCount: Integer;
 
   public
     constructor Create(const Tag: string; const CheckSum, Offset, Length: Int64);
@@ -136,6 +145,10 @@ type
     // Only meant for the subtables while the table is read. False (and one log line) when the budget is used up.
     function TryCharge(const Count: Int64): Boolean;
     procedure LogWarning(const Message: string);
+    procedure LogUnsupportedFormat14;
+    // Subtable records that point at the same offset with the same format share one read
+    function TryGetReadSubtable(const Offset: Int64; const Format: Integer; out Subtable: TCmapSubtable): Boolean;
+    procedure RegisterReadSubtable(const Offset: Int64; const Format: Integer; const Subtable: TCmapSubtable);
 
     function TryGetSubtable(const PlatformId, EncodingId: Integer; out Subtable: TCmapSubtable): Boolean;
 
@@ -201,6 +214,13 @@ procedure TCmapSubtable.InitSubtable(const Cmap: TCmapTable; const NumGlyphs: In
 begin
   Data.Seek(Cmap.Offset + FSubTableOffset);
   const SubtableFormat = Data.ReadUnsignedShort;
+  var Original: TCmapSubtable;
+  if Cmap.TryGetReadSubtable(FSubTableOffset, SubtableFormat, Original) then
+  begin
+    CopyFrom(Cmap, Original);
+    Exit;
+  end;
+
   if SubtableFormat < 8 then
   begin
     Data.ReadUnsignedShort; // length
@@ -214,7 +234,7 @@ begin
   end;
 
   case SubtableFormat of
-    0 : ProcessFormat0(Data);
+    0 : ProcessFormat0(Cmap, Data);
     2 : ProcessFormat2(Cmap, Data, NumGlyphs);
     4 : ProcessFormat4(Cmap, Data);
     6 : ProcessFormat6(Cmap, Data);
@@ -222,9 +242,37 @@ begin
     10: ProcessFormat10(Data);
     12: ProcessFormat12(Cmap, Data, NumGlyphs);
     13: ProcessFormat13(Cmap, Data, NumGlyphs);
-    14: Cmap.LogWarning('Format 14 cmap table is not supported and will be ignored');
+    14: Cmap.LogUnsupportedFormat14;
   else
     raise EPdfParseException.CreateFmt('Unknown cmap format: %d', [SubtableFormat]);
+  end;
+
+  Cmap.RegisterReadSubtable(FSubTableOffset, SubtableFormat, Self);
+end;
+
+// Subtable records often share one subtable (Unicode and Windows records). The copy is charged like a read, so a hostile table with
+// thousands of records on one subtable stays within the budget.
+procedure TCmapSubtable.CopyFrom(const Cmap: TCmapTable; const Source: TCmapSubtable);
+begin
+  const Cost = Int64(System.Length(Source.FGlyphIdToCharacterCode)) + Source.FCharacterCodeToGlyphId.Count;
+  if not Cmap.TryCharge(Cost) then
+  begin
+    Exit;
+  end;
+
+  FGlyphIdToCharacterCode := Copy(Source.FGlyphIdToCharacterCode);
+  for var Mapping in Source.FCharacterCodeToGlyphId do
+  begin
+    FCharacterCodeToGlyphId.Add(Mapping.Key, Mapping.Value);
+  end;
+
+  if Assigned(Source.FGlyphIdToCharacterCodeMultiple) then
+  begin
+    FGlyphIdToCharacterCodeMultiple := TObjectDictionary<Integer, TList<Integer>>.Create([doOwnsValues]);
+    for var Multiple in Source.FGlyphIdToCharacterCodeMultiple do
+    begin
+      FGlyphIdToCharacterCodeMultiple.Add(Multiple.Key, TList<Integer>.Create(Multiple.Value));
+    end;
   end;
 end;
 
@@ -233,8 +281,13 @@ begin
   FCharacterCodeToGlyphId.AddOrSetValue(CharacterCode, GlyphId);
 end;
 
-procedure TCmapSubtable.ProcessFormat0(const Data: TTTFDataStream);
+procedure TCmapSubtable.ProcessFormat0(const Cmap: TCmapTable; const Data: TTTFDataStream);
 begin
+  if not Cmap.TryCharge(Format0Entries * 2) then
+  begin
+    Exit;
+  end;
+
   const GlyphMapping = Data.ReadBytes(Format0Entries);
   FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(Format0Entries);
   for var Code := 0 to High(GlyphMapping) do
@@ -269,12 +322,17 @@ begin
   end;
 
   const StartGlyphIndexOffset = Data.CurrentPosition;
-  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   if NumGlyphs = 0 then
   begin
-    Cmap.LogWarning('subtable has no glyphs');
+    Cmap.LogWarning(NoGlyphsMessage);
     Exit;
   end;
+
+  if not Cmap.TryCharge(NumGlyphs) then
+  begin
+    Exit;
+  end;
+  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
 
   ReadFormat2Entries(Cmap, Data, NumGlyphs, SubHeaders, StartGlyphIndexOffset);
 end;
@@ -410,7 +468,7 @@ begin
     Exit;
   end;
 
-  BuildGlyphIdToCharacterCodeLookup(MaxGlyphId);
+  TryBuildGlyphIdToCharacterCodeLookup(Cmap, MaxGlyphId);
 end;
 
 procedure TCmapSubtable.ProcessFormat6(const Cmap: TCmapTable; const Data: TTTFDataStream);
@@ -429,7 +487,7 @@ begin
     MaxGlyphId := Max(MaxGlyphId, GlyphIdArray[Index]);
     MapCharacter(FirstCode + Index, GlyphIdArray[Index]);
   end;
-  BuildGlyphIdToCharacterCodeLookup(MaxGlyphId);
+  TryBuildGlyphIdToCharacterCodeLookup(Cmap, MaxGlyphId);
 end;
 
 function TCmapSubtable.Format8CharacterCode(const Is32: TBytes; const Code: Int64): Integer;
@@ -446,7 +504,7 @@ begin
   const CodePoint = (Lead shl 10) + Trail + SurrogateOffset;
   if CodePoint > MaxInt then
   begin
-    raise EPdfParseException.CreateFmt('[Sub Format 8] Invalid character code %d', [CodePoint]);
+    raise EPdfParseException.CreateFmt(Format8InvalidCodeMessage, [CodePoint]);
   end;
   Result := Integer(CodePoint);
 end;
@@ -460,14 +518,18 @@ begin
     raise EPdfParseException.Create('CMap (format 8) is invalid');
   end;
 
-  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   if NumGlyphs = 0 then
   begin
-    Cmap.LogWarning('subtable has no glyphs');
+    Cmap.LogWarning(NoGlyphsMessage);
     Exit;
   end;
 
   GuardGroupCount(Data, GroupCount);
+  if (GroupCount = 0) or not Cmap.TryCharge(NumGlyphs) then
+  begin
+    Exit;
+  end;
+  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   const FlaggedCodes = Int64(Format8FlagBytes) * 8;
   for var Group := 1 to Integer(GroupCount) do
   begin
@@ -481,7 +543,7 @@ begin
 
     if LastCode >= FlaggedCodes then
     begin
-      raise EPdfParseException.CreateFmt('[Sub Format 8] Invalid character code %d', [LastCode]);
+      raise EPdfParseException.CreateFmt(Format8InvalidCodeMessage, [LastCode]);
     end;
 
     if not Cmap.TryCharge(LastCode - FirstCode + 1) then
@@ -525,14 +587,20 @@ end;
 procedure TCmapSubtable.ProcessFormat12(const Cmap: TCmapTable; const Data: TTTFDataStream; const NumGlyphs: Integer);
 begin
   const GroupCount = Data.ReadUnsignedInt;
-  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   if NumGlyphs = 0 then
   begin
-    Cmap.LogWarning('subtable has no glyphs');
+    Cmap.LogWarning(NoGlyphsMessage);
     Exit;
   end;
 
   GuardGroupCount(Data, GroupCount);
+  // The reverse lookup is paid for in advance (no glyph id reaches numGlyphs), so a budget that runs out in the groups leaves
+  // the mappings read so far complete in both directions
+  if (GroupCount = 0) or not Cmap.TryCharge(NumGlyphs) then
+  begin
+    Exit;
+  end;
+
   var MaxGlyphId := 0;
   for var Group := 1 to Integer(GroupCount) do
   begin
@@ -543,13 +611,13 @@ begin
     const IsFirstCodeInvalid = ((FirstCode > MaximumCharacterCode) or IsSurrogate(FirstCode));
     if IsFirstCodeInvalid then
     begin
-      raise EPdfParseException.CreateFmt('Invalid character code 0x%X', [FirstCode]);
+      raise EPdfParseException.CreateFmt(InvalidCharacterCodeMessage, [FirstCode]);
     end;
 
     const IsLastCodeInvalid = (((LastCode > 0) and (LastCode < FirstCode)) or (LastCode > MaximumCharacterCode) or IsSurrogate(LastCode));
     if IsLastCodeInvalid then
     begin
-      raise EPdfParseException.CreateFmt('Invalid character code 0x%X', [LastCode]);
+      raise EPdfParseException.CreateFmt(InvalidCharacterCodeMessage, [LastCode]);
     end;
 
     // A group whose glyphs run past numGlyphs is cut short there
@@ -567,7 +635,7 @@ begin
 
     if not Cmap.TryCharge(Count + 1) then
     begin
-      Exit;
+      Break;
     end;
 
     for var Offset := 0 to Count - 1 do
@@ -583,14 +651,18 @@ end;
 procedure TCmapSubtable.ProcessFormat13(const Cmap: TCmapTable; const Data: TTTFDataStream; const NumGlyphs: Integer);
 begin
   const GroupCount = Data.ReadUnsignedInt;
-  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   if NumGlyphs = 0 then
   begin
-    Cmap.LogWarning('subtable has no glyphs');
+    Cmap.LogWarning(NoGlyphsMessage);
     Exit;
   end;
 
   GuardGroupCount(Data, GroupCount);
+  if (GroupCount = 0) or not Cmap.TryCharge(NumGlyphs) then
+  begin
+    Exit;
+  end;
+  FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(NumGlyphs);
   for var Group := 1 to Integer(GroupCount) do
   begin
     const FirstCode = Data.ReadUnsignedInt;
@@ -607,13 +679,13 @@ begin
     const IsFirstCodeInvalid = ((FirstCode > MaximumCharacterCode) or IsSurrogate(FirstCode));
     if IsFirstCodeInvalid then
     begin
-      raise EPdfParseException.CreateFmt('Invalid character code 0x%X', [FirstCode]);
+      raise EPdfParseException.CreateFmt(InvalidCharacterCodeMessage, [FirstCode]);
     end;
 
     const IsLastCodeInvalid = (((LastCode > 0) and (LastCode < FirstCode)) or (LastCode > MaximumCharacterCode) or IsSurrogate(LastCode));
     if IsLastCodeInvalid then
     begin
-      raise EPdfParseException.CreateFmt('Invalid character code 0x%X', [LastCode]);
+      raise EPdfParseException.CreateFmt(InvalidCharacterCodeMessage, [LastCode]);
     end;
 
     var Count := 0;
@@ -653,8 +725,30 @@ begin
   MappedValues.Add(CharacterCode);
 end;
 
+// When the budget cannot pay for the reverse lookup the mappings are dropped as well, so that both directions agree.
+procedure TCmapSubtable.TryBuildGlyphIdToCharacterCodeLookup(const Cmap: TCmapTable; const MaxGlyphId: Integer);
+begin
+  if FCharacterCodeToGlyphId.Count = 0 then
+  begin
+    Exit;
+  end;
+
+  if not Cmap.TryCharge(Int64(MaxGlyphId) + 1) then
+  begin
+    FCharacterCodeToGlyphId.Clear;
+    Exit;
+  end;
+
+  BuildGlyphIdToCharacterCodeLookup(MaxGlyphId);
+end;
+
 procedure TCmapSubtable.BuildGlyphIdToCharacterCodeLookup(const MaxGlyphId: Integer);
 begin
+  if FCharacterCodeToGlyphId.Count = 0 then
+  begin
+    Exit;
+  end;
+
   FGlyphIdToCharacterCode := NewGlyphIdToCharacterCode(MaxGlyphId + 1);
   for var Mapping in FCharacterCodeToGlyphId do
   begin
@@ -721,10 +815,12 @@ constructor TCmapTable.Create(const Tag: string; const CheckSum, Offset, Length:
 begin
   inherited Create(Tag, CheckSum, Offset, Length);
   FSubtables := TObjectList<TCmapSubtable>.Create;
+  FReadSubtables := TDictionary<Int64, TCmapSubtable>.Create;
 end;
 
 destructor TCmapTable.Destroy;
 begin
+  FReadSubtables.Free;
   FSubtables.Free;
   inherited Destroy;
 end;
@@ -744,13 +840,21 @@ begin
   FHost := Host;
   FRemainingWork := MaximumWork;
   FWorkLimitLogged := False;
+  FUnsupportedFormatCount := 0;
+  FReadSubtables.Clear;
   try
     for var Subtable in FSubtables do
     begin
       Subtable.InitSubtable(Self, NumberOfGlyphs, Data);
     end;
+
+    if FUnsupportedFormatCount > MaximumLoggedUnsupportedFormats then
+    begin
+      LogWarning(Format('%d cmap subtables of format 14 were ignored', [FUnsupportedFormatCount]));
+    end;
   finally
     FHost := nil;
+    FReadSubtables.Clear;
   end;
   FInitialized := True;
 end;
@@ -775,6 +879,25 @@ begin
   begin
     FHost.LogWarning(Message);
   end;
+end;
+
+procedure TCmapTable.LogUnsupportedFormat14;
+begin
+  Inc(FUnsupportedFormatCount);
+  if FUnsupportedFormatCount <= MaximumLoggedUnsupportedFormats then
+  begin
+    LogWarning(UnsupportedFormat14Message);
+  end;
+end;
+
+function TCmapTable.TryGetReadSubtable(const Offset: Int64; const Format: Integer; out Subtable: TCmapSubtable): Boolean;
+begin
+  Result := FReadSubtables.TryGetValue((Offset shl 8) or Format, Subtable);
+end;
+
+procedure TCmapTable.RegisterReadSubtable(const Offset: Int64; const Format: Integer; const Subtable: TCmapSubtable);
+begin
+  FReadSubtables.TryAdd((Offset shl 8) or Format, Subtable);
 end;
 
 function TCmapTable.TryGetSubtable(const PlatformId, EncodingId: Integer; out Subtable: TCmapSubtable): Boolean;

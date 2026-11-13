@@ -239,6 +239,7 @@ begin
   end;
 
   SetAllNamesMissing(NumGlyphs);
+  var BadIndexCount := 0;
   for var GID := 0 to NumGlyphs - 1 do
   begin
     const Index = GID + 1 + Data.ReadSignedByte;
@@ -249,8 +250,17 @@ begin
     end
     else
     begin
-      Host.LogWarning(Format('incorrect glyph name index %d, valid numbers 0..%d', [Index, TWGL4Names.NumberOfMacGlyphs]));
+      Inc(BadIndexCount);
+      if BadIndexCount <= MaximumLoggedRecordProblems then
+      begin
+        Host.LogWarning(Format('incorrect glyph name index %d, valid numbers 0..%d', [Index, TWGL4Names.NumberOfMacGlyphs]));
+      end;
     end;
+  end;
+
+  if BadIndexCount > MaximumLoggedRecordProblems then
+  begin
+    Host.LogWarning(Format('%d glyph name indexes of the post table are incorrect', [BadIndexCount]));
   end;
 end;
 

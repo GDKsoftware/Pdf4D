@@ -158,7 +158,7 @@ function TVerticalMetricsTable.GetTopSideBearing(const GID: Integer): Integer;
 begin
   if GID < 0 then
   begin
-    raise EPdfParseException.CreateFmt('Invalid glyph id %d', [GID]);
+    raise EPdfParseException.CreateFmt(InvalidGlyphIdMessage, [GID]);
   end;
 
   if GID < FNumVMetrics then
@@ -182,7 +182,7 @@ function TVerticalMetricsTable.GetAdvanceHeight(const GID: Integer): Integer;
 begin
   if GID < 0 then
   begin
-    raise EPdfParseException.CreateFmt('Invalid glyph id %d', [GID]);
+    raise EPdfParseException.CreateFmt(InvalidGlyphIdMessage, [GID]);
   end;
 
   const MetricCount = System.Length(FAdvanceHeight);

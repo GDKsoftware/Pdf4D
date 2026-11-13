@@ -9,15 +9,37 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
   DUnitX.TestFramework,
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Font;
 
 type
+  // Reads a parsed font the way a shared system font is read and keeps the signature of what it saw
+  TFontReaderThread = class(TThread)
+  private
+    FFont: TTrueTypeFont;
+    FRounds: Integer;
+    FSignature: string;
+    FFailure: string;
+
+  protected
+    procedure Execute; override;
+
+  public
+    constructor Create(const Font: TTrueTypeFont; const Rounds: Integer);
+
+    class function SignatureOf(const Font: TTrueTypeFont): string; static;
+
+    property Signature: string read FSignature;
+    property Failure: string read FFailure;
+  end;
+
   [TestFixture]
   TTrueTypeParserTests = class
   private
     const LiberationSans = 'LiberationSans-Regular.ttf';
+    const JosefinSans = 'JosefinSans-Italic.ttf';
     const MaximumHostileParseMilliseconds = 1000;
 
   private
@@ -27,6 +49,7 @@ type
     class function DirectoryEntry(const Data: TBytes; const Tag: string): Integer; static;
     class function TableOffset(const Data: TBytes; const Tag: string): Integer; static;
     class function MemoryStream(const Bytes: array of Byte): TTTFMemoryDataStream; static;
+    class procedure CheckBoxAndMatrix(const FileName: string; const LowerLeftX, LowerLeftY, UpperRightX, UpperRightY, Scale: Single); static;
 
     function ParseFailure(const Data: TBytes): string;
     procedure CheckParseOutcomeIsBounded(const Data: TBytes);
@@ -34,6 +57,9 @@ type
   public
     [Test]
     procedure TestLiberationSansHeader;
+
+    [Test]
+    procedure TestSharedFontGivesTheSameResultsInSeveralThreads;
 
     [Test]
     [TestCase('LiberationSans', 'LiberationSans-Regular.ttf')]
@@ -118,7 +144,6 @@ type
 implementation
 
 uses
-  System.Classes,
   System.Diagnostics,
   System.Generics.Collections,
   Pdf4D.Common.Defines,
@@ -134,7 +159,82 @@ const
   EntryLengthField = 12;
   NumberOfTablesField = 4;
 
+{ TFontReaderThread }
+
+constructor TFontReaderThread.Create(const Font: TTrueTypeFont; const Rounds: Integer);
+begin
+  FFont := Font;
+  FRounds := Rounds;
+  inherited Create(False);
+end;
+
+class function TFontReaderThread.SignatureOf(const Font: TTrueTypeFont): string;
+begin
+  Result := '';
+  for var Name in ['A', 'B', 'space', 'uni0041', 'g12', 'nosuchglyph'] do
+  begin
+    Result := Result + Format('%s=%d/%f;', [Name, Font.NameToGID(Name), Font.GetWidth(Name)]);
+  end;
+
+  for var Tag in ['head', 'hmtx', 'cmap'] do
+  begin
+    const Bytes = Font.GetTableBytes(Tag);
+    var Sum: Int64 := 0;
+    for var Value in Bytes do
+    begin
+      Inc(Sum, Value);
+    end;
+    Result := Result + Format('%s:%d:%d;', [Tag, Length(Bytes), Sum]);
+  end;
+end;
+
+procedure TFontReaderThread.Execute;
+begin
+  try
+    for var Round := 1 to FRounds do
+    begin
+      FSignature := SignatureOf(FFont);
+    end;
+  except
+    on Failure: Exception do
+    begin
+      FFailure := Failure.ClassName + ': ' + Failure.Message;
+    end;
+  end;
+end;
+
 { TTrueTypeParserTests }
+
+procedure TTrueTypeParserTests.TestSharedFontGivesTheSameResultsInSeveralThreads;
+begin
+  const ThreadTotal = 8;
+  const Parser = TTTFParser.Create;
+  try
+    const Font = Parser.Parse(TTestFonts.Bytes(LiberationSans));
+    try
+      const Expected = TFontReaderThread.SignatureOf(Font);
+
+      var Threads: TArray<TFontReaderThread>;
+      SetLength(Threads, ThreadTotal);
+      for var Index := 0 to ThreadTotal - 1 do
+      begin
+        Threads[Index] := TFontReaderThread.Create(Font, 50);
+      end;
+
+      for var Thread in Threads do
+      begin
+        Thread.WaitFor;
+        Assert.AreEqual('', Thread.Failure);
+        Assert.AreEqual(Expected, Thread.Signature);
+        Thread.Free;
+      end;
+    finally
+      Font.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
+end;
 
 class function TTrueTypeParserTests.Unsigned16(const Data: TBytes; const Position: Integer): Integer;
 begin
@@ -449,7 +549,7 @@ begin
       Assert.AreEqual<Integer>(2048, Font.Header.UnitsPerEm);
       Assert.IsTrue(OS2Windows.TypoAscender > 0);
       Assert.IsTrue(OS2Windows.TypoDescender < 0);
-      Assert.IsTrue(OS2Windows.Version >= 0);
+      Assert.IsTrue(OS2Windows.Version <= 5, 'OS/2 versions go up to 5');
     finally
       Font.Free;
     end;
@@ -458,22 +558,32 @@ begin
   end;
 end;
 
+// The expected values are the float results of PDFBox 3.0.8 (TrueTypeFont.getFontBBox and getFontMatrix)
 procedure TTrueTypeParserTests.TestFontBBoxAndMatrixScaleToThousand;
+begin
+  CheckBoxAndMatrix(LiberationSans, -543.9453, -303.22266, 1301.7578, 979.98047, 4.8828125E-4);
+  CheckBoxAndMatrix(JosefinSans, -99.0, -310.0, 1441.0, 1187.0, 0.001);
+end;
+
+class procedure TTrueTypeParserTests.CheckBoxAndMatrix(const FileName: string; const LowerLeftX, LowerLeftY, UpperRightX, UpperRightY,
+                                                       Scale: Single);
 begin
   const Parser = TTTFParser.Create;
   try
-    const Font = Parser.Parse(TTestFonts.Bytes(LiberationSans));
+    const Font = Parser.Parse(TTestFonts.Bytes(FileName));
     try
-      const Header = Font.Header;
-      const Scale: Single = 1000.0 / 2048;
       const Box = Font.FontBBox;
-      Assert.AreEqual<Single>(Header.XMin * Scale, Box.LowerLeftX);
-      Assert.AreEqual<Single>(Header.YMax * Scale, Box.UpperRightY);
+      Assert.AreEqual<Single>(LowerLeftX, Box.LowerLeftX);
+      Assert.AreEqual<Single>(LowerLeftY, Box.LowerLeftY);
+      Assert.AreEqual<Single>(UpperRightX, Box.UpperRightX);
+      Assert.AreEqual<Single>(UpperRightY, Box.UpperRightY);
 
       const Matrix = Font.FontMatrix;
       Assert.AreEqual<Integer>(6, Length(Matrix));
-      Assert.AreEqual<Single>(0.001 * Scale, Matrix[0]);
+      Assert.AreEqual<Single>(Scale, Matrix[0]);
       Assert.AreEqual<Single>(0, Matrix[1]);
+      Assert.AreEqual<Single>(0, Matrix[2]);
+      Assert.AreEqual<Single>(Scale, Matrix[3]);
     finally
       Font.Free;
     end;

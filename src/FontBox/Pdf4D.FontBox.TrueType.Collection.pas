@@ -44,6 +44,7 @@ type
 implementation
 
 uses
+  System.Generics.Collections,
   Pdf4D.Common.Defines,
   Pdf4D.FontBox.OpenType,
   Pdf4D.FontBox.TrueType.DataStream,
@@ -145,15 +146,26 @@ end;
 
 function TTrueTypeCollection.TryGetFontByName(const Name: string; out Font: TTrueTypeFont): Boolean;
 begin
-  for var Index := 0 to Count - 1 do
-  begin
-    const Candidate = FontAt(Index);
-    if Candidate.Name = Name then
+  // Offsets that repeat point at a font that was already looked at, so a hostile collection cannot make the parser repeat the work
+  const SeenOffsets = TDictionary<Int64, Boolean>.Create;
+  try
+    for var Index := 0 to Count - 1 do
     begin
-      Font := Candidate;
-      Exit(True);
+      if not SeenOffsets.TryAdd(FFontOffsets[Index], True) then
+      begin
+        Continue;
+      end;
+
+      const Candidate = FontAt(Index);
+      if Candidate.Name = Name then
+      begin
+        Font := Candidate;
+        Exit(True);
+      end;
+      Candidate.Free;
     end;
-    Candidate.Free;
+  finally
+    SeenOffsets.Free;
   end;
 
   Font := nil;

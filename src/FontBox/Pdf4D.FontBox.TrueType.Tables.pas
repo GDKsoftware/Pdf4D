@@ -26,6 +26,11 @@ type
 
   // A table that is not parsed (yet) has no fields of its own; its bytes stay available through the font
   TTTFTable = class
+  public
+    const InvalidGlyphIdMessage = 'Invalid glyph id %d';
+    // Table readers log the first problems of a record list and then one count
+    const MaximumLoggedRecordProblems = 3;
+
   private
     FTag: string;
     FCheckSum: Int64;
@@ -578,7 +583,7 @@ function THorizontalMetricsTable.GetAdvanceWidth(const GID: Integer): Integer;
 begin
   if GID < 0 then
   begin
-    raise EPdfParseException.CreateFmt('Invalid glyph id %d', [GID]);
+    raise EPdfParseException.CreateFmt(InvalidGlyphIdMessage, [GID]);
   end;
 
   const AdvanceCount = System.Length(FAdvanceWidth);
@@ -601,7 +606,7 @@ function THorizontalMetricsTable.GetLeftSideBearing(const GID: Integer): Integer
 begin
   if GID < 0 then
   begin
-    raise EPdfParseException.CreateFmt('Invalid glyph id %d', [GID]);
+    raise EPdfParseException.CreateFmt(InvalidGlyphIdMessage, [GID]);
   end;
 
   if System.Length(FLeftSideBearing) = 0 then
@@ -732,6 +737,7 @@ begin
   const StorageStart = Offset + HeaderSize + (Int64(FNameRecords.Count) * RecordSize);
   const TableEnd = Offset + Length;
   var TotalStringBytes: Int64 := 0;
+  var SkippedCount := 0;
   for var Index := 0 to FNameRecords.Count - 1 do
   begin
     var NameRecord := FNameRecords[Index];
@@ -741,7 +747,11 @@ begin
     const IsInsideBudget = (TotalStringBytes + NameRecord.StringLength <= MaximumTotalStringBytes);
     if not (IsInsideTable and IsInsideBudget) then
     begin
-      Host.LogWarning(Format('Skip name record %d of the name table: its string does not fit', [Index]));
+      Inc(SkippedCount);
+      if SkippedCount <= MaximumLoggedRecordProblems then
+      begin
+        Host.LogWarning(Format('Skip name record %d of the name table: its string does not fit', [Index]));
+      end;
       Continue;
     end;
 
@@ -750,6 +760,11 @@ begin
     NameRecord.HasValue := True;
     FNameRecords[Index] := NameRecord;
     Inc(TotalStringBytes, NameRecord.StringLength);
+  end;
+
+  if SkippedCount > MaximumLoggedRecordProblems then
+  begin
+    Host.LogWarning(Format('%d name records of the name table were skipped', [SkippedCount]));
   end;
 end;
 

@@ -59,6 +59,12 @@ type
 
     [Test]
     procedure TestFontIndexOutOfRangeRaises;
+
+    [Test]
+    procedure TestOpenTypeFontInACollectionUsesTheOpenTypeParser;
+
+    [Test]
+    procedure TestRepeatedOffsetsAreLookedAtOnce;
   end;
 
 implementation
@@ -67,6 +73,7 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.FontBox.TrueType.Collection,
   Pdf4D.FontBox.TrueType.Font,
+  Pdf4D.FontBox.OpenType,
   Pdf4D.Tests.TestFonts,
   Pdf4D.Tests.TrueTypeBuilder;
 
@@ -290,6 +297,40 @@ begin
         Collection.FontAt(-1).Free;
       end,
       EPdfParseException);
+  finally
+    Collection.Free;
+  end;
+end;
+
+procedure TTrueTypeCollectionTests.TestOpenTypeFontInACollectionUsesTheOpenTypeParser;
+begin
+  const Collection = TTrueTypeCollection.Create(TTrueTypeTestData.BuildCollection([TTestFonts.Bytes('FoglihtenNo07.otf')]));
+  try
+    const Font = Collection.FontAt(0);
+    try
+      Assert.IsTrue(Font is TOpenTypeFont, 'An OTTO font of a collection is read by the OpenType parser');
+      Assert.IsTrue(Font.HasTable('CFF '));
+    finally
+      Font.Free;
+    end;
+  finally
+    Collection.Free;
+  end;
+end;
+
+procedure TTrueTypeCollectionTests.TestRepeatedOffsetsAreLookedAtOnce;
+begin
+  const Data = CollectionOf(LiberationSans, LiberationSans);
+  // The second offset becomes the first one
+  Move(Data[12], Data[16], 4);
+
+  const Collection = TTrueTypeCollection.Create(Data);
+  try
+    var Font: TTrueTypeFont;
+    Assert.IsFalse(Collection.TryGetFontByName('NoSuchFont', Font));
+    Assert.IsNull(Font);
+    Assert.IsTrue(Collection.TryGetFontByName('LiberationSans', Font));
+    Font.Free;
   finally
     Collection.Free;
   end;

@@ -18,8 +18,10 @@ type
   TTTFStringEncoding = (Latin1, Utf16BE);
   {$SCOPEDENUMS OFF}
 
-  // Font data is big-endian. Every read past the end of the data raises EPdfParseException, and a read never allocates more
-  // than the data still holds.
+  // Font data is big-endian. A typed read past the end of the data raises EPdfParseException (Read and ReadInto return -1, as in
+  // PDFBox), and a read never allocates more than the data still holds.
+  // A stream has one read position, so it is not thread-safe while it is read through Seek and the Read methods. ReadRange and
+  // OriginalData of the memory stream only read the immutable data and may be called from several threads.
   TTTFDataStream = class abstract
   private
     function Remaining: Int64;
@@ -34,6 +36,8 @@ type
     function CurrentPosition: Int64; virtual; abstract;
     function OriginalDataSize: Int64; virtual; abstract;
     function OriginalData: TBytes; virtual; abstract;
+    // A copy of the bytes from Offset on. Does not change the read position of a memory stream.
+    function ReadRange(const Offset: Int64; const Count: Integer): TBytes; virtual; abstract;
 
     function ReadBytes(const Count: Integer): TBytes;
     function ReadUnsignedByte: Integer;
@@ -63,9 +67,11 @@ type
     function CurrentPosition: Int64; override;
     function OriginalDataSize: Int64; override;
     function OriginalData: TBytes; override;
+    function ReadRange(const Offset: Int64; const Count: Integer): TBytes; override;
   end;
 
   // Reads from a source without copying it. The source belongs to the caller and has to outlive the stream.
+  // The source has one position that ReadRange and OriginalData move and restore, so a font on this stream is single-threaded.
   TTTFRandomAccessDataStream = class(TTTFDataStream)
   private
     FSource: TRandomAccessRead;
@@ -80,6 +86,7 @@ type
     function CurrentPosition: Int64; override;
     function OriginalDataSize: Int64; override;
     function OriginalData: TBytes; override;
+    function ReadRange(const Offset: Int64; const Count: Integer): TBytes; override;
   end;
 
 implementation
@@ -301,6 +308,17 @@ begin
   Result := FData;
 end;
 
+function TTTFMemoryDataStream.ReadRange(const Offset: Int64; const Count: Integer): TBytes;
+begin
+  const IsOutside = ((Offset < 0) or (Count < 0) or (Offset > System.Length(FData)) or (Count > System.Length(FData) - Offset));
+  if IsOutside then
+  begin
+    raise EPdfParseException.CreateFmt('Unexpected end of TrueType data: %d bytes requested at offset %d of %d', [Count, Offset, System.Length(FData)]);
+  end;
+
+  Result := Copy(FData, Integer(Offset), Count);
+end;
+
 { TTTFRandomAccessDataStream }
 
 constructor TTTFRandomAccessDataStream.Create(const Source: TRandomAccessRead);
@@ -333,6 +351,17 @@ end;
 function TTTFRandomAccessDataStream.OriginalDataSize: Int64;
 begin
   Result := FSize;
+end;
+
+function TTTFRandomAccessDataStream.ReadRange(const Offset: Int64; const Count: Integer): TBytes;
+begin
+  const SavedPosition = FSource.GetPosition;
+  try
+    Seek(Offset);
+    Result := ReadBytes(Count);
+  finally
+    FSource.Seek(SavedPosition);
+  end;
 end;
 
 function TTTFRandomAccessDataStream.OriginalData: TBytes;

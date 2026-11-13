@@ -19,13 +19,15 @@ uses
 
 type
   // Tables are read when they are first asked for, as in PDFBox. That makes the font a single-threaded object until
-  // ReadAllTables has run: after it nothing changes any more (the tables, the cached counts and the glyph name lookup are all
-  // filled) and the font can be shared. The parser calls it before it hands out a font.
+  // ReadAllTables has run: after it the tables, the cached counts and the glyph name lookup are all filled, AddTable and Version
+  // refuse changes, and a font on a memory stream can be shared between threads (its table bytes are copied from immutable data).
+  // A font on a random-access stream stays single-threaded, because that stream has one position. The parser calls ReadAllTables
+  // before it hands out a font.
   // The font owns its tables and its data stream.
   TTrueTypeFont = class(TTTFTableHost)
   private
     const DefaultAdvanceWidth = 250;
-    const FontUnitsPerThousand = 1000.0;
+    const NotParseTimeMessage = 'The font is read-only after its tables have been read';
     const UnicodeNameLength = 7;
 
   private
@@ -35,6 +37,7 @@ type
     FNumberOfGlyphs: Integer;
     FUnitsPerEm: Integer;
     FPostScriptNames: TDictionary<string, Integer>;
+    FIsReadOnly: Boolean;
 
     class function TryParseUnicodeName(const Name: string; out CodePoint: Integer): Boolean; static;
     class function TryParseHexNumber(const Text: string; out Value: Integer): Boolean; static;
@@ -55,6 +58,7 @@ type
     constructor Create(const Data: TTTFDataStream);
     destructor Destroy; override;
 
+    // Only while the font is parsed
     procedure AddTable(const Table: TTTFTable);
     function TableTags: TArray<string>;
     // Whether the font has the table; the table is not read
@@ -95,6 +99,7 @@ type
     function GetWidth(const GlyphName: string): Single; override;
     function HasGlyph(const GlyphName: string): Boolean; override;
 
+    // Set by the parser only
     property Version: Single read FVersion write SetVersion;
   end;
 
@@ -143,11 +148,19 @@ end;
 
 procedure TTrueTypeFont.SetVersion(const Value: Single);
 begin
+  if FIsReadOnly then
+  begin
+    raise EInvalidOpException.Create(NotParseTimeMessage);
+  end;
   FVersion := Value;
 end;
 
 procedure TTrueTypeFont.AddTable(const Table: TTTFTable);
 begin
+  if FIsReadOnly then
+  begin
+    raise EInvalidOpException.Create(NotParseTimeMessage);
+  end;
   FTables.AddOrSetValue(Table.Tag, Table);
 end;
 
@@ -184,13 +197,7 @@ begin
 
   GuardTableRange(Table);
 
-  const SavedPosition = FData.CurrentPosition;
-  try
-    FData.Seek(Table.Offset);
-    Result := FData.ReadBytes(Integer(Table.Length));
-  finally
-    FData.Seek(SavedPosition);
-  end;
+  Result := FData.ReadRange(Table.Offset, Integer(Table.Length));
 end;
 
 procedure TTrueTypeFont.ReadTable(const Table: TTTFTable);
@@ -240,6 +247,7 @@ begin
   NumberOfGlyphs;
   UnitsPerEm;
   ReadPostScriptNames;
+  FIsReadOnly := True;
 end;
 
 function TTrueTypeFont.RequiredTable(const Tag: string): TTTFTable;
@@ -433,7 +441,7 @@ begin
     Exit(1);
   end;
 
-  Result := FontUnitsPerThousand / Units;
+  Result := Single(1000) / Units;
 end;
 
 function TTrueTypeFont.FontBBox: TBoundingBox;
@@ -446,7 +454,7 @@ end;
 function TTrueTypeFont.FontMatrix: TArray<Single>;
 begin
   const Scale = BoxScale;
-  Result := [0.001 * Scale, 0, 0, 0.001 * Scale, 0, 0];
+  Result := [Single(0.001) * Scale, 0, 0, Single(0.001) * Scale, 0, 0];
 end;
 
 procedure TTrueTypeFont.ReadPostScriptNames;

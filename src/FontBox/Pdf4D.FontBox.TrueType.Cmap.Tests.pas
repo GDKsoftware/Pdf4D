@@ -65,6 +65,8 @@ type
     class procedure ReadCmapTable(const Host: TTestTableHost; const Bytes: TBytes); static;
     class function LoadCmap(const Host: TTestTableHost; const Bytes: TBytes): TCmapTable; static;
     class function ParseFailureWithCmap(const CmapBytes: TBytes): string; static;
+    class function RecordsOnOneSubtable(const Subtable: TBytes; const RecordTotal: Integer): TBytes; static;
+    class function CountSubtablesWithGlyph(const Cmap: TCmapTable; const GlyphId: Integer): Integer; static;
 
   public
     [Test]
@@ -165,6 +167,18 @@ type
     procedure TestManySubtablesOnTheSameDataStopAtTheWorkLimit;
 
     [Test]
+    procedure TestManyRecordsOnOneEmptyFormat13SubtableAllocateLittle;
+
+    [Test]
+    procedure TestManyRecordsOnOneFormat4SubtableAreChargedForTheLookup;
+
+    [Test]
+    procedure TestRecordsOnOneSubtableShareItsMappings;
+
+    [Test]
+    procedure TestBudgetThatRunsOutKeepsBothDirectionsConsistent;
+
+    [Test]
     procedure TestHostileFormat12InFontEndsInParseError;
 
     [Test]
@@ -175,6 +189,7 @@ implementation
 
 uses
   System.Diagnostics,
+  System.Classes,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Log,
   Pdf4D.FontBox.TrueType.DataStream,
@@ -1164,6 +1179,135 @@ begin
       Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'The table took too long');
     finally
       Writer.Free;
+    end;
+  finally
+    Host.Free;
+  end;
+end;
+
+class function TTrueTypeCmapTests.RecordsOnOneSubtable(const Subtable: TBytes; const RecordTotal: Integer): TBytes;
+begin
+  const Writer = TTestByteWriter.Create;
+  try
+    Writer.U16(0);
+    Writer.U16(RecordTotal);
+    const DataStart = 4 + (8 * RecordTotal);
+    for var Index := 1 to RecordTotal do
+    begin
+      Writer.U16(3);
+      Writer.U16(1);
+      Writer.U32(DataStart);
+    end;
+    Writer.Append(Subtable);
+    Result := Writer.ToBytes;
+  finally
+    Writer.Free;
+  end;
+end;
+
+class function TTrueTypeCmapTests.CountSubtablesWithGlyph(const Cmap: TCmapTable; const GlyphId: Integer): Integer;
+begin
+  Result := 0;
+  for var Subtable in Cmap.Subtables do
+  begin
+    if Length(Subtable.GetCharCodes(GlyphId)) > 0 then
+    begin
+      Inc(Result);
+    end;
+  end;
+end;
+
+// 65535 records on one format 13 subtable without groups: nothing is mapped, so nothing may be allocated per record
+procedure TTrueTypeCmapTests.TestManyRecordsOnOneEmptyFormat13SubtableAllocateLittle;
+begin
+  const MaximumGlyphs = 65535;
+  const MaximumRecords = 65535;
+  const Host = TTestTableHost.Create(MaximumGlyphs);
+  try
+    const Bytes = RecordsOnOneSubtable(Format12Or13(13, [], 0), MaximumRecords);
+
+    const Stopwatch = TStopwatch.StartNew;
+    const Cmap = LoadCmap(Host, Bytes);
+    Stopwatch.Stop;
+
+    CheckEqual(MaximumRecords, Cmap.Subtables.Count);
+    Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'The table took too long');
+    CheckEqual(0, CountSubtablesWithGlyph(Cmap, 0));
+  finally
+    Host.Free;
+  end;
+end;
+
+// One format 4 segment with delta 65535 gives a lookup of 65536 entries: the records share the budget for those
+procedure TTrueTypeCmapTests.TestManyRecordsOnOneFormat4SubtableAreChargedForTheLookup;
+begin
+  const MaximumGlyphs = 65535;
+  const MaximumRecords = 65535;
+  const LookupSize = 65536;
+  const Host = TTestTableHost.Create(MaximumGlyphs);
+  try
+    const Bytes = RecordsOnOneSubtable(Format4([Segment(0, 0, 65535, 0)], []), MaximumRecords);
+
+    const Stopwatch = TStopwatch.StartNew;
+    const Cmap = LoadCmap(Host, Bytes);
+    Stopwatch.Stop;
+
+    CheckEqual(MaximumRecords, Cmap.Subtables.Count);
+    Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'The table took too long');
+
+    const WithLookup = CountSubtablesWithGlyph(Cmap, 65535);
+    Assert.IsTrue(WithLookup >= 1, 'The first subtable is read');
+    Assert.IsTrue(WithLookup <= (TCmapTable.MaximumWork div LookupSize) + 1, Format('%d subtables kept a lookup', [WithLookup]));
+  finally
+    Host.Free;
+  end;
+end;
+
+procedure TTrueTypeCmapTests.TestRecordsOnOneSubtableShareItsMappings;
+begin
+  const Host = TTestTableHost.Create(GlyphCount);
+  try
+    const Bytes = RecordsOnOneSubtable(Format4([Segment($41, $42, DeltaFor($41, 3), 0)], []), 3);
+    const Cmap = LoadCmap(Host, Bytes);
+
+    CheckEqual(3, Cmap.Subtables.Count);
+    for var Subtable in Cmap.Subtables do
+    begin
+      CheckEqual(3, Subtable.GetGlyphId($41));
+      CheckEqual(4, Subtable.GetGlyphId($42));
+      CheckCodes([$41], Subtable.GetCharCodes(3));
+    end;
+  finally
+    Host.Free;
+  end;
+end;
+
+// A budget that runs out in a subtable must not leave codes without reverse lookup (or the other way round)
+procedure TTrueTypeCmapTests.TestBudgetThatRunsOutKeepsBothDirectionsConsistent;
+begin
+  const Host = TTestTableHost.Create(65535);
+  try
+    const GroupTotal = 2000;
+    var Groups: TArray<TCmapGroupSpec>;
+    SetLength(Groups, GroupTotal);
+    for var Index := 0 to GroupTotal - 1 do
+    begin
+      Groups[Index] := Group(0, $FFF, 1);
+    end;
+    const Cmap = LoadCmap(Host, BuildCmapTable([Spec(3, 10, Format12Or13(12, Groups, GroupTotal)),
+                                                Spec(3, 1, Format4([Segment(0, 0, 65535, 0)], []))]));
+
+    for var Subtable in Cmap.Subtables do
+    begin
+      for var Code := 0 to $FFF do
+      begin
+        const GlyphId = Subtable.GetGlyphId(Code);
+        if GlyphId > 0 then
+        begin
+          var FoundAt: Integer;
+          Assert.IsTrue(TArray.BinarySearch<Integer>(Subtable.GetCharCodes(GlyphId), Code, FoundAt), Format('Code %d has no reverse lookup', [Code]));
+        end;
+      end;
     end;
   finally
     Host.Free;
