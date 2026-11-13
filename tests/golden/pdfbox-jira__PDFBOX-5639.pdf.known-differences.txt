@@ -1,0 +1,8 @@
+object 2 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 3 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 4 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 6 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 19 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 21 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 22 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)
+object 28 0: # PDFBox decrypts a stream when it loads it and sets /Length to the decrypted size; Pdf4D decrypts when the data is read and keeps the /Length of the file (the data and its hash are equal)

@@ -40,6 +40,8 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - `ValueAsString` of a non terminal field and of a signature field is empty (PDFBox prints Java object text there).
 - No bidirectional text processing.
 - Images are not decoded.
+- Loading a document changes nothing in it. PDFBox adds `/Type /Outlines` to the outline root when it reads it, and sets `/Length` of an encrypted stream to the decrypted size when it decrypts the stream while loading. Pdf4D keeps both as they are in the file (it decrypts when the data is read). The golden comparison lists the affected objects in `tests/golden/*.known-differences.txt`.
+- Corrupt Flate data keeps every byte that was inflated before the error. `FlateFilterDecoderStream` of PDFBox loses the zeros at the end of the failing inflate call and, depending on the read size of its caller, what is left in its buffer (PDFBOX-3964, object 635).
 
 ## Unicode normalization (SASLprep)
 

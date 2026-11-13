@@ -63,12 +63,10 @@ uses
   Pdf4D.Model.Field in '..\src\Model\Pdf4D.Model.Field.pas',
   Pdf4D.Model.AcroForm in '..\src\Model\Pdf4D.Model.AcroForm.pas',
   Pdf4D.Model.Field.Tests in '..\src\Model\Pdf4D.Model.Field.Tests.pas',
-  Pdf4D.Model.Field.Golden.Tests in '..\src\Model\Pdf4D.Model.Field.Golden.Tests.pas',
   Pdf4D.Model.NameTree.Tests in '..\src\Model\Pdf4D.Model.NameTree.Tests.pas',
   Pdf4D.Model.PageLabels.Tests in '..\src\Model\Pdf4D.Model.PageLabels.Tests.pas',
   Pdf4D.Model.Outline.Tests in '..\src\Model\Pdf4D.Model.Outline.Tests.pas',
   Pdf4D.Model.EmbeddedFile.Tests in '..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas',
-  Pdf4D.Model.Navigation.Golden.Tests in '..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas',
   Pdf4D.Api.Document.Interfaces in '..\src\Api\Pdf4D.Api.Document.Interfaces.pas',
   Pdf4D.Api.Page.Interfaces in '..\src\Api\Pdf4D.Api.Page.Interfaces.pas',
   Pdf4D.Api.Outline.Interfaces in '..\src\Api\Pdf4D.Api.Outline.Interfaces.pas',
@@ -80,7 +78,11 @@ uses
   Pdf4D.Api.Field in '..\src\Api\Pdf4D.Api.Field.pas',
   Pdf4D.Api.Attachment in '..\src\Api\Pdf4D.Api.Attachment.pas',
   Pdf4D.Api.Document in '..\src\Api\Pdf4D.Api.Document.pas',
-  Pdf4D.Api.Document.Tests in '..\src\Api\Pdf4D.Api.Document.Tests.pas';
+  Pdf4D.Api.Document.Tests in '..\src\Api\Pdf4D.Api.Document.Tests.pas',
+  Pdf4D.Tests.Corpus in 'Support\Pdf4D.Tests.Corpus.pas',
+  Pdf4D.Tests.StructureDump in 'Support\Pdf4D.Tests.StructureDump.pas',
+  Pdf4D.Tests.Golden in 'Support\Pdf4D.Tests.Golden.pas',
+  Pdf4D.Tests.Golden.Tests in 'Acceptance\Pdf4D.Tests.Golden.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

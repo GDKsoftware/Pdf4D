@@ -74,6 +74,9 @@ type
     procedure TestStreamWithoutLengthUsesEndstream;
 
     [Test]
+    procedure TestStreamWithoutLengthDropsFinalLineBreakOfDataThatStartsWithHighByte;
+
+    [Test]
     procedure TestObjectFromObjectStream;
 
     [Test]
@@ -416,6 +419,20 @@ begin
 
   Assert.AreEqual('ABCDE', StreamText(4));
   Assert.AreEqual<Integer>(5, (Fetch(4) as TCosStream).GetInt(TCosNames.Length, -1));
+end;
+
+// Java reads the bytes as signed, so a byte of 0x80 or more is binary data and the line break before endstream is not part of it
+procedure TPdfParserTests.TestStreamWithoutLengthDropsFinalLineBreakOfDataThatStartsWithHighByte;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< >>'#10'stream'#10'x' + Char($9C) + 'ABCDEFGHIJKL'#13#10'endstream');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual<Integer>(14, (Fetch(4) as TCosStream).GetInt(TCosNames.Length, -1));
 end;
 
 procedure TPdfParserTests.TestObjectFromObjectStream;

@@ -34,6 +34,9 @@ type
     procedure TestNameTreeLookupThroughKids;
 
     [Test]
+    procedure TestLookupLoadsAllKidsLikePdfBox;
+
+    [Test]
     procedure TestNameTreeCycleTerminates;
 
     [Test]
@@ -101,7 +104,9 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Integer,
-  Pdf4D.Cos.Names;
+  Pdf4D.Cos.Names,
+  Pdf4D.Cos.ObjectKey,
+  Pdf4D.Cos.PdfObject;
 
 { TNameTreeTests }
 
@@ -149,6 +154,31 @@ begin
       Assert.IsFalse(Tree.TryGetValue('b', Value));
       Assert.IsFalse(Tree.TryGetValue('~', Value));
       Assert.IsFalse(Tree.TryGetValue('', Value));
+    finally
+      Tree.Free;
+    end;
+  finally
+    Builder.Free;
+  end;
+end;
+
+// PDFBox makes the nodes of all kids before it looks at their limits, so a lookup loads every kid, also those behind
+// the one that has the name. This decides which objects a document has loaded (and found by recovery) afterwards.
+procedure TNameTreeTests.TestLookupLoadsAllKidsLikePdfBox;
+begin
+  const Builder = TModelTestDocuments.NewBuilderWithPages(1, '/Names << /Dests 3 0 R >>');
+  try
+    Builder.AddObject(3, '<< /Kids [4 0 R 5 0 R] >>');
+    Builder.AddObject(4, '<< /Limits [(a) (m)] /Names [(a) 10 (k) 11] >>');
+    Builder.AddObject(5, '<< /Limits [(n) (z)] /Names [(p) 12 (z) 13] >>');
+    const Tree = NewTree(Builder);
+    try
+      const LastKid = FDocuments.Document.CosDocument.GetObjectFromPool(TCosObjectKey.Make(5, 0));
+      Assert.IsFalse(LastKid.IsLoaded);
+
+      var Value: TCosBase;
+      Assert.IsTrue(Tree.TryGetValue('k', Value));
+      Assert.IsTrue(LastKid.IsLoaded);
     finally
       Tree.Free;
     end;

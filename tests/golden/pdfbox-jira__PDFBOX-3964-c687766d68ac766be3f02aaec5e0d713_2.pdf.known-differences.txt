@@ -1,0 +1,1 @@
+object 635 0: # The Flate data of this stream is corrupt. Pdf4D keeps every byte inflated before the error (299751); PDFBox gives 299008 because FlateFilterDecoderStream drops the zeros at the end of the failing inflate call and loses what is left in its buffer when a read ends there, which depends on the read sizes of the input stream

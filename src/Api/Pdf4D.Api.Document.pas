@@ -14,7 +14,8 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Document,
   Pdf4D.Cos.Dictionary,
-  Pdf4D.Encryption.AccessPermission;
+  Pdf4D.Encryption.AccessPermission,
+  Pdf4D.Model.Document;
 
 type
   TPdfDocument = class(TInterfacedObject, IPdfDocument)
@@ -46,6 +47,10 @@ type
     function Fields: TArray<IPdfField>;
     function Attachments: TArray<IPdfAttachment>;
     function CosDocument: TCosDocument;
+
+    // The document of the model layer, for code that needs more than the interfaces give (the acceptance test that
+    // compares with PDFBox reads the same objects PDFBox reads). Like CosDocument, it is valid as long as this document is.
+    function ModelDocument: TPDDocument;
   end;
 
 implementation
@@ -56,7 +61,6 @@ uses
   Pdf4D.Api.OutlineItem,
   Pdf4D.Api.Page,
   Pdf4D.Model.AcroForm,
-  Pdf4D.Model.Document,
   Pdf4D.Model.Outline,
   Pdf4D.Model.DocumentInformation;
 
@@ -333,6 +337,11 @@ end;
 function TPdfDocument.CosDocument: TCosDocument;
 begin
   Result := FHandle.Document.CosDocument;
+end;
+
+function TPdfDocument.ModelDocument: TPDDocument;
+begin
+  Result := FHandle.Document;
 end;
 
 end.

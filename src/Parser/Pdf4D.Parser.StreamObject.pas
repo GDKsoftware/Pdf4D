@@ -61,6 +61,7 @@ const
   FirstControlByte = $09;
   LastControlByteOfText = $0A;
   FirstPrintableByte = $20;
+  LastByteOfAscii = $7F;
 
 { TStreamObjectReader }
 
@@ -171,7 +172,9 @@ begin
     for var Index := 1 to MaxLengthOfEndstreamFilterCheck do
     begin
       const Value = FSource.Read;
-      const IsBinary = ((Value < FirstControlByte) or ((Value > LastControlByteOfText) and (Value < FirstPrintableByte) and (Value <> ByteCarriageReturn)));
+      // Java reads a byte as signed, so a byte above 0x7F counts as a control character
+      const IsBinary = ((Value < FirstControlByte) or (Value > LastByteOfAscii) or
+                        ((Value > LastControlByteOfText) and (Value < FirstPrintableByte) and (Value <> ByteCarriageReturn)));
       if IsBinary then
       begin
         MustFilter := True;

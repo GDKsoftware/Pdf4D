@@ -134,12 +134,10 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Field.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.AcroForm.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Field.Tests.pas"/>
-        <DCCReference Include="..\src\Model\Pdf4D.Model.Field.Golden.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas"/>
-        <DCCReference Include="..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Page.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Outline.Interfaces.pas"/>
@@ -152,6 +150,10 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.Corpus.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.StructureDump.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.Golden.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -284,6 +284,13 @@ begin
       Exit(False);
     end;
 
+    // PDFBox makes the nodes of all kids first (getKids), which loads every kid object. That decides which objects of
+    // a damaged file are found by recovery, so it is done here too.
+    for var Index := 0 to Kids.Count - 1 do
+    begin
+      Kids.GetObject(Index);
+    end;
+
     var Kid: TCosDictionary;
     if not TryFindFirstMatchingKid(Kids, Name, Kid) then
     begin
