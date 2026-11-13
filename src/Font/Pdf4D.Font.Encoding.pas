@@ -12,6 +12,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.FontBox.Afm,
   Pdf4D.FontBox.Encoding;
 
 type
@@ -60,6 +61,8 @@ type
   public
     // The caller owns the new encoding
     class function FromFontBox(const Encoding: TFontBoxEncoding): TType1Encoding; static;
+    // The caller owns the new encoding. The codes and names are those of the character metrics of an AFM.
+    class function FromMetrics(const Metrics: TFontMetrics): TType1Encoding; static;
 
     function EncodingName: string; override;
   end;
@@ -232,6 +235,20 @@ begin
     for var Pair in Encoding.CodeToNameMap do
     begin
       Result.Add(Pair.Key, Pair.Value);
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TType1Encoding.FromMetrics(const Metrics: TFontMetrics): TType1Encoding;
+begin
+  Result := TType1Encoding.Create;
+  try
+    for var Metric in Metrics.CharMetrics do
+    begin
+      Result.Add(Metric.CharacterCode, Metric.Name);
     end;
   except
     Result.Free;

@@ -162,6 +162,13 @@
         <DCCReference Include="..\src\Common\Pdf4D.Common.Matrix.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Simple.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Factory.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.TextDocuments.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>

@@ -38,6 +38,7 @@ type
 
   private
     FDictionary: TCosDictionary;
+    FOwnsDictionary: Boolean;
     FContext: TPDDocumentContext;
     FStandard14AFM: TFontMetrics;
     FFontDescriptor: TPDFontDescriptor;
@@ -106,10 +107,13 @@ type
     constructor Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
     destructor Destroy; override;
 
+    // For a font that was made from a dictionary of its own (the default font): the font frees Dictionary with itself
+    procedure OwnDictionary;
+
     function TryGetFontDescriptor(out Descriptor: TPDFontDescriptor): Boolean;
     // The shared AFM when the font is one of the standard 14, otherwise False. The caller does not own it.
     function TryGetStandardAFM(out Metrics: TFontMetrics): Boolean;
-    function IsStandard14: Boolean;
+    function IsStandard14: Boolean; virtual;
 
     // Reads the next code at Position and moves Position behind it
     function ReadCode(const Data: TBytes; var Position: Integer): Integer; virtual; abstract;
@@ -188,6 +192,10 @@ begin
   FFontDescriptor.Free;
   FBuiltDescriptorDictionary.Free;
   FCodeToWidth.Free;
+  if FOwnsDictionary then
+  begin
+    FDictionary.Free;
+  end;
   inherited;
 end;
 
@@ -458,6 +466,11 @@ end;
 function TPDFont.GetSubType: string;
 begin
   Result := FDictionary.GetNameAsString(TCosNames.Subtype, '');
+end;
+
+procedure TPDFont.OwnDictionary;
+begin
+  FOwnsDictionary := True;
 end;
 
 function TPDFont.TryGetFontDescriptor(out Descriptor: TPDFontDescriptor): Boolean;
