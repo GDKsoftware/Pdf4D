@@ -16,6 +16,9 @@ uses
   Pdf4D.Cos.Resolver.Interfaces,
   Pdf4D.Parser.Base,
   Pdf4D.Parser.BruteForce,
+  Pdf4D.Encryption.Dictionary,
+  Pdf4D.Encryption.SecurityHandler,
+  Pdf4D.Encryption.StandardSecurityHandler,
   Pdf4D.Parser.Security.Interfaces,
   Pdf4D.Parser.StreamObject,
   Pdf4D.Parser.Xref,
@@ -39,6 +42,7 @@ type
     // Each level of the chain of loading objects (a /Length that refers to an object whose /Length refers to ...) takes
     // stack. A file does not need more than a few.
     const MaxResolveDepth = 100;
+    const PublicKeyFilterName = 'Adobe.PubSec';
 
   private
     FDocument: TCosDocument;
@@ -48,6 +52,7 @@ type
     FDecompressedObjects: TObjectDictionary<Int64, TObjectDictionary<TCosObjectKey, TCosBase>>;
     FBruteForceParser: TBruteForceParser;
     FSecurityHandler: ISecurityHandler;
+    FSecurityHandlerOwner: TSecurityHandler;
     FResolveDepth: Integer;
     FTrailerWasRebuilt: Boolean;
 
@@ -68,6 +73,8 @@ type
 
     function GetBruteForceParser: TBruteForceParser;
     function PrepareBruteForceDecryption: ISecurityHandler;
+    function CreateSecurityHandler(const Encryption: TPdfEncryption): TStandardSecurityHandler;
+    function GetDocumentIdBytes: TBytes;
     function TryParseXref(out Message: string): Boolean;
     procedure FinishXrefParsing(const Rebuilt: Boolean);
     procedure DiscardXrefParsing;
@@ -88,8 +95,9 @@ type
     // Port of retrieveTrailer: reads the xref chain, or rebuilds the trailer, and gives the trailer of the document
     function RetrieveTrailer: TCosDictionary;
 
-    // Port of prepareDecryption. Task 12 adds the encryption: nothing is decrypted until a security handler is set.
-    procedure PrepareDecryption; virtual;
+    // Port of prepareDecryption: reads /Encrypt from the trailer, checks the password of the load options and sets the security
+    // handler. Raises EPdfInvalidPasswordException for a wrong password.
+    procedure PrepareDecryption;
 
     // Port of checkPages. Raises when the page tree root is not a dictionary.
     procedure CheckPages(const Root: TCosDictionary);
@@ -129,6 +137,7 @@ uses
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Null,
   Pdf4D.Cos.PdfObject,
+  Pdf4D.Cos.PdfString,
   Pdf4D.IO.RandomAccessRead,
   Pdf4D.Parser.ObjectStream;
 
@@ -146,6 +155,8 @@ destructor TCosParser.Destroy;
 begin
   DiscardXrefParsing;
   FBruteForceParser.Free;
+  FSecurityHandler := nil;
+  FSecurityHandlerOwner.Free;
   FDecompressedObjects.Free;
   FStreamReader.Free;
   inherited;
@@ -561,9 +572,71 @@ end;
 
 { trailer }
 
+function TCosParser.GetDocumentIdBytes: TBytes;
+begin
+  // Some documents have no ID
+  var Ids: TCosArray;
+  if (not FDocument.Trailer.TryGetCosArray(TCosNames.ID, Ids)) or (Ids.Count < 1) then
+  begin
+    Exit(nil);
+  end;
+
+  const Id = Ids.GetObject(0);
+  if not (Id is TCosString) then
+  begin
+    raise EPdfParseException.Create('The first item of the document ID is not a string');
+  end;
+  Result := Copy(TCosString(Id).Bytes);
+end;
+
+function TCosParser.CreateSecurityHandler(const Encryption: TPdfEncryption): TStandardSecurityHandler;
+begin
+  var Filter: string;
+  const HasFilter = Encryption.TryGetFilter(Filter);
+  if HasFilter and (Filter = PublicKeyFilterName) then
+  begin
+    raise EPdfUnsupportedFeatureException.Create('Public key security is not supported');
+  end;
+  if (not HasFilter) or (Filter <> StandardSecurityFilterName) then
+  begin
+    raise EPdfUnsupportedFeatureException.CreateFmt('No security handler for filter %s', [Filter]);
+  end;
+
+  Result := TStandardSecurityHandler.Create(FDocument.Log);
+end;
+
 procedure TCosParser.PrepareDecryption;
 begin
-  // Nothing to prepare without encryption support
+  if Assigned(FDocument.Encryption) then
+  begin
+    Exit;
+  end;
+
+  var EncryptionDictionary: TCosDictionary;
+  if not FDocument.Trailer.TryGetCosDictionary(TCosNames.Encrypt, EncryptionDictionary) then
+  begin
+    Exit;
+  end;
+
+  const Encryption = TPdfEncryption.Create(EncryptionDictionary);
+  try
+    const Handler = CreateSecurityHandler(Encryption);
+    try
+      Handler.PrepareForDecryption(Encryption, GetDocumentIdBytes, FDocument.Options.Password);
+    except
+      Handler.Free;
+      raise;
+    end;
+
+    FSecurityHandlerOwner.Free;
+    FSecurityHandlerOwner := Handler;
+    FSecurityHandler := Handler;
+    FDocument.SetAccessPermission(Handler.CurrentAccessPermission.Clone);
+  except
+    Encryption.Free;
+    raise;
+  end;
+  FDocument.SetEncryption(Encryption);
 end;
 
 procedure TCosParser.DiscardXrefParsing;

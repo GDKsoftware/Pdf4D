@@ -13,6 +13,8 @@ uses
   Pdf4D.Cos.PdfObject,
   Pdf4D.Cos.ObjectKey,
   Pdf4D.Cos.Resolver.Interfaces,
+  Pdf4D.Encryption.AccessPermission,
+  Pdf4D.Encryption.Dictionary,
   Pdf4D.IO.RandomAccessRead;
 
 type
@@ -35,6 +37,8 @@ type
     FIsXRefStream: Boolean;
     FHasHybridXRef: Boolean;
     FHighestXRefObjectNumber: Int64;
+    FEncryption: TPdfEncryption;
+    FAccessPermission: TPdfAccessPermission;
 
   public
     constructor Create(const Source: TRandomAccessRead; const Options: TPdfLoadOptions);
@@ -48,6 +52,10 @@ type
     function GetObjectFromPool(const Key: TCosObjectKey): TCosObject;
 
     function ObjectKeys: TArray<TCosObjectKey>;
+
+    // Replace what the document owns. Passing the object that is there already changes nothing.
+    procedure SetEncryption(const Value: TPdfEncryption);
+    procedure SetAccessPermission(const Value: TPdfAccessPermission);
 
     property Source: TRandomAccessRead read FSource;
     property Resolver: ICosObjectResolver read FResolver;
@@ -64,6 +72,11 @@ type
     property XrefTable: TDictionary<TCosObjectKey, Int64> read FXrefTable;
     property Log: TPdfLog read FLog;
     property Options: TPdfLoadOptions read FOptions;
+    // The encryption dictionary of the trailer, nil for a document that is not encrypted. It looks into the dictionary, so
+    // it is freed before the objects.
+    property Encryption: TPdfEncryption read FEncryption;
+    // What the password that opened the document allows. All permissions for a document that is not encrypted.
+    property AccessPermission: TPdfAccessPermission read FAccessPermission;
   end;
 
 implementation
@@ -118,10 +131,13 @@ begin
   FTrailer := TCosDictionary.Create;
   FForwarder := TCosDocumentResolver.Create(Self);
   FVersion := 1.4;
+  FAccessPermission := TPdfAccessPermission.GetOwnerAccessPermission;
 end;
 
 destructor TCosDocument.Destroy;
 begin
+  FEncryption.Free;
+  FAccessPermission.Free;
   // The proxies hold interface references to the forwarder: they have to go first
   FPool.Free;
   FTrailer.Free;
@@ -143,6 +159,24 @@ begin
   if PreviousOwner <> Owner then
   begin
     PreviousOwner.Free;
+  end;
+end;
+
+procedure TCosDocument.SetEncryption(const Value: TPdfEncryption);
+begin
+  if FEncryption <> Value then
+  begin
+    FEncryption.Free;
+    FEncryption := Value;
+  end;
+end;
+
+procedure TCosDocument.SetAccessPermission(const Value: TPdfAccessPermission);
+begin
+  if FAccessPermission <> Value then
+  begin
+    FAccessPermission.Free;
+    FAccessPermission := Value;
   end;
 end;
 

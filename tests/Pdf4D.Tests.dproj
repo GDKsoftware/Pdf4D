@@ -48,7 +48,7 @@
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -108,6 +108,7 @@
         <DCCReference Include="..\src\Parser\Pdf4D.Parser.BruteForce.Tests.pas"/>
         <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.RC4.Tests.pas"/>
         <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.AES.Tests.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.StandardSecurityHandler.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
