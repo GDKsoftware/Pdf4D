@@ -7,6 +7,7 @@ uses
   System.SysUtils,
   Pdf4D.Common.Log,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.AcroForm,
   Pdf4D.Model.DestinationResolver,
   Pdf4D.Model.Outline,
   Pdf4D.Model.PageTree;
@@ -21,6 +22,7 @@ type
     FPages: TPDPageTree;
     FResolver: TPDDestinationResolver;
     FOutline: TPDDocumentOutline;
+    FAcroForm: TPDAcroForm;
 
     function GetPages: TPDPageTree;
     function GetDestinationResolver: TPDDestinationResolver;
@@ -36,7 +38,8 @@ type
     // Port of getDocumentOutline. The outline belongs to the catalog. False when /Outlines is no dictionary.
     function TryGetOutline(out Outline: TPDDocumentOutline): Boolean;
     function TryGetPageLabels(out PageLabels: TCosDictionary): Boolean;
-    function TryGetAcroForm(out AcroForm: TCosDictionary): Boolean;
+    // Port of getAcroForm(null), without fix ups. The form belongs to the catalog. False when /AcroForm is no dictionary.
+    function TryGetAcroForm(out AcroForm: TPDAcroForm): Boolean;
     function TryGetNames(out Names: TCosDictionary): Boolean;
     function TryGetDests(out Dests: TCosDictionary): Boolean;
     function TryGetMetadata(out Metadata: TCosStream): Boolean;
@@ -67,6 +70,7 @@ end;
 
 destructor TPDDocumentCatalog.Destroy;
 begin
+  FAcroForm.Free;
   FOutline.Free;
   FResolver.Free;
   FPages.Free;
@@ -119,9 +123,18 @@ begin
   Result := FRoot.TryGetCosDictionary(TCosNames.PageLabels, PageLabels);
 end;
 
-function TPDDocumentCatalog.TryGetAcroForm(out AcroForm: TCosDictionary): Boolean;
+function TPDDocumentCatalog.TryGetAcroForm(out AcroForm: TPDAcroForm): Boolean;
 begin
-  Result := FRoot.TryGetCosDictionary(TCosNames.AcroForm, AcroForm);
+  if not Assigned(FAcroForm) then
+  begin
+    var Dictionary: TCosDictionary;
+    if FRoot.TryGetCosDictionary(TCosNames.AcroForm, Dictionary) then
+    begin
+      FAcroForm := TPDAcroForm.Create(Dictionary, FLog);
+    end;
+  end;
+  AcroForm := FAcroForm;
+  Result := Assigned(FAcroForm);
 end;
 
 function TPDDocumentCatalog.TryGetNames(out Names: TCosDictionary): Boolean;

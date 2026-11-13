@@ -131,6 +131,10 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Field.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.AcroForm.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Field.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Field.Golden.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.Tests.pas"/>

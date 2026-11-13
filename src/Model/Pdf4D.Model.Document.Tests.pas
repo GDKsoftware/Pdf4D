@@ -58,6 +58,7 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.AcroForm,
   Pdf4D.Model.Document,
   Pdf4D.Model.Outline;
 
@@ -227,7 +228,8 @@ begin
     var Outline: TPDDocumentOutline;
     Assert.IsTrue(Catalog.TryGetOutline(Outline));
     Assert.IsTrue(Catalog.TryGetPageLabels(Dictionary));
-    Assert.IsTrue(Catalog.TryGetAcroForm(Dictionary));
+    var AcroForm: TPDAcroForm;
+    Assert.IsTrue(Catalog.TryGetAcroForm(AcroForm));
     Assert.IsTrue(Catalog.TryGetNames(Dictionary));
     Assert.IsTrue(Catalog.TryGetDests(Dictionary));
     Assert.IsTrue(Catalog.TryGetMetadata(Metadata));

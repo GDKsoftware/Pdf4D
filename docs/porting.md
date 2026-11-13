@@ -31,7 +31,8 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 ## Deliberate deviations
 
 - Names are returned as `string`, not as a separate name type.
-- `TPDField` carries a `Kind` instead of a subclass per field type.
+- `TPDField` carries a `Kind` instead of a subclass per field type (`PDTextField`, `PDCheckBox`, `PDNonTerminalField` and the others). The kind is decided once, as `PDFieldFactory.createField` does, and every kind-specific property (`ValueAsString`, `Values`, `ExportValues`, `OnValues`) gives the value of an empty one when it does not belong to the kind.
+- The field tree is walked without recursion and cut off at `MaxFieldDepth` (256) levels, which also bounds the `/Parent` chain that is followed for `/FT`; PDFBox recurses and has no such limit.
 - No bidirectional text processing.
 - Images are not decoded.
 
