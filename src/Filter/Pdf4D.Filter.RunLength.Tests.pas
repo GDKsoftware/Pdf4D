@@ -20,12 +20,16 @@ type
 
     [Test]
     procedure TestRunLengthLongRun;
+
+    [Test]
+    procedure TestRunLengthExpansionRaisesLimitExceeded;
   end;
 
 implementation
 
 uses
   System.SysUtils,
+  Pdf4D.Common.Defines,
   Pdf4D.Filter.Tests.Support;
 
 { TRunLengthFilterTests }
@@ -60,6 +64,27 @@ begin
   const Compressed: TBytes = [129, 7, 128];
 
   Assert.AreEqual<Integer>(128, Length(TFilterTestSupport.Decode('RL', Compressed)));
+end;
+
+procedure TRunLengthFilterTests.TestRunLengthExpansionRaisesLimitExceeded;
+begin
+  // Each pair of bytes gives a run of 128 bytes: 20 pairs give 2560 bytes
+  var Compressed: TBytes;
+  SetLength(Compressed, 41);
+  for var Pair := 0 to 19 do
+  begin
+    Compressed[Pair * 2] := 129;
+    Compressed[Pair * 2 + 1] := 7;
+  end;
+  Compressed[40] := 128;
+
+  Assert.WillRaise(
+    procedure
+    begin
+      TFilterTestSupport.Decode('RL', Compressed, nil, nil, 1000);
+    end,
+    EPdfLimitExceededException);
+  Assert.AreEqual<Integer>(2560, Length(TFilterTestSupport.Decode('RL', Compressed, nil, nil, 2560)));
 end;
 
 end.

@@ -10,6 +10,7 @@ uses
   System.Generics.Collections,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.Document,
+  Pdf4D.Cos.ObjectKey,
   Pdf4D.IO.RandomAccessRead,
   Pdf4D.Parser.Base,
   Pdf4D.Parser.XrefTrailerResolver;
@@ -17,6 +18,9 @@ uses
 type
   // Gives the offset of the xref table or stream that a brute force search finds for the offset that was expected, or -1
   TXrefOffsetSearch = reference to function(const ExpectedOffset: Int64): Int64;
+
+  // Gives the offsets of all objects that a brute force search of the file finds, or nil. Not owned by the caller.
+  TBruteForceOffsetsProvider = reference to function: TDictionary<TCosObjectKey, Int64>;
 
   // Reads the chain of xref tables, xref streams and trailers of a file into a TXrefTrailerResolver and copies the
   // result to the document
@@ -32,6 +36,8 @@ type
   private
     FResolver: TXrefTrailerResolver;
     FOnSearchXRef: TXrefOffsetSearch;
+    FOnGetBruteForceOffsets: TBruteForceOffsetsProvider;
+    FValidateOffsets: Boolean;
     FDocument: TCosDocument;
     FSource: TRandomAccessRead;
     FParser: TBaseParser;
@@ -65,6 +71,14 @@ type
     function ParseChainSection(const Prev: Int64): Int64;
     procedure CopyResultToDocument;
 
+    function ValidateXrefOffsets(const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+    function CollectCorrections(const XrefOffsets: TDictionary<TCosObjectKey, Int64>; const CorrectedKeys: TDictionary<TCosObjectKey, TCosObjectKey>; const ValidKeys: TDictionary<TCosObjectKey, Boolean>): Boolean;
+    procedure ApplyCorrections(const XrefOffsets: TDictionary<TCosObjectKey, Int64>; const CorrectedKeys: TDictionary<TCosObjectKey, TCosObjectKey>; const ValidKeys: TDictionary<TCosObjectKey, Boolean>);
+    procedure CheckXrefOffsets;
+    function FindObjectKey(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>; out FoundKey: TCosObjectKey): Boolean;
+    function SkipGarbageBeforeObject(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+    function IsNearbyObjectBefore(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+
   public
     // The resolver is not owned: the brute force recovery shares it. It collects the sections and keeps them until Reset.
     constructor Create(const Resolver: TXrefTrailerResolver);
@@ -82,6 +96,14 @@ type
     // Called with the offset where a table or stream was expected and not found, to find where it really is
     property OnSearchXRef: TXrefOffsetSearch read FOnSearchXRef write FOnSearchXRef;
 
+    // Called when the offsets of the xref table do not match the objects in the file, for the result of a brute force
+    // search that replaces the table
+    property OnGetBruteForceOffsets: TBruteForceOffsetsProvider read FOnGetBruteForceOffsets write FOnGetBruteForceOffsets;
+
+    // PDFBox checks every offset of the table against the file (checkXrefOffsets) when it is lenient, which it always
+    // is here. False skips that, to test the reading of the sections on its own.
+    property ValidateOffsets: Boolean read FValidateOffsets write FValidateOffsets;
+
     // The values of the document that PDFBox sets while parsing: the first xref position, whether the last one is an
     // xref stream, whether a /XRefStm was read and the highest object number of the xref table
     property StartXref: Int64 read FStartXref;
@@ -97,7 +119,6 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Names,
-  Pdf4D.Cos.ObjectKey,
   Pdf4D.Parser.StreamObject,
   Pdf4D.Parser.XrefStream;
 
@@ -111,6 +132,7 @@ const
   MinimumEntryFields = 3;
   SectionHeaderFields = 2;
   MaxJavaIntDigits = 10;
+  MinimumSearchOffset = 6;
 
 { TXrefParser }
 
@@ -118,6 +140,7 @@ constructor TXrefParser.Create(const Resolver: TXrefTrailerResolver);
 begin
   inherited Create;
   FResolver := Resolver;
+  FValidateOffsets := True;
 end;
 
 class function TXrefParser.LastIndexOf(const Pattern: string; const Buffer: TBytes; const EndOffset: Integer): Integer;
@@ -700,6 +723,8 @@ end;
 
 procedure TXrefParser.CopyResultToDocument;
 begin
+  FDocument.StartXref := FStartXref;
+  FDocument.HasHybridXRef := FHasHybridXRef;
   TXrefTrailerResolver.CopyEntries(FResolver.GetTrailer, FDocument.Trailer);
   FIsXRefStream := (FResolver.GetXrefType = TXrefType.Stream);
 
@@ -710,6 +735,203 @@ begin
     if Entry.Key.Number > FHighestXRefObjectNumber then
     begin
       FHighestXRefObjectNumber := Entry.Key.Number;
+    end;
+  end;
+  FDocument.IsXRefStream := FIsXRefStream;
+  FDocument.HighestXRefObjectNumber := FHighestXRefObjectNumber;
+end;
+
+function TXrefParser.IsNearbyObjectBefore(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+begin
+  var Current := FSource.GetPosition;
+  Dec(Current);
+  FSource.Seek(Current);
+  while TBaseParser.IsDigit(FSource.Peek) do
+  begin
+    Dec(Current);
+    FSource.Seek(Current);
+  end;
+
+  const NewObjectNumber = FParser.ReadObjectNumber;
+  const NewGenerationNumber = FParser.ReadGenerationNumber;
+  const NewKey = TCosObjectKey.Make(NewObjectNumber, NewGenerationNumber);
+  var ExistingOffset: Int64;
+  // The found object number belongs to another uncompressed object at the same or nearby offset: something has to be wrong
+  Result := (XrefOffsets.TryGetValue(NewKey, ExistingOffset) and (ExistingOffset > 0) and (Abs(Offset - ExistingOffset) < 10));
+  if Result then
+  begin
+    FDocument.Log.Debug('Found the object %s instead of %s at offset %d - ignoring', [NewKey.ToString, ObjectKey.ToString, Offset]);
+  end
+  else
+  begin
+    // Something seems to be wrong but it is hard to determine what exactly: simply continue
+    FSource.Seek(Offset);
+  end;
+end;
+
+// At least one white space has to be in front of the object number. False when another object is found there.
+function TXrefParser.SkipGarbageBeforeObject(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+begin
+  Result := True;
+  FSource.Seek(Offset - 1);
+  if FSource.GetPosition >= Offset then
+  begin
+    Exit;
+  end;
+
+  if not TBaseParser.IsDigit(FSource.Peek) then
+  begin
+    // Anything else but a digit may be some garbage of the previous object: just ignore it
+    FSource.Read;
+  end
+  else
+  begin
+    Result := not IsNearbyObjectBefore(ObjectKey, Offset, XrefOffsets);
+  end;
+end;
+
+// Port of findObjectKey: gives the key of the object that is at the offset, which differs from ObjectKey when the
+// generation or the number is not the one of the xref entry
+function TXrefParser.FindObjectKey(const ObjectKey: TCosObjectKey; const Offset: Int64; const XrefOffsets: TDictionary<TCosObjectKey, Int64>; out FoundKey: TCosObjectKey): Boolean;
+begin
+  FoundKey := ObjectKey;
+  Result := False;
+  // There cannot be any object at the very beginning of a PDF
+  if Offset < MinimumSearchOffset then
+  begin
+    Exit;
+  end;
+
+  try
+    FSource.Seek(Offset);
+    FParser.SkipWhiteSpaces;
+    if (FSource.GetPosition = Offset) and not SkipGarbageBeforeObject(ObjectKey, Offset, XrefOffsets) then
+    begin
+      Exit;
+    end;
+
+    const FoundObjectNumber = FParser.ReadObjectNumber;
+    var ExpectedKey := ObjectKey;
+    if ObjectKey.Number <> FoundObjectNumber then
+    begin
+      FDocument.Log.Warning('found wrong object number. expected [%d] found [%d]', [ObjectKey.Number, FoundObjectNumber]);
+      ExpectedKey := TCosObjectKey.Make(FoundObjectNumber, ObjectKey.Generation);
+    end;
+
+    const GenerationNumber = FParser.ReadGenerationNumber;
+    FParser.ReadExpectedString(ObjMarker);
+    if GenerationNumber = ExpectedKey.Generation then
+    begin
+      FoundKey := ExpectedKey;
+      Result := True;
+    end
+    else if GenerationNumber > ExpectedKey.Generation then
+    begin
+      FoundKey := TCosObjectKey.Make(ExpectedKey.Number, GenerationNumber);
+      Result := True;
+    end;
+  except
+    on EPdfParseException do
+    begin
+      // Obviously there is no valid object number
+      FDocument.Log.Debug('No valid object at given location %d - ignoring', [Offset]);
+    end;
+  end;
+end;
+
+// False as soon as one entry cannot be dereferenced: the table is not usable then
+function TXrefParser.CollectCorrections(const XrefOffsets: TDictionary<TCosObjectKey, Int64>; const CorrectedKeys: TDictionary<TCosObjectKey, TCosObjectKey>; const ValidKeys: TDictionary<TCosObjectKey, Boolean>): Boolean;
+begin
+  Result := True;
+  for var Entry in XrefOffsets.ToArray do
+  begin
+    // A negative offset stands for the number of an object stream: the entry is of type 2
+    if Entry.Value < 0 then
+    begin
+      Continue;
+    end;
+
+    var FoundKey: TCosObjectKey;
+    if not FindObjectKey(Entry.Key, Entry.Value, XrefOffsets, FoundKey) then
+    begin
+      FDocument.Log.Debug('Stop checking xref offsets as at least one (%s) couldn''t be dereferenced', [Entry.Key.ToString]);
+      Exit(False);
+    end;
+
+    if FoundKey <> Entry.Key then
+    begin
+      CorrectedKeys.AddOrSetValue(Entry.Key, FoundKey);
+    end
+    else
+    begin
+      ValidKeys.AddOrSetValue(Entry.Key, True);
+    end;
+  end;
+end;
+
+procedure TXrefParser.ApplyCorrections(const XrefOffsets: TDictionary<TCosObjectKey, Int64>; const CorrectedKeys: TDictionary<TCosObjectKey, TCosObjectKey>; const ValidKeys: TDictionary<TCosObjectKey, Boolean>);
+begin
+  const CorrectedPointers = TDictionary<TCosObjectKey, Int64>.Create(TCosObjectKeyComparer.Create);
+  try
+    for var Correction in CorrectedKeys do
+    begin
+      // Only replace entries if the original entry does not point to a valid object
+      if not ValidKeys.ContainsKey(Correction.Value) then
+      begin
+        CorrectedPointers.AddOrSetValue(Correction.Value, XrefOffsets[Correction.Key]);
+      end;
+    end;
+
+    // Remove the old invalid entries, as some might not be replaced
+    for var Correction in CorrectedKeys do
+    begin
+      XrefOffsets.Remove(Correction.Key);
+    end;
+
+    for var Pointer in CorrectedPointers do
+    begin
+      XrefOffsets.AddOrSetValue(Pointer.Key, Pointer.Value);
+    end;
+  finally
+    CorrectedPointers.Free;
+  end;
+end;
+
+function TXrefParser.ValidateXrefOffsets(const XrefOffsets: TDictionary<TCosObjectKey, Int64>): Boolean;
+begin
+  const CorrectedKeys = TDictionary<TCosObjectKey, TCosObjectKey>.Create(TCosObjectKeyComparer.Create);
+  const ValidKeys = TDictionary<TCosObjectKey, Boolean>.Create(TCosObjectKeyComparer.Create);
+  try
+    Result := CollectCorrections(XrefOffsets, CorrectedKeys, ValidKeys);
+    if Result then
+    begin
+      ApplyCorrections(XrefOffsets, CorrectedKeys, ValidKeys);
+    end;
+  finally
+    ValidKeys.Free;
+    CorrectedKeys.Free;
+  end;
+end;
+
+// Port of checkXrefOffsets: dereferences all objects of the table and fixes the offsets. A table that cannot be fixed
+// is replaced by the result of a brute force search, when there is one.
+procedure TXrefParser.CheckXrefOffsets;
+begin
+  const XrefOffsets = FResolver.GetXrefTable;
+  if ValidateXrefOffsets(XrefOffsets) or not Assigned(FOnGetBruteForceOffsets) then
+  begin
+    Exit;
+  end;
+
+  const SearchResult = FOnGetBruteForceOffsets();
+  if Assigned(SearchResult) and (SearchResult.Count > 0) then
+  begin
+    FDocument.Log.Debug('Replaced read xref table with the results of a brute force search');
+    const Found = SearchResult.ToArray;
+    XrefOffsets.Clear;
+    for var Entry in Found do
+    begin
+      XrefOffsets.AddOrSetValue(Entry.Key, Entry.Value);
     end;
   end;
 end;
@@ -739,6 +961,10 @@ begin
     ParseChain(StartXrefOffset);
 
     FResolver.SetStartxref(StartXrefOffset);
+    if FValidateOffsets then
+    begin
+      CheckXrefOffsets;
+    end;
     CopyResultToDocument;
     Result := Document.Trailer;
   finally

@@ -116,7 +116,9 @@ begin
       finally
         Limited.Free;
       end;
-      Result := Copy(Output.Bytes, 0, Output.Size);
+      // The buffer of the stream is taken over: a copy would double the peak memory
+      Result := Output.Bytes;
+      SetLength(Result, Output.Size);
     finally
       Output.Free;
       Input.Free;

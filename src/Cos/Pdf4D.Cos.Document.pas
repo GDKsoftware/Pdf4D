@@ -31,6 +31,10 @@ type
     FResolver: ICosObjectResolver;
     FResolverOwner: TObject;
     FVersion: Single;
+    FStartXref: Int64;
+    FIsXRefStream: Boolean;
+    FHasHybridXRef: Boolean;
+    FHighestXRefObjectNumber: Int64;
 
   public
     constructor Create(const Source: TRandomAccessRead; const Options: TPdfLoadOptions);
@@ -49,6 +53,13 @@ type
     property Resolver: ICosObjectResolver read FResolver;
     property Trailer: TCosDictionary read FTrailer;
     property Version: Single read FVersion write FVersion;
+    // What the xref parsing found, like the values that COSParser sets on COSDocument: the offset of the first xref
+    // section, whether the last one is an xref stream, whether a /XRefStm was read and the highest object number of
+    // the xref table
+    property StartXref: Int64 read FStartXref write FStartXref;
+    property IsXRefStream: Boolean read FIsXRefStream write FIsXRefStream;
+    property HasHybridXRef: Boolean read FHasHybridXRef write FHasHybridXRef;
+    property HighestXRefObjectNumber: Int64 read FHighestXRefObjectNumber write FHighestXRefObjectNumber;
     // The offset of an object, or -N for an object in the object stream N, like PDFBox
     property XrefTable: TDictionary<TCosObjectKey, Int64> read FXrefTable;
     property Log: TPdfLog read FLog;

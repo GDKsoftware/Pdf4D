@@ -215,6 +215,9 @@ begin
     Exit(False);
   end;
 
+  // Leading zeros carry no value, and TryStrToFloat misparses a digit string of a few hundred characters
+  IntegerDigits := IntegerDigits.TrimLeft(['0']);
+
   var ExponentText := '';
   var ExponentValue := 0;
   if (Index <= Last) and CharInSet(Text[Index], ['e', 'E']) then

@@ -101,6 +101,7 @@
         <DCCReference Include="..\src\Parser\Pdf4D.Parser.XrefTrailerResolver.Tests.pas"/>
         <DCCReference Include="..\src\Parser\Pdf4D.Parser.Xref.Tests.pas"/>
         <DCCReference Include="..\src\Parser\Pdf4D.Parser.ObjectStream.Tests.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Pdf.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

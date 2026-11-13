@@ -11,6 +11,7 @@ type
   [TestFixture]
   TPredictorTests = class
   private
+    function DecodeFlateWithPredictor(const Predicted: TBytes; const Columns: Integer; const Limit: Int64): TBytes;
     function Decode(const Predicted: TBytes; const Predictor, Colors, BitsPerComponent, Columns: Integer): string;
     function NewParameters(const Predictor, Colors, BitsPerComponent, Columns: Integer): TCosDictionary;
 
@@ -59,6 +60,12 @@ type
 
     [Test]
     procedure TestUnsupportedTiffDepthLeavesDataAsItIs;
+
+    [Test]
+    procedure TestPredictorOutputRaisesLimitExceeded;
+
+    [Test]
+    procedure TestPredictorRowLongerThanTheLimitRaises;
   end;
 
 implementation
@@ -67,6 +74,7 @@ uses
   System.Classes,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Integer,
+  Pdf4D.Cos.Name,
   Pdf4D.Filter.Predictor,
   Pdf4D.Filter.Tests.Support;
 
@@ -91,6 +99,18 @@ begin
     Output.Free;
     Input.Free;
     Parameters.Free;
+  end;
+end;
+
+function TPredictorTests.DecodeFlateWithPredictor(const Predicted: TBytes; const Columns: Integer; const Limit: Int64): TBytes;
+begin
+  const StreamDictionary = TCosDictionary.Create;
+  try
+    StreamDictionary.SetItem('Filter', TCosName.Create('FlateDecode'));
+    StreamDictionary.SetItem('DecodeParms', NewParameters(12, 1, 8, Columns));
+    Result := TFilterTestSupport.Decode('FlateDecode', TFilterTestSupport.Compress(Predicted), StreamDictionary, nil, Limit);
+  finally
+    StreamDictionary.Free;
   end;
 end;
 
@@ -216,6 +236,36 @@ end;
 procedure TPredictorTests.TestUnsupportedTiffDepthLeavesDataAsItIs;
 begin
   Assert.AreEqual('01020304', Decode([1, 2, 3, 4], 2, 1, 3, 3));
+end;
+
+procedure TPredictorTests.TestPredictorOutputRaisesLimitExceeded;
+begin
+  // 1000 rows of a filter byte and 4 data bytes give 4000 bytes
+  var Predicted: TBytes;
+  SetLength(Predicted, 5000);
+  for var Row := 0 to 999 do
+  begin
+    Predicted[Row * 5] := 2;
+  end;
+
+  Assert.WillRaise(
+    procedure
+    begin
+      DecodeFlateWithPredictor(Predicted, 4, 100);
+    end,
+    EPdfLimitExceededException);
+  Assert.AreEqual<Integer>(4000, Length(DecodeFlateWithPredictor(Predicted, 4, 4000)));
+end;
+
+procedure TPredictorTests.TestPredictorRowLongerThanTheLimitRaises;
+begin
+  // The row would be allocated twice from /Columns before any data arrives
+  Assert.WillRaise(
+    procedure
+    begin
+      DecodeFlateWithPredictor([2, 1, 2, 3], 50 * 1024 * 1024, 1000);
+    end,
+    EPdfLimitExceededException);
 end;
 
 end.

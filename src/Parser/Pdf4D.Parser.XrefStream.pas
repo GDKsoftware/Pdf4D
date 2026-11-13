@@ -14,8 +14,14 @@ type
   TXrefStreamParser = class
   private
     const MaxTotalWidth = 20;
-    // Far above the 8388607 objects that a PDF can have in practice. Stops a stream of tiny entries from filling memory.
-    const MaxEntries = 16777216;
+
+  public
+    // The highest object number a PDF can address (seven digits of the xref table entry). Stops a stream of tiny
+    // entries from filling memory.
+    const MaxEntries = 8388607;
+    // PDFBox only uses /Size for the default /Index, so it tolerates a /Size that is too small. Here a stream may hold
+    // this many entries more than /Size says.
+    const SizeMargin = 65536;
 
   private
     FStream: TCosStream;
@@ -36,6 +42,7 @@ type
     function DecodeEntries: TBytes;
     function ParseValue(const Data: TBytes; const Start, Width: Integer): Int64;
     procedure ParseEntry(const Data: TBytes; const Offset: Integer; const Resolver: TXrefTrailerResolver);
+    function EntryLimitFor(const Size: Integer): Integer;
     procedure LogWarning(const Fmt: string; const Args: array of const);
 
   public
@@ -49,6 +56,7 @@ type
 implementation
 
 uses
+  System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Integer,
@@ -269,6 +277,15 @@ begin
   end;
 end;
 
+function TXrefStreamParser.EntryLimitFor(const Size: Integer): Integer;
+begin
+  Result := MaxEntries;
+  if Size > 0 then
+  begin
+    Result := Min(MaxEntries, Int64(Size) + SizeMargin);
+  end;
+end;
+
 procedure TXrefStreamParser.Parse(const Resolver: TXrefTrailerResolver);
 begin
   const EntryLength = FWidths[0] + FWidths[1] + FWidths[2];
@@ -279,13 +296,14 @@ begin
   end;
 
   const Data = DecodeEntries;
+  const EntryLimit = EntryLimitFor(FStream.GetInt(TCosNames.Size, 0));
   var Offset := 0;
   var EntryCount := 0;
   while HasNextObjectNumber and (Length(Data) - Offset >= EntryLength) do
   begin
-    if EntryCount >= MaxEntries then
+    if EntryCount >= EntryLimit then
     begin
-      LogWarning('Xref stream has more than %d entries, the rest is ignored', [MaxEntries]);
+      LogWarning('Xref stream has more than %d entries, the rest is ignored', [EntryLimit]);
       Exit;
     end;
 

@@ -34,6 +34,10 @@ type
     // Removes the last item and hands it to the caller, who owns it again, except of a TCosObject.
     function RemoveLast: TCosBase;
 
+    // Port of COSArray.remove(COSBase): removes the first item that is this instance and frees it unless it is a
+    // TCosObject. False when the array does not hold it.
+    function Remove(const Item: TCosBase): Boolean;
+
     function GetEnumerator: TList<TCosBase>.TEnumerator;
 
     // Port of COSArray.toFloatArray: an item that is not a number gives 0
@@ -112,6 +116,22 @@ begin
   Result := FItems[LastIndex];
   FItems.Delete(LastIndex);
   FOwned.Delete(LastIndex);
+end;
+
+function TCosArray.Remove(const Item: TCosBase): Boolean;
+begin
+  const Position = FItems.IndexOf(Item);
+  Result := (Position >= 0);
+  if Result then
+  begin
+    const IsOwned = FOwned[Position];
+    FItems.Delete(Position);
+    FOwned.Delete(Position);
+    if IsOwned then
+    begin
+      Item.Free;
+    end;
+  end;
 end;
 
 function TCosArray.GetEnumerator: TList<TCosBase>.TEnumerator;

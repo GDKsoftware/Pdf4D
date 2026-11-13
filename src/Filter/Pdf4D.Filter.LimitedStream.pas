@@ -23,6 +23,7 @@ type
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
 
     property Written: Int64 read FWritten;
+    property Limit: Int64 read FLimit;
   end;
 
 implementation

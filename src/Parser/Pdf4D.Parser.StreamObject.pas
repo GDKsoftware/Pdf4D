@@ -12,8 +12,8 @@ uses
   Pdf4D.Parser.Base;
 
 type
-  // The part of COSParser that the xref parsing needs: it reads the stream that follows a dictionary. The document
-  // parser absorbs this class.
+  // The stream part of COSParser (parseCOSStream): it reads the stream that follows a dictionary. TCosParser and the xref
+  // parsing both use it.
   TStreamObjectReader = class
   private
     const MaxLengthOfEndstreamFilterCheck = 10;

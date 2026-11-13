@@ -28,6 +28,7 @@ type
     FPredictorRead: Boolean;
     FUnsupportedLogged: Boolean;
 
+    procedure AllocateRows;
     procedure DecodeAndWriteRow;
     procedure FlipRows;
 
@@ -77,7 +78,8 @@ implementation
 uses
   System.Math,
   Pdf4D.Common.Defines,
-  Pdf4D.Cos.Names;
+  Pdf4D.Cos.Names,
+  Pdf4D.Filter.LimitedStream;
 
 { TPredictor }
 
@@ -318,10 +320,24 @@ begin
     raise EPdfParseException.CreateFmt('Unsupported predictor parameters: colors %d, bits per component %d, columns %d', [Colors, BitsPerComponent, Columns]);
   end;
 
+  // A row that is longer than the output may be is padded and written as a whole, so it can only exceed the limit
+  if (Target is TLimitedStream) and (RowLength > TLimitedStream(Target).Limit) then
+  begin
+    raise EPdfLimitExceededException.CreateFmt('A predictor row of %d bytes exceeds the limit of %d bytes', [RowLength, TLimitedStream(Target).Limit]);
+  end;
+
   FRowLength := Integer(RowLength);
   FPredictorPerRow := (Predictor >= 10);
-  SetLength(FCurrentRow, FRowLength);
-  SetLength(FLastRow, FRowLength);
+end;
+
+// The rows are allocated with the first data: the row length comes from /Columns and a stream without data costs nothing
+procedure TPredictorStream.AllocateRows;
+begin
+  if Length(FCurrentRow) = 0 then
+  begin
+    SetLength(FCurrentRow, FRowLength);
+    SetLength(FLastRow, FRowLength);
+  end;
 end;
 
 function TPredictorStream.Read(var Buffer; Count: Longint): Longint;
@@ -343,6 +359,10 @@ function TPredictorStream.Write(const Buffer; Count: Longint): Longint;
 begin
   const Bytes = PByte(@Buffer);
   var CurrentOffset := 0;
+  if Count > 0 then
+  begin
+    AllocateRows;
+  end;
   while CurrentOffset < Count do
   begin
     if FPredictorPerRow and (FCurrentRowData = 0) and not FPredictorRead then

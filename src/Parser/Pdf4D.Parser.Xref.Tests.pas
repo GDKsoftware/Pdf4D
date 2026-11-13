@@ -11,6 +11,7 @@ uses
   Pdf4D.Cos.Document,
   Pdf4D.IO.RandomAccessRead,
   Pdf4D.Parser.Xref,
+  Pdf4D.Parser.XrefStream,
   Pdf4D.Parser.XrefTrailerResolver,
   Pdf4D.Tests.PdfBuilder;
 
@@ -131,6 +132,18 @@ type
     procedure TestXrefStreamIndexThatOverflowsDoesNotWrap;
 
     [Test]
+    procedure TestOffsetThatIsWrongKeepsTheTableWithoutBruteForce;
+
+    [Test]
+    procedure TestOffsetThatIsWrongReplacesTheTableByTheBruteForceResult;
+
+    [Test]
+    procedure TestHigherGenerationInTheFileCorrectsTheKey;
+
+    [Test]
+    procedure TestXrefStreamEntriesAreCapped;
+
+    [Test]
     procedure TestXrefStreamWithTruncatedLastEntryIgnoresIt;
 
     [Test]
@@ -214,6 +227,8 @@ begin
   FDocument := TCosDocument.Create(TRandomAccessRead.FromBytes(Data), Options);
   FResolver := TXrefTrailerResolver.Create(FDocument.Log);
   FParser := TXrefParser.Create(FResolver);
+  // Most tests read sections whose entries point nowhere in particular
+  FParser.ValidateOffsets := False;
 end;
 
 function TXrefParserTests.ParseOpened: TCosDictionary;
@@ -690,6 +705,90 @@ begin
 
   Assert.AreEqual(3, XrefCount);
   Assert.AreEqual<Int64>(9, OffsetInTable(9223372036854775800));
+end;
+
+procedure TXrefParserTests.TestOffsetThatIsWrongKeepsTheTableWithoutBruteForce;
+begin
+  const Builder = ThreeObjectBuilder;
+  try
+    Builder.CorruptOffset(3, 5);
+    const Data = Builder.Build(TXrefStyle.Table);
+    OpenFile(Data);
+    FParser.ValidateOffsets := True;
+    ParseOpened;
+
+    Assert.AreEqual<Int64>(Builder.OffsetOf(3) + 5, OffsetInTable(3));
+    Assert.IsTrue(HasLogLine('Stop checking xref offsets'));
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TXrefParserTests.TestOffsetThatIsWrongReplacesTheTableByTheBruteForceResult;
+begin
+  const Builder = ThreeObjectBuilder;
+  const Found = TDictionary<TCosObjectKey, Int64>.Create(TCosObjectKeyComparer.Create);
+  try
+    Builder.CorruptOffset(3, 5);
+    const Data = Builder.Build(TXrefStyle.Table);
+    for var Number := 1 to 3 do
+    begin
+      Found.Add(TCosObjectKey.Make(Number, 0), Builder.OffsetOf(Number));
+    end;
+
+    OpenFile(Data);
+    FParser.ValidateOffsets := True;
+    FParser.OnGetBruteForceOffsets :=
+      function: TDictionary<TCosObjectKey, Int64>
+      begin
+        Result := Found;
+      end;
+    ParseOpened;
+
+    Assert.AreEqual<Int64>(Builder.OffsetOf(3), OffsetInTable(3));
+    Assert.IsTrue(HasLogLine('Replaced read xref table'));
+  finally
+    Found.Free;
+    Builder.Free;
+  end;
+end;
+
+procedure TXrefParserTests.TestHigherGenerationInTheFileCorrectsTheKey;
+begin
+  // The table says generation 0 for object 3, the file has generation 2 there
+  const Builder = ThreeObjectBuilder;
+  try
+    const Original = Builder.Build(TXrefStyle.Table);
+    var Text := TextOf(Original);
+    const Marker = '3 0 obj';
+    const Position = Text.IndexOf(Marker);
+    Assert.IsTrue(Position > 0);
+    Text := Text.Substring(0, Position) + '3 2 obj' + Text.Substring(Position + Marker.Length);
+
+    OpenFile(Ascii(Text));
+    FParser.ValidateOffsets := True;
+    ParseOpened;
+
+    Assert.AreEqual<Int64>(Builder.OffsetOf(3), OffsetInTable(3, 2));
+    Assert.IsFalse(FDocument.XrefTable.ContainsKey(TCosObjectKey.Make(3, 0)));
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TXrefParserTests.TestXrefStreamEntriesAreCapped;
+begin
+  Assert.AreEqual(8388607, TXrefStreamParser.MaxEntries);
+
+  // Entries of one byte, with an /Index that is far beyond what /Size says
+  var Entries: TBytes;
+  SetLength(Entries, 200000);
+  FillChar(Entries[0], Length(Entries), 9);
+
+  ParseFile(RawXrefStreamFile('/Size 10 /W [0 1 0] /Index [0 1000000]', Entries));
+
+  Assert.AreEqual(10 + TXrefStreamParser.SizeMargin, XrefCount);
+  Assert.IsTrue(HasLogLine('entries, the rest is ignored'));
 end;
 
 procedure TXrefParserTests.TestXrefStreamWithTruncatedLastEntryIgnoresIt;

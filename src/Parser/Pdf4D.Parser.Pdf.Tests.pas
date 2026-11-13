@@ -1,0 +1,512 @@
+unit Pdf4D.Parser.Pdf.Tests;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  System.Generics.Collections,
+  DUnitX.TestFramework,
+  Pdf4D.Common.Defines,
+  Pdf4D.Cos.Base,
+  Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.Document,
+  Pdf4D.Tests.PdfBuilder;
+
+type
+  [TestFixture]
+  TPdfParserTests = class
+  private
+    FDocument: TCosDocument;
+    FLogLines: TList<string>;
+
+    function Ascii(const Text: string): TBytes;
+    function MinimalBuilder: TTestPdfBuilder;
+    function MinimalFile: TBytes;
+    function Load(const Data: TBytes): TCosDocument;
+    procedure OpenFile(const Data: TBytes);
+    function Fetch(const Number: Integer): TCosBase;
+    function StreamText(const Number: Integer): string;
+    function HasLogLine(const Fragment: string): Boolean;
+    procedure AssertLoadRaises(const Data: TBytes);
+
+  public
+    [Setup]
+    procedure Setup;
+
+    [TearDown]
+    procedure TearDown;
+
+    [Test]
+    procedure TestLoadsMinimalDocument;
+
+    [Test]
+    procedure TestVersionFromHeader;
+
+    [Test]
+    procedure TestHeaderWithLeadingGarbage;
+
+    [Test]
+    procedure TestMissingCatalogTypeIsAdded;
+
+    [Test]
+    procedure TestObjectsAreLazy;
+
+    [Test]
+    procedure TestStreamLengthIndirect;
+
+    [Test]
+    procedure TestStreamLengthSelfReference;
+
+    [Test]
+    procedure TestStreamLengthBeyondEof;
+
+    [Test]
+    procedure TestStreamWithoutLengthUsesEndstream;
+
+    [Test]
+    procedure TestObjectFromObjectStream;
+
+    [Test]
+    procedure TestReferenceToMissingObjectIsNull;
+
+    [Test]
+    procedure TestChainOfLengthObjectsDoesNotOverflowTheStack;
+
+    [Test]
+    procedure TestPositionOfTheSourceIsKeptWhileLoading;
+
+    [Test]
+    procedure TestIncrementalUpdateIsLoaded;
+
+    [Test]
+    procedure TestXrefValuesAreSetOnTheDocument;
+
+    [Test]
+    procedure TestMissingStartxrefRaises;
+
+    [Test]
+    procedure TestMissingRootRaises;
+
+    [Test]
+    procedure TestFileWithoutHeaderRaises;
+
+    [Test]
+    procedure TestEmptyFileRaises;
+
+    [Test]
+    procedure TestOwnedSourceIsFreedOnFailure;
+
+    [Test]
+    procedure TestHostileBytesRaiseOnlyPdfExceptions;
+  end;
+
+implementation
+
+uses
+  Pdf4D.Cos.Integer,
+  Pdf4D.Cos.Names,
+  Pdf4D.Cos.ObjectKey,
+  Pdf4D.Cos.Null,
+  Pdf4D.Cos.PdfObject,
+  Pdf4D.Parser.Pdf;
+
+type
+  TFreedFlagStream = class(TBytesStream)
+  private
+    FFreed: PBoolean;
+
+  public
+    constructor Create(const Data: TBytes; const Freed: PBoolean);
+    destructor Destroy; override;
+  end;
+
+{ TFreedFlagStream }
+
+constructor TFreedFlagStream.Create(const Data: TBytes; const Freed: PBoolean);
+begin
+  inherited Create(Data);
+  FFreed := Freed;
+end;
+
+destructor TFreedFlagStream.Destroy;
+begin
+  FFreed^ := True;
+  inherited;
+end;
+
+{ TPdfParserTests }
+
+procedure TPdfParserTests.Setup;
+begin
+  FLogLines := TList<string>.Create;
+end;
+
+procedure TPdfParserTests.TearDown;
+begin
+  FreeAndNil(FDocument);
+  FLogLines.Free;
+end;
+
+function TPdfParserTests.Ascii(const Text: string): TBytes;
+begin
+  Result := TEncoding.ASCII.GetBytes(Text);
+end;
+
+function TPdfParserTests.MinimalBuilder: TTestPdfBuilder;
+begin
+  Result := TTestPdfBuilder.Create;
+  try
+    Result.AddObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    Result.AddObject(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    Result.AddObject(3, '<< /Type /Page /Parent 2 0 R >>');
+    Result.SetRoot(1);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function TPdfParserTests.MinimalFile: TBytes;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Result := Builder.Build(TXrefStyle.Table);
+  finally
+    Builder.Free;
+  end;
+end;
+
+function TPdfParserTests.Load(const Data: TBytes): TCosDocument;
+begin
+  var Options := TPdfLoadOptions.Default;
+  Options.OnLog :=
+    procedure(const Level: TPdfLogLevel; const Message: string)
+    begin
+      FLogLines.Add(Message);
+    end;
+  Result := TPdfParser.Parse(TBytesStream.Create(Data), True, Options);
+end;
+
+procedure TPdfParserTests.OpenFile(const Data: TBytes);
+begin
+  FreeAndNil(FDocument);
+  FDocument := Load(Data);
+end;
+
+function TPdfParserTests.Fetch(const Number: Integer): TCosBase;
+begin
+  Result := FDocument.GetObjectFromPool(TCosObjectKey.Make(Number, 0)).GetObject;
+end;
+
+function TPdfParserTests.StreamText(const Number: Integer): string;
+begin
+  const Stream = Fetch(Number) as TCosStream;
+  const Raw = Stream.CreateRawStream;
+  try
+    var Data: TBytes;
+    SetLength(Data, Raw.Size);
+    if Length(Data) > 0 then
+    begin
+      Raw.Position := 0;
+      Raw.ReadBuffer(Data[0], Length(Data));
+    end;
+    Result := TEncoding.ASCII.GetString(Data);
+  finally
+    Raw.Free;
+  end;
+end;
+
+function TPdfParserTests.HasLogLine(const Fragment: string): Boolean;
+begin
+  Result := False;
+  for var Line in FLogLines do
+  begin
+    if Line.Contains(Fragment) then
+    begin
+      Exit(True);
+    end;
+  end;
+end;
+
+procedure TPdfParserTests.AssertLoadRaises(const Data: TBytes);
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      Load(Data).Free;
+    end,
+    EPdfParseException);
+end;
+
+procedure TPdfParserTests.TestLoadsMinimalDocument;
+begin
+  OpenFile(MinimalFile);
+
+  var Root: TCosDictionary;
+  Assert.IsTrue(FDocument.Trailer.TryGetCosDictionary(TCosNames.Root, Root));
+  Assert.AreEqual(TCosNames.Catalog, Root.GetNameAsString(TCosNames.Type_, ''));
+end;
+
+procedure TPdfParserTests.TestVersionFromHeader;
+begin
+  var Data := MinimalFile;
+  Assert.AreEqual('%PDF-1.', TEncoding.ASCII.GetString(Data, 0, 7));
+  Data[7] := Ord('4');
+
+  OpenFile(Data);
+
+  Assert.AreEqual<Single>(1.4, FDocument.Version);
+end;
+
+procedure TPdfParserTests.TestHeaderWithLeadingGarbage;
+begin
+  // Garbage in front of the header, in the 15 bytes of the header of the builder so that the offsets stay right
+  var Data := MinimalFile;
+  const Header = Ascii('GAR%PDF-1.7'#10'%%'#10);
+  Assert.AreEqual<Integer>(15, Length(Header));
+  Move(Header[0], Data[0], Length(Header));
+
+  OpenFile(Data);
+
+  Assert.IsTrue(FDocument.Trailer.ContainsKey(TCosNames.Root));
+  Assert.AreEqual<Single>(1.7, FDocument.Version);
+end;
+
+procedure TPdfParserTests.TestMissingCatalogTypeIsAdded;
+begin
+  const Builder = TTestPdfBuilder.Create;
+  try
+    Builder.AddObject(1, '<< /Pages 2 0 R >>');
+    Builder.AddObject(2, '<< /Type /Pages /Kids [] /Count 0 >>');
+    Builder.SetRoot(1);
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  var Root: TCosDictionary;
+  Assert.IsTrue(FDocument.Trailer.TryGetCosDictionary(TCosNames.Root, Root));
+  Assert.AreEqual(TCosNames.Catalog, Root.GetNameAsString(TCosNames.Type_, ''));
+end;
+
+procedure TPdfParserTests.TestObjectsAreLazy;
+begin
+  OpenFile(MinimalFile);
+
+  const Page = FDocument.GetObjectFromPool(TCosObjectKey.Make(3, 0));
+  Assert.IsFalse(Page.IsLoaded);
+  Assert.IsTrue(Page.GetObject is TCosDictionary);
+  Assert.IsTrue(Page.IsLoaded);
+end;
+
+procedure TPdfParserTests.TestStreamLengthIndirect;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< /Length 9 0 R >>'#10'stream'#10'ABCDE'#10'endstream');
+    Builder.AddObject(9, '5');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual('ABCDE', StreamText(4));
+end;
+
+procedure TPdfParserTests.TestStreamLengthSelfReference;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< /Length 4 0 R >>'#10'stream'#10'ABCDE'#10'endstream');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual('ABCDE', StreamText(4));
+  Assert.IsTrue(HasLogLine('not found'));
+end;
+
+procedure TPdfParserTests.TestStreamLengthBeyondEof;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< /Length 999999 >>'#10'stream'#10'ABCDE'#10'endstream');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual('ABCDE', StreamText(4));
+  Assert.IsTrue(HasLogLine('out of range'));
+end;
+
+procedure TPdfParserTests.TestStreamWithoutLengthUsesEndstream;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< >>'#10'stream'#10'ABCDE'#10'endstream');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual('ABCDE', StreamText(4));
+  Assert.AreEqual<Integer>(5, (Fetch(4) as TCosStream).GetInt(TCosNames.Length, -1));
+end;
+
+procedure TPdfParserTests.TestObjectFromObjectStream;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddCompressedObject(5, '<< /Kind /Packed >>', 6);
+    Builder.AddCompressedObject(7, '42', 6);
+    OpenFile(Builder.Build(TXrefStyle.Stream));
+  finally
+    Builder.Free;
+  end;
+
+  const Entry = Fetch(5);
+  Assert.IsTrue(Entry is TCosDictionary);
+  Assert.AreEqual('Packed', TCosDictionary(Entry).GetNameAsString('Kind', ''));
+  Assert.AreEqual<Integer>(42, (Fetch(7) as TCosInteger).IntValue);
+end;
+
+procedure TPdfParserTests.TestReferenceToMissingObjectIsNull;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< /A 99 0 R >>');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  var Value: TCosBase;
+  Assert.IsFalse((Fetch(4) as TCosDictionary).TryGetDictionaryObject('A', Value));
+end;
+
+procedure TPdfParserTests.TestChainOfLengthObjectsDoesNotOverflowTheStack;
+begin
+  const Builder = MinimalBuilder;
+  try
+    // The length of object N is object N + 1, a thousand times
+    for var Number := 10 to 1010 do
+    begin
+      Builder.AddObject(Number, Format('<< /Length %d 0 R >>'#10'stream'#10'AB'#10'endstream', [Number + 1]));
+    end;
+    Builder.AddObject(1011, '2');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  // The objects of the chain are streams, which are no valid length: what matters is that the chain ends
+  Assert.IsNotNull(Fetch(10));
+  Assert.IsTrue(HasLogLine('too many objects'));
+end;
+
+procedure TPdfParserTests.TestPositionOfTheSourceIsKeptWhileLoading;
+begin
+  OpenFile(MinimalFile);
+  FDocument.Source.Seek(5);
+
+  Fetch(3);
+
+  Assert.AreEqual<Int64>(5, FDocument.Source.GetPosition);
+end;
+
+procedure TPdfParserTests.TestIncrementalUpdateIsLoaded;
+begin
+  const Original = MinimalFile;
+  const Update = TTestPdfBuilder.Create;
+  try
+    Update.AddObject(3, '<< /Type /Page /Parent 2 0 R /Updated true >>');
+    Update.SetRoot(1);
+    Update.MinimumSize := 4;
+    OpenFile(Update.AppendIncrementalUpdate(Original, TXrefStyle.Table));
+  finally
+    Update.Free;
+  end;
+
+  Assert.IsTrue((Fetch(3) as TCosDictionary).GetBoolean('Updated', False));
+end;
+
+procedure TPdfParserTests.TestXrefValuesAreSetOnTheDocument;
+begin
+  OpenFile(MinimalFile);
+
+  Assert.IsTrue(FDocument.StartXref > 0);
+  Assert.IsFalse(FDocument.IsXRefStream);
+  Assert.AreEqual<Int64>(3, FDocument.HighestXRefObjectNumber);
+end;
+
+procedure TPdfParserTests.TestMissingStartxrefRaises;
+begin
+  AssertLoadRaises(Ascii('%PDF-1.4'#10'1 0 obj'#10'<< /Type /Catalog >>'#10'endobj'#10));
+end;
+
+procedure TPdfParserTests.TestMissingRootRaises;
+begin
+  const Builder = TTestPdfBuilder.Create;
+  try
+    Builder.AddObject(1, '<< /A 1 >>');
+    AssertLoadRaises(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TPdfParserTests.TestFileWithoutHeaderRaises;
+begin
+  AssertLoadRaises(Ascii('no header here'#10'and no data'#10));
+end;
+
+procedure TPdfParserTests.TestEmptyFileRaises;
+begin
+  AssertLoadRaises(nil);
+end;
+
+procedure TPdfParserTests.TestOwnedSourceIsFreedOnFailure;
+begin
+  var Freed := False;
+  const FlagPointer = @Freed;
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfParser.Parse(TFreedFlagStream.Create(Ascii('garbage'), FlagPointer), True, TPdfLoadOptions.Default).Free;
+    end,
+    EPdfParseException);
+  Assert.IsTrue(Freed);
+end;
+
+procedure TPdfParserTests.TestHostileBytesRaiseOnlyPdfExceptions;
+begin
+  const Valid = MinimalFile;
+  var Seed: Cardinal := 12345;
+  for var Round := 1 to 300 do
+  begin
+    var Data := Copy(Valid);
+    for var Change := 1 to 4 do
+    begin
+      Seed := Seed * 1103515245 + 12345;
+      Data[(Seed shr 8) mod Cardinal(Length(Data))] := Byte(Seed shr 16);
+    end;
+
+    try
+      OpenFile(Data);
+      for var Key in FDocument.ObjectKeys do
+      begin
+        FDocument.GetObjectFromPool(Key).GetObject;
+      end;
+    except
+      on EPdfException do
+      begin
+        // The file is damaged: an error of the library is the answer
+      end;
+    end;
+  end;
+end;
+
+end.

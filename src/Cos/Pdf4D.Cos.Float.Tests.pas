@@ -38,6 +38,9 @@ type
     procedure TestParseValueBeyondDoubleRange;
 
     [Test]
+    procedure TestParseLeadingZerosAreIgnored;
+
+    [Test]
     procedure TestParseVeryLongTokenIsFast;
 
     [Test]
@@ -167,6 +170,15 @@ begin
   AssertParses('0.' + StringOfChar('0', 2 * 1024 * 1024) + '1', 0);
   AssertParses('1.' + StringOfChar('0', 350), 1);
   Assert.IsTrue(Watch.ElapsedMilliseconds < 3000, 'a long number token must be parsed in linear time');
+end;
+
+procedure TCosFloatTests.TestParseLeadingZerosAreIgnored;
+begin
+  AssertParses(StringOfChar('0', 400) + '1.5', 1.5);
+  AssertParses('-' + StringOfChar('0', 400) + '1.5', -1.5);
+  AssertParses(StringOfChar('0', 400) + '.5', 0.5);
+  AssertParses(StringOfChar('0', 400) + '.0', 0);
+  AssertParses('007.25', 7.25);
 end;
 
 procedure TCosFloatTests.TestParseValueBeyondDoubleRange;

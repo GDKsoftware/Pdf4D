@@ -30,6 +30,9 @@ type
 
     [Test]
     procedure TestLzwAppliesPredictor;
+
+    [Test]
+    procedure TestLzwExpansionRaisesLimitExceeded;
   end;
 
 implementation
@@ -326,6 +329,22 @@ begin
   finally
     Parameters.Free;
   end;
+end;
+
+procedure TLZWFilterTests.TestLzwExpansionRaisesLimitExceeded;
+begin
+  var Data: TBytes;
+  SetLength(Data, 100000);
+  FillChar(Data[0], Length(Data), Ord('a'));
+  const Compressed = Encode(Data, True);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      TFilterTestSupport.Decode('LZWDecode', Compressed, nil, nil, 1000);
+    end,
+    EPdfLimitExceededException);
+  Assert.AreEqual<Integer>(Length(Data), Length(TFilterTestSupport.Decode('LZWDecode', Compressed, nil, nil, Length(Data))));
 end;
 
 end.
