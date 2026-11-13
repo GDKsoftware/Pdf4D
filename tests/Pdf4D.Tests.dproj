@@ -105,6 +105,12 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.CMapManager.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CMapParser.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.CMapManager.Tests.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.BoundingBox.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Afm.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.AfmParser.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Standard14.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.AfmParser.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Standard14.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>
