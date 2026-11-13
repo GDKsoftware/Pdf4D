@@ -1,0 +1,24 @@
+# Delphi
+__history/
+__recovery/
+*.dcu
+*.identcache
+*.local
+*.stat
+*.map
+*.rsm
+*.tds
+*.dsk
+*.~*
+Win32/
+Win64/
+Linux64/
+
+# Test run output and local third-party code
+tests/ThirdParty/
+tests/results-*.xml
+
+# Oracle tooling
+tools/oracle/lib/
+tools/oracle/jdk/
+*.res
