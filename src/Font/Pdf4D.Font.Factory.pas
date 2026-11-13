@@ -15,7 +15,7 @@ uses
   Pdf4D.Model.DocumentContext;
 
 type
-  // Makes the right font class for a font dictionary. Type 1 (with or without /FontFile3) and MMType1 are known; the other
+  // Makes the right font class for a font dictionary. Type 1 (with or without /FontFile3), MMType1 and TrueType are known; the other
   // subtypes raise EPdfUnsupportedFeatureException until their classes exist.
   TPDFontFactory = class
   private
@@ -45,6 +45,7 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
   Pdf4D.Font.Type1,
+  Pdf4D.Font.TrueType,
   Pdf4D.Font.Type1C;
 
 const
@@ -108,7 +109,11 @@ begin
   begin
     Result := CreateType1Font(Dictionary, Context);
   end
-  else if (SubType = TCosNames.TrueType) or (SubType = TCosNames.Type3) or (SubType = TCosNames.Type0) then
+  else if SubType = TCosNames.TrueType then
+  begin
+    Result := TPDTrueTypeFont.Create(Dictionary, Context);
+  end
+  else if (SubType = TCosNames.Type3) or (SubType = TCosNames.Type0) then
   begin
     raise EPdfUnsupportedFeatureException.CreateFmt('Font subtype %s is not supported yet', [SubType]);
   end
