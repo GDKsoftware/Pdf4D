@@ -28,11 +28,15 @@ type
     const OpenSansType1 = 'PFB:OpenSans-Regular';
     const SourceSansOpenType = 'OTF:SourceSansPro-Bold';
     const TimeLimitMilliseconds = 2000;
-    // The fonts that get loaded live at the same paths in every run, so that the process-wide font cache gets the same entries again
-    const FontFolderName = 'Pdf4D-fs-provider-fonts';
-    const WorkFolderName = 'Pdf4D-fs-provider-work';
+    // Each process gets its own folders, so that parallel runs on one machine do not collide. The folders keep their names for the
+    // whole process: the fonts that get loaded stay in the process-wide font cache, which must get the same entries again in a second run.
+    const FontFolderPrefix = 'Pdf4D-fs-provider-fonts-';
+    const WorkFolderPrefix = 'Pdf4D-fs-provider-work-';
 
   private
+    class var FProcessId: string;
+
+    class function ProcessId: string; static;
     class function JunkBytes: TBytes; static;
     class function Describe(const Info: TFontInfo): string; static;
     class function DescribeAll(const Infos: TArray<TFontInfo>): string; static;
@@ -122,6 +126,24 @@ type
     [Test]
     procedure TestCollectionHeadersAreReadPerFont;
 
+    [Test]
+    procedure TestFileCapStopsTheSearch;
+
+    [Test]
+    procedure TestFolderCapStopsTheSearch;
+
+    [Test]
+    procedure TestInfoCapStopsTheScan;
+
+    [Test]
+    procedure TestFileOverTheSizeCapIsSkipped;
+
+    [Test]
+    procedure TestProcessWideLogReceivesWarnings;
+
+    [Test]
+    procedure TestDefaultProviderUsesTheProcessWideLog;
+
     {$IFDEF POSIX}
     [Test]
     procedure TestSymbolicLinkLoopTerminates;
@@ -152,10 +174,20 @@ uses
   Pdf4D.Font.Descriptor,
   Pdf4D.Font.DirFinder,
   Pdf4D.Font.FileSystemProvider,
+  Pdf4D.Font.Mapper,
   Pdf4D.Tests.TestFonts,
   Pdf4D.Tests.TrueTypeBuilder;
 
 { TFileSystemFontProviderTests }
+
+class function TFileSystemFontProviderTests.ProcessId: string;
+begin
+  if FProcessId = '' then
+  begin
+    FProcessId := TGUID.NewGuid.ToString;
+  end;
+  Result := FProcessId;
+end;
 
 class function TFileSystemFontProviderTests.JunkBytes: TBytes;
 begin
@@ -234,7 +266,7 @@ end;
 
 procedure TFileSystemFontProviderTests.SetupFixture;
 begin
-  FFontFolder := TPath.Combine(TPath.GetTempPath, FontFolderName);
+  FFontFolder := TPath.Combine(TPath.GetTempPath, FontFolderPrefix + ProcessId);
   if TDirectory.Exists(FFontFolder) then
   begin
     TDirectory.Delete(FFontFolder, True);
@@ -263,7 +295,7 @@ end;
 
 procedure TFileSystemFontProviderTests.Setup;
 begin
-  FWorkFolder := TPath.Combine(TPath.GetTempPath, WorkFolderName);
+  FWorkFolder := TPath.Combine(TPath.GetTempPath, WorkFolderPrefix + ProcessId);
   if TDirectory.Exists(FWorkFolder) then
   begin
     TDirectory.Delete(FWorkFolder, True);
@@ -594,6 +626,92 @@ begin
   finally
     Source.Free;
   end;
+end;
+
+procedure TFileSystemFontProviderTests.TestFileCapStopsTheSearch;
+begin
+  for var Index := 1 to 5 do
+  begin
+    TFile.WriteAllBytes(TPath.Combine(FWorkFolder, Format('f%d.ttf', [Index])), JunkBytes);
+  end;
+
+  const Found = TFontFileFinder.Find([FWorkFolder], FLog, 3);
+
+  Assert.AreEqual<NativeInt>(3, Length(Found));
+  Assert.IsTrue(LogText.Contains('font files'), 'The log does not name the file limit: ' + LogText);
+end;
+
+procedure TFileSystemFontProviderTests.TestFolderCapStopsTheSearch;
+begin
+  for var Index := 1 to 6 do
+  begin
+    const Folder = TPath.Combine(FWorkFolder, Format('d%d', [Index]));
+    TDirectory.CreateDirectory(Folder);
+    TFile.WriteAllBytes(TPath.Combine(Folder, 'a.ttf'), JunkBytes);
+  end;
+
+  const Found = TFontFileFinder.Find([FWorkFolder], FLog, TFontFileFinder.MaximumFiles, 3);
+
+  Assert.IsTrue(Length(Found) < 6, 'The folder cap did not stop the search');
+  Assert.IsTrue(LogText.Contains('folders'), 'The log does not name the folder limit: ' + LogText);
+end;
+
+procedure TFileSystemFontProviderTests.TestInfoCapStopsTheScan;
+begin
+  CopyTestFont(LiberationSans, FWorkFolder);
+  CopyTestFont(JosefinSans, FWorkFolder);
+  CopyTestFont(SourceSans, FWorkFolder);
+  const Provider = TFileSystemFontProvider.Create([FWorkFolder], FLog);
+  Provider.MaximumInfos := 2;
+  const Keeper: IPdfFontProvider = Provider;
+
+  Assert.AreEqual<NativeInt>(2, Length(Keeper.FontInfos));
+  Assert.IsTrue(LogText.Contains('Stop scanning'), 'The log does not name the info limit: ' + LogText);
+end;
+
+procedure TFileSystemFontProviderTests.TestFileOverTheSizeCapIsSkipped;
+begin
+  CopyTestFont(LiberationSans, FWorkFolder);
+  const Provider = TFileSystemFontProvider.Create([FWorkFolder], FLog);
+  Provider.MaximumFileSize := 1000;
+  const Keeper: IPdfFontProvider = Provider;
+
+  Assert.AreEqual<NativeInt>(0, Length(Keeper.FontInfos));
+  Assert.IsTrue(LogText.Contains('more than the limit'), 'The log does not name the size limit: ' + LogText);
+end;
+
+procedure TFileSystemFontProviderTests.TestProcessWideLogReceivesWarnings;
+begin
+  TFile.WriteAllBytes(TPath.Combine(FWorkFolder, 'broken.ttf'), JunkBytes);
+  const Received = TStringList.Create;
+  try
+    TPdfFontMappers.SetLog(
+      procedure(const Level: TPdfLogLevel; const Message: string)
+      begin
+        Received.Add(Message);
+      end);
+    try
+      const Provider = TFileSystemFontProvider.Create([FWorkFolder], TPdfFontMappers.Log);
+      const Keeper: IPdfFontProvider = Provider;
+      Assert.AreEqual<NativeInt>(0, Length(Keeper.FontInfos));
+    finally
+      TPdfFontMappers.SetLog(nil);
+    end;
+
+    Assert.IsTrue(Received.Text.Contains('broken.ttf'), 'The callback got: ' + Received.Text);
+  finally
+    Received.Free;
+  end;
+end;
+
+procedure TFileSystemFontProviderTests.TestDefaultProviderUsesTheProcessWideLog;
+begin
+  // Nothing is scanned: the provider only has to accept the process-wide log
+  const Provider = TFileSystemFontProvider.CreateDefault(TPdfFontMappers.Log);
+
+  Assert.IsTrue(Assigned(Provider));
+  Assert.IsNotNull(TPdfFontMappers.Log);
+  Assert.IsTrue(TPdfFontMappers.Log = TPdfFontMappers.Log, 'The log is one object');
 end;
 
 {$IFDEF POSIX}

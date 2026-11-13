@@ -638,7 +638,8 @@ begin
   begin
     Text := Text + Chr(GetChar);
   end;
-  Builder.Append(Chr(ParseNumber(Text, OctalRadix)));
+  // Java casts to char, so Ā to ǿ give characters above 255
+  Builder.Append(Char(ParseNumber(Text, OctalRadix)));
 end;
 
 function TType1Lexer.ReadCharString(const Count: Integer): TType1Token;

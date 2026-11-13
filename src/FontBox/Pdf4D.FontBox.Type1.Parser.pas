@@ -289,7 +289,7 @@ begin
     raise EPdfParseException.Create('Invalid start of ASCII segment of type 1 font');
   end;
 
-  FLexer.Free;
+  FreeAndNil(FLexer);
   FLexer := TType1Lexer.Create(Bytes, FLog);
   if FLexer.PeekToken.Kind = TType1TokenKind.None then
   begin
@@ -1027,7 +1027,8 @@ procedure TType1Parser.ReadSubrs(const LenIV: Integer);
 begin
   // Allocate the size; the array indexes may not be in order. A count beyond what the data could hold is damaged.
   const Count = ReadKind(TType1TokenKind.Int).IntValue;
-  if Count > FDataLength then
+  // Repeated /Subrs entries would add up, so the total is bounded as well
+  if (Count > FDataLength) or (FFont.Subrs.Count > FDataLength - Count) then
   begin
     raise EPdfParseException.CreateFmt('The Subrs count %d is larger than the font data', [Count]);
   end;

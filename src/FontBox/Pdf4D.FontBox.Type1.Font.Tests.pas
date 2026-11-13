@@ -11,6 +11,7 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
+  System.Diagnostics,
   DUnitX.TestFramework,
   Pdf4D.FontBox.Pfb,
   Pdf4D.FontBox.Type1.Lexer,
@@ -130,12 +131,17 @@ type
 
     [Test]
     procedure TestHugeUnterminatedArrayDoesNotHang;
+
+    [Test]
+    procedure TestOctalEscapeAboveByteRangeIsACharacter;
   end;
 
   [TestFixture]
   TType1FontTests = class
   private
     FFont: TType1Font;
+
+    const TimeLimitMilliseconds = 2000;
 
     class function AsciiBytes(const Text: string): TBytes; static;
     class function Join(const Parts: array of TBytes): TBytes; static;
@@ -228,6 +234,9 @@ type
 
     [Test]
     procedure TestSubrsCountBeyondDataRaises;
+
+    [Test]
+    procedure TestRepeatedSubrsAreBounded;
 
     [Test]
     procedure TestNegativeSubrIndexRaises;
@@ -720,6 +729,19 @@ begin
   CheckLexerRaises('1#1 ');
   CheckLexerRaises('8#9 ');
   CheckLexerRaises('10#99999999999 ');
+end;
+
+procedure TType1LexerTests.TestOctalEscapeAboveByteRangeIsACharacter;
+begin
+  // Java casts the value to a char, so there is no range error
+  const Lexer = LexerFor('(\777\400) ');
+  try
+    const Tokens = ReadAll(Lexer);
+    Assert.AreEqual<NativeInt>(1, Length(Tokens));
+    Assert.AreEqual(#$01FF + #$0100, Tokens[0].Text);
+  finally
+    Lexer.Free;
+  end;
 end;
 
 procedure TType1LexerTests.TestInvalidOctalEscapeRaises;
@@ -1262,6 +1284,21 @@ begin
   CheckFontRaises(AsciiBytes(HeaderText(False)), EncryptedSegment(Private, False));
 end;
 
+procedure TType1FontTests.TestRepeatedSubrsAreBounded;
+begin
+  // Each entry is small, so the sum of the counts soon passes the size of the data
+  var Text := 'dup /Private 2 dict dup begin'#10;
+  for var Index := 1 to 600 do
+  begin
+    Text := Text + '/Subrs 5000 array'#10'ND'#10;
+  end;
+  const Stopwatch = TStopwatch.StartNew;
+
+  CheckFontRaises(AsciiBytes(HeaderText(False)), EncryptedSegment(AsciiBytes(Text), False));
+
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TimeLimitMilliseconds, Format('The parse took %d ms', [Stopwatch.ElapsedMilliseconds]));
+end;
+
 procedure TType1FontTests.TestNegativeSubrIndexRaises;
 begin
   const Private = AsciiBytes('dup /Private 2 dict dup begin'#10'/Subrs 2 array'#10'dup -1 1 RD a NP'#10'ND'#10);
@@ -1398,6 +1435,9 @@ begin
   const Segment1 = SyntheticSegments(DefaultOptions, Segment2Unused);
   const PrivatePlain = PrivateSection(DefaultOptions.LenIV);
 
+  const SavedSeed = RandSeed;
+  var Parsed := 0;
+  var Failed := 0;
   RandSeed := 11;
   for var Round := 1 to 400 do
   begin
@@ -1423,17 +1463,21 @@ begin
         begin
           Font.GetWidth(Pair.Key);
         end;
+        Inc(Parsed);
       except
         on EPdfParseException do
         begin
           // A clean failure is a valid result for a damaged font
+          Inc(Failed);
         end;
       end;
     finally
       Font.Free;
     end;
   end;
-  Assert.IsTrue(True);
+  RandSeed := SavedSeed;
+  Assert.IsTrue(Parsed > 0, 'No mutated font parsed');
+  Assert.IsTrue(Failed > 0, 'No mutated font failed');
 end;
 
 procedure TType1FontTests.TestMutatedOpenSansEndsCleanly;
@@ -1448,6 +1492,9 @@ begin
     Original.Free;
   end;
 
+  const SavedSeed = RandSeed;
+  var Parsed := 0;
+  var Failed := 0;
   RandSeed := 23;
   for var Round := 1 to 60 do
   begin
@@ -1475,17 +1522,21 @@ begin
         begin
           Font.GetWidth(Pair.Key);
         end;
+        Inc(Parsed);
       except
         on EPdfParseException do
         begin
           // A clean failure is a valid result for a damaged font
+          Inc(Failed);
         end;
       end;
     finally
       Font.Free;
     end;
   end;
-  Assert.IsTrue(True);
+  RandSeed := SavedSeed;
+  Assert.IsTrue(Parsed > 0, 'No mutated font parsed');
+  Assert.IsTrue(Failed > 0, 'No mutated font failed');
 end;
 
 end.

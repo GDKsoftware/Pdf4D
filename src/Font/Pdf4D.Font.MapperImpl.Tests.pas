@@ -110,7 +110,10 @@ type
     procedure TestSetInstanceNilGivesDefaultMapper;
 
     [Test]
-    procedure TestMapperInstanceConcurrentFirstUse;
+    procedure TestMapperInstanceIsSharedByConcurrentReaders;
+
+    [Test]
+    procedure TestConcurrentFirstLookupOnFreshMapper;
 
     [Test]
     procedure TestSetInstanceRacingWithInstance;
@@ -192,13 +195,22 @@ type
     function ToDebugString: string;
   end;
 
-  // Does nothing: only an identity to put in the process-wide slot
-  TStubFontMapper = class(TInterfacedObject, IPdfFontMapper)
+  // Waits for the gate, then does the first lookup on a mapper that nobody has used yet: the lazy font index is built in the race
+  TFirstLookupThread = class(TThread)
+  private
+    FGate: TEvent;
+    FMapper: IPdfFontMapper;
+    FFont: Pointer;
+    FFailure: string;
+
+  protected
+    procedure Execute; override;
+
   public
-    function GetTrueTypeFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TTrueTypeFont>;
-    function GetFontBoxFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TFontBoxFont>;
-    function GetCIDFont(const BaseFont: string; const Descriptor: TPDFontDescriptor; const HasCIDSystemInfo: Boolean;
-                        const CIDSystemInfo: TPDCIDSystemInfo): TCIDFontMapping;
+    constructor Create(const Gate: TEvent; const Mapper: IPdfFontMapper);
+
+    property Font: Pointer read FFont;
+    property Failure: string read FFailure;
   end;
 
   // Waits for the gate, then asks for the process-wide mapper over and over
@@ -372,22 +384,31 @@ begin
   Result := '';
 end;
 
-{ TStubFontMapper }
+{ TFirstLookupThread }
 
-function TStubFontMapper.GetTrueTypeFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TTrueTypeFont>;
+constructor TFirstLookupThread.Create(const Gate: TEvent; const Mapper: IPdfFontMapper);
 begin
-  Result := Default(TFontMapping<TTrueTypeFont>);
+  inherited Create(True);
+  FGate := Gate;
+  FMapper := Mapper;
 end;
 
-function TStubFontMapper.GetFontBoxFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TFontBoxFont>;
+procedure TFirstLookupThread.Execute;
 begin
-  Result := Default(TFontMapping<TFontBoxFont>);
-end;
-
-function TStubFontMapper.GetCIDFont(const BaseFont: string; const Descriptor: TPDFontDescriptor; const HasCIDSystemInfo: Boolean;
-                                    const CIDSystemInfo: TPDCIDSystemInfo): TCIDFontMapping;
-begin
-  Result := Default(TCIDFontMapping);
+  try
+    FGate.WaitFor(INFINITE);
+    const Mapping = FMapper.GetTrueTypeFont('Arial', nil);
+    FFont := Pointer(Mapping.Font);
+    if (not Assigned(Mapping.Font)) or Mapping.IsFallback or (Mapping.Font.Name <> 'LiberationSans') then
+    begin
+      FFailure := 'The mapper gave an unexpected font';
+    end;
+  except
+    on E: Exception do
+    begin
+      FFailure := E.ClassName + ': ' + E.Message;
+    end;
+  end;
 end;
 
 { TInstanceReader }
@@ -831,7 +852,7 @@ begin
   Assert.AreEqual('LiberationSans', Default.GetTrueTypeFont('Foo', nil).Font.Name);
 end;
 
-procedure TFontMapperTests.TestMapperInstanceConcurrentFirstUse;
+procedure TFontMapperTests.TestMapperInstanceIsSharedByConcurrentReaders;
 begin
   TPdfFontMappers.SetInstance(nil);
   const Gate = TEvent.Create(nil, True, False, '');
@@ -859,6 +880,38 @@ begin
     for var Reader in Readers do
     begin
       Reader.Free;
+    end;
+    Gate.Free;
+  end;
+end;
+
+procedure TFontMapperTests.TestConcurrentFirstLookupOnFreshMapper;
+begin
+  const Mapper = NewMapper([LiberationSansFile]);
+  const Gate = TEvent.Create(nil, True, False, '');
+  var Threads: array[0..ThreadCount - 1] of TFirstLookupThread;
+  try
+    for var Index := 0 to ThreadCount - 1 do
+    begin
+      Threads[Index] := TFirstLookupThread.Create(Gate, Mapper);
+      Threads[Index].Start;
+    end;
+
+    Gate.SetEvent;
+    for var Thread in Threads do
+    begin
+      Thread.WaitFor;
+    end;
+
+    for var Thread in Threads do
+    begin
+      Assert.AreEqual('', Thread.Failure);
+      Assert.IsTrue(Thread.Font = Threads[0].Font, 'The threads got different fonts');
+    end;
+  finally
+    for var Thread in Threads do
+    begin
+      Thread.Free;
     end;
     Gate.Free;
   end;

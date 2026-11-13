@@ -89,6 +89,8 @@ type
   private
     FDirectories: TArray<string>;
     FLog: TPdfLog;
+    FMaximumFileSize: Int64;
+    FMaximumInfos: Integer;
     FLock: TCriticalSection;
     FInfos: TObjectList<TFSFontInfo>;
     FInfoArray: TArray<TFontInfo>;
@@ -111,11 +113,15 @@ type
     constructor Create(const Directories: TArray<string>; const Log: TPdfLog);
     destructor Destroy; override;
 
-    // The provider for the font folders of the machine, without a log
-    class function CreateDefault: IPdfFontProvider; static;
+    // The provider for the font folders of the machine. The log is optional, not owned and must outlive the provider.
+    class function CreateDefault(const Log: TPdfLog = nil): IPdfFontProvider; static;
 
     function FontInfos: TArray<TFontInfo>;
     function ToDebugString: string;
+
+    // The limits of the scan, for tests; set them before the infos are first asked for
+    property MaximumFileSize: Int64 read FMaximumFileSize write FMaximumFileSize;
+    property MaximumInfos: Integer read FMaximumInfos write FMaximumInfos;
   end;
 
 implementation
@@ -369,9 +375,9 @@ begin
   Result := (TPdfFailure.IsInputFailure(Failure) or (Failure is EInOutError) or (Failure is EOSError));
 end;
 
-class function TFileSystemFontProvider.CreateDefault: IPdfFontProvider;
+class function TFileSystemFontProvider.CreateDefault(const Log: TPdfLog): IPdfFontProvider;
 begin
-  Result := TFileSystemFontProvider.Create(TFontDirFinder.SearchableDirectories, nil);
+  Result := TFileSystemFontProvider.Create(TFontDirFinder.SearchableDirectories, Log);
 end;
 
 constructor TFileSystemFontProvider.Create(const Directories: TArray<string>; const Log: TPdfLog);
@@ -379,6 +385,8 @@ begin
   inherited Create;
   FDirectories := Copy(Directories);
   FLog := Log;
+  FMaximumFileSize := MaximumFontFileSize;
+  FMaximumInfos := MaximumFontInfos;
   FLock := TCriticalSection.Create;
   FInfos := TObjectList<TFSFontInfo>.Create(True);
 end;
@@ -407,10 +415,10 @@ begin
       raise;
     end;
 
-    FInfoArray := nil;
-    for var Info in FInfos do
+    SetLength(FInfoArray, FInfos.Count);
+    for var Index := 0 to FInfos.Count - 1 do
     begin
-      FInfoArray := FInfoArray + [Info];
+      FInfoArray[Index] := FInfos[Index];
     end;
     FIsScanned := True;
   finally
@@ -422,11 +430,11 @@ procedure TFileSystemFontProvider.Scan;
 begin
   for var FilePath in TFontFileFinder.Find(FDirectories, FLog) do
   begin
-    if FInfos.Count >= MaximumFontInfos then
+    if FInfos.Count >= FMaximumInfos then
     begin
       if Assigned(FLog) then
       begin
-        FLog.Warning('Stop scanning fonts after %d fonts', [MaximumFontInfos]);
+        FLog.Warning('Stop scanning fonts after %d fonts', [FMaximumInfos]);
       end;
       Exit;
     end;
@@ -444,9 +452,9 @@ end;
 
 procedure TFileSystemFontProvider.GuardFileSize(const FilePath: string; const Size: Int64);
 begin
-  if Size > MaximumFontFileSize then
+  if Size > FMaximumFileSize then
   begin
-    raise EPdfLimitExceededException.CreateFmt('the file is %d bytes, more than the limit of %d', [Size, MaximumFontFileSize]);
+    raise EPdfLimitExceededException.CreateFmt('the file is %d bytes, more than the limit of %d', [Size, FMaximumFileSize]);
   end;
 end;
 
@@ -540,7 +548,7 @@ begin
     const AllHeaders = TTrueTypeCollection.ReadAllFontHeaders(Source);
     for var Index := 0 to Length(AllHeaders) - 1 do
     begin
-      if FInfos.Count >= MaximumFontInfos then
+      if FInfos.Count >= FMaximumInfos then
       begin
         Exit;
       end;

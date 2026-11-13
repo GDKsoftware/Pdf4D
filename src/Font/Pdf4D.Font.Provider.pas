@@ -53,13 +53,6 @@ type
     function ToDebugString: string;
   end;
 
-  // A provider without fonts: every font that is not embedded and not one of the standard 14 ends up in the last-resort font
-  TPdfEmptyFontProvider = class(TInterfacedObject, IPdfFontProvider)
-  public
-    function FontInfos: TArray<TFontInfo>;
-    function ToDebugString: string;
-  end;
-
 implementation
 
 uses
@@ -109,18 +102,6 @@ begin
   const FormatName = GetEnumName(TypeInfo(TFontFormat), Ord(Format));
   Result := System.SysUtils.Format('%s (%s, mac: 0x%s, os/2: 0x%s, cid: %s)',
                                    [PostScriptName, FormatName, HexOf(MacStyle), HexOf(FamilyClass), CIDText]);
-end;
-
-{ TPdfEmptyFontProvider }
-
-function TPdfEmptyFontProvider.FontInfos: TArray<TFontInfo>;
-begin
-  Result := nil;
-end;
-
-function TPdfEmptyFontProvider.ToDebugString: string;
-begin
-  Result := '';
 end;
 
 end.

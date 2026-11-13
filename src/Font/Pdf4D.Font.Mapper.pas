@@ -10,6 +10,8 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   System.SyncObjs,
+  Pdf4D.Common.Defines,
+  Pdf4D.Common.Log,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.TrueType.Font,
   Pdf4D.Font.Descriptor,
@@ -54,10 +56,14 @@ type
     class var FDefault: IPdfFontMapper;
     class var FRetired: TList<IPdfFontMapper>;
     class var FDefaultProvider: IPdfFontProvider;
+    class var FLogLock: TLightweightMREW;
+    class var FLogEvent: TPdfLogEvent;
+    class var FLog: TPdfLog;
 
     class destructor Destroy;
 
     class function CreateDefault: IPdfFontMapper; static;
+    class procedure DispatchLog(const Level: TPdfLogLevel; const Message: string); static;
     class procedure Retire(const Mapper: IPdfFontMapper); static;
 
   public
@@ -66,6 +72,12 @@ type
     // The font provider of the default mapper, instead of the file system provider; nil goes back to that. Meant for tests, and only
     // useful before the default mapper is first made, which is when Instance is first called without SetInstance having been called.
     class procedure SetDefaultProvider(const Provider: IPdfFontProvider); static;
+    // Sets the process-wide log callback for font discovery: a font file or folder that is skipped, and the limits of the scan, get a
+    // warning. Nil by default, which means silent. The callback can be set or cleared at any time and is called from whichever thread
+    // scans the fonts, so it must be thread-safe. Pass nil to switch the log off.
+    class procedure SetLog(const OnLog: TPdfLogEvent); static;
+    // The log that goes to the callback of SetLog. It lives until the process ends; the default provider uses it, and so can others.
+    class function Log: TPdfLog; static;
   end;
 
 implementation
@@ -89,6 +101,8 @@ begin
   FDefault := nil;
   FDefaultProvider := nil;
   FreeAndNil(FRetired);
+  FreeAndNil(FLog);
+  FLogEvent := nil;
 end;
 
 class function TPdfFontMappers.CreateDefault: IPdfFontMapper;
@@ -96,9 +110,49 @@ begin
   var Provider := FDefaultProvider;
   if not Assigned(Provider) then
   begin
-    Provider := TFileSystemFontProvider.CreateDefault;
+    Provider := TFileSystemFontProvider.CreateDefault(Log);
   end;
   Result := TFontMapperImpl.Create(Provider);
+end;
+
+class procedure TPdfFontMappers.DispatchLog(const Level: TPdfLogLevel; const Message: string);
+begin
+  FLogLock.BeginRead;
+  var OnLog: TPdfLogEvent;
+  try
+    OnLog := FLogEvent;
+  finally
+    FLogLock.EndRead;
+  end;
+
+  if Assigned(OnLog) then
+  begin
+    OnLog(Level, Message);
+  end;
+end;
+
+class procedure TPdfFontMappers.SetLog(const OnLog: TPdfLogEvent);
+begin
+  FLogLock.BeginWrite;
+  try
+    FLogEvent := OnLog;
+  finally
+    FLogLock.EndWrite;
+  end;
+end;
+
+class function TPdfFontMappers.Log: TPdfLog;
+begin
+  FLogLock.BeginWrite;
+  try
+    if not Assigned(FLog) then
+    begin
+      FLog := TPdfLog.Create(DispatchLog);
+    end;
+    Result := FLog;
+  finally
+    FLogLock.EndWrite;
+  end;
 end;
 
 class function TPdfFontMappers.Instance: IPdfFontMapper;

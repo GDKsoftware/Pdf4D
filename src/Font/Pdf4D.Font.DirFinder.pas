@@ -45,6 +45,8 @@ type
 
   private
     FLog: TPdfLog;
+    FMaximumFiles: Integer;
+    FMaximumDirectories: Integer;
     FVisited: TDictionary<string, Boolean>;
     FFiles: TList<string>;
     FDirectoryCount: Integer;
@@ -61,12 +63,14 @@ type
     procedure ScanChildren(const Directory: string; const Depth: Integer);
 
   public
-    constructor Create(const Log: TPdfLog);
+    constructor Create(const Log: TPdfLog; const MaxFiles: Integer = MaximumFiles; const MaxDirectories: Integer = MaximumDirectories);
     destructor Destroy; override;
 
     // The font files (.ttf, .otf, .ttc, .otc and .pfb) in the folders and below them, in the order of the folders and, inside a
     // folder, of the file names. Folders that do not exist are skipped. The log is not owned and only used while Find runs.
-    class function Find(const Directories: TArray<string>; const Log: TPdfLog = nil): TArray<string>; static;
+    // The two caps can be lowered, for tests
+    class function Find(const Directories: TArray<string>; const Log: TPdfLog = nil; const MaxFiles: Integer = MaximumFiles;
+                        const MaxDirectories: Integer = MaximumDirectories): TArray<string>; static;
   end;
 
 implementation
@@ -148,9 +152,10 @@ end;
 
 { TFontFileFinder }
 
-class function TFontFileFinder.Find(const Directories: TArray<string>; const Log: TPdfLog): TArray<string>;
+class function TFontFileFinder.Find(const Directories: TArray<string>; const Log: TPdfLog; const MaxFiles: Integer;
+                                    const MaxDirectories: Integer): TArray<string>;
 begin
-  const Finder = TFontFileFinder.Create(Log);
+  const Finder = TFontFileFinder.Create(Log, MaxFiles, MaxDirectories);
   try
     for var Directory in Directories do
     begin
@@ -162,10 +167,12 @@ begin
   end;
 end;
 
-constructor TFontFileFinder.Create(const Log: TPdfLog);
+constructor TFontFileFinder.Create(const Log: TPdfLog; const MaxFiles: Integer; const MaxDirectories: Integer);
 begin
   inherited Create;
   FLog := Log;
+  FMaximumFiles := MaxFiles;
+  FMaximumDirectories := MaxDirectories;
   FVisited := TDictionary<string, Boolean>.Create;
   FFiles := TList<string>.Create;
 end;
@@ -225,7 +232,7 @@ end;
 
 function TFontFileFinder.IsFull: Boolean;
 begin
-  Result := (FFiles.Count >= MaximumFiles) or (FDirectoryCount >= MaximumDirectories);
+  Result := (FFiles.Count >= FMaximumFiles) or (FDirectoryCount >= FMaximumDirectories);
 end;
 
 procedure TFontFileFinder.LogLimit(const Message: string);
@@ -288,9 +295,9 @@ begin
       Continue;
     end;
 
-    if FFiles.Count >= MaximumFiles then
+    if FFiles.Count >= FMaximumFiles then
     begin
-      LogLimit(Format('Stop looking for fonts after %d font files', [MaximumFiles]));
+      LogLimit(Format('Stop looking for fonts after %d font files', [FMaximumFiles]));
       Exit;
     end;
     FFiles.Add(FileName);
@@ -309,6 +316,7 @@ begin
   begin
     if IsFull then
     begin
+      LogLimit(Format('Stop looking for fonts: the limit of %d folders or %d font files is reached', [FMaximumDirectories, FMaximumFiles]));
       Exit;
     end;
     ScanDirectory(ResolveLink(Child), Depth + 1);
@@ -323,9 +331,9 @@ begin
     Exit;
   end;
 
-  if FDirectoryCount >= MaximumDirectories then
+  if FDirectoryCount >= FMaximumDirectories then
   begin
-    LogLimit(Format('Stop looking for fonts after %d folders', [MaximumDirectories]));
+    LogLimit(Format('Stop looking for fonts after %d folders', [FMaximumDirectories]));
     Exit;
   end;
 
