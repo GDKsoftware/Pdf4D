@@ -76,6 +76,13 @@ uses
   Pdf4D.FontBox.CharStringWidth.Tests in '..\src\FontBox\Pdf4D.FontBox.CharStringWidth.Tests.pas',
   Pdf4D.FontBox.Type1.Font.Tests in '..\src\FontBox\Pdf4D.FontBox.Type1.Font.Tests.pas',
   Pdf4D.FontBox.OpenType.Tests in '..\src\FontBox\Pdf4D.FontBox.OpenType.Tests.pas',
+  Pdf4D.Font.Descriptor in '..\src\Font\Pdf4D.Font.Descriptor.pas',
+  Pdf4D.Font.Provider in '..\src\Font\Pdf4D.Font.Provider.pas',
+  Pdf4D.Font.Mapper in '..\src\Font\Pdf4D.Font.Mapper.pas',
+  Pdf4D.Font.MapperImpl in '..\src\Font\Pdf4D.Font.MapperImpl.pas',
+  Pdf4D.Tests.FontProvider in 'Support\Pdf4D.Tests.FontProvider.pas',
+  Pdf4D.Font.Descriptor.Tests in '..\src\Font\Pdf4D.Font.Descriptor.Tests.pas',
+  Pdf4D.Font.MapperImpl.Tests in '..\src\Font\Pdf4D.Font.MapperImpl.Tests.pas',
   Pdf4D.Common.ResourceData.Tests in '..\src\Common\Pdf4D.Common.ResourceData.Tests.pas',
   Pdf4D.Cos.Float.Tests in '..\src\Cos\Pdf4D.Cos.Float.Tests.pas',
   Pdf4D.Cos.Name.Tests in '..\src\Cos\Pdf4D.Cos.Name.Tests.pas',
@@ -195,6 +202,10 @@ begin
   {$ENDIF}
 
   TMemoryCheck.Install;
+
+  // Test output must not depend on the fonts of the machine: only the fonts that a test names can be found, and everything
+  // else ends up in the last-resort font (LiberationSans), like in the oracle.
+  TPdfFontMappers.SetInstance(TFontMapperImpl.Create(TTestFontProvider.Empty));
 
   ExitCode := 0;
   try

@@ -37,6 +37,8 @@ type
     class procedure AddAcrobatNames(const Aliases: TDictionary<string, TStandard14FontName>); static;
 
   public
+    // The 14 names and all their aliases
+    class function Names: TArray<string>; static;
     // True for the 14 names and all their aliases
     class function ContainsName(const Name: string): Boolean; static;
     // The standard font behind a name or alias
@@ -131,6 +133,11 @@ begin
   finally
     Parser.Free;
   end;
+end;
+
+class function TStandard14Fonts.Names: TArray<string>;
+begin
+  Result := FAliases.Get(CreateAliases).Keys.ToArray;
 end;
 
 class function TStandard14Fonts.ContainsName(const Name: string): Boolean;

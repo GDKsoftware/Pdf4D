@@ -1,0 +1,155 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/font/FontMapper.java, FontMapping.java, CIDFontMapping.java and
+// FontMappers.java (3.0.8)
+unit Pdf4D.Font.Mapper;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Generics.Collections,
+  System.SyncObjs,
+  Pdf4D.FontBox.FontBoxFont,
+  Pdf4D.FontBox.TrueType.Font,
+  Pdf4D.Font.Descriptor;
+
+type
+  // The mapped font is shared: the mapper owns it and the caller must not free it. It stays valid until the process ends.
+  TFontMapping<T: class> = record
+    Font: T;
+    IsFallback: Boolean;
+  end;
+
+  // Font is the OpenType font of a CID font (nil when there is none), TrueTypeFont the substitute when it is not a CID font
+  TCIDFontMapping = record
+    Font: TFontBoxFont;
+    TrueTypeFont: TTrueTypeFont;
+    IsFallback: Boolean;
+
+    function IsCIDFont: Boolean;
+  end;
+
+  // Finds fonts that are not embedded. The fonts are shared: the mapper keeps them and the caller does not free them. The
+  // descriptor may be nil.
+  IPdfFontMapper = interface
+    ['{B1A3C7E5-84D2-4F6B-9E10-2D7A5C3F8B64}']
+    function GetTrueTypeFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TTrueTypeFont>;
+    function GetFontBoxFont(const BaseFont: string; const Descriptor: TPDFontDescriptor): TFontMapping<TFontBoxFont>;
+    function GetCIDFont(const BaseFont: string; const Descriptor: TPDFontDescriptor; const HasCIDSystemInfo: Boolean;
+                        const CIDSystemInfo: TPDCIDSystemInfo): TCIDFontMapping;
+  end;
+
+  // The process-wide font mapper, like FontMappers in PDFBox. Instance and SetInstance are thread-safe.
+  // SetInstance can be called at any time, but a mapper that has been in use is never freed before the process ends: fonts
+  // that it gave out are borrowed from it and a thread may still use them. SetInstance is therefore meant for start up and
+  // tests, and each different mapper that is replaced stays in memory until shutdown. SetInstance(nil) goes back to the
+  // default mapper, which has an empty font provider.
+  TPdfFontMappers = record
+  private
+    class var FLock: TLightweightMREW;
+    class var FCurrent: IPdfFontMapper;
+    class var FDefault: IPdfFontMapper;
+    class var FRetired: TList<IPdfFontMapper>;
+
+    class destructor Destroy;
+
+    class function CreateDefault: IPdfFontMapper; static;
+    class procedure Retire(const Mapper: IPdfFontMapper); static;
+
+  public
+    class function Instance: IPdfFontMapper; static;
+    class procedure SetInstance(const Mapper: IPdfFontMapper); static;
+  end;
+
+implementation
+
+uses
+  Pdf4D.Font.Provider,
+  Pdf4D.Font.MapperImpl;
+
+{ TCIDFontMapping }
+
+function TCIDFontMapping.IsCIDFont: Boolean;
+begin
+  Result := Assigned(Font);
+end;
+
+{ TPdfFontMappers }
+
+class destructor TPdfFontMappers.Destroy;
+begin
+  FCurrent := nil;
+  FDefault := nil;
+  FreeAndNil(FRetired);
+end;
+
+class function TPdfFontMappers.CreateDefault: IPdfFontMapper;
+begin
+  Result := TFontMapperImpl.Create(TPdfEmptyFontProvider.Create);
+end;
+
+class function TPdfFontMappers.Instance: IPdfFontMapper;
+begin
+  FLock.BeginRead;
+  try
+    Result := FCurrent;
+    if not Assigned(Result) then
+    begin
+      Result := FDefault;
+    end;
+  finally
+    FLock.EndRead;
+  end;
+  if Assigned(Result) then
+  begin
+    Exit;
+  end;
+
+  FLock.BeginWrite;
+  try
+    if not Assigned(FDefault) then
+    begin
+      FDefault := CreateDefault;
+    end;
+    Result := FCurrent;
+    if not Assigned(Result) then
+    begin
+      Result := FDefault;
+    end;
+  finally
+    FLock.EndWrite;
+  end;
+end;
+
+class procedure TPdfFontMappers.Retire(const Mapper: IPdfFontMapper);
+begin
+  if not Assigned(Mapper) then
+  begin
+    Exit;
+  end;
+
+  if not Assigned(FRetired) then
+  begin
+    FRetired := TList<IPdfFontMapper>.Create;
+  end;
+
+  const IsKnown = FRetired.Contains(Mapper);
+  if not IsKnown then
+  begin
+    FRetired.Add(Mapper);
+  end;
+end;
+
+class procedure TPdfFontMappers.SetInstance(const Mapper: IPdfFontMapper);
+begin
+  FLock.BeginWrite;
+  try
+    Retire(FCurrent);
+    FCurrent := Mapper;
+  finally
+    FLock.EndWrite;
+  end;
+end;
+
+end.
