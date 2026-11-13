@@ -48,7 +48,7 @@
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -110,6 +110,18 @@
         <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.AES.Tests.pas"/>
         <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.StandardSecurityHandler.Tests.pas"/>
         <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.Exemptions.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DateConverter.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DateConverter.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Rectangle.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentInformation.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentCatalog.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Document.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Tests.Support.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Page.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Document.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

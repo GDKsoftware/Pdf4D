@@ -38,7 +38,19 @@ uses
   Pdf4D.Crypto.RC4.Tests in '..\src\Crypto\Pdf4D.Crypto.RC4.Tests.pas',
   Pdf4D.Crypto.AES.Tests in '..\src\Crypto\Pdf4D.Crypto.AES.Tests.pas',
   Pdf4D.Encryption.StandardSecurityHandler.Tests in '..\src\Encryption\Pdf4D.Encryption.StandardSecurityHandler.Tests.pas',
-  Pdf4D.Encryption.Exemptions.Tests in '..\src\Encryption\Pdf4D.Encryption.Exemptions.Tests.pas';
+  Pdf4D.Encryption.Exemptions.Tests in '..\src\Encryption\Pdf4D.Encryption.Exemptions.Tests.pas',
+  Pdf4D.Model.DateConverter in '..\src\Model\Pdf4D.Model.DateConverter.pas',
+  Pdf4D.Model.DateConverter.Tests in '..\src\Model\Pdf4D.Model.DateConverter.Tests.pas',
+  Pdf4D.Model.Rectangle in '..\src\Model\Pdf4D.Model.Rectangle.pas',
+  Pdf4D.Model.Page in '..\src\Model\Pdf4D.Model.Page.pas',
+  Pdf4D.Model.PageTree in '..\src\Model\Pdf4D.Model.PageTree.pas',
+  Pdf4D.Model.DocumentInformation in '..\src\Model\Pdf4D.Model.DocumentInformation.pas',
+  Pdf4D.Model.DocumentCatalog in '..\src\Model\Pdf4D.Model.DocumentCatalog.pas',
+  Pdf4D.Model.Document in '..\src\Model\Pdf4D.Model.Document.pas',
+  Pdf4D.Model.Tests.Support in '..\src\Model\Pdf4D.Model.Tests.Support.pas',
+  Pdf4D.Model.PageTree.Tests in '..\src\Model\Pdf4D.Model.PageTree.Tests.pas',
+  Pdf4D.Model.Page.Tests in '..\src\Model\Pdf4D.Model.Page.Tests.pas',
+  Pdf4D.Model.Document.Tests in '..\src\Model\Pdf4D.Model.Document.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
