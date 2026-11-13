@@ -33,6 +33,11 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - Names are returned as `string`, not as a separate name type.
 - `TPDField` carries a `Kind` instead of a subclass per field type (`PDTextField`, `PDCheckBox`, `PDNonTerminalField` and the others). The kind is decided once, as `PDFieldFactory.createField` does, and every kind-specific property (`ValueAsString`, `Values`, `ExportValues`, `OnValues`) gives the value of an empty one when it does not belong to the kind.
 - The field tree is walked without recursion and cut off at `MaxFieldDepth` (256) levels, which also bounds the `/Parent` chain that is followed for `/FT`; PDFBox recurses and has no such limit.
+- A node or leaf of the page tree that is reachable twice is listed once.
+- Lookup of a page by index uses the list that the walk of the tree found, not the `/Count` entries.
+- `TPDDateConverter` keeps to the limits of the port: time zone names are recognised from a fixed list, there is no Julian calendar, and years run from 1 to 9999.
+- The page labels are made for the smaller of `/Count` and the pages that the walk finds, not for `/Count` alone.
+- `ValueAsString` of a non terminal field and of a signature field is empty (PDFBox prints Java object text there).
 - No bidirectional text processing.
 - Images are not decoded.
 

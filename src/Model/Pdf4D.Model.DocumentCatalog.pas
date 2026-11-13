@@ -13,8 +13,8 @@ uses
   Pdf4D.Model.PageTree;
 
 type
-  // The catalog (/Root). It holds the dictionary and does not own it. The sub dictionaries are given as they are,
-  // except the outline, the classes for forms and so on come with the tasks that need them.
+  // The catalog (/Root). It holds the dictionary and does not own it. It owns what it gives out: the page tree, the
+  // destination resolver, the outline and the form. The other entries are given as the dictionary or stream they are.
   TPDDocumentCatalog = class
   private
     FRoot: TCosDictionary;

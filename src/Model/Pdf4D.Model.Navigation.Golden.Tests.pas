@@ -319,7 +319,7 @@ begin
   const Corpus = CorpusFolder;
   if Corpus = '' then
   begin
-    Assert.Pass('The corpus was not found');
+    Assert.Fail('The corpus was not found');
   end;
 
   const GoldenFolder = TPath.Combine(TPath.GetDirectoryName(Corpus), 'golden');

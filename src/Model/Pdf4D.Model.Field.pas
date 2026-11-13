@@ -93,14 +93,18 @@ type
     // /Opt or /V array of choice or button that holds something else than strings (where PDFBox throws).
     property ValueAsString: string read GetValueAsString;
 
-    // Port of PDChoice.getValue: /V of the field itself (not inherited) as a string or an array of strings
+    // Port of PDChoice.getValue: /V of the field itself (not inherited) as a string or an array of strings. Raises
+    // EPdfParseException when the /V array holds something else than direct strings (PDFBox throws a ClassCastException).
     property Values: TArray<string> read GetValues;
 
-    // Port of PDButton.getExportValues: /Opt, inherited. Empty for a push button and other kinds.
+    // Port of PDButton.getExportValues: /Opt, inherited. Empty for a push button and other kinds. Raises EPdfParseException
+    // when the /Opt array holds something else than direct strings.
     property ExportValues: TArray<string> read GetExportValues;
 
-    // Port of PDButton.getOnValues: the export values, or else the on value of each widget (see Assumptions). Order of
-    // first occurrence, without doubles.
+    // Port of PDButton.getOnValues for a check box and a radio button: the export values, or else for each widget the first
+    // entry of its normal appearance (/AP /N) that is a stream and not /Off ('' when there is none). Order of first
+    // occurrence, without doubles. Raises EPdfParseException for an export value array that is not made of direct strings
+    // and for a normal appearance that is a stream.
     property OnValues: TArray<string> read GetOnValues;
 
     property Kind: TPdfFieldKind read FKind;

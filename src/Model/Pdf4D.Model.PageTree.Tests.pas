@@ -157,8 +157,8 @@ begin
     end;
 
     // The page that the cyclic nodes point to is counted for each node that lists it, not for each walk around the cycle
-    Assert.IsTrue(Count <= 2, Format('%d pages', [Count]));
-    Assert.IsTrue(Count >= 1);
+    Assert.AreEqual(2, Count);
+    Assert.IsTrue(FDocuments.HasLogLine('already been visited'));
   finally
     Builder.Free;
   end;
@@ -300,18 +300,18 @@ end;
 procedure TPageTreeTests.TestVeryDeepTreeDoesNotOverflowTheStack;
 begin
   const Depth = 3000;
-  const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [3 0 R] /Count 1 /Rotate 90 >>');
   try
     for var Level := 1 to Depth - 1 do
     begin
       Builder.AddObject(2 + Level, Format('<< /Type /Pages /Parent %d 0 R /Kids [%d 0 R] /Count 1 >>', [1 + Level, 3 + Level]));
     end;
-    Builder.AddObject(2 + Depth, Format('<< /Type /Page /Parent %d 0 R /Rotate 90 >>', [1 + Depth]));
+    Builder.AddObject(2 + Depth, Format('<< /Type /Page /Parent %d 0 R >>', [1 + Depth]));
     const Document = FDocuments.Open(Builder);
 
     Assert.AreEqual(1, Document.Pages.EnumeratedCount);
-    // The /Rotate of the page itself, and an inherited value that is 3000 parents away is out of reach
-    Assert.AreEqual(90, Document.Pages.Get(0).Rotation);
+    // The /Rotate of the root is 3000 parents away, which is out of reach of the inheritance
+    Assert.AreEqual(0, Document.Pages.Get(0).Rotation);
   finally
     Builder.Free;
   end;

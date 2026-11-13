@@ -61,8 +61,9 @@ type
 
     function TryGetPageLabelRange(const StartPage: Integer; out Range: TPDPageLabelRange): Boolean;
 
-    // Port of getLabelsByPageIndices: the array has as many entries as the /Count of the page tree, like
-    // PDDocument.getNumberOfPages. An entry that has no label is empty. Raises EPdfParseException for a negative /Count
+    // Port of getLabelsByPageIndices: the array has as many entries as the /Count of the page tree (PDDocument.getNumberOfPages),
+    // but never more than the pages that the walk of the tree finds: a label beyond the real pages cannot be asked for, and a
+    // /Count that is far too large must not allocate for nothing. An entry that has no label is empty. Raises EPdfParseException for a negative /Count
     // and for a null range that has pages (a NullPointerException in PDFBox), and EPdfLimitExceededException beyond
     // MaxPageLabelCount pages or MaxPageLabelCharacters characters.
     function GetLabelsByPageIndices: TArray<string>;
@@ -331,11 +332,12 @@ end;
 
 function TPDPageLabels.GetLabelsByPageIndices: TArray<string>;
 begin
-  const NumberOfPages = FDocument.Pages.Count;
-  if NumberOfPages < 0 then
+  const CountEntry = FDocument.Pages.Count;
+  if CountEntry < 0 then
   begin
-    raise EPdfParseException.CreateFmt('The page tree has a negative page count of %d', [NumberOfPages]);
+    raise EPdfParseException.CreateFmt('The page tree has a negative page count of %d', [CountEntry]);
   end;
+  const NumberOfPages = Min(CountEntry, FDocument.Pages.EnumeratedCount);
   if NumberOfPages > MaxPageLabelCount then
   begin
     raise EPdfLimitExceededException.CreateFmt('The page tree has %d pages, more than the %d that page labels are made for', [NumberOfPages, MaxPageLabelCount]);

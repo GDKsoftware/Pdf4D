@@ -87,12 +87,16 @@ type
 
     [Test]
     procedure TestCatalogGivesNoFormWithoutAcroForm;
+
+    [Test]
+    procedure TestRepeatedRootIsListedAgainButNotExpandedAgain;
   end;
 
 implementation
 
 uses
   System.Classes,
+  System.Diagnostics,
   Pdf4D.Common.Defines,
   Pdf4D.Model.Document,
   Pdf4D.Model.Field;
@@ -517,6 +521,47 @@ begin
     Assert.IsFalse(FDocuments.Open(Builder).Catalog.TryGetAcroForm(Form));
   finally
     Builder.Free;
+  end;
+end;
+
+procedure TFieldTests.TestRepeatedRootIsListedAgainButNotExpandedAgain;
+begin
+  const RootCount = 3000;
+  const KidCount = 500;
+  const Roots = TStringBuilder.Create;
+  const Kids = TStringBuilder.Create;
+  try
+    for var Index := 1 to RootCount do
+    begin
+      Roots.Append('4 0 R ');
+    end;
+    for var Index := 1 to KidCount do
+    begin
+      Kids.Append(5 + Index).Append(' 0 R ');
+    end;
+
+    const Builder = NewFormBuilder(Format('/Fields [%s]', [Roots.ToString]));
+    try
+      Builder.AddObject(4, Format('<< /T (a) /Kids [%s] >>', [Kids.ToString]));
+      for var Index := 1 to KidCount do
+      begin
+        Builder.AddObject(5 + Index, '<< /T (k) /FT /Tx /Parent 4 0 R >>');
+      end;
+      const Form = OpenForm(Builder);
+
+      const Watch = TStopwatch.StartNew;
+      const Tree = Form.GetFieldTree;
+
+      Assert.AreEqual<Integer>(RootCount + KidCount, Length(Tree));
+      Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, 'The tree took too long');
+      Assert.AreEqual('a.k', Tree[1].FullyQualifiedName);
+      Assert.AreEqual('a', Tree[RootCount + KidCount - 1].FullyQualifiedName);
+    finally
+      Builder.Free;
+    end;
+  finally
+    Kids.Free;
+    Roots.Free;
   end;
 end;
 

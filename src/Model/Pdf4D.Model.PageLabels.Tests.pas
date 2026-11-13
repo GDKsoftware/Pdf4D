@@ -52,6 +52,9 @@ type
     procedure TestLabelsFollowTheCountOfThePageTree;
 
     [Test]
+    procedure TestHugeCountWithFewPagesAllocatesForTheRealPages;
+
+    [Test]
     procedure TestRangeBeyondTheLastPageAndNegativeKeysChangeNothing;
 
     [Test]
@@ -62,9 +65,6 @@ type
 
     [Test]
     procedure TestNullRangeRaisesWhenItHasPages;
-
-    [Test]
-    procedure TestHugeCountIsLimited;
 
     [Test]
     procedure TestHugeLabelsAreLimited;
@@ -207,11 +207,28 @@ begin
   const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [10 0 R] /Count 3 >>');
   try
     Builder.AddObject(10, '<< /Type /Page /Parent 2 0 R >>');
-    // The count says 3 and there is one page: PDFBox makes the labels for the count
+    // The count says 3 and there is one page: the labels are made for the page that exists
     const Labels = TPDPageLabels.Create(FDocuments.Open(Builder));
     try
       Assert.AreEqual(1, FDocuments.Document.Pages.EnumeratedCount);
-      Assert.AreEqual<Integer>(3, Length(Labels.GetLabelsByPageIndices));
+      Assert.AreEqual<Integer>(1, Length(Labels.GetLabelsByPageIndices));
+    finally
+      Labels.Free;
+    end;
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TPageLabelsTests.TestHugeCountWithFewPagesAllocatesForTheRealPages;
+begin
+  const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [10 0 R 11 0 R] /Count 9999999 >>');
+  try
+    Builder.AddObject(10, '<< /Type /Page /Parent 2 0 R >>');
+    Builder.AddObject(11, '<< /Type /Page /Parent 2 0 R >>');
+    const Labels = TPDPageLabels.Create(FDocuments.Open(Builder));
+    try
+      Assert.AreEqual<Integer>(2, Length(Labels.GetLabelsByPageIndices));
     finally
       Labels.Free;
     end;
@@ -259,25 +276,6 @@ begin
       end, EPdfParseException);
   finally
     Labels.Free;
-  end;
-end;
-
-procedure TPageLabelsTests.TestHugeCountIsLimited;
-begin
-  const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [] /Count 2000000000 >>');
-  try
-    const Labels = TPDPageLabels.Create(FDocuments.Open(Builder));
-    try
-      Assert.WillRaiseDescendant(
-        procedure
-        begin
-          Labels.GetLabelsByPageIndices;
-        end, EPdfLimitExceededException);
-    finally
-      Labels.Free;
-    end;
-  finally
-    Builder.Free;
   end;
 end;
 

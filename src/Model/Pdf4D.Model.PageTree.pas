@@ -69,7 +69,7 @@ type
     destructor Destroy; override;
 
     // Port of PDPageTree.getInheritableAttribute: the value of Key on the node or on the nearest ancestor that is a page
-    // tree node, with indirect references resolved. The walk stops at a cycle and after MaxInheritanceDepth parents.
+    // tree node, with indirect references resolved. The walk stops after MaxInheritanceDepth nodes, which also ends a cycle.
     class function TryGetInheritableAttribute(const Node: TCosDictionary; const Key: string; out Value: TCosBase): Boolean; static;
 
     // Zero based. Raises EArgumentOutOfRangeException beyond the pages that the walk found.
@@ -155,35 +155,32 @@ class function TPDPageTree.TryGetInheritableAttribute(const Node: TCosDictionary
 begin
   Value := nil;
   Result := False;
-  const Visited = TDictionary<TCosDictionary, Boolean>.Create;
-  try
-    var Current := Node;
-    while Assigned(Current) and (Visited.Count < MaxInheritanceDepth) and not Visited.ContainsKey(Current) do
+  // The number of steps bounds the work and ends a cycle of /Parent entries, without a set of the nodes seen
+  var Current := Node;
+  var Steps := 0;
+  while Assigned(Current) and (Steps < MaxInheritanceDepth) do
+  begin
+    Inc(Steps);
+    if Current.TryGetDictionaryObject(Key, Value) then
     begin
-      Visited.Add(Current, True);
-      if Current.TryGetDictionaryObject(Key, Value) then
-      begin
-        Exit(True);
-      end;
-
-      // getCOSDictionary(PARENT, P): /P is only looked at when there is no /Parent
-      var ParentValue: TCosBase;
-      if not Current.TryGetDictionaryObject(TCosNames.Parent, ParentValue) then
-      begin
-        Current.TryGetDictionaryObject(TCosNames.P, ParentValue);
-      end;
-
-      if (ParentValue is TCosDictionary) and HasTypeName(TCosDictionary(ParentValue), TCosNames.Pages) then
-      begin
-        Current := TCosDictionary(ParentValue);
-      end
-      else
-      begin
-        Current := nil;
-      end;
+      Exit(True);
     end;
-  finally
-    Visited.Free;
+
+    // getCOSDictionary(PARENT, P): /P is only looked at when there is no /Parent
+    var ParentValue: TCosBase;
+    if not Current.TryGetDictionaryObject(TCosNames.Parent, ParentValue) then
+    begin
+      Current.TryGetDictionaryObject(TCosNames.P, ParentValue);
+    end;
+
+    if (ParentValue is TCosDictionary) and HasTypeName(TCosDictionary(ParentValue), TCosNames.Pages) then
+    begin
+      Current := TCosDictionary(ParentValue);
+    end
+    else
+    begin
+      Current := nil;
+    end;
   end;
 end;
 

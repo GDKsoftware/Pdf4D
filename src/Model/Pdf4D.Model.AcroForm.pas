@@ -28,7 +28,8 @@ type
     destructor Destroy; override;
 
     // Port of PDFieldTree: all fields in document order, depth first, a non terminal field before its children. A field
-    // that is met a second time below another field is left out, a tree that is too deep is cut off. Walks without recursion.
+    // that is met a second time below another field is left out. A field of /Fields that is met again is listed again but its
+    // kids are not walked again. A tree that is too deep is cut off. Walks without recursion.
     function GetFieldTree: TArray<TPDField>;
 
     // Port of getField: the first field of the tree with this fully qualified name
@@ -112,8 +113,8 @@ begin
     while Pending.Count > 0 do
     begin
       const Field = Pending.Pop;
-      // The fields of the form itself are not checked, as in PDFBox
-      if Assigned(Field.Parent) and Seen.ContainsKey(Field.CosObject) then
+      const IsRepeated = Seen.ContainsKey(Field.CosObject);
+      if IsRepeated and Assigned(Field.Parent) then
       begin
         if Assigned(FPool.Log) then
         begin
@@ -123,7 +124,13 @@ begin
       end;
 
       Ordered.Add(Field);
-      Seen.AddOrSetValue(Field.CosObject, True);
+      // A field of the form itself is listed again, as PDFBox does, but its kids were met the first time and are skipped
+      // there: not expanding them again keeps the work and the memory linear for a /Fields array that repeats a field
+      if IsRepeated then
+      begin
+        Continue;
+      end;
+      Seen.Add(Field.CosObject, True);
 
       const Children = Field.Children;
       for var Index := High(Children) downto 0 do
