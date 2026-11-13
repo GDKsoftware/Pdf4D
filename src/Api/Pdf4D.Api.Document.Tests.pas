@@ -71,6 +71,12 @@ type
     procedure TestInfoAndXmpMetadata;
 
     [Test]
+    procedure TestInfoDatesGiveTheTimeZoneOffset;
+
+    [Test]
+    procedure TestPermissionsOutliveDocumentReference;
+
+    [Test]
     procedure TestMissingFileRaisesAPdfException;
 
     [Test]
@@ -435,6 +441,45 @@ begin
     Assert.AreEqual<TDateTime>(EncodeDate(2024, 1, 2) + EncodeTime(3, 4, 5, 0), Created);
     Assert.IsFalse(Info.TryGetModificationDate(Created));
     Assert.AreEqual('<x/>', TEncoding.ASCII.GetString(Document.XmpMetadata));
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TApiDocumentTests.TestInfoDatesGiveTheTimeZoneOffset;
+begin
+  const Builder = TModelTestDocuments.NewBuilderWithPages(1, '');
+  try
+    Builder.AddObject(3, '<< /CreationDate (D:20240102030405+05''30'') /ModDate (D:20240102030405Z) >>');
+    Builder.TrailerExtra := '/Info 3 0 R';
+    const Info = LoadFromMemory(Builder).Info;
+
+    var Moment: TDateTime;
+    var OffsetMinutes: Integer;
+    Assert.IsTrue(Info.TryGetCreationDate(Moment, OffsetMinutes));
+    Assert.AreEqual<TDateTime>(EncodeDate(2024, 1, 2) + EncodeTime(3, 4, 5, 0), Moment);
+    Assert.AreEqual(330, OffsetMinutes);
+    Assert.IsTrue(Info.TryGetModificationDate(Moment, OffsetMinutes));
+    Assert.AreEqual(0, OffsetMinutes);
+    Assert.IsTrue(Info.TryGetModificationDate(Moment));
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TApiDocumentTests.TestPermissionsOutliveDocumentReference;
+begin
+  const Builder = TModelTestDocuments.NewBuilderWithPages(1, '');
+  try
+    var Document := LoadFromMemory(Builder);
+    const Permissions = Document.Permissions;
+
+    Document := nil;
+
+    Assert.IsTrue(Permissions.CanPrint);
+    Assert.IsTrue(Permissions.CanExtractContent);
+    Assert.IsTrue(Permissions.IsOwnerPermission);
+    Assert.AreEqual(-4, Permissions.Bits);
   finally
     Builder.Free;
   end;

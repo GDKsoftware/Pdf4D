@@ -40,7 +40,7 @@ type
     function Page(const Index: Integer): IPdfPage;
     function Version: Single;
     function IsEncrypted: Boolean;
-    function Permissions: TPdfAccessPermission;
+    function Permissions: IPdfPermissions;
     function Info: IPdfDocumentInfo;
     function XmpMetadata: TBytes;
     function Outline: TArray<IPdfOutlineItem>;
@@ -65,6 +65,27 @@ uses
   Pdf4D.Model.DocumentInformation;
 
 type
+  // A copy of the permissions of the inner layer, so that it does not depend on the document
+  TPdfPermissions = class(TInterfacedObject, IPdfPermissions)
+  private
+    FPermission: TPdfAccessPermission;
+
+  public
+    constructor Create(const Source: TPdfAccessPermission);
+    destructor Destroy; override;
+
+    function CanPrint: Boolean;
+    function CanModify: Boolean;
+    function CanExtractContent: Boolean;
+    function CanModifyAnnotations: Boolean;
+    function CanFillInForm: Boolean;
+    function CanExtractForAccessibility: Boolean;
+    function CanAssembleDocument: Boolean;
+    function CanPrintFaithful: Boolean;
+    function IsOwnerPermission: Boolean;
+    function Bits: Integer;
+  end;
+
   TPdfDocumentInfo = class(TInterfacedObject, IPdfDocumentInfo)
   private
     FHandle: IPdfDocumentHandle;
@@ -80,11 +101,78 @@ type
     function Keywords: string;
     function Creator: string;
     function Producer: string;
-    function TryGetCreationDate(out Value: TDateTime): Boolean;
-    function TryGetModificationDate(out Value: TDateTime): Boolean;
+    function TryGetCreationDate(out Value: TDateTime): Boolean; overload;
+    function TryGetModificationDate(out Value: TDateTime): Boolean; overload;
+    function TryGetCreationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean; overload;
+    function TryGetModificationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean; overload;
     function Keys: TArray<string>;
     function TryGetValue(const Key: string; out Value: string): Boolean;
   end;
+
+{ TPdfPermissions }
+
+constructor TPdfPermissions.Create(const Source: TPdfAccessPermission);
+begin
+  inherited Create;
+  FPermission := Source.Clone;
+  FPermission.SetReadOnly;
+end;
+
+destructor TPdfPermissions.Destroy;
+begin
+  FPermission.Free;
+  inherited;
+end;
+
+function TPdfPermissions.CanPrint: Boolean;
+begin
+  Result := FPermission.CanPrint;
+end;
+
+function TPdfPermissions.CanModify: Boolean;
+begin
+  Result := FPermission.CanModify;
+end;
+
+function TPdfPermissions.CanExtractContent: Boolean;
+begin
+  Result := FPermission.CanExtractContent;
+end;
+
+function TPdfPermissions.CanModifyAnnotations: Boolean;
+begin
+  Result := FPermission.CanModifyAnnotations;
+end;
+
+function TPdfPermissions.CanFillInForm: Boolean;
+begin
+  Result := FPermission.CanFillInForm;
+end;
+
+function TPdfPermissions.CanExtractForAccessibility: Boolean;
+begin
+  Result := FPermission.CanExtractForAccessibility;
+end;
+
+function TPdfPermissions.CanAssembleDocument: Boolean;
+begin
+  Result := FPermission.CanAssembleDocument;
+end;
+
+function TPdfPermissions.CanPrintFaithful: Boolean;
+begin
+  Result := FPermission.CanPrintFaithful;
+end;
+
+function TPdfPermissions.IsOwnerPermission: Boolean;
+begin
+  Result := FPermission.IsOwnerPermission;
+end;
+
+function TPdfPermissions.Bits: Integer;
+begin
+  Result := FPermission.PermissionBytes;
+end;
 
 { TPdfDocumentInfo }
 
@@ -138,6 +226,16 @@ end;
 function TPdfDocumentInfo.TryGetModificationDate(out Value: TDateTime): Boolean;
 begin
   var OffsetMinutes: Integer;
+  Result := Information.TryGetModificationDate(Value, OffsetMinutes);
+end;
+
+function TPdfDocumentInfo.TryGetCreationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean;
+begin
+  Result := Information.TryGetCreationDate(Value, OffsetMinutes);
+end;
+
+function TPdfDocumentInfo.TryGetModificationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean;
+begin
   Result := Information.TryGetModificationDate(Value, OffsetMinutes);
 end;
 
@@ -237,9 +335,9 @@ begin
   Result := FHandle.Document.IsEncrypted;
 end;
 
-function TPdfDocument.Permissions: TPdfAccessPermission;
+function TPdfDocument.Permissions: IPdfPermissions;
 begin
-  Result := FHandle.Document.AccessPermission;
+  Result := TPdfPermissions.Create(FHandle.Document.AccessPermission);
 end;
 
 function TPdfDocument.Info: IPdfDocumentInfo;

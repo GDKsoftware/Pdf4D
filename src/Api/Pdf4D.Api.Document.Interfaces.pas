@@ -8,10 +8,27 @@ uses
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
-  Pdf4D.Cos.Document,
-  Pdf4D.Encryption.AccessPermission;
+  Pdf4D.Cos.Document;
 
 type
+  // What the current user may do with the document: a copy of the permission bits of the encryption dictionary (all permissions
+  // for a document without encryption). It does not depend on the document and stays valid after it is released.
+  IPdfPermissions = interface
+    ['{5D7E2A91-3C84-4B06-A1F5-9E0B6D4C8372}']
+
+    function CanPrint: Boolean;
+    function CanModify: Boolean;
+    function CanExtractContent: Boolean;
+    function CanModifyAnnotations: Boolean;
+    function CanFillInForm: Boolean;
+    function CanExtractForAccessibility: Boolean;
+    function CanAssembleDocument: Boolean;
+    function CanPrintFaithful: Boolean;
+    function IsOwnerPermission: Boolean;
+    // The bits as the /P entry holds them
+    function Bits: Integer;
+  end;
+
   // The /Info dictionary. A text entry that is missing gives an empty string.
   IPdfDocumentInfo = interface
     ['{1A9C4E70-6B3D-4F25-8E1A-D07B5C92E468}']
@@ -23,8 +40,12 @@ type
     function Creator: string;
     function Producer: string;
     // The wall clock time of the date, without its time zone. False when the entry is missing or is no date.
-    function TryGetCreationDate(out Value: TDateTime): Boolean;
-    function TryGetModificationDate(out Value: TDateTime): Boolean;
+    function TryGetCreationDate(out Value: TDateTime): Boolean; overload;
+    function TryGetModificationDate(out Value: TDateTime): Boolean; overload;
+    // The same with the offset of the time zone of the date in minutes east of UTC (+01:00 is 60): Value minus OffsetMinutes
+    // is the UTC time
+    function TryGetCreationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean; overload;
+    function TryGetModificationDate(out Value: TDateTime; out OffsetMinutes: Integer): Boolean; overload;
     // All keys in the order of the file
     function Keys: TArray<string>;
     function TryGetValue(const Key: string; out Value: string): Boolean;
@@ -45,8 +66,7 @@ type
 
     function Version: Single;
     function IsEncrypted: Boolean;
-    // Owned by the document: do not free it
-    function Permissions: TPdfAccessPermission;
+    function Permissions: IPdfPermissions;
 
     function Info: IPdfDocumentInfo;
     // The XMP metadata stream, empty when there is none
