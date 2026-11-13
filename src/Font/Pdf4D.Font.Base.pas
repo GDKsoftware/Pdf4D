@@ -110,7 +110,7 @@ type
     // For a font that was made from a dictionary of its own (the default font): the font frees Dictionary with itself
     procedure OwnDictionary;
 
-    function TryGetFontDescriptor(out Descriptor: TPDFontDescriptor): Boolean;
+    function TryGetFontDescriptor(out Descriptor: TPDFontDescriptor): Boolean; virtual;
     // The shared AFM when the font is one of the standard 14, otherwise False. The caller does not own it.
     function TryGetStandardAFM(out Metrics: TFontMetrics): Boolean;
     function IsStandard14: Boolean; virtual;

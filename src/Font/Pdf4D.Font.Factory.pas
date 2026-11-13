@@ -12,11 +12,12 @@ uses
   System.SysUtils,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Base,
+  Pdf4D.Font.CIDFont,
   Pdf4D.Model.DocumentContext;
 
 type
-  // Makes the right font class for a font dictionary. Type 1 (with or without /FontFile3), MMType1 and TrueType are known; the other
-  // subtypes raise EPdfUnsupportedFeatureException until their classes exist.
+  // Makes the right font class for a font dictionary. Type 1 (with or without /FontFile3), MMType1, TrueType and Type0 are known; the
+  // other subtypes raise EPdfUnsupportedFeatureException until their classes exist.
   TPDFontFactory = class
   private
     class function HasFontFile3(const Dictionary: TCosDictionary): Boolean; static;
@@ -35,6 +36,10 @@ type
     class function GetFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
     // Helvetica with WinAnsiEncoding, like PDType1Font.HELVETICA. The caller owns the font.
     class function CreateDefaultFont(const Context: TPDDocumentContext): TPDFont; static;
+    // PDFontFactory.createDescendantFont: the CID font of a Type 0 font, which the caller owns. Parent stays the owner of
+    // nothing and has to outlive the font. Raises EPdfParseException for a dictionary that is not a font or has another
+    // subtype than CIDFontType0 or CIDFontType2.
+    class function CreateDescendantFont(const Dictionary: TCosDictionary; const Parent: TPDCIDFontParent): TPDCIDFont; static;
   end;
 
 implementation
@@ -44,6 +49,8 @@ uses
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
+  Pdf4D.Font.CIDFontType2,
+  Pdf4D.Font.Type0,
   Pdf4D.Font.Type1,
   Pdf4D.Font.TrueType,
   Pdf4D.Font.Type1C;
@@ -113,7 +120,11 @@ begin
   begin
     Result := TPDTrueTypeFont.Create(Dictionary, Context);
   end
-  else if (SubType = TCosNames.Type3) or (SubType = TCosNames.Type0) then
+  else if SubType = TCosNames.Type0 then
+  begin
+    Result := TPDType0Font.Create(Dictionary, Context);
+  end
+  else if SubType = TCosNames.Type3 then
   begin
     raise EPdfUnsupportedFeatureException.CreateFmt('Font subtype %s is not supported yet', [SubType]);
   end
@@ -127,6 +138,34 @@ begin
     // sophisticated logic perhaps looking at the FontFile.
     LogWarning(Context, 'Invalid font subtype ''%s''', [SubType]);
     Result := TPDType1Font.Create(Dictionary, Context);
+  end;
+end;
+
+class function TPDFontFactory.CreateDescendantFont(const Dictionary: TCosDictionary; const Parent: TPDCIDFontParent): TPDCIDFont;
+begin
+  if not Assigned(Dictionary) then
+  begin
+    raise EArgumentNilException.Create('A descendant font needs a font dictionary');
+  end;
+
+  const TypeName = Dictionary.GetNameAsString(TCosNames.Type_, TCosNames.Font);
+  if TypeName <> TCosNames.Font then
+  begin
+    raise EPdfParseException.CreateFmt('Expected ''Font'' dictionary but found ''%s''', [TypeName]);
+  end;
+
+  const SubType = Dictionary.GetNameAsString(TCosNames.Subtype, '');
+  if SubType = TCosNames.CIDFontType2 then
+  begin
+    Result := TPDCIDFontType2.Create(Dictionary, Parent);
+  end
+  else if SubType = TCosNames.CIDFontType0 then
+  begin
+    raise EPdfUnsupportedFeatureException.CreateFmt('Font subtype %s is not supported yet', [SubType]);
+  end
+  else
+  begin
+    raise EPdfParseException.CreateFmt('Invalid font type: %s', [TypeName]);
   end;
 end;
 
