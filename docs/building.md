@@ -30,3 +30,7 @@ The Linux64 binary is built with msbuild on Windows and run in WSL. The script c
 ## Adding source folders
 
 The test project's unit search path lists each folder under `src\` explicitly (Delphi has no wildcards). Add a new folder to `DCC_UnitSearchPath` in `tests\Pdf4D.Tests.dproj` and add new test units to `tests\Pdf4D.Tests.dpr`.
+
+## DEC for the crypto tests
+
+The AES tests compare against Delphi Encryption Compendium (DEC) 6.4.1. DEC is used by the tests only and the library does not depend on it. Run `tools/fetch-dec.ps1` once; it puts DEC in `tests\ThirdParty\DEC` (ignored by git). The test project's search path contains `tests\ThirdParty\DEC\Source`, and Linux64 defines `NO_ASM`.

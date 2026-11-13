@@ -34,7 +34,9 @@ uses
   Pdf4D.Parser.Xref.Tests in '..\src\Parser\Pdf4D.Parser.Xref.Tests.pas',
   Pdf4D.Parser.ObjectStream.Tests in '..\src\Parser\Pdf4D.Parser.ObjectStream.Tests.pas',
   Pdf4D.Parser.Pdf.Tests in '..\src\Parser\Pdf4D.Parser.Pdf.Tests.pas',
-  Pdf4D.Parser.BruteForce.Tests in '..\src\Parser\Pdf4D.Parser.BruteForce.Tests.pas';
+  Pdf4D.Parser.BruteForce.Tests in '..\src\Parser\Pdf4D.Parser.BruteForce.Tests.pas',
+  Pdf4D.Crypto.RC4.Tests in '..\src\Crypto\Pdf4D.Crypto.RC4.Tests.pas',
+  Pdf4D.Crypto.AES.Tests in '..\src\Crypto\Pdf4D.Crypto.AES.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
