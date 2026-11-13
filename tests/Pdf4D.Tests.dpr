@@ -16,7 +16,9 @@ uses
   Pdf4D.Cos.Float.Tests in '..\src\Cos\Pdf4D.Cos.Float.Tests.pas',
   Pdf4D.Cos.Name.Tests in '..\src\Cos\Pdf4D.Cos.Name.Tests.pas',
   Pdf4D.Cos.PdfDocEncoding.Tests in '..\src\Cos\Pdf4D.Cos.PdfDocEncoding.Tests.pas',
-  Pdf4D.Cos.PdfString.Tests in '..\src\Cos\Pdf4D.Cos.PdfString.Tests.pas';
+  Pdf4D.Cos.PdfString.Tests in '..\src\Cos\Pdf4D.Cos.PdfString.Tests.pas',
+  Pdf4D.Cos.Dictionary.Tests in '..\src\Cos\Pdf4D.Cos.Dictionary.Tests.pas',
+  Pdf4D.Cos.Document.Tests in '..\src\Cos\Pdf4D.Cos.Document.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

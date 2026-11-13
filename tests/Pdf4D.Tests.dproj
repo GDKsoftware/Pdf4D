@@ -85,6 +85,8 @@
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfDocEncoding.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfString.Tests.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Dictionary.Tests.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Document.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
