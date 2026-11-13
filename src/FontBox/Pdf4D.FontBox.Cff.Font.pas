@@ -18,6 +18,15 @@ uses
   Pdf4D.FontBox.Cff.Encoding;
 
 type
+  // The DICT keys that the parser and the fonts both use
+  TCFFKeys = record
+  public
+    const FontMatrix = 'FontMatrix';
+    const FontBBox = 'FontBBox';
+    const Private_ = 'Private';
+    const SyntheticBase = 'SyntheticBase';
+  end;
+
   // A font DICT or private DICT of a CID-keyed font: numbers, strings and local subroutines by key. The parser fills it.
   TCFFDictionary = class
   private
@@ -53,14 +62,11 @@ type
     FTopDictStrings: TDictionary<string, string>;
     FCharStrings: TArray<TBytes>;
     FGlobalSubrs: TArray<TBytes>;
-    FLog: TPdfLog;
 
   public
     constructor Create;
     destructor Destroy; override;
 
-    // The log gets the warnings about damaged charstrings. The font does not own it; it must outlive the font.
-    procedure SetLog(const Log: TPdfLog);
     procedure SetName(const Name: string);
     procedure AddTopDictNumbers(const Key: string; const Values: TArray<Double>);
     procedure AddTopDictString(const Key, Value: string);
@@ -83,7 +89,6 @@ type
     // has no charstrings.
     function TryGetCharString(const GID: Integer; out CharString: TBytes): Boolean;
 
-    property Log: TPdfLog read FLog;
     property Charset: TCFFCharset read FCharset;
     property CharStrings: TArray<TBytes> read FCharStrings;
     property GlobalSubrs: TArray<TBytes> read FGlobalSubrs;
@@ -113,7 +118,9 @@ type
 
     // The width of the glyph; the .notdef width for a name that the charset does not have
     function GetWidth(const GlyphName: string): Single; override;
-    function GetWidthForGID(const GID: Integer): Single;
+    // A font does not keep a log, because fonts can be shared and outlive the log of a document. The warnings about a damaged
+    // charstring go to the log of the call, which may be nil.
+    function GetWidthForGID(const GID: Integer; const Log: TPdfLog = nil): Single;
     function HasGlyph(const GlyphName: string): Boolean; override;
 
     // 0 (.notdef) when the charset has no glyph with this name
@@ -159,6 +166,12 @@ type
   private
     FRanges: TArray<TCFFFormat3Range>;
     FSentinel: Integer;
+    // The ranges start in ascending order, so a binary search finds the same range as the linear one
+    FIsSorted: Boolean;
+
+    function GetFDIndexLinear(const GID: Integer): Integer;
+    function GetFDIndexSorted(const GID: Integer): Integer;
+    function RangeResult(const RangeIndex, GID: Integer): Integer;
 
   public
     constructor Create(const Ranges: TArray<TCFFFormat3Range>; const Sentinel: Integer);
@@ -211,8 +224,8 @@ type
     // The selector is a CID in the form \ddddd. A selector that has another form raises EPdfParseException.
     function GetWidth(const Selector: string): Single; override;
     // The width of the glyph of the CID. A CID whose glyph is beyond the CharStrings gets the .notdef charstring and the widths
-    // of the private DICT of that glyph.
-    function GetWidthForCID(const CID: Integer): Single;
+    // of the private DICT of that glyph. The log gets the warnings about a damaged charstring and may be nil.
+    function GetWidthForCID(const CID: Integer; const Log: TPdfLog = nil): Single;
     function HasGlyph(const Selector: string): Boolean; override;
 
     property Registry: string read FRegistry;
@@ -239,8 +252,7 @@ uses
   Pdf4D.FontBox.CharStringWidth;
 
 const
-  FontMatrixKey = 'FontMatrix';
-  FontBBoxKey = 'FontBBox';
+  InvalidSelectorMessage = 'Invalid selector "%s"';
   DefaultWidthXKey = 'defaultWidthX';
   NominalWidthXKey = 'nominalWidthX';
   BBoxNumberCount = 4;
@@ -355,11 +367,6 @@ begin
   inherited;
 end;
 
-procedure TCFFFont.SetLog(const Log: TPdfLog);
-begin
-  FLog := Log;
-end;
-
 procedure TCFFFont.SetName(const Name: string);
 begin
   FName := Name;
@@ -403,7 +410,7 @@ end;
 function TCFFFont.FontBBox: TBoundingBox;
 begin
   var Numbers: TArray<Double>;
-  if (not TryGetTopDictArray(FontBBoxKey, Numbers)) or (Length(Numbers) < BBoxNumberCount) then
+  if (not TryGetTopDictArray(TCFFKeys.FontBBox, Numbers)) or (Length(Numbers) < BBoxNumberCount) then
   begin
     raise EPdfParseException.Create('FontBBox must have 4 numbers');
   end;
@@ -414,7 +421,7 @@ end;
 function TCFFFont.FontMatrix: TArray<Single>;
 begin
   var Numbers: TArray<Double>;
-  if not TryGetTopDictArray(FontMatrixKey, Numbers) then
+  if not TryGetTopDictArray(TCFFKeys.FontMatrix, Numbers) then
   begin
     Numbers := [0.001, 0, 0, 0.001, 0, 0];
   end;
@@ -505,7 +512,7 @@ begin
   Result := GetWidthForGID(NameToGID(GlyphName));
 end;
 
-function TCFFType1Font.GetWidthForGID(const GID: Integer): Single;
+function TCFFType1Font.GetWidthForGID(const GID: Integer; const Log: TPdfLog): Single;
 begin
   var CharString: TBytes;
   if TryGetCharString(GID, CharString) then
@@ -599,9 +606,72 @@ begin
   inherited Create;
   FRanges := Ranges;
   FSentinel := Sentinel;
+  FIsSorted := True;
+  for var Index := 1 to High(Ranges) do
+  begin
+    if Ranges[Index].First < Ranges[Index - 1].First then
+    begin
+      FIsSorted := False;
+      Break;
+    end;
+  end;
 end;
 
 function TCFFFormat3FDSelect.GetFDIndex(const GID: Integer): Integer;
+begin
+  if FIsSorted then
+  begin
+    Result := GetFDIndexSorted(GID);
+  end
+  else
+  begin
+    Result := GetFDIndexLinear(GID);
+  end;
+end;
+
+// The range that holds the glyph is the last one that starts at or before it
+function TCFFFormat3FDSelect.GetFDIndexSorted(const GID: Integer): Integer;
+begin
+  var Low := 0;
+  var Top := High(FRanges);
+  var Found := -1;
+  while Low <= Top do
+  begin
+    const Middle = Low + ((Top - Low) div 2);
+    if FRanges[Middle].First <= GID then
+    begin
+      Found := Middle;
+      Low := Middle + 1;
+    end
+    else
+    begin
+      Top := Middle - 1;
+    end;
+  end;
+
+  if Found < 0 then
+  begin
+    Exit(0);
+  end;
+  Result := RangeResult(Found, GID);
+end;
+
+function TCFFFormat3FDSelect.RangeResult(const RangeIndex, GID: Integer): Integer;
+begin
+  const IsLastRange = (RangeIndex + 1 = System.Length(FRanges));
+  if not IsLastRange then
+  begin
+    Exit(FRanges[RangeIndex].FD);
+  end;
+  // The sentinel must be greater than the glyph
+  if FSentinel > GID then
+  begin
+    Exit(FRanges[RangeIndex].FD);
+  end;
+  Result := -1;
+end;
+
+function TCFFFormat3FDSelect.GetFDIndexLinear(const GID: Integer): Integer;
 begin
   for var Index := 0 to High(FRanges) do
   begin
@@ -756,12 +826,12 @@ begin
   var CID: Integer;
   if not TryParseSelector(Selector, CID) then
   begin
-    raise EPdfParseException.CreateFmt('Invalid selector "%s"', [Selector]);
+    raise EPdfParseException.CreateFmt(InvalidSelectorMessage, [Selector]);
   end;
   Result := GetWidthForCID(CID);
 end;
 
-function TCFFCIDFont.GetWidthForCID(const CID: Integer): Single;
+function TCFFCIDFont.GetWidthForCID(const CID: Integer; const Log: TPdfLog): Single;
 begin
   const GID = CIDToGID(CID);
   var CharString: TBytes;
@@ -817,7 +887,7 @@ begin
   var CID: Integer;
   if not TryParseSelector(Selector, CID) then
   begin
-    raise EPdfParseException.CreateFmt('Invalid selector "%s"', [Selector]);
+    raise EPdfParseException.CreateFmt(InvalidSelectorMessage, [Selector]);
   end;
   Result := (CID <> 0);
 end;

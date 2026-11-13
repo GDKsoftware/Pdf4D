@@ -70,6 +70,7 @@ uses
   Pdf4D.FontBox.Type1.Font in '..\src\FontBox\Pdf4D.FontBox.Type1.Font.pas',
   Pdf4D.FontBox.OpenType in '..\src\FontBox\Pdf4D.FontBox.OpenType.pas',
   Pdf4D.Tests.CffBuilder in 'Support\Pdf4D.Tests.CffBuilder.pas',
+  Pdf4D.Tests.CffParseOutcome in 'Support\Pdf4D.Tests.CffParseOutcome.pas',
   Pdf4D.FontBox.Cff.Parser.Tests in '..\src\FontBox\Pdf4D.FontBox.Cff.Parser.Tests.pas',
   Pdf4D.FontBox.Cff.CID.Tests in '..\src\FontBox\Pdf4D.FontBox.Cff.CID.Tests.pas',
   Pdf4D.FontBox.CharStringWidth.Tests in '..\src\FontBox\Pdf4D.FontBox.CharStringWidth.Tests.pas',

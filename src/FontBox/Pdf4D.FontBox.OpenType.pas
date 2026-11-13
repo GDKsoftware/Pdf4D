@@ -94,7 +94,8 @@ begin
   const Bytes = Data.ReadBytes(Integer(Length));
   const Parser = TCFFParser.Create(Host.Log);
   try
-    const Fonts = Parser.Parse(Bytes);
+    // Only the first font is used, so the others are not read
+    const Fonts = Parser.Parse(Bytes, 1);
     try
       if Fonts.Count = 0 then
       begin

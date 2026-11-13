@@ -85,7 +85,8 @@ type
   end;
 
   // A CID charset of format 1 or 2: ranges of consecutive CIDs. A range is only stored, so a range that reaches past the
-  // last glyph costs nothing. The first range that holds the value wins, as in PDFBox.
+  // last glyph costs nothing. The first range that holds the value wins, as in PDFBox. Freeze, which the parser calls
+  // once the ranges are in, builds the index for a binary search; the charset does not change after that.
   TCFFRangeCharsetCID = class(TCFFCharsetCID)
   private
     type
@@ -99,10 +100,21 @@ type
   private
     FRanges: TArray<TRange>;
     FRangeCount: Integer;
+    // The range indexes in order of StartCID, only when no two ranges share a CID; otherwise empty
+    FCIDOrder: TArray<Integer>;
+    // The ranges are in order of GID and do not share a GID
+    FGIDSorted: Boolean;
+    FIsFrozen: Boolean;
+
+    function FindByCID(const CID: Integer; out Range: TRange): Boolean;
+    function FindByGID(const GID: Integer; out Range: TRange): Boolean;
+    procedure BuildCIDOrder;
 
   public
     // The glyphs StartGID to StartGID + Left hold the CIDs First to First + Left
     procedure AddRangeMapping(const StartGID, First, Left: Integer);
+    // Builds the lookup index. Ranges added after that are not indexed, so the lookups go back to a linear search.
+    procedure Freeze;
 
     function GetGIDForCID(const CID: Integer): Integer; override;
     function GetCIDForGID(const GID: Integer): Integer; override;
@@ -153,6 +165,7 @@ type
 implementation
 
 uses
+  System.Generics.Defaults,
   Pdf4D.Common.Defines,
   Pdf4D.FontBox.Cff.StandardStrings;
 
@@ -368,32 +381,156 @@ begin
   FRanges[FRangeCount].StartCID := First;
   FRanges[FRangeCount].EndCID := First + Left;
   Inc(FRangeCount);
+  FIsFrozen := False;
+  FCIDOrder := nil;
+  FGIDSorted := False;
+end;
+
+procedure TCFFRangeCharsetCID.Freeze;
+begin
+  FGIDSorted := True;
+  for var Index := 1 to FRangeCount - 1 do
+  begin
+    if FRanges[Index].StartGID <= FRanges[Index - 1].EndGID then
+    begin
+      FGIDSorted := False;
+      Break;
+    end;
+  end;
+  BuildCIDOrder;
+  FIsFrozen := True;
+end;
+
+procedure TCFFRangeCharsetCID.BuildCIDOrder;
+begin
+  var Order: TArray<Integer>;
+  SetLength(Order, FRangeCount);
+  for var Index := 0 to FRangeCount - 1 do
+  begin
+    Order[Index] := Index;
+  end;
+
+  const Ranges = FRanges;
+  TArray.Sort<Integer>(Order, TComparer<Integer>.Construct(
+    function(const Left, Right: Integer): Integer
+    begin
+      Result := TComparer<Integer>.Default.Compare(Ranges[Left].StartCID, Ranges[Right].StartCID);
+      if Result = 0 then
+      begin
+        Result := TComparer<Integer>.Default.Compare(Left, Right);
+      end;
+    end));
+
+  // Where two ranges share a CID the first one must win, which only the linear search gives
+  for var Position := 1 to FRangeCount - 1 do
+  begin
+    if FRanges[Order[Position]].StartCID <= FRanges[Order[Position - 1]].EndCID then
+    begin
+      FCIDOrder := nil;
+      Exit;
+    end;
+  end;
+  FCIDOrder := Order;
+end;
+
+function TCFFRangeCharsetCID.FindByCID(const CID: Integer; out Range: TRange): Boolean;
+begin
+  Result := False;
+  const IsIndexed = FIsFrozen and (System.Length(FCIDOrder) = FRangeCount) and (FRangeCount > 0);
+  if IsIndexed then
+  begin
+    // The last range that starts at or before the CID
+    var Low := 0;
+    var High := FRangeCount - 1;
+    var Found := -1;
+    while Low <= High do
+    begin
+      const Middle = Low + ((High - Low) div 2);
+      if FRanges[FCIDOrder[Middle]].StartCID <= CID then
+      begin
+        Found := Middle;
+        Low := Middle + 1;
+      end
+      else
+      begin
+        High := Middle - 1;
+      end;
+    end;
+    if (Found >= 0) and (CID <= FRanges[FCIDOrder[Found]].EndCID) then
+    begin
+      Range := FRanges[FCIDOrder[Found]];
+      Result := True;
+    end;
+    Exit;
+  end;
+
+  for var Index := 0 to FRangeCount - 1 do
+  begin
+    const IsInRange = ((CID >= FRanges[Index].StartCID) and (CID <= FRanges[Index].EndCID));
+    if IsInRange then
+    begin
+      Range := FRanges[Index];
+      Exit(True);
+    end;
+  end;
+end;
+
+function TCFFRangeCharsetCID.FindByGID(const GID: Integer; out Range: TRange): Boolean;
+begin
+  Result := False;
+  if FIsFrozen and FGIDSorted then
+  begin
+    var Low := 0;
+    var High := FRangeCount - 1;
+    var Found := -1;
+    while Low <= High do
+    begin
+      const Middle = Low + ((High - Low) div 2);
+      if FRanges[Middle].StartGID <= GID then
+      begin
+        Found := Middle;
+        Low := Middle + 1;
+      end
+      else
+      begin
+        High := Middle - 1;
+      end;
+    end;
+    if (Found >= 0) and (GID <= FRanges[Found].EndGID) then
+    begin
+      Range := FRanges[Found];
+      Result := True;
+    end;
+    Exit;
+  end;
+
+  for var Index := 0 to FRangeCount - 1 do
+  begin
+    const IsInRange = ((GID >= FRanges[Index].StartGID) and (GID <= FRanges[Index].EndGID));
+    if IsInRange then
+    begin
+      Range := FRanges[Index];
+      Exit(True);
+    end;
+  end;
 end;
 
 function TCFFRangeCharsetCID.GetGIDForCID(const CID: Integer): Integer;
 begin
-  for var Index := 0 to FRangeCount - 1 do
+  var Range: TRange;
+  if FindByCID(CID, Range) then
   begin
-    const Range = FRanges[Index];
-    const IsInRange = ((CID >= Range.StartCID) and (CID <= Range.EndCID));
-    if IsInRange then
-    begin
-      Exit(Range.StartGID + (CID - Range.StartCID));
-    end;
+    Exit(Range.StartGID + (CID - Range.StartCID));
   end;
   Result := inherited GetGIDForCID(CID);
 end;
 
 function TCFFRangeCharsetCID.GetCIDForGID(const GID: Integer): Integer;
 begin
-  for var Index := 0 to FRangeCount - 1 do
+  var Range: TRange;
+  if FindByGID(GID, Range) then
   begin
-    const Range = FRanges[Index];
-    const IsInRange = ((GID >= Range.StartGID) and (GID <= Range.EndGID));
-    if IsInRange then
-    begin
-      Exit(Range.StartCID + (GID - Range.StartGID));
-    end;
+    Exit(Range.StartCID + (GID - Range.StartGID));
   end;
   Result := inherited GetCIDForGID(GID);
 end;

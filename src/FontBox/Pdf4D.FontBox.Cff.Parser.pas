@@ -65,11 +65,24 @@ type
     const MaxFontDicts = 256;
     // A private DICT is a few hundred bytes; this keeps the cost of reading one per font DICT bounded
     const MaxCIDPrivateDictSize = 65535;
+    // A font set holds one font; this is far more than a real one has and keeps the work for a damaged name INDEX bounded
+    const MaxFonts = 256;
+    // The work of one parse is limited to what the data can hold, with some room for the DICTs that are read twice
+    const BudgetFactor = 2;
+    const BudgetSlack = 4096;
 
   private
     FLog: TPdfLog;
     FStringIndex: TArray<string>;
-    FCIDSubrsBytes: Int64;
+    // What one parse may still read: INDEX entries (and glyph tables) and bytes, shared by all fonts and font DICTs
+    FEntriesLeft: Int64;
+    FBytesLeft: Int64;
+    // INDEXes that were read already, by position. Font DICTs and fonts that point to the same INDEX share it.
+    FIndexCache: TDictionary<Integer, TArray<TBytes>>;
+
+    procedure StartBudget(const DataLength: Integer);
+    procedure ChargeEntries(const Count: Int64);
+    procedure ChargeBytes(const Count: Int64);
 
     class function Latin1String(const Bytes: TBytes): string; static;
     class function ResolveCffData(const Data: TBytes): TBytes; static;
@@ -79,9 +92,11 @@ type
     class function ReadOffSize(const Input: TCFFDataInput): Integer; static;
     class procedure ReadHeader(const Input: TCFFDataInput); static;
 
-    class function ReadIndexDataOffsets(const Input: TCFFDataInput): TArray<Int64>; static;
-    class function ReadIndexData(const Input: TCFFDataInput): TArray<TBytes>; static;
-    class function ReadStringIndexData(const Input: TCFFDataInput): TArray<string>; static;
+    function ReadIndexDataOffsets(const Input: TCFFDataInput): TArray<Int64>;
+    function ReadIndexData(const Input: TCFFDataInput): TArray<TBytes>;
+    // Reads the INDEX at the position of the input, or hands out the one that was read there before
+    function ReadSharedIndexData(const Input: TCFFDataInput): TArray<TBytes>;
+    function ReadStringIndexData(const Input: TCFFDataInput): TArray<string>;
 
     class function OperatorName(const B0, B1: Integer): string; static;
     class function ReadOperator(const Input: TCFFDataInput; const B0: Integer): string; static;
@@ -89,8 +104,8 @@ type
     class function ReadRealNumber(const Input: TCFFDataInput; const Log: TPdfLog): Double; static;
     class function ReadEntry(const Input: TCFFDataInput; const Log: TPdfLog): TCFFDictEntry; static;
     class function ReadDictData(const Input: TCFFDataInput; const Log: TPdfLog): TCFFDictData; overload; static;
-    class function ReadDictData(const Input: TCFFDataInput; const Offset, DictSize: Integer;
-                                const Log: TPdfLog): TCFFDictData; overload; static;
+    function ReadDictData(const Input: TCFFDataInput; const Offset, DictSize: Integer;
+                          const Log: TPdfLog): TCFFDictData; overload;
 
     function ReadString(const Index: Integer): string;
     function TryGetString(const Dict: TCFFDictData; const Name: string; out Value: string): Boolean;
@@ -119,7 +134,6 @@ type
                            const FontDicts, PrivateDicts: TObjectList<TCFFDictionary>);
     function ReadCIDFontDict(const FontDict: TCFFDictData): TCFFDictionary;
     function ReadCIDPrivateDict(const Input: TCFFDataInput; const PrivateEntry: TCFFDictEntry): TCFFDictionary;
-    procedure GuardSubrsBudget(const Input: TCFFDataInput; const Subrs: TArray<TBytes>);
     function ReadFDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFDSelect;
     function ReadFormat0FDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFormat0FDSelect;
     function ReadFormat3FDSelect(const Input: TCFFDataInput): TCFFFormat3FDSelect;
@@ -149,9 +163,12 @@ type
   public
     // The log may be nil
     constructor Create(const Log: TPdfLog = nil);
+    destructor Destroy; override;
 
     // The caller owns the list and the fonts in it. A CID-keyed font comes out as a TCFFCIDFont.
-    function Parse(const Data: TBytes): TObjectList<TCFFFont>;
+    function Parse(const Data: TBytes): TObjectList<TCFFFont>; overload;
+    // Only the first FontLimit fonts are read. A caller that needs one font does not pay for the others.
+    function Parse(const Data: TBytes; const FontLimit: Integer): TObjectList<TCFFFont>; overload;
     // The registry, ordering and supplement of the first font, which only reads as much of the data as that needs. False
     // when that font is not CID-keyed, and for the cases where PDFBox records an error in its font headers (no names, no
     // top DICT, a synthetic font). Malformed data raises EPdfParseException.
@@ -171,6 +188,8 @@ const
   TrueTypeTag = #0#1#0#0;
   CffTableTag = 'CFF ';
   IsFixedPitchKey = 'isFixedPitch';
+  FDSelectTooShortMessage = 'The FDSelect needs %d bytes, the data has %d left';
+  BudgetExceededMessage = 'The CFF font needs more work than its size allows';
 
   // A DICT operator with a second byte starts with this one
   EscapeOperator = 12;
@@ -368,6 +387,38 @@ constructor TCFFParser.Create(const Log: TPdfLog);
 begin
   inherited Create;
   FLog := Log;
+  FIndexCache := TDictionary<Integer, TArray<TBytes>>.Create;
+end;
+
+destructor TCFFParser.Destroy;
+begin
+  FIndexCache.Free;
+  inherited;
+end;
+
+procedure TCFFParser.StartBudget(const DataLength: Integer);
+begin
+  FIndexCache.Clear;
+  FEntriesLeft := (Int64(DataLength) * BudgetFactor) + BudgetSlack;
+  FBytesLeft := (Int64(DataLength) * BudgetFactor) + BudgetSlack;
+end;
+
+procedure TCFFParser.ChargeEntries(const Count: Int64);
+begin
+  Dec(FEntriesLeft, Count);
+  if FEntriesLeft < 0 then
+  begin
+    raise EPdfParseException.Create(BudgetExceededMessage);
+  end;
+end;
+
+procedure TCFFParser.ChargeBytes(const Count: Int64);
+begin
+  Dec(FBytesLeft, Count);
+  if FBytesLeft < 0 then
+  begin
+    raise EPdfParseException.Create(BudgetExceededMessage);
+  end;
 end;
 
 class function TCFFParser.Latin1String(const Bytes: TBytes): string;
@@ -381,8 +432,14 @@ end;
 
 function TCFFParser.Parse(const Data: TBytes): TObjectList<TCFFFont>;
 begin
+  Result := Parse(Data, MaxFonts);
+end;
+
+function TCFFParser.Parse(const Data: TBytes; const FontLimit: Integer): TObjectList<TCFFFont>;
+begin
   const Input = TCFFDataInput.Create(ResolveCffData(Data));
   try
+    StartBudget(Input.GetLength);
     ReadHeader(Input);
     const NameIndex = ReadStringIndexData(Input);
     if Length(NameIndex) = 0 then
@@ -402,9 +459,15 @@ begin
     FStringIndex := ReadStringIndexData(Input);
     const GlobalSubrs = ReadIndexData(Input);
 
+    const FontCount = Min(Length(NameIndex), Min(FontLimit, MaxFonts));
+    if (FontCount < Length(NameIndex)) and Assigned(FLog) then
+    begin
+      FLog.Warning('Only the first %d of the %d fonts of the CFF font set are read', [FontCount, Length(NameIndex)]);
+    end;
+
     Result := TObjectList<TCFFFont>.Create(True);
     try
-      for var Index := 0 to High(NameIndex) do
+      for var Index := 0 to FontCount - 1 do
       begin
         const Font = ParseFont(Input, NameIndex[Index], TopDictIndex[Index]);
         Result.Add(Font);
@@ -428,6 +491,7 @@ begin
 
   const Input = TCFFDataInput.Create(ResolveCffData(Data));
   try
+    StartBudget(Input.GetLength);
     ReadHeader(Input);
     const NameIndex = ReadStringIndexData(Input);
     if Length(NameIndex) = 0 then
@@ -456,7 +520,7 @@ begin
     const TopDict = ReadDictData(TopDictInput, FLog);
     try
       var Entry: TCFFDictEntry;
-      if TopDict.TryGetEntry('SyntheticBase', Entry) then
+      if TopDict.TryGetEntry(TCFFKeys.SyntheticBase, Entry) then
       begin
         Registry := '';
         Ordering := '';
@@ -548,7 +612,7 @@ begin
   ReadOffSize(Input);
 end;
 
-class function TCFFParser.ReadIndexDataOffsets(const Input: TCFFDataInput): TArray<Int64>;
+function TCFFParser.ReadIndexDataOffsets(const Input: TCFFDataInput): TArray<Int64>;
 begin
   const Count = Input.ReadUnsignedShort;
   if Count = 0 then
@@ -564,6 +628,7 @@ begin
     raise EPdfParseException.CreateFmt('The CFF INDEX of %d entries is longer than the data', [Count]);
   end;
 
+  ChargeEntries(Count);
   SetLength(Result, Count + 1);
   for var Index := 0 to Count do
   begin
@@ -576,7 +641,7 @@ begin
   end;
 end;
 
-class function TCFFParser.ReadIndexData(const Input: TCFFDataInput): TArray<TBytes>;
+function TCFFParser.ReadIndexData(const Input: TCFFDataInput): TArray<TBytes>;
 begin
   const Offsets = ReadIndexDataOffsets(Input);
   if Length(Offsets) = 0 then
@@ -585,6 +650,8 @@ begin
   end;
 
   const Count = Length(Offsets) - 1;
+  // The entries are read one after the other, so the sum of their lengths is what the INDEX takes from the data
+  ChargeBytes(Min(Int64(Input.GetLength - Input.GetPosition), Max(Int64(0), Offsets[Count] - Offsets[0])));
   SetLength(Result, Count);
   for var Index := 0 to Count - 1 do
   begin
@@ -597,7 +664,19 @@ begin
   end;
 end;
 
-class function TCFFParser.ReadStringIndexData(const Input: TCFFDataInput): TArray<string>;
+function TCFFParser.ReadSharedIndexData(const Input: TCFFDataInput): TArray<TBytes>;
+begin
+  const Position = Input.GetPosition;
+  if FIndexCache.TryGetValue(Position, Result) then
+  begin
+    Exit;
+  end;
+
+  Result := ReadIndexData(Input);
+  FIndexCache.Add(Position, Result);
+end;
+
+function TCFFParser.ReadStringIndexData(const Input: TCFFDataInput): TArray<string>;
 begin
   const Entries = ReadIndexData(Input);
   SetLength(Result, Length(Entries));
@@ -732,6 +811,10 @@ end;
 class function TCFFParser.ReadEntry(const Input: TCFFDataInput; const Log: TPdfLog): TCFFDictEntry;
 begin
   Result := Default(TCFFDictEntry);
+  // The operands are collected here and copied once at the operator; growing the result per operand would cost
+  // quadratic time for an entry of many operands
+  var Collected: array[0..MaxDictOperands - 1] of TCFFOperand;
+  var Count := 0;
   var Operand: TCFFOperand;
   while True do
   begin
@@ -739,10 +822,15 @@ begin
     if B0 <= 21 then
     begin
       Result.OperatorName := ReadOperator(Input, B0);
+      SetLength(Result.Operands, Count);
+      for var Index := 0 to Count - 1 do
+      begin
+        Result.Operands[Index] := Collected[Index];
+      end;
       Exit;
     end;
 
-    if Length(Result.Operands) >= MaxDictOperands then
+    if Count >= MaxDictOperands then
     begin
       raise EPdfParseException.Create('Too many operands in a CFF DICT entry');
     end;
@@ -760,7 +848,8 @@ begin
     begin
       raise EPdfParseException.CreateFmt('invalid DICT data b0 byte: %d', [B0]);
     end;
-    Result.Operands := Result.Operands + [Operand];
+    Collected[Count] := Operand;
+    Inc(Count);
   end;
 end;
 
@@ -779,13 +868,14 @@ begin
   end;
 end;
 
-class function TCFFParser.ReadDictData(const Input: TCFFDataInput; const Offset, DictSize: Integer;
-                                       const Log: TPdfLog): TCFFDictData;
+function TCFFParser.ReadDictData(const Input: TCFFDataInput; const Offset, DictSize: Integer;
+                                 const Log: TPdfLog): TCFFDictData;
 begin
   Result := TCFFDictData.Create;
   try
     if DictSize > 0 then
     begin
+      ChargeBytes(DictSize);
       Input.SetPosition(Offset);
       const EndPosition = Int64(Offset) + DictSize;
       while Input.GetPosition < EndPosition do
@@ -830,12 +920,14 @@ end;
 
 function TCFFParser.ParseFont(const Input: TCFFDataInput; const Name: string; const TopDictBytes: TBytes): TCFFFont;
 begin
+  // Fonts may share a top DICT, so every one of them pays for reading it
+  ChargeBytes(Length(TopDictBytes));
   const TopDictInput = TCFFDataInput.Create(TopDictBytes);
   try
     const TopDict = ReadDictData(TopDictInput, FLog);
     try
       var Entry: TCFFDictEntry;
-      if TopDict.TryGetEntry('SyntheticBase', Entry) then
+      if TopDict.TryGetEntry(TCFFKeys.SyntheticBase, Entry) then
       begin
         raise EPdfParseException.Create('Synthetic Fonts are not supported');
       end;
@@ -934,17 +1026,17 @@ begin
   Font.AddTopDictNumbers('StrokeWidth', [TopDict.GetNumber('StrokeWidth', 0)]);
 
   var Values: TArray<Double>;
-  if not TopDict.TryGetArray('FontMatrix', Values) then
+  if not TopDict.TryGetArray(TCFFKeys.FontMatrix, Values) then
   begin
     Values := [0.001, 0, 0, 0.001, 0, 0];
   end;
-  Font.AddTopDictNumbers('FontMatrix', Values);
+  Font.AddTopDictNumbers(TCFFKeys.FontMatrix, Values);
 
-  if not TopDict.TryGetArray('FontBBox', Values) then
+  if not TopDict.TryGetArray(TCFFKeys.FontBBox, Values) then
   begin
     Values := [0, 0, 0, 0];
   end;
-  Font.AddTopDictNumbers('FontBBox', Values);
+  Font.AddTopDictNumbers(TCFFKeys.FontBBox, Values);
 
   var Entry: TCFFDictEntry;
   if TopDict.TryGetEntry('UniqueID', Entry) and Entry.HasOperands then
@@ -965,7 +1057,7 @@ begin
     raise EPdfParseException.Create('CharStrings is missing or empty');
   end;
   Input.SetPosition(Entry.IntValue(0));
-  Result := ReadIndexData(Input);
+  Result := ReadSharedIndexData(Input);
 end;
 
 class function TCFFParser.CreateEmptyCIDCharset(const GlyphCount: Integer): TCFFCharsetCID;
@@ -1004,6 +1096,7 @@ begin
     if IsCIDFont then
     begin
       // A CID font with no charset does not default to any predefined charset
+      ChargeEntries(CharStringCount);
       Font.SetCharset(CreateEmptyCIDCharset(CharStringCount), True);
     end
     else
@@ -1029,7 +1122,9 @@ begin
   else if CharStringCount > 0 then
   begin
     Input.SetPosition(CharsetId);
-    Font.SetCharset(ReadCharset(Input, CharStringCount, IsCIDFont), True);
+    ChargeEntries(CharStringCount);
+    const Charset = ReadCharset(Input, CharStringCount, IsCIDFont);
+    Font.SetCharset(Charset, True);
   end
   else
   begin
@@ -1047,7 +1142,7 @@ begin
   ReadFontEncoding(Input, TopDict, Font);
 
   var PrivateEntry: TCFFDictEntry;
-  if (not TopDict.TryGetEntry('Private', PrivateEntry)) or (Length(PrivateEntry.Operands) < 2) then
+  if (not TopDict.TryGetEntry(TCFFKeys.Private_, PrivateEntry)) or (Length(PrivateEntry.Operands) < 2) then
   begin
     raise EPdfParseException.CreateFmt('Private dictionary entry missing for font %s', [Font.Name]);
   end;
@@ -1079,7 +1174,7 @@ begin
       raise EPdfParseException.Create('The local subroutines lie outside the CFF data');
     end;
     Input.SetPosition(Integer(SubrsPosition));
-    Result := ReadIndexData(Input);
+    Result := ReadSharedIndexData(Input);
   end;
 end;
 
@@ -1163,7 +1258,7 @@ begin
   end;
 
   Input.SetPosition(Entry.IntValue(0));
-  const FontDictBytes = ReadIndexData(Input);
+  const FontDictBytes = ReadSharedIndexData(Input);
   if Length(FontDictBytes) = 0 then
   begin
     raise EPdfParseException.Create('Font dict index is missing for a CIDKeyed Font');
@@ -1174,7 +1269,6 @@ begin
                                        [Length(FontDictBytes), MaxFontDicts]);
   end;
 
-  FCIDSubrsBytes := 0;
   const FontDicts = TObjectList<TCFFDictionary>.Create(True);
   const PrivateDicts = TObjectList<TCFFDictionary>.Create(True);
   var FdSelect: TCFFFDSelect := nil;
@@ -1214,7 +1308,7 @@ begin
         FontDicts.Add(ReadCIDFontDict(FontDict));
 
         var PrivateEntry: TCFFDictEntry;
-        const HasPrivateDict = (FontDict.TryGetEntry('Private', PrivateEntry) and (Length(PrivateEntry.Operands) >= 2));
+        const HasPrivateDict = (FontDict.TryGetEntry(TCFFKeys.Private_, PrivateEntry) and (Length(PrivateEntry.Operands) >= 2));
         if HasPrivateDict then
         begin
           PrivateDicts.Add(ReadCIDPrivateDict(Input, PrivateEntry));
@@ -1251,13 +1345,13 @@ begin
     Result.AddNumbers('FontType', [FontDict.GetNumber('FontType', 0)]);
 
     var Values: TArray<Double>;
-    if FontDict.TryGetArray('FontBBox', Values) then
+    if FontDict.TryGetArray(TCFFKeys.FontBBox, Values) then
     begin
-      Result.AddNumbers('FontBBox', Values);
+      Result.AddNumbers(TCFFKeys.FontBBox, Values);
     end;
-    if FontDict.TryGetArray('FontMatrix', Values) then
+    if FontDict.TryGetArray(TCFFKeys.FontMatrix, Values) then
     begin
-      Result.AddNumbers('FontMatrix', Values);
+      Result.AddNumbers(TCFFKeys.FontMatrix, Values);
     end;
   except
     Result.Free;
@@ -1279,29 +1373,13 @@ begin
     Result := TCFFDictionary.Create;
     try
       ReadPrivateDict(PrivateDict, Result);
-      const Subrs = ReadLocalSubrs(Input, PrivateDict, PrivateOffset);
-      GuardSubrsBudget(Input, Subrs);
-      Result.SetSubrs(Subrs);
+      Result.SetSubrs(ReadLocalSubrs(Input, PrivateDict, PrivateOffset));
     except
       Result.Free;
       raise;
     end;
   finally
     PrivateDict.Free;
-  end;
-end;
-
-// The local subroutines of a font do not overlap, so together they cannot be larger than the font. Font DICTs that point
-// to overlapping data would otherwise make a copy of it each.
-procedure TCFFParser.GuardSubrsBudget(const Input: TCFFDataInput; const Subrs: TArray<TBytes>);
-begin
-  for var Subr in Subrs do
-  begin
-    Inc(FCIDSubrsBytes, Length(Subr));
-  end;
-  if FCIDSubrsBytes > Input.GetLength then
-  begin
-    raise EPdfParseException.Create('The local subroutines of the font DICTs are larger than the font');
   end;
 end;
 
@@ -1323,8 +1401,9 @@ begin
   const Remaining = Input.GetLength - Input.GetPosition;
   if GlyphCount > Remaining then
   begin
-    raise EPdfParseException.CreateFmt('The FDSelect needs %d bytes, the data has %d left', [GlyphCount, Remaining]);
+    raise EPdfParseException.CreateFmt(FDSelectTooShortMessage, [GlyphCount, Remaining]);
   end;
+  ChargeEntries(GlyphCount);
   Result := TCFFFormat0FDSelect.Create(Input.ReadBytes(GlyphCount));
 end;
 
@@ -1336,8 +1415,9 @@ begin
   const Remaining = Input.GetLength - Input.GetPosition;
   if Needed > Remaining then
   begin
-    raise EPdfParseException.CreateFmt('The FDSelect needs %d bytes, the data has %d left', [Needed, Remaining]);
+    raise EPdfParseException.CreateFmt(FDSelectTooShortMessage, [Needed, Remaining]);
   end;
+  ChargeEntries(RangeCount);
 
   var Ranges: TArray<TCFFFormat3Range>;
   SetLength(Ranges, RangeCount);
@@ -1346,7 +1426,8 @@ begin
     Ranges[Index].First := Input.ReadUnsignedShort;
     Ranges[Index].FD := Input.ReadUnsignedByte;
   end;
-  Result := TCFFFormat3FDSelect.Create(Ranges, Input.ReadUnsignedShort);
+  const Sentinel = Input.ReadUnsignedShort;
+  Result := TCFFFormat3FDSelect.Create(Ranges, Sentinel);
 end;
 
 procedure TCFFParser.WarnAboutUnknownFDs(const FdSelect: TCFFFDSelect; const FontDictCount: Integer);
@@ -1363,20 +1444,20 @@ end;
 procedure TCFFParser.ApplyCIDFontMatrix(const TopDict: TCFFDictData; const Font: TCFFCIDFont);
 begin
   var FontDictMatrix: TArray<Double>;
-  const HasFontDictMatrix = ((Font.FontDicts.Count > 0) and Font.FontDicts[0].TryGetNumbers('FontMatrix', FontDictMatrix));
+  const HasFontDictMatrix = ((Font.FontDicts.Count > 0) and Font.FontDicts[0].TryGetNumbers(TCFFKeys.FontMatrix, FontDictMatrix));
   if not HasFontDictMatrix then
   begin
     Exit;
   end;
 
   var Matrix: TArray<Double>;
-  if TopDict.TryGetArray('FontMatrix', Matrix) then
+  if TopDict.TryGetArray(TCFFKeys.FontMatrix, Matrix) then
   begin
     ConcatenateFontMatrix(Font, Matrix, FontDictMatrix);
   end
   else
   begin
-    Font.AddTopDictNumbers('FontMatrix', FontDictMatrix);
+    Font.AddTopDictNumbers(TCFFKeys.FontMatrix, FontDictMatrix);
   end;
 end;
 
@@ -1406,7 +1487,7 @@ begin
   const D2 = FontDictMatrix[3];
   const X2 = FontDictMatrix[4];
   const Y2 = FontDictMatrix[5];
-  Font.AddTopDictNumbers('FontMatrix', [(A1 * A2) + (B1 * C2), (A1 * B2) + (B1 * D1), (C1 * A2) + (D1 * C2),
+  Font.AddTopDictNumbers(TCFFKeys.FontMatrix, [(A1 * A2) + (B1 * C2), (A1 * B2) + (B1 * D1), (C1 * A2) + (D1 * C2),
                                         (C1 * B2) + (D1 * D2), (X1 * A2) + (Y1 * C2) + X2, (X1 * B2) + (Y1 * D2) + Y2]);
 end;
 
@@ -1494,9 +1575,11 @@ begin
     begin
       Left := Input.ReadUnsignedShort;
     end;
+    ChargeEntries(1);
     Charset.AddRangeMapping(GID, First, Left);
     Inc(GID, Left + 1);
   end;
+  Charset.Freeze;
 end;
 
 procedure TCFFParser.ReadFormat0Charset(const Input: TCFFDataInput; const GlyphCount: Integer;

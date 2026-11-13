@@ -14,7 +14,8 @@ uses
   System.Diagnostics,
   DUnitX.TestFramework,
   Pdf4D.FontBox.Cff.Font,
-  Pdf4D.Tests.CffBuilder;
+  Pdf4D.Tests.CffBuilder,
+  Pdf4D.Tests.CffParseOutcome;
 
 type
   TCidFontCheck = reference to procedure(const Font: TCFFCIDFont);
@@ -87,17 +88,20 @@ type
 
     [Test]
     procedure TestSourceSansIsNotCidKeyed;
+
+    [Test]
+    procedure TestRangeCharsetLookupsMatchTheLinearSearch;
+
+    [Test]
+    procedure TestRangeCharsetOverlappingRangesKeepTheFirst;
+
+    [Test]
+    procedure TestFormat3FDSelectLookupsMatchTheLinearSearch;
   end;
 
   [TestFixture]
   TCFFCIDHostileInputTests = class
   private
-    const MaximumHostileMilliseconds = 1000;
-
-  private
-    class function OutcomeOf(const Data: TBytes; out Message: string): string; overload; static;
-    class function OutcomeOf(const Data: TBytes): string; overload; static;
-    class procedure CheckRaises(const Data: TBytes; const MessageFragment: string = ''); static;
     class function Options: TCffCidOptions; static;
     class function PrivateEntry(const Size, Offset: Integer): TBytes; static;
 
@@ -139,7 +143,10 @@ type
     procedure TestPrivateSizeBeyondTheLimitRaises;
 
     [Test]
-    procedure TestLocalSubrsBeyondTheFontRaise;
+    procedure TestFontDictsThatShareLocalSubrsShareTheIndex;
+
+    [Test]
+    procedure TestSharedPrivateDictOfManyOperandsRaisesOverBudget;
 
     [Test]
     procedure TestRosWithTwoOperandsRaises;
@@ -624,6 +631,136 @@ begin
   end;
 end;
 
+procedure TCFFCIDFontTests.TestRangeCharsetLookupsMatchTheLinearSearch;
+begin
+  // CIDs that are not in order, with gaps, and with ranges that overlap, as the ranges of a damaged font can
+  const Starts: TArray<Integer> = [500, 10, 100, 300, 20];
+  const Lefts: TArray<Integer> = [9, 4, 49, 0, 99];
+  const Charset = TCFFRangeCharsetCID.Create;
+  try
+    Charset.AddCID(0, 0);
+    var NextGID := 1;
+    for var Index := 0 to High(Starts) do
+    begin
+      Charset.AddRangeMapping(NextGID, Starts[Index], Lefts[Index]);
+      Inc(NextGID, Lefts[Index] + 1);
+    end;
+    Charset.Freeze;
+
+    // PDFBox answers by the first range that holds the value
+    for var CID := -2 to 700 do
+    begin
+      var ExpectedGID := 0;
+      var First := 1;
+      for var Index := 0 to High(Starts) do
+      begin
+        if (CID >= Starts[Index]) and (CID <= Starts[Index] + Lefts[Index]) then
+        begin
+          ExpectedGID := First + (CID - Starts[Index]);
+          Break;
+        end;
+        Inc(First, Lefts[Index] + 1);
+      end;
+      Assert.AreEqual(ExpectedGID, Charset.GetGIDForCID(CID), Format('CID %d', [CID]));
+    end;
+
+    for var GID := -2 to NextGID + 5 do
+    begin
+      var ExpectedCID := 0;
+      var First := 1;
+      for var Index := 0 to High(Starts) do
+      begin
+        if (GID >= First) and (GID <= First + Lefts[Index]) then
+        begin
+          ExpectedCID := Starts[Index] + (GID - First);
+          Break;
+        end;
+        Inc(First, Lefts[Index] + 1);
+      end;
+      Assert.AreEqual(ExpectedCID, Charset.GetCIDForGID(GID), Format('GID %d', [GID]));
+    end;
+  finally
+    Charset.Free;
+  end;
+end;
+
+procedure TCFFCIDFontTests.TestRangeCharsetOverlappingRangesKeepTheFirst;
+begin
+  const Charset = TCFFRangeCharsetCID.Create;
+  try
+    Charset.AddCID(0, 0);
+    Charset.AddRangeMapping(1, 100, 9);
+    Charset.AddRangeMapping(11, 105, 9);
+    Charset.Freeze;
+    // CID 107 is in both ranges; the first one maps it to GID 8
+    Assert.AreEqual(8, Charset.GetGIDForCID(107));
+    Assert.AreEqual(17, Charset.GetGIDForCID(111));
+    Assert.AreEqual(0, Charset.GetGIDForCID(115));
+  finally
+    Charset.Free;
+  end;
+end;
+
+function Format3Range(const First, FD: Integer): TCFFFormat3Range;
+begin
+  Result.First := First;
+  Result.FD := FD;
+end;
+
+procedure TCFFCIDFontTests.TestFormat3FDSelectLookupsMatchTheLinearSearch;
+begin
+  const Sentinel = 60;
+  // Sorted ranges use a binary search, ranges out of order keep the linear search of PDFBox; both give what that does
+  for var IsSorted := False to True do
+  begin
+    var Ranges: TArray<TCFFFormat3Range>;
+    if IsSorted then
+    begin
+      Ranges := [Format3Range(0, 0), Format3Range(10, 2), Format3Range(10, 3), Format3Range(40, 1)];
+    end
+    else
+    begin
+      Ranges := [Format3Range(20, 1), Format3Range(0, 0), Format3Range(40, 2)];
+    end;
+    const FDSelect = TCFFFormat3FDSelect.Create(Ranges, Sentinel);
+    try
+      for var GID := -3 to 70 do
+      begin
+        // PDFBox: the first range that starts at or before the glyph and whose successor starts after it
+        var Expected := 0;
+        for var Index := 0 to High(Ranges) do
+        begin
+          if Ranges[Index].First > GID then
+          begin
+            Continue;
+          end;
+          const IsLastRange = (Index + 1 = Length(Ranges));
+          if IsLastRange then
+          begin
+            if Sentinel > GID then
+            begin
+              Expected := Ranges[Index].FD;
+            end
+            else
+            begin
+              Expected := -1;
+            end;
+            Break;
+          end;
+          if Ranges[Index + 1].First > GID then
+          begin
+            Expected := Ranges[Index].FD;
+            Break;
+          end;
+        end;
+        Assert.AreEqual(Expected, FDSelect.GetFDIndex(GID), Format('sorted %s, GID %d', [BoolToStr(IsSorted, True), GID]));
+      end;
+    finally
+      FDSelect.Free;
+    end;
+  end;
+end;
+
 { TCFFCIDHostileInputTests }
 
 class function TCFFCIDHostileInputTests.Options: TCffCidOptions;
@@ -639,55 +776,18 @@ begin
                                     TCffTestBuilder.Bytes([18])]);
 end;
 
-class function TCFFCIDHostileInputTests.OutcomeOf(const Data: TBytes; out Message: string): string;
-begin
-  Result := '';
-  Message := '';
-  const Parser = TCFFParser.Create;
-  try
-    try
-      Parser.Parse(Data).Free;
-    except
-      on Failure: Exception do
-      begin
-        Result := Failure.ClassName;
-        Message := Failure.Message;
-      end;
-    end;
-  finally
-    Parser.Free;
-  end;
-end;
-
-class function TCFFCIDHostileInputTests.OutcomeOf(const Data: TBytes): string;
-begin
-  var Message: string;
-  Result := OutcomeOf(Data, Message);
-end;
-
-class procedure TCFFCIDHostileInputTests.CheckRaises(const Data: TBytes; const MessageFragment: string);
-begin
-  const Stopwatch = TStopwatch.StartNew;
-  var Message: string;
-  const Outcome = OutcomeOf(Data, Message);
-  Assert.AreEqual(EPdfParseException.ClassName, Outcome);
-  Assert.IsTrue((MessageFragment = '') or Message.Contains(MessageFragment),
-                Format('Message "%s" does not contain "%s"', [Message, MessageFragment]));
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'Parsing took too long');
-end;
-
 procedure TCFFCIDHostileInputTests.TestMissingFDArrayRaises;
 begin
   var Data := Options;
   Data.OmitFDArray := True;
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'FDArray');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'FDArray');
 end;
 
 procedure TCFFCIDHostileInputTests.TestMissingFDSelectRaises;
 begin
   var Data := Options;
   Data.OmitFDSelect := True;
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect');
 end;
 
 procedure TCFFCIDHostileInputTests.TestFDSelectOfUnknownFormatRaises;
@@ -696,7 +796,7 @@ begin
   begin
     var Data := Options;
     Data.FDSelectData := TCffTestBuilder.Bytes([Byte(FormatNumber), 0, 0, 0, 0, 0]);
-    CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect format');
+    TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect format');
   end;
 end;
 
@@ -705,7 +805,7 @@ begin
   var Data := Options;
   // 65535 ranges of three bytes each in a font of a few hundred bytes
   Data.FDSelectData := TCffTestBuilder.Bytes([3, $FF, $FF, 0, 0, 0, 0, 3]);
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect needs');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'FDSelect needs');
 end;
 
 procedure TCFFCIDHostileInputTests.TestFDArrayCountBeyondDataRaises;
@@ -713,14 +813,14 @@ begin
   var Data := Options;
   // An INDEX of 65535 entries with 4-byte offsets, and the data of a single one
   Data.FDArrayRaw := TCffTestBuilder.Bytes([$FF, $FF, 4, 0, 0, 0, 1, 0, 0, 0, 2, 0]);
-  CheckRaises(TCffTestBuilder.CidFont(Data));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data));
 end;
 
 procedure TCFFCIDHostileInputTests.TestMoreFontDictsThanFDSelectCanSelectRaise;
 begin
   var Data := Options;
   Data.FontDictCount := 300;
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'font DICTs');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'font DICTs');
 end;
 
 procedure TCFFCIDHostileInputTests.TestNoPrivateDictAtAllRaises;
@@ -728,14 +828,14 @@ begin
   var Data := Options;
   Data.FontDictCount := 2;
   Data.FontDictsWithoutPrivate := 2;
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'Private');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'Private');
 end;
 
 procedure TCFFCIDHostileInputTests.TestPrivateOffsetBeyondDataRaises;
 begin
   var Data := Options;
   Data.FontDictBytes := [PrivateEntry(10, 1000000)];
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'out of range');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'out of range');
 end;
 
 procedure TCFFCIDHostileInputTests.TestPrivateOffsetAndSizeAtTheLimitOfAnIntegerRaise;
@@ -743,49 +843,86 @@ begin
   var Data := Options;
   // The sum of the offset and the size does not fit in 32 bits
   Data.FontDictBytes := [PrivateEntry(100, MaxInt - 5)];
-  CheckRaises(TCffTestBuilder.CidFont(Data));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data));
 
   Data.FontDictBytes := [PrivateEntry(MaxInt, MaxInt)];
-  CheckRaises(TCffTestBuilder.CidFont(Data));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data));
 
   Data.FontDictBytes := [PrivateEntry(MaxInt, 20)];
-  CheckRaises(TCffTestBuilder.CidFont(Data));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data));
 end;
 
 procedure TCFFCIDHostileInputTests.TestNegativePrivateOffsetRaises;
 begin
   var Data := Options;
   Data.FontDictBytes := [PrivateEntry(10, -20)];
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'negative');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'negative');
 end;
 
 procedure TCFFCIDHostileInputTests.TestPrivateSizeBeyondDataRaises;
 begin
   var Data := Options;
   Data.FontDictBytes := [PrivateEntry(60000, 10)];
-  CheckRaises(TCffTestBuilder.CidFont(Data));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data));
 end;
 
 procedure TCFFCIDHostileInputTests.TestPrivateSizeBeyondTheLimitRaises;
 begin
   var Data := Options;
   Data.FontDictBytes := [PrivateEntry(70000, 10)];
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'too large');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'too large');
 end;
 
-// Font DICTs that share one private DICT would each copy the same local subroutines
-procedure TCFFCIDHostileInputTests.TestLocalSubrsBeyondTheFontRaise;
+// 256 font DICTs that share one private DICT and its 65535 empty subroutines (a font of about 130 KB) must not make 256
+// copies of the INDEX, which would be about 128 MB
+procedure TCFFCIDHostileInputTests.TestFontDictsThatShareLocalSubrsShareTheIndex;
 begin
   var Data := Options;
-  var Subr: TBytes;
-  SetLength(Subr, 60);
-  FillChar(Subr[0], Length(Subr), 11);
-  Data.LocalSubrs := [Subr];
-  Data.FontDictCount := 1;
-  Assert.AreEqual(EmptyStr, OutcomeOf(TCffTestBuilder.CidFont(Data)));
+  SetLength(Data.LocalSubrs, 65535);
+  Data.FontDictCount := 256;
+  const Font = TCffTestBuilder.CidFont(Data);
 
-  Data.FontDictCount := 40;
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'larger than the font');
+  const Stopwatch = TStopwatch.StartNew;
+  const Parser = TCFFParser.Create;
+  try
+    const Fonts = Parser.Parse(Font);
+    try
+      const CidFont = TCFFCIDFont(Fonts[0]);
+      Assert.AreEqual(256, Integer(CidFont.PrivDicts.Count));
+      Assert.AreEqual(65535, Integer(Length(CidFont.PrivDicts[0].Subrs)));
+      for var Index := 1 to CidFont.PrivDicts.Count - 1 do
+      begin
+        Assert.IsTrue(Pointer(CidFont.PrivDicts[0].Subrs) = Pointer(CidFont.PrivDicts[Index].Subrs),
+                      Format('Font DICT %d has its own copy of the subroutines', [Index]));
+      end;
+    finally
+      Fonts.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
+end;
+
+// A 50 KB private DICT of entries with 512 operands, read for each of 256 font DICTs, is far more work than the font holds
+procedure TCFFCIDHostileInputTests.TestSharedPrivateDictOfManyOperandsRaisesOverBudget;
+begin
+  var Entry: TBytes;
+  SetLength(Entry, 513);
+  FillChar(Entry[0], 512, 139);
+  Entry[512] := 20;
+  var ExtraPrivateDict: TBytes;
+  const EntryCount = 100;
+  SetLength(ExtraPrivateDict, EntryCount * Length(Entry));
+  for var Index := 0 to EntryCount - 1 do
+  begin
+    Move(Entry[0], ExtraPrivateDict[Index * Length(Entry)], Length(Entry));
+  end;
+
+  var Data := Options;
+  Data.ExtraPrivateDict := ExtraPrivateDict;
+  Data.FontDictCount := 256;
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'more work');
 end;
 
 procedure TCFFCIDHostileInputTests.TestRosWithTwoOperandsRaises;
@@ -793,7 +930,7 @@ begin
   var Data := Options;
   Data.RosData := TCffTestBuilder.Concat([TCffTestBuilder.IntegerOperand(391), TCffTestBuilder.IntegerOperand(392),
                                           TCffTestBuilder.Bytes([12, 30])]);
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'ROS');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'ROS');
 end;
 
 procedure TCFFCIDHostileInputTests.TestRosWithNegativeStringIndexRaises;
@@ -801,14 +938,14 @@ begin
   var Data := Options;
   Data.RosData := TCffTestBuilder.Concat([TCffTestBuilder.IntegerOperand(-1), TCffTestBuilder.IntegerOperand(392),
                                           TCffTestBuilder.IntegerOperand(0), TCffTestBuilder.Bytes([12, 30])]);
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'negative');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'negative');
 end;
 
 procedure TCFFCIDHostileInputTests.TestCharsetOfUnknownFormatRaises;
 begin
   var Data := Options;
   Data.CharsetData := TCffTestBuilder.Bytes([3, 0, 1]);
-  CheckRaises(TCffTestBuilder.CidFont(Data), 'charset format');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.CidFont(Data), 'charset format');
 end;
 
 procedure TCFFCIDHostileInputTests.TestTruncatedCidFontOnlyRaisesParseException;
@@ -820,7 +957,7 @@ begin
   const Font = TCffTestBuilder.CidFont(Data);
   for var Size := 0 to Length(Font) - 1 do
   begin
-    const Outcome = OutcomeOf(Copy(Font, 0, Size));
+    const Outcome = TCffParseOutcome.OutcomeOf(Copy(Font, 0, Size));
     Assert.IsTrue((Outcome = '') or (Outcome = EPdfParseException.ClassName), Format('%d bytes: %s', [Size, Outcome]));
   end;
 end;
@@ -841,12 +978,12 @@ begin
     begin
       var Changed := Copy(Original);
       Changed[Position] := Value;
-      const Outcome = OutcomeOf(Changed);
+      const Outcome = TCffParseOutcome.OutcomeOf(Changed);
       Assert.IsTrue((Outcome = '') or (Outcome = EPdfParseException.ClassName),
                     Format('byte %d set to %d: %s', [Position, Value, Outcome]));
     end;
   end;
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 20 * MaximumHostileMilliseconds, 'Parsing took too long');
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 20 * TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
 end;
 
 end.

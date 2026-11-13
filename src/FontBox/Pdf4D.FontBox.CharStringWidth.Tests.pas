@@ -188,7 +188,6 @@ begin
     const Fonts = Parser.Parse(Data);
     try
       Assert.AreEqual(1, Integer(Fonts.Count));
-      Fonts[0].SetLog(FLog);
       Check(Fonts[0]);
     finally
       Fonts.Free;

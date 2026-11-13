@@ -20,6 +20,8 @@ type
     NominalWidthX: Integer;
     // DICT bytes put in front of the top DICT entries the builder makes
     ExtraTopDict: TBytes;
+    // DICT bytes put in front of the private DICT entries the builder makes
+    ExtraPrivateDict: TBytes;
 
     class function Standard: TCffType1Options; static;
   end;
@@ -56,6 +58,8 @@ type
     OmitFDSelect: Boolean;
     // DICT bytes put in front of the top DICT entries the builder makes
     ExtraTopDict: TBytes;
+    // DICT bytes put in front of the private DICT entries the builder makes
+    ExtraPrivateDict: TBytes;
 
     class function Standard: TCffCidOptions; static;
   end;
@@ -164,23 +168,37 @@ begin
     Exit(Bytes([0, 0]));
   end;
 
-  var Data: TBytes := nil;
-  var Offsets: TBytes := nil;
+  var DataSize := 0;
+  for var Entry in Entries do
+  begin
+    Inc(DataSize, Length(Entry));
+  end;
+
+  // One allocation: an INDEX of 65535 entries must not take quadratic time to make
+  const IndexHeaderSize = 3;
+  const OffsetsSize = (Length(Entries) + 1) * OffSize;
+  SetLength(Result, IndexHeaderSize + OffsetsSize + DataSize);
+  Result[0] := Byte(Length(Entries) shr 8);
+  Result[1] := Byte(Length(Entries) and $FF);
+  Result[2] := Byte(OffSize);
   var Offset := 1;
+  var DataPosition := IndexHeaderSize + OffsetsSize;
   for var Position := 0 to Length(Entries) do
   begin
     for var Shift := OffSize - 1 downto 0 do
     begin
-      Offsets := Offsets + Bytes([Byte((Offset shr (Shift * 8)) and $FF)]);
+      Result[IndexHeaderSize + (Position * OffSize) + (OffSize - 1 - Shift)] := Byte((Offset shr (Shift * 8)) and $FF);
     end;
     if Position < Length(Entries) then
     begin
-      Data := Data + Entries[Position];
+      if Length(Entries[Position]) > 0 then
+      begin
+        Move(Entries[Position][0], Result[DataPosition], Length(Entries[Position]));
+      end;
+      Inc(DataPosition, Length(Entries[Position]));
       Inc(Offset, Length(Entries[Position]));
     end;
   end;
-
-  Result := Concat([Bytes([Byte(Length(Entries) shr 8), Byte(Length(Entries) and $FF), Byte(OffSize)]), Offsets, Data]);
 end;
 
 class function TCffTestBuilder.IntegerOperand(const Value: Integer): TBytes;
@@ -219,7 +237,7 @@ end;
 
 class function TCffTestBuilder.PrivateDict(const Options: TCffType1Options): TBytes;
 begin
-  Result := Concat([IntegerOperand(Options.DefaultWidthX), Bytes([20]), IntegerOperand(Options.NominalWidthX), Bytes([21])]);
+  Result := Concat([Options.ExtraPrivateDict, IntegerOperand(Options.DefaultWidthX), Bytes([20]), IntegerOperand(Options.NominalWidthX), Bytes([21])]);
   if Length(Options.LocalSubrs) > 0 then
   begin
     // The offset of the local subroutines is counted from the start of the private DICT: they follow it directly
@@ -335,7 +353,7 @@ end;
 
 class function TCffTestBuilder.CidPrivateDict(const Options: TCffCidOptions): TBytes;
 begin
-  Result := Concat([IntegerOperand(Options.DefaultWidthX), Bytes([20]), IntegerOperand(Options.NominalWidthX), Bytes([21])]);
+  Result := Concat([Options.ExtraPrivateDict, IntegerOperand(Options.DefaultWidthX), Bytes([20]), IntegerOperand(Options.NominalWidthX), Bytes([21])]);
   if Length(Options.LocalSubrs) > 0 then
   begin
     // The offset of the local subroutines is counted from the start of the private DICT: they follow it directly

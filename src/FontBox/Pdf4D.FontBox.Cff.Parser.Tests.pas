@@ -13,7 +13,8 @@ uses
   System.Generics.Collections,
   System.Diagnostics,
   DUnitX.TestFramework,
-  Pdf4D.FontBox.Cff.Font;
+  Pdf4D.FontBox.Cff.Font,
+  Pdf4D.Tests.CffParseOutcome;
 
 type
   TFontCheck = reference to procedure(const Font: TCFFType1Font);
@@ -212,13 +213,10 @@ type
   [TestFixture]
   TCFFHostileInputTests = class
   private
-    const MaximumHostileMilliseconds = 1000;
-
-  private
-    class function OutcomeOf(const Data: TBytes; out Message: string): string; overload; static;
-    class function OutcomeOf(const Data: TBytes): string; overload; static;
-    class procedure CheckRaises(const Data: TBytes; const MessageFragment: string = ''); static;
     class function RawFont(const TopDict: TBytes): TBytes; static;
+    // Count fonts with empty names and the same top DICT, which all point at the same data. With BigGlyphTable the charstrings
+    // are 65535 empty ones and every font has a charset for them.
+    class function ManyFonts(const Count: Integer; const BigGlyphTable: Boolean): TBytes; static;
 
   public
     [Test]
@@ -237,7 +235,7 @@ type
     procedure TestIllegalOffSizeRaises;
 
     [Test]
-    procedure TestDictWithBadRealIsLenient;
+    procedure TestDictWithBadRealRaisesParseException;
 
     [Test]
     procedure TestDictWithUnterminatedRealRaises;
@@ -247,6 +245,18 @@ type
 
     [Test]
     procedure TestDictOperandStackIsBounded;
+
+    [Test]
+    procedure TestPrivateDictOfManyOperandsParsesInLinearTime;
+
+    [Test]
+    procedure TestFontSetIsCutOffAtTheFontLimit;
+
+    [Test]
+    procedure TestFirstFontOnlyIsReadWhenAsked;
+
+    [Test]
+    procedure TestFontsThatEachNeedABigGlyphTableRaiseOverBudget;
 
     [Test]
     procedure TestDictWithInvalidByteRaises;
@@ -1202,93 +1212,174 @@ end;
 
 { TCFFHostileInputTests }
 
-// The class name of the exception that parsing ends in, or an empty string when it gives fonts
-class function TCFFHostileInputTests.OutcomeOf(const Data: TBytes; out Message: string): string;
-begin
-  Result := '';
-  Message := '';
-  const Parser = TCFFParser.Create;
-  try
-    try
-      Parser.Parse(Data).Free;
-    except
-      on Failure: Exception do
-      begin
-        Result := Failure.ClassName;
-        Message := Failure.Message;
-      end;
-    end;
-  finally
-    Parser.Free;
-  end;
-end;
-
-class function TCFFHostileInputTests.OutcomeOf(const Data: TBytes): string;
-begin
-  var Message: string;
-  Result := OutcomeOf(Data, Message);
-end;
-
-class procedure TCFFHostileInputTests.CheckRaises(const Data: TBytes; const MessageFragment: string);
-begin
-  const Stopwatch = TStopwatch.StartNew;
-  var Message: string;
-  const Outcome = OutcomeOf(Data, Message);
-  Assert.AreEqual(EPdfParseException.ClassName, Outcome);
-  Assert.IsTrue((MessageFragment = '') or Message.Contains(MessageFragment), Format('Message "%s" does not contain "%s"', [Message, MessageFragment]));
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'Parsing took too long');
-end;
-
 class function TCFFHostileInputTests.RawFont(const TopDict: TBytes): TBytes;
 begin
   Result := TCffTestBuilder.Concat([TCffTestBuilder.Bytes([1, 0, 4, 4]), TCffTestBuilder.Index([TCffTestBuilder.AsciiBytes('A')], 1),
                                 TCffTestBuilder.Index([TopDict], 2), TCffTestBuilder.Index(nil), TCffTestBuilder.Index(nil)]);
 end;
 
+class function TCFFHostileInputTests.ManyFonts(const Count: Integer; const BigGlyphTable: Boolean): TBytes;
+begin
+  var Names: TArray<TBytes>;
+  SetLength(Names, Count);
+
+  var CharStrings: TArray<TBytes>;
+  if BigGlyphTable then
+  begin
+    SetLength(CharStrings, 65535);
+  end
+  else
+  begin
+    CharStrings := [TCffTestBuilder.Bytes([14])];
+  end;
+  const CharStringsData = TCffTestBuilder.Index(CharStrings, 1);
+  const Charset = TCffTestBuilder.Bytes([2, 0, 1, $FF, $FF]);
+  const PrivateData = TCffTestBuilder.Bytes([139, 20]);
+
+  var Offsets: TArray<Integer> := [0, 0, 0];
+  var TopDicts: TArray<TBytes>;
+  SetLength(TopDicts, Count);
+  for var Pass := 1 to 2 do
+  begin
+    var TopDict := TCffTestBuilder.Concat([TCffTestBuilder.IntegerOperand(Offsets[0]), TCffTestBuilder.Bytes([17])]);
+    if BigGlyphTable then
+    begin
+      TopDict := TCffTestBuilder.Concat([TopDict, TCffTestBuilder.IntegerOperand(Offsets[1]), TCffTestBuilder.Bytes([15])]);
+    end;
+    TopDict := TCffTestBuilder.Concat([TopDict, TCffTestBuilder.IntegerOperand(Length(PrivateData)),
+                                       TCffTestBuilder.IntegerOperand(Offsets[2]), TCffTestBuilder.Bytes([18])]);
+    for var Index := 0 to Count - 1 do
+    begin
+      TopDicts[Index] := TopDict;
+    end;
+    // The header, the INDEXes before the data, and then the data itself
+    const HeaderLength = 4 + Length(TCffTestBuilder.Index(Names, 1)) + Length(TCffTestBuilder.Index(TopDicts, 4)) + 4;
+    Offsets[0] := HeaderLength;
+    Offsets[1] := Offsets[0] + Length(CharStringsData);
+    Offsets[2] := Offsets[1] + Length(Charset);
+  end;
+
+  Result := TCffTestBuilder.Concat([TCffTestBuilder.Bytes([1, 0, 4, 4]), TCffTestBuilder.Index(Names, 1),
+                                    TCffTestBuilder.Index(TopDicts, 4), TCffTestBuilder.Index(nil), TCffTestBuilder.Index(nil),
+                                    CharStringsData, Charset, PrivateData]);
+end;
+
+// An entry of 512 operands has to be read in time that grows with its length, not with its square
+procedure TCFFHostileInputTests.TestPrivateDictOfManyOperandsParsesInLinearTime;
+begin
+  var Entry: TBytes;
+  SetLength(Entry, 513);
+  FillChar(Entry[0], 512, 139);
+  // The last byte is the operator of the entry (defaultWidthX), which the real value after the entries replaces
+  Entry[512] := 20;
+  var ExtraPrivateDict: TBytes;
+  const EntryCount = 2400;
+  SetLength(ExtraPrivateDict, EntryCount * Length(Entry));
+  for var Index := 0 to EntryCount - 1 do
+  begin
+    Move(Entry[0], ExtraPrivateDict[Index * Length(Entry)], Length(Entry));
+  end;
+
+  var Options := TCffType1Options.Standard;
+  Options.ExtraPrivateDict := ExtraPrivateDict;
+  const Data = TCffTestBuilder.Type1Font(Options);
+
+  const Stopwatch = TStopwatch.StartNew;
+  TCFFParserTests.WithFont(Data,
+    procedure(const Font: TCFFType1Font)
+    begin
+      Assert.AreEqual<Single>(Options.DefaultWidthX, Font.DefaultWidthX);
+    end);
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
+end;
+
+// The name INDEX allows 65535 fonts with 64 KB of offsets; they are not all read
+procedure TCFFHostileInputTests.TestFontSetIsCutOffAtTheFontLimit;
+begin
+  const Data = ManyFonts(65535, False);
+  const Stopwatch = TStopwatch.StartNew;
+  const Parser = TCFFParser.Create;
+  try
+    const Fonts = Parser.Parse(Data);
+    try
+      Assert.AreEqual(256, Integer(Fonts.Count));
+    finally
+      Fonts.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
+end;
+
+procedure TCFFHostileInputTests.TestFirstFontOnlyIsReadWhenAsked;
+begin
+  const Data = ManyFonts(65535, False);
+  const Stopwatch = TStopwatch.StartNew;
+  const Parser = TCFFParser.Create;
+  try
+    const Fonts = Parser.Parse(Data, 1);
+    try
+      Assert.AreEqual(1, Integer(Fonts.Count));
+    finally
+      Fonts.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
+end;
+
+// Every font here gets its own charset of 65535 glyphs from a few bytes. The work of all fonts together is limited.
+procedure TCFFHostileInputTests.TestFontsThatEachNeedABigGlyphTableRaiseOverBudget;
+begin
+  TCffParseOutcome.CheckRaises(ManyFonts(300, True), 'more work');
+end;
+
 procedure TCFFHostileInputTests.TestIndexCountBeyondDataRaises;
 begin
   // 20 bytes: the header, then an INDEX that claims 65535 entries of 4-byte offsets
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, $FF, $FF, 4, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, $FF, $FF, 4, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexOffsetsGoingBackwardsRaise;
 begin
   // Name INDEX with one entry, offsets 5 and 1
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexOffsetBeyondDataRaises;
 begin
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, $FF, 0, 0, 0]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, $FF, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexEntryBeyondDataRaises;
 begin
   // The offsets are inside the data, but the entry would be longer than what is left of it
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, 12, 65, 66, 67, 68, 0, 0, 0]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, 12, 65, 66, 67, 68, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIllegalOffSizeRaises;
 begin
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 0, 1, 2, 65]));
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 5, 1, 2, 65]));
-  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 0]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 0, 1, 2, 65]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 5, 1, 2, 65]));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 0]));
 end;
 
-procedure TCFFHostileInputTests.TestDictWithBadRealIsLenient;
+procedure TCFFHostileInputTests.TestDictWithBadRealRaisesParseException;
 begin
   // A real number that is only a minus sign has no value
-  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([$E, $F]), TCffTestBuilder.Bytes([12, 2])])),
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([$E, $F]), TCffTestBuilder.Bytes([12, 2])])),
              'Invalid real number');
   // A real number of two dots
-  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, $A, 2, $A, 3, $F]), TCffTestBuilder.Bytes([12, 2])])),
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, $A, 2, $A, 3, $F]), TCffTestBuilder.Bytes([12, 2])])),
              'Invalid real number');
 end;
 
 procedure TCFFHostileInputTests.TestDictWithUnterminatedRealRaises;
 begin
   // The real number has no $F nibble: the DICT ends inside it
-  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, 2, 3, 4])])), 'End of CFF data');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, 2, 3, 4])])), 'End of CFF data');
 end;
 
 procedure TCFFHostileInputTests.TestDictRealNumberLengthIsBounded;
@@ -1300,7 +1391,7 @@ begin
     Nibbles[Index] := 1;
   end;
   Nibbles[High(Nibbles)] := $F;
-  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand(Nibbles), TCffTestBuilder.Bytes([12, 2])])), 'too long');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand(Nibbles), TCffTestBuilder.Bytes([12, 2])])), 'too long');
 end;
 
 procedure TCFFHostileInputTests.TestDictOperandStackIsBounded;
@@ -1311,21 +1402,21 @@ begin
   begin
     Operands[Index] := $8B;
   end;
-  CheckRaises(RawFont(TCffTestBuilder.Concat([Operands, TCffTestBuilder.Bytes([5])])), 'Too many operands');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Concat([Operands, TCffTestBuilder.Bytes([5])])), 'Too many operands');
 end;
 
 procedure TCFFHostileInputTests.TestDictWithInvalidByteRaises;
 begin
-  CheckRaises(RawFont(TCffTestBuilder.Bytes([$FF, 5])), 'invalid DICT');
-  CheckRaises(RawFont(TCffTestBuilder.Bytes([22, 5])), 'invalid DICT');
-  CheckRaises(RawFont(TCffTestBuilder.Bytes([31, 5])), 'invalid DICT');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Bytes([$FF, 5])), 'invalid DICT');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Bytes([22, 5])), 'invalid DICT');
+  TCffParseOutcome.CheckRaises(RawFont(TCffTestBuilder.Bytes([31, 5])), 'invalid DICT');
 end;
 
 procedure TCFFHostileInputTests.TestSyntheticBaseRaises;
 begin
   var Options := TCffType1Options.Standard;
   Options.ExtraTopDict := TCffTestBuilder.Concat([TCffTestBuilder.IntegerOperand(0), TCffTestBuilder.Bytes([12, 20])]);
-  CheckRaises(TCffTestBuilder.Type1Font(Options), 'Synthetic');
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Type1Font(Options), 'Synthetic');
 end;
 
 procedure TCFFHostileInputTests.TestCharsetBeyondDataRaises;
@@ -1334,14 +1425,14 @@ begin
   Options.GlyphCount := 65535;
   // Format 0 with room for one SID, where 65534 are needed
   Options.CharsetData := TCffTestBuilder.Bytes([0, 0, 1]);
-  CheckRaises(TCffTestBuilder.Type1Font(Options));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestCharsetOfUnknownFormatRaises;
 begin
   var Options := TCffType1Options.Standard;
   Options.CharsetData := TCffTestBuilder.Bytes([7, 0, 1]);
-  CheckRaises(TCffTestBuilder.Type1Font(Options));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestCharsetRangeStopsAtTheGlyphCount;
@@ -1370,14 +1461,14 @@ begin
         Assert.AreEqual(0, Font.Charset.GetGIDForSID(100));
       end);
   end;
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < MaximumHostileMilliseconds, 'Parsing took too long');
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
 end;
 
 procedure TCFFHostileInputTests.TestEncodingOfUnknownFormatRaises;
 begin
   var Options := TCffType1Options.Standard;
   Options.EncodingData := TCffTestBuilder.Bytes([5, 0, 0]);
-  CheckRaises(TCffTestBuilder.Type1Font(Options));
+  TCffParseOutcome.CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestEncodingOffsetBeyondDataRaises;
@@ -1386,7 +1477,7 @@ begin
   // A format 0 encoding that claims 255 codes, at the very end of the data
   Options.EncodingData := TCffTestBuilder.Bytes([0, 255]);
   const Data = TCffTestBuilder.Type1Font(Options);
-  CheckRaises(Copy(Data, 0, Length(Data) - 20));
+  TCffParseOutcome.CheckRaises(Copy(Data, 0, Length(Data) - 20));
 end;
 
 procedure TCFFHostileInputTests.TestTruncatedFontOnlyRaisesParseException;
@@ -1398,7 +1489,7 @@ begin
   const Data = TCffTestBuilder.Type1Font(Options);
   for var Size := 0 to Length(Data) - 1 do
   begin
-    const Outcome = OutcomeOf(Copy(Data, 0, Size));
+    const Outcome = TCffParseOutcome.OutcomeOf(Copy(Data, 0, Size));
     Assert.IsTrue((Outcome = '') or (Outcome = EPdfParseException.ClassName), Format('%d bytes: %s', [Size, Outcome]));
   end;
 end;
@@ -1409,10 +1500,10 @@ begin
   const Stopwatch = TStopwatch.StartNew;
   for var Step := 0 to 40 do
   begin
-    const Outcome = OutcomeOf(Copy(Data, 0, Length(Data) * Step div 41));
+    const Outcome = TCffParseOutcome.OutcomeOf(Copy(Data, 0, Length(Data) * Step div 41));
     Assert.IsTrue((Outcome = '') or (Outcome = EPdfParseException.ClassName), Format('step %d: %s', [Step, Outcome]));
   end;
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 10 * MaximumHostileMilliseconds, 'Parsing took too long');
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 10 * TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
 end;
 
 procedure TCFFHostileInputTests.TestChangedBytesNeverEndInAnotherException;
@@ -1430,13 +1521,13 @@ begin
     begin
       var Changed := Copy(Original);
       Changed[Position] := Value;
-      const Outcome = OutcomeOf(Changed);
+      const Outcome = TCffParseOutcome.OutcomeOf(Changed);
       const IsAccepted = ((Outcome = '') or (Outcome = EPdfParseException.ClassName) or
                           (Outcome = EPdfUnsupportedFeatureException.ClassName));
       Assert.IsTrue(IsAccepted, Format('byte %d set to %d: %s', [Position, Value, Outcome]));
     end;
   end;
-  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 20 * MaximumHostileMilliseconds, 'Parsing took too long');
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < 20 * TCffParseOutcome.MaximumHostileMilliseconds, 'Parsing took too long');
 end;
 
 end.

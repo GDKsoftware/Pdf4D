@@ -38,9 +38,15 @@ implementation
 uses
   System.Math,
   System.Generics.Collections,
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.FontBox.Cff.Font;
 
 const
+  TruncatedTokenMessage = 'The charstring ends in the middle of a token';
+  IntegerOperandMessage = 'The charstring expects an integer operand';
+  TooManyOperandsMessage = 'The charstring has more than %d operands for one operator';
+  SubrsTooDeepMessage = 'Subroutines are nested deeper than %d';
+
   // An operator is a b0 below 32; the two byte operators (b0 = 12) get EscapeBase + b1
   EscapeBase = 256;
 
@@ -137,7 +143,6 @@ type
     procedure RemoveTrailingReturn;
     procedure Warn(const Fmt: string; const Args: array of const);
 
-    class function TruncateToInt(const Value: Double): Integer; static;
     class function DivideSingles(const Dividend, Divisor: Single): Single; static;
 
     property Items: TList<TCharStringItem> read FItems;
@@ -224,7 +229,7 @@ function TCharStringInput.ReadByte: Integer;
 begin
   if not HasRemaining then
   begin
-    raise EPdfParseException.Create('The charstring ends in the middle of a token');
+    raise EPdfParseException.Create(TruncatedTokenMessage);
   end;
   Result := FBytes[FPosition];
   Inc(FPosition);
@@ -235,7 +240,7 @@ begin
   const IsBeyondEnd = ((Offset < 0) or (Offset >= Length(FBytes) - FPosition));
   if IsBeyondEnd then
   begin
-    raise EPdfParseException.Create('The charstring ends in the middle of a token');
+    raise EPdfParseException.Create(TruncatedTokenMessage);
   end;
   Result := FBytes[FPosition + Offset];
 end;
@@ -319,9 +324,9 @@ begin
   const IsIntegerNumber = ((not Item.IsCommand) and Item.IsInteger);
   if not IsIntegerNumber then
   begin
-    raise EPdfParseException.Create('The charstring expects an integer operand');
+    raise EPdfParseException.Create(IntegerOperandMessage);
   end;
-  Result := TruncateToInt(Item.Value);
+  Result := TCFFNumber.ToInt(Item.Value);
 end;
 
 // A subroutine ends with return, which does not belong to the sequence of the caller
@@ -345,24 +350,6 @@ begin
   begin
     FLog.Warning(Fmt, Args);
   end;
-end;
-
-// Java's (int) of a double: truncated, limited to the range of an Integer, NaN is 0
-class function TCharStringReader.TruncateToInt(const Value: Double): Integer;
-begin
-  if IsNaN(Value) then
-  begin
-    Exit(0);
-  end;
-  if Value >= MaxInt then
-  begin
-    Exit(MaxInt);
-  end;
-  if Value <= Integer.MinValue then
-  begin
-    Exit(Integer.MinValue);
-  end;
-  Result := Trunc(Value);
 end;
 
 // Java's float division, which does not raise for a divisor of zero
@@ -529,7 +516,7 @@ begin
   end;
   if Depth >= MaxSubrDepth then
   begin
-    raise EPdfParseException.CreateFmt('Subroutines are nested deeper than %d', [MaxSubrDepth]);
+    raise EPdfParseException.CreateFmt(SubrsTooDeepMessage, [MaxSubrDepth]);
   end;
 
   const Number = SubrNumber(PopInteger, Length(Subrs));
@@ -596,7 +583,7 @@ procedure TType2WidthReader.AddPendingOperand(const Value: Double);
 begin
   if FPending.Count >= MaxOperands then
   begin
-    raise EPdfParseException.CreateFmt('The charstring has more than %d operands for one operator', [MaxOperands]);
+    raise EPdfParseException.CreateFmt(TooManyOperandsMessage, [MaxOperands]);
   end;
   FPending.Add(Value);
 end;
@@ -631,12 +618,12 @@ begin
     const FirstOperand = Single(FPending[0]);
     const Nominal = Single(FNominalWidthX);
     const Width = Single(FirstOperand + Nominal);
-    Result := TruncateToInt(Width);
+    Result := TCFFNumber.ToInt(Width);
   end
   else
   begin
     const Default = Single(FDefaultWidthX);
-    Result := TruncateToInt(Default);
+    Result := TCFFNumber.ToInt(Default);
   end;
 end;
 
@@ -775,7 +762,7 @@ begin
     Exit;
   end;
 
-  const SubrIndex = TruncateToInt(Operand.Value);
+  const SubrIndex = TCFFNumber.ToInt(Operand.Value);
   const IsInRange = ((SubrIndex >= 0) and (SubrIndex < Length(FSubrs)));
   if not IsInRange then
   begin
@@ -786,7 +773,7 @@ begin
 
   if Depth >= MaxSubrDepth then
   begin
-    raise EPdfParseException.CreateFmt('Subroutines are nested deeper than %d', [MaxSubrDepth]);
+    raise EPdfParseException.CreateFmt(SubrsTooDeepMessage, [MaxSubrDepth]);
   end;
 
   ParseSequence(FSubrs[SubrIndex], Depth + 1);
@@ -881,9 +868,9 @@ begin
   begin
     if not Item.IsInteger then
     begin
-      raise EPdfParseException.Create('The charstring expects an integer operand');
+      raise EPdfParseException.Create(IntegerOperandMessage);
     end;
-    Exit(TruncateToInt(Item.Value));
+    Exit(TCFFNumber.ToInt(Item.Value));
   end;
   if Item.Code <> CodeDiv then
   begin
@@ -918,7 +905,7 @@ begin
       begin
         if Operands.Count >= MaxOperands then
         begin
-          raise EPdfParseException.CreateFmt('The charstring has more than %d operands for one operator', [MaxOperands]);
+          raise EPdfParseException.CreateFmt(TooManyOperandsMessage, [MaxOperands]);
         end;
         Operands.Add(Item.Value);
       end
@@ -940,7 +927,7 @@ begin
         end;
         if Operands.Count > WidthPosition then
         begin
-          Width := TruncateToInt(Operands[WidthPosition]);
+          Width := TCFFNumber.ToInt(Operands[WidthPosition]);
         end;
         Exit(True);
       end
@@ -992,7 +979,7 @@ begin
       on Failure: EPdfParseException do
       begin
         const Default = Single(DefaultWidthX);
-        Result := TCharStringReader.TruncateToInt(Default);
+        Result := TCFFNumber.ToInt(Default);
         if Assigned(Log) then
         begin
           Log.Warning('Type 2 charstring ignored, the default width is used: %s', [Failure.Message]);

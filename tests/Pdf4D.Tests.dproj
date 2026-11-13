@@ -141,6 +141,7 @@
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Type1.Font.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.OpenType.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.CffBuilder.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.CffParseOutcome.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Parser.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.CID.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringWidth.Tests.pas"/>
