@@ -62,6 +62,7 @@ uses
 
 const
   LargeSize = 70000;
+  HugeSize = 200000;
 
 function TextBytes(const Text: string): TBytes;
 begin
@@ -306,18 +307,33 @@ end;
 
 procedure TRandomAccessReadTests.TestParentAndViewInterleave;
 begin
-  const Source = SequenceBytes(LargeSize);
+  const Source = SequenceBytes(HugeSize);
   const Reader = TRandomAccessRead.FromBytes(Source);
   try
-    const View = Reader.CreateView(1000, LargeSize - 1000);
+    const View = Reader.CreateView(1000, HugeSize - 1000);
     try
-      Reader.Seek(65530);
-      View.Seek(64530);
-      for var Index := 0 to 20 do
+      Reader.Seek(30000);
+      View.Seek(50000);
+      // Each side reads more than twice the buffer size, so both refill several times while
+      // the other one moves the shared stream position in between.
+      for var Index := 0 to 139999 do
       begin
-        Assert.AreEqual<Integer>(Source[65530 + Index], Reader.Read, Format('Parent %d', [Index]));
-        Assert.AreEqual<Integer>(Source[65530 + Index], View.Read, Format('View %d', [Index]));
+        const ParentActual = Reader.Read;
+        const ViewActual = View.Read;
+        if ParentActual <> Source[30000 + Index] then
+        begin
+          Assert.AreEqual<Integer>(Source[30000 + Index], ParentActual, Format('Parent %d', [Index]));
+        end;
+        if ViewActual <> Source[51000 + Index] then
+        begin
+          Assert.AreEqual<Integer>(Source[51000 + Index], ViewActual, Format('View %d', [Index]));
+        end;
       end;
+
+      Reader.Seek(5);
+      View.Seek(5);
+      Assert.AreEqual<Integer>(Source[1005], View.Read, 'View after seeking back');
+      Assert.AreEqual<Integer>(Source[5], Reader.Read, 'Parent after seeking back');
     finally
       View.Free;
     end;
@@ -347,12 +363,12 @@ end;
 
 procedure TRandomAccessReadTests.TestViewCrossingBufferBoundaryFromOffset;
 begin
-  const Source = SequenceBytes(LargeSize);
+  const Source = SequenceBytes(HugeSize);
   const Reader = TRandomAccessRead.FromBytes(Source);
   try
-    const View = Reader.CreateView(60000, 8000);
+    const View = Reader.CreateView(60000, 68000);
     try
-      for var Index := 0 to 7999 do
+      for var Index := 0 to 67999 do
       begin
         const Actual = View.Read;
         if Actual <> Source[60000 + Index] then
