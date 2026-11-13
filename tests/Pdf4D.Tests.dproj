@@ -111,6 +111,13 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.Standard14.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.AfmParser.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Standard14.Tests.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.FontBoxFont.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.DataStream.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Tables.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Font.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Parser.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.TestFonts.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Parser.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>
