@@ -8,6 +8,7 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Common.Log,
+  Pdf4D.Model.DocumentContext,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.AcroForm,
   Pdf4D.Model.DestinationResolver,
@@ -20,7 +21,7 @@ type
   TPDDocumentCatalog = class
   private
     FRoot: TCosDictionary;
-    FLog: TPdfLog;
+    FContext: TPDDocumentContext;
     FPages: TPDPageTree;
     FResolver: TPDDestinationResolver;
     FOutline: TPDDocumentOutline;
@@ -30,8 +31,8 @@ type
     function GetDestinationResolver: TPDDestinationResolver;
 
   public
-    // Log may be nil
-    constructor Create(const Root: TCosDictionary; const Log: TPdfLog);
+    // The catalog does not own Root or Context
+    constructor Create(const Root: TCosDictionary; const Context: TPDDocumentContext);
     destructor Destroy; override;
 
     // The page tree, which the catalog owns. Raises EPdfParseException when /Pages is no dictionary.
@@ -63,11 +64,11 @@ uses
 
 { TPDDocumentCatalog }
 
-constructor TPDDocumentCatalog.Create(const Root: TCosDictionary; const Log: TPdfLog);
+constructor TPDDocumentCatalog.Create(const Root: TCosDictionary; const Context: TPDDocumentContext);
 begin
   inherited Create;
   FRoot := Root;
-  FLog := Log;
+  FContext := Context;
 end;
 
 destructor TPDDocumentCatalog.Destroy;
@@ -88,7 +89,7 @@ begin
     begin
       raise EPdfParseException.Create('The document catalog has no page tree');
     end;
-    FPages := TPDPageTree.Create(PagesRoot, FLog);
+    FPages := TPDPageTree.Create(PagesRoot, FContext);
   end;
   Result := FPages;
 end;
@@ -101,7 +102,7 @@ begin
       function: TPDPageTree
       begin
         Result := Pages;
-      end, FLog);
+      end, FContext.Log);
   end;
   Result := FResolver;
 end;
@@ -132,7 +133,7 @@ begin
     var Dictionary: TCosDictionary;
     if FRoot.TryGetCosDictionary(TCosNames.AcroForm, Dictionary) then
     begin
-      FAcroForm := TPDAcroForm.Create(Dictionary, FLog);
+      FAcroForm := TPDAcroForm.Create(Dictionary, FContext.Log);
     end;
   end;
   AcroForm := FAcroForm;

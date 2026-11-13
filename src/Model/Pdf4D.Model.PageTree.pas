@@ -8,7 +8,7 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
-  Pdf4D.Common.Log,
+  Pdf4D.Model.DocumentContext,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Page;
@@ -45,7 +45,7 @@ type
   TPDPageTree = class
   private
     FRoot: TCosDictionary;
-    FLog: TPdfLog;
+    FContext: TPDDocumentContext;
     FIsSinglePage: Boolean;
     FIsListBuilt: Boolean;
     FDictionaries: TList<TCosDictionary>;
@@ -66,8 +66,8 @@ type
     function GetEnumeratedCount: Integer;
 
   public
-    // The tree does not own Root. Log may be nil.
-    constructor Create(const Root: TCosDictionary; const Log: TPdfLog);
+    // The tree does not own Root or Context
+    constructor Create(const Root: TCosDictionary; const Context: TPDDocumentContext);
     destructor Destroy; override;
 
     // Port of PDPageTree.getInheritableAttribute: the value of Key on the node or on the nearest ancestor that is a page
@@ -119,11 +119,11 @@ end;
 
 { TPDPageTree }
 
-constructor TPDPageTree.Create(const Root: TCosDictionary; const Log: TPdfLog);
+constructor TPDPageTree.Create(const Root: TCosDictionary; const Context: TPDDocumentContext);
 begin
   inherited Create;
   FRoot := Root;
-  FLog := Log;
+  FContext := Context;
   // PDFBOX-3154: a page dictionary instead of a page tree
   FIsSinglePage := HasTypeName(Root, TCosNames.Page);
   FDictionaries := TList<TCosDictionary>.Create;
@@ -188,17 +188,17 @@ end;
 
 procedure TPDPageTree.LogWarning(const Message: string);
 begin
-  if Assigned(FLog) then
+  if Assigned(FContext.Log) then
   begin
-    FLog.Warning(Message);
+    FContext.Log.Warning(Message);
   end;
 end;
 
 procedure TPDPageTree.LogError(const Message: string);
 begin
-  if Assigned(FLog) then
+  if Assigned(FContext.Log) then
   begin
-    FLog.Error(Message);
+    FContext.Log.Error(Message);
   end;
 end;
 
@@ -338,7 +338,7 @@ begin
   Result := FPages[Index];
   if not Assigned(Result) then
   begin
-    Result := TPDPage.Create(FDictionaries[Index]);
+    Result := TPDPage.Create(FDictionaries[Index], FContext);
     FPages[Index] := Result;
   end;
 end;

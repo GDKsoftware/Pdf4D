@@ -8,6 +8,7 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Rectangle;
 
 type
@@ -15,12 +16,14 @@ type
   TPDPage = class
   private
     FDictionary: TCosDictionary;
+    FContext: TPDDocumentContext;
 
     function TryGetInheritedBox(const Key: string; out Box: TPdfRectangle): Boolean;
     function GetOwnBox(const Key: string): TPdfRectangle;
 
   public
-    constructor Create(const Dictionary: TCosDictionary);
+    // The page does not own Dictionary or Context
+    constructor Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
 
     // Inherited from the page tree, US Letter when there is none
     function MediaBox: TPdfRectangle;
@@ -41,6 +44,7 @@ type
     function ContentStreams: TArray<TCosStream>;
 
     property CosObject: TCosDictionary read FDictionary;
+    property Context: TPDDocumentContext read FContext;
   end;
 
 implementation
@@ -55,10 +59,11 @@ uses
 
 { TPDPage }
 
-constructor TPDPage.Create(const Dictionary: TCosDictionary);
+constructor TPDPage.Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
 begin
   inherited Create;
   FDictionary := Dictionary;
+  FContext := Context;
 end;
 
 function TPDPage.TryGetInheritedBox(const Key: string; out Box: TPdfRectangle): Boolean;

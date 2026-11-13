@@ -10,6 +10,7 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 4. **`var` parameters only** where a ported algorithm has to update a position or state and that cannot be done through a field. Overrides: "no `var` parameters".
 5. **Long ported methods may keep the PDFBox order** as long as they stay readable. Splitting into private methods is preferred. Overrides: method decomposition.
 6. **Inline variables and `const` stay mandatory**, as in the GDK rules.
+7. **Shared, lazily made objects go through `TPdfSharedInstance` and `TPdfSharedCache`.** A `class destructor` may free such an object. No `initialization` or `finalization` sections. Overrides: the GDK rule on singletons. Reason: thread-safe lazy publication and leak detection (an object that is filled once and freed at shutdown is no leak).
 
 ## Additions
 

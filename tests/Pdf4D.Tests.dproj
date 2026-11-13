@@ -115,6 +115,10 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.DateConverter.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DateConverter.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Rectangle.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.SharedInstance.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.SharedInstance.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentInformation.pas"/>

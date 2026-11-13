@@ -14,6 +14,7 @@ uses
   Pdf4D.Cos.Document,
   Pdf4D.Encryption.AccessPermission,
   Pdf4D.Model.DocumentCatalog,
+  Pdf4D.Model.DocumentContext,
   Pdf4D.Model.DocumentInformation,
   Pdf4D.Model.EmbeddedFile,
   Pdf4D.Model.PageTree;
@@ -24,6 +25,7 @@ type
   TPDDocument = class
   private
     FCosDocument: TCosDocument;
+    FContext: TPDDocumentContext;
     FCatalog: TPDDocumentCatalog;
     FInformation: TPDDocumentInformation;
     // Stand ins for a trailer without /Root or /Info, as PDFBox creates them
@@ -54,6 +56,8 @@ type
     function GetEmbeddedFiles: TArray<TPDEmbeddedFile>;
 
     property CosDocument: TCosDocument read FCosDocument;
+    // Shared by the catalog, the page tree and the pages. The document owns it and frees it before the TCosDocument.
+    property Context: TPDDocumentContext read FContext;
     property Catalog: TPDDocumentCatalog read GetCatalog;
     property DocumentInformation: TPDDocumentInformation read GetInformation;
     property Pages: TPDPageTree read GetPages;
@@ -81,6 +85,7 @@ constructor TPDDocument.Create(const CosDocument: TCosDocument);
 begin
   inherited Create;
   FCosDocument := CosDocument;
+  FContext := TPDDocumentContext.Create(CosDocument);
   FSubstitutes := TObjectList<TCosDictionary>.Create(True);
 end;
 
@@ -89,6 +94,7 @@ begin
   FEmbeddedFiles.Free;
   FInformation.Free;
   FCatalog.Free;
+  FContext.Free;
   FCosDocument.Free;
   FSubstitutes.Free;
   inherited;
@@ -114,7 +120,7 @@ begin
     begin
       Root := CreateSubstitute;
     end;
-    FCatalog := TPDDocumentCatalog.Create(Root, FCosDocument.Log);
+    FCatalog := TPDDocumentCatalog.Create(Root, FContext);
   end;
   Result := FCatalog;
 end;

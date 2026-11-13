@@ -85,6 +85,7 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Page,
   Pdf4D.Model.PageTree;
 
@@ -185,12 +186,17 @@ begin
         Messages := Messages + Message + #10;
       end);
     try
-      const Tree = TPDPageTree.Create(Root, Log);
+      const Context = TPDDocumentContext.Create(Log, TPdfLoadOptions.Default);
       try
-        Assert.AreEqual(1, Tree.EnumeratedCount);
-        Assert.AreSame(Page, Tree.Get(0).CosObject);
+        const Tree = TPDPageTree.Create(Root, Context);
+        try
+          Assert.AreEqual(1, Tree.EnumeratedCount);
+          Assert.AreSame(Page, Tree.Get(0).CosObject);
+        finally
+          Tree.Free;
+        end;
       finally
-        Tree.Free;
+        Context.Free;
       end;
     finally
       Log.Free;
