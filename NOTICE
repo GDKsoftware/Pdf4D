@@ -23,3 +23,9 @@ Copyright (C) 2003-2007 Apple, Inc., All Rights Reserved
 
 
 Pdf4D, a Delphi port of Apache PDFBox
+
+Includes data of the Unicode Character Database (UnicodeData.txt and
+CompositionExclusions.txt, Unicode 16.0.0), in
+src/Encryption/Pdf4D.Encryption.UnicodeData.pas.
+Copyright (c) 1991-2024 Unicode, Inc. All rights reserved.
+Distributed under the Unicode License v3, https://www.unicode.org/license.txt

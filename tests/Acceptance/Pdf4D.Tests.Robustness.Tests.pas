@@ -53,13 +53,12 @@ type
   strict private
     class function MutationName(const FileName: string; const Index: Integer; const Kind: TMutationKind): string; static;
     class procedure SaveFailure(const Name: string; const Bytes: TBytes); static;
-    class procedure CheckMutations(const WithTimeLimit: Boolean); static;
 
   public
+    // Every mutation runs on a worker thread with a time limit and with the strict dump: success or an EPdfException, never another
+    // exception and never a hang
     [Test]
-    procedure TestMutatedCorpusNeverCrashes;
-    [Test]
-    procedure TestMutationFinishesInTime;
+    procedure TestMutatedCorpusFailsCleanlyInTime;
     [Test]
     procedure TestAllCorpusFilesLoadWithoutLeak;
   end;
@@ -111,7 +110,7 @@ begin
     Exit;
   end;
 
-  const Count = 1 + Random(Length(Bytes) mod MaxDuplicatedBytes + 1);
+  const Count = 1 + Random(Min(Length(Bytes), MaxDuplicatedBytes));
   const Start = Random(Length(Bytes) - Count + 1);
   const Target = Random(Length(Bytes) + 1);
   const Block = Copy(Bytes, Start, Count);
@@ -197,7 +196,7 @@ begin
     const Stream = TBytesStream.Create(FBytes);
     try
       const Document: IPdfDocument = TPdfDocument.Load(Stream, Options);
-      TStructureDump.Dump(Document);
+      TStructureDump.Dump(Document, True);
     finally
       Stream.Free;
     end;
@@ -253,8 +252,7 @@ begin
   end;
 end;
 
-
-class procedure TRobustnessTests.CheckMutations(const WithTimeLimit: Boolean);
+procedure TRobustnessTests.TestMutatedCorpusFailsCleanlyInTime;
 begin
   const Files = TCorpus.Files;
   if Length(Files) = 0 then
@@ -277,16 +275,8 @@ begin
       const Name = MutationName(FileName, Index, Kind);
       const Run = TMutationRun.Create(Mutated, Password);
       var Outcome: TMutationOutcome;
-      var Finished := True;
       const Watch = TStopwatch.StartNew;
-      if WithTimeLimit then
-      begin
-        Finished := Run.RunWithin(MaxMutationSeconds * 1000, Outcome);
-      end
-      else
-      begin
-        Outcome := Run.RunHere;
-      end;
+      const Finished = Run.RunWithin(MaxMutationSeconds * 1000, Outcome);
 
       if not Finished then
       begin
@@ -302,7 +292,7 @@ begin
         Failures := Failures + [Format('%s: %s', [Name, Outcome.Failure])];
         SaveFailure(Name, Mutated);
       end
-      else if WithTimeLimit and (Watch.ElapsedMilliseconds > MaxMutationSeconds * 1000) then
+      else if (Watch.ElapsedMilliseconds > MaxMutationSeconds * 1000) then
       begin
         Failures := Failures + [Format('%s: took %d ms', [Name, Watch.ElapsedMilliseconds])];
       end;
@@ -315,16 +305,6 @@ begin
     Assert.Fail(Format('%d of the mutations failed, the first %d:%s%s',
                        [Length(Failures), Length(Reported), sLineBreak, string.Join(sLineBreak, Reported)]));
   end;
-end;
-
-procedure TRobustnessTests.TestMutatedCorpusNeverCrashes;
-begin
-  CheckMutations(False);
-end;
-
-procedure TRobustnessTests.TestMutationFinishesInTime;
-begin
-  CheckMutations(True);
 end;
 
 procedure TRobustnessTests.TestAllCorpusFilesLoadWithoutLeak;

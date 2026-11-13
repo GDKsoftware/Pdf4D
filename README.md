@@ -1,6 +1,6 @@
 # Pdf4D
 
-Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0.8 for reading PDF files: document structure, pages, text extraction, outlines, form fields and attachments. It has no dependencies besides the Delphi RTL.
+Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0.8 for reading PDF files: document structure, pages, outlines, form fields and attachments. It has no dependencies besides the Delphi RTL.
 
 ## Platforms
 

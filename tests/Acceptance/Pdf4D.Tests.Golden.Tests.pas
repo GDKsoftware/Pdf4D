@@ -109,16 +109,18 @@ class function TGoldenTests.Dump(const RelativePath: string): string;
 begin
   var Options := TPdfLoadOptions.Default;
   Options.Password := TCorpus.PasswordFor(RelativePath);
+  // The dump is strict, so that a crash in a section fails the test instead of becoming an "error" line. The document is
+  // released when the method ends, before the next file is loaded.
+  var Document: IPdfDocument := nil;
   try
-    // The document is released at the end of the statement block, before the next file is loaded
-    const Document: IPdfDocument = TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
-    Result := TStructureDump.Dump(Document);
+    Document := TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
   except
-    on Failure: Exception do
+    on Failure: EPdfException do
     begin
-      Result := TStructureDump.DumpLoadError(Failure);
+      Exit(TStructureDump.DumpLoadError(Failure));
     end;
   end;
+  Result := TStructureDump.Dump(Document, True);
 end;
 
 // For looking at a difference: the text that was found goes to the folder in PDF4D_GOLDEN_OUTPUT
@@ -128,7 +130,7 @@ begin
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TFile.WriteAllText(TPath.Combine(Folder, TCorpus.GoldenName(RelativePath) + '.dump.txt'), Actual, TUTF8Encoding.Create(False));
+    TFile.WriteAllBytes(TPath.Combine(Folder, TCorpus.GoldenName(RelativePath) + '.dump.txt'), TEncoding.UTF8.GetBytes(Actual));
   end;
 end;
 

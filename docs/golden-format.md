@@ -93,4 +93,14 @@ Values are the decrypted values for encrypted files.
 `tests/golden/<name>.known-differences.txt` lists lines of a dump that are allowed to differ from the golden file. One entry per line, in the form `<prefix> # <reason>`. Lines starting with `#` and empty lines are ignored.
 
 - `<prefix>`: a line of the dump (expected or found) that starts with it is not compared, for example `object 12 0:`.
-- `<prefix> ignore-key /Key`: the line is still compared, but the entry `/Key <value>` (an integer or a reference `n g R`) is removed from both sides first. The hash of a stream and all other keys stay in the comparison. Example: `object 12 0: ignore-key /Length # reason`. This is used for the encrypted files, where PDFBox rewrites `/Length` of a stream dictionary to the decrypted size and Pdf4D keeps the value of the file.
+- `<prefix> ignore-key /Key`: the line is still compared, but the entry `/Key <value>` (an integer, a reference `n g R` or a name such as `/Outlines`) is removed from both sides first. The hash of a stream and all other keys stay in the comparison. Example: `object 12 0: ignore-key /Length # reason`. A name value is used for `object 296 0: ignore-key /Type`, where PDFBox adds `/Type /Outlines` to the outline root: `/Count`, `/First` and `/Last` of that line are still compared. This is used for the encrypted files, where PDFBox rewrites `/Length` of a stream dictionary to the decrypted size and Pdf4D keeps the value of the file.
+
+## How dumps are compared
+
+The acceptance test (`tests/Support/Pdf4D.Tests.Golden.pas`) compares the dump of Pdf4D with the golden file line by line:
+
+- A line is compared exactly. Only a CR and spaces or tabs at the end of a line are dropped. Leading and inner whitespace is data: the two spaces per level of an `outline:` line carry the nesting, and spaces in titles, labels, field values and info values are part of the value.
+- There is no whitespace leniency for any section of M1. A section may only get one by naming it here. The extracted text of M2 (`text:` sections) is expected to need one (the PDFBox text stripper and Pdf4D may differ in runs of spaces and line breaks); when it does, the rule is written down in this section for that section only: which section, which characters are collapsed or ignored, and why. Structure sections never get one.
+- A number with a decimal point may differ by 0.001 from the golden value. The text around the numbers must be equal.
+- Lines are matched by `object <n> <g>:`, `page <i>:` and `info <key>:` as their start, all others by kind and position. A key that occurs twice in one dump is a difference.
+- Known differences (above) are the only other leniency.

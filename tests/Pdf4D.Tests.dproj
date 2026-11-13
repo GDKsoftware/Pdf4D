@@ -69,6 +69,8 @@
         <DCC_Optimize>false</DCC_Optimize>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -153,6 +155,7 @@
         <DCCReference Include="Support\Pdf4D.Tests.Corpus.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.StructureDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.Golden.Comparer.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Golden.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Robustness.Tests.pas"/>
         <BuildConfiguration Include="Base">

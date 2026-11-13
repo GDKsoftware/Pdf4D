@@ -1,1 +1,1 @@
-object 296 0: # PDFBox sets /Type /Outlines in the outline root dictionary when it reads it; Pdf4D leaves a loaded document unchanged (TPDDocumentOutline)
+object 296 0: ignore-key /Type # PDFBox sets /Type /Outlines in the outline root dictionary when it reads it; Pdf4D leaves a loaded document unchanged (TPDDocumentOutline)

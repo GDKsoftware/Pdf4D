@@ -19,7 +19,7 @@ type
 
     class function Canonical(const Value: TObject): string; static;
     class function CanonicalDictionary(const Dictionary: TObject): string; static;
-    class function CanonicalStream(const Stream: TObject): string; static;
+    class function CanonicalStream(const Stream: TObject; const IsStrict: Boolean): string; static;
   public
     // The text of a float as the golden format wants it: the shortest decimal of the 32 bit value (Float.toString), rounded
     // half up to 4 decimals, without trailing zeros, "0" for zero
@@ -28,7 +28,9 @@ type
     class function FormatVersion(const Value: Single): string; static;
     class function EscapedText(const Text: string): string; static;
 
-    class function Dump(const Document: IPdfDocument): string; static;
+    // Lenient: every exception of a section becomes an "error" line, as the oracle does. Strict: only a PDF exception becomes an "error"
+    // line, any other exception (an access violation, a range error) goes to the caller.
+    class function Dump(const Document: IPdfDocument; const IsStrict: Boolean = False): string; static;
     // The single line for a file that cannot be loaded
     class function DumpLoadError(const E: Exception): string; static;
   end;
@@ -413,7 +415,7 @@ begin
   end;
 end;
 
-class function TStructureDump.CanonicalStream(const Stream: TObject): string;
+class function TStructureDump.CanonicalStream(const Stream: TObject; const IsStrict: Boolean): string;
 begin
   const Source = TCosStream(Stream);
   const Header = CanonicalDictionary(Source);
@@ -429,8 +431,12 @@ begin
     end;
     Result := Result + ' sha256=' + Hash.HashAsString;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if IsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Result := Header + ' stream error';
     end;
   end;
@@ -455,6 +461,7 @@ type
   private
     FLines: TStringBuilder;
     FModel: TPDDocument;
+    FIsStrict: Boolean;
     FPageCosObjects: TList<TCosDictionary>;
 
     procedure Add(const Line: string);
@@ -475,7 +482,7 @@ type
     function PageNumberOf(const Item: TPDOutlineItem): string;
 
   public
-    constructor Create(const Model: TPDDocument);
+    constructor Create(const Model: TPDDocument; const IsStrict: Boolean);
     destructor Destroy; override;
 
     function Write: string;
@@ -483,10 +490,11 @@ type
 
 { TDumpWriter }
 
-constructor TDumpWriter.Create(const Model: TPDDocument);
+constructor TDumpWriter.Create(const Model: TPDDocument; const IsStrict: Boolean);
 begin
   inherited Create;
   FModel := Model;
+  FIsStrict := IsStrict;
   FLines := TStringBuilder.Create;
   FPageCosObjects := TList<TCosDictionary>.Create;
 end;
@@ -514,8 +522,12 @@ begin
   try
     Add('version: ' + TStructureDump.FormatVersion(FModel.Version));
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Add('version: error');
     end;
   end;
@@ -539,8 +551,12 @@ begin
     try
       Permissions := IntToStr(FModel.CosDocument.Encryption.GetPermissions);
     except
-      on Exception do
+      on Failure: Exception do
       begin
+        if FIsStrict and not (Failure is EPdfException) then
+        begin
+          raise;
+        end;
         Permissions := 'error';
       end;
     end;
@@ -564,8 +580,12 @@ begin
       end;
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Result := nil;
     end;
   end;
@@ -581,8 +601,12 @@ begin
       FPageCosObjects.Add(Tree.Get(Position).CosObject);
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       IsFailed := True;
     end;
   end;
@@ -609,8 +633,12 @@ begin
       Add('page ' + IntToStr(Position + 1) + ': media=' + RectangleText(Page.MediaBox) + ' crop=' + RectangleText(Page.CropBox) +
           ' rotate=' + IntToStr(Page.Rotation) + ' label=' + TStructureDump.EscapedText(PageLabel));
     except
-      on Exception do
+      on Failure: Exception do
       begin
+        if FIsStrict and not (Failure is EPdfException) then
+        begin
+          raise;
+        end;
         Add('page ' + IntToStr(Position + 1) + ': error');
       end;
     end;
@@ -669,8 +697,12 @@ begin
             Text := TStructureDump.Canonical(Entry);
           end;
         except
-          on Exception do
+          on Failure: Exception do
           begin
+            if FIsStrict and not (Failure is EPdfException) then
+            begin
+              raise;
+            end;
             Text := '<error>';
           end;
         end;
@@ -691,8 +723,12 @@ begin
       Lines.Free;
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Add('info: error');
     end;
   end;
@@ -713,8 +749,12 @@ begin
       end;
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Text := 'error';
     end;
   end;
@@ -731,8 +771,12 @@ begin
       Result := IntToStr(PageIndex + 1);
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Result := '?';
     end;
   end;
@@ -769,8 +813,12 @@ begin
       end;
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Add('outline: error');
     end;
   end;
@@ -796,8 +844,12 @@ begin
   try
     Name := TStructureDump.EscapedText(Item.FullyQualifiedName);
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Name := '<error>';
     end;
   end;
@@ -826,8 +878,12 @@ begin
       Value := TStructureDump.EscapedText(Item.ValueAsString);
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Value := '<error>';
     end;
   end;
@@ -847,8 +903,12 @@ begin
       end;
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Add('field: error');
     end;
   end;
@@ -868,8 +928,12 @@ begin
       Add('attachment: ' + TStructureDump.EscapedText(Attachment.FileName) + ' | ' + Size);
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Add('attachment: error');
     end;
   end;
@@ -897,15 +961,19 @@ begin
 
     if Base is TCosStream then
     begin
-      Result := Prefix + TStructureDump.CanonicalStream(Base);
+      Result := Prefix + TStructureDump.CanonicalStream(Base, FIsStrict);
     end
     else
     begin
       Result := Prefix + TStructureDump.Canonical(Base);
     end;
   except
-    on Exception do
+    on Failure: Exception do
     begin
+      if FIsStrict and not (Failure is EPdfException) then
+      begin
+        raise;
+      end;
       Result := Prefix + 'error';
     end;
   end;
@@ -939,9 +1007,9 @@ begin
   Result := FLines.ToString;
 end;
 
-class function TStructureDump.Dump(const Document: IPdfDocument): string;
+class function TStructureDump.Dump(const Document: IPdfDocument; const IsStrict: Boolean): string;
 begin
-  const Writer = TDumpWriter.Create((Document as TPdfDocument).ModelDocument);
+  const Writer = TDumpWriter.Create((Document as TPdfDocument).ModelDocument, IsStrict);
   try
     Result := Writer.Write;
   finally
