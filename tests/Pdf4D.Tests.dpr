@@ -10,7 +10,8 @@ uses
   DUnitX.Loggers.XML.NUnit,
   DUnitX.TestFramework,
   Pdf4D.Tests.MemoryCheck in 'Pdf4D.Tests.MemoryCheck.pas',
-  Pdf4D.Common.Log.Tests in '..\src\Common\Pdf4D.Common.Log.Tests.pas';
+  Pdf4D.Common.Log.Tests in '..\src\Common\Pdf4D.Common.Log.Tests.pas',
+  Pdf4D.IO.RandomAccessRead.Tests in '..\src\IO\Pdf4D.IO.RandomAccessRead.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

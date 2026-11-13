@@ -48,7 +48,7 @@
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -79,6 +79,7 @@
         </DelphiCompile>
         <DCCReference Include="Pdf4D.Tests.MemoryCheck.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Log.Tests.pas"/>
+        <DCCReference Include="..\src\IO\Pdf4D.IO.RandomAccessRead.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
