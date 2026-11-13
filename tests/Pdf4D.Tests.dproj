@@ -134,10 +134,12 @@
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Font.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Parser.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Type1FontUtil.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringWidth.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.OpenType.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.CffBuilder.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Parser.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.CID.Tests.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringWidth.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.OpenType.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>

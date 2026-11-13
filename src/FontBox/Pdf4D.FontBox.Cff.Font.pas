@@ -11,6 +11,7 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
+  Pdf4D.Common.Log,
   Pdf4D.FontBox.BoundingBox,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.Cff.Charset,
@@ -52,11 +53,14 @@ type
     FTopDictStrings: TDictionary<string, string>;
     FCharStrings: TArray<TBytes>;
     FGlobalSubrs: TArray<TBytes>;
+    FLog: TPdfLog;
 
   public
     constructor Create;
     destructor Destroy; override;
 
+    // The log gets the warnings about damaged charstrings. The font does not own it; it must outlive the font.
+    procedure SetLog(const Log: TPdfLog);
     procedure SetName(const Name: string);
     procedure AddTopDictNumbers(const Key: string; const Values: TArray<Double>);
     procedure AddTopDictString(const Key, Value: string);
@@ -75,7 +79,11 @@ type
     function GetTopDictNumber(const Key: string; const Default: Double): Double;
     function TryGetTopDictArray(const Key: string; out Values: TArray<Double>): Boolean;
     function TryGetTopDictString(const Key: string; out Value: string): Boolean;
+    // The charstring of the glyph, or the .notdef charstring for a GID beyond the CharStrings (as PDFBox). False when the font
+    // has no charstrings.
+    function TryGetCharString(const GID: Integer; out CharString: TBytes): Boolean;
 
+    property Log: TPdfLog read FLog;
     property Charset: TCFFCharset read FCharset;
     property CharStrings: TArray<TBytes> read FCharStrings;
     property GlobalSubrs: TArray<TBytes> read FGlobalSubrs;
@@ -103,8 +111,9 @@ type
     procedure SetEncoding(const Encoding: TCFFEncoding; const OwnsEncoding: Boolean);
     procedure SetLocalSubrs(const LocalSubrs: TArray<TBytes>);
 
-    // Widths follow with the charstring interpreter
+    // The width of the glyph; the .notdef width for a name that the charset does not have
     function GetWidth(const GlyphName: string): Single; override;
+    function GetWidthForGID(const GID: Integer): Single;
     function HasGlyph(const GlyphName: string): Boolean; override;
 
     // 0 (.notdef) when the charset has no glyph with this name
@@ -199,9 +208,11 @@ type
     // Empty when the glyph has no private DICT or the DICT has no local subroutines
     function GetLocalSubrs(const GID: Integer): TArray<TBytes>;
 
-    // Widths follow with the charstring interpreter
-    function GetWidth(const Selector: string): Single; override;
     // The selector is a CID in the form \ddddd. A selector that has another form raises EPdfParseException.
+    function GetWidth(const Selector: string): Single; override;
+    // The width of the glyph of the CID. A CID whose glyph is beyond the CharStrings gets the .notdef charstring and the widths
+    // of the private DICT of that glyph.
+    function GetWidthForCID(const CID: Integer): Single;
     function HasGlyph(const Selector: string): Boolean; override;
 
     property Registry: string read FRegistry;
@@ -224,7 +235,8 @@ implementation
 
 uses
   System.Math,
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.FontBox.CharStringWidth;
 
 const
   FontMatrixKey = 'FontMatrix';
@@ -343,6 +355,11 @@ begin
   inherited;
 end;
 
+procedure TCFFFont.SetLog(const Log: TPdfLog);
+begin
+  FLog := Log;
+end;
+
 procedure TCFFFont.SetName(const Name: string);
 begin
   FName := Name;
@@ -409,6 +426,24 @@ begin
   end;
 end;
 
+function TCFFFont.TryGetCharString(const GID: Integer; out CharString: TBytes): Boolean;
+begin
+  CharString := nil;
+  Result := (Length(FCharStrings) > 0);
+  if Result then
+  begin
+    const IsInRange = ((GID >= 0) and (GID < Length(FCharStrings)));
+    if IsInRange then
+    begin
+      CharString := FCharStrings[GID];
+    end
+    else
+    begin
+      CharString := FCharStrings[0];
+    end;
+  end;
+end;
+
 function TCFFFont.GetTopDictNumber(const Key: string; const Default: Double): Double;
 begin
   var Values: TArray<Double>;
@@ -467,7 +502,20 @@ end;
 
 function TCFFType1Font.GetWidth(const GlyphName: string): Single;
 begin
-  raise EPdfUnsupportedFeatureException.Create('Glyph widths of CFF fonts are not available yet');
+  Result := GetWidthForGID(NameToGID(GlyphName));
+end;
+
+function TCFFType1Font.GetWidthForGID(const GID: Integer): Single;
+begin
+  var CharString: TBytes;
+  if TryGetCharString(GID, CharString) then
+  begin
+    Result := TCharStringWidth.Type2Width(CharString, GlobalSubrs, LocalSubrs, DefaultWidthX, NominalWidthX, Log);
+  end
+  else
+  begin
+    Result := DefaultWidthX;
+  end;
 end;
 
 function TCFFType1Font.HasGlyph(const GlyphName: string): Boolean;
@@ -705,7 +753,27 @@ end;
 
 function TCFFCIDFont.GetWidth(const Selector: string): Single;
 begin
-  raise EPdfUnsupportedFeatureException.Create('Glyph widths of CFF fonts are not available yet');
+  var CID: Integer;
+  if not TryParseSelector(Selector, CID) then
+  begin
+    raise EPdfParseException.CreateFmt('Invalid selector "%s"', [Selector]);
+  end;
+  Result := GetWidthForCID(CID);
+end;
+
+function TCFFCIDFont.GetWidthForCID(const CID: Integer): Single;
+begin
+  const GID = CIDToGID(CID);
+  var CharString: TBytes;
+  if TryGetCharString(GID, CharString) then
+  begin
+    Result := TCharStringWidth.Type2Width(CharString, GlobalSubrs, GetLocalSubrs(GID), GetDefaultWidthX(GID),
+                                          GetNominalWidthX(GID), Log);
+  end
+  else
+  begin
+    Result := GetDefaultWidthX(GID);
+  end;
 end;
 
 // Java's Integer.parseInt of the text after the backslash: an optional sign and decimal digits
