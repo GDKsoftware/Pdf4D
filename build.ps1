@@ -30,6 +30,16 @@ function Invoke-Build([string]$TargetPlatform) {
     }
 }
 
+# Shared state is published lazily and freed by class destructors; initialization and finalization sections are not allowed
+function Test-NoInitializationSections {
+    $offenders = Get-ChildItem -Path (Join-Path $PSScriptRoot 'src') -Filter '*.pas' -Recurse |
+        Select-String -Pattern '^\s*(initialization|finalization)\b' -CaseSensitive:$false
+    if ($offenders) {
+        $offenders | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
+        throw 'Units under src must not have initialization or finalization sections'
+    }
+}
+
 function Get-WslPath([string]$WindowsPath) {
     $linuxPath = (& wsl -d $WslDistro -- wslpath -a ($WindowsPath -replace '\\', '/') | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or -not $linuxPath) {
@@ -55,6 +65,8 @@ function Invoke-Tests([string]$TargetPlatform) {
         throw "Tests failed for $TargetPlatform (exit code $LASTEXITCODE)"
     }
 }
+
+Test-NoInitializationSections
 
 $platforms = if ($Platform -eq 'All') { @('Win32', 'Win64', 'Linux64') } else { @($Platform) }
 

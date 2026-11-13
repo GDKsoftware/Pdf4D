@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 unit Pdf4D.Common.Log.Tests;
 
 interface
@@ -18,13 +17,13 @@ type
     procedure TestNilCallbackIsIgnored;
 
     [Test]
-    procedure TestBadFormatStringFallsBackToRawFormat;
+    procedure TestBadFormatStringLogsRawText;
 
     [Test]
-    procedure TestRaisingCallbackIsSwallowed;
+    procedure TestRaisingCallbackIsContained;
 
     [Test]
-    procedure TestNoFormattingWithoutCallback;
+    procedure TestNoFormatWithoutCallback;
 
     [Test]
     procedure TestDefaultOptions;
@@ -74,7 +73,7 @@ begin
   end;
 end;
 
-procedure TPdfLogTests.TestBadFormatStringFallsBackToRawFormat;
+procedure TPdfLogTests.TestBadFormatStringLogsRawText;
 begin
   var ReceivedMessage := '';
   const Log = TPdfLog.Create(
@@ -90,6 +89,9 @@ begin
       end);
     Assert.AreEqual('Broken %d and %s', ReceivedMessage);
 
+    Log.Warning('Object %d of %s', [12]);
+    Assert.IsTrue(ReceivedMessage.StartsWith('Object %d of %s'));
+
     Log.Warning('Wrong %q', [1]);
     Assert.AreEqual('Wrong %q', ReceivedMessage);
   finally
@@ -97,7 +99,7 @@ begin
   end;
 end;
 
-procedure TPdfLogTests.TestRaisingCallbackIsSwallowed;
+procedure TPdfLogTests.TestRaisingCallbackIsContained;
 begin
   var CallCount := 0;
   const Log = TPdfLog.Create(
@@ -112,14 +114,15 @@ begin
       begin
         Log.Info('Plain');
         Log.Error('Object %d', [3]);
+        Log.Error('a');
       end);
-    Assert.AreEqual(2, CallCount);
+    Assert.AreEqual(3, CallCount);
   finally
     Log.Free;
   end;
 end;
 
-procedure TPdfLogTests.TestNoFormattingWithoutCallback;
+procedure TPdfLogTests.TestNoFormatWithoutCallback;
 begin
   // A format string that would raise is never evaluated when nobody listens; observable only as not raising and not failing
   const Log = TPdfLog.Create(nil);
@@ -127,7 +130,7 @@ begin
     Assert.WillNotRaise(
       procedure
       begin
-        Log.Debug('Broken %d', ['text']);
+        Log.Warning('%d', ['x']);
       end);
   finally
     Log.Free;
@@ -140,6 +143,11 @@ begin
 
   Assert.AreEqual<Int64>(256 * 1024 * 1024, Options.MaxDecodedStreamSize);
   Assert.AreEqual(500, Options.MaxNestingDepth);
+  Assert.AreEqual(50, Options.MaxFormXObjectDepth);
+  Assert.AreEqual<Int64>(10000000, Options.MaxOperatorsPerPage);
+  Assert.AreEqual(2000000, Options.MaxGlyphsPerPage);
+  Assert.AreEqual(16 * 1024 * 1024, Options.MaxInlineImageSize);
+  Assert.AreEqual(4096, Options.MaxGraphicsStateDepth);
   Assert.AreEqual('', Options.Password);
   Assert.IsFalse(Assigned(Options.OnLog));
 end;

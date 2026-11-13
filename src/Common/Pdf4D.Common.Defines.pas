@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 unit Pdf4D.Common.Defines;
 
 interface
@@ -33,6 +32,16 @@ type
     Password: string;
     MaxDecodedStreamSize: Int64;
     MaxNestingDepth: Integer;
+    // Nesting of Form XObjects (and Type 3 glyph procedures) while interpreting a content stream
+    MaxFormXObjectDepth: Integer;
+    // Operators that one page may execute, summed over its content streams and forms
+    MaxOperatorsPerPage: Int64;
+    // Glyphs that one page may show
+    MaxGlyphsPerPage: Integer;
+    // Bytes of the data of one inline image (between ID and EI)
+    MaxInlineImageSize: Integer;
+    // Depth of the q/Q stack
+    MaxGraphicsStateDepth: Integer;
     OnLog: TPdfLogEvent;
 
     class function Default: TPdfLoadOptions; static;
@@ -44,6 +53,12 @@ const
   DefaultMaxNestingDepth = 500;
   // A caller's MaxNestingDepth is clamped to this: the parser recurses, and deeper nesting could overflow the stack
   MaximumNestingDepth = 2000;
+  // Same limit as PDFStreamEngine.drawObject in PDFBox (level > 50)
+  DefaultMaxFormXObjectDepth = 50;
+  DefaultMaxOperatorsPerPage: Int64 = 10000000;
+  DefaultMaxGlyphsPerPage = 2000000;
+  DefaultMaxInlineImageSize = 16 * 1024 * 1024;
+  DefaultMaxGraphicsStateDepth = 4096;
 
 implementation
 
@@ -61,6 +76,11 @@ begin
   Result.Password             := '';
   Result.MaxDecodedStreamSize := DefaultMaxDecodedStreamSize;
   Result.MaxNestingDepth      := DefaultMaxNestingDepth;
+  Result.MaxFormXObjectDepth  := DefaultMaxFormXObjectDepth;
+  Result.MaxOperatorsPerPage  := DefaultMaxOperatorsPerPage;
+  Result.MaxGlyphsPerPage     := DefaultMaxGlyphsPerPage;
+  Result.MaxInlineImageSize   := DefaultMaxInlineImageSize;
+  Result.MaxGraphicsStateDepth := DefaultMaxGraphicsStateDepth;
   Result.OnLog                := nil;
 end;
 

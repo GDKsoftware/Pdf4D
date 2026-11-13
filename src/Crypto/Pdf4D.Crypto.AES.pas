@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 unit Pdf4D.Crypto.AES;
 
 // Replaces javax.crypto.Cipher with AES/CBC/PKCS5Padding, AES/CBC/NoPadding and AES/ECB/NoPadding as used by

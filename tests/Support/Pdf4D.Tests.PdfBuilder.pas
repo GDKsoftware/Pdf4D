@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Builds small synthetic PDF files with exact offsets, for the tests of the parser.
 unit Pdf4D.Tests.PdfBuilder;
 

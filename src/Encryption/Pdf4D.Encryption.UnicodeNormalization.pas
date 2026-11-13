@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Replaces java.text.Normalizer (NFKC) as used by pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/SaslPrep.java (3.0.8)
 // The algorithm is the one of Unicode Standard Annex 15: full compatibility decomposition, canonical ordering, canonical composition.
 unit Pdf4D.Encryption.UnicodeNormalization;

@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 unit Pdf4D.Tests.Robustness.Tests;
 
 interface
@@ -37,6 +36,7 @@ type
     FBytes: TBytes;
     FPassword: string;
     FFinished: TEvent;
+    FWorker: TThread;
     FOutcome: TMutationOutcome;
     procedure Execute;
 
@@ -184,6 +184,12 @@ end;
 
 destructor TMutationRun.Destroy;
 begin
+  // The worker may still be inside SetEvent when the wait returns: wait until the thread has ended before the event goes
+  if Assigned(FWorker) then
+  begin
+    FWorker.WaitFor;
+    FWorker.Free;
+  end;
   FFinished.Free;
   inherited;
 end;
@@ -220,12 +226,15 @@ end;
 function TMutationRun.RunWithin(const Milliseconds: Cardinal; out Outcome: TMutationOutcome): Boolean;
 begin
   FFinished.ResetEvent;
-  TThread.CreateAnonymousThread(
+  FWorker := TThread.CreateAnonymousThread(
     procedure
     begin
       Execute;
       FFinished.SetEvent;
-    end).Start;
+    end);
+  // The run owns the thread object, so it is never freed while it can still signal
+  FWorker.FreeOnTerminate := False;
+  FWorker.Start;
 
   Result := FFinished.WaitFor(Milliseconds) = wrSignaled;
   if Result then

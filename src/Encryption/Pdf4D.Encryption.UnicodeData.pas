@@ -1,5 +1,4 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Contains data of the Unicode Character Database, Copyright (c) 1991-2024 Unicode, Inc., under the Unicode License v3 (see NOTICE).
 // Data of the Unicode normalization forms, generated from the Unicode 16.0.0 character database (UnicodeData.txt and
 // CompositionExclusions.txt) by tools/unicode/generate-unicode-data.ps1. Do not edit by hand.
