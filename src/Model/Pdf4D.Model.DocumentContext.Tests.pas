@@ -28,6 +28,9 @@ type
     procedure TestContextWithoutDocumentHasDefaults;
 
     [Test]
+    procedure TestToUnicodeBudgetIsChargedAndExhausted;
+
+    [Test]
     procedure TestAddingTheSameValueAgainKeepsIt;
 
     [Test]
@@ -86,6 +89,24 @@ begin
   finally
     KeyTwo.Free;
     KeyOne.Free;
+  end;
+end;
+
+procedure TDocumentContextTests.TestToUnicodeBudgetIsChargedAndExhausted;
+begin
+  var Options := TPdfLoadOptions.Default;
+  Options.MaxToUnicodeMappings := 10;
+  const Context = TPDDocumentContext.Create(nil, Options);
+  try
+    Assert.IsTrue(Context.TryChargeToUnicodeMappings(6));
+    Assert.IsTrue(Context.TryChargeToUnicodeMappings(4), 'the limit itself is allowed');
+    Assert.IsFalse(Context.IsToUnicodeBudgetExhausted);
+
+    Assert.IsFalse(Context.TryChargeToUnicodeMappings(1));
+    Assert.IsTrue(Context.IsToUnicodeBudgetExhausted);
+    Assert.IsFalse(Context.TryChargeToUnicodeMappings(0), 'nothing is accepted once the budget is gone');
+  finally
+    Context.Free;
   end;
 end;
 

@@ -42,6 +42,9 @@ type
     MaxInlineImageSize: Integer;
     // Depth of the q/Q stack
     MaxGraphicsStateDepth: Integer;
+    // Mappings (character, CID and CID range entries) that all ToUnicode CMaps of one document may add up to. A CMap
+    // that takes the total over the limit is dropped, and so is every ToUnicode CMap that follows.
+    MaxToUnicodeMappings: Int64;
     OnLog: TPdfLogEvent;
 
     class function Default: TPdfLoadOptions; static;
@@ -59,6 +62,8 @@ const
   DefaultMaxGlyphsPerPage = 2000000;
   DefaultMaxInlineImageSize = 16 * 1024 * 1024;
   DefaultMaxGraphicsStateDepth = 4096;
+  // Four times the limit of one CMap (4194304 mappings): a document of ordinary size is never near it
+  DefaultMaxToUnicodeMappings: Int64 = 16777216;
 
 implementation
 
@@ -81,6 +86,7 @@ begin
   Result.MaxGlyphsPerPage     := DefaultMaxGlyphsPerPage;
   Result.MaxInlineImageSize   := DefaultMaxInlineImageSize;
   Result.MaxGraphicsStateDepth := DefaultMaxGraphicsStateDepth;
+  Result.MaxToUnicodeMappings := DefaultMaxToUnicodeMappings;
   Result.OnLog                := nil;
 end;
 

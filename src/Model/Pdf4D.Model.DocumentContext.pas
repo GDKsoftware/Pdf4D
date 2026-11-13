@@ -20,6 +20,8 @@ type
     FLog: TPdfLog;
     FOptions: TPdfLoadOptions;
     FObjects: TObjectDictionary<TObject, TObject>;
+    FToUnicodeMappings: Int64;
+    FIsToUnicodeBudgetExhausted: Boolean;
 
     procedure Initialize(const Log: TPdfLog; const Options: TPdfLoadOptions);
 
@@ -34,6 +36,13 @@ type
     function TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean;
     // The context becomes the owner of Value. A second value for the same Key raises EArgumentException.
     procedure AddCachedObject(const Key: TObject; const Value: TObject);
+
+    // The budget for the mappings of all ToUnicode CMaps of this document (Options.MaxToUnicodeMappings). A font asks
+    // IsToUnicodeBudgetExhausted before it parses a ToUnicode CMap, and charges the mappings of the parsed CMap
+    // afterwards. False means the CMap takes the total over the budget: the font treats it as absent. The first time
+    // that happens a warning goes to the log; from then on every ToUnicode CMap of the document counts as absent.
+    function IsToUnicodeBudgetExhausted: Boolean;
+    function TryChargeToUnicodeMappings(const MappingCount: Integer): Boolean;
 
     property CosDocument: TCosDocument read FCosDocument;
     property Log: TPdfLog read FLog;
@@ -99,6 +108,32 @@ end;
 function TPDDocumentContext.TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean;
 begin
   Result := FObjects.TryGetValue(Key, Value);
+end;
+
+function TPDDocumentContext.IsToUnicodeBudgetExhausted: Boolean;
+begin
+  Result := FIsToUnicodeBudgetExhausted;
+end;
+
+function TPDDocumentContext.TryChargeToUnicodeMappings(const MappingCount: Integer): Boolean;
+begin
+  if FIsToUnicodeBudgetExhausted then
+  begin
+    Exit(False);
+  end;
+
+  FToUnicodeMappings := FToUnicodeMappings + MappingCount;
+  const IsOverBudget = (FToUnicodeMappings > FOptions.MaxToUnicodeMappings);
+  if IsOverBudget then
+  begin
+    FIsToUnicodeBudgetExhausted := True;
+    if Assigned(FLog) then
+    begin
+      FLog.Warning('The ToUnicode CMaps of this document exceed %d mappings in total; further ToUnicode CMaps are ignored',
+                   [FOptions.MaxToUnicodeMappings]);
+    end;
+  end;
+  Result := not IsOverBudget;
 end;
 
 procedure TPDDocumentContext.AddCachedObject(const Key: TObject; const Value: TObject);
