@@ -15,25 +15,13 @@ uses
   Pdf4D.Cos.PdfArray,
   Pdf4D.Cos.Resolver.Interfaces,
   Pdf4D.Parser.Base,
+  Pdf4D.Parser.BruteForce,
+  Pdf4D.Parser.Security.Interfaces,
   Pdf4D.Parser.StreamObject,
   Pdf4D.Parser.Xref,
   Pdf4D.Parser.XrefTrailerResolver;
 
 type
-  // The part of PDFBox' SecurityHandler that the parser uses. The handler is set before objects are loaded.
-  ISecurityHandler = interface
-    ['{2F0E7B64-7D0B-4B5C-9A55-6C5E8B1D3F21}']
-    procedure DecryptStream(const Stream: TCosStream; const ObjectNumber: Int64; const Generation: Integer);
-    // Value may be nil: the object was empty
-    procedure Decrypt(const Value: TCosBase; const ObjectNumber: Int64; const Generation: Integer);
-  end;
-
-  // Gives the trailer of a file whose xref could not be used, by searching the file for objects. The parser owns the
-  // result.
-  TTrailerRebuilder = reference to function(const Resolver: TXrefTrailerResolver): TCosDictionary;
-
-  TXrefResolverAction = reference to procedure(const Resolver: TXrefTrailerResolver);
-
   // Loads the objects of a document on demand. The parser belongs to the document (see TCosDocument.SetResolver),
   // so the interface does not count references.
   TCosParser = class(TBaseParser, ICosObjectResolver)
@@ -58,13 +46,10 @@ type
     FXrefResolver: TXrefTrailerResolver;
     FXrefParser: TXrefParser;
     FDecompressedObjects: TObjectDictionary<Int64, TObjectDictionary<TCosObjectKey, TCosBase>>;
+    FBruteForceParser: TBruteForceParser;
     FSecurityHandler: ISecurityHandler;
     FResolveDepth: Integer;
     FTrailerWasRebuilt: Boolean;
-    FOnRebuildTrailer: TTrailerRebuilder;
-    FOnSearchXRef: TXrefOffsetSearch;
-    FOnGetBruteForceOffsets: TBruteForceOffsetsProvider;
-    FOnAfterXrefParsed: TXrefResolverAction;
 
     class function IsHeaderVersionPattern(const Header: string; const Marker: string): Boolean; static;
     class function TryParseHeaderVersion(const Header: string; out Version: Single): Boolean; static;
@@ -81,8 +66,9 @@ type
     function LoadObjectStream(const ObjectStreamNumber: Int64): TCosStream;
     procedure KeepOtherObjects(const AllObjects, StreamObjects: TObjectDictionary<TCosObjectKey, TCosBase>);
 
+    function GetBruteForceParser: TBruteForceParser;
+    function PrepareBruteForceDecryption: ISecurityHandler;
     function TryParseXref(out Message: string): Boolean;
-    procedure RebuildTrailer(const FailureMessage: string);
     procedure FinishXrefParsing(const Rebuilt: Boolean);
     procedure DiscardXrefParsing;
     function CheckPagesDictionary(const PagesDictionary: TCosDictionary; const Visited: TList<TCosBase>; const Depth: Integer): Integer;
@@ -116,10 +102,6 @@ type
     constructor Create(const Document: TCosDocument);
     destructor Destroy; override;
 
-    // True for an exception that comes from the data of a file and not from a mistake in the library: the load turns
-    // it into an EPdfParseException. PDFBox sees these as an IOException.
-    class function IsInputFailure(const Failure: Exception): Boolean; static;
-
     // The object for the key, for the TCosObject that stands for it. A load that fails is logged and gives nil, like
     // COSObject.getObject does with an IOException. The position of the source is the same afterwards.
     function ResolveObject(const Key: TCosObjectKey): TCosBase;
@@ -135,12 +117,6 @@ type
 
     // Called before an object is decrypted, set when the file is encrypted
     property SecurityHandler: ISecurityHandler read FSecurityHandler write FSecurityHandler;
-
-    // The hooks of the brute force recovery. PDFBox falls back to a BruteForceParser at these places.
-    property OnRebuildTrailer: TTrailerRebuilder read FOnRebuildTrailer write FOnRebuildTrailer;
-    property OnSearchXRef: TXrefOffsetSearch read FOnSearchXRef write FOnSearchXRef;
-    property OnGetBruteForceOffsets: TBruteForceOffsetsProvider read FOnGetBruteForceOffsets write FOnGetBruteForceOffsets;
-    property OnAfterXrefParsed: TXrefResolverAction read FOnAfterXrefParsed write FOnAfterXrefParsed;
   end;
 
 implementation
@@ -169,6 +145,7 @@ end;
 destructor TCosParser.Destroy;
 begin
   DiscardXrefParsing;
+  FBruteForceParser.Free;
   FDecompressedObjects.Free;
   FStreamReader.Free;
   inherited;
@@ -194,11 +171,6 @@ end;
 function TCosParser._Release: Integer;
 begin
   Result := -1;
-end;
-
-class function TCosParser.IsInputFailure(const Failure: Exception): Boolean;
-begin
-  Result := ((Failure is EOutOfMemory) or (Failure is ERangeError) or (Failure is EIntOverflow) or (Failure is EStreamError));
 end;
 
 { header }
@@ -347,7 +319,7 @@ begin
     except
       on Failure: Exception do
       begin
-        const IsFailureOfData = ((Failure is EPdfParseException) or IsInputFailure(Failure));
+        const IsFailureOfData = ((Failure is EPdfParseException) or TPdfFailure.IsInputFailure(Failure));
         if not IsFailureOfData then
         begin
           raise;
@@ -371,15 +343,11 @@ begin
   Result := FDocument.XrefTable.TryGetValue(Key, OffsetOrObjectStream);
 
   // Maybe something is wrong with the xref table: use the result of a brute force search of all objects
-  if (not Result) and Assigned(FOnGetBruteForceOffsets) then
+  if (not Result) and GetBruteForceParser.GetBFCOSObjectOffsets.TryGetValue(Key, OffsetOrObjectStream) then
   begin
-    const SearchResult = FOnGetBruteForceOffsets();
-    if Assigned(SearchResult) and SearchResult.TryGetValue(Key, OffsetOrObjectStream) then
-    begin
-      Result := True;
-      FDocument.Log.Debug('Set missing offset %d for object %s', [OffsetOrObjectStream, Key.ToString]);
-      FDocument.XrefTable.AddOrSetValue(Key, OffsetOrObjectStream);
-    end;
+    Result := True;
+    FDocument.Log.Debug('Set missing offset %d for object %s', [OffsetOrObjectStream, Key.ToString]);
+    FDocument.XrefTable.AddOrSetValue(Key, OffsetOrObjectStream);
   end;
 
   // Circumvents loops with broken documents
@@ -556,7 +524,7 @@ begin
   except
     on Failure: Exception do
     begin
-      const IsFailureOfData = ((Failure is EPdfParseException) or (Failure is EPdfUnsupportedFeatureException) or IsInputFailure(Failure));
+      const IsFailureOfData = ((Failure is EPdfParseException) or (Failure is EPdfUnsupportedFeatureException) or TPdfFailure.IsInputFailure(Failure));
       if not IsFailureOfData then
       begin
         raise;
@@ -605,14 +573,38 @@ begin
   FreeAndNil(FXrefResolver);
 end;
 
+function TCosParser.PrepareBruteForceDecryption: ISecurityHandler;
+begin
+  PrepareDecryption;
+  Result := FSecurityHandler;
+end;
+
+// PDFBox creates its BruteForceParser at the first place that needs it
+function TCosParser.GetBruteForceParser: TBruteForceParser;
+begin
+  if not Assigned(FBruteForceParser) then
+  begin
+    FBruteForceParser := TBruteForceParser.Create(FDocument, PrepareBruteForceDecryption);
+  end;
+  Result := FBruteForceParser;
+end;
+
 // The xref chain of the file. False with the reason when it cannot be used.
 function TCosParser.TryParseXref(out Message: string): Boolean;
 begin
   Message := '';
   FXrefResolver := TXrefTrailerResolver.Create(FDocument.Log);
   FXrefParser := TXrefParser.Create(FXrefResolver);
-  FXrefParser.OnSearchXRef := FOnSearchXRef;
-  FXrefParser.OnGetBruteForceOffsets := FOnGetBruteForceOffsets;
+  FXrefParser.OnSearchXRef :=
+    function(const ExpectedOffset: Int64): Int64
+    begin
+      Result := GetBruteForceParser.BfSearchForXRef(ExpectedOffset);
+    end;
+  FXrefParser.OnGetBruteForceOffsets :=
+    function: TDictionary<TCosObjectKey, Int64>
+    begin
+      Result := GetBruteForceParser.GetBFCOSObjectOffsets;
+    end;
   try
     const StartXrefOffset = GetStartxrefOffset;
     FXrefParser.ParseXref(FDocument, StartXrefOffset);
@@ -620,7 +612,7 @@ begin
   except
     on Failure: Exception do
     begin
-      const IsFailureOfData = ((Failure is EPdfParseException) or IsInputFailure(Failure));
+      const IsFailureOfData = ((Failure is EPdfParseException) or TPdfFailure.IsInputFailure(Failure));
       if not IsFailureOfData then
       begin
         raise;
@@ -631,39 +623,19 @@ begin
   end;
 end;
 
-procedure TCosParser.RebuildTrailer(const FailureMessage: string);
-begin
-  if not Assigned(FOnRebuildTrailer) then
-  begin
-    if FailureMessage <> '' then
-    begin
-      raise EPdfParseException.Create(FailureMessage);
-    end;
-    raise EPdfParseException.Create('Missing root object specification in trailer.');
-  end;
-
-  const Rebuilt = FOnRebuildTrailer(FXrefResolver);
-  try
-    if Assigned(Rebuilt) then
-    begin
-      TXrefTrailerResolver.CopyEntries(Rebuilt, FDocument.Trailer);
-    end;
-  finally
-    Rebuilt.Free;
-  end;
-  FTrailerWasRebuilt := True;
-end;
-
 procedure TCosParser.FinishXrefParsing(const Rebuilt: Boolean);
 begin
-  if not Rebuilt then
+  if Rebuilt then
   begin
-    // Prepare decryption if necessary
-    PrepareDecryption;
-    if Assigned(FOnAfterXrefParsed) then
-    begin
-      FOnAfterXrefParsed(FXrefResolver);
-    end;
+    Exit;
+  end;
+
+  // Prepare decryption if necessary
+  PrepareDecryption;
+  // The brute force parser is only there when it was needed: do not create it just to ask
+  if Assigned(FBruteForceParser) and FBruteForceParser.SearchTriggered then
+  begin
+    FBruteForceParser.BfSearchForObjStreams(FXrefResolver, FSecurityHandler);
   end;
 end;
 
@@ -676,7 +648,9 @@ begin
     const NeedsRebuild = (not IsParsed) or (not Assigned(FDocument.Trailer.GetItem(TCosNames.Root)));
     if NeedsRebuild then
     begin
-      RebuildTrailer(FailureMessage);
+      FDocument.Log.Debug('The xref cannot be used, the trailer is rebuilt: %s', [FailureMessage]);
+      GetBruteForceParser.RebuildTrailer(FXrefResolver);
+      FTrailerWasRebuilt := True;
     end;
     FinishXrefParsing(NeedsRebuild);
   finally

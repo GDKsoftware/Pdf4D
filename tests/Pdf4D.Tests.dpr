@@ -33,7 +33,8 @@ uses
   Pdf4D.Parser.XrefTrailerResolver.Tests in '..\src\Parser\Pdf4D.Parser.XrefTrailerResolver.Tests.pas',
   Pdf4D.Parser.Xref.Tests in '..\src\Parser\Pdf4D.Parser.Xref.Tests.pas',
   Pdf4D.Parser.ObjectStream.Tests in '..\src\Parser\Pdf4D.Parser.ObjectStream.Tests.pas',
-  Pdf4D.Parser.Pdf.Tests in '..\src\Parser\Pdf4D.Parser.Pdf.Tests.pas';
+  Pdf4D.Parser.Pdf.Tests in '..\src\Parser\Pdf4D.Parser.Pdf.Tests.pas',
+  Pdf4D.Parser.BruteForce.Tests in '..\src\Parser\Pdf4D.Parser.BruteForce.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

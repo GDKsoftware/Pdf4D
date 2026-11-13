@@ -17,11 +17,6 @@ type
     procedure InitialParse;
     procedure Load;
 
-  protected
-    // Where Task 10 connects the brute force recovery: set the On... hooks of the parser. PDFBox creates its
-    // BruteForceParser lazily at the places where the hooks are called.
-    procedure InstallFallback; virtual;
-
   public
     // Reads the document from Source. The document owns the source when OwnsSource is true, and owns the parser. The
     // caller owns the result. A file that cannot be loaded raises an EPdfException; the source is then freed when
@@ -38,11 +33,6 @@ uses
   Pdf4D.IO.RandomAccessRead;
 
 { TPdfParser }
-
-procedure TPdfParser.InstallFallback;
-begin
-  // The brute force recovery is not there yet: a broken xref ends in an EPdfParseException
-end;
 
 procedure TPdfParser.InitialParse;
 begin
@@ -65,7 +55,6 @@ end;
 
 procedure TPdfParser.Load;
 begin
-  InstallFallback;
   // PDFBOX-1922: read the version header and rewind
   if not (ParsePdfHeader or ParseFdfHeader) then
   begin
@@ -96,7 +85,7 @@ begin
     on Failure: Exception do
     begin
       FreeAndNil(Result);
-      if TCosParser.IsInputFailure(Failure) then
+      if TPdfFailure.IsInputFailure(Failure) then
       begin
         raise EPdfParseException.CreateFmt('The file could not be loaded: %s', [Failure.Message]);
       end;

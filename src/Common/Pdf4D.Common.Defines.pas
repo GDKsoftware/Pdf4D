@@ -3,7 +3,8 @@ unit Pdf4D.Common.Defines;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  System.Classes;
 
 type
   {$SCOPEDENUMS ON}
@@ -17,6 +18,12 @@ type
   EPdfLimitExceededException = class(EPdfException);
 
   TPdfLogEvent = reference to procedure(const Level: TPdfLogLevel; const Message: string);
+
+  TPdfFailure = record
+    // True for an exception that comes from the data of a file and not from a mistake in the library: the load turns
+    // it into an EPdfParseException. PDFBox sees these as an IOException.
+    class function IsInputFailure(const Failure: Exception): Boolean; static;
+  end;
 
   TPdfLoadOptions = record
     Password: string;
@@ -35,6 +42,13 @@ const
   MaximumNestingDepth = 2000;
 
 implementation
+
+{ TPdfFailure }
+
+class function TPdfFailure.IsInputFailure(const Failure: Exception): Boolean;
+begin
+  Result := ((Failure is EOutOfMemory) or (Failure is ERangeError) or (Failure is EIntOverflow) or (Failure is EStreamError));
+end;
 
 { TPdfLoadOptions }
 
