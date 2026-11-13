@@ -11,7 +11,12 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Tests.MemoryCheck in 'Pdf4D.Tests.MemoryCheck.pas',
   Pdf4D.Common.Log.Tests in '..\src\Common\Pdf4D.Common.Log.Tests.pas',
-  Pdf4D.IO.RandomAccessRead.Tests in '..\src\IO\Pdf4D.IO.RandomAccessRead.Tests.pas';
+  Pdf4D.IO.RandomAccessRead.Tests in '..\src\IO\Pdf4D.IO.RandomAccessRead.Tests.pas',
+  Pdf4D.Common.Utf8.Tests in '..\src\Common\Pdf4D.Common.Utf8.Tests.pas',
+  Pdf4D.Cos.Float.Tests in '..\src\Cos\Pdf4D.Cos.Float.Tests.pas',
+  Pdf4D.Cos.Name.Tests in '..\src\Cos\Pdf4D.Cos.Name.Tests.pas',
+  Pdf4D.Cos.PdfDocEncoding.Tests in '..\src\Cos\Pdf4D.Cos.PdfDocEncoding.Tests.pas',
+  Pdf4D.Cos.PdfString.Tests in '..\src\Cos\Pdf4D.Cos.PdfString.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
