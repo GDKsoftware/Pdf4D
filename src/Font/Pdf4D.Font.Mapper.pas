@@ -12,7 +12,8 @@ uses
   System.SyncObjs,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.TrueType.Font,
-  Pdf4D.Font.Descriptor;
+  Pdf4D.Font.Descriptor,
+  Pdf4D.Font.Provider;
 
 type
   // The mapped font is shared: the mapper owns it and the caller must not free it. It stays valid until the process ends.
@@ -44,13 +45,15 @@ type
   // SetInstance can be called at any time, but a mapper that has been in use is never freed before the process ends: fonts
   // that it gave out are borrowed from it and a thread may still use them. SetInstance is therefore meant for start up and
   // tests, and each different mapper that is replaced stays in memory until shutdown. SetInstance(nil) goes back to the
-  // default mapper, which has an empty font provider.
+  // default mapper. The default mapper is made when Instance is first called and reads the font folders of the machine when the
+  // first font is asked for, so a process that sets its own mapper first never scans the file system.
   TPdfFontMappers = record
   private
     class var FLock: TLightweightMREW;
     class var FCurrent: IPdfFontMapper;
     class var FDefault: IPdfFontMapper;
     class var FRetired: TList<IPdfFontMapper>;
+    class var FDefaultProvider: IPdfFontProvider;
 
     class destructor Destroy;
 
@@ -60,12 +63,15 @@ type
   public
     class function Instance: IPdfFontMapper; static;
     class procedure SetInstance(const Mapper: IPdfFontMapper); static;
+    // The font provider of the default mapper, instead of the file system provider; nil goes back to that. Meant for tests, and only
+    // useful before the default mapper is first made, which is when Instance is first called without SetInstance having been called.
+    class procedure SetDefaultProvider(const Provider: IPdfFontProvider); static;
   end;
 
 implementation
 
 uses
-  Pdf4D.Font.Provider,
+  Pdf4D.Font.FileSystemProvider,
   Pdf4D.Font.MapperImpl;
 
 { TCIDFontMapping }
@@ -81,12 +87,18 @@ class destructor TPdfFontMappers.Destroy;
 begin
   FCurrent := nil;
   FDefault := nil;
+  FDefaultProvider := nil;
   FreeAndNil(FRetired);
 end;
 
 class function TPdfFontMappers.CreateDefault: IPdfFontMapper;
 begin
-  Result := TFontMapperImpl.Create(TPdfEmptyFontProvider.Create);
+  var Provider := FDefaultProvider;
+  if not Assigned(Provider) then
+  begin
+    Provider := TFileSystemFontProvider.CreateDefault;
+  end;
+  Result := TFontMapperImpl.Create(Provider);
 end;
 
 class function TPdfFontMappers.Instance: IPdfFontMapper;
@@ -138,6 +150,16 @@ begin
   if not IsKnown then
   begin
     FRetired.Add(Mapper);
+  end;
+end;
+
+class procedure TPdfFontMappers.SetDefaultProvider(const Provider: IPdfFontProvider);
+begin
+  FLock.BeginWrite;
+  try
+    FDefaultProvider := Provider;
+  finally
+    FLock.EndWrite;
   end;
 end;
 

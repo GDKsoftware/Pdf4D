@@ -83,6 +83,10 @@ uses
   Pdf4D.Tests.FontProvider in 'Support\Pdf4D.Tests.FontProvider.pas',
   Pdf4D.Font.Descriptor.Tests in '..\src\Font\Pdf4D.Font.Descriptor.Tests.pas',
   Pdf4D.Font.MapperImpl.Tests in '..\src\Font\Pdf4D.Font.MapperImpl.Tests.pas',
+  Pdf4D.FontBox.TrueType.Headers in '..\src\FontBox\Pdf4D.FontBox.TrueType.Headers.pas',
+  Pdf4D.Font.DirFinder in '..\src\Font\Pdf4D.Font.DirFinder.pas',
+  Pdf4D.Font.FileSystemProvider in '..\src\Font\Pdf4D.Font.FileSystemProvider.pas',
+  Pdf4D.Font.FileSystemProvider.Tests in '..\src\Font\Pdf4D.Font.FileSystemProvider.Tests.pas',
   Pdf4D.Common.ResourceData.Tests in '..\src\Common\Pdf4D.Common.ResourceData.Tests.pas',
   Pdf4D.Cos.Float.Tests in '..\src\Cos\Pdf4D.Cos.Float.Tests.pas',
   Pdf4D.Cos.Name.Tests in '..\src\Cos\Pdf4D.Cos.Name.Tests.pas',
@@ -205,6 +209,7 @@ begin
 
   // Test output must not depend on the fonts of the machine: only the fonts that a test names can be found, and everything
   // else ends up in the last-resort font (LiberationSans), like in the oracle.
+  TPdfFontMappers.SetDefaultProvider(TTestFontProvider.Empty);
   TPdfFontMappers.SetInstance(TFontMapperImpl.Create(TTestFontProvider.Empty));
 
   ExitCode := 0;

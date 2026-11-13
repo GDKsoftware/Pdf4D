@@ -63,6 +63,7 @@ type
     function CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable; override;
     function AllowCFF: Boolean; override;
     function IsPostScript(const Font: TTrueTypeFont): Boolean; override;
+    function IsSupportedPostScript(const Font: TTrueTypeFont): Boolean; override;
     procedure GuardMandatoryTables(const Font: TTrueTypeFont); override;
 
   public
@@ -185,6 +186,11 @@ end;
 function TOTFParser.IsPostScript(const Font: TTrueTypeFont): Boolean;
 begin
   Result := (Font as TOpenTypeFont).IsPostScript;
+end;
+
+function TOTFParser.IsSupportedPostScript(const Font: TTrueTypeFont): Boolean;
+begin
+  Result := (Font as TOpenTypeFont).IsSupportedOTF;
 end;
 
 procedure TOTFParser.GuardMandatoryTables(const Font: TTrueTypeFont);

@@ -154,6 +154,10 @@
         <DCCReference Include="Support\Pdf4D.Tests.FontProvider.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Descriptor.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.MapperImpl.Tests.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Headers.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.DirFinder.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.FileSystemProvider.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.FileSystemProvider.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>
