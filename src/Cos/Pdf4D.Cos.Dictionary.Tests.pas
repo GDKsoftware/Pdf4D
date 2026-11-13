@@ -85,6 +85,9 @@ type
     procedure TestArrayAddOfNilStoresNull;
 
     [Test]
+    procedure TestArrayRemoveLastHandsOverOwnership;
+
+    [Test]
     procedure TestObjectKeyEqualityAndText;
 
     [Test]
@@ -461,6 +464,33 @@ begin
     Items.Add(nil);
 
     Assert.IsTrue(Items.Get(0) is TCosNull);
+  finally
+    Items.Free;
+  end;
+end;
+
+procedure TCosDictionaryTests.TestArrayRemoveLastHandsOverOwnership;
+begin
+  const Items = TCosArray.Create;
+  try
+    Items.Add(TCosInteger.Create(1));
+    Items.Add(TCosInteger.Create(2));
+
+    const Removed = Items.RemoveLast;
+    try
+      Assert.AreEqual(Int64(2), TCosInteger(Removed).Value);
+    finally
+      Removed.Free;
+    end;
+    Assert.AreEqual(1, Items.Count);
+
+    Items.RemoveLast.Free;
+    Assert.WillRaise(
+      procedure
+      begin
+        Items.RemoveLast;
+      end,
+      EArgumentOutOfRangeException);
   finally
     Items.Free;
   end;

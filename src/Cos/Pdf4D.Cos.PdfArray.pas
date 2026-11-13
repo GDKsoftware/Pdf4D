@@ -4,6 +4,7 @@ unit Pdf4D.Cos.PdfArray;
 interface
 
 uses
+  System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Cos.Base;
 
@@ -29,6 +30,9 @@ type
 
     // The item with an indirect reference resolved. Never nil: a missing target is a TCosNull.
     function GetObject(const Index: Integer): TCosBase;
+
+    // Removes the last item and hands it to the caller, who owns it again, except of a TCosObject.
+    function RemoveLast: TCosBase;
 
     function GetEnumerator: TList<TCosBase>.TEnumerator;
 
@@ -94,6 +98,20 @@ begin
   begin
     Result := TCosObject(Result).GetObject;
   end;
+end;
+
+function TCosArray.RemoveLast: TCosBase;
+begin
+  const LastIndex = FItems.Count - 1;
+  const IsEmpty = (LastIndex < 0);
+  if IsEmpty then
+  begin
+    raise EArgumentOutOfRangeException.Create('Cannot remove the last item of an empty array');
+  end;
+
+  Result := FItems[LastIndex];
+  FItems.Delete(LastIndex);
+  FOwned.Delete(LastIndex);
 end;
 
 function TCosArray.GetEnumerator: TList<TCosBase>.TEnumerator;
