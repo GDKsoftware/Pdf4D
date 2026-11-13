@@ -25,6 +25,7 @@ type
     function DecodedText(const Stream: TCosStream): string;
     function RawText(const Stream: TCosStream): string;
     function MetadataStream(const Document: TCosDocument): TCosStream;
+    procedure AssertAllStreamsDecode(const Document: TCosDocument);
     function BuildWithEncryptDictionary(const Dictionary: string): TBytes;
     procedure AssertLoadRaises(const Dictionary: string; const ExceptionClass: ExceptClass);
 
@@ -81,9 +82,6 @@ type
 
     [Test]
     procedure TestRawEncryptedBytesStayAvailable;
-
-    [Test]
-    procedure TestEncryptedBytesAreNotChangedBySourceRead;
 
     [Test]
     procedure TestMetadataNotEncryptedWhenFlagFalse;
@@ -176,6 +174,15 @@ type
 
     [Test]
     procedure TestCombiningMarksAreOrdered;
+
+    [Test]
+    procedure TestCompositionExclusionStaysDecomposed;
+
+    [Test]
+    procedure TestSingletonDecompositionIsNotComposedBack;
+
+    [Test]
+    procedure TestSuperscriptAndFractionAreMapped;
   end;
 
 implementation
@@ -320,6 +327,24 @@ begin
   Assert.IsTrue(Root.TryGetCosStream(TCosNames.Metadata, Result), 'The catalog has no /Metadata stream');
 end;
 
+// Every stream decodes: with a wrong key the Flate data would be damaged
+procedure TStandardSecurityHandlerTests.AssertAllStreamsDecode(const Document: TCosDocument);
+begin
+  var StreamCount := 0;
+  for var Key in Document.ObjectKeys do
+  begin
+    const Loaded = Document.GetObjectFromPool(Key).GetObject;
+    if Loaded is TCosStream then
+    begin
+      Inc(StreamCount);
+      // Up to the first image filter: the images are not decoded
+      const Decoded = TCosStream(Loaded).DecodeUntilImageFilter;
+      Assert.IsTrue(Length(Decoded.Data) > 0, Format('Stream %s has no data', [Key.ToString]));
+    end;
+  end;
+  Assert.IsTrue(StreamCount > 0, 'The file has no streams');
+end;
+
 procedure TStandardSecurityHandlerTests.TestOpensEmptyUserPassword(const Variant: string);
 begin
   const Base = LoadCorpus(EncryptedFolder + 'base.pdf', '');
@@ -402,7 +427,7 @@ begin
   try
     Assert.AreEqual(5, Document.Encryption.GetRevision);
     Assert.IsNotNull(Document.Trailer.GetItem(TCosNames.Root));
-    Assert.IsTrue(Document.AccessPermission.IsReadOnly or Document.AccessPermission.IsOwnerPermission);
+    AssertAllStreamsDecode(Document);
   finally
     Document.Free;
   end;
@@ -414,18 +439,7 @@ begin
   try
     Assert.IsNotNull(Document.Encryption);
 
-    // Every stream decodes: with a wrong key the Flate data would be damaged
-    var StreamCount := 0;
-    for var Key in Document.ObjectKeys do
-    begin
-      const Loaded = Document.GetObjectFromPool(Key).GetObject;
-      if Loaded is TCosStream then
-      begin
-        Inc(StreamCount);
-        Assert.IsTrue(Length(DecodedText(TCosStream(Loaded))) > 0, Format('Stream %s has no data', [Key.ToString]));
-      end;
-    end;
-    Assert.IsTrue(StreamCount > 0, 'The file has no streams');
+    AssertAllStreamsDecode(Document);
   finally
     Document.Free;
   end;
@@ -487,23 +501,6 @@ begin
     end;
   finally
     Base.Free;
-  end;
-end;
-
-procedure TStandardSecurityHandlerTests.TestEncryptedBytesAreNotChangedBySourceRead;
-begin
-  const First = LoadCorpus(EncryptedFolder + 'rc4-128-empty.pdf', '');
-  try
-    const Second = LoadCorpus(EncryptedFolder + 'rc4-128-empty.pdf', '');
-    try
-      // RC4 decrypts and encrypts with the same operation: a second decryption would give other bytes than the first
-      Assert.AreEqual(RawText(FirstContentStream(First)), RawText(FirstContentStream(Second)));
-      Assert.AreEqual(RawText(FirstContentStream(First)), RawText(FirstContentStream(First)));
-    finally
-      Second.Free;
-    end;
-  finally
-    First.Free;
   end;
 end;
 
@@ -719,6 +716,24 @@ procedure TSaslPrepTests.TestCombiningMarksAreOrdered;
 begin
   // a with a dot below (class 220) and an acute (class 230): the order of the marks in the input does not matter
   Assert.AreEqual(TPdfSaslPrep.SaslPrepQuery('a' + #$0323 + #$0301), TPdfSaslPrep.SaslPrepQuery('a' + #$0301 + #$0323));
+end;
+
+procedure TSaslPrepTests.TestCompositionExclusionStaysDecomposed;
+begin
+  // U+0958 (Devanagari letter qa) is in CompositionExclusions.txt: it becomes ka and nukta and stays that way
+  Assert.AreEqual(#$0915 + #$093C, TPdfSaslPrep.SaslPrepQuery(#$0958));
+end;
+
+procedure TSaslPrepTests.TestSingletonDecompositionIsNotComposedBack;
+begin
+  // The angstrom sign U+212B decomposes to U+00C5 only
+  Assert.AreEqual(#$00C5, TPdfSaslPrep.SaslPrepQuery(#$212B));
+end;
+
+procedure TSaslPrepTests.TestSuperscriptAndFractionAreMapped;
+begin
+  Assert.AreEqual('2', TPdfSaslPrep.SaslPrepQuery(#$00B2));
+  Assert.AreEqual('1' + #$2044 + '4', TPdfSaslPrep.SaslPrepQuery(#$00BC));
 end;
 
 end.

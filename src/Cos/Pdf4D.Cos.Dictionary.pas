@@ -106,6 +106,10 @@ type
     // it stays valid after the document is freed.
     function CreateRawStream: TStream;
 
+    // The first MaxCount bytes (or fewer when the stream is shorter) as stored in the file, without decryption. Reads only
+    // those bytes.
+    function ReadRawPrefix(const MaxCount: Integer): TBytes;
+
     // The names in /Filter, in order: empty without a filter. The names are as written, so an abbreviation stays one.
     function GetFilterNames: TArray<string>;
 
@@ -129,6 +133,7 @@ type
 implementation
 
 uses
+  System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Document,
@@ -439,6 +444,26 @@ function TCosStream.CreateRawStream: TStream;
 begin
   const Stream = TBytesStream.Create(GetRawBytes);
   Result := Stream;
+end;
+
+function TCosStream.ReadRawPrefix(const MaxCount: Integer): TBytes;
+begin
+  if FHasRawData then
+  begin
+    Exit(Copy(FRawData, 0, MaxCount));
+  end;
+  if not Assigned(FSource) then
+  begin
+    Exit(nil);
+  end;
+
+  const Count = Min(Int64(MaxCount), FLength);
+  const View = FSource.CreateView(FOffset, Count);
+  try
+    Result := View.ReadFully(Integer(Count));
+  finally
+    View.Free;
+  end;
 end;
 
 procedure TCosStream.SetDocument(const Value: TObject);

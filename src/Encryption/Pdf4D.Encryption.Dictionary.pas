@@ -204,7 +204,8 @@ begin
   begin
     raise EPdfParseException.CreateFmt('The /%s entry of the encryption dictionary is not a string', [Key]);
   end;
-  Bytes := Copy(TCosString(Value).Bytes);
+  const Stored = TCosString(Value);
+  Bytes := Copy(Stored.Bytes);
 end;
 
 // Arrays.copyOf: cut, or filled with zeros

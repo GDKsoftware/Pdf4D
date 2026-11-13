@@ -109,6 +109,7 @@
         <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.RC4.Tests.pas"/>
         <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.AES.Tests.pas"/>
         <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.StandardSecurityHandler.Tests.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.Exemptions.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

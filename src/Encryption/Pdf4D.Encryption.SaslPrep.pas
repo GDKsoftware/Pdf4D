@@ -198,7 +198,8 @@ end;
 
 class function TPdfSaslPrep.IsLCat(const CodePoint: Integer): Boolean;
 begin
-  const IsLetterCodePoint = Char.IsLetter(Char.ConvertFromUtf32(CodePoint), 0);
+  const CodePointText = Char.ConvertFromUtf32(CodePoint);
+  const IsLetterCodePoint = Char.IsLetter(CodePointText, 0);
   Result := (IsLetterCodePoint and (not IsRandALCat(CodePoint)));
 end;
 
@@ -305,7 +306,8 @@ end;
 
 class function TPdfSaslPrep.SaslPrepQuery(const Value: string): string;
 begin
-  Result := Normalize(MapCharacters(Value));
+  const Mapped = MapCharacters(Value);
+  Result := Normalize(Mapped);
   CheckProhibitedAndBidi(Result);
 end;
 

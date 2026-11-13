@@ -50,6 +50,7 @@ type
     FXrefResolver: TXrefTrailerResolver;
     FXrefParser: TXrefParser;
     FDecompressedObjects: TObjectDictionary<Int64, TObjectDictionary<TCosObjectKey, TCosBase>>;
+    FLimitFailures: TDictionary<Int64, string>;
     FBruteForceParser: TBruteForceParser;
     FSecurityHandler: ISecurityHandler;
     FSecurityHandlerOwner: TSecurityHandler;
@@ -149,6 +150,7 @@ begin
   FDocument := Document;
   FStreamReader := TStreamObjectReader.Create(Self, Document);
   FDecompressedObjects := TObjectDictionary<Int64, TObjectDictionary<TCosObjectKey, TCosBase>>.Create([doOwnsValues]);
+  FLimitFailures := TDictionary<Int64, string>.Create;
 end;
 
 destructor TCosParser.Destroy;
@@ -158,6 +160,7 @@ begin
   FSecurityHandler := nil;
   FSecurityHandlerOwner.Free;
   FDecompressedObjects.Free;
+  FLimitFailures.Free;
   FStreamReader.Free;
   inherited;
 end;
@@ -556,6 +559,13 @@ end;
 
 function TCosParser.ParseObjectStreamObject(const ObjectStreamNumber: Int64; const Key: TCosObjectKey): TCosBase;
 begin
+  // A stream that is over the limit stays over it: each of its keys raises, not only the first
+  var LimitMessage: string;
+  if FLimitFailures.TryGetValue(ObjectStreamNumber, LimitMessage) then
+  begin
+    raise EPdfLimitExceededException.Create(LimitMessage);
+  end;
+
   var StreamObjects: TObjectDictionary<TCosObjectKey, TCosBase>;
   if FDecompressedObjects.TryGetValue(ObjectStreamNumber, StreamObjects) then
   begin
@@ -567,7 +577,15 @@ begin
 
   StreamObjects := TObjectDictionary<TCosObjectKey, TCosBase>.Create([doOwnsValues], TCosObjectKeyComparer.Create);
   FDecompressedObjects.Add(ObjectStreamNumber, StreamObjects);
-  Result := ParseObjectStreamObjects(ObjectStreamNumber, Key, StreamObjects);
+  try
+    Result := ParseObjectStreamObjects(ObjectStreamNumber, Key, StreamObjects);
+  except
+    on Failure: EPdfLimitExceededException do
+    begin
+      FLimitFailures.AddOrSetValue(ObjectStreamNumber, Failure.Message);
+      raise;
+    end;
+  end;
 end;
 
 { trailer }
@@ -586,7 +604,8 @@ begin
   begin
     raise EPdfParseException.Create('The first item of the document ID is not a string');
   end;
-  Result := Copy(TCosString(Id).Bytes);
+  const IdString = TCosString(Id);
+  Result := Copy(IdString.Bytes);
 end;
 
 function TCosParser.CreateSecurityHandler(const Encryption: TPdfEncryption): TStandardSecurityHandler;
@@ -631,7 +650,8 @@ begin
     FSecurityHandlerOwner.Free;
     FSecurityHandlerOwner := Handler;
     FSecurityHandler := Handler;
-    FDocument.SetAccessPermission(Handler.CurrentAccessPermission.Clone);
+    const Permission = Handler.CurrentAccessPermission.Clone;
+    FDocument.SetAccessPermission(Permission);
   except
     Encryption.Free;
     raise;

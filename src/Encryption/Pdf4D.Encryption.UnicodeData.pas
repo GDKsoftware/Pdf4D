@@ -1,4 +1,7 @@
-// Data of the Unicode normalization forms, generated from the Unicode 16.0.0 character database (Python unicodedata).
+// Data of the Unicode normalization forms, generated from the Unicode 16.0.0 character database (UnicodeData.txt and
+// CompositionExclusions.txt) by tools/unicode/generate-unicode-data.ps1. Do not edit by hand.
+// Composition exclusions: the entries of CompositionExclusions.txt, the singleton decompositions and the decompositions that
+// start with a non-starter (UAX 15, full composition exclusion).
 // Not ported from PDFBox: Java has this data in the JDK, the Delphi RTL has no normalization.
 unit Pdf4D.Encryption.UnicodeData;
 

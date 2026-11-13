@@ -233,11 +233,13 @@ begin
     end
     else if FUseAES then
     begin
-      Result := DecryptAesWithKey(CalcFinalKey(Key), Data);
+      const ObjectKey = CalcFinalKey(Key);
+      Result := DecryptAesWithKey(ObjectKey, Data);
     end
     else
     begin
-      Result := TRC4Cipher.Process(CalcFinalKey(Key), Data);
+      const ObjectKey = CalcFinalKey(Key);
+      Result := TRC4Cipher.Process(ObjectKey, Data);
     end;
   except
     on Failure: EArgumentException do
@@ -379,21 +381,14 @@ begin
     Exit;
   end;
 
-  const RawData = Stream.CreateRawStream;
-  try
-    var Start: TBytes;
-    SetLength(Start, XpacketLength);
-    const BytesRead = RawData.Read(Start, XpacketLength);
-    if BytesRead < XpacketLength then
-    begin
-      FLog.Debug('Tried reading %d bytes but only %d bytes read', [XpacketLength, BytesRead]);
-      Exit;
-    end;
-
-    Result := CompareMem(@Start[0], @XpacketStart[0], XpacketLength);
-  finally
-    RawData.Free;
+  const Start = Stream.ReadRawPrefix(XpacketLength);
+  if Length(Start) < XpacketLength then
+  begin
+    FLog.Debug('Tried reading %d bytes but only %d bytes read', [XpacketLength, Length(Start)]);
+    Exit;
   end;
+
+  Result := CompareMem(@Start[0], @XpacketStart[0], XpacketLength);
 
   if Result then
   begin
@@ -471,7 +466,8 @@ begin
     const IsSkipped = (SkipContents and (EntryKey = TCosNames.Contents));
     if not IsSkipped then
     begin
-      DecryptValue(Dictionary.GetItem(EntryKey), Key);
+      const Entry = Dictionary.GetItem(EntryKey);
+      DecryptValue(Entry, Key);
     end;
   end;
 end;
@@ -484,7 +480,8 @@ begin
     Exit;
   end;
 
-  DecryptEntries(Dictionary, Key, IsSignature(Dictionary));
+  const IsSignatureDictionary = IsSignature(Dictionary);
+  DecryptEntries(Dictionary, Key, IsSignatureDictionary);
 end;
 
 procedure TSecurityHandler.DecryptArray(const Items: TCosArray; const Key: TCosObjectKey);

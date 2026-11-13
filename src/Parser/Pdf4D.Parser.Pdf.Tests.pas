@@ -92,6 +92,9 @@ type
     procedure TestLimitExceededOnLazyLoadPropagates;
 
     [Test]
+    procedure TestLimitExceededRaisesForEveryKeyOfTheObjectStream;
+
+    [Test]
     procedure TestPositionOfTheSourceIsKeptWhileLoading;
 
     [Test]
@@ -556,6 +559,33 @@ begin
       Fetch(5);
     end,
     EPdfLimitExceededException);
+end;
+
+procedure TPdfParserTests.TestLimitExceededRaisesForEveryKeyOfTheObjectStream;
+begin
+  var Data: TBytes;
+  const Builder = MinimalBuilder;
+  try
+    Builder.ObjectStreamFilter := TStreamFilter.Flate;
+    Builder.AddCompressedObject(5, '<< /Pad (' + StringOfChar('x', 500) + ') >>', 6);
+    Builder.AddCompressedObject(7, '42', 6);
+    Data := Builder.Build(TXrefStyle.Stream);
+  finally
+    Builder.Free;
+  end;
+
+  FDocument := Load(Data, 200);
+
+  for var Number in [5, 7, 5] do
+  begin
+    Assert.WillRaise(
+      procedure
+      begin
+        Fetch(Number);
+      end,
+      EPdfLimitExceededException,
+      Format('Object %d of the object stream', [Number]));
+  end;
 end;
 
 procedure TPdfParserTests.TestPositionOfTheSourceIsKeptWhileLoading;

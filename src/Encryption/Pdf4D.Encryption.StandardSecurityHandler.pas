@@ -117,6 +117,7 @@ const
   Latin1Limit = $100;
   FullPermissionsBytes = 4;
   RevisionFourMinimumKeyBytes = 16;
+  UnknownRevisionMessage = 'Unknown Encryption Revision %d';
 
   EncryptPadding: array[0..31] of Byte = (
     $28, $BF, $4E, $5E, $4E, $75, $8A, $41, $64, $00, $4E, $56, $FF, $FA, $01, $08,
@@ -259,14 +260,16 @@ end;
 // Steps a to d of algorithm 3, the key to encrypt the user password with
 class function TStandardSecurityHandler.ComputeRC4Key(const OwnerPassword: TBytes; const Revision, KeyLengthInBytes: Integer): TBytes;
 begin
-  var Digest := Md5Of(TruncateOrPad(OwnerPassword));
+  const PaddedPassword = TruncateOrPad(OwnerPassword);
+  var Digest := Md5Of(PaddedPassword);
   if (Revision = Revision3) or (Revision = Revision4) then
   begin
     for var Round := 0 to 49 do
     begin
       // This deviates from the specification: omitting the length keeps the file from opening in Adobe Reader with the
       // owner password when the key has 40 bits
-      Digest := Md5Of(Copy(Digest, 0, KeyLengthInBytes));
+      const KeyPart = Copy(Digest, 0, KeyLengthInBytes);
+      Digest := Md5Of(KeyPart);
     end;
   end;
   Result := Copy(Digest, 0, KeyLengthInBytes);
@@ -286,7 +289,8 @@ begin
     Result := Copy(Owner);
     for var Round := 19 downto 0 do
     begin
-      Result := TRC4Cipher.Process(XorWithRound(Rc4Key, Round), Result);
+      const IterationKey = XorWithRound(Rc4Key, Round);
+      Result := TRC4Cipher.Process(IterationKey, Result);
     end;
   end;
 end;
@@ -312,7 +316,8 @@ begin
   begin
     for var Round := 0 to 49 do
     begin
-      Digest := Md5Of(Copy(Digest, 0, Parameters.KeyLengthInBytes));
+      const KeyPart = Copy(Digest, 0, Parameters.KeyLengthInBytes);
+      Digest := Md5Of(KeyPart);
     end;
   end;
   Result := Copy(Digest, 0, Parameters.KeyLengthInBytes);
@@ -334,7 +339,8 @@ begin
   var Encrypted := Md5Of(Padding + Parameters.DocumentId);
   for var Round := 0 to 19 do
   begin
-    Encrypted := TRC4Cipher.Process(XorWithRound(EncryptionKey, Round), Encrypted);
+    const IterationKey = XorWithRound(EncryptionKey, Round);
+    Encrypted := TRC4Cipher.Process(IterationKey, Encrypted);
   end;
   Result := Copy(Encrypted, 0, Md5Length) + Copy(Padding, 0, PaddingLength - Md5Length);
 end;
@@ -348,7 +354,9 @@ begin
   end;
 
   // Only the first 16 bytes are compared
-  Result := BytesEqual(Copy(Parameters.UserKey, 0, Md5Length), Copy(Computed, 0, Md5Length));
+  const ExpectedStart = Copy(Parameters.UserKey, 0, Md5Length);
+  const ComputedStart = Copy(Computed, 0, Md5Length);
+  Result := BytesEqual(ExpectedStart, ComputedStart);
 end;
 
 class function TStandardSecurityHandler.IsOwnerPassword234(const OwnerPassword: TBytes; const Parameters: TEncryptionParameters): Boolean;
@@ -375,7 +383,8 @@ end;
 // The hash of revision 5: SHA-256 over the password, the salt and the user key
 class function TStandardSecurityHandler.ComputeSha256(const Input, Password, UserKey: TBytes): TBytes;
 begin
-  Result := Sha2Of(Sha256Version, Input + Password + AdjustUserKey(UserKey));
+  const AdjustedUserKey = AdjustUserKey(UserKey);
+  Result := Sha2Of(Sha256Version, Input + Password + AdjustedUserKey);
 end;
 
 // Algorithm 2.A for the hash
@@ -383,22 +392,23 @@ class function TStandardSecurityHandler.ComputeHash2A(const Password, Salt, User
 begin
   const AdjustedUserKey = AdjustUserKey(UserKey);
   const TruncatedPassword = Truncate127(Password);
-  Result := ComputeHash2B(Concat(TruncatedPassword, Salt, AdjustedUserKey), TruncatedPassword, AdjustedUserKey);
+  const Input = Concat(TruncatedPassword, Salt, AdjustedUserKey);
+  Result := ComputeHash2B(Input, TruncatedPassword, AdjustedUserKey);
 end;
 
 // The password, K and the user key repeated 64 times
 class function TStandardSecurityHandler.RepeatedHashInput(const Password, K, UserKey: TBytes): TBytes;
 begin
-  var Unit_ := Password + K;
+  var RepeatedBlock := Password + K;
   if Length(UserKey) >= UserKeyLengthRevision56 then
   begin
-    Unit_ := Unit_ + Copy(UserKey, 0, UserKeyLengthRevision56);
+    RepeatedBlock := RepeatedBlock + Copy(UserKey, 0, UserKeyLengthRevision56);
   end;
 
-  SetLength(Result, Length(Unit_) * Hash2BFixedRounds);
+  SetLength(Result, Length(RepeatedBlock) * Hash2BFixedRounds);
   for var Repetition := 0 to Hash2BFixedRounds - 1 do
   begin
-    Move(Unit_[0], Result[Repetition * Length(Unit_)], Length(Unit_));
+    Move(RepeatedBlock[0], Result[Repetition * Length(RepeatedBlock)], Length(RepeatedBlock));
   end;
 end;
 
@@ -409,7 +419,8 @@ begin
   const SecondHalf = Copy(K, AesBlockLength, AesBlockLength);
   const Cipher = TAESCipher.Create(FirstHalf);
   try
-    E := Cipher.EncryptCbcNoPadding(SecondHalf, RepeatedHashInput(Password, K, UserKey));
+    const Repeated = RepeatedHashInput(Password, K, UserKey);
+    E := Cipher.EncryptCbcNoPadding(SecondHalf, Repeated);
   finally
     Cipher.Free;
   end;
@@ -528,7 +539,7 @@ begin
     Revision2, Revision3, Revision4 : Result := IsOwnerPassword234(PasswordBytes, Parameters);
     Revision5, Revision6            : Result := IsOwnerPassword56(PasswordBytes, Parameters);
   else
-    raise EPdfParseException.CreateFmt('Unknown Encryption Revision %d', [Parameters.Revision]);
+    raise EPdfParseException.CreateFmt(UnknownRevisionMessage, [Parameters.Revision]);
   end;
 end;
 
@@ -538,7 +549,7 @@ begin
     Revision2, Revision3, Revision4 : Result := IsUserPassword234(PasswordBytes, Parameters);
     Revision5, Revision6            : Result := IsUserPassword56(PasswordBytes, Parameters);
   else
-    raise EPdfParseException.CreateFmt('Unknown Encryption Revision %d', [Parameters.Revision]);
+    raise EPdfParseException.CreateFmt(UnknownRevisionMessage, [Parameters.Revision]);
   end;
 end;
 

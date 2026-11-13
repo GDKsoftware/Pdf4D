@@ -159,7 +159,8 @@ begin
   begin
     Decomposition[Position] := ParseHex(Values[Position]);
   end;
-  FDecompositions.Add(ParseHex(Parts[0]), Decomposition);
+  const CodePoint = ParseHex(Parts[0]);
+  FDecompositions.Add(CodePoint, Decomposition);
 end;
 
 procedure TPdfUnicodeNormalizer.AddCombiningClass(const Entry: string);
@@ -184,7 +185,8 @@ procedure TPdfUnicodeNormalizer.AddComposition(const Entry: string);
 begin
   const Parts = Entry.Split([ValueSeparator]);
   const Pair = Parts[0].Split([CodePointSeparator]);
-  FCompositions.Add(CompositionKey(ParseHex(Pair[0]), ParseHex(Pair[1])), ParseHex(Parts[1]));
+  const Key = CompositionKey(ParseHex(Pair[0]), ParseHex(Pair[1]));
+  FCompositions.Add(Key, ParseHex(Parts[1]));
 end;
 
 procedure TPdfUnicodeNormalizer.LoadDecompositions;
@@ -307,7 +309,8 @@ end;
 
 function TPdfUnicodeNormalizer.TryCompose(const First, Second: Integer; out Composite: Integer): Boolean;
 begin
-  Result := (FCompositions.TryGetValue(CompositionKey(First, Second), Composite) or TryComposeHangul(First, Second, Composite));
+  const Key = CompositionKey(First, Second);
+  Result := (FCompositions.TryGetValue(Key, Composite) or TryComposeHangul(First, Second, Composite));
 end;
 
 function TPdfUnicodeNormalizer.Compose(const CodePoints: TCodePoints): TCodePoints;
@@ -355,9 +358,11 @@ end;
 
 function TPdfUnicodeNormalizer.NormalizeNfkc(const Text: string): string;
 begin
-  const Decomposed = Decompose(ToCodePoints(Text));
+  const CodePoints = ToCodePoints(Text);
+  const Decomposed = Decompose(CodePoints);
   OrderCanonically(Decomposed);
-  Result := FromCodePoints(Compose(Decomposed));
+  const Composed = Compose(Decomposed);
+  Result := FromCodePoints(Composed);
 end;
 
 end.
