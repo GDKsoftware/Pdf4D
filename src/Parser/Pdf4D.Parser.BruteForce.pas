@@ -823,10 +823,7 @@ end;
 
 procedure TBruteForceParser.ClearTrailer(const Trailer: TCosDictionary);
 begin
-  for var Key in Trailer.Keys do
-  begin
-    Trailer.RemoveItem(Key);
-  end;
+  Trailer.Clear;
 end;
 
 procedure TBruteForceParser.TakeOptionalTrailerEntries(const TrailerDictionary, Trailer: TCosDictionary);

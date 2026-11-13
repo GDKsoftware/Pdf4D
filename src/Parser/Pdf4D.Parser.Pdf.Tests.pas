@@ -23,7 +23,10 @@ type
     function Ascii(const Text: string): TBytes;
     function MinimalBuilder: TTestPdfBuilder;
     function MinimalFile: TBytes;
-    function Load(const Data: TBytes): TCosDocument;
+    function Load(const Data: TBytes): TCosDocument; overload;
+    function Load(const Data: TBytes; const MaxDecodedStreamSize: Int64): TCosDocument; overload;
+    function WithLeadingGarbage(const Data: TBytes): TBytes;
+    procedure AssertShiftedFileLoads(const Style: TXrefStyle);
     procedure OpenFile(const Data: TBytes);
     function Fetch(const Number: Integer): TCosBase;
     function StreamText(const Number: Integer): string;
@@ -44,7 +47,13 @@ type
     procedure TestVersionFromHeader;
 
     [Test]
+    procedure TestHeaderWithGarbageInsideTheHeaderLine;
+
+    [Test]
     procedure TestHeaderWithLeadingGarbage;
+
+    [Test]
+    procedure TestHeaderWithLeadingGarbageAndXrefStream;
 
     [Test]
     procedure TestMissingCatalogTypeIsAdded;
@@ -72,6 +81,15 @@ type
 
     [Test]
     procedure TestChainOfLengthObjectsDoesNotOverflowTheStack;
+
+    [Test]
+    procedure TestMutualStreamLengthCycle;
+
+    [Test]
+    procedure TestObjectStreamIsParsedOnceForManyMissingKeys;
+
+    [Test]
+    procedure TestLimitExceededOnLazyLoadPropagates;
 
     [Test]
     procedure TestPositionOfTheSourceIsKeptWhileLoading;
@@ -179,7 +197,13 @@ end;
 
 function TPdfParserTests.Load(const Data: TBytes): TCosDocument;
 begin
+  Result := Load(Data, TPdfLoadOptions.Default.MaxDecodedStreamSize);
+end;
+
+function TPdfParserTests.Load(const Data: TBytes; const MaxDecodedStreamSize: Int64): TCosDocument;
+begin
   var Options := TPdfLoadOptions.Default;
+  Options.MaxDecodedStreamSize := MaxDecodedStreamSize;
   Options.OnLog :=
     procedure(const Level: TPdfLogLevel; const Message: string)
     begin
@@ -259,7 +283,42 @@ begin
   Assert.AreEqual<Single>(1.4, FDocument.Version);
 end;
 
+function TPdfParserTests.WithLeadingGarbage(const Data: TBytes): TBytes;
+begin
+  // One line of 100 bytes that does not start with a digit and has no header marker: every offset in the file is 100 too low
+  const Garbage = Ascii(StringOfChar('G', 99) + #10);
+  Assert.AreEqual<Integer>(100, Length(Garbage));
+  Result := Garbage + Data;
+end;
+
+// The offsets of the xref and the startxref are wrong by 100 bytes: the nearest xref is searched, and the offsets of the
+// objects are checked and corrected
+procedure TPdfParserTests.AssertShiftedFileLoads(const Style: TXrefStyle);
+begin
+  const Builder = MinimalBuilder;
+  try
+    OpenFile(WithLeadingGarbage(Builder.Build(Style)));
+  finally
+    Builder.Free;
+  end;
+
+  Assert.IsTrue(FDocument.Trailer.ContainsKey(TCosNames.Root));
+  Assert.AreEqual<Single>(1.7, FDocument.Version);
+  Assert.IsTrue(Fetch(3) is TCosDictionary, 'an object can be dereferenced');
+  Assert.AreEqual(TCosNames.Page, TCosDictionary(Fetch(3)).GetNameAsString(TCosNames.Type_, ''));
+end;
+
 procedure TPdfParserTests.TestHeaderWithLeadingGarbage;
+begin
+  AssertShiftedFileLoads(TXrefStyle.Table);
+end;
+
+procedure TPdfParserTests.TestHeaderWithLeadingGarbageAndXrefStream;
+begin
+  AssertShiftedFileLoads(TXrefStyle.Stream);
+end;
+
+procedure TPdfParserTests.TestHeaderWithGarbageInsideTheHeaderLine;
 begin
   // Garbage in front of the header, in the 15 bytes of the header of the builder so that the offsets stay right
   var Data := MinimalFile;
@@ -403,8 +462,100 @@ begin
   end;
 
   // The objects of the chain are streams, which are no valid length: what matters is that the chain ends
-  Assert.IsNotNull(Fetch(10));
+  Assert.IsTrue(Fetch(10) is TCosNull, 'a stream is no length: the object is not loaded');
+  Assert.IsTrue(HasLogLine('Wrong type of length object'));
   Assert.IsTrue(HasLogLine('too many objects'));
+end;
+
+procedure TPdfParserTests.TestMutualStreamLengthCycle;
+begin
+  const Builder = MinimalBuilder;
+  try
+    Builder.AddObject(4, '<< /Length 5 0 R >>'#10'stream'#10'ABCDE'#10'endstream');
+    Builder.AddObject(5, '<< /Length 4 0 R >>'#10'stream'#10'FGHIJ'#10'endstream');
+    OpenFile(Builder.Build(TXrefStyle.Table));
+  finally
+    Builder.Free;
+  end;
+
+  // Each is the length of the other, and a stream is no length: the first is not loaded, and the second is read to its
+  // endstream
+  Assert.IsTrue(Fetch(4) is TCosNull);
+  Assert.IsTrue(Fetch(5) is TCosStream);
+  Assert.AreEqual('FGHIJ', StreamText(5));
+  Assert.IsTrue(HasLogLine('Wrong type of length object'));
+end;
+
+// The xref maps many numbers to an object stream that cannot be read: it is tried once, not once for each number
+procedure TPdfParserTests.TestObjectStreamIsParsedOnceForManyMissingKeys;
+begin
+  const FirstNumber = 1000;
+  const KeyCount = 200;
+  var Data: TBytes;
+  const Builder = MinimalBuilder;
+  try
+    for var Number := FirstNumber to FirstNumber + KeyCount - 1 do
+    begin
+      Builder.AddCompressedObject(Number, '1', 6);
+    end;
+    Data := Builder.Build(TXrefStyle.Stream);
+  finally
+    Builder.Free;
+  end;
+
+  // Break /N of the object stream: the stream cannot be parsed
+  const Pattern = Ascii('/Type /ObjStm /N ');
+  var Position := -1;
+  for var Start := 0 to Length(Data) - Length(Pattern) do
+  begin
+    if CompareMem(@Data[Start], @Pattern[0], Length(Pattern)) then
+    begin
+      Position := Start;
+      Break;
+    end;
+  end;
+  Assert.IsTrue(Position > 0, 'the object stream is in the file');
+  Data[Position + Length('/Type /ObjStm /')] := Ord('M');
+  OpenFile(Data);
+
+  for var Number := FirstNumber to FirstNumber + KeyCount - 1 do
+  begin
+    Assert.IsTrue(FDocument.GetObjectFromPool(TCosObjectKey.Make(Number, 0)).GetObject is TCosNull, Format('object %d is not null', [Number]));
+  end;
+
+  var Failures := 0;
+  for var Line in FLogLines do
+  begin
+    if Line.Contains('object stream 6 could not be parsed') then
+    begin
+      Inc(Failures);
+    end;
+  end;
+  Assert.AreEqual<Integer>(1, Failures);
+end;
+
+// PDFBox has no limit on the decoded size. The limit is an addition of this library, so its exception is not an IOException
+// to be logged and turned into null: it reaches the caller who dereferences the object.
+procedure TPdfParserTests.TestLimitExceededOnLazyLoadPropagates;
+begin
+  var Data: TBytes;
+  const Builder = MinimalBuilder;
+  try
+    Builder.ObjectStreamFilter := TStreamFilter.Flate;
+    Builder.AddCompressedObject(5, '<< /Pad (' + StringOfChar('x', 500) + ') >>', 6);
+    Data := Builder.Build(TXrefStyle.Stream);
+  finally
+    Builder.Free;
+  end;
+
+  FDocument := Load(Data, 200);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      Fetch(5);
+    end,
+    EPdfLimitExceededException);
 end;
 
 procedure TPdfParserTests.TestPositionOfTheSourceIsKeptWhileLoading;

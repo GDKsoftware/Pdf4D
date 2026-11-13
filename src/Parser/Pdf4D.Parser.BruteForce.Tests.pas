@@ -74,6 +74,9 @@ type
     procedure TestManyObjectStreamMarkersAreScannedOnce;
 
     [Test]
+    procedure TestPageTreeWithManyMissingKidsIsCheckedInOnePass;
+
+    [Test]
     procedure TestObjectLimitIsTheLimitOfXrefStreams;
   end;
 
@@ -82,6 +85,7 @@ implementation
 uses
   Pdf4D.Cos.Names,
   Pdf4D.Cos.ObjectKey,
+  Pdf4D.Cos.PdfArray,
   Pdf4D.Parser.BruteForce,
   Pdf4D.Parser.Pdf;
 
@@ -414,6 +418,37 @@ begin
   end;
 
   Assert.IsTrue(FDocument.Trailer.ContainsKey(TCosNames.Root));
+end;
+
+// After a rebuilt trailer the kids that cannot be loaded are removed from the page tree: with many of them, one by one
+// would be quadratic
+procedure TBruteForceParserTests.TestPageTreeWithManyMissingKidsIsCheckedInOnePass;
+begin
+  const MissingCount = 30000;
+  const Kids = TStringBuilder.Create;
+  const Builder = TTestPdfBuilder.Create;
+  try
+    Kids.Append('3 0 R');
+    for var Number := 100 to 100 + MissingCount - 1 do
+    begin
+      Kids.Append(Format(' %d 0 R', [Number]));
+    end;
+    Builder.AddObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    Builder.AddObject(2, Format('<< /Type /Pages /Kids [%s] /Count 1 >>', [Kids.ToString]));
+    Builder.AddObject(3, '<< /Type /Page /Parent 2 0 R >>');
+    Builder.SetRoot(1);
+    FDocument := Load(CutAfterLastEndObj(Builder.Build(TXrefStyle.Table)));
+  finally
+    Builder.Free;
+    Kids.Free;
+  end;
+
+  var Pages: TCosDictionary;
+  Assert.IsTrue(RootOf(FDocument).TryGetCosDictionary(TCosNames.Pages, Pages));
+  var KidsArray: TCosArray;
+  Assert.IsTrue(Pages.TryGetCosArray(TCosNames.Kids, KidsArray));
+  Assert.AreEqual<Integer>(1, KidsArray.Count);
+  Assert.AreEqual<Integer>(1, Pages.GetInt(TCosNames.Count, 0));
 end;
 
 procedure TBruteForceParserTests.TestObjectLimitIsTheLimitOfXrefStreams;

@@ -85,9 +85,12 @@ begin
     on Failure: Exception do
     begin
       FreeAndNil(Result);
-      if TPdfFailure.IsInputFailure(Failure) then
+      // Only an EPdfException leaves a load. A failure of the RTL on the data of the file is turned into one, with its class and
+      // message. An access violation is a bug in the library: it stays visible.
+      const IsForeignFailure = (not (Failure is EPdfException)) and (not (Failure is EAccessViolation));
+      if IsForeignFailure then
       begin
-        raise EPdfParseException.CreateFmt('The file could not be loaded: %s', [Failure.Message]);
+        raise EPdfParseException.CreateFmt('The file could not be loaded: %s: %s', [Failure.ClassName, Failure.Message]);
       end;
       raise;
     end;

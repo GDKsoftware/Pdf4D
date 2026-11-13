@@ -67,6 +67,9 @@ type
 
     function ContainsKey(const Key: string): Boolean;
     procedure RemoveItem(const Key: string);
+
+    // Removes all entries and frees the values the dictionary owns
+    procedure Clear;
     function Keys: TArray<string>;
 
     property Count: Integer read GetCount;
@@ -354,6 +357,19 @@ begin
   begin
     Removed.Value.Free;
   end;
+end;
+
+procedure TCosDictionary.Clear;
+begin
+  for var Item in FItems do
+  begin
+    if Item.Owned then
+    begin
+      Item.Value.Free;
+    end;
+  end;
+  FItems.Clear;
+  FIndex.Clear;
 end;
 
 function TCosDictionary.Keys: TArray<string>;

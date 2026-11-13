@@ -38,6 +38,10 @@ type
     // TCosObject. False when the array does not hold it.
     function Remove(const Item: TCosBase): Boolean;
 
+    // Removes each item of Items once (the same item twice in Items removes two entries of the array), in a single pass.
+    // Frees what it removes, like Remove.
+    procedure RemoveItems(const Items: TList<TCosBase>);
+
     function GetEnumerator: TList<TCosBase>.TEnumerator;
 
     // Port of COSArray.toFloatArray: an item that is not a number gives 0
@@ -131,6 +135,54 @@ begin
     begin
       Item.Free;
     end;
+  end;
+end;
+
+procedure TCosArray.RemoveItems(const Items: TList<TCosBase>);
+begin
+  if Items.Count = 0 then
+  begin
+    Exit;
+  end;
+
+  const Pending = TDictionary<TCosBase, Integer>.Create;
+  const Kept = TList<TCosBase>.Create;
+  const KeptOwned = TList<Boolean>.Create;
+  try
+    for var Item in Items do
+    begin
+      var Count: Integer;
+      Pending.TryGetValue(Item, Count);
+      Pending.AddOrSetValue(Item, Count + 1);
+    end;
+
+    for var Position := 0 to FItems.Count - 1 do
+    begin
+      const Item = FItems[Position];
+      var Count: Integer;
+      if Pending.TryGetValue(Item, Count) and (Count > 0) then
+      begin
+        Pending[Item] := Count - 1;
+        if FOwned[Position] then
+        begin
+          Item.Free;
+        end;
+      end
+      else
+      begin
+        Kept.Add(Item);
+        KeptOwned.Add(FOwned[Position]);
+      end;
+    end;
+
+    FItems.Clear;
+    FItems.AddRange(Kept);
+    FOwned.Clear;
+    FOwned.AddRange(KeptOwned);
+  finally
+    KeptOwned.Free;
+    Kept.Free;
+    Pending.Free;
   end;
 end;
 

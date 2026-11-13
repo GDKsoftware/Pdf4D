@@ -116,9 +116,12 @@ begin
       finally
         Limited.Free;
       end;
-      // The buffer of the stream is taken over: a copy would double the peak memory
+      // Take the buffer over without a copy: the stream lets go of its reference first, so the array is unique and
+      // SetLength trims it in place (a shared array would be copied, and the peak would be capacity plus size)
+      const DataSize = Output.Size;
       Result := Output.Bytes;
-      SetLength(Result, Output.Size);
+      Output.Clear;
+      SetLength(Result, DataSize);
     finally
       Output.Free;
       Input.Free;

@@ -71,8 +71,8 @@ type
     function TryParseXref(out Message: string): Boolean;
     procedure FinishXrefParsing(const Rebuilt: Boolean);
     procedure DiscardXrefParsing;
-    function CheckPagesDictionary(const PagesDictionary: TCosDictionary; const Visited: TList<TCosBase>; const Depth: Integer): Integer;
-    function IsPagesKidCounted(const Kids: TCosArray; const Kid: TCosBase; const Visited: TList<TCosBase>; const Depth: Integer; var NumberOfPages: Integer): Boolean;
+    function CheckPagesDictionary(const PagesDictionary: TCosDictionary; const Visited: TDictionary<TCosBase, Boolean>; const Depth: Integer): Integer;
+    function CheckPagesKid(const Kid: TCosBase; const Visited: TDictionary<TCosBase, Boolean>; const Removed: TList<TCosBase>; const Depth: Integer): Integer;
 
   protected
     function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
@@ -546,18 +546,17 @@ end;
 function TCosParser.ParseObjectStreamObject(const ObjectStreamNumber: Int64; const Key: TCosObjectKey): TCosBase;
 begin
   var StreamObjects: TObjectDictionary<TCosObjectKey, TCosBase>;
-  if not FDecompressedObjects.TryGetValue(ObjectStreamNumber, StreamObjects) then
+  if FDecompressedObjects.TryGetValue(ObjectStreamNumber, StreamObjects) then
   begin
-    StreamObjects := TObjectDictionary<TCosObjectKey, TCosBase>.Create([doOwnsValues], TCosObjectKeyComparer.Create);
-    FDecompressedObjects.Add(ObjectStreamNumber, StreamObjects);
+    // The stream was read already, or could not be read: what it holds is kept in StreamObjects. A key that is not
+    // there is not in the stream, and parsing it again for each such key would be quadratic.
+    Result := TakeFromObjectStream(StreamObjects, Key);
+    Exit;
   end;
 
-  // Was the object stream read already?
-  Result := TakeFromObjectStream(StreamObjects, Key);
-  if not Assigned(Result) then
-  begin
-    Result := ParseObjectStreamObjects(ObjectStreamNumber, Key, StreamObjects);
-  end;
+  StreamObjects := TObjectDictionary<TCosObjectKey, TCosBase>.Create([doOwnsValues], TCosObjectKeyComparer.Create);
+  FDecompressedObjects.Add(ObjectStreamNumber, StreamObjects);
+  Result := ParseObjectStreamObjects(ObjectStreamNumber, Key, StreamObjects);
 end;
 
 { trailer }
@@ -662,16 +661,17 @@ end;
 
 { pages }
 
-function TCosParser.IsPagesKidCounted(const Kids: TCosArray; const Kid: TCosBase; const Visited: TList<TCosBase>; const Depth: Integer; var NumberOfPages: Integer): Boolean;
+// Checks one kid of a pages dictionary. Gives the number of pages in it, and adds the kid to Removed when it has to go.
+function TCosParser.CheckPagesKid(const Kid: TCosBase; const Visited: TDictionary<TCosBase, Boolean>; const Removed: TList<TCosBase>; const Depth: Integer): Integer;
 begin
-  Result := False;
+  Result := 0;
   const KidObject = TCosObject(Kid);
   const KidBase = KidObject.GetObject;
   if KidBase is TCosNull then
   begin
     // The object was not dereferenced: remove it
     FDocument.Log.Warning('Removed null object %s from pages dictionary', [KidObject.Key.ToString]);
-    Kids.Remove(Kid);
+    Removed.Add(Kid);
   end
   else if KidBase is TCosDictionary then
   begin
@@ -686,17 +686,17 @@ begin
     if TypeName = TCosNames.Pages then
     begin
       // Process nested pages dictionaries
-      Visited.Add(Kid);
-      Inc(NumberOfPages, CheckPagesDictionary(KidDictionary, Visited, Depth + 1));
+      Visited.AddOrSetValue(Kid, True);
+      Result := CheckPagesDictionary(KidDictionary, Visited, Depth + 1);
     end
     else if TypeName = TCosNames.Page then
     begin
-      Inc(NumberOfPages);
+      Result := 1;
     end;
   end;
 end;
 
-function TCosParser.CheckPagesDictionary(const PagesDictionary: TCosDictionary; const Visited: TList<TCosBase>; const Depth: Integer): Integer;
+function TCosParser.CheckPagesDictionary(const PagesDictionary: TCosDictionary; const Visited: TDictionary<TCosBase, Boolean>; const Depth: Integer): Integer;
 begin
   Result := 0;
   // A page tree that is nested deeper than a document can be is not followed: the parser recurses
@@ -709,23 +709,32 @@ begin
   var Kids: TCosArray;
   if PagesDictionary.TryGetCosArray(TCosNames.Kids, Kids) then
   begin
+    // The kids that have to go are removed in one pass afterwards: removing them one by one is quadratic
     var Snapshot: TArray<TCosBase>;
     SetLength(Snapshot, Kids.Count);
-    for var Position := 0 to Kids.Count - 1 do
+    var SnapshotPosition := 0;
+    for var Item in Kids do
     begin
-      Snapshot[Position] := Kids.Get(Position);
+      Snapshot[SnapshotPosition] := Item;
+      Inc(SnapshotPosition);
     end;
 
-    for var Kid in Snapshot do
-    begin
-      if (not (Kid is TCosObject)) or Visited.Contains(Kid) then
+    const Removed = TList<TCosBase>.Create;
+    try
+      for var Kid in Snapshot do
       begin
-        Kids.Remove(Kid);
-      end
-      else
-      begin
-        IsPagesKidCounted(Kids, Kid, Visited, Depth, Result);
+        if (not (Kid is TCosObject)) or Visited.ContainsKey(Kid) then
+        begin
+          Removed.Add(Kid);
+        end
+        else
+        begin
+          Inc(Result, CheckPagesKid(Kid, Visited, Removed, Depth));
+        end;
       end;
+      Kids.RemoveItems(Removed);
+    finally
+      Removed.Free;
     end;
   end;
 
@@ -739,7 +748,7 @@ begin
   if FTrailerWasRebuilt and Root.TryGetCosDictionary(TCosNames.Pages, Pages) then
   begin
     // Check if all page objects are dereferenced
-    const Visited = TList<TCosBase>.Create;
+    const Visited = TDictionary<TCosBase, Boolean>.Create;
     try
       CheckPagesDictionary(Pages, Visited, 0);
     finally
