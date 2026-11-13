@@ -9,6 +9,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
+  Pdf4D.Common.Log,
   Pdf4D.Cos.PdfArray,
   Pdf4D.Cos.Base,
   Pdf4D.IO.RandomAccessRead;
@@ -71,6 +72,11 @@ type
     property Count: Integer read GetCount;
   end;
 
+  TPdfDecodedData = record
+    Data: TBytes;
+    RemainingFilters: TArray<string>;
+  end;
+
   // The raw bytes come from the data of the document (the source is not owned) or from bytes set directly.
   TCosStream = class(TCosDictionary)
   private
@@ -80,8 +86,13 @@ type
     FRawData: TBytes;
     FHasRawData: Boolean;
     FDecryptor: TFunc<TBytes, TBytes>;
+    FDocument: TObject;
 
     function ReadSourceBytes: TBytes;
+    function GetRawBytes: TBytes;
+    function MaxDecodedSize: Int64;
+    function DocumentLog: TPdfLog;
+    procedure SetDocument(const Value: TObject);
 
   public
     // The source belongs to the document and has to outlive the stream
@@ -92,6 +103,22 @@ type
     // it stays valid after the document is freed.
     function CreateRawStream: TStream;
 
+    // The names in /Filter, in order: empty without a filter. The names are as written, so an abbreviation stays one.
+    function GetFilterNames: TArray<string>;
+
+    // The data with all filters applied, for the caller to own. An image filter and an unknown filter raise
+    // EPdfUnsupportedFeatureException, a result over the decoded size limit of the document raises
+    // EPdfLimitExceededException.
+    function CreateDecodedStream: TStream;
+
+    // The data decoded up to the first image filter, with the names of the filters that are left. Without an
+    // image filter nothing is left. Raises like CreateDecodedStream for an unknown filter.
+    function DecodeUntilImageFilter: TPdfDecodedData;
+
+    // The document (a TCosDocument) whose options give the limit on the decoded size and whose log receives the
+    // problems of decoding. Not owned, may be nil: the default limit applies and nothing is logged.
+    property Document: TObject read FDocument write SetDocument;
+
     // Applied to the bytes read from the source, set by the security handler. Not applied to SetRawData.
     property Decryptor: TFunc<TBytes, TBytes> read FDecryptor write FDecryptor;
   end;
@@ -101,7 +128,10 @@ implementation
 uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
+  Pdf4D.Cos.Document,
+  Pdf4D.Filter.Chain,
   Pdf4D.Cos.Name,
+  Pdf4D.Cos.Names,
   Pdf4D.Cos.Null,
   Pdf4D.Cos.Number,
   Pdf4D.Cos.PdfObject,
@@ -391,10 +421,92 @@ end;
 
 function TCosStream.CreateRawStream: TStream;
 begin
+  const Stream = TBytesStream.Create(GetRawBytes);
+  Result := Stream;
+end;
+
+procedure TCosStream.SetDocument(const Value: TObject);
+begin
+  if Assigned(Value) and not (Value is TCosDocument) then
+  begin
+    raise EArgumentException.Create('The document of a stream has to be a TCosDocument');
+  end;
+  FDocument := Value;
+end;
+
+function TCosStream.MaxDecodedSize: Int64;
+begin
+  if Assigned(FDocument) then
+  begin
+    Result := TCosDocument(FDocument).Options.MaxDecodedStreamSize;
+  end
+  else
+  begin
+    Result := TPdfLoadOptions.Default.MaxDecodedStreamSize;
+  end;
+end;
+
+function TCosStream.DocumentLog: TPdfLog;
+begin
+  Result := nil;
+  if Assigned(FDocument) then
+  begin
+    Result := TCosDocument(FDocument).Log;
+  end;
+end;
+
+function TCosStream.GetFilterNames: TArray<string>;
+begin
+  Result := nil;
+  var Filters: TCosBase;
+  if not TryGetDictionaryObject(TCosNames.Filter, Filters) then
+  begin
+    Exit;
+  end;
+
+  if Filters is TCosName then
+  begin
+    Result := [TCosName(Filters).Name];
+    Exit;
+  end;
+
+  if Filters is TCosArray then
+  begin
+    for var Item in TCosArray(Filters) do
+    begin
+      var Resolved := Item;
+      if Resolved is TCosObject then
+      begin
+        Resolved := TCosObject(Resolved).GetObject;
+      end;
+
+      if not (Resolved is TCosName) then
+      begin
+        raise EPdfParseException.CreateFmt('Forbidden type in filter array: %s', [Resolved.ClassName]);
+      end;
+      Result := Result + [TCosName(Resolved).Name];
+    end;
+  end;
+end;
+
+function TCosStream.CreateDecodedStream: TStream;
+begin
+  var Remaining: TArray<string>;
+  const Data = TFilterChain.Decode(GetRawBytes, GetFilterNames, Self, MaxDecodedSize, DocumentLog, False, Remaining);
+  Result := TBytesStream.Create(Data);
+end;
+
+function TCosStream.DecodeUntilImageFilter: TPdfDecodedData;
+begin
+  Result.Data := TFilterChain.Decode(GetRawBytes, GetFilterNames, Self, MaxDecodedSize, DocumentLog, True, Result.RemainingFilters);
+end;
+
+function TCosStream.GetRawBytes: TBytes;
+begin
   var Bytes: TBytes;
   if FHasRawData then
   begin
-    Bytes := FRawData;
+    Bytes := Copy(FRawData);
   end
   else if Assigned(FSource) then
   begin
@@ -405,8 +517,7 @@ begin
     end;
   end;
 
-  const Stream = TBytesStream.Create(Bytes);
-  Result := Stream;
+  Result := Bytes;
 end;
 
 function TCosStream.ReadSourceBytes: TBytes;

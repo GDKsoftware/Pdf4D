@@ -19,6 +19,15 @@ uses
   Pdf4D.Cos.PdfString.Tests in '..\src\Cos\Pdf4D.Cos.PdfString.Tests.pas',
   Pdf4D.Cos.Dictionary.Tests in '..\src\Cos\Pdf4D.Cos.Dictionary.Tests.pas',
   Pdf4D.Cos.Document.Tests in '..\src\Cos\Pdf4D.Cos.Document.Tests.pas',
+  Pdf4D.Filter.Tests.Support in '..\src\Filter\Pdf4D.Filter.Tests.Support.pas',
+  Pdf4D.Filter.Factory.Tests in '..\src\Filter\Pdf4D.Filter.Factory.Tests.pas',
+  Pdf4D.Filter.Flate.Tests in '..\src\Filter\Pdf4D.Filter.Flate.Tests.pas',
+  Pdf4D.Filter.LZW.Tests in '..\src\Filter\Pdf4D.Filter.LZW.Tests.pas',
+  Pdf4D.Filter.ASCII85.Tests in '..\src\Filter\Pdf4D.Filter.ASCII85.Tests.pas',
+  Pdf4D.Filter.ASCIIHex.Tests in '..\src\Filter\Pdf4D.Filter.ASCIIHex.Tests.pas',
+  Pdf4D.Filter.RunLength.Tests in '..\src\Filter\Pdf4D.Filter.RunLength.Tests.pas',
+  Pdf4D.Filter.Predictor.Tests in '..\src\Filter\Pdf4D.Filter.Predictor.Tests.pas',
+  Pdf4D.Cos.Stream.Tests in '..\src\Cos\Pdf4D.Cos.Stream.Tests.pas',
   Pdf4D.Parser.Base.Tests in '..\src\Parser\Pdf4D.Parser.Base.Tests.pas';
 
 const
