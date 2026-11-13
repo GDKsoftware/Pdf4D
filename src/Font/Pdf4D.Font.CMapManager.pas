@@ -27,7 +27,8 @@ type
     class function ParsePredefinedCMap(Name: string): TCMap; static;
 
   public
-    // The shared predefined CMap of that name; the caller does not own it. False when there is no such CMap.
+    // The shared predefined CMap of that exact, case-sensitive name; the caller does not own it. False when there is no
+    // such CMap.
     class function TryGetPredefinedCMap(const Name: string; out CMap: TCMap): Boolean; static;
     // Parses an embedded CMap in strict mode. The caller owns the result.
     class function ParseCMap(const Source: TRandomAccessRead): TCMap; static;
@@ -70,8 +71,8 @@ begin
     Exit(True);
   end;
 
-  var Data: TBytes;
-  if not TPdfCMapResources.TryLoad(Name, Data) then
+  // Only the exact names get a cache entry, so a hostile name cannot grow the cache
+  if not TPdfCMapResources.IsPredefined(Name) then
   begin
     Exit(False);
   end;

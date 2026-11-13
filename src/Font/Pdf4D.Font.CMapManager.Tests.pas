@@ -61,6 +61,9 @@ type
     procedure TestUnknownPredefinedReturnsFalse;
 
     [Test]
+    procedure TestOnlyExactPredefinedNamesAreAccepted;
+
+    [Test]
     procedure TestPredefinedCMapIsShared;
 
     [Test]
@@ -245,6 +248,24 @@ begin
   Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('No-Such-CMap', CMap));
   Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('', CMap));
   Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('../Identity-H/..', CMap));
+end;
+
+procedure TCMapManagerTests.TestOnlyExactPredefinedNamesAreAccepted;
+begin
+  var CMap: TCMap;
+  var Exact: TCMap;
+
+  Assert.IsTrue(TCMapManager.TryGetPredefinedCMap('Identity-H', Exact));
+  Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('identity-h', CMap));
+  Assert.IsNull(CMap);
+  Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('IDENTITY-H', CMap));
+  Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('Identity+H', CMap));
+  Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('Identity_H', CMap));
+  Assert.IsFalse(TCMapManager.TryGetPredefinedCMap('UniJIS.UCS2.H', CMap));
+
+  // The exact name still gives the one shared CMap
+  Assert.IsTrue(TCMapManager.TryGetPredefinedCMap('Identity-H', CMap));
+  Assert.AreSame(Exact, CMap);
 end;
 
 procedure TCMapManagerTests.TestPredefinedCMapIsShared;

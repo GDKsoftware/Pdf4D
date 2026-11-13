@@ -16,8 +16,8 @@ uses
   Pdf4D.Common.Log;
 
 const
-  // The most mappings (character, CID and CID range entries) that one CMap takes. PDFBox has no limit; this one keeps
-  // a hostile bfrange or cidrange from using all memory.
+  // The default for the most mappings (character, CID and CID range entries) that one CMap takes. PDFBox has no limit;
+  // this one keeps a hostile bfrange or cidrange from using all memory.
   MaxCMapMappings = 4194304;
 
 type
@@ -74,6 +74,13 @@ type
     class function DecodeUtf16BigEndian(const Bytes: TBytes): string; static;
   end;
 
+  // The CID ranges of one code length without overlap: every segment holds the CID range that comes first in the CMap
+  TCIDSegment = record
+    FromCode: Integer;
+    ToCode: Integer;
+    RangeIndex: Integer;
+  end;
+
   // A CMap maps character codes to CIDs or to Unicode. It is filled by TCMapParser; the Add methods are for the parser
   // and a CMap does not change after it is shared.
   TCMap = class
@@ -97,16 +104,25 @@ type
     FCodeToCidRanges: TList<TCIDRange>;
     FSpaceMapping: Integer;
     FMappingCount: Integer;
+    FIsSealed: Boolean;
+    FSegmentsByLength: TDictionary<Integer, TArray<TCIDSegment>>;
+    FCidLengths: TArray<Integer>;
+
+    class var FMappingLimitOverride: Integer;
+
+    class function GetMappingLimit: Integer; static;
 
     function IsCodespaceFullMatch(const Bytes: TBytes; const ByteCount: Integer): Boolean;
     function ReadCodeWithoutCodespace(const Data: TBytes; var Position: Integer): Integer;
-    function ToCIDFromRanges(const Code, CodeLen: Integer): Integer; overload;
-    function ToCIDFromRanges(const Code: TBytes): Integer; overload;
+    function ToCIDFromRanges(const Code, CodeLen: Integer): Integer;
     procedure AddCIDRange(const Range: TCIDRange);
     procedure CopyCharMappings(const Source: TDictionary<Integer, string>; const Target: TDictionary<Integer, string>);
     procedure CopyCIDMappings(const Other: TCMap);
     procedure CopyCIDRanges(const Other: TCMap);
     procedure WarnInvalidSequence(const Bytes: TBytes; const Log: TPdfLog);
+    procedure BuildSegments(const CodeLength: Integer; const Segments: TList<TCIDSegment>);
+    procedure BuildCidIndex;
+    function FindSegmentRange(const Code, CodeLen: Integer): Integer;
 
   public
     constructor Create;
@@ -147,6 +163,13 @@ type
     // Copies everything from Other, as usecmap does. Other itself stays as it is.
     procedure UseCMap(const Other: TCMap);
     function IsFull: Boolean;
+    // Builds the index that ToCID uses for the CID ranges. The parser calls it when the CMap is complete; a mapping that
+    // is added later drops the index again and ToCID goes back to scanning.
+    procedure Seal;
+
+    // The most mappings one CMap takes. Set it to 0 to restore the default MaxCMapMappings. Only for tests: it is not
+    // thread-safe to change while CMaps are being filled.
+    class property MappingLimit: Integer read GetMappingLimit write FMappingLimitOverride;
 
     property Name: string read FName write FName;
     property Version: string read FVersion write FVersion;
@@ -161,7 +184,8 @@ type
 implementation
 
 uses
-  System.Math;
+  System.Math,
+  System.Generics.Defaults;
 
 const
   MaxByteValue = $FF;
@@ -417,6 +441,7 @@ end;
 
 destructor TCMap.Destroy;
 begin
+  FSegmentsByLength.Free;
   FCodeToCidRanges.Free;
   FCodeToCid.Free;
   FCharToUnicodeMoreBytes.Free;
@@ -588,12 +613,7 @@ begin
     Exit(0);
   end;
 
-  var CodeToCidMap: TDictionary<Integer, Integer>;
-  if FCodeToCid.TryGetValue(Length(Code), CodeToCidMap) and CodeToCidMap.TryGetValue(ToInt(Code), Result) then
-  begin
-    Exit;
-  end;
-  Result := ToCIDFromRanges(Code);
+  Result := ToCID(ToInt(Code), Length(Code));
 end;
 
 function TCMap.ToCID(const Code: Integer): Integer;
@@ -601,6 +621,23 @@ begin
   Result := 0;
   if not HasCIDMappings then
   begin
+    Exit;
+  end;
+
+  if FIsSealed then
+  begin
+    // Only the code lengths that occur can give a CID
+    for var CodeLen in FCidLengths do
+    begin
+      if CodeLen >= FMinCidLength then
+      begin
+        Result := ToCID(Code, CodeLen);
+        if Result <> 0 then
+        begin
+          Exit;
+        end;
+      end;
+    end;
     Exit;
   end;
 
@@ -630,6 +667,16 @@ end;
 
 function TCMap.ToCIDFromRanges(const Code, CodeLen: Integer): Integer;
 begin
+  if FIsSealed then
+  begin
+    const RangeIndex = FindSegmentRange(Code, CodeLen);
+    if RangeIndex < 0 then
+    begin
+      Exit(0);
+    end;
+    Exit(FCodeToCidRanges[RangeIndex].Map(Code, CodeLen));
+  end;
+
   for var Range in FCodeToCidRanges do
   begin
     Result := Range.Map(Code, CodeLen);
@@ -641,17 +688,204 @@ begin
   Result := 0;
 end;
 
-function TCMap.ToCIDFromRanges(const Code: TBytes): Integer;
+function TCMap.FindSegmentRange(const Code, CodeLen: Integer): Integer;
 begin
-  for var Range in FCodeToCidRanges do
+  Result := -1;
+  var Segments: TArray<TCIDSegment>;
+  if not FSegmentsByLength.TryGetValue(CodeLen, Segments) then
   begin
-    Result := Range.Map(Code);
-    if Result <> -1 then
+    Exit;
+  end;
+
+  // The last segment that starts at or before the code
+  var LowIndex := 0;
+  var HighIndex := Length(Segments) - 1;
+  while LowIndex <= HighIndex do
+  begin
+    const Middle = LowIndex + (HighIndex - LowIndex) div 2;
+    if Segments[Middle].FromCode <= Code then
     begin
-      Exit;
+      LowIndex := Middle + 1;
+    end
+    else
+    begin
+      HighIndex := Middle - 1;
     end;
   end;
-  Result := 0;
+
+  if (HighIndex >= 0) and (Code <= Segments[HighIndex].ToCode) then
+  begin
+    Result := Segments[HighIndex].RangeIndex;
+  end;
+end;
+
+procedure TCMap.Seal;
+begin
+  FIsSealed := False;
+  BuildCidIndex;
+  FIsSealed := True;
+end;
+
+procedure TCMap.BuildCidIndex;
+begin
+  FreeAndNil(FSegmentsByLength);
+  FSegmentsByLength := TDictionary<Integer, TArray<TCIDSegment>>.Create;
+
+  const Lengths = TList<Integer>.Create;
+  try
+    for var LengthPair in FCodeToCid do
+    begin
+      if not Lengths.Contains(LengthPair.Key) then
+      begin
+        Lengths.Add(LengthPair.Key);
+      end;
+    end;
+    for var Range in FCodeToCidRanges do
+    begin
+      if not Lengths.Contains(Range.FCodeLength) then
+      begin
+        Lengths.Add(Range.FCodeLength);
+      end;
+    end;
+    Lengths.Sort;
+    FCidLengths := Lengths.ToArray;
+
+    const Segments = TList<TCIDSegment>.Create;
+    try
+      for var CodeLength in Lengths do
+      begin
+        Segments.Clear;
+        BuildSegments(CodeLength, Segments);
+        if Segments.Count > 0 then
+        begin
+          FSegmentsByLength.Add(CodeLength, Segments.ToArray);
+        end;
+      end;
+    finally
+      Segments.Free;
+    end;
+  finally
+    Lengths.Free;
+  end;
+end;
+
+function CompareSegmentStarts(const Left, Right: TCIDSegment): Integer;
+begin
+  // The index is part of the order, so equal starts keep their order in the CMap
+  if Left.FromCode <> Right.FromCode then
+  begin
+    Result := TComparer<Integer>.Default.Compare(Left.FromCode, Right.FromCode);
+  end
+  else
+  begin
+    Result := TComparer<Integer>.Default.Compare(Left.RangeIndex, Right.RangeIndex);
+  end;
+end;
+
+// Sweeps over the ranges of one code length in order of their start. A heap holds the ranges that cover the position,
+// the one that comes first in the CMap on top, because ToCID takes the first range that matches.
+procedure TCMap.BuildSegments(const CodeLength: Integer; const Segments: TList<TCIDSegment>);
+begin
+  const Starts = TList<TCIDSegment>.Create;
+  try
+    for var Index := 0 to FCodeToCidRanges.Count - 1 do
+    begin
+      const Range = FCodeToCidRanges[Index];
+      if (Range.FCodeLength = CodeLength) and (Range.FFromCode <= Range.FToCode) then
+      begin
+        var Item: TCIDSegment;
+        Item.FromCode := Range.FFromCode;
+        Item.ToCode := Range.FToCode;
+        Item.RangeIndex := Index;
+        Starts.Add(Item);
+      end;
+    end;
+    Starts.Sort(TComparer<TCIDSegment>.Construct(CompareSegmentStarts));
+
+    // The heap holds the segments (start unused) of the ranges that are open
+    var Heap: TArray<TCIDSegment>;
+    var HeapCount := 0;
+    var Next := 0;
+    var Position: Int64 := 0;
+    if Starts.Count > 0 then
+    begin
+      Position := Starts[0].FromCode;
+    end;
+
+    while (Next < Starts.Count) or (HeapCount > 0) do
+    begin
+      while (Next < Starts.Count) and (Starts[Next].FromCode <= Position) do
+      begin
+        if HeapCount = Length(Heap) then
+        begin
+          SetLength(Heap, Max(16, HeapCount * 2));
+        end;
+        var Child := HeapCount;
+        Inc(HeapCount);
+        while (Child > 0) and (Heap[(Child - 1) div 2].RangeIndex > Starts[Next].RangeIndex) do
+        begin
+          Heap[Child] := Heap[(Child - 1) div 2];
+          Child := (Child - 1) div 2;
+        end;
+        Heap[Child] := Starts[Next];
+        Inc(Next);
+      end;
+
+      // Remove the ranges that ended before the position
+      while (HeapCount > 0) and (Heap[0].ToCode < Position) do
+      begin
+        Dec(HeapCount);
+        const Last = Heap[HeapCount];
+        var Parent := 0;
+        while True do
+        begin
+          var Child := Parent * 2 + 1;
+          if Child >= HeapCount then
+          begin
+            Break;
+          end;
+          if (Child + 1 < HeapCount) and (Heap[Child + 1].RangeIndex < Heap[Child].RangeIndex) then
+          begin
+            Inc(Child);
+          end;
+          if Heap[Child].RangeIndex >= Last.RangeIndex then
+          begin
+            Break;
+          end;
+          Heap[Parent] := Heap[Child];
+          Parent := Child;
+        end;
+        if HeapCount > 0 then
+        begin
+          Heap[Parent] := Last;
+        end;
+      end;
+
+      if HeapCount = 0 then
+      begin
+        if Next < Starts.Count then
+        begin
+          Position := Starts[Next].FromCode;
+        end;
+        Continue;
+      end;
+
+      var SegmentEnd := Int64(Heap[0].ToCode);
+      if (Next < Starts.Count) and (Int64(Starts[Next].FromCode) - 1 < SegmentEnd) then
+      begin
+        SegmentEnd := Int64(Starts[Next].FromCode) - 1;
+      end;
+
+      var Segment: TCIDSegment;
+      Segment.FromCode := Integer(Position);
+      Segment.ToCode := Integer(SegmentEnd);
+      Segment.RangeIndex := Heap[0].RangeIndex;
+      Segments.Add(Segment);
+      Position := SegmentEnd + 1;
+    end;
+  finally
+    Starts.Free;
+  end;
 end;
 
 function TCMap.TryGetSpaceMapping(out Code: Integer): Boolean;
@@ -660,9 +894,21 @@ begin
   Result := (FSpaceMapping <> -1);
 end;
 
+class function TCMap.GetMappingLimit: Integer;
+begin
+  if FMappingLimitOverride > 0 then
+  begin
+    Result := FMappingLimitOverride;
+  end
+  else
+  begin
+    Result := MaxCMapMappings;
+  end;
+end;
+
 function TCMap.IsFull: Boolean;
 begin
-  Result := (FMappingCount >= MaxCMapMappings);
+  Result := (FMappingCount >= MappingLimit);
 end;
 
 procedure TCMap.AddCharMapping(const Codes: TBytes; const Unicode: string);
@@ -699,6 +945,7 @@ end;
 
 procedure TCMap.AddCIDMapping(const Code: TBytes; const CID: Integer);
 begin
+  FIsSealed := False;
   if IsFull then
   begin
     Exit;
@@ -724,6 +971,7 @@ end;
 
 procedure TCMap.AddCIDRange(const Range: TCIDRange);
 begin
+  FIsSealed := False;
   if FCodeToCidRanges.Count > 0 then
   begin
     var LastRange := FCodeToCidRanges[FCodeToCidRanges.Count - 1];
@@ -759,6 +1007,7 @@ end;
 
 procedure TCMap.UseCMap(const Other: TCMap);
 begin
+  FIsSealed := False;
   for var Range in Other.FCodespaceRanges do
   begin
     AddCodespaceRange(Range);

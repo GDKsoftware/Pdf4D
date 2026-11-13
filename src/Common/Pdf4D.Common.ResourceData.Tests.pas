@@ -17,6 +17,9 @@ type
     procedure TestLoadRaisesForMissingResource;
 
     [Test]
+    procedure TestDamagedResourceRaises;
+
+    [Test]
     procedure TestGlyphListLoads;
 
     [Test]
@@ -24,6 +27,9 @@ type
 
     [Test]
     procedure TestCMapLoads;
+
+    [Test]
+    procedure TestCMapNamesAreExact;
 
     [Test]
     procedure TestLiberationSansLoads;
@@ -90,6 +96,16 @@ begin
     EPdfException);
 end;
 
+procedure TPdfResourceDataTests.TestDamagedResourceRaises;
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfResourceData.Decompress('PDF4D_TEST_DAMAGED', TEncoding.ASCII.GetBytes('this is not zlib data'));
+    end,
+    EPdfException);
+end;
+
 procedure TPdfResourceDataTests.TestGlyphListLoads;
 begin
   const Data = TPdfGlyphListResources.Load('glyphlist');
@@ -113,6 +129,25 @@ begin
   Assert.IsTrue(TPdfCMapResources.TryLoad('Identity-H', Data));
   Assert.IsTrue(Length(Data) > 0);
   Assert.IsFalse(TPdfCMapResources.TryLoad('No-Such-CMap', Data));
+end;
+
+procedure TPdfResourceDataTests.TestCMapNamesAreExact;
+begin
+  var Data: TBytes;
+
+  Assert.IsTrue(TPdfCMapResources.IsPredefined('Identity-H'));
+  Assert.IsFalse(TPdfCMapResources.IsPredefined('identity-h'));
+  Assert.IsFalse(TPdfCMapResources.IsPredefined('Identity+H'));
+  Assert.IsFalse(TPdfCMapResources.IsPredefined('IDENTITY_H'));
+  Assert.IsFalse(TPdfCMapResources.TryLoad('identity-h', Data));
+  Assert.IsFalse(TPdfCMapResources.TryLoad('UniJIS.UCS2.H', Data));
+
+  // Every name has its resource
+  Assert.AreEqual<Integer>(92, Length(TPdfCMapResources.Names));
+  for var Name in TPdfCMapResources.Names do
+  begin
+    Assert.IsTrue(TPdfCMapResources.TryLoad(Name, Data), Name);
+  end;
 end;
 
 procedure TPdfResourceDataTests.TestLiberationSansLoads;

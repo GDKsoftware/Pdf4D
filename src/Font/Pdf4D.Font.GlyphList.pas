@@ -50,7 +50,7 @@ type
 
     // The Adobe Glyph List (4281 entries). Shared, the caller does not own it.
     class function AdobeGlyphList: TGlyphList; static;
-    // The Zapf Dingbats glyph list (201 entries). Shared.
+    // The Zapf Dingbats glyph list (202 entries). Shared.
     class function ZapfDingbats: TGlyphList; static;
     // The Adobe list plus the additional list, as the text extraction of PDFBox uses it. Shared.
     class function TextExtraction: TGlyphList; static;
@@ -250,7 +250,7 @@ begin
     Start := 2;
   end;
 
-  // Eight digits is the most that fits an Integer, and no glyph list or glyph name is longer
+  // At most seven digits, so the value stays below $10000000 and no glyph list entry or glyph name is longer
   if (Start > Length(Text)) or (Length(Text) - Start + 1 > 7) then
   begin
     Exit(False);

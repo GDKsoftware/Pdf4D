@@ -99,6 +99,18 @@ type
 
     [Test]
     procedure TestMappingsStopAtTheLimit;
+
+    [Test]
+    procedure TestCidRangeIndexKeepsFirstMatch;
+
+    [Test]
+    procedure TestCidRangeIndexMatchesLinearScanOfRandomRanges;
+
+    [Test]
+    procedure TestCidLookupWithManyRangesIsFast;
+
+    [Test]
+    procedure TestCidLookupIgnoresCodeLengthsThatDoNotOccur;
   end;
 
   [TestFixture]
@@ -171,6 +183,15 @@ type
 
     [Test]
     procedure TestRepeatedUseCMapIsBounded;
+
+    [Test]
+    procedure TestManyRepeatedUseCMapsAreFast;
+
+    [Test]
+    procedure TestUseCMapOfFullCMapIsSkipped;
+
+    [Test]
+    procedure TestBfRangeWithUnsupportedStartCodeIsSkipped;
 
     [Test]
     procedure TestNestedArraysRaiseParseError;
@@ -661,15 +682,128 @@ end;
 
 procedure TCMapTests.TestMappingsStopAtTheLimit;
 begin
+  TCMap.MappingLimit := 1000;
+  try
+    const CMap = TCMap.Create;
+    try
+      for var Index := 0 to TCMap.MappingLimit + 10 do
+      begin
+        CMap.AddCharMapping(Bytes([Byte(Index shr 16), Byte(Index shr 8), Byte(Index)]), 'x');
+      end;
+
+      Assert.AreEqual(1000, CMap.MappingCount);
+      Assert.IsTrue(CMap.IsFull);
+    finally
+      CMap.Free;
+    end;
+  finally
+    TCMap.MappingLimit := 0;
+  end;
+end;
+
+procedure TCMapTests.TestCidRangeIndexKeepsFirstMatch;
+begin
   const CMap = TCMap.Create;
   try
-    for var Index := 0 to MaxCMapMappings + 10 do
+    CMap.AddCIDRangeMapping(Bytes([0, 10]), Bytes([0, 20]), 100);
+    CMap.AddCIDRangeMapping(Bytes([0, 15]), Bytes([0, 30]), 200);
+    CMap.AddCIDRangeMapping(Bytes([0, 5]), Bytes([0, 12]), 300);
+    CMap.AddCIDRangeMapping(Bytes([0, 0]), Bytes([0, 100]), 400);
+    CMap.Seal;
+
+    Assert.AreEqual(100 + 1, CMap.ToCID(Bytes([0, 11])), 'first range wins over the third');
+    Assert.AreEqual(100 + 8, CMap.ToCID(Bytes([0, 18])), 'first range wins over the second');
+    Assert.AreEqual(200 + 8, CMap.ToCID(Bytes([0, 23])));
+    Assert.AreEqual(300 + 1, CMap.ToCID(Bytes([0, 6])));
+    Assert.AreEqual(400 + 4, CMap.ToCID(Bytes([0, 4])));
+    Assert.AreEqual(400 + 50, CMap.ToCID(Bytes([0, 50])));
+    Assert.AreEqual(0, CMap.ToCID(Bytes([0, 101])));
+    Assert.AreEqual(0, CMap.ToCID(Bytes([1, 0])));
+    Assert.AreEqual(100 + 3, CMap.ToCID(13, 2));
+  finally
+    CMap.Free;
+  end;
+end;
+
+procedure TCMapTests.TestCidRangeIndexMatchesLinearScanOfRandomRanges;
+begin
+  const Indexed = TCMap.Create;
+  const Linear = TCMap.Create;
+  try
+    var Seed: Cardinal := 12345;
+    for var Index := 0 to 299 do
     begin
-      CMap.AddCharMapping(Bytes([Byte(Index shr 16), Byte(Index shr 8), Byte(Index)]), 'x');
+      Seed := Cardinal((Int64(Seed) * 1664525 + 1013904223) and $FFFFFFFF);
+      const FromCode = Integer((Seed shr 8) mod 400);
+      Seed := Cardinal((Int64(Seed) * 1664525 + 1013904223) and $FFFFFFFF);
+      const Width = Integer((Seed shr 8) mod 60);
+      Seed := Cardinal((Int64(Seed) * 1664525 + 1013904223) and $FFFFFFFF);
+      const CID = Integer((Seed shr 8) mod 5000) + 1;
+      const FromBytes = Bytes([Byte(FromCode shr 8), Byte(FromCode)]);
+      const ToBytes = Bytes([Byte((FromCode + Width) shr 8), Byte(FromCode + Width)]);
+      Indexed.AddCIDRangeMapping(FromBytes, ToBytes, CID);
+      Linear.AddCIDRangeMapping(FromBytes, ToBytes, CID);
+    end;
+    Indexed.Seal;
+
+    for var Code := 0 to 520 do
+    begin
+      const CodeBytes = Bytes([Byte(Code shr 8), Byte(Code)]);
+      Assert.AreEqual(Linear.ToCID(Code, 2), Indexed.ToCID(Code, 2), 'code ' + Code.ToString);
+      Assert.AreEqual(Linear.ToCID(Code), Indexed.ToCID(Code), 'code ' + Code.ToString);
+      Assert.AreEqual(Linear.ToCID(CodeBytes), Indexed.ToCID(CodeBytes), 'code ' + Code.ToString);
+    end;
+  finally
+    Linear.Free;
+    Indexed.Free;
+  end;
+end;
+
+procedure TCMapTests.TestCidLookupWithManyRangesIsFast;
+begin
+  const CMap = TCMap.Create;
+  try
+    for var Index := 0 to 199999 do
+    begin
+      const FromCode = Index * 4;
+      const ToCode = FromCode + 1;
+      const FromBytes = Bytes([Byte(FromCode shr 24), Byte(FromCode shr 16), Byte(FromCode shr 8), Byte(FromCode)]);
+      const ToBytes = Bytes([Byte(ToCode shr 24), Byte(ToCode shr 16), Byte(ToCode shr 8), Byte(ToCode)]);
+      CMap.AddCIDRangeMapping(FromBytes, ToBytes, Index * 10);
+    end;
+    CMap.Seal;
+
+    const Watch = TStopwatch.StartNew;
+    var Found := 0;
+    for var Lookup := 0 to 99999 do
+    begin
+      const Code = (Lookup * 7919) mod 800000;
+      if CMap.ToCID(Code) <> 0 then
+      begin
+        Inc(Found);
+      end;
     end;
 
-    Assert.AreEqual(MaxCMapMappings, CMap.MappingCount);
-    Assert.IsTrue(CMap.IsFull);
+    Assert.IsTrue(Found > 0);
+    Assert.IsTrue(Watch.ElapsedMilliseconds < 2000, 'Lookups took too long');
+  finally
+    CMap.Free;
+  end;
+end;
+
+procedure TCMapTests.TestCidLookupIgnoresCodeLengthsThatDoNotOccur;
+begin
+  const CMap = TCMap.Create;
+  try
+    CMap.AddCIDMapping(Bytes([1]), 5);
+    CMap.AddCIDRangeMapping(Bytes([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+                            Bytes([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9]), 70);
+    CMap.Seal;
+
+    Assert.AreEqual(5, CMap.ToCID(1));
+    Assert.AreEqual(70 + 2, CMap.ToCID(2), 'the range of 20 bytes is the only one that holds the code');
+    Assert.AreEqual(0, CMap.ToCID(100));
+    Assert.AreEqual(70 + 3, CMap.ToCID(3, 20));
   finally
     CMap.Free;
   end;
@@ -927,30 +1061,48 @@ end;
 
 procedure TCMapParserTests.TestHugeBfRangeIsBounded;
 begin
-  const Watch = TStopwatch.StartNew;
-
-  const CMap = ParseText('1 beginbfrange <00000000> <FFFFFFFF> <0000> endbfrange');
+  // The range reaches the limit of 1000 mappings and stops there
+  TCMap.MappingLimit := 1000;
   try
-    Assert.IsTrue(Watch.ElapsedMilliseconds < 2000, 'Parsing took too long');
-    Assert.IsTrue(CMap.MappingCount <= MaxCMapMappings);
+    const Watch = TStopwatch.StartNew;
+    const CMap = ParseText('1 beginbfrange <00000000> <7FFFFFFE> <0000> endbfrange');
+    try
+      Assert.IsTrue(Watch.ElapsedMilliseconds < 2000, 'Parsing took too long');
+      Assert.AreEqual(1000, CMap.MappingCount);
+      Assert.IsTrue(HasWarning('limit'), 'The limit is reported');
+    finally
+      CMap.Free;
+    end;
+  finally
+    TCMap.MappingLimit := 0;
+  end;
+
+  // A range that ends before it starts is reported and adds nothing
+  const Reversed = ParseText('1 beginbfrange <00000000> <FFFFFFFF> <0000> endbfrange');
+  try
+    Assert.AreEqual(0, Reversed.MappingCount);
     Assert.IsTrue(HasWarning('bfrange'), 'The range is reported');
   finally
-    CMap.Free;
+    Reversed.Free;
   end;
 end;
 
 procedure TCMapParserTests.TestHugeBfRangeBelowSignedLimitIsBounded;
 begin
-  const Watch = TStopwatch.StartNew;
-
-  const CMap = ParseText('1 beginbfrange <00000000> <7FFFFFFE> <0041> endbfrange');
+  TCMap.MappingLimit := 5000;
   try
-    Assert.IsTrue(Watch.ElapsedMilliseconds < 20000, 'Parsing took too long');
-    Assert.AreEqual(MaxCMapMappings, CMap.MappingCount);
-    Assert.IsTrue(HasWarning('limit'), 'The limit is reported');
-    Assert.AreEqual('A', UnicodeOf(CMap, Bytes([0, 0, 0, 0])));
+    const Watch = TStopwatch.StartNew;
+    const CMap = ParseText('1 beginbfrange <00000000> <7FFFFFFE> <0041> endbfrange');
+    try
+      Assert.IsTrue(Watch.ElapsedMilliseconds < 2000, 'Parsing took too long');
+      Assert.AreEqual(5000, CMap.MappingCount);
+      Assert.IsTrue(HasWarning('limit'), 'The limit is reported');
+      Assert.AreEqual('A', UnicodeOf(CMap, Bytes([0, 0, 0, 0])));
+    finally
+      CMap.Free;
+    end;
   finally
-    CMap.Free;
+    TCMap.MappingLimit := 0;
   end;
 end;
 
@@ -971,6 +1123,78 @@ begin
   finally
     CMap.Free;
   end;
+end;
+
+procedure TCMapParserTests.TestManyRepeatedUseCMapsAreFast;
+begin
+  const Builder = TStringBuilder.Create;
+  try
+    for var Index := 1 to 100000 do
+    begin
+      Builder.Append('/UniJIS-UCS2-H usecmap ');
+    end;
+
+    const Watch = TStopwatch.StartNew;
+    const CMap = ParseText(Builder.ToString);
+    try
+      Assert.IsTrue(CMap.HasCIDMappings);
+      Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, 'Parsing took too long');
+    finally
+      CMap.Free;
+    end;
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TCMapParserTests.TestUseCMapOfFullCMapIsSkipped;
+begin
+  TCMap.MappingLimit := 1000;
+  try
+    const Builder = TStringBuilder.Create;
+    try
+      for var Index := 1 to 100000 do
+      begin
+        Builder.Append('/UniJIS-UCS2-H usecmap /UniGB-UCS2-H usecmap ');
+      end;
+
+      const Watch = TStopwatch.StartNew;
+      const CMap = ParseText(Builder.ToString);
+      try
+        Assert.AreEqual(1000, CMap.MappingCount);
+        Assert.IsTrue(HasWarning('limit'), 'The limit is reported');
+        Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, 'Parsing took too long');
+      finally
+        CMap.Free;
+      end;
+    finally
+      Builder.Free;
+    end;
+  finally
+    TCMap.MappingLimit := 0;
+  end;
+end;
+
+procedure TCMapParserTests.TestBfRangeWithUnsupportedStartCodeIsSkipped;
+begin
+  const Watch = TStopwatch.StartNew;
+
+  const NoBytes = ParseText('1 beginbfrange <> <7FFFFFFE> <0041> endbfrange');
+  try
+    Assert.AreEqual(0, NoBytes.MappingCount);
+    Assert.IsTrue(HasWarning('0 or more than 4 bytes'), 'The range is reported');
+  finally
+    NoBytes.Free;
+  end;
+
+  const FiveBytes = ParseText('1 beginbfrange <0000000000> <007FFFFFFE> <0041> endbfrange');
+  try
+    Assert.AreEqual(0, FiveBytes.MappingCount);
+  finally
+    FiveBytes.Free;
+  end;
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < 2000, 'Parsing took too long');
 end;
 
 procedure TCMapParserTests.ParseNestedArrays;

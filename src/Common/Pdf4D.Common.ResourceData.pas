@@ -18,6 +18,10 @@ type
     // Returns False when the resource does not exist.
     class function TryLoad(const Name: string; out Data: TBytes): Boolean; static;
 
+    // Inflates the stored bytes of the resource Name. Raises EPdfException when they are damaged. TryLoad uses it; it is
+    // public so that a test can feed it damaged data.
+    class function Decompress(const Name: string; const Compressed: TBytes): TBytes; static;
+
     // Raises EPdfException when the resource does not exist.
     class function Load(const Name: string): TBytes; static;
   end;
@@ -76,15 +80,21 @@ begin
     end;
   end;
 
+  Data := Decompress(Name, Compressed);
+  Result := True;
+end;
+
+class function TPdfResourceData.Decompress(const Name: string; const Compressed: TBytes): TBytes;
+begin
+  // No limit on the output: the input is data that is linked into the program, not data from a PDF
   try
-    ZDecompress(Compressed, Data);
+    ZDecompress(Compressed, Result);
   except
     on E: EZLibError do
     begin
       raise EPdfException.CreateFmt('Resource %s is damaged: %s', [Name, E.Message]);
     end;
   end;
-  Result := True;
 end;
 
 class function TPdfResourceData.Load(const Name: string): TBytes;

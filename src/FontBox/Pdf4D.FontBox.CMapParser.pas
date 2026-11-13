@@ -9,6 +9,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Generics.Collections,
   Pdf4D.Common.Log,
   Pdf4D.FontBox.CMap,
   Pdf4D.IO.RandomAccessRead;
@@ -49,6 +50,7 @@ type
     FTokenBuffer: TBytes;
     FTokenNesting: Integer;
     FUseCMapDepth: Integer;
+    FUsedCMaps: TDictionary<string, Boolean>;
     FHasWarnedAboutLimit: Boolean;
     FHasWarnedAboutLength: Boolean;
 
@@ -173,11 +175,13 @@ begin
   FStrictMode := StrictMode;
   FLog := Log;
   SetLength(FTokenBuffer, TokenBufferSize);
+  FUsedCMaps := TDictionary<string, Boolean>.Create;
 end;
 
 destructor TCMapParser.Destroy;
 begin
   FTokenBuffer := nil;
+  FUsedCMaps.Free;
   inherited;
 end;
 
@@ -204,7 +208,9 @@ begin
   FHasWarnedAboutLength := False;
   FTokenNesting := 0;
   FUseCMapDepth := 0;
+  FUsedCMaps.Clear;
   Result := ParseSource(Source);
+  Result.Seal;
 end;
 
 function TCMapParser.ParseSource(const Source: TRandomAccessRead): TCMap;
@@ -283,11 +289,23 @@ end;
 
 procedure TCMapParser.ParseUseCMap(const UseCMapName: string; const Result: TCMap);
 begin
+  // A full CMap takes nothing more, and a CMap that was used before adds nothing new: neither is worth another parse
+  if Result.IsFull then
+  begin
+    WarnAboutLimit;
+    Exit;
+  end;
+  if FUsedCMaps.ContainsKey(UseCMapName) then
+  begin
+    Exit;
+  end;
+
   var Data: TBytes;
   if not TPdfCMapResources.TryLoad(UseCMapName, Data) then
   begin
     raise EPdfParseException.CreateFmt('Could not find the referenced CMap %s', [UseCMapName]);
   end;
+  FUsedCMaps.Add(UseCMapName, True);
 
   if FUseCMapDepth >= MaxUseCMapDepth then
   begin
@@ -614,9 +632,14 @@ begin
     begin
       AddIdentityBfRange(Result, StartCode, Token.Data);
     end
-    else
+    else if (Length(StartCode) >= 1) and (Length(StartCode) <= 4) then
     begin
       AddMappingFrombfrange(Result, StartCode, Integer(Cardinal((Int64(Span) + 1) and $FFFFFFFF)), Token.Data);
+    end
+    else
+    begin
+      // Nothing of the range could be stored, and the loop over its codes would never reach the limit
+      WarnAboutLength;
     end;
   end;
 end;
@@ -1133,7 +1156,7 @@ begin
   if not FHasWarnedAboutLimit then
   begin
     FHasWarnedAboutLimit := True;
-    Warn('The CMap has reached the limit of %d mappings, the rest is ignored', [MaxCMapMappings]);
+    Warn('The CMap has reached the limit of %d mappings, the rest is ignored', [TCMap.MappingLimit]);
   end;
 end;
 
@@ -1142,7 +1165,7 @@ begin
   if not FHasWarnedAboutLength then
   begin
     FHasWarnedAboutLength := True;
-    Warn('Mappings with more than 4 bytes aren''t supported yet');
+    Warn('Mappings of codes of 0 or more than 4 bytes aren''t supported');
   end;
 end;
 
