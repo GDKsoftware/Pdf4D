@@ -2,10 +2,10 @@ version: 1.4
 encrypted: false
 permissions: none
 pages: 4
-page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
-page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=2
-page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=3
-page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=4
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=one
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=two
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=two
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=two
 xmp: none
 object 1 0: <</PageLabels 3 0 R /Pages 2 0 R /Type /Catalog /Version /1.4>>
 object 2 0: <</Count 4 /Kids [4 0 R 5 0 R 6 0 R 7 0 R] /Type /Pages>>

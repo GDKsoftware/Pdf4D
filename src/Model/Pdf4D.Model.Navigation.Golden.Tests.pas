@@ -179,7 +179,7 @@ begin
   end;
 end;
 
-// The oracle uses new PDPageLabels(doc), which has the default range only, for each document with /PageLabels
+// The oracle reads the labels of the catalog's /PageLabels, and gives none when the catalog has no /PageLabels
 function TNavigationGoldenTests.LabelsOf(const Document: TPDDocument): TArray<string>;
 begin
   var Dictionary: TCosDictionary;
@@ -188,7 +188,7 @@ begin
     Exit(nil);
   end;
 
-  const Labels = TPDPageLabels.Create(Document);
+  const Labels = TPDPageLabels.Create(Document, Dictionary);
   try
     Result := Labels.GetLabelsByPageIndices;
   finally

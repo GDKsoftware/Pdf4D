@@ -228,9 +228,10 @@ public class Pdf4DOracle
         String[] labels = null;
         try
         {
-            if (catalog != null && catalog.getCOSObject().getDictionaryObject(COSName.PAGE_LABELS) != null)
+            PDPageLabels pageLabels = catalog == null ? null : catalog.getPageLabels();
+            if (pageLabels != null)
             {
-                labels = new PDPageLabels(doc).getLabelsByPageIndices();
+                labels = pageLabels.getLabelsByPageIndices();
             }
         }
         catch (Throwable t)
