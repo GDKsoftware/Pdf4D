@@ -1,0 +1,25 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 3
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+page 2: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+page 3: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 3 /Kids [3 0 R 4 0 R 5 0 R] /Type /Pages>>
+object 3 0: <</Contents 6 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 7 0 R /Type /Page>>
+object 4 0: <</Contents 8 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 9 0 R /Type /Page>>
+object 5 0: <</Contents 10 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 11 0 R /Type /Page>>
+object 6 0: <</Length 53>> stream sha256=2b608de0ea76580ec995d7e65ea4b64b65051586cdb9c9c5bbe290e764eb5308
+object 7 0: <</XObject <</Im1 12 0 R>>>>
+object 8 0: <</Length 53>> stream sha256=2b608de0ea76580ec995d7e65ea4b64b65051586cdb9c9c5bbe290e764eb5308
+object 9 0: <</XObject <</Im1 13 0 R>>>>
+object 10 0: <</Length 53>> stream sha256=2b608de0ea76580ec995d7e65ea4b64b65051586cdb9c9c5bbe290e764eb5308
+object 11 0: <</XObject <</Im1 14 0 R>>>>
+object 12 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 15 0 R /Filter /CCITTFaxDecode /Height 287 /Length 221 /Subtype /Image /Type /XObject /Width 344>> stream partial=CCITTFaxDecode sha256=833cd50db2cd71e6948f5d5ba33ab31ce64708116ba5ae454d32ad9a5da9c60c
+object 13 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 16 0 R /Filter /CCITTFaxDecode /Height 287 /Length 236 /Subtype /Image /Type /XObject /Width 344>> stream partial=CCITTFaxDecode sha256=d4ad9eef02b64df32616342bb1addef103bbb77b720ccdd44bdd681799e774eb
+object 14 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 17 0 R /Filter /CCITTFaxDecode /Height 287 /Length 261 /Subtype /Image /Type /XObject /Width 344>> stream partial=CCITTFaxDecode sha256=cbd995436f3b690f62cc080157c4cdc4068ad2a61e4bdf95aa31b9779588d7d2
+object 15 0: <</Columns 344 /K -1 /Rows 287>>
+object 16 0: <</Columns 344 /K -1 /Rows 287>>
+object 17 0: <</Columns 344 /K -1 /Rows 287>>

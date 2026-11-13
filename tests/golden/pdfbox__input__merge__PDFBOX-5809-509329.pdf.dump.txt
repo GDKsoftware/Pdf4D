@@ -1,0 +1,149 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 3
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=2
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=3
+info Author: Michael K. Skinner – Center for Reproductive Biology
+info Company: ICF Consulting
+info CreationDate: 2006-03-07T16:10:32-05:00
+info Creator: Acrobat PDFMaker 7.0.7 for Word
+info Keywords: R827405 embryonic testis organ culture transforming growth factor TGF and neurotropin NT gene expression methoxychlor MXC and vinclozolin maternal exposures fetal sex determination
+info ModDate: 2006-05-11T14:33:49-04:00
+info Producer: Acrobat Distiller 7.0.5 (Windows)
+info SourceModified: D:20060307210958
+info Subject: EPA STAR Grant #R827405
+info Title: Endocrine Disruptors and Testis Development
+xmp: 5143
+object 1 0: <</Contents 2 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 22 0 R /Resources <</ColorSpace <</CS0 111 0 R>> /ExtGState <</GS0 108 0 R>> /Font <</TT0 104 0 R /TT1 105 0 R /TT2 113 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 120 0 R>>>> /Rotate 0 /StructParents 1 /Type /Page>>
+object 2 0: <</Filter /FlateDecode /Length 4399>> stream sha256=b9b0867d82c8f2705035c5f08eba0224d25d36a09ae97328e72772f4fd425bd7
+object 3 0: <</Annots 4 0 R /Contents 7 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 22 0 R /Resources <</ColorSpace <</CS0 111 0 R>> /ExtGState <</GS0 108 0 R>> /Font <</TT0 104 0 R /TT1 105 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 120 0 R>>>> /Rotate 0 /StructParents 2 /Type /Page>>
+object 4 0: [10 0 R 15 0 R 13 0 R 5 0 R 6 0 R]
+object 5 0: <</AP <</D 11 0 R /N 8 0 R>> /C [1 0 1] /Contents <54686520746162206f7264657220666f7220746869732070616765206d617920626520696e636f6e73697374656e7420776974682074686520737472756374757265206f726465722e20> /CreationDate <443a32303036303531313134323831302d303427303027> /F 28 /M <443a32303036303531313134323830392d303427303027> /NM <61626131333232642d666666622d346335622d386435332d383764376439623931613035> /Name /Comment /P 3 0 R /Popup 6 0 R /RC <3c3f786d6c2076657273696f6e3d22312e30223f3e3c626f647920786d6c6e733d22687474703a2f2f7777772e77332e6f72672f313939392f7868746d6c2220786d6c6e733a7866613d22687474703a2f2f7777772e7866612e6f72672f736368656d612f7866612d646174612f312e302f22207866613a41504956657273696f6e3d224163726f6261743a372e302e3522207866613a737065633d22322e302e3222203e3c703e54686520746162206f7264657220666f7220746869732070616765206d617920626520696e636f6e73697374656e7420776974682074686520737472756374757265206f726465722e203c2f703e3c2f626f64793e> /Rect [64 721 84 739] /Subtype /Text /T <4242617373> /Type /Annot>>
+object 6 0: <</F 28 /Open true /Parent 5 0 R /Rect [64 639 264 739] /Subtype /Popup /Type /Annot>>
+object 7 0: <</Filter /FlateDecode /Length 1049>> stream sha256=f73f62ec1a4968a85cf6c7cf53e9dc1198de27cb282ff10897c74c4c054ee170
+object 8 0: <</BBox [0 0 20 18] /Filter /FlateDecode /FormType 1 /Length 325 /Matrix [1 0 0 1 0 0] /Resources <</ProcSet [/PDF]>> /Subtype /Form /Type /XObject>> stream sha256=f71f7633bf20dd1b3794f361705a92c44b2976c8507fede3d8ee673b18d2390b
+object 9 0: <</S /URI /URI <687474703a2f2f7777772e736b696e6e65722e7773752e6564752f>>>
+object 10 0: <</A 12 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [72 610.484 302.735 623.82] /StructParent 3 /Subtype /Link /Type /Annot>>
+object 11 0: <</BBox [0 0 20 18] /Filter /FlateDecode /FormType 1 /Length 327 /Matrix [1 0 0 1 0 0] /Resources <</ProcSet [/PDF]>> /Subtype /Form /Type /XObject>> stream sha256=b266941fbf0916a0ab64876fd6a8ed67ec879169fbcb00369d2ff6dedc29fa4a
+object 12 0: <</S /URI /URI <687474703a2f2f7777772e6372622e7773752e6564752f33466163756c747950616765732f536b696e6e65722e68746d6c>>>
+object 13 0: <</A 14 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [72 549.583 520.637 562.92] /StructParent 5 /Subtype /Link /Type /Annot>>
+object 14 0: <</S /URI /URI <687474703a2f2f6366707562322e6570612e676f762f6e6365725f6162737472616374732f696e6465782e63666d2f66757365616374696f6e2f646973706c61792e616273747261637444657461696c2f61627374726163742f3939322f7265706f72742f30>>>
+object 15 0: <</A 9 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [72 586.232 208.925 600.846] /StructParent 4 /Subtype /Link /Type /Annot>>
+object 16 0: <</Differences [24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis] /Type /Encoding>>
+object 17 0: <</BaseFont /Helvetica /Encoding 16 0 R /Name /Helv /Subtype /Type1 /Type /Font>>
+object 18 0: <</BaseFont /ZapfDingbats /Name /ZaDb /Subtype /Type1 /Type /Font>>
+object 20 0: <</Nums [0 21 0 R]>>
+object 21 0: <</S /D>>
+object 22 0: <</Count 3 /Kids [103 0 R 1 0 R 3 0 R] /Type /Pages>>
+object 23 0: <</Names [<feff00690063006f006e002b0043006f006d006d0065006e0074002b003200350035003a0030003a003200350035002d0045004e0055002d0030> 11 0 R <feff007e00690063006f006e002b0043006f006d006d0065006e0074002b003200350035003a0030003a003200350035002d0045004e0055002d0030> 8 0 R]>>
+object 24 0: <</Length 5143 /Subtype /XML /Type /Metadata>> stream sha256=6b0bee6743e713d32beb872315ebdc274c9768d0a126e874e6cc96ca7b49d6a9
+object 25 0: <</Author <4d69636861656c204b2e20536b696e6e657220852043656e74657220666f7220526570726f647563746976652042696f6c6f6779> /Company <49434620436f6e73756c74696e67> /CreationDate <443a32303036303330373136313033322d303527303027> /Creator <4163726f626174205044464d616b657220372e302e3720666f7220576f7264> /Keywords <5238323734303520656d6272796f6e696320746573746973206f7267616e2063756c74757265207472616e73666f726d696e672067726f77746820666163746f722054474620616e64206e6575726f74726f70696e204e542067656e652065787072657373696f6e206d6574686f787963686c6f72204d584320616e642076696e636c6f7a6f6c696e206d617465726e616c206578706f737572657320666574616c207365782064657465726d696e6174696f6e> /ModDate <443a32303036303531313134333334392d303427303027> /Producer <4163726f6261742044697374696c6c657220372e302e35202857696e646f777329> /SourceModified <443a3230303630333037323130393538> /Subject <4550412053544152204772616e74202352383237343035> /Title <456e646f6372696e6520446973727570746f727320616e642054657374697320446576656c6f706d656e74>>>
+object 26 0: <</K 27 0 R /ParentTree 28 0 R /ParentTreeNextKey 6 /RoleMap 29 0 R /Type /StructTreeRoot>>
+object 27 0: <</K [85 0 R 86 0 R 87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R 93 0 R 94 0 R 95 0 R 97 0 R 62 0 R 63 0 R 64 0 R 65 0 R 68 0 R 69 0 R 71 0 R 72 0 R 73 0 R 74 0 R 75 0 R 76 0 R 81 0 R 82 0 R 49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 45 0 R 58 0 R 41 0 R 59 0 R 60 0 R 36 0 R] /Lang <454e2d4742> /P 26 0 R /S /Sect>>
+object 28 0: <</Nums [0 30 0 R 1 31 0 R 2 32 0 R 3 33 0 R 4 34 0 R 5 35 0 R]>>
+object 29 0: <</ACE#20Level#205 /P /CFD#20bodytext /P /Caps#20Head#202 /P /Comment#20Reference /Span /DropCap /Figure /Emphasis /Span /Endnote /Note /FollowedHyperlink /Span /Footnote /Note /Footnote#20Reference /Span /Frame /Div /Hyperlink /Span /InlineShape /Figure /ItGH#20bullettext /P /LRI#20Heading#201 /P /LRI#20Heading#202 /P /LRI#20Pullquote /P /LRI#20bodytext /P /Normal /P /Outline /Span /Page#20Number /Span /Shape /Figure /Strikeout /Span /Subscript /Span /Superscript /Span /TOA /TOC /TOAI /TOCI /TOF /TOC /TOFI /TOCI /TextBox /Div /Underline /Span /emailstyle22 /Span>>
+object 30 0: [85 0 R 86 0 R 87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R 93 0 R 94 0 R 95 0 R null null null null null null null null null null null null null 96 0 R]
+object 31 0: [62 0 R 63 0 R 64 0 R 65 0 R 66 0 R 65 0 R 67 0 R 65 0 R 68 0 R 69 0 R 70 0 R 69 0 R 71 0 R 72 0 R 73 0 R 74 0 R 75 0 R 76 0 R null 77 0 R 78 0 R 79 0 R 80 0 R]
+object 32 0: [49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 47 0 R 58 0 R 43 0 R 59 0 R 60 0 R 39 0 R]
+object 33 0: <</K [46 0 R <</Obj 10 0 R /Pg 3 0 R /Type /OBJR>>] /P 45 0 R /S /Link>>
+object 34 0: <</K [42 0 R <</Obj 15 0 R /Pg 3 0 R /Type /OBJR>>] /P 41 0 R /S /Link>>
+object 35 0: <</K [38 0 R <</Obj 13 0 R /Pg 3 0 R /Type /OBJR>>] /P 36 0 R /S /Link>>
+object 36 0: <</A 37 0 R /K 35 0 R /P 27 0 R /S /LRI#20bodytext>>
+object 37 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 0 /WritingMode /LrTb>>
+object 38 0: <</K 39 0 R /P 35 0 R /S /Hyperlink>>
+object 39 0: <</A 40 0 R /K 14 /P 38 0 R /Pg 3 0 R /S /Underline>>
+object 40 0: <</O /Layout /TextDecorationColor [0 0 1] /TextDecorationType /Underline>>
+object 41 0: <</A 37 0 R /K 34 0 R /P 27 0 R /S /LRI#20bodytext>>
+object 42 0: <</K 43 0 R /P 34 0 R /S /Hyperlink>>
+object 43 0: <</A 44 0 R /K 11 /P 42 0 R /Pg 3 0 R /S /Underline>>
+object 44 0: <</O /Layout /TextDecorationColor [0 0 1] /TextDecorationType /Underline>>
+object 45 0: <</A 37 0 R /K 33 0 R /P 27 0 R /S /LRI#20bodytext>>
+object 46 0: <</K 47 0 R /P 33 0 R /S /Hyperlink>>
+object 47 0: <</A 48 0 R /K 9 /P 46 0 R /Pg 3 0 R /S /Underline>>
+object 48 0: <</O /Layout /TextDecorationColor [0 0 0] /TextDecorationType /Underline>>
+object 49 0: <</A 37 0 R /K 0 /P 27 0 R /Pg 3 0 R /S /LRI#20Heading#202>>
+object 50 0: <</A 37 0 R /K 1 /P 27 0 R /Pg 3 0 R /S /LRI#20Heading#202>>
+object 51 0: <</A 37 0 R /K 2 /P 27 0 R /Pg 3 0 R /S /LRI#20Heading#202>>
+object 52 0: <</A 61 0 R /K 3 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 53 0: <</A 61 0 R /K 4 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 54 0: <</A 61 0 R /K 5 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 55 0: <</A 37 0 R /K 6 /P 27 0 R /Pg 3 0 R /S /LRI#20Heading#202>>
+object 56 0: <</A 37 0 R /K 7 /P 27 0 R /Pg 3 0 R /S /LRI#20Heading#202>>
+object 57 0: <</A 37 0 R /K 8 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 58 0: <</A 37 0 R /K 10 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 59 0: <</A 37 0 R /K 12 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 60 0: <</A 37 0 R /K 13 /P 27 0 R /Pg 3 0 R /S /LRI#20bodytext>>
+object 61 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 18 /TextAlign /Start /TextIndent -18 /WritingMode /LrTb>>
+object 62 0: <</A 37 0 R /K 0 /P 27 0 R /Pg 1 0 R /S /LRI#20Heading#202>>
+object 63 0: <</A 37 0 R /K 1 /P 27 0 R /Pg 1 0 R /S /LRI#20Heading#202>>
+object 64 0: <</A 37 0 R /K 2 /P 27 0 R /Pg 1 0 R /S /LRI#20Heading#202>>
+object 65 0: <</A 37 0 R /K [3 66 0 R 5 67 0 R 7] /P 27 0 R /Pg 1 0 R /S /ACE#20Level#205>>
+object 66 0: <</K 4 /P 65 0 R /Pg 1 0 R /S /Emphasis>>
+object 67 0: <</K 6 /P 65 0 R /Pg 1 0 R /S /Emphasis>>
+object 68 0: <</A 37 0 R /K 8 /P 27 0 R /Pg 1 0 R /S /ACE#20Level#205>>
+object 69 0: <</A 37 0 R /K [9 70 0 R 11] /P 27 0 R /Pg 1 0 R /S /ACE#20Level#205>>
+object 70 0: <</K 10 /P 69 0 R /Pg 1 0 R /S /Emphasis>>
+object 71 0: <</A 37 0 R /K 12 /P 27 0 R /Pg 1 0 R /S /ACE#20Level#205>>
+object 72 0: <</A 37 0 R /K 13 /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 73 0: <</A 37 0 R /K 14 /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 74 0: <</A 37 0 R /K 15 /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 75 0: <</A 37 0 R /K 16 /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 76 0: <</A 37 0 R /K 17 /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 77 0: <</A [84 0 R] /K 19 /P 81 0 R /Pg 1 0 R /S /InlineShape>>
+object 78 0: <</A 83 0 R /K 20 /P 82 0 R /Pg 1 0 R /S /LRI#20Heading#202>>
+object 79 0: <</A 37 0 R /K 21 /P 82 0 R /Pg 1 0 R /S /ItGH#20bullettext>>
+object 80 0: <</K 22 /P 81 0 R /Pg 1 0 R /S /P /T <>>>
+object 81 0: <</A 37 0 R /K [80 0 R 77 0 R] /P 27 0 R /Pg 1 0 R /S /LRI#20bodytext>>
+object 82 0: <</K [78 0 R 79 0 R] /P 27 0 R /S /TextBox>>
+object 83 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 6 /StartIndent 0 /TextAlign /Center /TextIndent 0 /WritingMode /LrTb>>
+object 84 0: <</BBox [71 118 540 263] /O /Layout /Placement /Inline>>
+object 85 0: <</A 37 0 R /K 0 /P 27 0 R /Pg 103 0 R /S /LRI#20Heading#201>>
+object 86 0: <</A 37 0 R /K 1 /P 27 0 R /Pg 103 0 R /S /LRI#20Heading#201>>
+object 87 0: <</A 37 0 R /K 2 /P 27 0 R /Pg 103 0 R /S /LRI#20Heading#202>>
+object 88 0: <</A 37 0 R /K 3 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 89 0: <</A 37 0 R /K 4 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 90 0: <</A 37 0 R /K 5 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 91 0: <</A 37 0 R /K 6 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 92 0: <</A 37 0 R /K 7 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 93 0: <</A 37 0 R /K 8 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 94 0: <</A 37 0 R /K 9 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 95 0: <</A 37 0 R /K 10 /P 27 0 R /Pg 103 0 R /S /LRI#20bodytext>>
+object 96 0: <</K 24 /P 97 0 R /Pg 103 0 R /S /P /T <>>>
+object 97 0: <</K 96 0 R /P 27 0 R /S /TextBox>>
+object 98 0: <</E 23888 /H [1016 333] /L 43516 /Linearized 1 /N 3 /O 103 /T 41509>>
+object 99 0: <</AcroForm 100 0 R /Lang <454e2d5553> /LastModified <443a3230303630333037313631313036> /MarkInfo <</LetterspaceFlags 0 /Marked true>> /Metadata 24 0 R /Names 101 0 R /OCProperties <</OCGs [102 0 R]>> /PageLabels 20 0 R /PageLayout /OneColumn /Pages 22 0 R /PieceInfo <</MarkedPDF <</LastModified <443a3230303630333037313631313036>>>>> /StructTreeRoot 26 0 R /Type /Catalog>>
+object 100 0: <</DA <2f48656c7620302054662030206720> /DR <</Encoding <</PDFDocEncoding 16 0 R>> /Font <</Helv 17 0 R /ZaDb 18 0 R>>>> /Fields []>>
+object 101 0: <</AP 23 0 R>>
+object 102 0: <</Name <486561646572466f6f746572> /Type /OCG /Usage <</CreatorInfo <</Creator <4163726f626174205044464d616b657220372e302e3720666f7220576f7264> /Subtype /Artwork>> /PageElement <</Subtype /HF>>>>>>
+object 103 0: <</Contents [109 0 R 110 0 R 112 0 R 116 0 R 117 0 R 119 0 R 121 0 R 122 0 R] /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 22 0 R /Resources <</ColorSpace <</CS0 111 0 R>> /ExtGState <</GS0 108 0 R>> /Font <</C2_0 114 0 R /C2_1 118 0 R /TT0 104 0 R /TT1 105 0 R /TT2 113 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 120 0 R>>>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 104 0: <</BaseFont /Arial-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 106 0 R /LastChar 146 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 333 0 0 556 556 556 0 0 0 0 0 0 556 333 0 0 0 0 0 0 722 722 722 722 667 611 778 0 278 556 722 611 833 722 778 667 0 722 667 611 0 0 0 0 667 0 0 0 0 0 0 0 556 611 556 611 556 333 611 611 278 278 556 278 889 611 611 611 0 389 556 333 611 556 0 0 556 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 278]>>
+object 105 0: <</BaseFont /ArialMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 107 0 R /LastChar 150 /Subtype /TrueType /Type /Font /Widths [278 0 0 556 0 0 0 0 333 333 0 0 278 333 278 278 556 556 556 556 556 556 556 556 556 556 278 0 0 0 0 0 0 667 667 722 722 667 611 778 722 278 0 667 556 833 722 778 667 0 722 667 611 722 0 944 667 667 0 278 0 278 0 556 0 556 556 500 556 556 278 556 556 222 222 500 222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 222 0 0 0 556]>>
+object 106 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 32 /FontBBox [-628 -376 2000 1010] /FontFamily <417269616c> /FontName /Arial-BoldMT /FontStretch /Normal /FontWeight 700 /ItalicAngle 0 /StemV 138 /Type /FontDescriptor /XHeight 515>>
+object 107 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 32 /FontBBox [-665 -325 2000 1006] /FontFamily <417269616c> /FontName /ArialMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 88 /Type /FontDescriptor /XHeight 515>>
+object 108 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 109 0: <</Filter /FlateDecode /Length 661>> stream sha256=f0793e205c04a4302fee1c608f91ba61566526e1a207506b70ed46867d05d57b
+object 110 0: <</Filter /FlateDecode /Length 681>> stream sha256=16a4c4f49d8e752db66f81c1d17ed2006ef3b7dee5e34f844a8258ca898a0cad
+object 111 0: [/ICCBased 123 0 R]
+object 112 0: <</Filter /FlateDecode /Length 654>> stream sha256=3933d0619a971115ccc860b3c161b18467675fd8148eafb29ab48f04b8ce7e02
+object 113 0: <</BaseFont /Arial-ItalicMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 115 0 R /LastChar 118 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 0 0 222 0 0 0 0 556 556 0 0 333 0 278 556 500]>>
+object 114 0: <</BaseFont /MBKBDC+SymbolMT /DescendantFonts [126 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 127 0 R /Type /Font>>
+object 115 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 96 /FontBBox [-517 -325 1082 1025] /FontFamily <417269616c> /FontName /Arial-ItalicMT /FontStretch /Normal /FontWeight 400 /ItalicAngle -15 /StemV 85.863 /Type /FontDescriptor /XHeight 515>>
+object 116 0: <</Filter /FlateDecode /Length 751>> stream sha256=c815bd50dc5cfc46c74cfbcbc22d0ac89f365fdc1ae16dfca3d92985d1b96df1
+object 117 0: <</Filter /FlateDecode /Length 713>> stream sha256=0d9db00960444e892731408d4e18df60e1602152907d0cef06a9d07bf4fab3b4
+object 118 0: <</BaseFont /MBKAIP+WP-GreekCourier /DescendantFonts [130 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 131 0 R /Type /Font>>
+object 119 0: <</Filter /FlateDecode /Length 753>> stream sha256=e18d5ea68febc4c2e9bb0b4877328d6a211030f84b19b0b6dd8e2434279aa5cf
+object 120 0: <</OCGs 102 0 R /Type /OCMD>>
+object 121 0: <</Filter /FlateDecode /Length 691>> stream sha256=e40b63822a641f7d7b727203a1202a41598eb5e7835bf4b3bc5ddd882aab255c
+object 122 0: <</Filter /FlateDecode /Length 677>> stream sha256=36882aa330af9ea5e107826dcde59af46a74445ef219dcc097e364db8877e82c
+object 123 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2575 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 124 0: <</Filter /FlateDecode /Length 6990 /Length1 11040>> stream sha256=a8f79f92db223186ad556b3cc6904626810da1dcbbbeb20ced0a2f70c627c14d
+object 125 0: <</Ascent 1005 /CapHeight 0 /Descent -219 /Flags 4 /FontBBox [0 -220 1113 1005] /FontFamily <53796d626f6c> /FontFile2 124 0 R /FontName /MBKBDC+SymbolMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 0 /Type /FontDescriptor>>
+object 126 0: <</BaseFont /MBKBDC+SymbolMT /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /DW 1000 /FontDescriptor 125 0 R /Subtype /CIDFontType2 /Type /Font /W [3 [250] 120 [459]]>>
+object 127 0: <</Filter /FlateDecode /Length 228>> stream sha256=f0ccf4259765b8ebdc1b5e98eb1b01982277699531a94215505f7661051e4dd2
+object 128 0: <</Filter /FlateDecode /Length 1446 /Length1 3652>> stream sha256=7b50201e206d96ab0b05a3dc30eef364bfa53f44f98800b865bb23db69d1d319
+object 129 0: <</Ascent 807 /CapHeight -562 /Descent -200 /Flags 4 /FontBBox [-13 -186 602 807] /FontFamily <575020477265656b20436f7572696572> /FontFile2 128 0 R /FontName /MBKAIP+WP-GreekCourier /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 69.824 /Type /FontDescriptor /XHeight 140>>
+object 130 0: <</BaseFont /MBKAIP+WP-GreekCourier /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /DW 1000 /FontDescriptor 129 0 R /Subtype /CIDFontType2 /Type /Font /W [5 [600]]>>
+object 131 0: <</Filter /FlateDecode /Length 215>> stream sha256=af18fe40b75960b3e1fae5e16a670538145a0d6a0f561a1251d7fbebd8477bb8
+object 133 0: <</C 236 /Filter /FlateDecode /I 263 /L 220 /Length 233 /S 104 /V 198>> stream sha256=bc5525bc6a89241e9dd8a2a316a1a7bab5b9af1e256774bf1c2e85057f012fc5

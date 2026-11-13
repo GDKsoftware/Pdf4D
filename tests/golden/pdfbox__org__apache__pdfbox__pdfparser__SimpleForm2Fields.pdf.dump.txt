@@ -1,0 +1,17 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+xmp: none
+field: Field1 | text | 
+field: Field2 | text | 
+object 1 0: <</AcroForm 3 0 R /Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 3 0: <</DA <2f48656c76203020546620302067> /DR 7 0 R /Fields [5 0 R 6 0 R]>>
+object 4 0: <</Annots [5 0 R 6 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Type /Page>>
+object 5 0: <</DA <2f48656c76203132205466203020302030207267> /F 4 /FT /Tx /P 4 0 R /Rect [50 750 250 770] /Subtype /Widget /T <4669656c6431> /Type /Annot>>
+object 6 0: <</DA <2f48656c76203132205466203020302030207267> /F 4 /FT /Tx /P 4 0 R /Rect [50 650 250 670] /Subtype /Widget /T <4669656c6432> /Type /Annot>>
+object 7 0: <</Font 8 0 R>>
+object 8 0: <</Helv 9 0 R>>
+object 9 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>

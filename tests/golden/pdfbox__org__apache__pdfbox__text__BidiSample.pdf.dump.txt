@@ -1,0 +1,38 @@
+version: 1.3
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.28 841.89] crop=[0 0 595.28 841.89] rotate=0 label=
+info CreationDate: 2015-09-28T08:00:50+00:00
+info Creator: Pages
+info ModDate: 2015-09-28T08:00:50+00:00
+info Producer: Mac OS X 10.10.5 Quartz PDFContext
+info Title: BidiSample.pages
+xmp: none
+object 1 0: <</CreationDate 28 0 R /Creator 27 0 R /ModDate 28 0 R /Producer 26 0 R /Title 25 0 R>>
+object 2 0: <</Contents 4 0 R /MediaBox [0 0 595.28 841.89] /Parent 3 0 R /Resources 6 0 R /Type /Page>>
+object 3 0: <</Count 1 /Kids [2 0 R] /MediaBox [0 0 595.28 841.89] /Type /Pages>>
+object 4 0: <</Filter /FlateDecode /Length 5 0 R>> stream sha256=40c92c7eff8fe3b92cfaec2ede7314b98ea7dc7bd3f36818807ba911acf6b077
+object 5 0: 933
+object 6 0: <</ColorSpace <</Cs1 7 0 R /Cs2 10 0 R>> /Font <</TT2 9 0 R /TT3 11 0 R>> /ProcSet [/PDF /Text]>>
+object 7 0: [/ICCBased 14 0 R]
+object 9 0: <</BaseFont /EEUWUQ+GeezaPro /FirstChar 33 /FontDescriptor 17 0 R /LastChar 55 /Subtype /TrueType /ToUnicode 18 0 R /Type /Font /Widths [322 297 297 408 424 233 292 408 292 297 297 614 525 525 525 475 297 292 297 698 297 408 614]>>
+object 10 0: [/ICCBased 12 0 R]
+object 11 0: <</BaseFont /BMYDLC+Helvetica /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 22 0 R /LastChar 200 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 333 333 0 0 0 333 278 0 0 556 0 556 556 0 0 0 0 0 0 0 0 0 0 0 0 667 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 500 556 556 278 0 556 222 222 0 222 833 556 556 556 0 333 500 278 556 0 722 0 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556]>>
+object 12 0: <</Alternate /DeviceGray /Filter /FlateDecode /Length 13 0 R /N 1>> stream sha256=bad673993556e6b0887d39ea77607649277a6ccaa6a2d454ec077dad52adc122
+object 13 0: 3317
+object 14 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 15 0 R /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 15 0: 2612
+object 16 0: <</Pages 3 0 R /Type /Catalog>>
+object 17 0: <</Ascent 895 /AvgWidth 480 /CapHeight 669 /Descent -331 /Flags 4 /FontBBox [-104 -620 6435 1196] /FontFile2 20 0 R /FontName /EEUWUQ+GeezaPro /ItalicAngle 0 /Leading 136 /MaxWidth 6489 /StemH 74 /StemV 53 /Type /FontDescriptor /XHeight 491>>
+object 18 0: <</Filter /FlateDecode /Length 19 0 R>> stream sha256=333991ce70d2e47d8fe988f16657ff39df31c45aacbffa45d7e916d03fc61df7
+object 19 0: 357
+object 20 0: <</Filter /FlateDecode /Length 21 0 R /Length1 3796>> stream sha256=34c3c10c6cd34778407cdf872bc03b32fc3fcf4ab2faf4059ad8a81a3c26b7db
+object 21 0: 2433
+object 22 0: <</Ascent 770 /AvgWidth 441 /CapHeight 717 /Descent -230 /Flags 32 /FontBBox [-951 -481 1445 1122] /FontFile2 23 0 R /FontName /BMYDLC+Helvetica /ItalicAngle 0 /MaxWidth 1500 /StemH 85 /StemV 98 /Type /FontDescriptor /XHeight 523>>
+object 23 0: <</Filter /FlateDecode /Length 24 0 R /Length1 12408>> stream sha256=97ab2612f5c801a1a9a7dc5e3979bcbdb480f08d01ba8bc2bd893a1375dc97e4
+object 24 0: 8021
+object 25 0: <4269646953616d706c652e7061676573>
+object 26 0: <4d6163204f5320582031302e31302e352051756172747a20504446436f6e74657874>
+object 27 0: <5061676573>
+object 28 0: <443a32303135303932383038303035305a303027303027>

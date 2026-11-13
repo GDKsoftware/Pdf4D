@@ -1,0 +1,304 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 6
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=2
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=3
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=4
+page 5: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=5
+page 6: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=6
+info Author: Kevin Grant
+info Company: NOAA-NMFS-AFSC
+info CreationDate: 2006-04-05T06:24:15-07:00
+info Creator: Acrobat PDFMaker 7.0.7 for Word
+info ModDate: 2006-04-05T13:52:13-07:00
+info Producer: Acrobat Distiller 7.0.5 (Windows)
+info SourceModified: D:20060324182106
+info Title: Long Beach, California Community Profile
+xmp: 4265
+object 1 0: <</Annots 2 0 R /Contents 3 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ExtGState <</GS0 281 0 R>> /Font <</TT0 277 0 R /TT1 276 0 R /TT2 275 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 6 /Type /Page>>
+object 2 0: [17 0 R 18 0 R 15 0 R 19 0 R 20 0 R]
+object 3 0: <</Filter /FlateDecode /Length 3041>> stream sha256=3eb7f88a91ae1b105365a8a7d5783facf12b8db750884c2dcefcb79324c1e822
+object 4 0: <</Annots 5 0 R /Contents 6 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ExtGState <</GS0 281 0 R>> /Font <</TT0 277 0 R /TT1 276 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 12 /Type /Page>>
+object 5 0: [28 0 R 29 0 R 26 0 R 25 0 R 27 0 R 33 0 R]
+object 6 0: <</Filter /FlateDecode /Length 3163>> stream sha256=c06dc3c9ab68cd16cd2e614d51e65553c1f6a9b203e0b7a29b1db1248ec422c6
+object 7 0: <</Annots 8 0 R /Contents 9 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ColorSpace <</CS0 45 0 R>> /ExtGState <</GS0 281 0 R>> /Font <</TT0 277 0 R /TT1 275 0 R /TT2 276 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 19 /Type /Page>>
+object 8 0: [39 0 R 42 0 R 37 0 R 41 0 R]
+object 9 0: <</Filter /FlateDecode /Length 2861>> stream sha256=121f90012497398c9ba074a3e7d3e104020052636d228266233133c06ba75a0d
+object 10 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2575 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 11 0: <</Contents 12 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ExtGState <</GS0 281 0 R>> /Font <</TT0 277 0 R /TT1 276 0 R /TT2 275 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 24 /Type /Page>>
+object 12 0: <</Filter /FlateDecode /Length 3555>> stream sha256=bf9db2e5037614450d5a412e6cb3fce92aac872bf67f56006e70af7c50338281
+object 13 0: <</Contents 14 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ExtGState <</GS0 281 0 R>> /Font <</TT0 277 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 25 /Type /Page>>
+object 14 0: <</Filter /FlateDecode /Length 2470>> stream sha256=8489f73eb2dee175af247093cec9c15e1e160eb6446228c069ae3741470e2a15
+object 15 0: <</A 16 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [385.14 146.29 389.13 156.776] /StructParent 9 /Subtype /Link /Type /Annot>>
+object 16 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 17 0: <</A 23 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [143.52 505.03 147.51 515.516] /StructParent 7 /Subtype /Link /Type /Annot>>
+object 18 0: <</A 24 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [170.16 173.89 174.15 184.376] /StructParent 8 /Subtype /Link /Type /Annot>>
+object 19 0: <</A 21 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [489.78 118.69 493.77 129.176] /StructParent 10 /Subtype /Link /Type /Annot>>
+object 20 0: <</A 22 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [173.52 91.0901 181.561 101.576] /StructParent 11 /Subtype /Link /Type /Annot>>
+object 21 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 22 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 23 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 24 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 25 0: <</A 36 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [151.86 367.03 159.901 377.516] /StructParent 16 /Subtype /Link /Type /Annot>>
+object 26 0: <</A 35 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [417.12 615.43 425.161 625.916] /StructParent 15 /Subtype /Link /Type /Annot>>
+object 27 0: <</A 34 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [205.5 160.09 213.541 170.576] /StructParent 17 /Subtype /Link /Type /Annot>>
+object 28 0: <</A 30 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [175.86 698.23 183.901 708.716] /StructParent 13 /Subtype /Link /Type /Annot>>
+object 29 0: <</A 32 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [361.2 656.83 369.241 667.316] /StructParent 14 /Subtype /Link /Type /Annot>>
+object 30 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 31 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 32 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 33 0: <</A 31 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [207.84 104.89 215.881 115.376] /StructParent 18 /Subtype /Link /Type /Annot>>
+object 34 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 35 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 36 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 37 0: <</A 40 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [342.84 380.83 350.881 391.316] /StructParent 22 /Subtype /Link /Type /Annot>>
+object 38 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 39 0: <</A 38 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [176.22 643.03 184.261 653.516] /StructParent 20 /Subtype /Link /Type /Annot>>
+object 40 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 41 0: <</A 43 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [132.24 298.09 140.281 308.576] /StructParent 23 /Subtype /Link /Type /Annot>>
+object 42 0: <</A 44 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [211.86 449.83 219.901 460.316] /StructParent 21 /Subtype /Link /Type /Annot>>
+object 43 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 44 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 45 0: [/ICCBased 10 0 R]
+object 49 0: <</Nums [0 50 0 R]>>
+object 50 0: <</S /D>>
+object 51 0: <</Count 6 /Kids [268 0 R 1 0 R 4 0 R 7 0 R 11 0 R 13 0 R] /Type /Pages>>
+object 52 0: <</Length 4265 /Subtype /XML /Type /Metadata>> stream sha256=74ee609ab6a7879dbcf93ac7971f09b11466b780f24ea25ad256117f50e72c7a
+object 53 0: <</Author <4b6576696e204772616e74> /Company <4e4f41412d4e4d46532d41465343> /CreationDate <443a32303036303430353036323431352d303727303027> /Creator <4163726f626174205044464d616b657220372e302e3720666f7220576f7264> /ModDate <443a32303036303430353133353231332d303727303027> /Producer <4163726f6261742044697374696c6c657220372e302e35202857696e646f777329> /SourceModified <443a3230303630333234313832313036> /Title <4c6f6e672042656163682c2043616c69666f726e696120436f6d6d756e6974792050726f66696c65>>>
+object 54 0: <</K 55 0 R /ParentTree 56 0 R /ParentTreeNextKey 26 /RoleMap 57 0 R /Type /StructTreeRoot>>
+object 55 0: <</K [252 0 R 253 0 R 254 0 R 255 0 R 256 0 R 257 0 R 258 0 R 259 0 R 260 0 R 261 0 R 262 0 R 263 0 R 242 0 R 264 0 R 265 0 R 232 0 R 233 0 R 234 0 R 235 0 R 231 0 R 236 0 R 237 0 R 238 0 R 228 0 R 215 0 R 210 0 R 222 0 R 223 0 R 224 0 R 225 0 R 206 0 R 201 0 R 191 0 R 192 0 R 193 0 R 194 0 R 195 0 R 188 0 R 185 0 R 182 0 R 196 0 R 197 0 R 198 0 R 167 0 R 168 0 R 169 0 R 170 0 R 171 0 R 172 0 R 173 0 R 174 0 R 175 0 R 176 0 R 177 0 R 108 0 R] /P 54 0 R /S /Sect>>
+object 56 0: <</Nums [0 58 0 R 1 59 0 R 2 60 0 R 3 61 0 R 4 62 0 R 5 63 0 R 6 64 0 R 7 65 0 R 8 66 0 R 9 67 0 R 10 68 0 R 11 69 0 R 12 70 0 R 13 71 0 R 14 72 0 R 15 73 0 R 16 74 0 R 17 75 0 R 18 76 0 R 19 77 0 R 20 78 0 R 21 79 0 R 22 80 0 R 23 81 0 R 24 82 0 R 25 83 0 R]>>
+object 57 0: <</DropCap /Figure /Endnote /Note /Endnote#20Reference /Span /FollowedHyperlink /Span /Footnote /Note /Frame /Div /Hyperlink /Span /InlineShape /Figure /Normal /P /Normal#20#28Web#29 /P /Outline /Span /Shape /Figure /Strikeout /Span /Strong /Span /Subscript /Span /Superscript /Span /TOA /TOC /TOAI /TOCI /TOF /TOC /TOFI /TOCI /TextBox /Div /Underline /Span /endnote#20text /P /subheads1 /Span>>
+object 58 0: [252 0 R 253 0 R 254 0 R 255 0 R 256 0 R 257 0 R 258 0 R 259 0 R 260 0 R 261 0 R 262 0 R 263 0 R 242 0 R 59 0 R 244 0 R 60 0 R 242 0 R 61 0 R 242 0 R 62 0 R 240 0 R 63 0 R 264 0 R 265 0 R]
+object 59 0: <</K [13 <</Obj 270 0 R /Type /OBJR>>] /P 251 0 R /Pg 268 0 R /S /Link>>
+object 60 0: <</K [15 <</Obj 271 0 R /Type /OBJR>>] /P 250 0 R /Pg 268 0 R /S /Link>>
+object 61 0: <</K [17 <</Obj 272 0 R /Type /OBJR>>] /P 248 0 R /Pg 268 0 R /S /Link>>
+object 62 0: <</K [19 <</Obj 273 0 R /Type /OBJR>>] /P 247 0 R /Pg 268 0 R /S /Link>>
+object 63 0: <</K [21 <</Obj 274 0 R /Type /OBJR>>] /P 239 0 R /Pg 268 0 R /S /Link>>
+object 64 0: [232 0 R 233 0 R 234 0 R 235 0 R 231 0 R 65 0 R 231 0 R 236 0 R 237 0 R 238 0 R 228 0 R 66 0 R 228 0 R 215 0 R 67 0 R 215 0 R 68 0 R 215 0 R 69 0 R 215 0 R]
+object 65 0: <</K [5 <</Obj 17 0 R /Type /OBJR>>] /P 229 0 R /Pg 1 0 R /S /Link>>
+object 66 0: <</K [11 <</Obj 18 0 R /Type /OBJR>>] /P 226 0 R /Pg 1 0 R /S /Link>>
+object 67 0: <</K [14 <</Obj 15 0 R /Type /OBJR>>] /P 221 0 R /Pg 1 0 R /S /Link>>
+object 68 0: <</K [16 <</Obj 19 0 R /Type /OBJR>>] /P 220 0 R /Pg 1 0 R /S /Link>>
+object 69 0: <</K [18 <</Obj 20 0 R /Type /OBJR>>] /P 219 0 R /Pg 1 0 R /S /Link>>
+object 70 0: [215 0 R 71 0 R 210 0 R 72 0 R 210 0 R 73 0 R 222 0 R 223 0 R 224 0 R 225 0 R 206 0 R 74 0 R 206 0 R 207 0 R 206 0 R 201 0 R 75 0 R 201 0 R 76 0 R]
+object 71 0: <</K [1 <</Obj 28 0 R /Type /OBJR>>] /P 213 0 R /Pg 4 0 R /S /Link>>
+object 72 0: <</K [3 <</Obj 29 0 R /Type /OBJR>>] /P 212 0 R /Pg 4 0 R /S /Link>>
+object 73 0: <</K [5 <</Obj 26 0 R /Type /OBJR>>] /P 208 0 R /Pg 4 0 R /S /Link>>
+object 74 0: <</K [11 <</Obj 25 0 R /Type /OBJR>>] /P 204 0 R /Pg 4 0 R /S /Link>>
+object 75 0: <</K [16 <</Obj 27 0 R /Type /OBJR>>] /P 203 0 R /Pg 4 0 R /S /Link>>
+object 76 0: <</K [18 <</Obj 33 0 R /Type /OBJR>>] /P 199 0 R /Pg 4 0 R /S /Link>>
+object 77 0: [191 0 R 78 0 R 192 0 R 193 0 R 194 0 R 195 0 R 188 0 R 79 0 R 188 0 R 185 0 R 80 0 R 185 0 R 182 0 R 81 0 R 182 0 R 196 0 R 197 0 R 198 0 R 167 0 R]
+object 78 0: <</K [1 <</Obj 39 0 R /Type /OBJR>>] /P 189 0 R /Pg 7 0 R /S /Link>>
+object 79 0: <</K [7 <</Obj 42 0 R /Type /OBJR>>] /P 186 0 R /Pg 7 0 R /S /Link>>
+object 80 0: <</K [10 <</Obj 37 0 R /Type /OBJR>>] /P 183 0 R /Pg 7 0 R /S /Link>>
+object 81 0: <</K [13 <</Obj 41 0 R /Type /OBJR>>] /P 180 0 R /Pg 7 0 R /S /Link>>
+object 82 0: [167 0 R 168 0 R 169 0 R 170 0 R 171 0 R 172 0 R 173 0 R 174 0 R 175 0 R 176 0 R 177 0 R 143 0 R 109 0 R 140 0 R 110 0 R 137 0 R 111 0 R 134 0 R 112 0 R 131 0 R 113 0 R 128 0 R 114 0 R 125 0 R 115 0 R 122 0 R 116 0 R 119 0 R 117 0 R]
+object 83 0: [84 0 R 85 0 R 86 0 R 87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R 93 0 R 94 0 R 95 0 R 96 0 R 97 0 R 98 0 R 99 0 R 100 0 R 101 0 R 102 0 R 103 0 R 104 0 R 105 0 R 106 0 R]
+object 84 0: <</A 166 0 R /K 0 /P 165 0 R /Pg 13 0 R /S /Superscript>>
+object 85 0: <</A 107 0 R /K [165 0 R 1] /P 108 0 R /Pg 13 0 R /S /Normal>>
+object 86 0: <</A 164 0 R /K 2 /P 163 0 R /Pg 13 0 R /S /Superscript>>
+object 87 0: <</A 107 0 R /K [163 0 R 3] /P 108 0 R /Pg 13 0 R /S /Normal>>
+object 88 0: <</A 162 0 R /K 4 /P 161 0 R /Pg 13 0 R /S /Superscript>>
+object 89 0: <</A 107 0 R /K [161 0 R 5] /P 108 0 R /Pg 13 0 R /S /Normal>>
+object 90 0: <</A 160 0 R /K 6 /P 159 0 R /Pg 13 0 R /S /Superscript>>
+object 91 0: <</A 107 0 R /K [159 0 R 7] /P 108 0 R /Pg 13 0 R /S /Normal>>
+object 92 0: <</A 158 0 R /K 8 /P 157 0 R /Pg 13 0 R /S /Superscript>>
+object 93 0: <</A 107 0 R /K [157 0 R 9] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 94 0: <</A 156 0 R /K 10 /P 155 0 R /Pg 13 0 R /S /Superscript>>
+object 95 0: <</A 107 0 R /K [155 0 R 11] /P 108 0 R /Pg 13 0 R /S /Normal#20#28Web#29>>
+object 96 0: <</A 154 0 R /K 12 /P 153 0 R /Pg 13 0 R /S /Superscript>>
+object 97 0: <</A 107 0 R /K [153 0 R 13] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 98 0: <</A 152 0 R /K 14 /P 151 0 R /Pg 13 0 R /S /Superscript>>
+object 99 0: <</A 107 0 R /K [151 0 R 15] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 100 0: <</A 150 0 R /K 16 /P 149 0 R /Pg 13 0 R /S /Superscript>>
+object 101 0: <</A 107 0 R /K [149 0 R 17] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 102 0: <</A 148 0 R /K 18 /P 147 0 R /Pg 13 0 R /S /Superscript>>
+object 103 0: <</A 107 0 R /K [147 0 R 19] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 104 0: <</A 146 0 R /K 20 /P 145 0 R /Pg 13 0 R /S /Superscript>>
+object 105 0: <</A 107 0 R /K [145 0 R 21] /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 106 0: <</A 107 0 R /K 22 /P 108 0 R /Pg 13 0 R /S /endnote#20text>>
+object 107 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 4 /StartIndent 9 /TextAlign /Start /TextIndent -9 /WritingMode /LrTb>>
+object 108 0: <</K [109 0 R 110 0 R 111 0 R 112 0 R 113 0 R 114 0 R 115 0 R 116 0 R 117 0 R 85 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 97 0 R 99 0 R 101 0 R 103 0 R 105 0 R 106 0 R] /P 55 0 R /S /Endnote>>
+object 109 0: <</A 107 0 R /K [142 0 R 12] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 110 0: <</A 107 0 R /K [139 0 R 14] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 111 0: <</A 107 0 R /K [136 0 R 16] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 112 0: <</A 107 0 R /K [133 0 R 18] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 113 0: <</A 107 0 R /K [130 0 R 20] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 114 0: <</A 107 0 R /K [127 0 R 22] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 115 0: <</A 107 0 R /K [124 0 R 24] /P 108 0 R /Pg 11 0 R /S /endnote#20text>>
+object 116 0: <</A 107 0 R /K [121 0 R 26] /P 108 0 R /Pg 11 0 R /S /Normal>>
+object 117 0: <</A 107 0 R /K [118 0 R 28] /P 108 0 R /Pg 11 0 R /S /Normal>>
+object 118 0: <</K 119 0 R /P 117 0 R /S /Endnote#20Reference>>
+object 119 0: <</A 120 0 R /K 27 /P 118 0 R /Pg 11 0 R /S /Superscript>>
+object 120 0: <</BaselineShift 4 /O /Layout>>
+object 121 0: <</K 122 0 R /P 116 0 R /S /Endnote#20Reference>>
+object 122 0: <</A 123 0 R /K 25 /P 121 0 R /Pg 11 0 R /S /Superscript>>
+object 123 0: <</BaselineShift 4 /O /Layout>>
+object 124 0: <</K 125 0 R /P 115 0 R /S /Endnote#20Reference>>
+object 125 0: <</A 126 0 R /K 23 /P 124 0 R /Pg 11 0 R /S /Superscript>>
+object 126 0: <</BaselineShift 4 /O /Layout>>
+object 127 0: <</K 128 0 R /P 114 0 R /S /Endnote#20Reference>>
+object 128 0: <</A 129 0 R /K 21 /P 127 0 R /Pg 11 0 R /S /Superscript>>
+object 129 0: <</BaselineShift 4 /O /Layout>>
+object 130 0: <</K 131 0 R /P 113 0 R /S /Endnote#20Reference>>
+object 131 0: <</A 132 0 R /K 19 /P 130 0 R /Pg 11 0 R /S /Superscript>>
+object 132 0: <</BaselineShift 4 /O /Layout>>
+object 133 0: <</K 134 0 R /P 112 0 R /S /Endnote#20Reference>>
+object 134 0: <</A 135 0 R /K 17 /P 133 0 R /Pg 11 0 R /S /Superscript>>
+object 135 0: <</BaselineShift 4 /O /Layout>>
+object 136 0: <</K 137 0 R /P 111 0 R /S /Endnote#20Reference>>
+object 137 0: <</A 138 0 R /K 15 /P 136 0 R /Pg 11 0 R /S /Superscript>>
+object 138 0: <</BaselineShift 4 /O /Layout>>
+object 139 0: <</K 140 0 R /P 110 0 R /S /Endnote#20Reference>>
+object 140 0: <</A 141 0 R /K 13 /P 139 0 R /Pg 11 0 R /S /Superscript>>
+object 141 0: <</BaselineShift 4 /O /Layout>>
+object 142 0: <</K 143 0 R /P 109 0 R /S /Endnote#20Reference>>
+object 143 0: <</A 144 0 R /K 11 /P 142 0 R /Pg 11 0 R /S /Superscript>>
+object 144 0: <</BaselineShift 4 /O /Layout>>
+object 145 0: <</K 104 0 R /P 105 0 R /S /Endnote#20Reference>>
+object 146 0: <</BaselineShift 4 /O /Layout>>
+object 147 0: <</K 102 0 R /P 103 0 R /S /Endnote#20Reference>>
+object 148 0: <</BaselineShift 4 /O /Layout>>
+object 149 0: <</K 100 0 R /P 101 0 R /S /Endnote#20Reference>>
+object 150 0: <</BaselineShift 4 /O /Layout>>
+object 151 0: <</K 98 0 R /P 99 0 R /S /Endnote#20Reference>>
+object 152 0: <</BaselineShift 4 /O /Layout>>
+object 153 0: <</K 96 0 R /P 97 0 R /S /Endnote#20Reference>>
+object 154 0: <</BaselineShift 4 /O /Layout>>
+object 155 0: <</K 94 0 R /P 95 0 R /S /Endnote#20Reference>>
+object 156 0: <</BaselineShift 4 /O /Layout>>
+object 157 0: <</K 92 0 R /P 93 0 R /S /Endnote#20Reference>>
+object 158 0: <</BaselineShift 4 /O /Layout>>
+object 159 0: <</K 90 0 R /P 91 0 R /S /Endnote#20Reference>>
+object 160 0: <</BaselineShift 4 /O /Layout>>
+object 161 0: <</K 88 0 R /P 89 0 R /S /Endnote#20Reference>>
+object 162 0: <</BaselineShift 4 /O /Layout>>
+object 163 0: <</K 86 0 R /P 87 0 R /S /Endnote#20Reference>>
+object 164 0: <</BaselineShift 4 /O /Layout>>
+object 165 0: <</K 84 0 R /P 85 0 R /S /Endnote#20Reference>>
+object 166 0: <</BaselineShift 4 /O /Layout>>
+object 167 0: <</A 178 0 R /K [18 <</MCID 0 /Pg 11 0 R /Type /MCR>>] /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 168 0: <</A 179 0 R /K 1 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 169 0: <</A 179 0 R /K 2 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 170 0: <</A 178 0 R /K 3 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 171 0: <</A 179 0 R /K 4 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 172 0: <</A 179 0 R /K 5 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 173 0: <</A 179 0 R /K 6 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 174 0: <</A 178 0 R /K 7 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 175 0: <</A 178 0 R /K 8 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 176 0: <</A 179 0 R /K 9 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 177 0: <</A 178 0 R /K 10 /P 55 0 R /Pg 11 0 R /S /Normal>>
+object 178 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 36 /WritingMode /LrTb>>
+object 179 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 0 /WritingMode /LrTb>>
+object 180 0: <</K 81 0 R /P 181 0 R /S /Superscript>>
+object 181 0: <</K 180 0 R /P 182 0 R /S /Endnote#20Reference>>
+object 182 0: <</A 178 0 R /K [12 181 0 R 14] /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 183 0: <</K 80 0 R /P 184 0 R /S /Superscript>>
+object 184 0: <</K 183 0 R /P 185 0 R /S /Endnote#20Reference>>
+object 185 0: <</A 178 0 R /K [9 184 0 R 11] /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 186 0: <</K 79 0 R /P 187 0 R /S /Superscript>>
+object 187 0: <</K 186 0 R /P 188 0 R /S /Endnote#20Reference>>
+object 188 0: <</A 178 0 R /K [6 187 0 R 8] /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 189 0: <</K 78 0 R /P 190 0 R /S /Superscript>>
+object 190 0: <</K 189 0 R /P 191 0 R /S /Endnote#20Reference>>
+object 191 0: <</A 179 0 R /K [0 190 0 R] /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 192 0: <</A 179 0 R /K 2 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 193 0: <</A 179 0 R /K 3 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 194 0: <</A 179 0 R /K 4 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 195 0: <</A 178 0 R /K 5 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 196 0: <</A 178 0 R /K 15 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 197 0: <</A 179 0 R /K 16 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 198 0: <</A 179 0 R /K 17 /P 55 0 R /Pg 7 0 R /S /Normal>>
+object 199 0: <</K 76 0 R /P 200 0 R /S /Superscript>>
+object 200 0: <</K 199 0 R /P 201 0 R /S /Endnote#20Reference>>
+object 201 0: <</A 178 0 R /K [15 202 0 R 17 200 0 R] /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 202 0: <</K 203 0 R /P 201 0 R /S /Endnote#20Reference>>
+object 203 0: <</K 75 0 R /P 202 0 R /S /Superscript>>
+object 204 0: <</K 74 0 R /P 205 0 R /S /Superscript>>
+object 205 0: <</K 204 0 R /P 206 0 R /S /Endnote#20Reference>>
+object 206 0: <</A 178 0 R /K [10 205 0 R 12 207 0 R 14] /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 207 0: <</K 13 /P 206 0 R /Pg 4 0 R /S /Strong>>
+object 208 0: <</K 73 0 R /P 209 0 R /S /Superscript>>
+object 209 0: <</K 208 0 R /P 210 0 R /S /Endnote#20Reference>>
+object 210 0: <</A 178 0 R /K [2 211 0 R 4 209 0 R] /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 211 0: <</K 212 0 R /P 210 0 R /S /Endnote#20Reference>>
+object 212 0: <</K 72 0 R /P 211 0 R /S /Superscript>>
+object 213 0: <</K 71 0 R /P 214 0 R /S /Superscript>>
+object 214 0: <</K 213 0 R /P 215 0 R /S /Endnote#20Reference>>
+object 215 0: <</A 178 0 R /K [13 216 0 R 15 217 0 R 17 218 0 R 19 <</MCID 0 /Pg 4 0 R /Type /MCR>> 214 0 R] /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 216 0: <</K 221 0 R /P 215 0 R /S /Endnote#20Reference>>
+object 217 0: <</K 220 0 R /P 215 0 R /S /Endnote#20Reference>>
+object 218 0: <</K 219 0 R /P 215 0 R /S /Endnote#20Reference>>
+object 219 0: <</K 69 0 R /P 218 0 R /S /Superscript>>
+object 220 0: <</K 68 0 R /P 217 0 R /S /Superscript>>
+object 221 0: <</K 67 0 R /P 216 0 R /S /Superscript>>
+object 222 0: <</A 179 0 R /K 6 /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 223 0: <</A 179 0 R /K 7 /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 224 0: <</A 179 0 R /K 8 /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 225 0: <</A 178 0 R /K 9 /P 55 0 R /Pg 4 0 R /S /Normal>>
+object 226 0: <</K 66 0 R /P 227 0 R /S /Superscript>>
+object 227 0: <</K 226 0 R /P 228 0 R /S /Endnote#20Reference>>
+object 228 0: <</A 178 0 R /K [10 227 0 R 12] /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 229 0: <</K 65 0 R /P 230 0 R /S /Superscript>>
+object 230 0: <</K 229 0 R /P 231 0 R /S /Endnote#20Reference>>
+object 231 0: <</A 178 0 R /K [4 230 0 R 6] /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 232 0: <</A 178 0 R /K 0 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 233 0: <</A 179 0 R /K 1 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 234 0: <</A 179 0 R /K 2 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 235 0: <</A 179 0 R /K 3 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 236 0: <</A 179 0 R /K 7 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 237 0: <</A 179 0 R /K 8 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 238 0: <</A 179 0 R /K 9 /P 55 0 R /Pg 1 0 R /S /Normal>>
+object 239 0: <</K 63 0 R /P 240 0 R /S /Endnote#20Reference>>
+object 240 0: <</A 241 0 R /K [20 239 0 R] /P 242 0 R /Pg 268 0 R /S /Superscript>>
+object 241 0: <</BaselineShift 5 /O /Layout>>
+object 242 0: <</A 178 0 R /K [12 243 0 R 244 0 R 16 245 0 R 18 246 0 R 240 0 R] /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 243 0: <</K 251 0 R /P 242 0 R /S /Endnote#20Reference>>
+object 244 0: <</A 249 0 R /K [14 250 0 R] /P 242 0 R /Pg 268 0 R /S /Superscript>>
+object 245 0: <</K 248 0 R /P 242 0 R /S /Endnote#20Reference>>
+object 246 0: <</K 247 0 R /P 242 0 R /S /Endnote#20Reference>>
+object 247 0: <</K 62 0 R /P 246 0 R /S /Superscript>>
+object 248 0: <</K 61 0 R /P 245 0 R /S /Superscript>>
+object 249 0: <</BaselineShift 5 /O /Layout>>
+object 250 0: <</K 60 0 R /P 244 0 R /S /Endnote#20Reference>>
+object 251 0: <</K 59 0 R /P 243 0 R /S /Superscript>>
+object 252 0: <</A 179 0 R /K 0 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 253 0: <</A 179 0 R /K 1 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 254 0: <</A 179 0 R /K 2 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 255 0: <</A 179 0 R /K 3 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 256 0: <</A 178 0 R /K 4 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 257 0: <</A 179 0 R /K 5 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 258 0: <</A 179 0 R /K 6 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 259 0: <</A 179 0 R /K 7 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 260 0: <</A 179 0 R /K 8 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 261 0: <</A 179 0 R /K 9 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 262 0: <</A 179 0 R /K 10 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 263 0: <</A 179 0 R /K 11 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 264 0: <</A 178 0 R /K 22 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 265 0: <</A 178 0 R /K 23 /P 55 0 R /Pg 268 0 R /S /Normal>>
+object 266 0: <</E 7963 /H [790 365] /L 44295 /Linearized 1 /N 6 /O 268 /T 38927>>
+object 267 0: <</LastModified <443a3230303630343035303632343239> /MarkInfo <</LetterspaceFlags 0 /Marked true>> /Metadata 52 0 R /PageLabels 49 0 R /PageLayout /OneColumn /Pages 51 0 R /PieceInfo <</MarkedPDF <</LastModified <443a3230303630343035303632343239>>>>> /StructTreeRoot 54 0 R /Type /Catalog>>
+object 268 0: <</Annots 269 0 R /Contents 282 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 51 0 R /Resources <</ExtGState <</GS0 281 0 R>> /Font <</TT0 275 0 R /TT1 276 0 R /TT2 277 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 269 0: [270 0 R 271 0 R 272 0 R 273 0 R 274 0 R]
+object 270 0: <</A 287 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [138.24 261.25 142.23 271.736] /StructParent 1 /Subtype /Link /Type /Annot>>
+object 271 0: <</A 286 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [145.38 261.25 149.37 271.736] /StructParent 2 /Subtype /Link /Type /Annot>>
+object 272 0: <</A 285 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [164.52 192.25 168.51 202.736] /StructParent 3 /Subtype /Link /Type /Annot>>
+object 273 0: <</A 284 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [356.46 123.25 360.45 133.736] /StructParent 4 /Subtype /Link /Type /Annot>>
+object 274 0: <</A 283 0 R /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /H /I /Rect [363.54 123.25 367.53 133.736] /StructParent 5 /Subtype /Link /Type /Annot>>
+object 275 0: <</BaseFont /TimesNewRomanPS-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 280 0 R /LastChar 118 /Subtype /TrueType /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 667 722 0 0 611 0 0 389 0 0 667 0 722 0 611 0 0 0 0 0 0 1000 0 0 0 0 0 0 0 0 0 500 0 444 556 444 333 500 556 278 0 0 278 833 556 500 556 0 444 389 333 556 500]>>
+object 276 0: <</BaseFont /TimesNewRomanPS-ItalicMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 279 0 R /LastChar 121 /Subtype /TrueType /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 667 722 611 611 722 722 333 0 0 556 0 0 0 611 0 0 500 0 0 0 0 0 0 0 0 0 0 0 0 0 500 500 444 0 444 278 500 500 278 0 0 278 722 500 500 500 0 389 389 278 500 444 0 0 444]>>
+object 277 0: <</BaseFont /TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 278 0 R /LastChar 176 /Subtype /TrueType /Type /Font /Widths [250 0 408 500 500 833 778 180 333 333 0 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 0 564 0 444 0 722 667 667 722 611 556 722 722 333 389 0 611 889 722 722 556 0 667 556 611 722 722 944 0 0 0 333 0 333 0 500 0 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 333 333 444 444 0 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 400]>>
+object 278 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight -546>>
+object 279 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 98 /FontBBox [-498 -307 1120 1023] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPS-ItalicMT /FontStretch /Normal /FontWeight 400 /ItalicAngle -15 /StemV 71.742 /Type /FontDescriptor /XHeight -546>>
+object 280 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 34 /FontBBox [-558 -307 2000 1026] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPS-BoldMT /FontStretch /Normal /FontWeight 700 /ItalicAngle 0 /StemV 136 /Type /FontDescriptor /XHeight -546>>
+object 281 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 282 0: <</Filter /FlateDecode /Length 2740>> stream sha256=e3cf6b73f1275bf67bd010286b551ea58348c097a20281430dca25b4b191aa6e
+object 283 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 284 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 285 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 286 0: <</D [13 0 R /XYZ 0 720 null] /S /GoTo>>
+object 287 0: <</D [13 0 R /XYZ 0 357 null] /S /GoTo>>
+object 289 0: <</C 283 /Filter /FlateDecode /I 335 /L 267 /Length 271 /S 159>> stream sha256=5dbe569c4820d0a23aa5dde69d8d8b239c53e4408e2f5b7f67131fdbc2bff7db

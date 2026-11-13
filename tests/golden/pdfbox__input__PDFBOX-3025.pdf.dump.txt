@@ -1,0 +1,33 @@
+version: 1.3
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info AAPL:Keywords: null
+info CreationDate: null
+info Creator: null
+info Keywords: null
+info ModDate: null
+info Producer: null
+info Title: null
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [10 0 R] /Type /Pages>>
+object 3 0: <</AAPL:Keywords 9 0 R /CreationDate 7 0 R /Creator 6 0 R /Keywords 8 0 R /ModDate 7 0 R /Producer 5 0 R /Title 4 0 R>>
+object 4 0: null
+object 5 0: null
+object 6 0: null
+object 7 0: null
+object 8 0: null
+object 9 0: null
+object 10 0: <</Annots [] /Contents 12 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 2 0 R /Resources 11 0 R /Rotate 0 /Type /Page>>
+object 11 0: <</ColorSpace <</Cs1 [/ICCBased 13 0 R] /Cs2 [/ICCBased 14 0 R]>> /Font <</TT1 15 0 R /TT3 16 0 R>> /ProcSet [/PDF /Text]>>
+object 12 0: <</Length 11712>> stream sha256=8ff854362309c3fffc4ad815a5a84231ee8083341d54dbc44f2ff2dd6939b2c7
+object 13 0: <</Alternate /DeviceRGB /Length 1960 /N 3>> stream sha256=283e482d9b10db98fb7df2f6ef4bdf4ddf8de5a07d2c7530cc361ec4b29ed39a
+object 14 0: <</Alternate /DeviceRGB /Length 3144 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 15 0: <</BaseFont /KSQPIF+TimesNewRomanPSMT /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 17 0 R /LastChar 32 /Subtype /TrueType /Type /Font /Widths [250]>>
+object 16 0: <</BaseFont /VVWFTA+HelveticaNeue-Light /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 18 0 R /LastChar 121 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 278 370 278 0 556 556 556 556 556 556 556 556 556 556 0 278 0 0 0 0 800 630 667 704 685 593 537 741 704 222 500 648 0 821 704 741 630 0 0 630 556 685 593 907 0 0 0 0 0 0 0 0 0 519 574 519 574 519 259 556 537 185 185 500 185 833 537 556 574 0 315 481 296 537 463 741 481 463]>>
+object 17 0: <</Ascent 891 /AvgWidth 401 /CapHeight 662 /Descent -216 /Flags 32 /FontBBox [-568 -307 2000 1006] /FontFile2 19 0 R /FontName /KSQPIF+TimesNewRomanPSMT /ItalicAngle 0 /Leading 42 /MaxWidth 2000 /StemH 36 /StemV 94 /Type /FontDescriptor /XHeight 447>>
+object 18 0: <</Ascent 967 /AvgWidth 429 /CapHeight 728 /Descent -213 /Flags 32 /FontBBox [-430 -338 1420 1163] /FontFile2 20 0 R /FontName /VVWFTA+HelveticaNeue-Light /ItalicAngle 0 /Leading 29 /MaxWidth 1480 /StemH 58 /StemV 68 /Type /FontDescriptor /XHeight 530>>
+object 19 0: <</Length 8104 /Length1 8104>> stream sha256=b1a1fae3953f6e088d18c9d6675831b33b5537ceab6b7fe4595241a8f036ed29
+object 20 0: <</Length 14652 /Length1 14652>> stream sha256=3d06aa0ab698158a0612293e46a895d3539864979a9b3660497c90d8f4a96f8d

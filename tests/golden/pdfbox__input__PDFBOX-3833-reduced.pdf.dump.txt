@@ -1,0 +1,18 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 792 612] crop=[0 0 792 612] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 3 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <<>>
+object 3 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 4 0: <</Contents 5 0 R /CropBox [0 0 792 612] /MediaBox [0 0 792 612] /Parent 3 0 R /Resources <</Font <</C0_0 6 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 3 /Type /Page /pdftk_PageNum 1>>
+object 5 0: <</Filter /FlateDecode /Length 114>> stream sha256=55ab1ad88996ebb9fd40bb5bbeae9b45ae789e8642bf14cc4d3213ac73647a07
+object 6 0: <</BaseFont /JFFJFV+KozGoPr6N-Regular /DescendantFonts [7 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 8 0 R /Type /Font>>
+object 7 0: <</BaseFont /JFFJFV+KozGoPr6N-Regular /CIDSystemInfo 9 0 R /DW 1000 /FontDescriptor 10 0 R /Subtype /CIDFontType0 /Type /Font /W [1 [233] 18 [551 551] 27 [218] 44 [579] 119 [304]]>>
+object 8 0: <</Filter /FlateDecode /Length 2884>> stream sha256=b3a66cadafb40f67bd9680db2a114b0ffa4b783608f14b79c3ba3bb2c60ad808
+object 9 0: <</Ordering <4a6170616e31> /Registry <41646f6265> /Supplement 6>>
+object 10 0: <</Ascent 1409 /CIDSet 11 0 R /CapHeight 763 /Descent -339 /Flags 4 /FontBBox [-529 -339 1214 1409] /FontFamily <4b6f7a756b6120476f74686963205072364e> /FontFile3 12 0 R /FontName /JFFJFV+KozGoPr6N-Regular /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 84 /Type /FontDescriptor /XHeight 545>>
+object 11 0: <</Filter /FlateDecode /Length 350>> stream sha256=eedad811e576843c7c54cd953e3147a19116adba653680a7ee4674e3bc0b30f9
+object 12 0: <</Filter /FlateDecode /Length 96610 /Subtype /CIDFontType0C>> stream sha256=0ac694b0db1d4d70423db0b86dce5571bb95b71bc0e699943f241cddbac1b464

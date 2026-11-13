@@ -1,0 +1,41 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+info Author: CCauthen
+info CreationDate: 2010-04-02T08:40:59-04:00
+info Creator: PScript5.dll Version 5.2.2
+info ModDate: 2010-04-02T08:40:59-04:00
+info Producer: Acrobat Distiller 9.2.0 (Windows)
+info Title: Microsoft Word - NOTICE OF PUBLIC HEARING_1.doc
+xmp: 3618
+object 2 0: <</Length 3618 /Subtype /XML /Type /Metadata>> stream sha256=230757d189ec06506ea67ff05a3faf7847321e79cf5da83f9d00a024e4145213
+object 6 0: <</Nums [0 7 0 R]>>
+object 7 0: <</S /D>>
+object 8 0: <</Count 1 /Kids [12 0 R] /Type /Pages>>
+object 9 0: <</Author <434361757468656e> /CreationDate <443a32303130303430323038343035392d303427303027> /Creator <50536372697074352e646c6c2056657273696f6e20352e322e32> /ModDate <443a32303130303430323038343035392d303427303027> /Producer <4163726f6261742044697374696c6c657220392e322e30202857696e646f777329> /Title <4d6963726f736f667420576f7264202d204e4f54494345204f46205055424c49432048454152494e475f312e646f63>>>
+object 10 0: <</E 76387 /H [486 174] /L 80944 /Linearized 1 /N 1 /O 12 /T 80640>>
+object 11 0: <</Metadata 2 0 R /PageLabels 6 0 R /Pages 8 0 R /Type /Catalog>>
+object 12 0: <</Contents [14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 19 0 R 20 0 R 21 0 R] /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 8 0 R /Resources 26 0 R /Rotate 0 /Type /Page>>
+object 14 0: <</Filter /FlateDecode /Length 483>> stream sha256=4c74785b4568d09a1b3742072a2b96f294e4524d778afbf723610deb32d5e9ea
+object 15 0: <</Filter /FlateDecode /Length 440>> stream sha256=b1ef618884bc116ee9084b72d1f44f8ba079eda0bdb2111153bbf8c0ecc685a8
+object 16 0: <</Filter /FlateDecode /Length 373>> stream sha256=34878ddec73565e85121938ce7c4f5a9468910deb518842d7f2c04e81dee8437
+object 17 0: <</Filter /FlateDecode /Length 400>> stream sha256=e5c7008e5ee6c9146ede0eebe315e1ae28271dd132c4f22e44d382aecec62e61
+object 18 0: <</Filter /FlateDecode /Length 353>> stream sha256=05f0750936b1e26575e9d08a620187fd0e76fac137f84eed9cecbac258dbaf9b
+object 19 0: <</Filter /FlateDecode /Length 377>> stream sha256=d423cc8c7aa2d5fd19bdb3d97f0b37fdb583aee2f87021bf7eebaede5dcc44ed
+object 20 0: <</Filter /FlateDecode /Length 383>> stream sha256=56aff37e8457347b1949f7da73d313a6efb4369247060b997a9aafb06a065006
+object 21 0: <</Filter /FlateDecode /Length 404>> stream sha256=34973996947f5f44193db14969e761081d3904c4694f6fb9b3997fd25fff1d47
+object 22 0: <</Filter /FlateDecode /Length 53>> stream sha256=f52f8ff46fa429ca40ae3e0ea540bae7b73a8052a63fe5acd4ecf619e96aaf10
+object 23 0: <</Filter /FlateDecode /Length 70286 /Length1 432248>> stream sha256=8578b73eac3a9242164f7c65c1fa1d1a8bf102a0e3f2550882863d67b3507480
+object 24 0: <</Filter /FlateDecode /Length 311>> stream sha256=592664b61ed6aa507c03627999387924bc5cce80da634b1b3a389fde4db09b35
+object 26 0: <</ExtGState <</GS1 27 0 R>> /Font <</TT2 30 0 R /TT4 32 0 R /TT6 34 0 R>> /ProcSet [/PDF /Text]>>
+object 27 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 28 0: <</Ascent 1068 /CIDSet 22 0 R /CapHeight 0 /Descent -270 /Flags 4 /FontBBox [-1011 -330 2260 1078] /FontFamily <417269616c20556e69636f6465204d53> /FontFile2 23 0 R /FontName /ACFLNP+ArialUnicodeMS /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 0 /Type /FontDescriptor>>
+object 29 0: <</BaseFont /ACFLNP+ArialUnicodeMS /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 28 0 R /Subtype /CIDFontType2 /Type /Font /W [3 [278] 15 [278 333 278] 19 24 556 26 28 556 29 [278] 36 37 667 38 39 722 40 [667 611 778 722 278] 47 [556 833 722 778 667] 53 [722 667 611 722] 68 69 556 70 [500 556] 72 [556 278 556] 75 [556 222] 78 [500 222 833 556] 82 84 556 85 [333 500 278 556 500 722] 92 [500]]>>
+object 30 0: <</BaseFont /ACFLNP+ArialUnicodeMS /DescendantFonts [29 0 R] /Encoding /Identity-V /Subtype /Type0 /ToUnicode 24 0 R /Type /Font>>
+object 31 0: <</Ascent 891 /CapHeight 1000 /Descent -216 /Flags 34 /FontBBox [-558 -307 2000 1026] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPS-BoldMT /FontStretch /Normal /FontWeight 700 /ItalicAngle 0 /StemV 136 /Type /FontDescriptor /XHeight 1000>>
+object 32 0: <</BaseFont /TimesNewRomanPS-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 31 0 R /LastChar 32 /Subtype /TrueType /Type /Font /Widths [250]>>
+object 33 0: <</Ascent 891 /CapHeight 1000 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight 1000>>
+object 34 0: <</BaseFont /TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 33 0 R /LastChar 32 /Subtype /TrueType /Type /Font /Widths [250]>>
+object 35 0: <</Filter /FlateDecode /I 108 /L 92 /Length 89 /S 38>> stream sha256=9bec0a2dc3276683fab5bc3c51eb80777dd25790b563a3a3143ac3c8f71150dd

@@ -1,0 +1,8 @@
+version: 1.0
+encrypted: false
+permissions: none
+pages: 0
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 0 /Kids [] /Type /Pages>>
+object 3 0: null

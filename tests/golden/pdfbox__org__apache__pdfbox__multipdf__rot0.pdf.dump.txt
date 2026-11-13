@@ -1,0 +1,13 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 200 400] crop=[0 0 200 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 5 0 R /MediaBox [0 0 200 400] /Parent 2 0 R /Resources 4 0 R /Rotate 0 /Type /Page>>
+object 4 0: <</Font 6 0 R>>
+object 5 0: <</Length 113>> stream sha256=0cd7bfec0002ae9a2401e03baa0ef3df20f4d60b0499bec7766bc965749b763f
+object 6 0: <</F1 7 0 R>>
+object 7 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>

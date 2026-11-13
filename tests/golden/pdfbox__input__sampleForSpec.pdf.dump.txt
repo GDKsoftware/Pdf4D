@@ -1,0 +1,54 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+info Author: Michel Felix
+info CreationDate: 2005-02-14T15:19:46-05:00
+info Creator: Acrobat PDFMaker 6.0 for Word
+info ModDate: 2005-02-14T15:20:41-05:00
+info Producer: Acrobat Distiller 6.0 (Windows)
+info SourceModified: D:20050214201803
+info Title: Microsoft Word - sampleForSpec.rtf
+xmp: 3917
+object 2 0: <</Nums [0 3 0 R]>>
+object 3 0: <</S /D>>
+object 4 0: <</Count 1 /Kids [34 0 R] /Type /Pages>>
+object 5 0: <</Length 3917 /Subtype /XML /Type /Metadata>> stream sha256=f869bd9414c420a8bc6aeec257ffaef2beee5292df161584654c90e3fa8be883
+object 6 0: <</Author <4d696368656c2046656c6978> /CreationDate <443a32303035303231343135313934362d303527303027> /Creator <4163726f626174205044464d616b657220362e3020666f7220576f7264> /ModDate <443a32303035303231343135323034312d303527303027> /Producer <4163726f6261742044697374696c6c657220362e30202857696e646f777329> /SourceModified <443a3230303530323134323031383033> /Title <4d6963726f736f667420576f7264202d2073616d706c65466f72537065632e727466>>>
+object 7 0: <</ClassMap 9 0 R /K 8 0 R /ParentTree 10 0 R /ParentTreeNextKey 1 /RoleMap 11 0 R /Type /StructTreeRoot>>
+object 8 0: <</K [13 0 R 14 0 R 15 0 R 16 0 R 29 0 R 27 0 R 19 0 R 25 0 R 21 0 R 22 0 R 23 0 R] /Lang <454e2d4742> /P 7 0 R /S /Sect>>
+object 9 0: <</Normal 30 0 R>>
+object 10 0: <</Nums [0 12 0 R]>>
+object 11 0: <</DropCap /Figure /Endnote /Note /Footnote /Note /Frame /Div /InlineShape /Figure /Normal /P /Outline /Span /Shape /Figure /Strikeout /Span /Subscript /Span /Superscript /Span /TOA /TOC /TOAI /TOCI /TOF /TOC /TOFI /TOCI /TextBox /Div /Underline /Span>>
+object 12 0: [13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 17 0 R 18 0 R 18 0 R 19 0 R 20 0 R 20 0 R 21 0 R 22 0 R 23 0 R]
+object 13 0: <</C /Normal /K 0 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 14 0: <</C /Normal /K 1 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 15 0: <</C /Normal /K 2 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 16 0: <</C /Normal /K 3 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 17 0: <</A 28 0 R /K [4 5] /P 29 0 R /Pg 34 0 R /S /Underline>>
+object 18 0: <</A 26 0 R /K [6 7] /P 27 0 R /Pg 34 0 R /S /Underline>>
+object 19 0: <</C /Normal /K 8 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 20 0: <</A 24 0 R /K [9 10] /P 25 0 R /Pg 34 0 R /S /Underline>>
+object 21 0: <</C /Normal /K 11 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 22 0: <</C /Normal /K 12 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 23 0: <</C /Normal /K 13 /P 8 0 R /Pg 34 0 R /S /Normal>>
+object 24 0: <</O /Layout /TextDecorationColor [0 0 0] /TextDecorationType /Underline>>
+object 25 0: <</C /Normal /K 20 0 R /P 8 0 R /S /Normal>>
+object 26 0: <</O /Layout /TextDecorationColor [0 0 0] /TextDecorationType /Underline>>
+object 27 0: <</C /Normal /K 18 0 R /P 8 0 R /S /Normal>>
+object 28 0: <</O /Layout /TextDecorationColor [0 0 0] /TextDecorationType /Underline>>
+object 29 0: <</C /Normal /K 17 0 R /P 8 0 R /S /Normal>>
+object 30 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 0 /WritingMode /LrTb>>
+object 31 0: <</E 3632 /H [556 156] /L 9364 /Linearized 1 /N 1 /O 34 /T 8697>>
+object 32 0: <</Lang <454e2d5553> /LastModified <443a3230303530323134313532303030> /MarkInfo <</LetterspaceFlags 0 /Marked true>> /Metadata 5 0 R /PageLabels 2 0 R /Pages 4 0 R /PieceInfo <</MarkedPDF <</LastModified <443a3230303530323134313532303030>>>>> /StructTreeRoot 7 0 R /Type /Catalog>>
+object 33 0: <</C 92 /Filter /FlateDecode /L 76 /Length 73 /S 39>> stream sha256=d88b8603d4d5d1e661887b4792c294a8d03749e8738e400d5c54c60ce2fa9731
+object 34 0: <</Contents 36 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 4 0 R /Resources <</ExtGState <</GS0 42 0 R>> /Font <</TT0 35 0 R /TT1 37 0 R /TT2 38 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 35 0: <</BaseFont /ArialMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 40 0 R /LastChar 114 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 0 556 556 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 0 722 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 0 0 0 222 0 0 222 0 556 0 0 0 333]>>
+object 36 0: <</Filter /FlateDecode /Length 433>> stream sha256=611416dea5be59269451e8d7f8ea9f44e0c7bd40c9b13a8f94fa43f407ea34f1
+object 37 0: <</BaseFont /Arial-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 41 0 R /LastChar 111 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 0 0 0 0 722 0 0 0 0 0 0 0 0 0 611 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 611 556 0 0 0 278 0 0 278 0 611 611]>>
+object 38 0: <</BaseFont /Arial-BoldItalicMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 39 0 R /LastChar 116 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 0 611 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 556 0 556 0 0 0 278 0 0 278 0 611 0 0 0 0 0 333]>>
+object 39 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 96 /FontBBox [-560 -376 1157 1031] /FontFamily <417269616c> /FontName /Arial-BoldItalicMT /FontStretch /Normal /FontWeight 700 /ItalicAngle -15 /StemV 135.84 /Type /FontDescriptor /XHeight 515>>
+object 40 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 32 /FontBBox [-665 -325 2000 1006] /FontFamily <417269616c> /FontName /ArialMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 88 /Type /FontDescriptor /XHeight 515>>
+object 41 0: <</Ascent 905 /CapHeight 718 /Descent -211 /Flags 32 /FontBBox [-628 -376 2000 1010] /FontFamily <417269616c> /FontName /Arial-BoldMT /FontStretch /Normal /FontWeight 700 /ItalicAngle 0 /StemV 138 /Type /FontDescriptor /XHeight 515>>
+object 42 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>

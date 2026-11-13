@@ -1,0 +1,19 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2007-02-13T22:28:10-05:00
+info ModDate: 2007-02-13T22:28:10-05:00
+xmp: 3093
+object 1 0: <</Count 0 /Type /Outlines>>
+object 2 0: <</Count 1 /Kids [8 0 R] /Type /Pages>>
+object 3 0: <</Length 3093 /Subtype /XML /Type /Metadata>> stream sha256=ee1a0b5518c2074f7b919a9915690c6ec8a29a5e09e42d8755c09e696cf550b4
+object 4 0: <</CreationDate <443a32303037303231333232323831302d303527303027> /ModDate <443a32303037303231333232323831302d303527303027>>>
+object 5 0: <</E 1125 /H [436 129] /L 4631 /Linearized 1 /N 1 /O 8 /T 4485>>
+object 6 0: <</Metadata 3 0 R /Outlines 1 0 R /Pages 2 0 R /Type /Catalog>>
+object 7 0: <</Filter /FlateDecode /Length 52 /O 67 /S 38>> stream sha256=669688dd6e47e4f820693b12acf0fb08141aa554583795b39901fd16d62ecaed
+object 8 0: <</Contents 9 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</F1 10 0 R>> /ProcSet 11 0 R>> /Rotate 0 /Type /Page>>
+object 9 0: <</Filter /FlateDecode /Length 137>> stream sha256=83c09c75e111e95f06d20f3a5016742c9b2b38f74e3ac2d9d36c926108bbebc2
+object 10 0: <</BaseFont /Helvetica /Encoding /MacRomanEncoding /Name /F1 /Subtype /Type1 /Type /Font>>
+object 11 0: [/PDF /Text]

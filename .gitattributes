@@ -1,0 +1,3 @@
+tests/golden/*.dump.txt text eol=lf
+tests/corpus/manifest.csv text eol=lf
+tests/corpus/**/*.pdf binary

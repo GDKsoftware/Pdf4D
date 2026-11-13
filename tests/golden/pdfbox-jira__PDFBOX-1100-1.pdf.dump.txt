@@ -1,0 +1,50 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.2 841.92] crop=[0 0 595.2 841.92] rotate=0 label=
+info Author: Fabasoft R&D Software GmbH
+info Comments: 
+info Company: Fabasoft AG
+info CreationDate: 2011-08-17T13:51:21+02:00
+info Creator: Acrobat PDFMaker 10.0 for Word
+info Keywords: 
+info ModDate: 2011-08-17T14:25:03+02:00
+info Producer: Adobe PDF Library 10.0
+info SourceModified: D:20110817115115
+info Subject: 
+info Title: 
+xmp: 4435
+field: Testfeld | text | asdfasdfasdf
+field: Testfeld2 | text | asdfasdf
+object 3 0: <</Length 4435 /Subtype /XML /Type /Metadata>> stream sha256=82c99e586499e9b1f0ef43c3441639e64d84e670758b4c2008a65a1e01d47998
+object 7 0: <</BaseFont /Helvetica /Encoding 9 0 R /Name /Helv /Subtype /Type1 /Type /Font>>
+object 8 0: <</BaseFont /ZapfDingbats /Name /ZaDb /Subtype /Type1 /Type /Font>>
+object 9 0: <</Differences [24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis] /Type /Encoding>>
+object 10 0: <</ClassMap 11 0 R /K 12 0 R /ParentTree 13 0 R /ParentTreeNextKey 1 /RoleMap 14 0 R /Type /StructTreeRoot>>
+object 11 0: <<>>
+object 12 0: <</K 16 0 R /P 10 0 R /S /Sect>>
+object 13 0: <</Nums [0 15 0 R]>>
+object 14 0: <</Annotation /Span /Chart /Figure /Diagram /Figure /DropCap /Figure /Endnote /Note /Footnote /Note /InlineShape /Figure /Outline /Span /Standard /P /Strikeout /Span /Subscript /Span /Superscript /Span /TextBox /Art /Underline /Span>>
+object 15 0: [16 0 R]
+object 16 0: <</A 17 0 R /K [0 0] /P 12 0 R /Pg 22 0 R /S /Standard>>
+object 17 0: <</O /Layout /SpaceAfter 10 /WritingMode /LrTb>>
+object 18 0: <</Count 1 /Kids [22 0 R] /Type /Pages>>
+object 19 0: <</Author <46616261736f66742052264420536f66747761726520476d6248> /Comments <> /Company <46616261736f6674204147> /CreationDate <443a32303131303831373133353132312b303227303027> /Creator <4163726f626174205044464d616b65722031302e3020666f7220576f7264> /Keywords <> /ModDate <443a32303131303831373134323530332b303227303027> /Producer <41646f626520504446204c6962726172792031302e30> /SourceModified <443a3230313130383137313135313135> /Subject <> /Title <>>>
+object 20 0: <</E 19760 /H [461 174] /L 26168 /Linearized 1 /N 1 /O 22 /T 25855>>
+object 21 0: <</AcroForm 29 0 R /MarkInfo <</Marked true>> /Metadata 3 0 R /PageLayout /OneColumn /Pages 18 0 R /StructTreeRoot 10 0 R /Type /Catalog>>
+object 22 0: <</Annots 30 0 R /Contents 24 0 R /CropBox [0 0 595.2 841.92] /MediaBox [0 0 595.2 841.92] /Parent 18 0 R /Resources <</ColorSpace <</CS0 33 0 R>> /Font <</TT0 35 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 24 0: <</Filter /FlateDecode /Length 119>> stream sha256=76cbf4515aff8b4787c0fd8f7f8402592889d85c25512e572df22cdefa53b22f
+object 25 0: <</Filter /FlateDecode /Length 216 /N 1>> stream sha256=653b586c4707574ffcd648ba35494daed2c76ceafcf4c07d315ed961b1dc347f
+object 26 0: <</Filter /FlateDecode /Length 17314 /Length1 50799>> stream sha256=3dc85e1366d53e318363326511a4692dd4babfe5942ba888bcadaa5c2a8667b5
+object 27 0: <</Filter /FlateDecode /Length 226>> stream sha256=a9fe13b630cccb35e12d073f7fbca490a28dd4d3db37cebbe450b066abf8fa86
+object 29 0: <</DA <2f48656c7620302054662030206720> /DR <</Encoding <</PDFDocEncoding 9 0 R>> /Font <</Helv 7 0 R /ZaDb 8 0 R>>>> /Fields [31 0 R 32 0 R]>>
+object 30 0: [31 0 R 32 0 R]
+object 31 0: <</AP <</N 38 0 R>> /DA <2f48656c7620313220546620302067> /F 4 /FT /Tx /MK <<>> /P 22 0 R /Rect [48.1055 725.325 331.031 800.337] /Subtype /Widget /T <5465737466656c64> /Type /Annot /V <617364666173646661736466>>>
+object 32 0: <</AP <</N 37 0 R>> /DA <2f48656c7620313220546620302067> /F 4 /FT /Tx /MK <<>> /P 22 0 R /Rect [43.2134 648.697 193.213 670.697] /Subtype /Widget /T <5465737466656c6432> /Type /Annot /V <6173646661736466>>>
+object 33 0: [/ICCBased 25 0 R]
+object 34 0: <</Ascent 964 /CapHeight 632 /Descent -307 /Flags 32 /FontBBox [-503 -307 1240 964] /FontFamily <43616c69627269> /FontFile2 26 0 R /FontName /FTQMTE+Calibri /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 80 /Type /FontDescriptor /XHeight 467>>
+object 35 0: <</BaseFont /FTQMTE+Calibri /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 34 0 R /LastChar 32 /Subtype /TrueType /ToUnicode 27 0 R /Type /Font /Widths [226]>>
+object 36 0: <</C 98 /Filter /FlateDecode /I 120 /Length 84 /S 38 /V 75>> stream sha256=cfd4c14072d8251206344e352dbf59069c3c89966a6fede4899a3dd0d3a2ab1e
+object 37 0: <</BBox [0 0 150 22] /FormType 1 /Length 87 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 7 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=1e6c3d9ed05abaa7d4b5d0cd629a36bbd97338d3a1e13b56bcb4f007c0de1bb6
+object 38 0: <</BBox [0 0 282.926 75.012] /FormType 1 /Length 96 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 7 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=a27ab7b7dc7457b529685fe3f5dcc212c58d48b2956e70e61f6cfd7850a253bc

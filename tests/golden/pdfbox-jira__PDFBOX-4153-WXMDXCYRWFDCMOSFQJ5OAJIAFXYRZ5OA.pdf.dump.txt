@@ -1,0 +1,650 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 4
+page 1: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 3: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+page 4: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+info Author: nakajima
+info CreationDate: 2001-06-11T20:07:01+00:00
+info Creator: LuraDocument PDF Compressor Server 5.7.66.46 (original: Microsoft Word )
+info ModDate: 2011-10-20T14:50:24-05:00
+info Producer: Recoded by LuraDocument PDF v2.46
+info Title: Nakajima.PDF
+xmp: 1513
+outline: Main Menu -> ?
+outline:   ------------------------- -> ?
+outline:   Welcome Letter -> ?
+outline:   Chairman Address -> ?
+outline:   Keynote Lecture -> ?
+outline:   Plenary Talks -> ?
+outline:   Mini Symposia -> ?
+outline:   Workshops -> ?
+outline:   Theme Index -> ?
+outline:     1.Cardiovascular Systems and Engineering  -> ?
+outline:       1.1.Cardiac Electrophysiology and Mechanics  -> ?
+outline:         1.1.1 Cardiac Cellular Electrophysiology -> ?
+outline:         1.1.2 Cardiac Electrophysiology  -> ?
+outline:         1.1.3 Electrical Interactions Between Purkinje and Ventricular Cells  -> ?
+outline:         1.1.4 Arrhythmogenesis and Spiral Waves  -> ?
+outline:       1.2. Cardiac and Vascular Biomechanics  -> ?
+outline:         1.2.1 Blood Flow and Material Interactions  -> ?
+outline:         1.2.2.Cardiac Mechanics  -> ?
+outline:         1.2.3 Vascular Flow  -> ?
+outline:         1.2.4 Cardiac Mechanics/Cardiovascular Systems  -> ?
+outline:         1.2.5 Hemodynamics and Vascular Mechanics  -> ?
+outline:         1.2.6 Hemodynamic Modeling and Measurement Techniques  -> ?
+outline:         1.2.7 Modeling of Cerebrovascular Dynamics  -> ?
+outline:         1.2.8 Cerebrovascular Dynamics  -> ?
+outline:       1.3 Cardiac Activation  -> ?
+outline:         1.3.1 Optical Potential Mapping in the Heart  -> ?
+outline:         1.3.2 Mapping and Arrhythmias   -> ?
+outline:         1.3.3 Propagation of Electrical Activity in Cardiac Tissue  -> ?
+outline:         1.3.4 Forward-Inverse Problems in ECG and MCG  -> ?
+outline:         1.3.5 Electrocardiology  -> ?
+outline:         1.3.6 Electrophysiology and Ablation  -> ?
+outline:       1.4 Pulmonary System Analysis and Critical Care Medicine  -> ?
+outline:         1.4.1 Cardiopulmonary Modeling  -> ?
+outline:         1.4.2 Pulmonary and Cardiovascular Clinical Systems  -> ?
+outline:         1.4.3 Mechanical Circulatory Support  -> ?
+outline:         1.4.4 Cardiopulmonary Bypass/Extracorporeal Circulation  -> ?
+outline:       1.5 Modeling and Control of Cardiovascular and Pulmonary Systems  -> ?
+outline:         1.5.1 Heart Rate Variability I: Modeling and Clinical Aspects  -> ?
+outline:         1.5.2 Heart Rate Variability II: Nonlinear processing  -> ?
+outline:         1.5.3 Neural Control of the Cardiovascular System II  -> ?
+outline:         1.5.4 Heart Rate Variability  -> ?
+outline:         1.5.5 Neural Control of the Cardiovascular System I  -> ?
+outline:     2. Neural Systems and Engineering  -> ?
+outline:       2.1 Neural Imaging and Sensing   -> ?
+outline:         2.1.1 Brain Imaging  -> ?
+outline:         2.1.2 EEG/MEG processing -> ?
+outline:       2.2 Neural Computation: Artificial and Biological  -> ?
+outline:         2.2.1 Neural Computational Modeling Closely Based on Anatomy and Physiology  -> ?
+outline:         2.2.2 Neural Computation  -> ?
+outline:       2.3 Neural Interfacing  -> ?
+outline:         2.3.1 Neural Recording  -> ?
+outline:         2.3.2 Cultured neurons: activity patterns, adhesion & survival  -> ?
+outline:         2.3.3 Neuro-technology  -> ?
+outline:       2.4 Neural Systems: Analysis and Control  -> ?
+outline:         2.4.1 Neural Mechanisms of Visual Selection  -> ?
+outline:         2.4.2 Models of Dynamic Neural Systems  -> ?
+outline:         2.4.3 Sensory Motor Mapping  -> ?
+outline:         2.4.4 Sensory Motor Control Systems  -> ?
+outline:       2.5 Neuro-electromagnetism  -> ?
+outline:         2.5.1 Magnetic Stimulation  -> ?
+outline:         2.5.2 Neural Signals Source Localization  -> ?
+outline:       2.6 Clinical Neural Engineering  -> ?
+outline:         2.6.1 Detection and mechanisms of epileptic activity  -> ?
+outline:         2.6.2 Diagnostic Tools  -> ?
+outline:       2.7 Neuro-electrophysiology  -> ?
+outline:         2.7.1 Neural Source Mapping  -> ?
+outline:         2.7.2 Neuro-Electrophysiology  -> ?
+outline:         2.7.3 Brain Mapping  -> ?
+outline:     3. Neuromuscular Systems and Rehabilitation Engineering  -> ?
+outline:       3.1 EMG  -> ?
+outline:         3.1.1 EMG modeling  -> ?
+outline:         3.1.2 Estimation of Muscle Fiber Conduction velocity  -> ?
+outline:         3.1.3 Clinical Applications of EMG  -> ?
+outline:         3.1.4 Analysis and Interpretation of EMG  -> ?
+outline:       3. 2 Posture and Gait  -> ?
+outline:         3.2.1 Posture and Gait -> ?
+outline:       3.3.Central Control of Movement  -> ?
+outline:         3.3.1 Central Control of movement  -> ?
+outline:       3.4 Peripheral Neuromuscular Mechanisms  -> ?
+outline:         3.4.1 Peripheral Neuromuscular Mechanisms II -> ?
+outline:         3.4.2 Peripheral Neuromuscular Mechanisms I  -> ?
+outline:       3.5 Functional Electrical Stimulation  -> ?
+outline:         3.5.1 Functional Electrical Stimulation  -> ?
+outline:       3.6 Assistive Devices, Implants, and Prosthetics  -> ?
+outline:         3.6.1 Assistive Devices, Implants and Prosthetics   -> ?
+outline:       3.7 Sensory Rehabilitation  -> ?
+outline:         3.7.1 Sensory Systems and Rehabilitation:Hearing & Speech  -> ?
+outline:         3.7.2 Sensory Systems and Rehabilitation   -> ?
+outline:       3.8 Orthopedic Biomechanics  -> ?
+outline:         3.8.1 Orthopedic Biomechanics  -> ?
+outline:     4. Biomedical Signal and System Analysis  -> ?
+outline:       4.1 Nonlinear Dynamical Analysis of Biosignals: Fractal and Chaos  -> ?
+outline:         4.1.1 Nonlinear Dynamical Analysis of Biosignals I  -> ?
+outline:         4.1.2 Nonlinear Dynamical Analysis of Biosignals II  -> ?
+outline:       4.2 Intelligent Analysis of Biosignals  -> ?
+outline:         4.2.1 Neural Networks and Adaptive Systems in Biosignal Analysis  -> ?
+outline:         4.2.2 Fuzzy and Knowledge-Based Systems in Biosignal Analysis  -> ?
+outline:         4.2.3 Intelligent Systems in Speech Analysis  -> ?
+outline:         4.2.4 Knowledge-Based and Neural Network Approaches to Biosignal Analysis  -> ?
+outline:         4.2.5 Neural Network Approaches to Biosignal Analysis  -> ?
+outline:         4.2.6 Hybrid Systems in Biosignal Analysis  -> ?
+outline:         4.2.7 Intelligent Systems in ECG Analysis  -> ?
+outline:         4.2.8 Intelligent Systems in EEG Analysis  -> ?
+outline:       4.3 Analysis of Nonstationary Biosignals  -> ?
+outline:         4.3.1 Analysis of Nonstationary Biosignals:EEG Applications II  -> ?
+outline:         4.3.2 Analysis of Nonstationary Biosignals:EEG Applications I -> ?
+outline:         4.3.3 Analysis of Nonstationary Biosignals:ECG-EMG Applications I  -> ?
+outline:         4.3.4 Analysis of Nonstationary Biosignals:Acoustics Applications I  -> ?
+outline:         4.3.5 Analysis of Nonstationary Biosignals:ECG-EMG Applications II  -> ?
+outline:         4.3.6 Analysis of Nonstationary Biosignals:Acoustics Applications II  -> ?
+outline:       4.4 Statistical Analysis of Biosignals  -> ?
+outline:         4.4.1 Statistical Parameter Estimation and Information Measures of Biosignals  -> ?
+outline:         4.4.2 Detection and Classification Algorithms of Biosignals I  -> ?
+outline:         4.4.3 Special Session: Component Analysis in Biosignals  -> ?
+outline:         4.4.4 Detection and Classification Algorithms of Biosignals II  -> ?
+outline:       4.5 Mathematical Modeling of Biosignals and Biosystems  -> ?
+outline:         4.5.1 Physiological Models  -> ?
+outline:         4.5.2 Evoked Potential Signal Analysis  -> ?
+outline:         4.5.3 Auditory System Modelling  -> ?
+outline:         4.5.4 Cardiovascular Signal Analysis  -> ?
+outline:       4.6 Other Methods for Biosignal Analysis  -> ?
+outline:         4.6.1 Other Methods for Biosignal Analysis  -> ?
+outline:     5. Medical and Cellular Imaging and Systems  -> ?
+outline:       5.1 Nuclear Medicine and Imaging  -> ?
+outline:         5.1.1 Image Reconstruction and Processing  -> ?
+outline:         5.1.2 Magnetic Resonance Imaging  -> ?
+outline:         5.1.3 Imaging Systems and Applications  -> ?
+outline:       5.2 Image Compression, Fusion, and Registration  -> ?
+outline:         5.2.1 Imaging Compression  -> ?
+outline:         5.2.2 Image Filtering and Enhancement  -> ?
+outline:         5.2.3 Imaging Registration  -> ?
+outline:       5.3 Image Guided Surgery  -> ?
+outline:         5.3.1 Image-Guided Surgery  -> ?
+outline:       5.4 Image Segmentation/Quantitative Analysis  -> ?
+outline:         5.4.1 Image Analysis and Processing I  -> ?
+outline:         5.4.2 Image Segmentation  -> ?
+outline:         5.4.3 Image Analysis and Processing II  -> ?
+outline:       5.5 Infrared Imaging  -> ?
+outline:         5.5.1 Clinical Applications of IR Imaging I  -> ?
+outline:         5.5.2 Clinical Applications of IR Imaging II  -> ?
+outline:         5.5.3 IR Imaging Techniques  -> ?
+outline:     6. Molecular, Cellular and Tissue Engineering  -> ?
+outline:       6.1 Molecular and Genomic Engineering  -> ?
+outline:         6.1.1 Genomic Engineering: 1  -> ?
+outline:         6.1.2 Genomic Engineering II  -> ?
+outline:       6.2 Cell Engineering and Mechanics  -> ?
+outline:         6.2.1 Cell Engineering -> ?
+outline:       6.3 Tissue Engineering  -> ?
+outline:         6.3.1 Tissue Engineering  -> ?
+outline:       6.4. Biomaterials  -> ?
+outline:         6.4.1 Biomaterials  -> ?
+outline:     7. Biomedical Sensors and Instrumentation  -> ?
+outline:       7.1 Biomedical Sensors  -> ?
+outline:         7.1.1 Optical Biomedical Sensors  -> ?
+outline:         7.1.2 Algorithms for Biomedical Sensors  -> ?
+outline:         7.1.3 Electro-physiological Sensors  -> ?
+outline:         7.1.4 General Biomedical Sensors  -> ?
+outline:         7.1.5 Advances in Biomedical Sensors  -> ?
+outline:       7.2 Biomedical Actuators  -> ?
+outline:         7.2.1 Biomedical Actuators  -> ?
+outline:       7.3 Biomedical Instrumentation  -> ?
+outline:         7.3.1 Biomedical Instrumentation  -> ?
+outline:         7.3.2 Non-Invasive Medical Instrumentation I  -> ?
+outline:         7.3.3 Non-Invasive Medical Instrumentation II  -> ?
+outline:       7.4 Data Acquisition and Measurement  -> ?
+outline:         7.4.1 Physiological Data Acquisition  -> ?
+outline:         7.4.2 Physiological Data Acquisition Using Imaging Technology  -> ?
+outline:         7.4.3 ECG & Cardiovascular Data Acquisition  -> ?
+outline:         7.4.4 Bioimpedance  -> ?
+outline:       7.5 Nano Technology  -> ?
+outline:         7.5.1 Nanotechnology  -> ?
+outline:       7.6 Robotics and Mechatronics  -> ?
+outline:         7.6.1 Robotics and Mechatronics  -> ?
+outline:     8. Biomedical Information Engineering  -> ?
+outline:       8.1 Telemedicine and Telehealth System  -> ?
+outline:         8.1.1 Telemedicine Systems and Telecardiology  -> ?
+outline:         8.1.2 Mobile Health Systems  -> ?
+outline:         8.1.3 Medical Data Compression and Authentication  -> ?
+outline:         8.1.4 Telehealth and Homecare  -> ?
+outline:         8.1.5 Telehealth and WAP-based Systems  -> ?
+outline:         8.1.6 Telemedicine and Telehealth  -> ?
+outline:       8.2 Information Systems  -> ?
+outline:         8.2.1 Information Systems I -> ?
+outline:         8.2.2 Information Systems II  -> ?
+outline:       8.3 Virtual and Augmented Reality  -> ?
+outline:         8.3.1 Virtual and Augmented Reality I  -> ?
+outline:         8.3.2 Virtual and Augmented Reality II  -> ?
+outline:       8.4 Knowledge Based Systems  -> ?
+outline:         8.4.1 Knowledge Based Systems I  -> ?
+outline:         8.4.2 Knowledge Based Systems II  -> ?
+outline:     9. Health Care Technology and Biomedical Education  -> ?
+outline:       9.1 Emerging Technologies for Health Care Delivery  -> ?
+outline:         9.1.1 Emerging Technologies for Health Care Delivery  -> ?
+outline:       9.2 Clinical Engineering  -> ?
+outline:         9.2.1 Technology in Clinical Engineering  -> ?
+outline:       9.3 Critical Care and Intelligent Monitoring Systems  -> ?
+outline:         9.3.1 Critical Care and Intelligent Monitoring Systems  -> ?
+outline:       9.4 Ethics, Standardization and Safety  -> ?
+outline:         9.4.1 Ethics, Standardization and Safety  -> ?
+outline:       9.5 Internet Learning and Distance Learning  -> ?
+outline:         9.5.1 Technology in Biomedical Engineering Education and Training  -> ?
+outline:         9.5.2 Computer Tools Developed by Integrating Research and Education  -> ?
+outline:     10. Symposia and Plenaries  -> ?
+outline:       10.1 Opening Ceremonies  -> ?
+outline:         10.1.1 Keynote Lecture  -> ?
+outline:       10.2 Plenary Lectures  -> ?
+outline:         10.2.1 Molecular Imaging with Optical, Magnetic Resonance, and  -> ?
+outline:         10.2.2 Microbioengineering: Microbe Capture and Detection  -> ?
+outline:         10.2.3 Advanced distributed learning, Broadband Internet, and Medical Education  -> ?
+outline:         10.2.4 Cardiac and Arterial Contribution to Blood Pressure  -> ?
+outline:         10.2.5 Hepatic Tissue Engineering  -> ?
+outline:         10.2.6 High Throughput Challenges in Molecular Cell Biology: The CELL MAP -> ?
+outline:       10.3 Minisymposia  -> ?
+outline:         10.3.1 Modeling as a Tool in Neuromuscular and Rehabilitation  -> ?
+outline:         10.3.2 Nanotechnology in Biomedicine  -> ?
+outline:         10.3.3 Functional Imaging  -> ?
+outline:         10.3.4 Neural Network Dynamics  -> ?
+outline:         10.3.5 Bioinformatics  -> ?
+outline:         10.3.6 Promises and Pitfalls of Biosignal Analysis: Seizure Prediction and Management  -> ?
+outline:   Author Index -> ?
+outline:     A -> ?
+outline:     B -> ?
+outline:     C -> ?
+outline:     D -> ?
+outline:     E -> ?
+outline:     F -> ?
+outline:     G -> ?
+outline:     H -> ?
+outline:     I -> ?
+outline:     J -> ?
+outline:     K -> ?
+outline:     L -> ?
+outline:     M -> ?
+outline:     N -> ?
+outline:     O -> ?
+outline:     Ö -> ?
+outline:     P -> ?
+outline:     Q -> ?
+outline:     R -> ?
+outline:     S -> ?
+outline:     T -> ?
+outline:     U -> ?
+outline:     Ü -> ?
+outline:     V -> ?
+outline:     W -> ?
+outline:     X -> ?
+outline:     Y -> ?
+outline:     Z -> ?
+outline:   Keyword Index -> ?
+outline:     - -> ?
+outline:     ¦  -> ?
+outline:     1 -> ?
+outline:     2 -> ?
+outline:     3 -> ?
+outline:     4 -> ?
+outline:     9 -> ?
+outline:     A -> ?
+outline:     B -> ?
+outline:     C -> ?
+outline:     D -> ?
+outline:     E -> ?
+outline:     F -> ?
+outline:     G -> ?
+outline:     H -> ?
+outline:     I -> ?
+outline:     i -> ?
+outline:     J -> ?
+outline:     K -> ?
+outline:     L -> ?
+outline:     M -> ?
+outline:     N -> ?
+outline:     O -> ?
+outline:     P -> ?
+outline:     Q -> ?
+outline:     R -> ?
+outline:     S -> ?
+outline:     T -> ?
+outline:     U -> ?
+outline:     V -> ?
+outline:     W -> ?
+outline:     X -> ?
+outline:     Y -> ?
+outline:     Z -> ?
+outline:   Committees -> ?
+outline:   Sponsors -> ?
+outline:   CD-Rom Help -> ?
+outline:   ------------------------- -> ?
+outline:   Return -> ?
+outline:   Previous Page -> ?
+outline:   Next Page -> ?
+outline:   Previous View -> ?
+outline:   Next View -> ?
+outline:   Print -> ?
+outline:   ------------------------- -> ?
+outline:   Query -> ?
+outline:   Query Results -> ?
+outline:   ------------------------- -> ?
+outline:   Exit CD-Rom -> ?
+object 1 1: <</Contents 4 1 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 13 0 R /Resources <</ExtGState <</GS1 <</SA false /SM 0.02 /TR /Identity /Type /ExtGState>>>> /Font <</F2 2 1 R /F4 3 1 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /Type /Page>>
+object 2 1: <</BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 3 1: <</BaseFont /Times-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 4 1: <</Filter /FlateDecode /Length 1544>> stream sha256=f45de015184011f51a75a337f324826d8b25d4fcabd89072709a043d52e77e4c
+object 5 0: <</Contents [8 0 R 9 0 R] /CropBox [0 0 596 842] /MediaBox [0 0 596 842] /Parent 13 0 R /Resources <</Font <</F2 324 0 R /F3 326 0 R /F4 6 0 R>> /ProcSet 328 0 R /XObject <</im1 10 0 R>>>> /Rotate 0 /Type /Page>>
+object 6 0: <</BaseFont /Arial /Encoding /WinAnsiEncoding /FirstChar 31 /FontDescriptor 7 0 R /LastChar 255 /Name /F4 /Subtype /TrueType /Type /Font /Widths [750 278 278 355 556 556 889 667 191 333 333 389 584 278 333 278 278 556 556 556 556 556 556 556 556 556 556 278 278 584 584 584 556 1015 667 667 722 722 667 611 778 722 278 500 667 556 833 722 778 667 778 722 667 611 722 667 944 667 667 611 278 278 278 469 556 333 556 556 500 556 556 278 556 556 222 222 500 222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 334 260 334 584 750 556 750 222 556 333 1000 556 556 333 1000 667 333 1000 750 750 750 750 222 222 333 333 350 556 1000 333 1000 500 333 944 750 750 667 278 333 556 556 556 556 260 556 333 737 370 556 584 333 737 552 400 549 333 333 333 576 537 278 333 333 365 556 834 834 834 611 667 667 667 667 667 667 1000 722 667 667 667 667 278 278 278 278 722 722 778 778 778 778 778 584 778 722 722 722 722 667 667 611 556 556 556 556 556 556 889 500 556 556 556 556 278 278 278 278 556 556 556 556 556 556 556 549 611 556 556 556 556 500 556 500]>>
+object 7 0: <</Ascent 1000 /AvgWidth 500 /CapHeight 1000 /Descent -250 /Flags 32 /FontBBox [-250 -250 1200 1000] /FontName /Arial /ItalicAngle 0 /Leading 250 /MaxWidth 1000 /MissingWidth 750 /StemH 91 /StemV 91 /Type /FontDescriptor /XHeight 700>>
+object 8 0: <</Filter /FlateDecode /Length 3047>> stream sha256=8faadd494d82de7e2be67b68eba4c8db4d1979ff5869632b77a03f9b86cb1605
+object 9 0: <</Filter /FlateDecode /Length 2918>> stream sha256=5e2c2f69d866b09b88f623541cde1d9699dac097f7b5a60bdae84023a7a2a7c9
+object 10 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter [/FlateDecode /DCTDecode] /Height 104 /Length 13937 /Name /im1 /Subtype /Image /Type /XObject /Width 302>> stream partial=DCTDecode sha256=bf3c4fda6b87787ebe7a0c52459879b3c5cf4eeb102525d890b8a15ece6cd258
+object 11 0: <</Contents 12 0 R /CropBox [0 0 596 842] /MediaBox [0 0 596 842] /Parent 13 0 R /Resources <</Font <</F2 324 0 R /F3 326 0 R>> /ProcSet 328 0 R>> /Rotate 0 /Type /Page>>
+object 12 0: <</Filter /FlateDecode /Length 21816>> stream sha256=c7e7913510f6d9f5e31e6ecf3dd62081611b65cdda5b2e8c402e624d2eb55f84
+object 13 0: <</Count 4 /Kids [319 0 R 1 1 R 5 0 R 11 0 R] /Type /Pages>>
+object 14 1: <</Count 26 /First 15 1 R /Last 15 1 R /Type /Outlines>>
+object 15 1: <</A <</D [0 /Fit] /F <</F <2e2e2f77656c636f6d652e706466> /Type /Filespec>> /S /GoToR>> /Count 25 /First 16 1 R /Last 312 0 R /Parent 14 1 R /Title <4d61696e204d656e75>>>
+object 16 1: <</Next 17 1 R /Parent 15 1 R /Title <2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d>>>
+object 17 1: <</A <</D [0 /FitH 792] /F <</F <2e2e2f776c65747465722e706466> /Type /Filespec>> /S /GoToR>> /Next 18 1 R /Parent 15 1 R /Prev 16 1 R /Title <57656c636f6d65204c6574746572>>>
+object 18 1: <</A <</D [0 /FitH 795] /F <</F <2e2e2f636c65747465722e504446> /Type /Filespec>> /S /GoToR>> /Next 19 1 R /Parent 15 1 R /Prev 17 1 R /Title <43686169726d616e2041646472657373>>>
+object 19 1: <</A <</D [0 /FitH 795] /F <</F <2e2e2f6b65796e6f74652e504446> /Type /Filespec>> /S /GoToR>> /Next 20 1 R /Parent 15 1 R /Prev 18 1 R /Title <4b65796e6f7465204c656374757265>>>
+object 20 1: <</A <</D [0 /FitH 842] /F <</F <2e2e2f706c616e6572792e706466> /Type /Filespec>> /S /GoToR>> /Next 21 1 R /Parent 15 1 R /Prev 19 1 R /Title <506c656e6172792054616c6b73>>>
+object 21 1: <</A <</D [0 /FitH 844] /F <</F <2e2e2f6d696e69736d2e706466> /Type /Filespec>> /S /GoToR>> /Next 22 1 R /Parent 15 1 R /Prev 20 1 R /Title <4d696e692053796d706f736961>>>
+object 22 1: <</A <</D [0 /FitH 844] /F <</F <2e2e2f507265636f6e662e706466> /Type /Filespec>> /S /GoToR>> /Next 23 1 R /Parent 15 1 R /Prev 21 1 R /Title <576f726b73686f7073>>>
+object 23 1: <</A <</D [0 /FitH 845] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -10 /First 24 1 R /Last 217 0 R /Next 234 0 R /Parent 15 1 R /Prev 22 1 R /Title <5468656d6520496e646578>>>
+object 24 1: <</A <</D [0 /FitH 753] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -32 /First 25 1 R /Last 51 1 R /Next 57 1 R /Parent 23 1 R /Title <312e43617264696f76617363756c61722053797374656d7320616e6420456e67696e656572696e6720>>>
+object 25 1: <</A <</D [0 /FitH 734] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 26 1 R /Last 29 1 R /Next 30 1 R /Parent 24 1 R /Title <312e312e4361726469616320456c656374726f70687973696f6c6f677920616e64204d656368616e69637320>>>
+object 26 1: <</A <</D [0 /FitH 715] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 27 1 R /Parent 25 1 R /Title <312e312e3120436172646961632043656c6c756c617220456c656374726f70687973696f6c6f6779>>>
+object 27 1: <</A <</D [0 /FitH 584] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 28 1 R /Parent 25 1 R /Prev 26 1 R /Title <312e312e32204361726469616320456c656374726f70687973696f6c6f677920>>>
+object 28 1: <</A <</D [0 /FitH 375] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 29 1 R /Parent 25 1 R /Prev 27 1 R /Title <312e312e3320456c656374726963616c20496e746572616374696f6e73204265747765656e205075726b696e6a6520616e642056656e74726963756c61722043656c6c7320>>>
+object 29 1: <</A <</D [0 /FitH 267] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 25 1 R /Prev 28 1 R /Title <312e312e3420417272687974686d6f67656e6573697320616e642053706972616c20576176657320>>>
+object 30 1: <</A <</D [0 /FitH 267] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 8 /First 31 1 R /Last 38 1 R /Next 39 1 R /Parent 24 1 R /Prev 25 1 R /Title <312e322e204361726469616320616e642056617363756c61722042696f6d656368616e69637320>>>
+object 31 1: <</A <</D [0 /FitH 267] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 32 1 R /Parent 30 1 R /Title <312e322e3120426c6f6f6420466c6f7720616e64204d6174657269616c20496e746572616374696f6e7320>>>
+object 32 1: <</A <</D [1 /FitH 671] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 33 1 R /Parent 30 1 R /Prev 31 1 R /Title <312e322e322e43617264696163204d656368616e69637320>>>
+object 33 1: <</A <</D [1 /FitH 506] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 34 1 R /Parent 30 1 R /Prev 32 1 R /Title <312e322e332056617363756c617220466c6f7720>>>
+object 34 1: <</A <</D [1 /FitH 281] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 35 1 R /Parent 30 1 R /Prev 33 1 R /Title <312e322e342043617264696163204d656368616e6963732f43617264696f76617363756c61722053797374656d7320>>>
+object 35 1: <</A <</D [2 /FitH 624] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 36 1 R /Parent 30 1 R /Prev 34 1 R /Title <312e322e352048656d6f64796e616d69637320616e642056617363756c6172204d656368616e69637320>>>
+object 36 1: <</A <</D [2 /FitH 485] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 37 1 R /Parent 30 1 R /Prev 35 1 R /Title <312e322e362048656d6f64796e616d6963204d6f64656c696e6720616e64204d6561737572656d656e7420546563686e697175657320>>>
+object 37 1: <</A <</D [2 /FitH 349] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 38 1 R /Parent 30 1 R /Prev 36 1 R /Title <312e322e37204d6f64656c696e67206f66204365726562726f76617363756c61722044796e616d69637320>>>
+object 38 1: <</A <</D [3 /FitH 638] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 30 1 R /Prev 37 1 R /Title <312e322e38204365726562726f76617363756c61722044796e616d69637320>>>
+object 39 1: <</A <</D [3 /FitH 487] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 6 /First 40 1 R /Last 45 1 R /Next 46 1 R /Parent 24 1 R /Prev 30 1 R /Title <312e3320436172646961632041637469766174696f6e20>>>
+object 40 1: <</A <</D [3 /FitH 487] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 41 1 R /Parent 39 1 R /Title <312e332e31204f70746963616c20506f74656e7469616c204d617070696e6720696e2074686520486561727420>>>
+object 41 1: <</A <</D [3 /FitH 335] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 42 1 R /Parent 39 1 R /Prev 40 1 R /Title <312e332e32204d617070696e6720616e6420417272687974686d6961732020>>>
+object 42 1: <</A <</D [4 /FitH 650] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 43 1 R /Parent 39 1 R /Prev 41 1 R /Title <312e332e332050726f7061676174696f6e206f6620456c656374726963616c20416374697669747920696e20436172646961632054697373756520>>>
+object 43 1: <</A <</D [4 /FitH 543] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 44 1 R /Parent 39 1 R /Prev 42 1 R /Title <312e332e3420466f72776172642d496e76657273652050726f626c656d7320696e2045434720616e64204d434720>>>
+object 44 1: <</A <</D [4 /FitH 412] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 45 1 R /Parent 39 1 R /Prev 43 1 R /Title <312e332e3520456c656374726f63617264696f6c6f677920>>>
+object 45 1: <</A <</D [4 /FitH 339] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 39 1 R /Prev 44 1 R /Title <312e332e3620456c656374726f70687973696f6c6f677920616e642041626c6174696f6e20>>>
+object 46 1: <</A <</D [4 /FitH 339] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 47 1 R /Last 50 1 R /Next 51 1 R /Parent 24 1 R /Prev 39 1 R /Title <312e342050756c6d6f6e6172792053797374656d20416e616c7973697320616e6420437269746963616c2043617265204d65646963696e6520>>>
+object 47 1: <</A <</D [4 /FitH 339] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 48 1 R /Parent 46 1 R /Title <312e342e312043617264696f70756c6d6f6e617279204d6f64656c696e6720>>>
+object 48 1: <</A <</D [5 /FitH 664] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 49 1 R /Parent 46 1 R /Prev 47 1 R /Title <312e342e322050756c6d6f6e61727920616e642043617264696f76617363756c617220436c696e6963616c2053797374656d7320>>>
+object 49 1: <</A <</D [5 /FitH 400] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 50 1 R /Parent 46 1 R /Prev 48 1 R /Title <312e342e33204d656368616e6963616c2043697263756c61746f727920537570706f727420>>>
+object 50 1: <</A <</D [5 /FitH 384] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 46 1 R /Prev 49 1 R /Title <312e342e342043617264696f70756c6d6f6e617279204279706173732f4578747261636f72706f7265616c2043697263756c6174696f6e20>>>
+object 51 1: <</A <</D [5 /FitH 363] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 5 /First 52 1 R /Last 56 1 R /Parent 24 1 R /Prev 46 1 R /Title <312e35204d6f64656c696e6720616e6420436f6e74726f6c206f662043617264696f76617363756c617220616e642050756c6d6f6e6172792053797374656d7320>>>
+object 52 1: <</A <</D [6 /FitH 753] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 53 1 R /Parent 51 1 R /Title <312e352e31204865617274205261746520566172696162696c69747920493a204d6f64656c696e6720616e6420436c696e6963616c204173706563747320>>>
+object 53 1: <</A <</D [6 /FitH 600] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 54 1 R /Parent 51 1 R /Prev 52 1 R /Title <312e352e32204865617274205261746520566172696162696c6974792049493a204e6f6e6c696e6561722070726f63657373696e6720>>>
+object 54 1: <</A <</D [6 /FitH 432] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 55 1 R /Parent 51 1 R /Prev 53 1 R /Title <312e352e33204e657572616c20436f6e74726f6c206f66207468652043617264696f76617363756c61722053797374656d20494920>>>
+object 55 1: <</A <</D [6 /FitH 306] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 56 1 R /Parent 51 1 R /Prev 54 1 R /Title <312e352e34204865617274205261746520566172696162696c69747920>>>
+object 56 1: <</A <</D [7 /FitH 752] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 51 1 R /Prev 55 1 R /Title <312e352e35204e657572616c20436f6e74726f6c206f66207468652043617264696f76617363756c61722053797374656d204920>>>
+object 57 1: <</A <</D [7 /FitH 621] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -25 /First 58 1 R /Last 79 1 R /Next 83 1 R /Parent 23 1 R /Prev 24 1 R /Title <322e204e657572616c2053797374656d7320616e6420456e67696e656572696e6720>>>
+object 58 1: <</A <</D [7 /FitH 604] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 59 1 R /Last 60 1 R /Next 61 1 R /Parent 57 1 R /Title <322e31204e657572616c20496d6167696e6720616e642053656e73696e672020>>>
+object 59 1: <</A <</D [7 /FitH 581] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 60 1 R /Parent 58 1 R /Title <322e312e3120427261696e20496d6167696e6720>>>
+object 60 1: <</A <</D [7 /FitH 427] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 58 1 R /Prev 59 1 R /Title <322e312e32204545472f4d45472070726f63657373696e67>>>
+object 61 1: <</A <</D [7 /FitH 362] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 62 1 R /Last 63 1 R /Next 64 1 R /Parent 57 1 R /Prev 58 1 R /Title <322e32204e657572616c20436f6d7075746174696f6e3a204172746966696369616c20616e642042696f6c6f676963616c20>>>
+object 62 1: <</A <</D [7 /FitH 309] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 63 1 R /Parent 61 1 R /Title <322e322e31204e657572616c20436f6d7075746174696f6e616c204d6f64656c696e6720436c6f73656c79204261736564206f6e20416e61746f6d7920616e642050687973696f6c6f677920>>>
+object 63 1: <</A <</D [8 /FitH 732] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 61 1 R /Prev 62 1 R /Title <322e322e32204e657572616c20436f6d7075746174696f6e20>>>
+object 64 1: <</A <</D [8 /FitH 576] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 65 1 R /Last 67 1 R /Next 68 1 R /Parent 57 1 R /Prev 61 1 R /Title <322e33204e657572616c20496e746572666163696e6720>>>
+object 65 1: <</A <</D [8 /FitH 555] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 66 1 R /Parent 64 1 R /Title <322e332e31204e657572616c205265636f7264696e6720>>>
+object 66 1: <</A <</D [8 /FitH 384] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 67 1 R /Parent 64 1 R /Prev 65 1 R /Title <322e332e322043756c7475726564206e6575726f6e733a206163746976697479207061747465726e732c206164686573696f6e202620737572766976616c20>>>
+object 67 1: <</A <</D [8 /FitH 321] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 64 1 R /Prev 66 1 R /Title <322e332e33204e6575726f2d746563686e6f6c6f677920>>>
+object 68 1: <</A <</D [9 /FitH 704] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 69 1 R /Last 72 1 R /Next 73 1 R /Parent 57 1 R /Prev 64 1 R /Title <322e34204e657572616c2053797374656d733a20416e616c7973697320616e6420436f6e74726f6c20>>>
+object 69 1: <</A <</D [9 /FitH 690] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 70 1 R /Parent 68 1 R /Title <322e342e31204e657572616c204d656368616e69736d73206f662056697375616c2053656c656374696f6e20>>>
+object 70 1: <</A <</D [9 /FitH 572] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 71 1 R /Parent 68 1 R /Prev 69 1 R /Title <322e342e32204d6f64656c73206f662044796e616d6963204e657572616c2053797374656d7320>>>
+object 71 1: <</A <</D [9 /FitH 416] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 72 1 R /Parent 68 1 R /Prev 70 1 R /Title <322e342e332053656e736f7279204d6f746f72204d617070696e6720>>>
+object 72 1: <</A <</D [9 /FitH 317] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 68 1 R /Prev 71 1 R /Title <322e342e342053656e736f7279204d6f746f7220436f6e74726f6c2053797374656d7320>>>
+object 73 1: <</A <</D [10 /FitH 686] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 74 1 R /Last 75 1 R /Next 76 1 R /Parent 57 1 R /Prev 68 1 R /Title <322e35204e6575726f2d656c656374726f6d61676e657469736d20>>>
+object 74 1: <</A <</D [10 /FitH 667] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 75 1 R /Parent 73 1 R /Title <322e352e31204d61676e65746963205374696d756c6174696f6e20>>>
+object 75 1: <</A <</D [10 /FitH 499] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 73 1 R /Prev 74 1 R /Title <322e352e32204e657572616c205369676e616c7320536f75726365204c6f63616c697a6174696f6e20>>>
+object 76 1: <</A <</D [10 /FitH 378] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 77 1 R /Last 78 1 R /Next 79 1 R /Parent 57 1 R /Prev 73 1 R /Title <322e3620436c696e6963616c204e657572616c20456e67696e656572696e6720>>>
+object 77 1: <</A <</D [10 /FitH 352] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 78 1 R /Parent 76 1 R /Title <322e362e3120446574656374696f6e20616e64206d656368616e69736d73206f66206570696c657074696320616374697669747920>>>
+object 78 1: <</A <</D [10 /FitH 352] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 76 1 R /Prev 77 1 R /Title <322e362e3220446961676e6f7374696320546f6f6c7320>>>
+object 79 1: <</A <</D [11 /FitH 566] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 80 1 R /Last 82 1 R /Parent 57 1 R /Prev 76 1 R /Title <322e37204e6575726f2d656c656374726f70687973696f6c6f677920>>>
+object 80 1: <</A <</D [11 /FitH 551] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 81 1 R /Parent 79 1 R /Title <322e372e31204e657572616c20536f75726365204d617070696e6720>>>
+object 81 1: <</A <</D [11 /FitH 378] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 82 1 R /Parent 79 1 R /Prev 80 1 R /Title <322e372e32204e6575726f2d456c656374726f70687973696f6c6f677920>>>
+object 82 1: <</A <</D [11 /FitH 361] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 79 1 R /Prev 81 1 R /Title <322e372e3320427261696e204d617070696e6720>>>
+object 83 1: <</A <</D [12 /FitH 738] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -21 /First 84 1 R /Last 103 0 R /Next 105 0 R /Parent 23 1 R /Prev 57 1 R /Title <332e204e6575726f6d757363756c61722053797374656d7320616e64205265686162696c69746174696f6e20456e67696e656572696e6720>>>
+object 84 1: <</A <</D [12 /FitH 720] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 85 1 R /Last 88 1 R /Next 89 1 R /Parent 83 1 R /Title <332e3120454d4720>>>
+object 85 1: <</A <</D [12 /FitH 700] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 86 1 R /Parent 84 1 R /Title <332e312e3120454d47206d6f64656c696e6720>>>
+object 86 1: <</A <</D [12 /FitH 500] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 87 1 R /Parent 84 1 R /Prev 85 1 R /Title <332e312e3220457374696d6174696f6e206f66204d7573636c6520466962657220436f6e64756374696f6e2076656c6f6369747920>>>
+object 87 1: <</A <</D [12 /FitH 383] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 88 1 R /Parent 84 1 R /Prev 86 1 R /Title <332e312e3320436c696e6963616c204170706c69636174696f6e73206f6620454d4720>>>
+object 88 1: <</A <</D [12 /FitH 298] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 84 1 R /Prev 87 1 R /Title <332e312e3420416e616c7973697320616e6420496e746572707265746174696f6e206f6620454d4720>>>
+object 89 1: <</A <</D [13 /FitH 648] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 90 0 R /Last 90 0 R /Next 91 0 R /Parent 83 1 R /Prev 84 1 R /Title <332e203220506f737475726520616e64204761697420>>>
+object 90 0: <</A <</D [13 /FitH 630] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 89 1 R /Title <332e322e3120506f737475726520616e642047616974>>>
+object 91 0: <</A <</D [13 /FitH 404] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 92 0 R /Last 92 0 R /Next 93 0 R /Parent 83 1 R /Prev 89 1 R /Title <332e332e43656e7472616c20436f6e74726f6c206f66204d6f76656d656e7420>>>
+object 92 0: <</A <</D [13 /FitH 387] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 91 0 R /Title <332e332e312043656e7472616c20436f6e74726f6c206f66206d6f76656d656e7420>>>
+object 93 0: <</A <</D [14 /FitH 617] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 94 0 R /Last 95 0 R /Next 96 0 R /Parent 83 1 R /Prev 91 0 R /Title <332e34205065726970686572616c204e6575726f6d757363756c6172204d656368616e69736d7320>>>
+object 94 0: <</A <</D [14 /FitH 595] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 95 0 R /Parent 93 0 R /Title <332e342e31205065726970686572616c204e6575726f6d757363756c6172204d656368616e69736d73204949>>>
+object 95 0: <</A <</D [14 /FitH 440] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 93 0 R /Prev 94 0 R /Title <332e342e32205065726970686572616c204e6575726f6d757363756c6172204d656368616e69736d73204920>>>
+object 96 0: <</A <</D [14 /FitH 386] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 97 0 R /Last 97 0 R /Next 98 0 R /Parent 83 1 R /Prev 93 0 R /Title <332e352046756e6374696f6e616c20456c656374726963616c205374696d756c6174696f6e20>>>
+object 97 0: <</A <</D [14 /FitH 386] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 96 0 R /Title <332e352e312046756e6374696f6e616c20456c656374726963616c205374696d756c6174696f6e20>>>
+object 98 0: <</A <</D [15 /FitH 671] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 99 0 R /Last 99 0 R /Next 100 0 R /Parent 83 1 R /Prev 96 0 R /Title <332e362041737369737469766520446576696365732c20496d706c616e74732c20616e642050726f737468657469637320>>>
+object 99 0: <</A <</D [15 /FitH 656] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 98 0 R /Title <332e362e312041737369737469766520446576696365732c20496d706c616e747320616e642050726f73746865746963732020>>>
+object 100 0: <</A <</D [16 /FitH 526] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 101 0 R /Last 102 0 R /Next 103 0 R /Parent 83 1 R /Prev 98 0 R /Title <332e372053656e736f7279205265686162696c69746174696f6e20>>>
+object 101 0: <</A <</D [16 /FitH 508] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 102 0 R /Parent 100 0 R /Title <332e372e312053656e736f72792053797374656d7320616e64205265686162696c69746174696f6e3a48656172696e6720262053706565636820>>>
+object 102 0: <</A <</D [16 /FitH 395] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 100 0 R /Prev 101 0 R /Title <332e372e322053656e736f72792053797374656d7320616e64205265686162696c69746174696f6e2020>>>
+object 103 0: <</A <</D [16 /FitH 364] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 104 0 R /Last 104 0 R /Parent 83 1 R /Prev 100 0 R /Title <332e38204f7274686f70656469632042696f6d656368616e69637320>>>
+object 104 0: <</A <</D [16 /FitH 364] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 103 0 R /Title <332e382e31204f7274686f70656469632042696f6d656368616e69637320>>>
+object 105 0: <</A <</D [17 /FitH 467] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -31 /First 106 0 R /Last 135 0 R /Next 137 0 R /Parent 23 1 R /Prev 83 1 R /Title <342e2042696f6d65646963616c205369676e616c20616e642053797374656d20416e616c7973697320>>>
+object 106 0: <</A <</D [17 /FitH 447] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 107 0 R /Last 108 0 R /Next 109 0 R /Parent 105 0 R /Title <342e31204e6f6e6c696e6561722044796e616d6963616c20416e616c79736973206f662042696f7369676e616c733a204672616374616c20616e64204368616f7320>>>
+object 107 0: <</A <</D [17 /FitH 424] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 108 0 R /Parent 106 0 R /Title <342e312e31204e6f6e6c696e6561722044796e616d6963616c20416e616c79736973206f662042696f7369676e616c73204920>>>
+object 108 0: <</A <</D [17 /FitH 384] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 106 0 R /Prev 107 0 R /Title <342e312e32204e6f6e6c696e6561722044796e616d6963616c20416e616c79736973206f662042696f7369676e616c7320494920>>>
+object 109 0: <</A <</D [18 /FitH 732] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 8 /First 110 0 R /Last 117 0 R /Next 118 0 R /Parent 105 0 R /Prev 106 0 R /Title <342e3220496e74656c6c6967656e7420416e616c79736973206f662042696f7369676e616c7320>>>
+object 110 0: <</A <</D [18 /FitH 714] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 111 0 R /Parent 109 0 R /Title <342e322e31204e657572616c204e6574776f726b7320616e642041646170746976652053797374656d7320696e2042696f7369676e616c20416e616c7973697320>>>
+object 111 0: <</A <</D [18 /FitH 560] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 112 0 R /Parent 109 0 R /Prev 110 0 R /Title <342e322e322046757a7a7920616e64204b6e6f776c656467652d42617365642053797374656d7320696e2042696f7369676e616c20416e616c7973697320>>>
+object 112 0: <</A <</D [18 /FitH 405] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 113 0 R /Parent 109 0 R /Prev 111 0 R /Title <342e322e3320496e74656c6c6967656e742053797374656d7320696e2053706565636820416e616c7973697320>>>
+object 113 0: <</A <</D [18 /FitH 341] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 114 0 R /Parent 109 0 R /Prev 112 0 R /Title <342e322e34204b6e6f776c656467652d426173656420616e64204e657572616c204e6574776f726b20417070726f616368657320746f2042696f7369676e616c20416e616c7973697320>>>
+object 114 0: <</A <</D [18 /FitH 316] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 115 0 R /Parent 109 0 R /Prev 113 0 R /Title <342e322e35204e657572616c204e6574776f726b20417070726f616368657320746f2042696f7369676e616c20416e616c7973697320>>>
+object 115 0: <</A <</D [19 /FitH 577] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 116 0 R /Parent 109 0 R /Prev 114 0 R /Title <342e322e36204879627269642053797374656d7320696e2042696f7369676e616c20416e616c7973697320>>>
+object 116 0: <</A <</D [19 /FitH 421] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 117 0 R /Parent 109 0 R /Prev 115 0 R /Title <342e322e3720496e74656c6c6967656e742053797374656d7320696e2045434720416e616c7973697320>>>
+object 117 0: <</A <</D [19 /FitH 340] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 109 0 R /Prev 116 0 R /Title <342e322e3820496e74656c6c6967656e742053797374656d7320696e2045454720416e616c7973697320>>>
+object 118 0: <</A <</D [19 /FitH 340] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 6 /First 119 0 R /Last 124 0 R /Next 125 0 R /Parent 105 0 R /Prev 109 0 R /Title <342e3320416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c7320>>>
+object 119 0: <</A <</D [19 /FitH 340] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 120 0 R /Parent 118 0 R /Title <342e332e3120416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a454547204170706c69636174696f6e7320494920>>>
+object 120 0: <</A <</D [20 /FitH 614] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 121 0 R /Parent 118 0 R /Prev 119 0 R /Title <342e332e3220416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a454547204170706c69636174696f6e732049>>>
+object 121 0: <</A <</D [20 /FitH 483] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 122 0 R /Parent 118 0 R /Prev 120 0 R /Title <342e332e3320416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a4543472d454d47204170706c69636174696f6e73204920>>>
+object 122 0: <</A <</D [20 /FitH 332] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 123 0 R /Parent 118 0 R /Prev 121 0 R /Title <342e332e3420416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a41636f757374696373204170706c69636174696f6e73204920>>>
+object 123 0: <</A <</D [20 /FitH 316] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 124 0 R /Parent 118 0 R /Prev 122 0 R /Title <342e332e3520416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a4543472d454d47204170706c69636174696f6e7320494920>>>
+object 124 0: <</A <</D [21 /FitH 673] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 118 0 R /Prev 123 0 R /Title <342e332e3620416e616c79736973206f66204e6f6e73746174696f6e6172792042696f7369676e616c733a41636f757374696373204170706c69636174696f6e7320494920>>>
+object 125 0: <</A <</D [21 /FitH 515] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 126 0 R /Last 129 0 R /Next 130 0 R /Parent 105 0 R /Prev 118 0 R /Title <342e3420537461746973746963616c20416e616c79736973206f662042696f7369676e616c7320>>>
+object 126 0: <</A <</D [21 /FitH 495] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 127 0 R /Parent 125 0 R /Title <342e342e3120537461746973746963616c20506172616d6574657220457374696d6174696f6e20616e6420496e666f726d6174696f6e204d65617375726573206f662042696f7369676e616c7320>>>
+object 127 0: <</A <</D [21 /FitH 341] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 128 0 R /Parent 125 0 R /Prev 126 0 R /Title <342e342e3220446574656374696f6e20616e6420436c617373696669636174696f6e20416c676f726974686d73206f662042696f7369676e616c73204920>>>
+object 128 0: <</A <</D [21 /FitH 321] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 129 0 R /Parent 125 0 R /Prev 127 0 R /Title <342e342e33205370656369616c2053657373696f6e3a20436f6d706f6e656e7420416e616c7973697320696e2042696f7369676e616c7320>>>
+object 129 0: <</A <</D [22 /FitH 622] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 125 0 R /Prev 128 0 R /Title <342e342e3420446574656374696f6e20616e6420436c617373696669636174696f6e20416c676f726974686d73206f662042696f7369676e616c7320494920>>>
+object 130 0: <</A <</D [22 /FitH 329] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 131 0 R /Last 134 0 R /Next 135 0 R /Parent 105 0 R /Prev 125 0 R /Title <342e35204d617468656d61746963616c204d6f64656c696e67206f662042696f7369676e616c7320616e642042696f73797374656d7320>>>
+object 131 0: <</A <</D [22 /FitH 312] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 132 0 R /Parent 130 0 R /Title <342e352e312050687973696f6c6f676963616c204d6f64656c7320>>>
+object 132 0: <</A <</D [22 /FitH 299] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 133 0 R /Parent 130 0 R /Prev 131 0 R /Title <342e352e322045766f6b656420506f74656e7469616c205369676e616c20416e616c7973697320>>>
+object 133 0: <</A <</D [23 /FitH 640] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 134 0 R /Parent 130 0 R /Prev 132 0 R /Title <342e352e332041756469746f72792053797374656d204d6f64656c6c696e6720>>>
+object 134 0: <</A <</D [23 /FitH 485] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 130 0 R /Prev 133 0 R /Title <342e352e342043617264696f76617363756c6172205369676e616c20416e616c7973697320>>>
+object 135 0: <</A <</D [23 /FitH 429] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 136 0 R /Last 136 0 R /Parent 105 0 R /Prev 130 0 R /Title <342e36204f74686572204d6574686f647320666f722042696f7369676e616c20416e616c7973697320>>>
+object 136 0: <</A <</D [23 /FitH 429] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 135 0 R /Title <342e362e31204f74686572204d6574686f647320666f722042696f7369676e616c20416e616c7973697320>>>
+object 137 0: <</A <</D [24 /FitH 353] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -18 /First 138 0 R /Last 152 0 R /Next 156 0 R /Parent 23 1 R /Prev 105 0 R /Title <352e204d65646963616c20616e642043656c6c756c617220496d6167696e6720616e642053797374656d7320>>>
+object 138 0: <</A <</D [24 /FitH 330] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 139 0 R /Last 141 0 R /Next 142 0 R /Parent 137 0 R /Title <352e31204e75636c656172204d65646963696e6520616e6420496d6167696e6720>>>
+object 139 0: <</A <</D [24 /FitH 308] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 140 0 R /Parent 138 0 R /Title <352e312e3120496d616765205265636f6e737472756374696f6e20616e642050726f63657373696e6720>>>
+object 140 0: <</A <</D [24 /FitH 300] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 141 0 R /Parent 138 0 R /Prev 139 0 R /Title <352e312e32204d61676e65746963205265736f6e616e636520496d6167696e6720>>>
+object 141 0: <</A <</D [25 /FitH 303] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 138 0 R /Prev 140 0 R /Title <352e312e3320496d6167696e672053797374656d7320616e64204170706c69636174696f6e7320>>>
+object 142 0: <</A <</D [26 /FitH 521] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 143 0 R /Last 145 0 R /Next 146 0 R /Parent 137 0 R /Prev 138 0 R /Title <352e3220496d61676520436f6d7072657373696f6e2c20467573696f6e2c20616e6420526567697374726174696f6e20>>>
+object 143 0: <</A <</D [26 /FitH 507] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 144 0 R /Parent 142 0 R /Title <352e322e3120496d6167696e6720436f6d7072657373696f6e20>>>
+object 144 0: <</A <</D [26 /FitH 364] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 145 0 R /Parent 142 0 R /Prev 143 0 R /Title <352e322e3220496d6167652046696c746572696e6720616e6420456e68616e63656d656e7420>>>
+object 145 0: <</A <</D [26 /FitH 324] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 142 0 R /Prev 144 0 R /Title <352e322e3320496d6167696e6720526567697374726174696f6e20>>>
+object 146 0: <</A <</D [27 /FitH 618] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 147 0 R /Last 147 0 R /Next 148 0 R /Parent 137 0 R /Prev 142 0 R /Title <352e3320496d61676520477569646564205375726765727920>>>
+object 147 0: <</A <</D [27 /FitH 595] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 146 0 R /Title <352e332e3120496d6167652d477569646564205375726765727920>>>
+object 148 0: <</A <</D [27 /FitH 395] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 149 0 R /Last 151 0 R /Next 152 0 R /Parent 137 0 R /Prev 146 0 R /Title <352e3420496d616765205365676d656e746174696f6e2f5175616e746974617469766520416e616c7973697320>>>
+object 149 0: <</A <</D [27 /FitH 377] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 150 0 R /Parent 148 0 R /Title <352e342e3120496d61676520416e616c7973697320616e642050726f63657373696e67204920>>>
+object 150 0: <</A <</D [28 /FitH 358] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 151 0 R /Parent 148 0 R /Prev 149 0 R /Title <352e342e3220496d616765205365676d656e746174696f6e20>>>
+object 151 0: <</A <</D [29 /FitH 395] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 148 0 R /Prev 150 0 R /Title <352e342e3320496d61676520416e616c7973697320616e642050726f63657373696e6720494920>>>
+object 152 0: <</A <</D [30 /FitH 557] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 153 0 R /Last 155 0 R /Parent 137 0 R /Prev 148 0 R /Title <352e3520496e66726172656420496d6167696e6720>>>
+object 153 0: <</A <</D [30 /FitH 535] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 154 0 R /Parent 152 0 R /Title <352e352e3120436c696e6963616c204170706c69636174696f6e73206f6620495220496d6167696e67204920>>>
+object 154 0: <</A <</D [30 /FitH 312] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 155 0 R /Parent 152 0 R /Prev 153 0 R /Title <352e352e3220436c696e6963616c204170706c69636174696f6e73206f6620495220496d6167696e6720494920>>>
+object 155 0: <</A <</D [31 /FitH 751] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 152 0 R /Prev 154 0 R /Title <352e352e3320495220496d6167696e6720546563686e697175657320>>>
+object 156 0: <</A <</D [31 /FitH 537] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -9 /First 157 0 R /Last 164 0 R /Next 166 0 R /Parent 23 1 R /Prev 137 0 R /Title <362e204d6f6c6563756c61722c2043656c6c756c617220616e642054697373756520456e67696e656572696e6720>>>
+object 157 0: <</A <</D [31 /FitH 515] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 158 0 R /Last 159 0 R /Next 160 0 R /Parent 156 0 R /Title <362e31204d6f6c6563756c617220616e642047656e6f6d696320456e67696e656572696e6720>>>
+object 158 0: <</A <</D [31 /FitH 494] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 159 0 R /Parent 157 0 R /Title <362e312e312047656e6f6d696320456e67696e656572696e673a203120>>>
+object 159 0: <</A <</D [31 /FitH 332] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 157 0 R /Prev 158 0 R /Title <362e312e322047656e6f6d696320456e67696e656572696e6720494920>>>
+object 160 0: <</A <</D [31 /FitH 288] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 161 0 R /Last 161 0 R /Next 162 0 R /Parent 156 0 R /Prev 157 0 R /Title <362e322043656c6c20456e67696e656572696e6720616e64204d656368616e69637320>>>
+object 161 0: <</A <</D [31 /FitH 288] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 160 0 R /Title <362e322e312043656c6c20456e67696e656572696e67>>>
+object 162 0: <</A <</D [32 /FitH 503] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 163 0 R /Last 163 0 R /Next 164 0 R /Parent 156 0 R /Prev 160 0 R /Title <362e332054697373756520456e67696e656572696e6720>>>
+object 163 0: <</A <</D [32 /FitH 481] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 162 0 R /Title <362e332e312054697373756520456e67696e656572696e6720>>>
+object 164 0: <</A <</D [32 /FitH 332] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 165 0 R /Last 165 0 R /Parent 156 0 R /Prev 162 0 R /Title <362e342e2042696f6d6174657269616c7320>>>
+object 165 0: <</A <</D [32 /FitH 332] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 164 0 R /Title <362e342e312042696f6d6174657269616c7320>>>
+object 166 0: <</A <</D [32 /FitH 332] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -21 /First 167 0 R /Last 186 0 R /Next 188 0 R /Parent 23 1 R /Prev 156 0 R /Title <372e2042696f6d65646963616c2053656e736f727320616e6420496e737472756d656e746174696f6e20>>>
+object 167 0: <</A <</D [32 /FitH 311] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 5 /First 168 0 R /Last 172 0 R /Next 173 0 R /Parent 166 0 R /Title <372e312042696f6d65646963616c2053656e736f727320>>>
+object 168 0: <</A <</D [32 /FitH 311] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 169 0 R /Parent 167 0 R /Title <372e312e31204f70746963616c2042696f6d65646963616c2053656e736f727320>>>
+object 169 0: <</A <</D [33 /FitH 603] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 170 0 R /Parent 167 0 R /Prev 168 0 R /Title <372e312e3220416c676f726974686d7320666f722042696f6d65646963616c2053656e736f727320>>>
+object 170 0: <</A <</D [33 /FitH 414] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 171 0 R /Parent 167 0 R /Prev 169 0 R /Title <372e312e3320456c656374726f2d70687973696f6c6f676963616c2053656e736f727320>>>
+object 171 0: <</A <</D [33 /FitH 349] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 172 0 R /Parent 167 0 R /Prev 170 0 R /Title <372e312e342047656e6572616c2042696f6d65646963616c2053656e736f727320>>>
+object 172 0: <</A <</D [34 /FitH 617] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 167 0 R /Prev 171 0 R /Title <372e312e3520416476616e63657320696e2042696f6d65646963616c2053656e736f727320>>>
+object 173 0: <</A <</D [34 /FitH 509] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 174 0 R /Last 174 0 R /Next 175 0 R /Parent 166 0 R /Prev 167 0 R /Title <372e322042696f6d65646963616c204163747561746f727320>>>
+object 174 0: <</A <</D [34 /FitH 487] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 173 0 R /Title <372e322e312042696f6d65646963616c204163747561746f727320>>>
+object 175 0: <</A <</D [34 /FitH 423] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 3 /First 176 0 R /Last 178 0 R /Next 179 0 R /Parent 166 0 R /Prev 173 0 R /Title <372e332042696f6d65646963616c20496e737472756d656e746174696f6e20>>>
+object 176 0: <</A <</D [34 /FitH 409] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 177 0 R /Parent 175 0 R /Title <372e332e312042696f6d65646963616c20496e737472756d656e746174696f6e20>>>
+object 177 0: <</A <</D [35 /FitH 302] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 178 0 R /Parent 175 0 R /Prev 176 0 R /Title <372e332e32204e6f6e2d496e766173697665204d65646963616c20496e737472756d656e746174696f6e204920>>>
+object 178 0: <</A <</D [36 /FitH 630] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 175 0 R /Prev 177 0 R /Title <372e332e33204e6f6e2d496e766173697665204d65646963616c20496e737472756d656e746174696f6e20494920>>>
+object 179 0: <</A <</D [36 /FitH 454] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 4 /First 180 0 R /Last 183 0 R /Next 184 0 R /Parent 166 0 R /Prev 175 0 R /Title <372e342044617461204163717569736974696f6e20616e64204d6561737572656d656e7420>>>
+object 180 0: <</A <</D [36 /FitH 430] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 181 0 R /Parent 179 0 R /Title <372e342e312050687973696f6c6f676963616c2044617461204163717569736974696f6e20>>>
+object 181 0: <</A <</D [36 /FitH 378] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 182 0 R /Parent 179 0 R /Prev 180 0 R /Title <372e342e322050687973696f6c6f676963616c2044617461204163717569736974696f6e205573696e6720496d6167696e6720546563686e6f6c6f677920>>>
+object 182 0: <</A <</D [37 /FitH 647] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 183 0 R /Parent 179 0 R /Prev 181 0 R /Title <372e342e332045434720262043617264696f76617363756c61722044617461204163717569736974696f6e20>>>
+object 183 0: <</A <</D [37 /FitH 484] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 179 0 R /Prev 182 0 R /Title <372e342e342042696f696d706564616e636520>>>
+object 184 0: <</A <</D [37 /FitH 310] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 185 0 R /Last 185 0 R /Next 186 0 R /Parent 166 0 R /Prev 179 0 R /Title <372e35204e616e6f20546563686e6f6c6f677920>>>
+object 185 0: <</A <</D [37 /FitH 310] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 184 0 R /Title <372e352e31204e616e6f746563686e6f6c6f677920>>>
+object 186 0: <</A <</D [37 /FitH 310] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 187 0 R /Last 187 0 R /Parent 166 0 R /Prev 184 0 R /Title <372e3620526f626f7469637320616e64204d6563686174726f6e69637320>>>
+object 187 0: <</A <</D [37 /FitH 310] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 186 0 R /Title <372e362e3120526f626f7469637320616e64204d6563686174726f6e69637320>>>
+object 188 0: <</A <</D [38 /FitH 510] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -16 /First 189 0 R /Last 202 0 R /Next 205 0 R /Parent 23 1 R /Prev 166 0 R /Title <382e2042696f6d65646963616c20496e666f726d6174696f6e20456e67696e656572696e6720>>>
+object 189 0: <</A <</D [38 /FitH 490] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 6 /First 190 0 R /Last 195 0 R /Next 196 0 R /Parent 188 0 R /Title <382e312054656c656d65646963696e6520616e642054656c656865616c74682053797374656d20>>>
+object 190 0: <</A <</D [38 /FitH 474] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 191 0 R /Parent 189 0 R /Title <382e312e312054656c656d65646963696e652053797374656d7320616e642054656c6563617264696f6c6f677920>>>
+object 191 0: <</A <</D [38 /FitH 298] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 192 0 R /Parent 189 0 R /Prev 190 0 R /Title <382e312e32204d6f62696c65204865616c74682053797374656d7320>>>
+object 192 0: <</A <</D [38 /FitH 298] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 193 0 R /Parent 189 0 R /Prev 191 0 R /Title <382e312e33204d65646963616c204461746120436f6d7072657373696f6e20616e642041757468656e7469636174696f6e20>>>
+object 193 0: <</A <</D [39 /FitH 626] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 194 0 R /Parent 189 0 R /Prev 192 0 R /Title <382e312e342054656c656865616c746820616e6420486f6d656361726520>>>
+object 194 0: <</A <</D [39 /FitH 449] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 195 0 R /Parent 189 0 R /Prev 193 0 R /Title <382e312e352054656c656865616c746820616e64205741502d62617365642053797374656d7320>>>
+object 195 0: <</A <</D [39 /FitH 295] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 189 0 R /Prev 194 0 R /Title <382e312e362054656c656d65646963696e6520616e642054656c656865616c746820>>>
+object 196 0: <</A <</D [40 /FitH 407] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 197 0 R /Last 198 0 R /Next 199 0 R /Parent 188 0 R /Prev 189 0 R /Title <382e3220496e666f726d6174696f6e2053797374656d7320>>>
+object 197 0: <</A <</D [40 /FitH 389] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 198 0 R /Parent 196 0 R /Title <382e322e3120496e666f726d6174696f6e2053797374656d732049>>>
+object 198 0: <</A <</D [40 /FitH 343] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 196 0 R /Prev 197 0 R /Title <382e322e3220496e666f726d6174696f6e2053797374656d7320494920>>>
+object 199 0: <</A <</D [41 /FitH 536] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 200 0 R /Last 201 0 R /Next 202 0 R /Parent 188 0 R /Prev 196 0 R /Title <382e33205669727475616c20616e64204175676d656e746564205265616c69747920>>>
+object 200 0: <</A <</D [41 /FitH 517] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 201 0 R /Parent 199 0 R /Title <382e332e31205669727475616c20616e64204175676d656e746564205265616c697479204920>>>
+object 201 0: <</A <</D [41 /FitH 353] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 199 0 R /Prev 200 0 R /Title <382e332e32205669727475616c20616e64204175676d656e746564205265616c69747920494920>>>
+object 202 0: <</A <</D [41 /FitH 329] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 203 0 R /Last 204 0 R /Parent 188 0 R /Prev 199 0 R /Title <382e34204b6e6f776c656467652042617365642053797374656d7320>>>
+object 203 0: <</A <</D [41 /FitH 329] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 204 0 R /Parent 202 0 R /Title <382e342e31204b6e6f776c656467652042617365642053797374656d73204920>>>
+object 204 0: <</A <</D [42 /FitH 623] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 202 0 R /Prev 203 0 R /Title <382e342e32204b6e6f776c656467652042617365642053797374656d7320494920>>>
+object 205 0: <</A <</D [42 /FitH 284] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -11 /First 206 0 R /Last 214 0 R /Next 217 0 R /Parent 23 1 R /Prev 188 0 R /Title <392e204865616c7468204361726520546563686e6f6c6f677920616e642042696f6d65646963616c20456475636174696f6e20>>>
+object 206 0: <</A <</D [42 /FitH 266] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 207 0 R /Last 207 0 R /Next 208 0 R /Parent 205 0 R /Title <392e3120456d657267696e6720546563686e6f6c6f6769657320666f72204865616c746820436172652044656c697665727920>>>
+object 207 0: <</A <</D [42 /FitH 266] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 206 0 R /Title <392e312e3120456d657267696e6720546563686e6f6c6f6769657320666f72204865616c746820436172652044656c697665727920>>>
+object 208 0: <</A <</D [43 /FitH 732] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 209 0 R /Last 209 0 R /Next 210 0 R /Parent 205 0 R /Prev 206 0 R /Title <392e3220436c696e6963616c20456e67696e656572696e6720>>>
+object 209 0: <</A <</D [43 /FitH 714] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 208 0 R /Title <392e322e3120546563686e6f6c6f677920696e20436c696e6963616c20456e67696e656572696e6720>>>
+object 210 0: <</A <</D [43 /FitH 307] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 211 0 R /Last 211 0 R /Next 212 0 R /Parent 205 0 R /Prev 208 0 R /Title <392e3320437269746963616c204361726520616e6420496e74656c6c6967656e74204d6f6e69746f72696e672053797374656d7320>>>
+object 211 0: <</A <</D [43 /FitH 307] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 210 0 R /Title <392e332e3120437269746963616c204361726520616e6420496e74656c6c6967656e74204d6f6e69746f72696e672053797374656d7320>>>
+object 212 0: <</A <</D [43 /FitH 307] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 213 0 R /Last 213 0 R /Next 214 0 R /Parent 205 0 R /Prev 210 0 R /Title <392e34204574686963732c205374616e64617264697a6174696f6e20616e642053616665747920>>>
+object 213 0: <</A <</D [43 /FitH 307] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 212 0 R /Title <392e342e31204574686963732c205374616e64617264697a6174696f6e20616e642053616665747920>>>
+object 214 0: <</A <</D [44 /FitH 569] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 2 /First 215 0 R /Last 216 0 R /Parent 205 0 R /Prev 212 0 R /Title <392e3520496e7465726e6574204c6561726e696e6720616e642044697374616e6365204c6561726e696e6720>>>
+object 215 0: <</A <</D [44 /FitH 550] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 216 0 R /Parent 214 0 R /Title <392e352e3120546563686e6f6c6f677920696e2042696f6d65646963616c20456e67696e656572696e6720456475636174696f6e20616e6420547261696e696e6720>>>
+object 216 0: <</A <</D [44 /FitH 360] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 214 0 R /Prev 215 0 R /Title <392e352e3220436f6d707574657220546f6f6c7320446576656c6f70656420627920496e746567726174696e6720526573656172636820616e6420456475636174696f6e20>>>
+object 217 0: <</A <</D [44 /FitH 334] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -16 /First 218 0 R /Last 227 0 R /Parent 23 1 R /Prev 205 0 R /Title <31302e2053796d706f73696120616e6420506c656e617269657320>>>
+object 218 0: <</A <</D [44 /FitH 334] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 1 /First 219 0 R /Last 219 0 R /Next 220 0 R /Parent 217 0 R /Title <31302e31204f70656e696e6720436572656d6f6e69657320>>>
+object 219 0: <</A <</D [44 /FitH 334] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 218 0 R /Title <31302e312e31204b65796e6f7465204c65637475726520>>>
+object 220 0: <</A <</D [44 /FitH 334] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 6 /First 221 0 R /Last 226 0 R /Next 227 0 R /Parent 217 0 R /Prev 218 0 R /Title <31302e3220506c656e617279204c6563747572657320>>>
+object 221 0: <</A <</D [44 /FitH 334] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 222 0 R /Parent 220 0 R /Title <31302e322e31204d6f6c6563756c617220496d6167696e672077697468204f70746963616c2c204d61676e65746963205265736f6e616e63652c20616e6420>>>
+object 222 0: <</A <</D [45 /FitH 731] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 223 0 R /Parent 220 0 R /Prev 221 0 R /Title <31302e322e32204d6963726f62696f656e67696e656572696e673a204d6963726f6265204361707475726520616e6420446574656374696f6e20>>>
+object 223 0: <</A <</D [45 /FitH 691] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 224 0 R /Parent 220 0 R /Prev 222 0 R /Title <31302e322e3320416476616e636564206469737472696275746564206c6561726e696e672c2042726f616462616e6420496e7465726e65742c20616e64204d65646963616c20456475636174696f6e20>>>
+object 224 0: <</A <</D [45 /FitH 652] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 225 0 R /Parent 220 0 R /Prev 223 0 R /Title <31302e322e34204361726469616320616e6420417274657269616c20436f6e747269627574696f6e20746f20426c6f6f6420507265737375726520>>>
+object 225 0: <</A <</D [45 /FitH 612] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 226 0 R /Parent 220 0 R /Prev 224 0 R /Title <31302e322e3520486570617469632054697373756520456e67696e656572696e6720>>>
+object 226 0: <</A <</D [45 /FitH 574] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 220 0 R /Prev 225 0 R /Title <31302e322e362048696768205468726f756768707574204368616c6c656e67657320696e204d6f6c6563756c61722043656c6c2042696f6c6f67793a205468652043454c4c204d4150>>>
+object 227 0: <</A <</D [45 /FitH 538] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count 6 /First 228 0 R /Last 233 0 R /Parent 217 0 R /Prev 220 0 R /Title <31302e33204d696e6973796d706f73696120>>>
+object 228 0: <</A <</D [45 /FitH 518] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 229 0 R /Parent 227 0 R /Title <31302e332e31204d6f64656c696e67206173206120546f6f6c20696e204e6575726f6d757363756c617220616e64205265686162696c69746174696f6e20>>>
+object 229 0: <</A <</D [45 /FitH 434] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 230 0 R /Parent 227 0 R /Prev 228 0 R /Title <31302e332e32204e616e6f746563686e6f6c6f677920696e2042696f6d65646963696e6520>>>
+object 230 0: <</A <</D [45 /FitH 315] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 231 0 R /Parent 227 0 R /Prev 229 0 R /Title <31302e332e332046756e6374696f6e616c20496d6167696e6720>>>
+object 231 0: <</A <</D [45 /FitH 280] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 232 0 R /Parent 227 0 R /Prev 230 0 R /Title <31302e332e34204e657572616c204e6574776f726b2044796e616d69637320>>>
+object 232 0: <</A <</D [45 /FitH 280] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 233 0 R /Parent 227 0 R /Prev 231 0 R /Title <31302e332e352042696f696e666f726d617469637320>>>
+object 233 0: <</A <</D [45 /FitH 280] /F <</F <2e2e2f74696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 227 0 R /Prev 232 0 R /Title <31302e332e362050726f6d6973657320616e642050697466616c6c73206f662042696f7369676e616c20416e616c797369733a205365697a7572652050726564696374696f6e20616e64204d616e6167656d656e7420>>>
+object 234 0: <</A <</D [0 /FitH 846] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Count -28 /First 235 0 R /Last 262 0 R /Next 263 0 R /Parent 15 1 R /Prev 23 1 R /Title <417574686f7220496e646578>>>
+object 235 0: <</A <</D [0 /FitH 744] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 236 0 R /Parent 234 0 R /Title <41>>>
+object 236 0: <</A <</D [9 /FitH 743] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 237 0 R /Parent 234 0 R /Prev 235 0 R /Title <42>>>
+object 237 0: <</A <</D [19 /FitH 744] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 238 0 R /Parent 234 0 R /Prev 236 0 R /Title <43>>>
+object 238 0: <</A <</D [29 /FitH 756] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 239 0 R /Parent 234 0 R /Prev 237 0 R /Title <44>>>
+object 239 0: <</A <</D [35 /FitH 752] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 240 0 R /Parent 234 0 R /Prev 238 0 R /Title <45>>>
+object 240 0: <</A <</D [38 /FitH 751] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 241 0 R /Parent 234 0 R /Prev 239 0 R /Title <46>>>
+object 241 0: <</A <</D [43 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 242 0 R /Parent 234 0 R /Prev 240 0 R /Title <47>>>
+object 242 0: <</A <</D [51 /FitH 751] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 243 0 R /Parent 234 0 R /Prev 241 0 R /Title <48>>>
+object 243 0: <</A <</D [61 /FitH 751] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 244 0 R /Parent 234 0 R /Prev 242 0 R /Title <49>>>
+object 244 0: <</A <</D [64 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 245 0 R /Parent 234 0 R /Prev 243 0 R /Title <4a>>>
+object 245 0: <</A <</D [68 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 246 0 R /Parent 234 0 R /Prev 244 0 R /Title <4b>>>
+object 246 0: <</A <</D [80 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 247 0 R /Parent 234 0 R /Prev 245 0 R /Title <4c>>>
+object 247 0: <</A <</D [90 /FitH 751] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 248 0 R /Parent 234 0 R /Prev 246 0 R /Title <4d>>>
+object 248 0: <</A <</D [105 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 249 0 R /Parent 234 0 R /Prev 247 0 R /Title <4e>>>
+object 249 0: <</A <</D [111 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 250 0 R /Parent 234 0 R /Prev 248 0 R /Title <4f>>>
+object 250 0: <</A <</D [115 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 251 0 R /Parent 234 0 R /Prev 249 0 R /Title <d6>>>
+object 251 0: <</A <</D [116 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 252 0 R /Parent 234 0 R /Prev 250 0 R /Title <50>>>
+object 252 0: <</A <</D [125 /FitH 756] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 253 0 R /Parent 234 0 R /Prev 251 0 R /Title <51>>>
+object 253 0: <</A <</D [126 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 254 0 R /Parent 234 0 R /Prev 252 0 R /Title <52>>>
+object 254 0: <</A <</D [134 /FitH 754] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 255 0 R /Parent 234 0 R /Prev 253 0 R /Title <53>>>
+object 255 0: <</A <</D [150 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 256 0 R /Parent 234 0 R /Prev 254 0 R /Title <54>>>
+object 256 0: <</A <</D [158 /FitH 756] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 257 0 R /Parent 234 0 R /Prev 255 0 R /Title <55>>>
+object 257 0: <</A <</D [160 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 258 0 R /Parent 234 0 R /Prev 256 0 R /Title <dc>>>
+object 258 0: <</A <</D [161 /FitH 751] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 259 0 R /Parent 234 0 R /Prev 257 0 R /Title <56>>>
+object 259 0: <</A <</D [164 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 260 0 R /Parent 234 0 R /Prev 258 0 R /Title <57>>>
+object 260 0: <</A <</D [170 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 261 0 R /Parent 234 0 R /Prev 259 0 R /Title <58>>>
+object 261 0: <</A <</D [171 /FitH 753] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Next 262 0 R /Parent 234 0 R /Prev 260 0 R /Title <59>>>
+object 262 0: <</A <</D [177 /FitH 755] /F <</F <2e2e2f61696e6465782e706466> /Type /Filespec>> /S /GoToR>> /Parent 234 0 R /Prev 261 0 R /Title <5a>>>
+object 263 0: <</A <</D [0 /FitH 846] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Count -34 /First 264 0 R /Last 297 0 R /Next 298 0 R /Parent 15 1 R /Prev 234 0 R /Title <4b6579776f726420496e646578>>>
+object 264 0: <</A <</D [0 /FitH 751] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 265 0 R /Parent 263 0 R /Title <2d>>>
+object 265 0: <</A <</D [0 /FitH 632] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 266 0 R /Parent 263 0 R /Prev 264 0 R /Title <a620>>>
+object 266 0: <</A <</D [0 /FitH 467] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 267 0 R /Parent 263 0 R /Prev 265 0 R /Title <31>>>
+object 267 0: <</A <</D [0 /FitH 388] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 268 0 R /Parent 263 0 R /Prev 266 0 R /Title <32>>>
+object 268 0: <</A <</D [1 /FitH 1066] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 269 0 R /Parent 263 0 R /Prev 267 0 R /Title <33>>>
+object 269 0: <</A <</D [1 /FitH 343] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 270 0 R /Parent 263 0 R /Prev 268 0 R /Title <34>>>
+object 270 0: <</A <</D [1 /FitH 343] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 271 0 R /Parent 263 0 R /Prev 269 0 R /Title <39>>>
+object 271 0: <</A <</D [1 /FitH 343] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 272 0 R /Parent 263 0 R /Prev 270 0 R /Title <41>>>
+object 272 0: <</A <</D [13 /FitH 755] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 273 0 R /Parent 263 0 R /Prev 271 0 R /Title <42>>>
+object 273 0: <</A <</D [22 /FitH 452] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 274 0 R /Parent 263 0 R /Prev 272 0 R /Title <43>>>
+object 274 0: <</A <</D [43 /FitH 754] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 275 0 R /Parent 263 0 R /Prev 273 0 R /Title <44>>>
+object 275 0: <</A <</D [51 /FitH 505] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 276 0 R /Parent 263 0 R /Prev 274 0 R /Title <45>>>
+object 276 0: <</A <</D [65 /FitH 587] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 277 0 R /Parent 263 0 R /Prev 275 0 R /Title <46>>>
+object 277 0: <</A <</D [73 /FitH 742] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 278 0 R /Parent 263 0 R /Prev 276 0 R /Title <47>>>
+object 278 0: <</A <</D [75 /FitH 385] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 279 0 R /Parent 263 0 R /Prev 277 0 R /Title <48>>>
+object 279 0: <</A <</D [83 /FitH 385] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 280 0 R /Parent 263 0 R /Prev 278 0 R /Title <49>>>
+object 280 0: <</A <</D [88 /FitH 698] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 281 0 R /Parent 263 0 R /Prev 279 0 R /Title <69>>>
+object 281 0: <</A <</D [93 /FitH 658] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 282 0 R /Parent 263 0 R /Prev 280 0 R /Title <4a>>>
+object 282 0: <</A <</D [93 /FitH 408] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 283 0 R /Parent 263 0 R /Prev 281 0 R /Title <4b>>>
+object 283 0: <</A <</D [95 /FitH 589] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 284 0 R /Parent 263 0 R /Prev 282 0 R /Title <4c>>>
+object 284 0: <</A <</D [99 /FitH 383] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 285 0 R /Parent 263 0 R /Prev 283 0 R /Title <4d>>>
+object 285 0: <</A <</D [116 /FitH 440] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 286 0 R /Parent 263 0 R /Prev 284 0 R /Title <4e>>>
+object 286 0: <</A <</D [123 /FitH 433] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 287 0 R /Parent 263 0 R /Prev 285 0 R /Title <4f>>>
+object 287 0: <</A <</D [127 /FitH 751] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 288 0 R /Parent 263 0 R /Prev 286 0 R /Title <50>>>
+object 288 0: <</A <</D [139 /FitH 753] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 289 0 R /Parent 263 0 R /Prev 287 0 R /Title <51>>>
+object 289 0: <</A <</D [139 /FitH 470] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 290 0 R /Parent 263 0 R /Prev 288 0 R /Title <52>>>
+object 290 0: <</A <</D [147 /FitH 667] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 291 0 R /Parent 263 0 R /Prev 289 0 R /Title <53>>>
+object 291 0: <</A <</D [164 /FitH 472] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 292 0 R /Parent 263 0 R /Prev 290 0 R /Title <54>>>
+object 292 0: <</A <</D [174 /FitH 564] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 293 0 R /Parent 263 0 R /Prev 291 0 R /Title <55>>>
+object 293 0: <</A <</D [176 /FitH 479] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 294 0 R /Parent 263 0 R /Prev 292 0 R /Title <56>>>
+object 294 0: <</A <</D [181 /FitH 514] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 295 0 R /Parent 263 0 R /Prev 293 0 R /Title <57>>>
+object 295 0: <</A <</D [185 /FitH 754] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 296 0 R /Parent 263 0 R /Prev 294 0 R /Title <58>>>
+object 296 0: <</A <</D [185 /FitH 605] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Next 297 0 R /Parent 263 0 R /Prev 295 0 R /Title <59>>>
+object 297 0: <</A <</D [185 /FitH 605] /F <</F <2e2e2f6b696e6465782e504446> /Type /Filespec>> /S /GoToR>> /Parent 263 0 R /Prev 296 0 R /Title <5a>>>
+object 298 0: <</A <</D [0 /FitH 796] /F <</F <2e2e2f636f6d697465652e504446> /Type /Filespec>> /S /GoToR>> /Next 299 0 R /Parent 15 1 R /Prev 263 0 R /Title <436f6d6d697474656573>>>
+object 299 0: <</A <</D [0 /FitH 796] /F <</F <2e2e2f73706f6e732e504446> /Type /Filespec>> /S /GoToR>> /Next 300 0 R /Parent 15 1 R /Prev 298 0 R /Title <53706f6e736f7273>>>
+object 300 0: <</A <</D [0 /FitH 842] /F <</F <2e2e2f68656c702e504446> /Type /Filespec>> /S /GoToR>> /Next 301 0 R /Parent 15 1 R /Prev 299 0 R /Title <43442d526f6d2048656c70>>>
+object 301 0: <</Next 302 0 R /Parent 15 1 R /Prev 300 0 R /Title <2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d>>>
+object 302 0: <</A <</N /Close /S /Named>> /Next 303 0 R /Parent 15 1 R /Prev 301 0 R /Title <52657475726e>>>
+object 303 0: <</A <</N /PrevPage /S /Named>> /Next 304 0 R /Parent 15 1 R /Prev 302 0 R /Title <50726576696f75732050616765>>>
+object 304 0: <</A <</N /NextPage /S /Named>> /Next 305 0 R /Parent 15 1 R /Prev 303 0 R /Title <4e6578742050616765>>>
+object 305 0: <</A <</N /GoBack /S /Named>> /Next 306 0 R /Parent 15 1 R /Prev 304 0 R /Title <50726576696f75732056696577>>>
+object 306 0: <</A <</N /GoForward /S /Named>> /Next 307 0 R /Parent 15 1 R /Prev 305 0 R /Title <4e6578742056696577>>>
+object 307 0: <</A <</N /Print /S /Named>> /Next 308 0 R /Parent 15 1 R /Prev 306 0 R /Title <5072696e74>>>
+object 308 0: <</Next 309 0 R /Parent 15 1 R /Prev 307 0 R /Title <2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d>>>
+object 309 0: <</A <</N /AcroSrch:Query /S /Named>> /Next 310 0 R /Parent 15 1 R /Prev 308 0 R /Title <5175657279>>>
+object 310 0: <</A <</N /AcroSrch:Results /S /Named>> /Next 311 0 R /Parent 15 1 R /Prev 309 0 R /Title <517565727920526573756c7473>>>
+object 311 0: <</Next 312 0 R /Parent 15 1 R /Prev 310 0 R /Title <2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d>>>
+object 312 0: <</A <</N /Quit /S /Named>> /Parent 15 1 R /Prev 311 0 R /Title <457869742043442d526f6d>>>
+object 313 1: <</Names [<30> [1 1 R /XYZ -4 842 null]]>>
+object 314 0: <</Length 1513 /Subtype /XML /Type /Metadata>> stream sha256=d164be4fd4c554f4091a4e799d86f4d4080a847229e288e1ae4d3b3f493f48f4
+object 315 2: <</Dests 313 1 R>>
+object 316 0: <</Author <6e616b616a696d61> /CreationDate <443a32303031303631313230303730315a> /Creator <4c757261446f63756d656e742050444620436f6d70726573736f722053657276657220352e372e36362e343620286f726967696e616c3a204d6963726f736f667420576f72642029> /ModDate <443a32303131313032303134353032342d303527303027> /Producer <5265636f646564206279204c757261446f63756d656e74205044462076322e3436> /Title <4e616b616a696d612e504446>>>
+object 317 0: <</E 14815 /H [857 224] /L 118706 /Linearized 1 /N 4 /O 319 /T 112249>>
+object 318 0: <</Metadata 314 0 R /Names 315 2 R /OpenAction <</D [319 0 R /FitH -32768] /S /GoTo>> /Outlines 14 1 R /PageMode /UseNone /Pages 13 0 R /Type /Catalog>>
+object 319 0: <</Contents [329 0 R 330 0 R 331 0 R 332 0 R 333 0 R 334 0 R 335 0 R 336 0 R] /CropBox [0 0 596 842] /MediaBox [0 0 596 842] /Parent 13 0 R /Resources <</Font <</F0 320 0 R /F1 322 0 R /F2 324 0 R /F3 326 0 R>> /ProcSet 328 0 R>> /Rotate 0 /Type /Page>>
+object 320 0: <</BaseFont /TimesNewRoman,BoldItalic /Encoding /WinAnsiEncoding /FirstChar 31 /FontDescriptor 321 0 R /LastChar 255 /Name /F0 /Subtype /TrueType /Type /Font /Widths [778 250 389 555 500 500 833 778 278 333 333 500 570 250 333 250 278 500 500 500 500 500 500 500 500 500 500 333 333 570 570 570 500 832 667 667 667 722 667 667 722 778 389 500 667 611 889 722 722 611 722 667 556 611 722 667 889 667 611 611 333 278 333 570 500 333 500 500 444 500 444 333 500 556 278 278 500 278 778 556 500 500 500 389 389 278 556 444 667 500 444 389 348 220 348 570 778 500 778 333 500 500 1000 500 500 333 1000 556 333 944 778 778 778 778 333 333 500 500 350 500 1000 333 1000 389 333 722 778 778 611 250 389 500 500 500 500 220 500 333 747 266 500 606 333 747 500 400 549 300 300 333 576 500 250 333 300 300 500 750 750 750 500 667 667 667 667 667 667 944 667 667 667 667 667 389 389 389 389 722 722 722 722 722 722 722 570 722 722 722 722 722 611 611 500 500 500 500 500 500 500 722 444 444 444 444 444 278 278 278 278 500 556 500 500 500 500 500 549 500 556 556 556 556 444 500 444]>>
+object 321 0: <</Ascent 1000 /AvgWidth 417 /CapHeight 1000 /Descent -250 /Flags 16482 /FontBBox [-250 -250 1300 1000] /FontName /TimesNewRoman,BoldItalic /ItalicAngle -11 /Leading 333 /MaxWidth 1083 /MissingWidth 750 /StemH 132 /StemV 132 /Type /FontDescriptor /XHeight 700>>
+object 322 0: <</BaseFont /TimesNewRoman,Bold /Encoding /WinAnsiEncoding /FirstChar 31 /FontDescriptor 323 0 R /LastChar 255 /Name /F1 /Subtype /TrueType /Type /Font /Widths [778 250 333 555 500 500 1000 833 278 333 333 500 570 250 333 250 278 500 500 500 500 500 500 500 500 500 500 333 333 570 570 570 500 930 722 667 722 722 667 611 778 778 389 500 778 667 944 722 778 611 778 722 556 667 722 722 1000 722 722 667 333 278 333 581 500 333 500 556 444 556 444 333 500 556 278 333 556 278 833 556 500 556 556 444 389 333 556 500 722 500 500 444 394 220 394 520 778 500 778 333 500 500 1000 500 500 333 1000 556 333 1000 778 778 778 778 333 333 500 500 350 500 1000 333 1000 389 333 722 778 778 722 250 333 500 500 500 500 220 500 333 747 300 500 570 333 747 500 400 549 300 300 333 576 540 250 333 300 330 500 750 750 750 500 722 722 722 722 722 722 1000 722 667 667 667 667 389 389 389 389 722 722 778 778 778 778 778 570 778 722 722 722 722 722 611 556 500 500 500 500 500 500 722 444 444 444 444 444 278 278 278 278 500 556 500 500 500 500 500 549 500 556 556 556 556 500 556 500]>>
+object 323 0: <</Ascent 1000 /AvgWidth 417 /CapHeight 1000 /Descent -250 /Flags 16418 /FontBBox [-250 -250 1300 1000] /FontName /TimesNewRoman,Bold /ItalicAngle 0 /Leading 333 /MaxWidth 1083 /MissingWidth 750 /StemH 132 /StemV 132 /Type /FontDescriptor /XHeight 700>>
+object 324 0: <</BaseFont /TimesNewRoman /Encoding /WinAnsiEncoding /FirstChar 31 /FontDescriptor 325 0 R /LastChar 255 /Name /F2 /Subtype /TrueType /Type /Font /Widths [778 250 333 408 500 500 833 778 180 333 333 500 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 564 564 564 444 921 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 722 667 556 611 722 722 944 722 722 611 333 278 333 469 500 333 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 480 200 480 541 778 500 778 333 500 444 1000 500 500 333 1000 556 333 889 778 778 778 778 333 333 444 444 350 500 1000 333 980 389 333 722 778 778 722 250 333 500 500 500 500 200 500 333 760 276 500 564 333 760 500 400 549 300 300 333 576 453 250 333 300 310 500 750 750 750 444 722 722 722 722 722 722 889 667 611 611 611 611 333 333 333 333 722 722 722 722 722 722 722 564 722 722 722 722 722 722 556 500 444 444 444 444 444 444 667 444 444 444 444 444 278 278 278 278 500 500 500 500 500 500 500 549 500 500 500 500 500 500 500 500]>>
+object 325 0: <</Ascent 923 /AvgWidth 385 /CapHeight 923 /Descent -231 /Flags 34 /FontBBox [-250 -231 1292 923] /FontName /TimesNewRoman /ItalicAngle 0 /Leading 231 /MaxWidth 1077 /MissingWidth 769 /StemH 70 /StemV 70 /Type /FontDescriptor /XHeight 646>>
+object 326 0: <</BaseFont /TimesNewRoman,Italic /Encoding /WinAnsiEncoding /FirstChar 31 /FontDescriptor 327 0 R /LastChar 255 /Name /F3 /Subtype /TrueType /Type /Font /Widths [778 250 333 420 500 500 833 778 214 333 333 500 675 250 333 250 278 500 500 500 500 500 500 500 500 500 500 333 333 675 675 675 500 920 611 611 667 722 611 611 722 722 333 444 667 556 833 667 722 611 722 611 500 556 722 611 833 611 556 556 389 278 389 422 500 333 500 500 444 500 444 278 500 500 278 278 444 278 722 500 500 500 500 389 389 278 500 444 667 444 444 389 400 275 400 541 778 500 778 333 500 556 889 500 500 333 1000 500 333 944 778 778 778 778 333 333 556 556 350 500 889 333 980 389 333 667 778 778 556 250 389 500 500 500 500 275 500 333 760 276 500 675 333 760 500 400 549 300 300 333 576 523 250 333 300 310 500 750 750 750 500 611 611 611 611 611 611 889 667 611 611 611 611 333 333 333 333 722 667 722 722 722 722 722 675 722 722 722 722 722 556 611 500 500 500 500 500 500 500 667 444 444 444 444 444 278 278 278 278 500 500 500 500 500 500 500 549 500 500 500 500 500 444 500 444]>>
+object 327 0: <</Ascent 923 /AvgWidth 385 /CapHeight 923 /Descent -231 /Flags 98 /FontBBox [-250 -231 1200 923] /FontName /TimesNewRoman,Italic /ItalicAngle -11 /Leading 231 /MaxWidth 1000 /MissingWidth 769 /StemH 70 /StemV 70 /Type /FontDescriptor /XHeight 646>>
+object 328 0: [/PDF /Text /ImageC]
+object 329 0: <</Filter /FlateDecode /Length 907>> stream sha256=08568a742d46d8e11f52c7ce2a83e65c548e74588653e07b46f86261a868f254
+object 330 0: <</Filter /FlateDecode /Length 985>> stream sha256=1f1ee384c35f3329d306759a76fde66b2cdaa9a024ffdeb39af7c4c990f17da7
+object 331 0: <</Filter /FlateDecode /Length 958>> stream sha256=37919349d12ce2d2bc3f88e079f0fe84257ce5c78d80a3909c571fcec8bf76f3
+object 332 0: <</Filter /FlateDecode /Length 931>> stream sha256=6bfcd7a33b42edd334782e1cf07ed0622c8bb08ee70b61b8a637d1f7d91fa287
+object 333 0: <</Filter /FlateDecode /Length 938>> stream sha256=fd872672e7a92a8fc5a44f63bb2abbd0ee155c267ae3b96949021949d5d57c60
+object 334 0: <</Filter /FlateDecode /Length 923>> stream sha256=9d0da1ff46cc8b2174d586c56b7e0440a3325e42f85035a7fb589f98961bf62f
+object 335 0: <</Filter /FlateDecode /Length 1027>> stream sha256=8ce5345b0a3430f19c7bed6934397d9a2eb8612ed86ad6426fd383e230d612d7
+object 336 0: <</Filter /FlateDecode /Length 917>> stream sha256=a581c9e0c8d9568f75a79d3602e0f54e63980303769b246320955bfdcacd08d5
+object 337 0: <</E 134 /Filter /FlateDecode /Length 128 /O 118 /S 66>> stream sha256=b2b967d9969b65a18e70e8463c093ac79b022fa1f3b18d93641d42d6471533c6

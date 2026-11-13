@@ -1,0 +1,96 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 8
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+page 2: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=90 label=
+page 3: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=180 label=
+page 4: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=270 label=
+page 5: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+page 6: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=90 label=
+page 7: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=180 label=
+page 8: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=270 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.6>>
+object 2 0: <</Count 8 /Kids [3 0 R 8 0 R 13 0 R 18 0 R 23 0 R 28 0 R 33 0 R 38 0 R] /Type /Pages>>
+object 3 0: <</Contents [51 0 R 7 0 R 52 0 R 53 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 4 0 R /Rotate 0 /Type /Page>>
+object 4 0: <</Font 5 0 R /XObject 44 0 R>>
+object 5 0: <</F1 6 0 R>>
+object 6 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 7 0: <</Filter /FlateDecode /Length 48>> stream sha256=fae89a11eafb58b1fdd118332e19b3fcc302db2401ca7c87a4da5f29d6457745
+object 8 0: <</Contents [56 0 R 12 0 R 57 0 R 58 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 9 0 R /Rotate 90 /Type /Page>>
+object 9 0: <</Font 10 0 R /XObject 54 0 R>>
+object 10 0: <</F1 11 0 R>>
+object 11 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 12 0: <</Filter /FlateDecode /Length 49>> stream sha256=eec94d3a2e6f28b34975cf38dd47ef77074e52d9990a3d665110b8648923d740
+object 13 0: <</Contents [61 0 R 17 0 R 62 0 R 63 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 14 0 R /Rotate 180 /Type /Page>>
+object 14 0: <</Font 15 0 R /XObject 59 0 R>>
+object 15 0: <</F1 16 0 R>>
+object 16 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 17 0: <</Filter /FlateDecode /Length 50>> stream sha256=a1423c52d66fc2c554a16c77b92d0d5750d3c352627b577c8194fb569b556039
+object 18 0: <</Contents [66 0 R 22 0 R 67 0 R 68 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 19 0 R /Rotate 270 /Type /Page>>
+object 19 0: <</Font 20 0 R /XObject 64 0 R>>
+object 20 0: <</F1 21 0 R>>
+object 21 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 22 0: <</Filter /FlateDecode /Length 50>> stream sha256=3519215ae567ca8af783a206a33d4450287da9e986c541c280f5c0479ecabffb
+object 23 0: <</Contents [70 0 R 27 0 R 71 0 R 72 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 24 0 R /Rotate 0 /Type /Page>>
+object 24 0: <</Font 25 0 R /XObject 69 0 R>>
+object 25 0: <</F1 26 0 R>>
+object 26 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 27 0: <</Filter /FlateDecode /Length 48>> stream sha256=fae89a11eafb58b1fdd118332e19b3fcc302db2401ca7c87a4da5f29d6457745
+object 28 0: <</Contents [74 0 R 32 0 R 75 0 R 76 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 29 0 R /Rotate 90 /Type /Page>>
+object 29 0: <</Font 30 0 R /XObject 73 0 R>>
+object 30 0: <</F1 31 0 R>>
+object 31 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 32 0: <</Filter /FlateDecode /Length 49>> stream sha256=eec94d3a2e6f28b34975cf38dd47ef77074e52d9990a3d665110b8648923d740
+object 33 0: <</Contents [78 0 R 37 0 R 79 0 R 80 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 34 0 R /Rotate 180 /Type /Page>>
+object 34 0: <</Font 35 0 R /XObject 77 0 R>>
+object 35 0: <</F1 36 0 R>>
+object 36 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 37 0: <</Filter /FlateDecode /Length 50>> stream sha256=a1423c52d66fc2c554a16c77b92d0d5750d3c352627b577c8194fb569b556039
+object 38 0: <</Contents [82 0 R 42 0 R 83 0 R 84 0 R] /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 39 0 R /Rotate 270 /Type /Page>>
+object 39 0: <</Font 40 0 R /XObject 81 0 R>>
+object 40 0: <</F1 41 0 R>>
+object 41 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 42 0: <</Filter /FlateDecode /Length 50>> stream sha256=3519215ae567ca8af783a206a33d4450287da9e986c541c280f5c0479ecabffb
+object 44 0: <</OL1 45 0 R>>
+object 45 0: <</BBox [0 0 595.2756 841.8898] /Filter /FlateDecode /FormType 1 /Length 117 /Matrix [1 0 0 1 0 0] /Resources 46 0 R /Subtype /Form /Type /XObject>> stream sha256=0e282766fabed8700dc0b62ba12460db0ef873fe3bbd0a91902c804267dae319
+object 46 0: <</ExtGState 49 0 R /Font 47 0 R>>
+object 47 0: <</F1 48 0 R>>
+object 48 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 49 0: <</gs1 50 0 R>>
+object 50 0: <</BM /Multiply /CA 0.2 /LW 3 /Type /ExtGState /ca 0.2>>
+object 51 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 52 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 53 0: <</Filter /FlateDecode /Length 37>> stream sha256=58b6de9ce4e9312a4789c06896cd880780fc039e8b3a68be96fc2a95bfcd2dcc
+object 54 0: <</OL1 55 0 R>>
+object 55 0: <</BBox [0 0 595.2756 841.8898] /Filter /FlateDecode /FormType 1 /Length 117 /Matrix [0 1 -1 0 841.8898 0] /Resources 46 0 R /Subtype /Form /Type /XObject>> stream sha256=0e282766fabed8700dc0b62ba12460db0ef873fe3bbd0a91902c804267dae319
+object 56 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 57 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 58 0: <</Filter /FlateDecode /Length 50>> stream sha256=beb4a750b365d742d0a992ae91608e7e4aef0888c1a14cfb4de67b757cd7fa32
+object 59 0: <</OL1 60 0 R>>
+object 60 0: <</BBox [0 0 595.2756 841.8898] /Filter /FlateDecode /FormType 1 /Length 117 /Matrix [-1 0 0 -1 595.2756 841.8898] /Resources 46 0 R /Subtype /Form /Type /XObject>> stream sha256=0e282766fabed8700dc0b62ba12460db0ef873fe3bbd0a91902c804267dae319
+object 61 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 62 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 63 0: <</Filter /FlateDecode /Length 37>> stream sha256=58b6de9ce4e9312a4789c06896cd880780fc039e8b3a68be96fc2a95bfcd2dcc
+object 64 0: <</OL1 65 0 R>>
+object 65 0: <</BBox [0 0 595.2756 841.8898] /Filter /FlateDecode /FormType 1 /Length 117 /Matrix [0 -1 1 0 0 595.2756] /Resources 46 0 R /Subtype /Form /Type /XObject>> stream sha256=0e282766fabed8700dc0b62ba12460db0ef873fe3bbd0a91902c804267dae319
+object 66 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 67 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 68 0: <</Filter /FlateDecode /Length 50>> stream sha256=beb4a750b365d742d0a992ae91608e7e4aef0888c1a14cfb4de67b757cd7fa32
+object 69 0: <</OL1 45 0 R>>
+object 70 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 71 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 72 0: <</Filter /FlateDecode /Length 37>> stream sha256=58b6de9ce4e9312a4789c06896cd880780fc039e8b3a68be96fc2a95bfcd2dcc
+object 73 0: <</OL1 55 0 R>>
+object 74 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 75 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 76 0: <</Filter /FlateDecode /Length 50>> stream sha256=beb4a750b365d742d0a992ae91608e7e4aef0888c1a14cfb4de67b757cd7fa32
+object 77 0: <</OL1 60 0 R>>
+object 78 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 79 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 80 0: <</Filter /FlateDecode /Length 37>> stream sha256=58b6de9ce4e9312a4789c06896cd880780fc039e8b3a68be96fc2a95bfcd2dcc
+object 81 0: <</OL1 65 0 R>>
+object 82 0: <</Length 2>> stream sha256=4adc33bd9fe74303c344be46e5916d65182fb218e248fe80452ab3f025b06c64
+object 83 0: <</Length 2>> stream sha256=282f82a2d55dbfe663906eecf403ead5ecad4a750d37f8a09d16d99c2283cd61
+object 84 0: <</Filter /FlateDecode /Length 50>> stream sha256=beb4a750b365d742d0a992ae91608e7e4aef0888c1a14cfb4de67b757cd7fa32

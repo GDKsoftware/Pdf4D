@@ -22,3 +22,8 @@ tests/results-*.xml
 # Oracle tooling
 tools/oracle/lib/
 tools/oracle/jdk/
+
+# Oracle build output and fetched sources
+tools/oracle/classes/
+tools/pdfbox-src/
+tools/corpus/failed-downloads.txt

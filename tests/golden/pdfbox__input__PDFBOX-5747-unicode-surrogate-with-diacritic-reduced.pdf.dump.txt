@@ -1,0 +1,16 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+xmp: none
+object 26 0: <</Pages 27 0 R /Type /Catalog /Version /1.6>>
+object 27 0: <</Count 1 /Kids [29 0 R] /Type /Pages>>
+object 29 0: <</Contents 30 0 R /MediaBox [0 0 596 842] /Parent 27 0 R /Resources 31 0 R /Type /Page>>
+object 30 0: <</Length 81>> stream sha256=e91f88b2512f4c89430ff739cfffe21689a0109e80a7d5e89f6687816cea2fc1
+object 31 0: <</Font <</f-0-1 32 0 R>>>>
+object 32 0: <</BaseFont /KELZXM+CairoFont-0-1 /DescendantFonts [34 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 35 0 R /Type /Font>>
+object 34 0: <</BaseFont /KELZXM+CairoFont-0-1 /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /FontDescriptor 38 0 R /Subtype /CIDFontType0 /Type /Font /W [0 [600 711 0 666]]>>
+object 35 0: <</Length 376>> stream sha256=a7e58b83ce8e17fe28eecd5bbdabbae58e736d5dfedb77b645b609fdb82e37d4
+object 38 0: <</Ascent 799 /CapHeight 799 /Descent -176 /Flags 4 /FontBBox [-405 -176 745 799] /FontFile3 40 0 R /FontName /KELZXM+CairoFont-0-1 /ItalicAngle 0 /StemH 80 /StemV 80 /Type /FontDescriptor>>
+object 40 0: <</Length 493 /Subtype /CIDFontType0C>> stream sha256=a14079e114e09854af687ecf0d6600056d359cbdd32aa16bbc471d5a671af292

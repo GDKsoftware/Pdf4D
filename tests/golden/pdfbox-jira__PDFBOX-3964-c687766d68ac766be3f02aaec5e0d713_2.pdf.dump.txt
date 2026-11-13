@@ -1,0 +1,146 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 10
+page 1: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 2: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 3: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 4: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 5: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 6: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 7: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 8: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 9: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+page 10: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+info Author: 巍巍 王
+info CreationDate: 2016-07-14T17:49:37+08:00
+info Creator: Microsoft® Word 2013
+info ModDate: 2016-07-14T17:49:37+08:00
+info Producer: Microsoft® Word 2013
+xmp: none
+object 1 0: <</Lang <7a682d434e> /MarkInfo <</Marked true>> /Pages 2 0 R /StructTreeRoot 93 0 R /Type /Catalog>>
+object 2 0: <</Count 10 /Kids [3 0 R 41 0 R 43 0 R 47 0 R 74 0 R 76 0 R 82 0 R 84 0 R 86 0 R 90 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F10 37 0 R /F2 8 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R /F8 30 0 R /F9 32 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R /Image39 39 0 R>>>> /StructParents 0 /Tabs /S /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 1517>> stream sha256=190da68ad7d2afd11efbf978b29370a49e620234b7582bdc3e095bb1891d73e8
+object 5 0: <</BaseFont /ABCDEE+#E5#AE#8B#E4#BD#93 /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 6 0 R /LastChar 32 /Name /F1 /Subtype /TrueType /Type /Font /Widths 605 0 R>>
+object 6 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-8 -141 1000 859] /FontFile2 603 0 R /FontName /ABCDEE+#E5#AE#8B#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1008 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 7 0: <</BM /Normal /Type /ExtGState /ca 1>>
+object 8 0: <</BaseFont /ABCDEE+#E6#A5#B7#E4#BD#93 /DescendantFonts 9 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 606 0 R /Type /Font>>
+object 9 0: [10 0 R]
+object 10 0: <</BaseFont /ABCDEE+#E6#A5#B7#E4#BD#93 /CIDSystemInfo 11 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 12 0 R /Subtype /CIDFontType2 /Type /Font /W 608 0 R>>
+object 11 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 12 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-47 -141 1031 859] /FontFile2 607 0 R /FontName /ABCDEE+#E6#A5#B7#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1078 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 13 0: <</BaseFont /ABCDEE+#E6#A5#B7#E4#BD#93 /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 14 0 R /LastChar 80 /Name /F3 /Subtype /TrueType /Type /Font /Widths 609 0 R>>
+object 14 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-47 -141 1031 859] /FontFile2 607 0 R /FontName /ABCDEE+#E6#A5#B7#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1078 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 15 0: <</BaseFont /ABCDEE+Cambria /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 16 0 R /LastChar 116 /Name /F4 /Subtype /TrueType /Type /Font /Widths 610 0 R>>
+object 16 0: <</Ascent 950 /AvgWidth 615 /CapHeight 778 /Descent -222 /Flags 32 /FontBBox [-1475 -222 2868 778] /FontFile2 611 0 R /FontName /ABCDEE+Cambria /FontWeight 400 /ItalicAngle 0 /MaxWidth 4342 /StemV 61 /Type /FontDescriptor /XHeight 250>>
+object 17 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 10 /Interpolate true /Length 1018 /Subtype /Image /Type /XObject /Width 106>> stream partial=DCTDecode sha256=4fbd79feee7dbb5bb4d4568e44f7180fa160d481d5fbca5811c45ede753a17bb
+object 18 0: <</BaseFont /ABCDEE+#E5#8D#8E#E6#96#87#E6#A5#B7#E4#BD#93 /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 19 0 R /LastChar 125 /Name /F5 /Subtype /TrueType /Type /Font /Widths 615 0 R>>
+object 19 0: <</Ascent 986 /AvgWidth 387 /CapHeight 800 /Descent -200 /Flags 32 /FontBBox [-141 -200 1063 800] /FontFile2 613 0 R /FontName /ABCDEE+#E5#8D#8E#E6#96#87#E6#A5#B7#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 181 /MaxWidth 1204 /StemV 38 /Type /FontDescriptor /XHeight 250>>
+object 20 0: <</BaseFont /ABCDEE+#E5#8D#8E#E6#96#87#E6#A5#B7#E4#BD#93 /DescendantFonts 21 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 612 0 R /Type /Font>>
+object 21 0: [22 0 R]
+object 22 0: <</BaseFont /ABCDEE+#E5#8D#8E#E6#96#87#E6#A5#B7#E4#BD#93 /CIDSystemInfo 23 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 24 0 R /Subtype /CIDFontType2 /Type /Font /W 614 0 R>>
+object 23 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 24 0: <</Ascent 986 /AvgWidth 387 /CapHeight 800 /Descent -200 /Flags 32 /FontBBox [-141 -200 1063 800] /FontFile2 613 0 R /FontName /ABCDEE+#E5#8D#8E#E6#96#87#E6#A5#B7#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 181 /MaxWidth 1204 /StemV 38 /Type /FontDescriptor /XHeight 250>>
+object 25 0: <</BaseFont /ABCDEE+#E5#AE#8B#E4#BD#93 /DescendantFonts 26 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 602 0 R /Type /Font>>
+object 26 0: [27 0 R]
+object 27 0: <</BaseFont /ABCDEE+#E5#AE#8B#E4#BD#93 /CIDSystemInfo 28 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 29 0 R /Subtype /CIDFontType2 /Type /Font /W 604 0 R>>
+object 28 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 29 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-8 -141 1000 859] /FontFile2 603 0 R /FontName /ABCDEE+#E5#AE#8B#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1008 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 30 0: <</BaseFont /ABCDEE+Calibri,Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 31 0 R /LastChar 80 /Name /F8 /Subtype /TrueType /Type /Font /Widths 616 0 R>>
+object 31 0: <</Ascent 750 /AvgWidth 536 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-519 -250 1240 750] /FontFile2 617 0 R /FontName /ABCDEE+Calibri,Bold /FontWeight 700 /ItalicAngle 0 /MaxWidth 1759 /StemV 53 /Type /FontDescriptor /XHeight 250>>
+object 32 0: <</BaseFont /ABCDEE+Calibri /DescendantFonts 33 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 618 0 R /Type /Font>>
+object 33 0: [34 0 R]
+object 34 0: <</BaseFont /ABCDEE+Calibri /CIDSystemInfo 35 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 36 0 R /Subtype /CIDFontType2 /Type /Font /W 620 0 R>>
+object 35 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 36 0: <</Ascent 750 /AvgWidth 521 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-503 -250 1240 750] /FontFile2 619 0 R /FontName /ABCDEE+Calibri /FontWeight 400 /ItalicAngle 0 /MaxWidth 1743 /StemV 52 /Type /FontDescriptor /XHeight 250>>
+object 37 0: <</BaseFont /ABCDEE+Calibri /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 38 0 R /LastChar 116 /Name /F10 /Subtype /TrueType /Type /Font /Widths 621 0 R>>
+object 38 0: <</Ascent 750 /AvgWidth 521 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-503 -250 1240 750] /FontFile2 619 0 R /FontName /ABCDEE+Calibri /FontWeight 400 /ItalicAngle 0 /MaxWidth 1743 /StemV 52 /Type /FontDescriptor /XHeight 250>>
+object 39 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 215 /Interpolate false /Length 8432 /SMask 40 0 R /Subtype /Image /Type /XObject /Width 670>> stream sha256=9e1ab75e65948eeced5f8ec6b29edfa7d80bb9d84dca4a7272e455b8c443da63
+object 40 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 215 /Interpolate false /Length 2909 /Matte [0 0 0] /Subtype /Image /Type /XObject /Width 670>> stream sha256=518c8cea36e587dc25aec465818c414a4d6a9fc684e3d8f834f15dfd16ef0e2a
+object 41 0: <</Contents 42 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F10 37 0 R /F2 8 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R /F8 30 0 R /F9 32 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 1 /Tabs /S /Type /Page>>
+object 42 0: <</Filter /FlateDecode /Length 1914>> stream sha256=b650928a8d708397628bb1e41bf0758b577bdf6615fa27e0d392543666684bcc
+object 43 0: <</Contents 44 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F10 37 0 R /F11 45 0 R /F2 8 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F7 25 0 R /F8 30 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 3 /Tabs /S /Type /Page>>
+object 44 0: <</Filter /FlateDecode /Length 2023>> stream sha256=1bf4d0692825ea4c223b89ca3e6da53f930b45b3adcc9524d165c64e0a3660a2
+object 45 0: <</BaseFont /ABCDEE+Calibri#20Light /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 46 0 R /LastChar 32 /Name /F11 /Subtype /TrueType /Type /Font /Widths 622 0 R>>
+object 46 0: <</Ascent 750 /AvgWidth 520 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-511 -250 1208 750] /FontFile2 623 0 R /FontName /ABCDEE+Calibri#20Light /FontWeight 300 /ItalicAngle 0 /MaxWidth 1720 /StemV 52 /Type /FontDescriptor /XHeight 250>>
+object 47 0: <</Annots [66 0 R] /Contents 48 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS49 49 0 R /GS7 7 0 R>> /Font <</F1 5 0 R /F12 50 0 R /F13 55 0 R /F14 57 0 R /F15 62 0 R /F16 64 0 R /F17 67 0 R /F18 69 0 R /F2 8 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 4 /Tabs /S /Type /Page>>
+object 48 0: <</Filter /FlateDecode /Length 2468>> stream sha256=71a5b1e4fabb72f20bdec47c8dbb6d99819b3b76fd7172521ea2b7d930a66676
+object 49 0: <</BM /Normal /CA 1 /Type /ExtGState>>
+object 50 0: <</BaseFont /ABCDEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91,Bold /DescendantFonts 51 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 624 0 R /Type /Font>>
+object 51 0: [52 0 R]
+object 52 0: <</BaseFont /ABCDEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91,Bold /CIDSystemInfo 53 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 54 0 R /Subtype /CIDFontType2 /Type /Font /W 626 0 R>>
+object 53 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 54 0: <</Ascent 1058 /AvgWidth 508 /CapHeight 812 /Descent -253 /Flags 32 /FontBBox [-113 -253 1336 812] /FontFile2 625 0 R /FontName /ABCDEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91,Bold /FontWeight 700 /ItalicAngle 0 /MaxWidth 1449 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 55 0: <</BaseFont /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91,Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 56 0 R /LastChar 84 /Name /F13 /Subtype /TrueType /Type /Font /Widths 627 0 R>>
+object 56 0: <</Ascent 1058 /AvgWidth 508 /CapHeight 812 /Descent -253 /Flags 32 /FontBBox [-113 -253 1336 812] /FontFile2 625 0 R /FontName /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91,Bold /FontWeight 700 /ItalicAngle 0 /MaxWidth 1449 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 57 0: <</BaseFont /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91 /DescendantFonts 58 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 628 0 R /Type /Font>>
+object 58 0: [59 0 R]
+object 59 0: <</BaseFont /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91 /CIDSystemInfo 60 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 61 0 R /Subtype /CIDFontType2 /Type /Font /W 630 0 R>>
+object 60 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 61 0: <</Ascent 1058 /AvgWidth 482 /CapHeight 812 /Descent -253 /Flags 32 /FontBBox [-158 -253 1270 812] /FontFile2 629 0 R /FontName /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91 /FontWeight 400 /ItalicAngle 0 /MaxWidth 1428 /StemV 48 /Type /FontDescriptor /XHeight 250>>
+object 62 0: <</BaseFont /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91 /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 63 0 R /LastChar 79 /Name /F15 /Subtype /TrueType /Type /Font /Widths 631 0 R>>
+object 63 0: <</Ascent 1058 /AvgWidth 482 /CapHeight 812 /Descent -253 /Flags 32 /FontBBox [-158 -253 1270 812] /FontFile2 629 0 R /FontName /ABCEEE+#E5#BE#AE#E8#BD#AF#E9#9B#85#E9#BB#91 /FontWeight 400 /ItalicAngle 0 /MaxWidth 1428 /StemV 48 /Type /FontDescriptor /XHeight 250>>
+object 64 0: <</BaseFont /ABCEEE+#E4#BB#BF#E5#AE#8B /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 65 0 R /LastChar 120 /Name /F16 /Subtype /TrueType /Type /Font /Widths 632 0 R>>
+object 65 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-8 -141 1004 859] /FontFile2 633 0 R /FontName /ABCEEE+#E4#BB#BF#E5#AE#8B /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1012 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 66 0: <</A <</S /URI /Type /Action /URI <687474703a2f2f73616e64626f782e736a77732e62616964752e636f6d3a383038302f>>> /BS <</W 0>> /F 4 /Rect [201.15 338.87 477.65 369.77] /StructParent 5 /Subtype /Link>>
+object 67 0: <</BaseFont /ABCEEE+#E9#BB#91#E4#BD#93 /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 68 0 R /LastChar 32 /Name /F17 /Subtype /TrueType /Type /Font /Widths 637 0 R>>
+object 68 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-12 -141 996 859] /FontFile2 635 0 R /FontName /ABCEEE+#E9#BB#91#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1008 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 69 0: <</BaseFont /ABCEEE+#E9#BB#91#E4#BD#93 /DescendantFonts 70 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 634 0 R /Type /Font>>
+object 70 0: [71 0 R]
+object 71 0: <</BaseFont /ABCEEE+#E9#BB#91#E4#BD#93 /CIDSystemInfo 72 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 73 0 R /Subtype /CIDFontType2 /Type /Font /W 636 0 R>>
+object 72 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 73 0: <</Ascent 859 /AvgWidth 500 /CapHeight 859 /Descent -141 /Flags 32 /FontBBox [-12 -141 996 859] /FontFile2 635 0 R /FontName /ABCEEE+#E9#BB#91#E4#BD#93 /FontWeight 400 /ItalicAngle 0 /Leading 141 /MaxWidth 1008 /StemV 50 /Type /FontDescriptor /XHeight 250>>
+object 74 0: <</Contents 75 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F12 50 0 R /F13 55 0 R /F15 62 0 R /F2 8 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 6 /Tabs /S /Type /Page>>
+object 75 0: <</Filter /FlateDecode /Length 2896>> stream sha256=b2ed9ec2f613612d5e7791bbb298956cf46f1c2eb8c9d68e1b9fc32cf0a224c9
+object 76 0: <</Contents 77 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F12 50 0 R /F13 55 0 R /F14 57 0 R /F15 62 0 R /F16 64 0 R /F19 78 0 R /F2 8 0 R /F20 80 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 7 /Tabs /S /Type /Page>>
+object 77 0: <</Filter /FlateDecode /Length 3745>> stream sha256=4252710ebe2cafae26ac8273ef3347316012b9886c29a309a6179fe6e04294a9
+object 78 0: <</BaseFont /ABCEEE+Consolas,Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 79 0 R /LastChar 125 /Name /F19 /Subtype /TrueType /Type /Font /Widths 638 0 R>>
+object 79 0: <</Ascent 743 /AvgWidth 550 /CapHeight 743 /Descent -257 /Flags 32 /FontBBox [-476 -257 700 743] /FontFile2 639 0 R /FontName /ABCEEE+Consolas,Bold /FontWeight 700 /ItalicAngle 0 /MaxWidth 1176 /StemV 55 /Type /FontDescriptor /XHeight 250>>
+object 80 0: <</BaseFont /ABCEEE+Consolas /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 81 0 R /LastChar 125 /Name /F20 /Subtype /TrueType /Type /Font /Widths 640 0 R>>
+object 81 0: <</Ascent 743 /AvgWidth 550 /CapHeight 743 /Descent -257 /Flags 32 /FontBBox [-432 -257 677 743] /FontFile2 641 0 R /FontName /ABCEEE+Consolas /FontWeight 400 /ItalicAngle 0 /MaxWidth 1109 /StemV 55 /Type /FontDescriptor /XHeight 250>>
+object 82 0: <</Contents 83 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F13 55 0 R /F19 78 0 R /F2 8 0 R /F20 80 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 2 /Tabs /S /Type /Page>>
+object 83 0: <</Filter /FlateDecode /Length 3522>> stream sha256=b5418d1fa325c203132a86a91ecc67a4b5c85dd5735783bc7ae61fec6ddae9de
+object 84 0: <</Contents 85 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R>> /Font <</F1 5 0 R /F2 8 0 R /F20 80 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 8 /Tabs /S /Type /Page>>
+object 85 0: <</Filter /FlateDecode /Length 3742>> stream sha256=5887bdc564fca199c95d0fa0795af8d72206d25e419671abc0af6235d0c09237
+object 86 0: <</Contents 87 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS49 49 0 R /GS7 7 0 R>> /Font <</F1 5 0 R /F13 55 0 R /F19 78 0 R /F2 8 0 R /F20 80 0 R /F21 88 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 9 /Tabs /S /Type /Page>>
+object 87 0: <</Filter /FlateDecode /Length 3489>> stream sha256=de4f98613eedae78c12111e7cc7d60f38fa78d296c37223acd8f1d71e6060d69
+object 88 0: <</BaseFont /ABCEEE+Source#20Code#20Pro /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 89 0 R /LastChar 32 /Name /F21 /Subtype /TrueType /Type /Font /Widths 642 0 R>>
+object 89 0: <</Ascent 984 /AvgWidth 599 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-25 -250 706 750] /FontFile2 643 0 R /FontName /ABCEEE+Source#20Code#20Pro /FontWeight 400 /ItalicAngle 0 /MaxWidth 731 /StemV 59 /Type /FontDescriptor /XHeight 250>>
+object 90 0: <</Contents 91 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS49 49 0 R /GS7 7 0 R>> /Font <</F1 5 0 R /F19 78 0 R /F2 8 0 R /F20 80 0 R /F3 13 0 R /F4 15 0 R /F5 18 0 R /F6 20 0 R /F7 25 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Image17 17 0 R>>>> /StructParents 10 /Tabs /S /Type /Page>>
+object 91 0: <</Filter /FlateDecode /Length 3632>> stream sha256=88f7f03a88dbab88c89aacd3543257422f9ba5a93c627f1cfdbdc933751782a7
+object 92 0: <</Author <feff5dcd5dcd0020738b> /CreationDate <443a32303136303731343137343933372b303827303027> /Creator <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200032003000310033> /ModDate <443a32303136303731343137343933372b303827303027> /Producer <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200032003000310033>>>
+object 602 0: <</Filter /FlateDecode /Length 938>> stream sha256=e1c664999b13c5bb2d6d569ebb476c62ac3d5df5c8f181ab1ded1ec122ebf12e
+object 603 0: <</Filter /FlateDecode /Length 40955 /Length1 291956>> stream sha256=623dd524faac382d7a2b42d822c37298fb57c3e7f4424ea1016fc6de3db48c94
+object 604 0: [0 [1000] 3 [500]]
+object 605 0: [500]
+object 606 0: <</Filter /FlateDecode /Length 291>> stream sha256=4a1eb96e9c5e1e9272bf0bfbd94707873788d5877a393e5e7a38761d68838308
+object 607 0: <</Filter /FlateDecode /Length 56338 /Length1 186188>> stream sha256=ad90b799832b936a1b926eabeb513c3547abd5a12d60db332c70a82f8e60bf1c
+object 608 0: [0 [1000] 3 [500] 36 [500] 44 [500] 51 [500]]
+object 609 0: [500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 0 0 0 0 0 0 0 500 0 0 0 0 0 0 500]
+object 610 0: [220 0 0 0 0 0 0 0 382 382 0 0 0 0 0 0 554 554 554 554 554 554 554 554 554 554 0 0 0 0 0 0 0 0 0 0 662 575 0 0 0 0 0 0 537 0 0 0 0 0 621 496 593 648 0 0 0 0 0 0 0 0 0 0 0 0 0 441 0 488 0 0 552 278 0 524 271 0 0 0 556 0 414 430 338]
+object 611 0: <</Filter /FlateDecode /Length 100874 /Length1 225368>> stream sha256=fb7f54e3351dd5939f003171fa8018031b6677b34b132ea21395c3af3c95998f
+object 612 0: <</Filter /FlateDecode /Length 1326>> stream sha256=41c2effa638d1b5d5da903c11d18108a85675d0e3cee4d13699f24cd443ce107
+object 613 0: <</Filter /FlateDecode /Length 67767 /Length1 312916>> stream sha256=c6e8bf160a418e5e50c876f5eb9131d95a783dd29d3a07962a55f9d19d90812f
+object 614 0: [0 [1000] 3 [250] 5 [406] 11 [292 292] 14 [667 219] 17 [219 500 469 469 469 469 469 469 469] 28 [469 219] 36 [677 615 635 771] 43 [760 354 333] 47 [573 833 771 781 563] 53 [625 479 615 708] 66 [500] 68 [406 510 417 500 417 323 448 510 229] 78 [469 229 771 510 510 510 490 333 365 292 490 469] 92 [417] 94 [479] 96 [479]]
+object 615 0: [250 0 406 0 0 0 0 0 292 292 0 667 219 0 219 500 469 469 469 469 469 469 469 0 0 469 219 0 0 0 0 0 0 677 615 635 771 0 0 0 760 354 333 0 573 833 771 781 563 0 625 479 615 708 0 0 0 0 0 0 0 0 0 500 0 406 510 417 500 417 323 448 510 229 0 469 229 771 510 510 510 490 333 365 292 490 469 0 0 417 0 479 0 479]
+object 616 0: [226 0 0 0 0 0 0 0 0 0 0 0 0 0 267 0 0 507 507 507 507 0 0 507 0 0 0 0 0 0 0 0 0 606 0 0 0 0 0 0 0 267 0 0 0 0 0 0 532]
+object 617 0: <</Filter /FlateDecode /Length 78766 /Length1 169876>> stream sha256=83a42ccc2227ebb94386d016c7a1caa036d6399fa1ddea4a4fe2b78d166d28b2
+object 618 0: <</Filter /FlateDecode /Length 360>> stream sha256=f2482a7e68e1454bbb3f08ff79499078d94ab3271fe027082f92fa8f8ee9f5ad
+object 619 0: <</Filter /FlateDecode /Length 230017 /Length1 186956>> stream sha256=217e50cb2f76ad745150a21c17b29515a70ae637d870777bc47ccf89aa88e051
+object 624 0: <</Filter /FlateDecode /Length 332>> stream sha256=9a0db090acc2a8eac33e91e4ff54614fb215a34eaf79cfac207d61dd21c8446d
+object 625 0: <</Filter /FlateDecode /Length 21561 /Length1 840348>> stream sha256=518c522362224afc820372841fa67894b545787cd3a1a823d3341c53671b2996
+object 626 0: [0 [697] 3 [298] 53 [818 657] 57 [602 625]]
+object 627 0: [298 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 818 657 0 0 602 625]
+object 628 0: <</Filter /FlateDecode /Length 337>> stream sha256=bdcf1be1b1fbd203c4c9c8ade014548c6d48313a536bd74c80e8ba34cef69633
+object 629 0: <</Filter /FlateDecode /Length 24581 /Length1 747196>> stream sha256=00f6c87a1893f1fe99af6e8b0bcb3df230b8ead93465b7f734a14c278ae21cd6
+object 630 0: [0 [697] 3 [296] 22 [586 586 586 586 586] 49 [635] 53 [815]]
+object 631 0: [296 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 586 586 586 586 586 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 635 0 0 0 815]
+object 632 0: [500 0 0 0 0 0 0 0 0 0 0 0 0 500 500 500 500 0 0 0 0 0 0 0 500 0 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 500 500 500 500 0 0 500 500 500 0 0 500 500 500 500 0 0 500 500 500 0 500 500]
+object 633 0: <</Filter /FlateDecode /Length 26485 /Length1 184720>> stream sha256=320e1845a88300f426a4f0e49dd70b4368e2d4a14e6f96af244d35c4b8bbf73e
+object 634 0: <</Filter /FlateDecode /Length 387>> stream sha256=8b6be3ef08b1c51090ab09cddb8c9d2d7ed0715d7472f77887c8e15a929804cd
+object 635 0: <</Filter /FlateDecode /Length 91227 /Length1 189208>> stream sha256=5ff07b6b18ac4718b9c0f22a997577dae0ab3ec5e6a1adbd76e3595d39ce17d9
+object 640 0: [550 0 550 0 0 0 0 0 550 550 0 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 0 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 0 550 550 550 550 550 550 0 550 0 550 0 550 0 550 0 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 550 0 550 550 550 550 550 550 550 550 0 550 0 550]
+object 641 0: <</Filter /FlateDecode /Length 45727 /Length1 101756>> stream sha256=9c97854d3740c203b02d4cc0787570b0338b16f5b34812a58a90834b8b0b5942
+object 642 0: [600]
+object 643 0: <</Filter /FlateDecode /Length 14426 /Length1 35396>> stream sha256=f7c36b0c0be3ebdf24a670b20b7eeb751e9ddc7b783d088315d00581a30eb0ce

@@ -1,0 +1,45 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+xmp: none
+field: RadioButton | radio | Off
+object 1 0: <</AcroForm 3 0 R /Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 3 0: <</DA <2f463120313020546620302067> /DR 6 0 R /Fields [5 0 R]>>
+object 4 0: <</Annots [9 0 R 10 0 R 11 0 R] /Contents 7 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 8 0 R /Type /Page>>
+object 5 0: <</DV /b /FT /Btn /Ff 49152 /Kids [9 0 R 10 0 R 11 0 R] /Opt [<61> <62> <63>] /T <526164696f427574746f6e>>>
+object 6 0: <</Font 12 0 R>>
+object 7 0: <</Filter /FlateDecode /Length 59>> stream sha256=3e1ce59f49138f7daeb5afdd007ad44f5bb5262e3b54aba08a2c2ce326f31c96
+object 8 0: <</Font 13 0 R>>
+object 9 0: <</AP 15 0 R /AS /Off /F 4 /MK 14 0 R /P 4 0 R /Parent 5 0 R /Rect [30 811 46 827] /Subtype /Widget /Type /Annot>>
+object 10 0: <</AP 17 0 R /AS /b /F 4 /MK 16 0 R /P 4 0 R /Parent 5 0 R /Rect [30 790 46 806] /Subtype /Widget /Type /Annot>>
+object 11 0: <</AP 19 0 R /AS /Off /F 4 /MK 18 0 R /P 4 0 R /Parent 5 0 R /Rect [30 769 46 785] /Subtype /Widget /Type /Annot>>
+object 12 0: <</F1 20 0 R>>
+object 13 0: <</F1 20 0 R>>
+object 14 0: <</BC [0 0 0]>>
+object 15 0: <</D 22 0 R /N 21 0 R>>
+object 16 0: <</BC [0 0 0]>>
+object 17 0: <</D 24 0 R /N 23 0 R>>
+object 18 0: <</BC [0 0 0]>>
+object 19 0: <</D 26 0 R /N 25 0 R>>
+object 20 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 21 0: <</Off 27 0 R /a 28 0 R>>
+object 22 0: <</Off 29 0 R /a 30 0 R>>
+object 23 0: <</Off 31 0 R /b 32 0 R>>
+object 24 0: <</Off 33 0 R /b 34 0 R>>
+object 25 0: <</Off 35 0 R /c 36 0 R>>
+object 26 0: <</Off 37 0 R /c 38 0 R>>
+object 27 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 78 /Subtype /Form /Type /XObject>> stream sha256=a16d0763e17c3c9b305dd05e80a511d7da84a8dab993375467c25c4b037b72b6
+object 28 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 122 /Subtype /Form /Type /XObject>> stream sha256=25c5842c3613aa70ec075b4543798eec25bf1d2680ccaa9fe796ba6f171a9a91
+object 29 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 134 /Subtype /Form /Type /XObject>> stream sha256=ce68a3b669883bef325ca3686185f0229e0ad3ad1388c3deb1c67b3c02e8a71c
+object 30 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 170 /Subtype /Form /Type /XObject>> stream sha256=e1fe8d22789b174053e0125971692a3e035f486ead67cf8971bf98a505e710ca
+object 31 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 78 /Subtype /Form /Type /XObject>> stream sha256=a16d0763e17c3c9b305dd05e80a511d7da84a8dab993375467c25c4b037b72b6
+object 32 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 122 /Subtype /Form /Type /XObject>> stream sha256=25c5842c3613aa70ec075b4543798eec25bf1d2680ccaa9fe796ba6f171a9a91
+object 33 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 134 /Subtype /Form /Type /XObject>> stream sha256=ce68a3b669883bef325ca3686185f0229e0ad3ad1388c3deb1c67b3c02e8a71c
+object 34 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 170 /Subtype /Form /Type /XObject>> stream sha256=e1fe8d22789b174053e0125971692a3e035f486ead67cf8971bf98a505e710ca
+object 35 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 78 /Subtype /Form /Type /XObject>> stream sha256=a16d0763e17c3c9b305dd05e80a511d7da84a8dab993375467c25c4b037b72b6
+object 36 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 122 /Subtype /Form /Type /XObject>> stream sha256=25c5842c3613aa70ec075b4543798eec25bf1d2680ccaa9fe796ba6f171a9a91
+object 37 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 134 /Subtype /Form /Type /XObject>> stream sha256=ce68a3b669883bef325ca3686185f0229e0ad3ad1388c3deb1c67b3c02e8a71c
+object 38 0: <</BBox [0 0 16 16] /Filter /FlateDecode /FormType 1 /Length 170 /Subtype /Form /Type /XObject>> stream sha256=e1fe8d22789b174053e0125971692a3e035f486ead67cf8971bf98a505e710ca

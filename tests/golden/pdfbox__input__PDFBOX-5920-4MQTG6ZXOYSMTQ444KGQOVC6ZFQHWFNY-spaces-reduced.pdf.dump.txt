@@ -1,0 +1,14 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.276 841.89] crop=[0 0 595.276 841.89] rotate=0 label=
+xmp: none
+object 49 0: <</Pages 51 0 R /Type /Catalog /Version /1.6>>
+object 51 0: <</Count 1 /Kids [54 0 R] /Type /Pages>>
+object 54 0: <</Contents [55 0 R] /MediaBox [0 0 595.276 841.89] /Parent 51 0 R /Resources <</Font <</T1_1 68 0 R>>>> /Type /Page>>
+object 55 0: <</Length 175>> stream sha256=68aa3cfa4f7989082294173837c0f2ffb8a708f63d3c2e4b7492e045fdbf5f80
+object 68 0: <</BaseFont /OXWYKR+FreightSans-Book /Encoding 81 0 R /FirstChar 1 /FontDescriptor 80 0 R /LastChar 68 /Subtype /Type1 /Type /Font /Widths [139 163 350 350 187 292 187 578 326 440 419 503 439 490 503 187 575 550 586 628 507 479 654 228 414 478 761 650 709 519 529 490 550 616 555 562 439 511 451 514 470 298 468 505 209 207 206 775 505 531 515 514 356 387 329 504 424 394 424 507 439 470 470 209 504 356 857 187]>>
+object 80 0: <</Ascent 687 /CapHeight 625 /Descent -15 /Flags 4 /FontBBox [-65 -260 1103 867] /FontFile3 91 0 R /FontName /OXWYKR+FreightSans-Book /ItalicAngle 0 /StemH 0 /StemV 63 /Type /FontDescriptor /XHeight 696>>
+object 81 0: <</BaseEncoding /MacRomanEncoding /Differences [1 /space /quotesingle /parenleft /parenright /comma /hyphen /period /zero /one /two /five /six /seven /eight /nine /colon /A /B /C /D /E /F /H /I /J /L /M /N /O /P /R /S /T /U /V /X /a /b /c /d /e /f /g /h /i /j /l /m /n /o /p /q /r /s /t /u /v /x /y /Eacute /agrave /eacute /egrave /icircumflex /ugrave /degree /oe /quoteright] /Type /Encoding>>
+object 91 0: <</Length 4326 /Length1 4326 /Subtype /Type1C>> stream sha256=4fadee30744a4fe93c7bada2cf89b9e4ddd2241f004b5f9ca44eb6074c1322aa

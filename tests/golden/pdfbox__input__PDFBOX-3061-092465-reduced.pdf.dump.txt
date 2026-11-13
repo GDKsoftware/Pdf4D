@@ -1,0 +1,22 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info Author: PB5
+info CreationDate: 2004-07-30T11:44:40-04:00
+info Creator: PScript5.dll Version 5.2
+info ModDate: 2004-07-30T11:44:40-04:00
+info Producer: Acrobat Distiller 6.0.1 (Windows)
+info Title: X:\\L6046\\Data_Publication\\PMM\\current\\ventura\\pmm.vp
+xmp: none
+object 1 0: <</Pages 3 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Author <504235> /CreationDate <443a32303034303733303131343434302d303427303027> /Creator <50536372697074352e646c6c2056657273696f6e20352e32> /ModDate <443a32303034303733303131343434302d303427303027> /Producer <4163726f6261742044697374696c6c657220362e302e31202857696e646f777329> /Title <583a5c4c363034365c446174615f5075626c69636174696f6e5c504d4d5c63757272656e745c76656e747572615c706d6d2e7670>>>
+object 3 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 4 0: <</Annots [5 0 R] /Contents 6 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 3 0 R /Resources 7 0 R /Rotate 0 /Type /Page>>
+object 5 0: <</Border [0 0 0] /Dest [null /XYZ 0 5000 null] /Rect [54 28.915 65.504 38.599] /Subtype /Link /Type /Annot>>
+object 6 0: <</Filter /FlateDecode /Length 146>> stream sha256=cf162eee91b4bdfc5d816e19ee3bbc59a5f77398cbf16ccd30510edaa34c0f39
+object 7 0: <</ExtGState <<>> /Font <</TT4 8 0 R>> /ProcSet [/PDF /Text]>>
+object 8 0: <</BaseFont /ICLFEE+Palatino-Roman /Encoding /WinAnsiEncoding /FirstChar 36 /FontDescriptor 9 0 R /LastChar 151 /Subtype /TrueType /Type /Font /Widths [500 0 0 0 333 333 0 0 250 333 250 0 500 500 500 500 500 500 500 500 500 500 0 0 0 0 0 0 0 778 0 709 774 611 556 763 832 337 0 726 611 946 831 786 604 0 668 525 613 778 722 1000 0 667 0 0 0 0 0 0 0 500 553 444 611 479 333 556 582 291 234 556 291 883 582 546 601 560 395 424 326 603 565 834 516 556 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 500 0 500 1000]>>
+object 9 0: <</Ascent 949 /CapHeight 692 /Descent -291 /Flags 34 /FontBBox [-166 -283 1021 927] /FontFamily <50616c6174696e6f> /FontFile2 10 0 R /FontName /ICLFEE+Palatino-Roman /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemH 84 /StemV 84 /Type /FontDescriptor /XHeight 469>>
+object 10 0: <</Filter /FlateDecode /Length 20957 /Length1 39040>> stream sha256=16042dacc79cf826aa52d71690e4d1e10074509079ee1dbe18943312ffd5e508

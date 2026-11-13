@@ -1,0 +1,15 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.6>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 9 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 4 0 R /Type /Page>>
+object 4 0: <</ExtGState 7 0 R /Font 5 0 R>>
+object 5 0: <</F1 6 0 R>>
+object 6 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 7 0: <</gs1 8 0 R>>
+object 8 0: <</BM /Multiply /CA 0.2 /LW 3 /Type /ExtGState /ca 0.2>>
+object 9 0: <</Filter /FlateDecode /Length 117>> stream sha256=0e282766fabed8700dc0b62ba12460db0ef873fe3bbd0a91902c804267dae319

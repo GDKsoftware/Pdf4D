@@ -1,0 +1,26 @@
+version: 1.6
+encrypted: true
+permissions: -1028
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info ModDate: 2015-08-31T10:35:34-07:00
+xmp: none
+attachment: test.txt | ?
+object 1 0: <</CF <</StdCF <</AuthEvent /EFOpen /CFM /AESV2 /Length 16>>>> /EFF /StdCF /EncryptMetadata false /Filter /Standard /Length 128 /O <62e466aedae816774a353df03f5beb58e2df52267e7b4d84579483a3ac656850> /P -1028 /R 4 /StmF /Identity /StrF /Identity /U <62692150008acf3e0fd8e9cfa8310df500000000000000000000000000000000> /V 4>>
+object 2 0: <</Names 12 0 R /Pages 3 0 R /PieceInfo 5 0 R /Type /Catalog>>
+object 3 0: <</Count 1 /Kids [8 0 R] /Type /Pages>>
+object 4 0: <</ModDate <443a32303135303833313130333533342d303727303027>>>
+object 5 0: <</XXFontMap 6 0 R>>
+object 6 0: <</LastModified <443a32303135303833313130333533342d303727303027> /Private 7 0 R>>
+object 7 0: <</Helvetica 11 0 R>>
+object 8 0: <</Contents 10 0 R /MediaBox [0 0 612 792] /Parent 3 0 R /Resources 9 0 R /Type /Page>>
+object 9 0: <</Font <</F11 11 0 R>> /ProcSet [/PDF /Text /ImageA /ImageB /ImageI]>>
+object 10 0: <</Filter /FlateDecode /Length 18 0 R>> stream sha256=5a7259409f891ea46e9bad16af87ac195e9db33c546ac78b93570db058948cdc
+object 11 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 12 0: <</EmbeddedFiles 13 0 R>>
+object 13 0: <</Names [<746573742e747874> 14 0 R]>>
+object 14 0: <</Desc <> /EF 15 0 R /F <746573742e747874> /Type /Filespec /UF <746573742e747874>>>
+object 15 0: <</F 16 0 R>>
+object 16 0: <</DecodeParms [<</Name /StdCF>>] /Filter [/Crypt] /Length 17 0 R>> stream sha256=cfa2d579f45bffc9ebd55301597cc96c14309c3e31067406ea18966114aaf954
+object 17 0: 48
+object 18 0: 79

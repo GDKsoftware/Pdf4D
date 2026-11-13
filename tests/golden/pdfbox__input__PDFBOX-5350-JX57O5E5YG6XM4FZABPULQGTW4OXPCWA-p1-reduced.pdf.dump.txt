@@ -1,0 +1,24 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.2 841.92] crop=[0 0 595.2 841.92] rotate=0 label=
+info CreationDate: 2018-08-15T17:38:54-08:00
+info Creator: nPDF (pdftk 1.41)
+info ModDate: 2023-10-08T11:05:26+02:00
+info Producer: itext-paulo-155 (itextpdf.sf.net-lowagie.com)
+xmp: 3188
+object 1 0: <</Length 3188 /Subtype /XML /Type /Metadata>> stream sha256=5d7b6029bd6a3e8f80521d66270145898cc09ad51c39457c40699e48c73593d7
+object 5 0: <</Count 1 /Kids [9 0 R] /Type /Pages>>
+object 6 0: <</CreationDate <443a32303138303831353137333835342d303827303027> /Creator <6e5044462028706466746b20312e343129> /ModDate <443a32303233313030383131303532362b303227303027> /Producer <69746578742d7061756c6f2d313535202869746578747064662e73662e6e65742d6c6f77616769652e636f6d29>>>
+object 7 0: <</E 44209 /H [455 139] /L 48143 /Linearized 1 /N 1 /O 9 /T 47854>>
+object 8 0: <</Metadata 1 0 R /Pages 5 0 R /Type /Catalog>>
+object 9 0: <</Contents 10 0 R /CropBox [0 0 595.2 841.92] /MediaBox [0 0 595.2 841.92] /Parent 5 0 R /Resources 15 0 R /Rotate 0 /Type /Page>>
+object 10 0: <</Filter /FlateDecode /Length 139>> stream sha256=0e2fd4a15c6288bc3bc5b18bf0f2f1b8f6c9d73c5582a03f7d5e10e599c9bda3
+object 12 0: <</Filter /FlateDecode /Length 42001 /Length1 222284>> stream sha256=3ab15c23ea19a50aa82c8b96c6cbf21649d01bf7db7ad0db1b20434d717f0481
+object 13 0: <</Filter /FlateDecode /Length 576>> stream sha256=d2fab7dc9c670092ca80355b6a10c7b2f28e80df8867019f1c744cc709aad0c7
+object 15 0: <</Font <</F5 18 0 R>> /ProcSet [/PDF /Text]>>
+object 16 0: <</Ascent 858 /CapHeight 500 /Descent 141 /Flags 34 /FontBBox [0 -150 1000 863] /FontFile2 12 0 R /FontName /JSPDGE+Gulim /ItalicAngle 0 /StemV 70 /Type /FontDescriptor>>
+object 17 0: <</BaseFont /JSPDGE+Gulim /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /DW 1000 /FontDescriptor 16 0 R /Subtype /CIDFontType2 /Type /Font /W [71 [333] 73 [375] 76 [875] 79 [375 375] 82 [625 333 625 333] 87 [574 574 574 574 574 574 574 574 574 574 333] 122 [632] 127 [625]]>>
+object 18 0: <</BaseFont /JSPDGE+Gulim /DescendantFonts [17 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 13 0 R /Type /Font>>
+object 19 0: <</Filter /FlateDecode /I 73 /Length 60 /S 38>> stream sha256=f5028e457b97131ebad6fc329880029980023107e15d365e1a41fdc487fc5091

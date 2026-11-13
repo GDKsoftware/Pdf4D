@@ -1,0 +1,20 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=
+info CreationDate: 2014-10-25T10:54:39+02:00
+info ModDate: 2014-10-25T10:54:39+02:00
+info Producer: iText 2.1.7 by 1T3XT
+xmp: none
+attachment: 48.rcpt.pdf | 57501
+object 1 0: <</Size 57501>>
+object 2 0: <</Filter /FlateDecode /Length 39973 /Params 1 0 R /Type /EmbeddedFile>> stream sha256=0dbfa9bae1bb9164bcc60c3ec63c40de0696bc519fca7ebc53a6b98d14e3f066
+object 3 0: <</Desc <34382e726370742e706466> /EF <</F 2 0 R /UF 2 0 R>> /F <34382e726370742e706466> /Type /Filespec /UF <34382e726370742e706466>>>
+object 4 0: <</Names [<34382e726370742e706466> 3 0 R]>>
+object 5 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 6 0: <</Filter /FlateDecode /Length 71>> stream sha256=67030a6a27bcfaef96fbf796329f6ddd559186bdae4a987fb5a2bf546e34ed5c
+object 7 0: <</Count 1 /ITXT <322e312e37> /Kids [8 0 R] /Type /Pages>>
+object 8 0: <</Contents 6 0 R /MediaBox [0 0 595 842] /Parent 7 0 R /Resources <</Font <</F1 5 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /Type /Page>>
+object 9 0: <</Names <</EmbeddedFiles 4 0 R>> /PageMode /UseAttachments /Pages 7 0 R /Type /Catalog>>
+object 10 0: <</CreationDate <443a32303134313032353130353433392b303227303027> /ModDate <443a32303134313032353130353433392b303227303027> /Producer <695465787420322e312e37206279203154335854>>>

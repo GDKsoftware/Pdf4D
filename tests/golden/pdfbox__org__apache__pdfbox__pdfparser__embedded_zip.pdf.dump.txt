@@ -1,0 +1,21 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+attachment: Test.docx | ?
+object 1 0: <</Names 3 0 R /Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 3 0: <</EmbeddedFiles 5 0 R>>
+object 4 0: <</Contents 7 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources 6 0 R /Type /Page>>
+object 5 0: <</Names [<4d79206669727374206174746163686d656e74> 8 0 R]>>
+object 6 0: <</Font 9 0 R>>
+object 7 0: <</Filter [/FlateDecode] /Length 10 0 R>> stream sha256=c73af181d773810996379a5d8c2e5a20d43ed72e39c9ac2f2c69b41fc87d9bdb
+object 8 0: <</EF 11 0 R /F <546573742e646f6378> /Type /Filespec>>
+object 9 0: <</F0 12 0 R>>
+object 10 0: 69
+object 11 0: <</F 13 0 R>>
+object 12 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 13 0: <</Length 17660 /Subtype /application#2Fvnd.openxmlformats-officedocument.wordprocessingml.document /Type /EmbeddedFile /Xength 14 0 R>> stream sha256=ca4797d2b019e0761cd47e66473809f0ec828a9235ed8a706044ffe942c0b7c3
+object 14 0: 17660

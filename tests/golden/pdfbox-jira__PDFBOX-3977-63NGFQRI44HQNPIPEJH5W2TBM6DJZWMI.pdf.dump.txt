@@ -1,0 +1,66 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 708.661 1077.1699] crop=[0 0 708.661 1077.1699] rotate=0 label=
+info CreationDate: 2007-06-08T15:19:15+02:00
+info Creator: QuarkXPress(tm) 6.52
+info ModDate: 2008-06-04T15:21:22+02:00
+info Producer: Acrobat Distiller 7.0 pour Macintosh
+info Title: Fich sal Fabr corr1 (Page 6)
+xmp: none
+object 1 0: <</Count 0 /Type /Outlines>>
+object 2 0: <</BaseFont /Helvetica /Encoding 4 0 R /Name /Helv /Subtype /Type1 /Type /Font>>
+object 3 0: <</BaseFont /ZapfDingbats /Name /ZaDb /Subtype /Type1 /Type /Font>>
+object 4 0: <</Differences [24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis] /Type /Encoding>>
+object 5 0: <</K 6 0 R /ParentTree 7 0 R /ParentTreeNextKey 2 /Type /StructTreeRoot>>
+object 6 0: <</K [10 0 R 13 0 R] /P 5 0 R /S /Document>>
+object 7 0: <</Nums [0 8 0 R]>>
+object 8 0: [9 0 R]
+object 9 0: <</K 0 /P 10 0 R /Pg 24 0 R /S /Part>>
+object 10 0: <</Info 11 0 R /K 9 0 R /Metadata 12 0 R /P 6 0 R /S /Part>>
+object 11 0: <</CreationDate <443a32303037303630383135313931382b303227303027> /Creator <517561726b58507265737328746d2920362e3532> /ModDate <443a32303038303630343135323131302b303227303027> /Producer <4163726f6261742044697374696c6c657220372e3020706f7572204d6163696e746f7368> /Title <466963682073616c204661627220636f727231202850616765203529>>>
+object 12 0: <</Length 1320 /Subtype /XML /Type /Metadata>> stream sha256=73b9057e949d281a176b1f2dc1d60cece46ca44f0bf46741c5132b8b129b9c56
+object 13 0: <</Info 14 0 R /K 15 0 R /Metadata 16 0 R /P 6 0 R /S /Part>>
+object 14 0: <</CreationDate <443a32303037303630383135313931352b303227303027> /Creator <517561726b58507265737328746d2920362e3532> /ModDate <443a32303038303630343135323132322b303227303027> /Producer <4163726f6261742044697374696c6c657220372e3020706f7572204d6163696e746f7368> /Title <466963682073616c204661627220636f727231202850616765203629>>>
+object 15 0: <</P 13 0 R /S /Part>>
+object 16 0: <</Length 1320 /Subtype /XML /Type /Metadata>> stream sha256=e9e1c708e15f391520ca517746d971a332a4b945c7b3d46c4583822e805795f3
+object 17 0: <</Count 1 /Kids [24 0 R] /Type /Pages>>
+object 20 0: <</E 293438 /H [1056 252] /L 302313 /Linearized 1 /N 1 /O 24 /T 301866>>
+object 21 0: <</AcroForm 23 0 R /Metadata 18 0 R /Outlines 1 0 R /Pages 17 0 R /StructTreeRoot 5 0 R /Type /Catalog>>
+object 22 0: <</C 190 /Filter /FlateDecode /Length 160 /O 152 /S 39 /V 168>> stream sha256=bef0dba079b63807dad838e85c413acd55117e2fe3f5188070597cc438d668bc
+object 23 0: <</DA <2f48656c7620302054662030206720> /DR <</Encoding <</PDFDocEncoding 4 0 R>> /Font <</Helv 2 0 R /ZaDb 3 0 R>>>> /Fields []>>
+object 24 0: <</Contents [27 0 R 29 0 R 30 0 R 31 0 R 32 0 R 33 0 R 35 0 R 36 0 R] /CropBox [0 0 708.661 1077.1699] /MediaBox [0 0 708.661 1077.1699] /Parent 17 0 R /Resources <</ExtGState <</GS0 48 0 R /GS1 57 0 R>> /Font <</T1_0 25 0 R /T1_1 26 0 R /T1_2 28 0 R /T1_3 34 0 R>> /ProcSet [/PDF /Text] /XObject <</Fm0 56 0 R>>>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 25 0: <</BaseFont /JFCMIM+OfficinaSans-Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 38 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [296 0 0 0 0 0 0 0 0 0 0 0 0 370 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 0 0 0 0 0 0 0 0 500 0 630 593 519 0 556 481 444 0 0 796 0 0 0 0 0 0 0 0 0 481 0 426 519 500 370 500 537 315 0 0 296 778 537 519 537 0 352 426 370 537 463 667 0 481]>>
+object 26 0: <</BaseFont /JFCMJO+OfficinaSans-Book /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 40 0 R /LastChar 213 /Subtype /Type1 /Type /Font /Widths [296 0 0 0 0 0 0 0 370 370 500 0 296 352 296 444 500 500 500 500 500 500 500 500 500 500 0 0 0 0 0 0 0 556 556 463 0 463 426 537 611 370 444 0 444 667 574 556 500 0 519 463 444 0 500 0 481 0 444 0 0 0 0 0 0 463 500 426 500 463 315 500 519 278 278 444 259 722 519 500 500 0 315 389 352 500 444 630 444 444 407 0 0 0 0 296 0 0 0 0 0 0 0 0 0 0 0 0 0 0 463 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 308 0 296 0 0 296 0 296 296 0 0 296 296 296 296 296 0 0 296 0 0 0 0 0 296 0 296 296 0 0 0 296 0 0 0 0 0 500 0 407 407 0 185]>>
+object 27 0: <</Filter /FlateDecode /Length 674>> stream sha256=ce6d56659c9da3554595fcc2dc824e46f2d024597d95e9a7f475398faaf085e9
+object 28 0: <</BaseFont /JFCMLA+OfficinaSans-BookItalic /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 42 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [296 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 537 444 537 463 426 0 574 0 426 0 426 0 0 0 0 0 500 463 426 0 0 685 0 0 0 0 0 0 0 0 0 481 0 389 481 444 315 463 500 259 0 0 241 722 500 481 481 0 296 370 333 500 407 611 0 426]>>
+object 29 0: <</Filter /FlateDecode /Length 689>> stream sha256=31564125c48f8612f2d18517bd5e01925b99d17ccf63a0b00763264fd6442472
+object 30 0: <</Filter /FlateDecode /Length 765>> stream sha256=95a9d8e636917212670433871200255662daccb0df357744f4963496ff8f0897
+object 31 0: <</Filter /FlateDecode /Length 653>> stream sha256=fc88f5814750f329d0f54cd8d28801c3523045c979d11e268003c218a4857dd9
+object 32 0: <</Filter /FlateDecode /Length 727>> stream sha256=45a9f184578be7ff6c2a942404ca1ad74239c071dd56069b335c93e302916ab4
+object 33 0: <</Filter /FlateDecode /Length 757>> stream sha256=a1c7b452040763f65b5a0c6d46f0c6d1ca9de0cad12d4b677e489190613edad4
+object 34 0: <</BaseFont /JFCMOD+TriplexLight /Encoding 43 0 R /FirstChar 48 /FontDescriptor 46 0 R /LastChar 49 /Subtype /Type1 /ToUnicode 44 0 R /Type /Font /Widths [476 250]>>
+object 35 0: <</Filter /FlateDecode /Length 771>> stream sha256=11b5bacec1e7bd068f5f32d2fa9833c9dc8c31aba922ee8e7d1de7e300a20913
+object 36 0: <</Filter /FlateDecode /Length 628>> stream sha256=d5c1245524e25afec716c3954f84a047f7227270b717dae2b037e743c2089cbd
+object 37 0: <</Filter /FlateDecode /Length 5968 /Subtype /Type1C>> stream sha256=ddfda3eb22a618867ae473d4043f8db7f91f706bc18ac9cdd938ec51bdbcbd96
+object 38 0: <</Ascent 724 /CapHeight 685 /CharSet <2f412f422f432f442f452f462f472f492f4a2f4c2f4d2f4e2f4f2f502f522f532f542f562f572f582f5a2f612f61637574652f622f632f63636564696c6c612f63697263756d666c65782f636f6d6d612f642f652f6561637574652f6563697263756d666c65782f6567726176652f65696768742f662f666976652f666f75722f672f67726176652f682f68797068656e2f692f6c2f6d2f6e2f6e696e652f6f2f6f6e652f702f706572696f642f712f71756f746572696768742f71756f746573696e676c652f722f732f736576656e2f7369782f73706163652f742f74687265652f74776f2f752f762f772f782f792f7a65726f> /Descent -212 /Flags 262176 /FontBBox [-55 -261 1137 964] /FontFile3 37 0 R /FontName /JFCMIM+OfficinaSans-Bold /ItalicAngle 0 /StemH 100 /StemV 127 /Type /FontDescriptor /XHeight 503>>
+object 39 0: <</Filter /FlateDecode /Length 7226 /Subtype /Type1C>> stream sha256=8751f79559a8b6e650d7f0565da26059ade34537ef2426eceef7c62e1e323ffa
+object 40 0: <</Ascent 724 /CapHeight 685 /CharSet <2f412f422f432f442f452f462f472f482f492f4a2f4c2f4d2f4e2f4f2f502f522f532f542f562f582f5a2f612f61637574652f6167726176652f617374657269736b2f622f632f63636564696c6c612f63697263756d666c65782f636f6d6d612f636f707972696768742f642f646f746c657373692f652f6561637574652f6563697263756d666c65782f6567726176652f65696768742f656e646173682f662f666976652f666f75722f672f67726176652f6775696c6c656d6f746c6566742f6775696c6c656d6f7472696768742f682f68797068656e2f692f6963697263756d666c65782f6a2f6b2f6c2f6d2f6e2f6e696e652f6f2f6f63697263756d666c65782f6f652f6f6e652f702f706172656e6c6566742f706172656e72696768742f706572696f642f712f71756f746564626c6c6566742f71756f746564626c72696768742f71756f746572696768742f71756f746573696e676c652f722f732f736576656e2f7369782f736c6173682f73706163652f742f74687265652f74776f2f752f762f772f782f792f7a2f7a65726f> /Descent -212 /Flags 32 /FontBBox [-79 -250 1060 923] /FontFile3 39 0 R /FontName /JFCMJO+OfficinaSans-Book /ItalicAngle 0 /StemH 66 /StemV 80 /Type /FontDescriptor /XHeight 487>>
+object 41 0: <</Filter /FlateDecode /Length 3568 /Subtype /Type1C>> stream sha256=9603cefed4aeae3d02733b238667ac615da5981c12fac59df5888e9000880360
+object 42 0: <</Ascent 724 /CapHeight 685 /CharSet <2f73706163652f532f612f692f6e2f742f4a2f6f2f682f652f422f702f732f572f6c2f642f722f452f762f672f662f442f432f522f752f632f482f792f462f6d2f4c2f772f54> /Descent -212 /Flags 96 /FontBBox [-164 -250 1031 919] /FontFile3 41 0 R /FontName /JFCMLA+OfficinaSans-BookItalic /ItalicAngle -12 /StemH 66 /StemV 78 /Type /FontDescriptor /XHeight 487>>
+object 43 0: <</Differences [48 /zero /one] /Type /Encoding>>
+object 44 0: <</Filter /FlateDecode /Length 215>> stream sha256=2dd2f0a2595be1048b72e7ca893b706e62ce4d20ce751cef703fa9bfef41c292
+object 45 0: <</Length 238 /Subtype /Type1C>> stream sha256=d8053d9c5a724e13ce83e3c2cdf012c8ed547e7609772c3c91bfb62f9ffc7288
+object 46 0: <</Ascent 688 /CapHeight 593 /CharSet <2f73706163652f6f6e652f7a65726f> /Descent -208 /Flags 4 /FontBBox [-25 -230 887 864] /FontFile3 45 0 R /FontName /JFCMOD+TriplexLight /ItalicAngle 0 /StemH 70 /StemV 71 /Type /FontDescriptor /XHeight 478>>
+object 47 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /DCTDecode /Height 957 /Length 262281 /Subtype /Image /Type /XObject /Width 696>> stream partial=DCTDecode sha256=97ab3f07f56337aae4324a167c9dae4303663196684f250c0f229199fca20b2c
+object 48 0: <</BG2 /Default /OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /UCR2 /Default /op false>>
+object 49 0: <</ExtGState <</GS1 48 0 R>> /ProcSet [/PDF /ImageB] /XObject <</Im1 47 0 R>>>>
+object 50 0: <</F <4d6163696e746f73682048443a55736572733a416c667265646f3a446f63756d656e74733a53414e4452413a46494348452053414c4c4520414e474c4149533a4649434845532044834acb204641495445533a696d61676573206e76207469663a43617272616368652c204c6f757672652c2031302e746966> /Type /Filespec>>
+object 51 0: <</2.0 <</CropRect [39.317 26.302 2207.41 3012.3599] /F 50 0 R /IncludedImageQuality 1 /Inks [/monochrome <4e6f6972> 1] /Overprint false /Size [2229 3066] /Tags [305 <41646f62652050686f746f73686f7020435332204d6163696e746f7368>] /Type /OPI /Version 2>>>>
+object 52 0: <</BBox [-2.3161 -1.9772 1.9284 2.7107] /Filter /FlateDecode /FormType 1 /Length 127 /Matrix [1 0 0 1 0 0] /OPI 51 0 R /Resources 49 0 R /Subtype /Form /Type /XObject>> stream sha256=e880083febd4f2760badfd7b8dfad54129cafd3d737ceafcb6a601cf1ab887fe
+object 53 0: <</ExtGState <</GS1 48 0 R>> /ProcSet [/PDF] /XObject <</Fm1 52 0 R>>>>
+object 54 0: <</F <4d6163696e746f73682048443a55736572733a416c667265646f3a446f63756d656e74733a53414e4452413a46494348452053414c4c4520414e474c4149533a4649434845532044834acb204641495445533a696d61676573206e76207469663a43617272616368652c204c6f757672652c2031302e746966> /Type /Filespec>>
+object 55 0: <</1.3 <</Color [0 0 0 1 <4e6f6972>] /ColorType /Process /CropFixed [39.317 26.302 2207.41 3012.3599] /CropRect [39 26 2207 3012] /F 54 0 R /ImageType [1 8] /Overprint false /Position [386.949 454.618 386.949 683.939 553.452 683.939 553.452 454.618] /Resolution [300 300] /Size [2229 3066] /Type /OPI /Version 1.3>>>>
+object 56 0: <</BBox [0 0.015 708.66 1077.2001] /Filter /FlateDecode /FormType 1 /Length 139 /Matrix [1 0 0 1 0 0] /OPI 55 0 R /Resources 53 0 R /Subtype /Form /Type /XObject>> stream sha256=0ba0341cdcf763456c66ebfde614489fe62b85e06495e8092297b9772f9046fb
+object 57 0: <</BG2 /Default /OP true /OPM 1 /SA false /SM 0.02 /Type /ExtGState /UCR2 /Default /op true>>

@@ -1,0 +1,23 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=
+info CreationDate: 2005-02-25T08:44:22+01:00
+info ModDate: 2005-02-25T08:44:22+01:00
+info Producer: iText1.1 by lowagie.com (based on itext-paulo-142)
+xmp: none
+object 1 0: <</BBox [0 0 595 842] /Filter /FlateDecode /FormType 1 /Length 457 /Matrix [1 0 0 1 0 0] /Resources <</ExtGState 5 0 R /Font 6 0 R /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=c9b7a509adef23c93e148387d07f93aaccdb5e0a362ae359780b60262b308d04
+object 2 0: <</Filter /FlateDecode /Length 29>> stream sha256=95fc0b4d50a61112b3537a830d078e84e6c830fdb582862f7e93678714f97090
+object 3 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 4 0: <</Contents 2 0 R /MediaBox [0 0 595 842] /Parent 3 0 R /Resources <</ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Xf1 1 0 R>>>> /Type /Page>>
+object 5 0: <</R6 7 0 R>>
+object 6 0: <</R12 8 0 R>>
+object 7 0: <</BG 9 0 R /Name /R6 /OPM 1 /SM 0.02 /TR /Identity /Type /ExtGState /UCR 10 0 R>>
+object 8 0: <</BaseFont /FZJPIV+Times-Roman /FirstChar 32 /FontDescriptor 11 0 R /LastChar 255 /Name /R12 /Subtype /Type1 /Type /Font /Widths [250 333 408 500 500 833 778 180 333 333 500 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 564 564 564 444 921 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 722 667 556 611 722 722 944 722 722 611 333 278 333 469 500 333 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 480 200 480 541 250 500 250 333 500 444 1000 500 500 333 1000 556 333 889 250 611 250 250 333 333 444 444 350 500 1000 333 980 389 333 722 250 444 722 250 333 500 500 500 500 200 500 333 760 276 500 564 333 760 333 400 564 300 300 333 500 453 250 333 300 310 500 750 750 750 444 722 722 722 722 722 722 889 667 611 611 611 611 333 333 333 333 722 722 722 722 722 722 722 564 722 722 722 722 722 722 556 500 444 444 444 444 444 444 667 444 444 444 444 444 278 278 278 278 500 500 500 500 500 500 500 564 500 500 500 500 500 500 500 500]>>
+object 9 0: <</BitsPerSample 8 /Domain [0 1] /Filter /FlateDecode /FunctionType 0 /Length 267 /Range [0 1] /Size [256]>> stream sha256=40aff2e9d2d8922e47afd4648e6967497158785fbd1da870e7110266bf944880
+object 10 0: <</BitsPerSample 8 /Domain [0 1] /Filter /FlateDecode /FunctionType 0 /Length 259 /Range [-1 1] /Size [256]>> stream sha256=34d0940fd2fdc023b60b3c0c0484f5a123a2517300e9dfbb115ae0acb3392158
+object 11 0: <</Ascent 924 /CapHeight 676 /CharSet <2f73706163652f646f6c6c61722f68797068656e2f706572696f642f736c6173682f7a65726f2f6f6e652f74776f2f666f75722f666976652f657175616c2f61742f412f422f452f472f492f4d2f542f552f612f622f632f642f652f662f672f682f692f6c2f6d2f6e2f6f2f702f722f732f742f75> /Descent -281 /Flags 34 /FontBBox [-168 -281 1031 924] /FontFile3 12 0 R /FontName /FZJPIV+Times-Roman /ItalicAngle 0 /MissingWidth 250 /StemV 111 /Type /FontDescriptor /XHeight 461>>
+object 12 0: <</Filter /FlateDecode /Length 4032 /Subtype /Type1C>> stream sha256=cb2cac81bc1e6911358e535ea193179954b84bc18b7756d3f9aaecdc3bf2f14f
+object 13 0: <</Pages 3 0 R /Type /Catalog>>
+object 14 0: <</CreationDate <443a32303035303232353038343432322b303127303027> /ModDate <443a32303035303232353038343432322b303127303027> /Producer <6954657874312e31206279206c6f77616769652e636f6d20286261736564206f6e2069746578742d7061756c6f2d31343229>>>

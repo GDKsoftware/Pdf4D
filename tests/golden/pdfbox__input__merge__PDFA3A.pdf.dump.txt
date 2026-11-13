@@ -1,0 +1,33 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+info Author: Tilman Hausherr
+info CreationDate: 2021-05-25T20:49:32+02:00
+info Creator: Microsoft® Word 2016
+info ModDate: 2021-05-25T20:49:32+02:00
+info Producer: Microsoft® Word 2016
+xmp: 3233
+object 1 0: <</Lang <64652d4445> /MarkInfo <</Marked true>> /Metadata 21 0 R /OutputIntents [<</DestOutputProfile 20 0 R /Info <43726561746f723a20485020202020204d616e7566616374757265723a494543202020204d6f64656c3a73524742> /OutputConditionIdentifier <73524742> /RegistryName <687474703a2f2f7777772e636f6c6f722e6f7267> /S /GTS_PDFA1 /Type /OutputIntent>>] /Pages 2 0 R /StructTreeRoot 10 0 R /Type /Catalog /ViewerPreferences 22 0 R>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R /GS8 8 0 R>> /Font <</F1 5 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /StructParents 0 /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 237>> stream sha256=b09ac99f2e4c6d1570b340f1a58c0e174f53b204e9f654d3e62ea17ee8d328b3
+object 5 0: <</BaseFont /BCDEEE+Calibri /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 6 0 R /LastChar 122 /Name /F1 /Subtype /TrueType /Type /Font /Widths 17 0 R>>
+object 6 0: <</Ascent 750 /AvgWidth 521 /CapHeight 750 /Descent -250 /Flags 32 /FontBBox [-503 -250 1240 750] /FontFile2 18 0 R /FontName /BCDEEE+Calibri /FontWeight 400 /ItalicAngle 0 /MaxWidth 1743 /StemV 52 /Type /FontDescriptor /XHeight 250>>
+object 7 0: <</BM /Normal /Type /ExtGState /ca 1>>
+object 8 0: <</BM /Normal /CA 1 /Type /ExtGState>>
+object 9 0: <</Author <54696c6d616e204861757368657272> /CreationDate <443a32303231303532353230343933322b303227303027> /Creator <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200032003000310036> /ModDate <443a32303231303532353230343933322b303227303027> /Producer <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200032003000310036>>>
+object 10 0: <</K [14 0 R] /ParentTree 12 0 R /ParentTreeNextKey 1 /RoleMap 11 0 R /Type /StructTreeRoot>>
+object 11 0: <</Annotation /Sect /Artifact /Sect /Chart /Sect /Chartsheet /Part /Diagram /Figure /Dialogsheet /Part /Endnote /Note /Footer /Sect /Footnote /Note /Header /Sect /InlineShape /Sect /Macrosheet /Part /Slide /Part /Textbox /Sect /Workbook /Document /Worksheet /Part>>
+object 12 0: <</Nums [0 16 0 R]>>
+object 13 0: <</Names []>>
+object 14 0: <</K [15 0 R] /P 10 0 R /S /Document /Type /StructElem>>
+object 15 0: <</K [0] /P 14 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 16 0: [15 0 R]
+object 17 0: [226 0 0 0 0 0 0 0 0 0 0 0 0 0 252 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 487 0 0 0 0 0 0 0 0 0 0 0 0 479 525 423 525 498 305 471 525 230 239 455 230 799 525 527 525 525 349 391 335 525 452 715 433 453 395]
+object 18 0: <</Filter /FlateDecode /Length 39008 /Length1 117356 /Metadata 19 0 R>> stream sha256=fee7554a3470ac37e9deb1d6c5f8e015fb837c9b8870293212d611ab8eb4ee85
+object 19 0: <</Length 1463 /Subtype /XML /Type /Metadata>> stream sha256=dcbea084ecf33e2871392e1f3d8ae2c4b4c9c2f42d5b99acf819e38fc688aaa4
+object 20 0: <</Filter /FlateDecode /Length 2593 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 21 0: <</Length 3233 /Subtype /XML /Type /Metadata>> stream sha256=d7ab8077e836f19932202ba47b3b84422e5e4d126be9e4326481da6843135b75
+object 22 0: <</DisplayDocTitle true>>

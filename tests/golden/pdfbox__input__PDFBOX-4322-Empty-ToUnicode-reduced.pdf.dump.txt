@@ -1,0 +1,19 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.276 841.89] crop=[0 0 595.276 841.89] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 3 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <<>>
+object 3 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 4 0: <</Contents 5 0 R /CropBox [0 0 595.276 841.89] /MediaBox [0 0 595.276 841.89] /Parent 3 0 R /Resources 6 0 R /Rotate 0 /Type /Page>>
+object 5 0: <</Filter /FlateDecode /Length 21>> stream sha256=833708068af881a3a4f617417eef87498e0f0832f7c28634196a3d092888aac7
+object 6 0: <</XObject <</X6 7 0 R>>>>
+object 7 0: <</BBox [0 0 595.276 841.89] /Filter /FlateDecode /FormType 1 /Length 83 /Resources <</Font <</TCDRYK+Calibri 8 0 R>>>> /Subtype /Form /Type /XObject>> stream sha256=27a71a720d469d30b63c9456285985539b7aefe0b652a7b8d72311955cdd2d51
+object 8 0: <</BaseFont /Calibri /DescendantFonts [9 0 R] /Encoding /Identity-H /Name /TCDRYK+Calibri /Subtype /Type0 /ToUnicode 10 0 R /Type /Font>>
+object 9 0: <</BaseFont /Calibri /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 1>> /CIDToGIDMap 11 0 R /FontDescriptor 12 0 R /Subtype /CIDFontType2 /Type /Font /W [32 [226] 36 [506 714] 44 [249 306 252 386 506 506 506 506 506 506 506 506 506 506 267] 63 [463 894 578 543 533 615 488 459] 72 [623 251 318] 76 [420 854 645 662 516] 82 [542 459 487] 87 [889 519 487] 97 [479 525 422 525 497 305 470 525 229 239 454 229 798 525 527 525] 114 [348 391 334 525 451 714] 121 [452 395]]>>
+object 10 0: <</Filter /FlateDecode /Length 665>> stream sha256=2a823d93e6243724dcac1e9cf8490dee10fc90b8a52b078ea70502bba416b3db
+object 11 0: <</Filter /FlateDecode /Length 279>> stream sha256=7735a848c27eb212d8939d14ff21b037c76057e345017f12f99cce2945817408
+object 12 0: <</Ascent 750 /CapHeight 963 /Descent -250 /Flags 4 /FontBBox [-502 -307 1240 963] /FontFamily <43616c69627269> /FontFile2 13 0 R /FontName /Calibri /ItalicAngle 0 /StemV 0 /Type /FontDescriptor>>
+object 13 0: <</Filter /FlateDecode /Length 18119 /Length1 32288>> stream sha256=799944ea0fe63fcb545b0ab3aa9603b7ff72179a37d042616e85dc6f51dc0a71

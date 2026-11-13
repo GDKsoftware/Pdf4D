@@ -1,0 +1,39 @@
+version: 1.2
+encrypted: false
+permissions: none
+pages: 5
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 5: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info Author: Unknown
+info CreationDate: 1998-07-28T16:00:09+00:00
+info Creator: C:REGULA~1IREGSFR_EQ_EM.WP
+info Keywords: 
+info Producer: Acrobat PDFWriter 3.02 for Windows
+info Subject: 
+info Title: C:REGULA~1IREGSFR_EQ_EM.PDF
+xmp: none
+object 1 0: <</Author <556e6b6e6f776e> /CreationDate <547565736461792c204a756c792032382c203139393820343a30303a303920504d> /Creator <433a524547554c417e31495245475346525f45515f454d2e5750> /Keywords <> /Producer <4163726f6261742050444657726974657220332e303220666f722057696e646f7773> /Subject <> /Title <433a524547554c417e31495245475346525f45515f454d2e504446>>>
+object 2 0: [/PDF /Text]
+object 3 0: <</DefaultGray 21 0 R /DefaultRGB 22 0 R /Pages 5 0 R /Type /Catalog>>
+object 4 0: <</Contents 7 0 R /Parent 5 0 R /Resources <</Font <</F0 6 0 R>> /ProcSet 2 0 R>> /Type /Page>>
+object 5 0: <</Count 5 /Kids [4 0 R 9 0 R 12 0 R 15 0 R 18 0 R] /MediaBox [0 0 612 792] /Type /Pages>>
+object 6 0: <</BaseFont /TimesNewRoman /Encoding /WinAnsiEncoding /Name /F0 /Subtype /TrueType /Type /Font>>
+object 7 0: <</Filter /LZWDecode /Length 8 0 R>> stream sha256=13cccf4566982293aa23957505b3c007f0655520b5788c9a99e1e01eda7488ba
+object 8 0: 1589
+object 9 0: <</Contents 10 0 R /Parent 5 0 R /Resources <</Font <</F0 6 0 R>> /ProcSet 2 0 R>> /Type /Page>>
+object 10 0: <</Filter /LZWDecode /Length 11 0 R>> stream sha256=0aa0dd6a4103025d46b798547bea03c71223751b52937086bf4641832773b052
+object 11 0: 2154
+object 12 0: <</Contents 13 0 R /Parent 5 0 R /Resources <</Font <</F0 6 0 R>> /ProcSet 2 0 R>> /Type /Page>>
+object 13 0: <</Filter /LZWDecode /Length 14 0 R>> stream sha256=6af3032d0fb9cde785a9decf65df6e7c7cd2455ace46d93d90c616a9959fbd76
+object 14 0: 1785
+object 15 0: <</Contents 16 0 R /Parent 5 0 R /Resources <</Font <</F0 6 0 R>> /ProcSet 2 0 R>> /Type /Page>>
+object 16 0: <</Filter /LZWDecode /Length 17 0 R>> stream sha256=66fd7e7afa1437b8dc8acf71afa8a8014c0e25581bd40da206d5d9802a523674
+object 17 0: 2170
+object 18 0: <</Contents 19 0 R /Parent 5 0 R /Resources <</Font <</F0 6 0 R>> /ProcSet 2 0 R>> /Type /Page>>
+object 19 0: <</Filter /LZWDecode /Length 20 0 R>> stream sha256=6bdd4c6b85ee625412da1bfadc16c6ecda8502dcfe16d44e5ce71642743dd863
+object 20 0: 1447
+object 21 0: [/CalGray <</Gamma 1.9 /WhitePoint [0.9643 1 0.8251]>>]
+object 22 0: [/CalRGB <</Gamma [1.9 1.9 1.9] /Matrix [0.511 0.2903 0.0273 0.3264 0.6499 0.1279 0.1268 0.0598 0.6699] /WhitePoint [0.9643 1 0.8251]>>]

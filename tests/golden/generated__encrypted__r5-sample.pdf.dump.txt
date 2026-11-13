@@ -1,0 +1,33 @@
+version: 1.7
+encrypted: true
+permissions: -4
+pages: 2
+page 1: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+page 2: media=[0 0 596 842] crop=[0 0 596 842] rotate=0 label=
+info CreationDate: 2023-07-17T09:40:39+01:00
+info Creator: Xerox AltaLink C8055
+info ModDate: 2023-07-17T09:53:56+01:00
+info Producer: PDFlib+PDI 8.0.4p2 (Linux)
+xmp: 3172
+object 1 0: <</Contents 2 0 R /CropBox [0 0 596 842] /MediaBox [0 0 596 842] /Parent 13 0 R /Resources 10 0 R /Rotate 0 /Type /Page>>
+object 2 0: <</Filter /FlateDecode /Length 19>> stream sha256=7802f5f1866f74d333f4de911b965eb634b9be6e8dcfb6c77d70c48e29c7ac4e
+object 3 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /DecodeParms [null 11 0 R] /Filter [/FlateDecode /DCTDecode] /Height 1248 /Length 7352 /Subtype /Image /Type /XObject /Width 1760>> stream partial=DCTDecode sha256=8ddcaf731dfac77f39bff5caeac3b9209f873a0185f24ead6cc52be40a96642d
+object 4 0: <</BBox [0 0 842 596] /Filter /FlateDecode /FormType 1 /Length 72 /Matrix [0 -1 1 0 0 842] /Resources 12 0 R /Subtype /Form /Type /XObject>> stream sha256=b5526b11595f2d606c8cea892edaa2613076dd3896a3222a1906e11b2d71ff9a
+object 6 0: <</Length 3172 /Subtype /XML /Type /Metadata>> stream sha256=6ad2d4275313f7129b123ecea1519bd63f707ae8c984d8634fee7a6057f9b888
+object 10 0: <</ProcSet 25 0 R /XObject <</I1 4 0 R>>>>
+object 11 0: <<>>
+object 12 0: <</ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</XIPLAYER0 3 0 R>>>>
+object 13 0: <</Count 2 /Kids [18 0 R 1 0 R] /Type /Pages>>
+object 14 0: <</CreationDate <443a32303233303731373039343033392b303127303027> /Creator <5865726f7820416c74614c696e6b204338303535> /ModDate <443a32303233303731373039353335362b303127303027> /Producer <5044466c69622b50444920382e302e34703220284c696e757829>>>
+object 15 0: <</E 8597 /H [475 175] /L 20926 /Linearized 1 /N 2 /O 18 /T 20596>>
+object 16 0: <</CF <</StdCF <</AuthEvent /DocOpen /CFM /AESV3 /Length 32>>>> /Filter /Standard /Length 256 /O <77628c5707a9e9c6dacadf4bb66faa2098222fc21d1d6ebaa91fade63c0ce7a0f94f1116f7e3eb68235d9046de9dfb9200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000> /OE <ed8d5555dab15da61f37c1d7dcc2e1d6081a3571e6493fdf1af613a3bc9c8a52> /P -4 /Perms <559cb83e8ff4d9513b5a0e3024137823> /R 5 /StmF /StdCF /StrF /StdCF /U <f5a334f426b12380f13a4b45a8fc7f6002846a0bf606ed819f2831069aa25304428cea49465642e87f5d7ac55b64240b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000> /UE <d1cc99edcdaf3bf7c2a47d386b4b4c95f8d6ea9101c1d6aa43be23cfc834dd55> /V 5>>
+object 17 0: <</Extensions <</ADBE <</BaseVersion /1.7 /ExtensionLevel 3>>>> /Metadata 6 0 R /Pages 13 0 R /Type /Catalog>>
+object 18 0: <</Contents 19 0 R /CropBox [0 0 596 842] /MediaBox [0 0 596 842] /Parent 13 0 R /Resources 24 0 R /Rotate 0 /Type /Page>>
+object 19 0: <</Filter /FlateDecode /Length 19>> stream sha256=fda290564f696929e1bf1872d98fae84eacb908e6c3f492a106024ffe3a606a4
+object 21 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /DecodeParms [null 26 0 R] /Filter [/FlateDecode /DCTDecode] /Height 1248 /Length 6356 /Subtype /Image /Type /XObject /Width 1760>> stream partial=DCTDecode sha256=6e67076a50d77ca1d81c95e45cd4a4ca64ddb843748c06d9e9edb89f0bc33f39
+object 22 0: <</BBox [0 0 842 596] /Filter /FlateDecode /FormType 1 /Length 72 /Matrix [0 1 -1 0 596 0] /Resources 27 0 R /Subtype /Form /Type /XObject>> stream sha256=b5526b11595f2d606c8cea892edaa2613076dd3896a3222a1906e11b2d71ff9a
+object 24 0: <</ProcSet 25 0 R /XObject <</I0 22 0 R>>>>
+object 25 0: [/PDF /ImageB /ImageC /ImageI /Text]
+object 26 0: <<>>
+object 27 0: <</ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</XIPLAYER0 21 0 R>>>>
+object 28 0: <</Filter /FlateDecode /I 79 /Length 75 /S 45>> stream sha256=bea7e00b9e73aed14aa413bb8ce0654257e866ce5dca263aa3f213387a8f7d3d

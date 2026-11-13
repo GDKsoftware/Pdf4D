@@ -1,0 +1,23 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2024-06-13T11:35:13+02:00
+info ModDate: 2024-06-13T11:35:27+02:00
+xmp: 2989
+object 1 0: <</Length 2989 /Subtype /XML /Type /Metadata>> stream sha256=dfa0483024f711a1d03ace4cb73065e7bfe396e2e3eb6a6cef9addff8485c85e
+object 5 0: <</Count 1 /Kids [9 0 R] /Type /Pages>>
+object 6 0: <</CreationDate <443a32303234303631333131333531332b303227303027> /ModDate <443a32303234303631333131333532372b303227303027>>>
+object 7 0: <</E 77115 /H [460 143] /L 80769 /Linearized 1 /N 1 /O 9 /T 80478>>
+object 8 0: <</Metadata 1 0 R /Pages 5 0 R /Type /Catalog>>
+object 9 0: <</Contents 10 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 5 0 R /Resources 15 0 R /Rotate 0 /Type /Page>>
+object 10 0: <</Filter /FlateDecode /Length 141>> stream sha256=a394cea390820b39c4169e4ae49f1250b82022d4f8194814a3e77e47001dee6c
+object 12 0: <</Filter /FlateDecode /Length 75159 /Length1 348280>> stream sha256=3263ad7d02c4a842c079febf03fd5e457a8ade6bb0c3841afc7a7132012f7227
+object 13 0: <</Filter /FlateDecode /Length 271>> stream sha256=debab0c763ddeb97d23c668cddd4db22590b0566b2f3147e9a381188c4681132
+object 15 0: <</Font <</G3 19 0 R>>>>
+object 16 0: <</Ascent 891 /AvgWidth 427 /CapHeight 662 /Descent -216 /Flags 4 /FontBBox [-558 -328 2000 1055] /FontFile2 12 0 R /FontName /WKREKB+TimesNewRomanPS-BoldMT /ItalicAngle 0 /Leading 42 /MaxWidth 2000 /StemV 0 /Type /FontDescriptor /XHeight 457>>
+object 17 0: [3 3 250 43 43 778 51 51 611 53 53 722 68 68 500 70 70 444 72 72 444 75 75 556 77 77 333 81 [556 500] 85 [444 389 333]]
+object 18 0: <</BaseFont /WKREKB+TimesNewRomanPS-BoldMT /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /DW 1000 /FontDescriptor 16 0 R /Subtype /CIDFontType2 /Type /Font /W 17 0 R>>
+object 19 0: <</BaseFont /WKREKB+TimesNewRomanPS-BoldMT /DescendantFonts [18 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 13 0 R /Type /Font>>
+object 20 0: <</Filter /FlateDecode /I 74 /Length 64 /S 38>> stream sha256=67ac5d9eae2216935781209c668b2933bed51464ffdfdd787de56f8bbdc3c3e1

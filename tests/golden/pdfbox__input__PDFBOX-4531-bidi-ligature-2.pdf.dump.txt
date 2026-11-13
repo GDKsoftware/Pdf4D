@@ -1,0 +1,50 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+info Author: Masaki Komedani
+info CreationDate: 2023-02-22T05:52:48+00:00
+info Creator: Microsoft® Word 2019
+info ModDate: 2023-02-22T05:52:50+00:00
+info Producer: Adobe PDF Services
+xmp: 2264
+object 1 0: <</Lang <656e2d5553> /MarkInfo <</Marked true>> /Metadata 38 0 R /Pages 2 0 R /StructTreeRoot 15 0 R /Type /Catalog /ViewerPreferences 39 0 R>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 44 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS0 5 0 R /GS1 48 0 R>> /Font <</C2_0 6 0 R /TT0 12 0 R>> /ProcSet [/PDF /Text]>> /StructParents 0 /Tabs /S /Type /Page>>
+object 5 0: <</BM /Normal /Type /ExtGState /ca 1>>
+object 6 0: <</BaseFont /DJDLCI+ArialMT /DescendantFonts 7 0 R /Encoding /Identity-H /Subtype /Type0 /ToUnicode 34 0 R /Type /Font>>
+object 7 0: [8 0 R]
+object 8 0: <</BaseFont /DJDLCI+ArialMT /CIDSystemInfo 9 0 R /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 10 0 R /Subtype /CIDFontType2 /Type /Font /W 36 0 R>>
+object 9 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 10 0: <</Ascent 905 /AvgWidth 441 /CIDSet 46 0 R /CapHeight 728 /Descent -210 /Flags 32 /FontBBox [-665 -210 2000 728] /FontFile2 47 0 R /FontName /DJDLCI+ArialMT /FontWeight 400 /ItalicAngle 0 /Leading 33 /MaxWidth 2665 /StemV 44 /Type /FontDescriptor /XHeight 250>>
+object 12 0: <</BaseFont /DJDLCI+ArialMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 13 0 R /LastChar 32 /Subtype /TrueType /Type /Font /Widths 37 0 R>>
+object 13 0: <</Ascent 905 /AvgWidth 441 /CapHeight 728 /Descent -210 /Flags 32 /FontBBox [-665 -210 2000 728] /FontFile2 45 0 R /FontName /DJDLCI+ArialMT /FontWeight 400 /ItalicAngle 0 /Leading 33 /MaxWidth 2665 /StemV 44 /Type /FontDescriptor /XHeight 250>>
+object 14 0: <</Author <4d6173616b69204b6f6d6564616e69> /CreationDate <443a32303233303232323035353234385a> /Creator <4d6963726f736f6674ae20576f72642032303139> /ModDate <443a32303233303232323035353235305a> /Producer <41646f626520504446205365727669636573>>>
+object 15 0: <</K [19 0 R] /ParentTree 17 0 R /ParentTreeNextKey 1 /RoleMap 16 0 R /Type /StructTreeRoot>>
+object 16 0: <</Annotation /Sect /Artifact /Sect /Chart /Sect /Chartsheet /Part /Diagram /Figure /Dialogsheet /Part /Endnote /Note /Footer /Sect /Footnote /Note /Header /Sect /InlineShape /Sect /Macrosheet /Part /Slide /Part /Textbox /Sect /Workbook /Document /Worksheet /Part>>
+object 17 0: <</Nums [0 22 0 R]>>
+object 19 0: <</K [20 0 R 26 0 R 28 0 R 32 0 R] /P 15 0 R /S /Document /Type /StructElem>>
+object 20 0: <</K [21 0 R 24 0 R 25 0 R] /P 19 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 21 0: <</K 0 /P 20 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 22 0: [21 0 R 24 0 R 25 0 R 27 0 R 29 0 R 30 0 R 31 0 R 33 0 R]
+object 24 0: <</K 1 /P 20 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 25 0: <</ActualText <20> /K [2] /P 20 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 26 0: <</K [27 0 R] /P 19 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 27 0: <</ActualText <20> /K [3] /P 26 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 28 0: <</K [29 0 R 30 0 R 31 0 R] /P 19 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 29 0: <</K 4 /P 28 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 30 0: <</K 5 /P 28 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 31 0: <</ActualText <20> /K [6] /P 28 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 32 0: <</K [33 0 R] /P 19 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 33 0: <</ActualText <20> /K [7] /P 32 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 34 0: <</Filter /FlateDecode /Length 244>> stream sha256=f8fcfdddef2704af8d2ad50deed2823b53005ee9ffcb62d88660e11d05aae105
+object 36 0: [0 [750] 3 [278] 717 [563] 1019 [544]]
+object 37 0: [278]
+object 38 0: <</Length 2264 /Subtype /XML /Type /Metadata>> stream sha256=ff226bd4c782bc67bd92c3def84fbcc7142cea1ee7fad9b56807dc31c7c80ccd
+object 39 0: <</DisplayDocTitle true>>
+object 44 0: <</Filter /FlateDecode /Length 265>> stream sha256=7a265bba1dbf8d0f3ffb23662e462d54713bd76d43a1e7b44d71a016a7206942
+object 45 0: <</Filter /FlateDecode /Length 18213 /Length1 51515>> stream sha256=ce6447e290c322580245f459e9232f9600186d27ade5a6a95f08db051cc75db1
+object 46 0: <</Filter /FlateDecode /Length 19>> stream sha256=cea0f73c39404f33c1227c092d90813ac49adcf4157b3f5a26922afe827f7684
+object 47 0: <</Filter /FlateDecode /Length 14620 /Length1 47115>> stream sha256=9b29e3a82111a23522160058ee079de95e1a0cbbab31784ef15928611e2a9512
+object 48 0: <</BM /Normal /CA 1 /Type /ExtGState /ca 1>>

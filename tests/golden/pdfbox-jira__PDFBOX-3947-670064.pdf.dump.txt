@@ -1,0 +1,660 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 41
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=2
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=3
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=4
+page 5: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=5
+page 6: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=6
+page 7: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=7
+page 8: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=8
+page 9: media=[0 0 612 792] crop=[0 0 612 792] rotate=90 label=9
+page 10: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=10
+page 11: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=11
+page 12: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=12
+page 13: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=13
+page 14: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=14
+page 15: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=15
+page 16: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=16
+page 17: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=17
+page 18: media=[0 0 612 792] crop=[0 0 612 792] rotate=90 label=18
+page 19: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=19
+page 20: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=20
+page 21: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=21
+page 22: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=22
+page 23: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=23
+page 24: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=24
+page 25: media=[0 0 612 792] crop=[0 0 612 792] rotate=90 label=25
+page 26: media=[0 0 612 792] crop=[0 0 612 792] rotate=90 label=26
+page 27: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=27
+page 28: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=28
+page 29: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=29
+page 30: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=30
+page 31: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=31
+page 32: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=32
+page 33: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=33
+page 34: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=34
+page 35: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=35
+page 36: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=36
+page 37: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=37
+page 38: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=38
+page 39: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=39
+page 40: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=40
+page 41: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=41
+info Author: Lester J. Williams, Phillip N. Albertson, Donna D. Tucker, and Jaime A. Painter
+info CreationDate: 2005-01-06T07:15:39+00:00
+info Creator: FrameMaker 7.1
+info Keywords: hydrogeologic data, geophyiscal logging, Lawrenceville, Georgia, ground water, crystalline bedrock, Gwinnett County
+info ModDate: 2005-08-08T14:27:24-04:00
+info Producer: Acrobat Distiller 6.0.1 (Windows)
+info Subject: Assessing ground-water resources of a study area in Gwinnett County, Georgia
+info Title: Methods and Hydrogeologic Data from Test Drilling and Geophysical Logging Surveys in the Lawrenceville, Georgia, Area
+xmp: 4303
+outline: Contents -> 5
+outline:   Figures -> 6
+outline:     Figure 1. Location of study area in Gwinnett County and well locations in Lawrenceville, Georgia. -> 9
+outline:     Figure 2. Distribution of principal lithologic units and bedrock well locations, Lawrenceville, Georgia (modified from Chapman and others, 1999). See table 1 for description of principal lithologic units. -> 12
+outline:     Figure 3. Schematic diagrams illustrating how the strike and dip of a planar feature intersecting a borehole are determined. The calculation assumes the feature is planar (not curved). Corrections are made for borehole deviation and magnetic declination. -> 20
+outline:     Figure 4. Down-hole packer assembly used during the study showing (A ) schematic of packer assembly, and photos of (B ) pressure... -> 23
+outline:     Figure 5. Example lithologic units and geophysical log figure showing caliper, gamma, lateral resistivity, fluid temperature, and fluid resistivity, Lawrenceville, Georgia. -> 25
+outline:     Figure 6. Example structure log figure showing rock types, lithologic units, tadpole plots, borehole images, and borehole deviation, Lawrenceville, Georgia. -> 26
+outline:     Figure 7. (A ) Flowmeter logs for well 13FF23, showing inflow and outflow from borehole, Lawrenceville, Georgia. Top left-facing... -> 31
+outline:     Figure 8. Partial record of water-level hydrograph for well 14FF08 showing effect of pumping at the Rhodes Jordan Wellfield, Lawrenceville, Georgia. -> 37
+outline:   Tables -> 6
+outline:     Table 1. Description of principal lithologic units in the Lawrenceville, Georgia, area (from Chapman and others, 1999). -> 13
+outline:     Table 2. Location and well construction information for the Lawrenceville. Georgia, area. -> 14
+outline:     Table 3. Description of borehole geophysical tools used in the Lawrenceville, Georgia, area. -> 17
+outline:     Table 4. Geophysical logs collected in the Lawrenceville, Georgia, area. -> 18
+outline:     Table 5. Depth, yield, and structural features of water-bearing fracture zones in the Lawrenceville, Georgia, area. -> 27
+outline:     Table 6. Observations from ambient and pumping flowmeter surveys, Lawrenceville, Georgia, area. -> 30
+outline:     Table 7. Drawdown, pumping rate, and specific capacity of wells during aquifer tests in the Lawrenceville, Georgia, area. -> 32
+outline:     Table 8. Fracture depth, straddle depths, and hydraulic response observed during packer testing of well 14FF59, Lawrenceville, Georgia, area. -> 34
+outline:     Table 9. Water levels in wells, October 31, 2001, Lawrenceville, Georgia, area. -> 35
+outline:     Table 10. Range of dates where continuous water-level data are available and influence from pumping, Lawrenceville, Georgia, area. -> 36
+outline:   Conversion Factors and Datum -> 7
+outline: Abstract -> 8
+outline: Introduction -> 8
+outline:   Purpose and Scope -> 10
+outline:   Description of the Study Area -> 10
+outline:     Water Use -> 10
+outline:     Geologic Setting -> 11
+outline:     Hydrogeologic Setting -> 11
+outline:   Well-Naming System -> 13
+outline:   Supplemental Data on CD-ROM -> 13
+outline:   Acknowledgments -> 13
+outline: Methods of Data Collection and Analysis -> 15
+outline:   Test-Well Drilling -> 15
+outline:     Air-Percussion Rotary Drilling and Well Construction -> 15
+outline:     Lithologic Sampling and Determination of Rock Type -> 15
+outline:     Well Development and Short-Term Yield -> 16
+outline:   Geophysical Logging and Borehole-Camera Surveys -> 16
+outline:     Caliper Logging -> 16
+outline:     Natural-Gamma Logging -> 17
+outline:     Resistivity Logging -> 17
+outline:     Fluid-Temperature and Fluid-Resistivity Logging -> 17
+outline:     Borehole-Televiewer Imaging -> 17
+outline:     Borehole-Camera Surveys -> 17
+outline:   Characterization of Fractures in Open Boreholes -> 19
+outline:     Determination of Type, Depth, and Orientation of Fractures -> 19
+outline:     Identification of Water-Bearing Fractures -> 19
+outline:     Estimating Yield Contribution from Individual Water-Bearing Fractures -> 21
+outline:       Estimating Yield during Drilling -> 21
+outline:       Flowmeter Surveys -> 21
+outline:   Aquifer Testing -> 22
+outline:   Packer Testing -> 22
+outline:   Water-Level Monitoring -> 22
+outline: Hydrogeologic Data -> 24
+outline:   Fracture Data -> 24
+outline:     Individual Fracture Yield -> 24
+outline:       Joints, Open Joints, and Zones of Joint Concentration -> 24
+outline:       Foliation Partings and Major Foliation Openings -> 24
+outline:       Dissolution Openings -> 30
+outline:       Irregular-Shaped Voids and Fractures -> 30
+outline:     Flowmeter Surveys -> 30
+outline:   Aquifer-Test Data -> 31
+outline:     Aquifer-Test Yield, Drawdown, and Recovery -> 32
+outline:     Direction and Magnitude of Drawdown -> 33
+outline:     Packer-Test Data -> 33
+outline:     Water-Level Data -> 33
+outline: Summary and Conclusions -> 36
+outline: References Cited -> 38
+attachment: High Quality.joboptions | ?
+object 1 0: <</Contents 2 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <<>> /Rotate 0 /Thumb 494 0 R /Type /Page>>
+object 2 0: <</Filter /FlateDecode /Length 10>> stream sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+object 3 0: <</B [4 0 R 5 0 R 7 0 R 6 0 R] /Contents 8 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 186 0 R /T1_3 179 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 1 /Thumb 495 0 R /Type /Page>>
+object 4 0: <</N 5 0 R /P 3 0 R /R [46 556 531 693] /T 13424 0 R /V 137 0 R>>
+object 5 0: <</N 7 0 R /P 3 0 R /R [46 241 448 273] /T 13424 0 R /V 4 0 R>>
+object 6 0: <</N 167 0 R /P 3 0 R /R [46 31 448 79] /T 13424 0 R /V 7 0 R>>
+object 7 0: <</N 6 0 R /P 3 0 R /R [46 115 448 153] /T 13424 0 R /V 5 0 R>>
+object 8 0: <</Filter /FlateDecode /Length 667>> stream sha256=89119e37d26c8b70b4d78144d9fc4ad094027c0e05261cdfebf3e901bea09b75
+object 9 0: <</Annots [191 0 R 190 0 R 189 0 R] /B [167 0 R 171 0 R 177 0 R 176 0 R] /Contents 10 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 179 0 R /T1_3 186 0 R /T1_4 188 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 2 /Thumb 496 0 R /Type /Page>>
+object 10 0: <</Filter /FlateDecode /Length 1689>> stream sha256=05272b09cd83c2bdf37a88ca6de72953de8860db63b6db75e22004f97f1b2efe
+object 11 0: <</Filter /FlateDecode /Length 3330 /Subtype /Type1C>> stream sha256=9e2337a04bfda0fdfd3a47f988b11138f1b6744e0595fd8de0fb2a7cb6d0a726
+object 12 0: <</Ascent 722 /CapHeight 722 /CharSet <2f73706163652f682f742f702f636f6c6f6e2f736c6173682f772f706572696f642f752f732f672f6f2f762f532f652f642f632f692f612f6e2f572f6c2f6d2f636f6d6d612f4c2f4a2f502f4e2f412f622f722f442f542f6b2f74776f2f7a65726f2f666f75722f4d2f792f662f472f552f4f2f68797068656e2f462f522f6f6e652f74687265652f7369782f6569676874> /Descent -217 /Flags 96 /FontBBox [-169 -250 1065 953] /FontFile3 11 0 R /FontName /CLOBHM+Univers-CondensedLightOblique /ItalicAngle -12 /StemH 48 /StemV 60 /Type /FontDescriptor /XHeight 505>>
+object 13 0: <</Annots [219 0 R 227 0 R 230 0 R 218 0 R 215 0 R 217 0 R 234 0 R 233 0 R 216 0 R 229 0 R 224 0 R 223 0 R 221 0 R 212 0 R 220 0 R 232 0 R 226 0 R 228 0 R 214 0 R 213 0 R 211 0 R 199 0 R 200 0 R 198 0 R 203 0 R 210 0 R 201 0 R 202 0 R 231 0 R 225 0 R 222 0 R 209 0 R 204 0 R 207 0 R 197 0 R 194 0 R 208 0 R 196 0 R 192 0 R 193 0 R 195 0 R 206 0 R 205 0 R] /B [181 0 R] /Contents 14 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 6 /Thumb 497 0 R /Type /Page>>
+object 14 0: <</Filter /FlateDecode /Length 2909>> stream sha256=6756c8e7feffd2446ef25e3d31e0017bdd56ba5a2426e8c82ff7456bf7b55149
+object 15 0: <</Annots [244 0 R 235 0 R 243 0 R 245 0 R 255 0 R 256 0 R 253 0 R 254 0 R 252 0 R 257 0 R 246 0 R 237 0 R 236 0 R 247 0 R 241 0 R 249 0 R 239 0 R 240 0 R 248 0 R 251 0 R 250 0 R 238 0 R 242 0 R] /B [172 0 R] /Contents 16 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 51 /Thumb 498 0 R /Type /Page>>
+object 16 0: <</Filter /FlateDecode /Length 2854>> stream sha256=d1292750e5ecc089dde2f670064a1ccd7d4df93f3711a33d547d996770882911
+object 17 0: <</B [132 0 R] /Contents 18 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 612 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 260 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 74 /Thumb 499 0 R /Type /Page>>
+object 18 0: <</Filter /FlateDecode /Length 2032>> stream sha256=40f0bb51531568b75fb42c4fecf83cbe0f0feadc1725236a92789b7ac697aa54
+object 19 0: <</B [173 0 R 131 0 R 129 0 R] /Contents 20 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 613 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 75 /Thumb 500 0 R /Type /Page>>
+object 20 0: <</Filter /FlateDecode /Length 6200>> stream sha256=58b4b6c45eb77c9ee9926222af1e758afa5025cc7153fe2315728236ddea85e4
+object 21 0: <</B [174 0 R] /Contents 22 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 613 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 263 0 R /GS2 269 0 R>> /Font <</T1_0 274 0 R /T1_1 271 0 R /T1_2 273 0 R /T1_3 186 0 R /T1_4 270 0 R /T1_5 266 0 R /T1_6 184 0 R /T1_7 267 0 R /T1_8 182 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 29 0 R>>>> /Rotate 90 /StructParents 76 /Thumb 501 0 R /Type /Page>>
+object 22 0: <</Filter /FlateDecode /Length 576377>> stream sha256=27ecc47b6254ddbfa483c485f681cf93cdd7273ea235e4fe27b7bd1d2df63dbd
+object 23 0: <</Ascent 939 /CapHeight 716 /Descent -250 /Flags 32 /FontBBox [-167 -250 1006 939] /FontName /Arial-BoldMT /ItalicAngle 0 /StemV 136 /Type /FontDescriptor /XHeight 518>>
+object 24 0: <</Filter /FlateDecode /Length 2118 /Subtype /Type1C>> stream sha256=e8394115a61a08a999d320c0a317db0d5a4083a8530bfab4716569088483a80d
+object 25 0: <</Ascent 762 /CapHeight 732 /CharSet <2f73706163652f592f452f4c2f4f2f572f522f492f562f422f412f532f4e2f43> /Descent -196 /Flags 262242 /FontBBox [-123 -278 1323 984] /FontFile3 24 0 R /FontName /CLOKGL+Souvenir-DemiItalic /ItalicAngle -9 /StemH 78 /StemV 163 /Type /FontDescriptor /XHeight 489>>
+object 26 0: <</Filter /FlateDecode /Length 2863 /Subtype /Type1C>> stream sha256=a37f37d26cc94ba6e947befa3d676da527ac464f65cf63d97dd17217f6799b2d
+object 27 0: <</Ascent 762 /CapHeight 732 /CharSet <2f522f652f642f6c2f612f6e2f432f722f6b2f502f772f592f6f2f692f762f532f682f412f632f79> /Descent -196 /Flags 98 /FontBBox [-201 -250 1242 960] /FontFile3 26 0 R /FontName /CLOKKL+Souvenir-LightItalic /ItalicAngle -10 /StemH 50 /StemV 75 /Type /FontDescriptor /XHeight 476>>
+object 28 0: <</Filter /FlateDecode /Length 423>> stream sha256=7abcd9701b6926591737583bd3df6972b0d42bf6476d155ae3eb4ace43cb1ce8
+object 29 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 28 0 R /Title <4669677572655f315f416c6c5f77656c6c735f4a502e657073>>>
+object 30 0: <</B [128 0 R 133 0 R] /Contents 31 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 613 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R /T1_3 276 0 R /T1_4 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 77 /Thumb 502 0 R /Type /Page>>
+object 31 0: <</Filter /FlateDecode /Length 7769>> stream sha256=4d1008a78f66e4aafd5168728d60b74165ed5ade56580d83bae772f5093f49f2
+object 32 0: <</B [170 0 R] /Contents 33 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 613 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 78 /Thumb 503 0 R /Type /Page>>
+object 33 0: <</Filter /FlateDecode /Length 7283>> stream sha256=aa7c47983f70875e616696391a1081f17bbc5654d08f22a9c6c9ceb0f2315814
+object 34 0: <</B [169 0 R] /Contents 35 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 613 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 38 0 R /GS2 269 0 R /GS3 263 0 R>> /Font <</T1_0 273 0 R /T1_1 186 0 R /T1_2 274 0 R /T1_3 270 0 R /T1_4 182 0 R /T1_5 184 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 37 0 R>>>> /Rotate 0 /StructParents 79 /Thumb 504 0 R /Type /Page>>
+object 35 0: <</Filter /FlateDecode /Length 151843>> stream sha256=0a5ab694102e1776d63e010e0be8107011d922fbd747722195d9bb1d33af1942
+object 36 0: <</Filter /FlateDecode /Length 424>> stream sha256=16caa628b229695e4c759bf90f729a8fb84a18cba4c753e019e47b46fc5fbf0f
+object 37 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 36 0 R /Title <4669677572655f325f67656f6c6f6769635f617468656e732e657073>>>
+object 38 0: <</BG2 /Default /OP true /OPM 1 /SA false /SM 0.02 /Type /ExtGState /UCR2 /Default /op true>>
+object 39 0: <</B [130 0 R 126 0 R] /Contents 40 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 279 0 R /T1_3 261 0 R /T1_4 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 80 /Thumb 505 0 R /Type /Page>>
+object 40 0: <</Filter /FlateDecode /Length 8963>> stream sha256=c2280d242f5cef68d26d252a92bf2623e507933fe600f0fdee0fab8c1995aff4
+object 41 0: <</B [187 0 R] /Contents 42 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 281 0 R /T1_3 261 0 R /T1_4 186 0 R /T1_5 284 0 R /T1_6 276 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 81 /Thumb 506 0 R /Type /Page>>
+object 42 0: <</Filter /FlateDecode /Length 11087>> stream sha256=c6ea09719c872991a379569039c4fc9091ea92ce6d821fb4ec76f45376167584
+object 43 0: <</Filter /FlateDecode /Length 227>> stream sha256=08475804f9ad111ffe9eae0d2d5d6b5ffefada5a5ab457cdcb0edc89e839edbe
+object 44 0: <</B [178 0 R 135 0 R 121 0 R] /Contents 45 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 186 0 R /T1_2 261 0 R /T1_3 184 0 R /T1_4 287 0 R /T1_5 284 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 82 /Thumb 507 0 R /Type /Page>>
+object 45 0: <</Filter /FlateDecode /Length 8070>> stream sha256=a57939db97b8a5ddc269f680278233195eaf23549231fcdc55d08eee151a3b56
+object 46 0: <</B [164 0 R 122 0 R] /Contents 47 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 279 0 R /T1_3 184 0 R /T1_4 287 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 83 /Thumb 508 0 R /Type /Page>>
+object 47 0: <</Filter /FlateDecode /Length 7565>> stream sha256=09b949cbde280d19b09ddc227d3c78b81c6c83f3970cfdd05558a8f3cde221df
+object 48 0: <</B [166 0 R 123 0 R 165 0 R] /Contents 49 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 288 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 84 /Thumb 509 0 R /Type /Page>>
+object 49 0: <</Filter /FlateDecode /Length 6268>> stream sha256=c90e0f26481fded2f2cd532d76fdeea3897a4237f3ae5c734ba4836ce3726dfd
+object 50 0: <</Ascent 721 /CapHeight 721 /Descent -211 /Flags 32 /FontBBox [-222 -250 1006 922] /FontName /ArialMT /ItalicAngle 0 /StemH 72 /StemV 88 /Type /FontDescriptor /XHeight 521>>
+object 51 0: <</Contents 52 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R>> /ProcSet [/PDF /Text]>> /Rotate 90 /StructParents 85 /Thumb 510 0 R /Type /Page>>
+object 52 0: <</Filter /FlateDecode /Length 8288>> stream sha256=a19c979b015f1716a3197eaf1170aca30d2164f08a18297b6eba0b4c06f8c13f
+object 53 0: <</B [136 0 R] /Contents 54 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R /T1_3 287 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 86 /Thumb 511 0 R /Type /Page>>
+object 54 0: <</Filter /FlateDecode /Length 7451>> stream sha256=c504c5ef360b080175ef67e1c508332e99b1f7c2b3fd7bb31781d117ecd45db4
+object 55 0: <</B [125 0 R] /Contents 56 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 269 0 R>> /Font <</T1_0 290 0 R /T1_1 292 0 R /T1_2 287 0 R /T1_3 274 0 R /T1_4 182 0 R /T1_5 184 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 58 0 R>>>> /Rotate 0 /StructParents 87 /Thumb 512 0 R /Type /Page>>
+object 56 0: <</Filter /FlateDecode /Length 7783>> stream sha256=3004801fc5c6a25eb4b3177d914aec718428def7d58c3bd527d1cf78e5d13119
+object 57 0: <</Filter /FlateDecode /Length 424>> stream sha256=55c67074b2dcce7b10011e60007134265764a27365d60e6d2fde02278931e91d
+object 58 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 57 0 R /Title <4669677572655f335f537472696b655f616e645f4469702e657073>>>
+object 59 0: <</B [124 0 R] /Contents 60 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 186 0 R /T1_3 261 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 88 /Thumb 513 0 R /Type /Page>>
+object 60 0: <</Filter /FlateDecode /Length 7462>> stream sha256=bcb839e37cb1f29c2c12e0472ac7df85c7558ebe77a2261728ad1127f4a905fe
+object 61 0: <</B [163 0 R] /Contents 62 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 614 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 89 /Thumb 514 0 R /Type /Page>>
+object 62 0: <</Filter /FlateDecode /Length 6749>> stream sha256=4bf5b3eff0144d4bf190b9b016d9eebf6ae80c8c7478adeaefeb2ed42c23478b
+object 63 0: <</B [161 0 R] /Contents 64 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 269 0 R /GS2 263 0 R>> /Font <</T1_0 184 0 R /T1_1 274 0 R /T1_2 292 0 R /T1_3 294 0 R /T1_4 182 0 R /T1_5 260 0 R>> /ProcSet [/PDF /Text /ImageC] /Properties <</MC0 69 0 R>> /XObject <</Im0 65 0 R /Im1 66 0 R /Im2 67 0 R>>>> /Rotate 0 /StructParents 90 /Thumb 515 0 R /Type /Page>>
+object 64 0: <</Filter /FlateDecode /Length 7853>> stream sha256=eecd28fea02c3a63ef233d2620c3322db0358c50308b951f196a201e1950e83e
+object 65 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 375 /Length 51728 /Subtype /Image /Type /XObject /Width 281>> stream partial=JPXDecode sha256=3f80276ce48e9a5099d92ba00c5e8f703a98546b2be04d11ac8c007e76178399
+object 66 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 216 /Length 24175 /Subtype /Image /Type /XObject /Width 288>> stream partial=JPXDecode sha256=96d7937069f779003a39de69e3f857bf82091c41e8096455ec50241915578d6a
+object 67 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 450 /Length 65706 /Subtype /Image /Type /XObject /Width 286>> stream partial=JPXDecode sha256=6b54e448681243e4b1608ff94b808c57a305f9e4918e14ade0d47a0cf155b492
+object 68 0: <</Filter /FlateDecode /Length 417>> stream sha256=1c7d281c7d72987fa9eb41c3e392f2423cd9d6483e29ae24af8f4864e12bcbf7
+object 69 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 68 0 R /Title <6669677572655f345f7061636b65722e657073>>>
+object 70 0: <</B [162 0 R] /Contents 71 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 91 /Thumb 516 0 R /Type /Page>>
+object 71 0: <</Filter /FlateDecode /Length 7276>> stream sha256=25a14080af54c37c78fbe3cc8a52c9f2fcaffc5d71e50955197149cd40decd0e
+object 72 0: <</B [160 0 R] /Contents 73 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 263 0 R /GS2 269 0 R>> /Font <</T1_0 184 0 R /T1_1 292 0 R /T1_2 274 0 R /T1_3 182 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 75 0 R>>>> /Rotate 90 /StructParents 92 /Thumb 517 0 R /Type /Page>>
+object 73 0: <</Filter /FlateDecode /Length 24114>> stream sha256=29a39a516d161b3549b8f8eaf306ec0ae457bbcbb76366ff0552be63878b1876
+object 74 0: <</Filter /FlateDecode /Length 423>> stream sha256=63103bd4101bb0c5c7c77fe02da2d8f0e182289a3ab68becb14d73335846f682
+object 75 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 74 0 R /Title <4669677572655f355f6c6974686f66696773616d706c652e657073>>>
+object 76 0: <</B [159 0 R] /Contents 77 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 269 0 R /GS2 263 0 R>> /Font <</T1_0 292 0 R /T1_1 290 0 R /T1_2 287 0 R /T1_3 184 0 R /T1_4 274 0 R /T1_5 294 0 R /T1_6 182 0 R>> /ProcSet [/PDF /Text /ImageC] /Properties <</MC0 83 0 R>> /XObject <</Im0 78 0 R /Im1 79 0 R /Im2 80 0 R /Im3 81 0 R>>>> /Rotate 90 /StructParents 93 /Thumb 518 0 R /Type /Page>>
+object 77 0: <</Filter /FlateDecode /Length 29776>> stream sha256=2950da8a6f00a9351f4a09f1d0f6d0bd4a44a147c2fb720543b48a659c3dc6f9
+object 78 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 453 /Length 42593 /Subtype /Image /Type /XObject /Width 395>> stream partial=JPXDecode sha256=799c0e521c129b4f1d5c34140be62a8f0650a70219d1dda2224c205cbd6c1a5d
+object 79 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 311 /Length 12763 /Subtype /Image /Type /XObject /Width 289>> stream partial=JPXDecode sha256=2ebcedfdca50965b9f458be8b75ec9bcc3ea1e6796d7c8e2ddd6d025db151ff6
+object 80 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 304 /Length 13140 /Subtype /Image /Type /XObject /Width 201>> stream partial=JPXDecode sha256=d608855296a651823c247dbb11aafce2ebd3ed770452974462439abea3ccc478
+object 81 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 718 /Length 105103 /Subtype /Image /Type /XObject /Width 140>> stream partial=JPXDecode sha256=16f107ca997631d6b2058c4ffe341cfafcb2d11901a9d5112fff61a76958949f
+object 82 0: <</Filter /FlateDecode /Length 425>> stream sha256=815c44bcbb9f2bb1586671a0d4ce5a2117f09febbda3ae1c7e0ef28ac2d10d1a
+object 83 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 82 0 R /Title <4669677572655f365f73747275637475726566696773616d706c652e657073>>>
+object 84 0: <</B [157 0 R] /Contents 85 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 279 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 94 /Thumb 519 0 R /Type /Page>>
+object 85 0: <</Filter /FlateDecode /Length 9208>> stream sha256=345dfbb1e9731a0e7f1575fac4cef97b9b420eb650be9a7a385a408a68e01f2c
+object 86 0: <</B [158 0 R] /Contents 87 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 279 0 R /T1_2 261 0 R /T1_3 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 95 /Thumb 520 0 R /Type /Page>>
+object 87 0: <</Filter /FlateDecode /Length 9307>> stream sha256=f357626cee757f24bebaf4681e12e7482a071934f825f40f0cb471c152a9b84c
+object 88 0: <</B [156 0 R 155 0 R] /Contents 89 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 279 0 R /T1_2 261 0 R /T1_3 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 96 /Thumb 521 0 R /Type /Page>>
+object 89 0: <</Filter /FlateDecode /Length 8322>> stream sha256=27cdde941f06aadcc12ea25fde8525729b5800d865adc95a47ef1455358a1d3b
+object 90 0: <</B [154 0 R 153 0 R] /Contents 91 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 97 /Thumb 522 0 R /Type /Page>>
+object 91 0: <</Filter /FlateDecode /Length 8735>> stream sha256=b5986f40ceaa9a4969f6f6c1ba3525be19b2c399ba9e06d6f2223ff03af5dbb2
+object 92 0: <</B [152 0 R 151 0 R] /Contents 93 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 269 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R /T1_3 260 0 R /T1_4 292 0 R /T1_5 294 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 95 0 R>>>> /Rotate 0 /StructParents 98 /Thumb 523 0 R /Type /Page>>
+object 93 0: <</Filter /FlateDecode /Length 11936>> stream sha256=43be6f937a3db24974f03975c6930d0d93f9b916e0a97efcc90f057bd69350e1
+object 94 0: <</Filter /FlateDecode /Length 419>> stream sha256=82cbfb32f41d05d0cafaa9c30dcc4d1fd542c87cce91ee649e9a3123411a2977
+object 95 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 94 0 R /Title <6669677572655f375f666c6f776c6f672e657073>>>
+object 96 0: <</B [150 0 R 149 0 R 148 0 R 147 0 R] /Contents 97 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 615 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 99 /Thumb 524 0 R /Type /Page>>
+object 97 0: <</Filter /FlateDecode /Length 6232>> stream sha256=be0b640871de969130a5179c0ea06e844e05c73430d98b087299699f6e678917
+object 98 0: <</B [146 0 R 145 0 R] /Contents 99 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 100 /Thumb 525 0 R /Type /Page>>
+object 99 0: <</Filter /FlateDecode /Length 7906>> stream sha256=8ccdc73112b10fac42b3d7530fcf47d7b4e59a6712771ffa2d8fc16872d56659
+object 100 0: <</B [144 0 R] /Contents 101 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 184 0 R /T1_2 261 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 101 /Thumb 526 0 R /Type /Page>>
+object 101 0: <</Filter /FlateDecode /Length 4794>> stream sha256=26a82cf3e24f0598f6ef98ef6813e0997a2a5065e830b42db225fe134dc0fc50
+object 102 0: <</B [143 0 R 142 0 R] /Contents 103 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 102 /Thumb 527 0 R /Type /Page>>
+object 103 0: <</Filter /FlateDecode /Length 8251>> stream sha256=85f68f6333a04dd62c44e4d91c35e204bd6e0696e613c0970973c66ad6b92518
+object 104 0: <</B [141 0 R] /Contents 105 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 103 /Thumb 528 0 R /Type /Page>>
+object 105 0: <</Filter /FlateDecode /Length 8935>> stream sha256=dd4c091005da3fb47ca92e44b9fd9714401a236ec575cb7c8da991b5fe986ac7
+object 106 0: <</B [140 0 R 139 0 R] /Contents 107 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R /GS1 269 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 186 0 R /T1_3 184 0 R /T1_4 292 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 109 0 R>>>> /Rotate 0 /StructParents 104 /Thumb 529 0 R /Type /Page>>
+object 107 0: <</Filter /FlateDecode /Length 16780>> stream sha256=86e2f0e04d7a8d5228afc2a1427a48ca87946c637df6d59d0c5f1f568ab1ae69
+object 108 0: <</Filter /FlateDecode /Length 429>> stream sha256=91de45ba425e02ebb0cec59325d19f108e783e36d5cbeb1ce37425e191c0436d
+object 109 0: <</Author <436172796c204a2e205769707065726675727468> /Creator <41646f626520496c6c7573747261746f722852292058> /Metadata 108 0 R /Title <6669677572655f385f3134464630385f487964726f67726170682e657073>>>
+object 110 0: <</B [138 0 R] /Contents 111 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 287 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 105 /Thumb 530 0 R /Type /Page>>
+object 111 0: <</Filter /FlateDecode /Length 6987>> stream sha256=06b5cba755a13aa348df2c3ef729ba7a581c74cb82860f1d5fae9b2d07726739
+object 112 0: <</B [137 0 R] /Contents 113 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 182 0 R /T1_1 261 0 R /T1_2 287 0 R /T1_3 186 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 106 /Thumb 531 0 R /Type /Page>>
+object 113 0: <</Filter /FlateDecode /Length 4028>> stream sha256=1de74da274a6a0f8c603e21fcc1dd237a87612aa67ac47a3d03d28e662544ece
+object 114 0: <</Contents 115 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /Font <</T1_0 184 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 107 /Thumb 532 0 R /Type /Page>>
+object 115 0: <</Filter /FlateDecode /Length 404>> stream sha256=fccfba437e11644bf3e7584b75dd3fe3d28a49f71490199d29889878ce669f13
+object 116 0: <</Contents 117 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 616 0 R /Resources <</ExtGState <</GS0 127 0 R>> /ProcSet [/PDF /ImageC] /XObject <</Im0 118 0 R>>>> /Rotate 0 /StructParents 109 /Thumb 533 0 R /Type /Page>>
+object 117 0: <</Filter /FlateDecode /Length 177>> stream sha256=8adfeb89ae2efb77c618af92cec9ebcc5b40cb577289d69ed8478455382e6557
+object 118 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /JPXDecode /Height 232 /Length 16056 /Subtype /Image /Type /XObject /Width 1124>> stream partial=JPXDecode sha256=475921171daedd595a06023e3e372784d9f78007338fe0a8b9f6927b946fc5e1
+object 119 0: <</Filter /FlateDecode /Length 336>> stream sha256=79ce1e7c3cae4365e4697012a92a408c0679ba4e6c83bc28ea47ad0a9501ac92
+object 120 0: [/Indexed /DeviceRGB 255 119 0 R]
+object 121 0: <</N 164 0 R /P 44 0 R /R [46 35 580 462] /T 13424 0 R /V 135 0 R>>
+object 122 0: <</N 166 0 R /P 46 0 R /R [44 15 569 58] /T 13424 0 R /V 164 0 R>>
+object 123 0: <</N 165 0 R /P 48 0 R /R [35 68 569 500] /T 13424 0 R /V 166 0 R>>
+object 124 0: <</N 163 0 R /P 59 0 R /R [34 39 568 729] /T 13424 0 R /V 125 0 R>>
+object 125 0: <</N 124 0 R /P 55 0 R /R [81 56 575 729] /T 13424 0 R /V 136 0 R>>
+object 126 0: <</N 187 0 R /P 39 0 R /R [308 41 590 731] /T 13424 0 R /V 130 0 R>>
+object 127 0: <</BG2 /Default /OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /UCR2 /Default /op false>>
+object 128 0: <</N 133 0 R /P 30 0 R /R [46 92 580 729] /T 13424 0 R /V 174 0 R>>
+object 129 0: <</N 174 0 R /P 19 0 R /R [46 21 559 73] /T 13424 0 R /V 131 0 R>>
+object 130 0: <</N 126 0 R /P 39 0 R /R [34 30 312 729] /T 13424 0 R /V 169 0 R>>
+object 131 0: <</N 129 0 R /P 19 0 R /R [46 59 580 561] /T 13424 0 R /V 173 0 R>>
+object 132 0: <</N 173 0 R /P 17 0 R /R [46 301 469 693] /T 13424 0 R /V 172 0 R>>
+object 133 0: <</N 170 0 R /P 30 0 R /R [49 28 575 92] /T 13424 0 R /V 128 0 R>>
+object 134 0: <</Ascent 722 /CapHeight 722 /Descent -191 /Flags 32 /FontBBox [-166 -250 1000 989] /FontFile3 180 0 R /FontName /CLOBBL+Univers-Condensed /ItalicAngle 0 /StemH 62 /StemV 82 /Type /FontDescriptor /XHeight 505>>
+object 135 0: <</N 121 0 R /P 44 0 R /R [47 466 577 530] /T 13424 0 R /V 178 0 R>>
+object 136 0: <</N 125 0 R /P 53 0 R /R [34 47 568 729] /T 13424 0 R /V 165 0 R>>
+object 137 0: <</N 4 0 R /P 112 0 R /R [34 385 568 729] /T 13424 0 R /V 138 0 R>>
+object 138 0: <</N 137 0 R /P 110 0 R /R [46 35 580 729] /T 13424 0 R /V 139 0 R>>
+object 139 0: <</N 138 0 R /P 106 0 R /R [34 39 568 344] /T 13424 0 R /V 140 0 R>>
+object 140 0: <</N 139 0 R /P 106 0 R /R [34 334 568 715] /T 13424 0 R /V 141 0 R>>
+object 141 0: <</N 140 0 R /P 104 0 R /R [35 55 583 729] /T 13424 0 R /V 142 0 R>>
+object 142 0: <</N 141 0 R /P 102 0 R /R [34 34 322 83] /T 13424 0 R /V 143 0 R>>
+object 143 0: <</N 142 0 R /P 102 0 R /R [34 83 568 729] /T 13424 0 R /V 144 0 R>>
+object 144 0: <</N 143 0 R /P 100 0 R /R [46 144 580 729] /T 13424 0 R /V 145 0 R>>
+object 145 0: <</N 144 0 R /P 98 0 R /R [34 25 359 72] /T 13424 0 R /V 146 0 R>>
+object 146 0: <</N 145 0 R /P 98 0 R /R [34 64 568 729] /T 13424 0 R /V 147 0 R>>
+object 147 0: <</N 146 0 R /P 96 0 R /R [37 35 399 78] /T 13424 0 R /V 148 0 R>>
+object 148 0: <</N 147 0 R /P 96 0 R /R [73 82 340 122] /T 13424 0 R /V 149 0 R>>
+object 149 0: <</N 148 0 R /P 96 0 R /R [73 117 555 379] /T 13424 0 R /V 150 0 R>>
+object 150 0: <</N 149 0 R /P 96 0 R /R [46 383 580 729] /T 13424 0 R /V 151 0 R>>
+object 151 0: <</N 150 0 R /P 92 0 R /R [55 82 542 498] /T 13424 0 R /V 152 0 R>>
+object 152 0: <</N 151 0 R /P 92 0 R /R [34 500 563 729] /T 13424 0 R /V 153 0 R>>
+object 153 0: <</N 152 0 R /P 90 0 R /R [46 52 586 414] /T 13424 0 R /V 154 0 R>>
+object 154 0: <</N 153 0 R /P 90 0 R /R [46 421 580 729] /T 13424 0 R /V 155 0 R>>
+object 155 0: <</N 154 0 R /P 88 0 R /R [51 61 368 148] /T 13424 0 R /V 156 0 R>>
+object 156 0: <</N 155 0 R /P 88 0 R /R [34 143 568 729] /T 13424 0 R /V 158 0 R>>
+object 157 0: <</N 158 0 R /P 84 0 R /R [34 38 568 729] /T 13424 0 R /V 159 0 R>>
+object 158 0: <</N 156 0 R /P 86 0 R /R [46 75 580 729] /T 13424 0 R /V 157 0 R>>
+object 159 0: <</N 157 0 R /P 76 0 R /R [46 39 553 729] /T 13424 0 R /V 160 0 R>>
+object 160 0: <</N 159 0 R /P 72 0 R /R [34 39 553 729] /T 13424 0 R /V 162 0 R>>
+object 161 0: <</N 162 0 R /P 63 0 R /R [90 65 518 729] /T 13424 0 R /V 163 0 R>>
+object 162 0: <</N 160 0 R /P 70 0 R /R [46 39 580 729] /T 13424 0 R /V 161 0 R>>
+object 163 0: <</N 161 0 R /P 61 0 R /R [39 43 575 731] /T 13424 0 R /V 124 0 R>>
+object 164 0: <</N 122 0 R /P 46 0 R /R [45 41 579 726] /T 13424 0 R /V 121 0 R>>
+object 165 0: <</N 136 0 R /P 48 0 R /R [39 29 569 70] /T 13424 0 R /V 123 0 R>>
+object 166 0: <</N 123 0 R /P 48 0 R /R [35 503 567 735] /T 13424 0 R /V 122 0 R>>
+object 167 0: <</N 171 0 R /P 9 0 R /R [159 585 561 693] /T 13424 0 R /V 6 0 R>>
+object 168 0: <</Filter /FlateDecode /Length 223>> stream sha256=eed3ec41d9e449a51049e946c3eb18534997303273daf20d961116d325568b41
+object 169 0: <</N 130 0 R /P 34 0 R /R [46 53 580 729] /T 13424 0 R /V 170 0 R>>
+object 170 0: <</N 169 0 R /P 32 0 R /R [34 35 568 729] /T 13424 0 R /V 133 0 R>>
+object 171 0: <</N 177 0 R /P 9 0 R /R [159 497 561 567] /T 13424 0 R /V 167 0 R>>
+object 172 0: <</N 132 0 R /P 15 0 R /R [166 142 568 709] /T 13424 0 R /V 181 0 R>>
+object 173 0: <</N 131 0 R /P 19 0 R /R [46 558 520 693] /T 13424 0 R /V 132 0 R>>
+object 174 0: <</N 128 0 R /P 21 0 R /R [34 39 568 729] /T 13424 0 R /V 129 0 R>>
+object 175 0: <</Differences [32 /space 176 /degree] /Type /Encoding>>
+object 176 0: <</N 181 0 R /P 9 0 R /R [159 230 561 283] /T 13424 0 R /V 177 0 R>>
+object 177 0: <</N 176 0 R /P 9 0 R /R [159 359 561 470] /T 13424 0 R /V 171 0 R>>
+object 178 0: <</N 135 0 R /P 44 0 R /R [47 515 581 727] /T 13424 0 R /V 187 0 R>>
+object 179 0: <</BaseFont /CLOBEM+Univers-CondensedLight /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 13438 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [222 0 0 0 0 0 0 0 0 0 0 0 222 278 222 0 444 444 444 444 444 444 444 0 444 0 222 0 0 0 0 0 0 556 500 500 556 0 389 556 0 222 0 500 0 0 0 556 0 0 500 500 444 556 0 833 0 0 0 0 0 0 0 0 0 444 444 389 444 444 278 444 444 222 0 0 222 667 444 444 444 0 278 389 278 444 389 667 389 389]>>
+object 180 0: <</Filter /FlateDecode /Length 4260 /Subtype /Type1C>> stream sha256=956a994747b0a03a0f0152c2b2a3413390f3aad3c0c2f059495ee4048c566ba9
+object 181 0: <</N 172 0 R /P 13 0 R /R [46 61 448 699] /T 13424 0 R /V 176 0 R>>
+object 182 0: <</BaseFont /CLOBAL+Univers-CondensedBold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 13437 0 R /LastChar 150 /Subtype /Type1 /Type /Font /Widths [222 0 0 0 0 0 0 0 278 278 444 0 222 333 222 278 444 444 444 444 444 444 444 444 444 444 0 0 0 0 0 0 0 611 611 556 611 500 444 611 611 278 500 0 444 833 667 611 556 0 556 556 500 611 0 889 0 556 0 0 0 0 0 0 0 500 500 500 500 500 278 500 500 278 0 500 278 722 500 500 500 500 333 444 278 500 444 778 0 444 389 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500]>>
+object 183 0: <</Filter /FlateDecode /Length 257 /Subtype /Type1C>> stream sha256=9232a934a06de5023eef0d24520a0560e22c0f19b79d9cb9ac3eaa6a1fc269e5
+object 184 0: <</BaseFont /CLOBBL+Univers-Condensed /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 134 0 R /LastChar 176 /Subtype /Type1 /Type /Font /Widths [222 0 0 0 0 0 0 0 278 278 0 500 222 333 222 278 444 444 444 444 444 444 444 444 444 444 222 0 0 500 0 0 0 611 611 556 611 500 444 611 611 278 500 0 444 833 667 611 556 0 556 556 500 611 556 889 0 500 500 0 0 0 0 0 0 500 500 500 500 500 278 500 500 222 222 444 222 722 500 500 500 500 333 444 278 500 444 722 444 444 389 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 1000 0 0 0 0 0 0 0 0 222 0 0 0 0 0 0 0 0 0 0 0 0 333 0 0 400]>>
+object 185 0: <</Ascent 0 /CapHeight 0 /CharSet <2f73706163652f646567726565> /Descent 0 /Flags 4 /FontBBox [-180 -293 1090 1010] /FontFile3 183 0 R /FontName /CLOBDM+Symbol /ItalicAngle 0 /StemH 92 /StemV 85 /Type /FontDescriptor>>
+object 186 0: <</BaseFont /CLOBDM+Symbol /Encoding 175 0 R /FirstChar 32 /FontDescriptor 185 0 R /LastChar 176 /Subtype /Type1 /ToUnicode 168 0 R /Type /Font /Widths [250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 400]>>
+object 187 0: <</N 178 0 R /P 41 0 R /R [35 51 568 729] /T 13424 0 R /V 126 0 R>>
+object 188 0: <</BaseFont /CLOBHM+Univers-CondensedLightOblique /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 12 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [222 0 0 0 0 0 0 0 0 0 0 0 222 278 222 333 444 444 444 444 444 0 444 0 444 0 222 0 0 0 0 0 0 556 0 0 556 0 389 556 0 0 444 0 389 778 611 556 444 0 500 500 444 556 0 833 0 0 0 0 0 0 0 0 0 444 444 389 444 444 278 444 444 222 0 389 222 667 444 444 444 0 278 389 278 444 389 667 0 389]>>
+object 189 0: <</A <</S /URI /URI <687474703a2f2f7777772e757367732e676f762f>>> /Border [0 0 0] /Rect [228.84 429.78 552 440.58] /StructParent 5 /Subtype /Link /Type /Annot>>
+object 190 0: <</A <</S /URI /URI <687474703a2f2f7777772e757367732e676f762f>>> /Border [0 0 0] /Rect [228.84 429.78 229.02 440.58] /StructParent 4 /Subtype /Link /Type /Annot>>
+object 191 0: <</A <</S /URI /URI <687474703a2f2f7777772e757367732e676f762f>>> /Border [0 0 0] /Rect [226.86 429.78 228.84 440.58] /StructParent 3 /Subtype /Link /Type /Annot>>
+object 192 0: <</A <</D <4731303236373232> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 127.02 439.2 139.38] /StructParent 45 /Subtype /Link /Type /Annot>>
+object 193 0: <</A <</D <4731303236373234> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 112.86 439.2 125.22] /StructParent 46 /Subtype /Link /Type /Annot>>
+object 194 0: <</A <</D <4731303139353933> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 169.38 439.2 181.74] /StructParent 42 /Subtype /Link /Type /Annot>>
+object 195 0: <</A <</D <4731303236393936> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 98.76 439.2 111.12] /StructParent 47 /Subtype /Link /Type /Annot>>
+object 196 0: <</A <</D <4731303236373230> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 141.12 439.2 153.48] /StructParent 44 /Subtype /Link /Type /Annot>>
+object 197 0: <</A <</D <4731303139353836> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 183.48 439.2 195.84] /StructParent 41 /Subtype /Link /Type /Annot>>
+object 198 0: <</A <</D <4731303135383639> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 338.88 439.2 351.24] /StructParent 30 /Subtype /Link /Type /Annot>>
+object 199 0: <</A <</D <4731303134373636> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 367.14 439.2 379.5] /StructParent 28 /Subtype /Link /Type /Annot>>
+object 200 0: <</A <</D <4731303134373638> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 353.04 439.2 365.4] /StructParent 29 /Subtype /Link /Type /Annot>>
+object 201 0: <</A <</D <4731303139353230> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 296.52 439.2 308.88] /StructParent 33 /Subtype /Link /Type /Annot>>
+object 202 0: <</A <</D <4731303139353232> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 282.42 439.2 294.78] /StructParent 34 /Subtype /Link /Type /Annot>>
+object 203 0: <</A <</D <4731303135383731> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 324.78 439.2 337.14] /StructParent 31 /Subtype /Link /Type /Annot>>
+object 204 0: <</A <</D <4731303139353831> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 211.74 439.2 224.1] /StructParent 39 /Subtype /Link /Type /Annot>>
+object 205 0: <</A <</D <4731303237323537> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [96 70.5 438 82.86] /StructParent 49 /Subtype /Link /Type /Annot>>
+object 206 0: <</A <</D <4731303237303233> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 84.6 439.2 96.96] /StructParent 48 /Subtype /Link /Type /Annot>>
+object 207 0: <</A <</D <4731303139353833> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 197.64 439.2 210] /StructParent 40 /Subtype /Link /Type /Annot>>
+object 208 0: <</A <</D <4731303139353936> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 155.22 439.2 167.58] /StructParent 43 /Subtype /Link /Type /Annot>>
+object 209 0: <</A <</D <4731303139353432> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 225.9 439.2 238.26] /StructParent 38 /Subtype /Link /Type /Annot>>
+object 210 0: <</A <</D <4731303135383737> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 310.62 439.2 322.98] /StructParent 32 /Subtype /Link /Type /Annot>>
+object 211 0: <</A <</D <4731303134373634> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 381.3 439.2 393.66] /StructParent 27 /Subtype /Link /Type /Annot>>
+object 212 0: <</A <</D <4731303133333634> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 480.18 439.2 492.54] /StructParent 20 /Subtype /Link /Type /Annot>>
+object 213 0: <</A <</D <4731303134373632> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 395.4 439.2 407.76] /StructParent 26 /Subtype /Link /Type /Annot>>
+object 214 0: <</A <</D <4731303134373630> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 409.56 439.2 421.92] /StructParent 25 /Subtype /Link /Type /Annot>>
+object 215 0: <</A <</D <4731303133313433> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 607.32 439.2 619.68] /StructParent 11 /Subtype /Link /Type /Annot>>
+object 216 0: <</A <</D <4731303133333531> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 550.8 439.2 563.16] /StructParent 15 /Subtype /Link /Type /Annot>>
+object 217 0: <</A <</D <4731303133313435> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 593.16 439.2 605.52] /StructParent 12 /Subtype /Link /Type /Annot>>
+object 218 0: <</A <</D <4731303133313335> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 621.42 439.2 633.78] /StructParent 10 /Subtype /Link /Type /Annot>>
+object 219 0: <</A <</D <4731303133323739> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 649.68 55.38 662.04] /StructParent 7 /Subtype /Link /Type /Annot>>
+object 220 0: <</A <</D <4731303133333638> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 466.02 439.2 478.38] /StructParent 21 /Subtype /Link /Type /Annot>>
+object 221 0: <</A <</D <4731303133333632> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 494.28 439.2 506.64] /StructParent 19 /Subtype /Link /Type /Annot>>
+object 222 0: <</A <</D <4731303139353337> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 240 439.2 252.36] /StructParent 37 /Subtype /Link /Type /Annot>>
+object 223 0: <</A <</D <4731303133333630> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 508.44 439.2 520.8] /StructParent 18 /Subtype /Link /Type /Annot>>
+object 224 0: <</A <</D <4731303133333535> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 522.54 439.2 534.9] /StructParent 17 /Subtype /Link /Type /Annot>>
+object 225 0: <</A <</D <4731303139353332> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 254.16 439.2 266.52] /StructParent 36 /Subtype /Link /Type /Annot>>
+object 226 0: <</A <</D <4731303134363538> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 437.82 439.2 450.18] /StructParent 23 /Subtype /Link /Type /Annot>>
+object 227 0: <</A <</D <4731303132393432> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 649.68 439.2 662.04] /StructParent 8 /Subtype /Link /Type /Annot>>
+object 228 0: <</A <</D <4731303134363630> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 423.66 439.2 436.02] /StructParent 24 /Subtype /Link /Type /Annot>>
+object 229 0: <</A <</D <4731303133333533> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 536.7 439.2 549.06] /StructParent 16 /Subtype /Link /Type /Annot>>
+object 230 0: <</A <</D <4731303132393438> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 635.58 439.2 647.94] /StructParent 9 /Subtype /Link /Type /Annot>>
+object 231 0: <</A <</D <4731303139353237> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 268.26 439.2 280.62] /StructParent 35 /Subtype /Link /Type /Annot>>
+object 232 0: <</A <</D <4731303134363534> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 451.92 439.2 464.28] /StructParent 22 /Subtype /Link /Type /Annot>>
+object 233 0: <</A <</D <4731303133313737> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 564.96 439.2 577.32] /StructParent 14 /Subtype /Link /Type /Annot>>
+object 234 0: <</A <</D <4731303133313636> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [55.2 579.06 439.2 591.42] /StructParent 13 /Subtype /Link /Type /Annot>>
+object 235 0: <</A <</D <4731303134373632> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 562.32 559.2 574.68] /StructParent 57 /Subtype /Link /Type /Annot>>
+object 236 0: <</A <</D <4731303432383636> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 231.54 559.2 243.9] /StructParent 70 /Subtype /Link /Type /Annot>>
+object 237 0: <</A <</D <4731303336333436> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 244.74 559.2 257.1] /StructParent 69 /Subtype /Link /Type /Annot>>
+object 238 0: <</A <</D <4731303238313635> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 657.36 559.2 669.72] /StructParent 53 /Subtype /Link /Type /Annot>>
+object 239 0: <</A <</D <4731303432343937> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 165.48 559.2 177.84] /StructParent 73 /Subtype /Link /Type /Annot>>
+object 240 0: <</A <</D <4731303133353531> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [558 643.14 559.2 655.5] /StructParent 55 /Subtype /Link /Type /Annot>>
+object 241 0: <</A <</D <4731303338353530> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 205.14 559.2 217.5] /StructParent 71 /Subtype /Link /Type /Annot>>
+object 242 0: <</A <</D <4731303238313834> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 643.14 558 655.5] /StructParent 54 /Subtype /Link /Type /Annot>>
+object 243 0: <</A <</D <4731303134373938> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 324.06 559.2 336.42] /StructParent 64 /Subtype /Link /Type /Annot>>
+object 244 0: <</A <</D <4731303432363339> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 588.72 559.2 601.08] /StructParent 56 /Subtype /Link /Type /Annot>>
+object 245 0: <</A <</D <4731303139353339> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 310.86 559.2 323.22] /StructParent 65 /Subtype /Link /Type /Annot>>
+object 246 0: <</A <</D <4731303335323331> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 444.6 559.2 456.96] /StructParent 61 /Subtype /Link /Type /Annot>>
+object 247 0: <</A <</D <4731303336343939> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 418.14 559.2 430.5] /StructParent 62 /Subtype /Link /Type /Annot>>
+object 248 0: <</A <</D <4731303431363738> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 391.74 559.2 404.1] /StructParent 63 /Subtype /Link /Type /Annot>>
+object 249 0: <</A <</D <4731303339313634> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 178.68 559.2 191.04] /StructParent 72 /Subtype /Link /Type /Annot>>
+object 250 0: <</A <</D <4731303237323639> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 671.58 559.2 683.94] /StructParent 52 /Subtype /Link /Type /Annot>>
+object 251 0: <</A <</D <4731303237323632> /F <57696c6c69616d735f4f4652323030345f313336362e626f64794e45572e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 685.8 559.2 698.16] /StructParent 50 /Subtype /Link /Type /Annot>>
+object 252 0: <</A <</D <4731303333343233> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 271.2 559.2 283.56] /StructParent 68 /Subtype /Link /Type /Annot>>
+object 253 0: <</A <</D <4731303235323738> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 535.86 559.2 548.22] /StructParent 58 /Subtype /Link /Type /Annot>>
+object 254 0: <</A <</D <4731303235343239> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 497.46 559.2 521.82] /StructParent 59 /Subtype /Link /Type /Annot>>
+object 255 0: <</A <</D <4731303232383631> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 297.66 559.2 310.02] /StructParent 66 /Subtype /Link /Type /Annot>>
+object 256 0: <</A <</D <4731303234303231> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 284.4 559.2 296.76] /StructParent 67 /Subtype /Link /Type /Annot>>
+object 257 0: <</A <</D <4731303335323131> /F <57696c6c69616d735f4f4652323030342d313336365f626f64792e706466> /S /GoToR>> /Border [0 0 0] /Rect [175.2 471 559.2 483.36] /StructParent 60 /Subtype /Link /Type /Annot>>
+object 258 0: <</Ascent 699 /CapHeight 662 /CharSet <2f73706163652f692f6e2f632f682f706172656e6c6566742f706572696f642f706172656e72696768742f74776f2f666976652f666f75722f652f742f6d2f722f662f6f2f7a65726f2f74687265652f65696768742f6c2f6f6e652f7369782f6e696e652f6b2f612f636f6d6d612f736576656e2f732f712f752f672f702f736c6173682f642f4c2f792f622f4d2f627261636b65746c6566742f627261636b657472696768742f542f68797068656e2f772f762f472f572f636f6c6f6e2f6a2f7a2f73656d69636f6c6f6e2f656d646173682f462f71756f746564626c6c6566742f71756f746564626c72696768742f782f492f432f522f4a2f4f2f502f422f442f482f552f532f62756c6c65742f562f592f412f656e646173682f4e2f452f706c75736d696e75732f6f6e6568616c662f5a2f726567697374657265642f4b2f616d70657273616e642f71756f746572696768742f74726164656d61726b2f582f636f707972696768742f512f6f6e65717561727465722f706c75732f617374657269736b2f6c657373> /Descent -217 /Flags 34 /FontBBox [-168 -218 1000 898] /FontFile3 259 0 R /FontName /CLOCGJ+Times-Roman /ItalicAngle 0 /StemH 84 /StemV 84 /Type /FontDescriptor /XHeight 450>>
+object 259 0: <</Filter /FlateDecode /Length 8070 /Subtype /Type1C>> stream sha256=cd4b8ca21a57f2c46a7dca7dc9101c6abf25bdbf6c4016b63dd63c7c2ad19e9a
+object 260 0: <</BaseFont /CLOCEI+Univers-CondensedOblique /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 13439 0 R /LastChar 117 /Subtype /Type1 /Type /Font /Widths [222 0 0 0 0 0 0 0 278 278 0 0 0 0 222 0 0 444 444 444 0 0 0 0 444 444 0 0 0 0 0 0 0 611 611 556 611 0 0 611 0 0 0 0 0 0 667 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 0 0 0 500 0 500 0 500 278 0 500 222 0 0 222 722 500 500 0 0 333 0 278 500]>>
+object 261 0: <</BaseFont /CLOCGJ+Times-Roman /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 258 0 R /LastChar 189 /Subtype /Type1 /Type /Font /Widths [250 0 0 0 0 0 778 0 333 333 500 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 564 0 0 0 0 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 722 667 556 611 722 722 944 722 722 611 333 0 333 0 0 0 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 0 0 0 0 350 0 350 0 0 0 0 0 0 0 0 0 0 0 350 0 350 350 0 333 444 444 350 500 1000 0 980 0 0 0 350 0 0 250 0 0 0 0 0 0 0 0 760 0 0 0 333 760 0 0 564 0 0 0 0 0 0 0 0 0 0 750 750]>>
+object 262 0: <</Filter /FlateDecode /Length 3773 /Subtype /Type1C>> stream sha256=f1fe1460e6e6762433e1665b590a2e1b1f9b83068b8f9d757f8b29e7c73160f0
+object 263 0: <</BG2 /Default /OP true /OPM 1 /SA true /SM 0.02 /Type /ExtGState /UCR2 /Default /op true>>
+object 264 0: <</Filter /FlateDecode /Length 2233 /Subtype /Type1C>> stream sha256=606c39adc21f5d31980e9e9685c06b2e254f24df559ac178e188f01c83f47faa
+object 265 0: <</Ascent 762 /CapHeight 732 /CharSet <2f472f772f692f6e2f652f742f432f6f2f752f792f452f4f2f522f492f41> /Descent -196 /Flags 34 /FontBBox [-157 -250 1190 957] /FontFile3 264 0 R /FontName /CLOHBP+Souvenir-Light /ItalicAngle 0 /StemH 50 /StemV 75 /Type /FontDescriptor /XHeight 473>>
+object 266 0: <</BaseFont /CLOKGL+Souvenir-DemiItalic /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 25 0 R /LastChar 89 /Subtype /Type1 /Type /Font /Widths [340 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 760 780 780 0 700 0 0 0 400 0 0 660 0 800 860 0 0 780 680 0 0 720 1020 0 740]>>
+object 267 0: <</BaseFont /CLOKKL+Souvenir-LightItalic /Encoding /WinAnsiEncoding /FirstChar 65 /FontDescriptor 27 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [740 0 720 0 0 0 0 0 0 0 0 0 0 0 0 640 0 700 620 0 0 0 0 0 740 0 0 0 0 0 0 0 520 0 460 580 500 0 0 580 280 0 560 300 0 600 560 0 0 400 0 0 0 480 720 0 500]>>
+object 268 0: <</Filter /FlateDecode /Length 4304 /Subtype /Type1C>> stream sha256=20d697df670471de6483087216d9d96b0e753e8343c3349900513d8acbc98d1e
+object 269 0: <</BG2 /Default /OP false /OPM 1 /SA true /SM 0.02 /Type /ExtGState /UCR2 /Default /op false>>
+object 270 0: <</BaseFont /CLOHBP+Souvenir-Light /Encoding /WinAnsiEncoding /FirstChar 65 /FontDescriptor 265 0 R /LastChar 121 /Subtype /Type1 /Type /Font /Widths [720 0 720 0 600 0 760 0 260 0 0 0 0 0 800 0 0 680 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 0 0 0 240 0 0 0 0 560 560 0 0 0 0 300 520 0 720 0 480]>>
+object 271 0: <</BaseFont /Arial-BoldMT /Encoding /WinAnsiEncoding /FirstChar 0 /FontDescriptor 23 0 R /LastChar 255 /Subtype /Type1 /Type /Font /Widths [278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 333 474 556 556 889 722 238 333 333 389 584 278 333 278 278 556 556 556 556 556 556 556 556 556 556 333 333 584 584 584 611 975 722 722 722 722 667 611 778 722 278 556 722 611 833 722 778 667 778 722 667 611 722 667 944 667 667 611 333 278 333 584 556 333 556 611 556 611 556 333 611 611 278 278 556 278 889 611 611 611 611 389 556 333 611 556 778 556 556 500 389 280 389 584 350 556 350 278 556 500 1000 556 556 333 1000 667 333 1000 350 611 350 350 278 278 500 500 350 556 1000 333 1000 556 333 944 350 500 667 278 333 556 556 556 556 280 556 333 737 370 556 584 333 737 333 400 584 333 333 333 611 556 278 333 333 365 556 834 834 834 611 722 722 722 722 722 722 1000 722 667 667 667 667 278 278 278 278 722 722 778 778 778 778 778 584 778 722 722 722 722 667 667 611 556 556 556 556 556 556 889 556 556 556 556 556 278 278 278 278 611 611 611 611 611 611 611 584 611 611 611 611 611 556 611 556]>>
+object 272 0: <</Ascent 718 /CapHeight 718 /CharSet <2f412f422f432f442f452f462f472f482f492f4a2f4b2f4c2f4d2f4e2f4f2f502f512f522f532f542f552f562f572f592f612f622f632f636f6c6f6e2f636f6d6d612f642f652f65696768742f656d646173682f662f666976652f666f75722f672f682f68797068656e2f692f6a2f6b2f6c2f6d2f6e2f6e696e652f6f2f6f6e652f702f706172656e6c6566742f706172656e72696768742f706572696f642f712f71756f746573696e676c652f722f732f73656d69636f6c6f6e2f736576656e2f7369782f736c6173682f73706163652f742f74687265652f74776f2f752f762f772f782f792f7a2f7a65726f> /Descent -207 /Flags 32 /FontBBox [-166 -225 1000 931] /FontFile3 268 0 R /FontName /CLOGNP+Helvetica /ItalicAngle 0 /StemH 88 /StemV 88 /Type /FontDescriptor /XHeight 523>>
+object 273 0: <</BaseFont /CLOGNP+Helvetica /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 272 0 R /LastChar 151 /Subtype /Type1 /Type /Font /Widths [278 0 0 0 0 0 0 191 0 0 0 0 278 333 278 278 556 556 556 556 556 556 556 0 556 556 278 0 0 0 0 0 0 667 667 722 722 667 0 778 0 278 0 667 556 833 722 778 0 778 722 667 611 722 667 944 0 667 0 0 0 0 0 0 0 556 556 500 556 556 278 556 556 222 0 500 222 833 556 556 556 0 333 500 278 556 500 722 500 500 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1000]>>
+object 274 0: <</BaseFont /CLOGKP+Helvetica-Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 275 0 R /LastChar 122 /Subtype /Type1 /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 278 333 0 0 556 556 556 556 556 556 556 556 556 556 0 0 0 0 0 0 0 722 722 722 722 667 611 778 0 278 556 0 611 833 722 778 667 0 722 667 611 0 0 944 667 0 0 0 0 0 0 0 0 556 611 556 611 556 333 611 611 278 0 556 278 889 611 611 611 0 389 556 333 611 556 778 0 556 500]>>
+object 275 0: <</Ascent 718 /CapHeight 718 /CharSet <2f6f6e652f666f75722f462f7a65726f2f636f6d6d612f7369782f736576656e2f65696768742f74776f2f74687265652f6e696e652f666976652f522f682f6f2f642f652f732f73706163652f4a2f722f612f6e2f572f6c2f692f4d2f742f622f532f412f492f502f4f2f542f452f582f4c2f4e2f762f6d2f772f662f632f702f672f752f792f472f6b2f442f432f422f68797068656e2f7a> /Descent -207 /Flags 262176 /FontBBox [-170 -228 1003 962] /FontFile3 262 0 R /FontName /CLOGKP+Helvetica-Bold /ItalicAngle 0 /StemH 140 /StemV 140 /Type /FontDescriptor /XHeight 532>>
+object 276 0: <</BaseFont /Times-Roman /Encoding /WinAnsiEncoding /FirstChar 0 /FontDescriptor 277 0 R /LastChar 255 /Subtype /Type1 /Type /Font /Widths [250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 333 408 500 500 833 778 180 333 333 500 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 564 564 564 444 921 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 722 667 556 611 722 722 944 722 722 611 333 278 333 469 500 333 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 480 200 480 541 350 500 350 333 500 444 1000 500 500 333 1000 556 333 889 350 611 350 350 333 333 444 444 350 500 1000 333 980 389 333 722 350 444 722 250 333 500 500 500 500 200 500 333 760 276 500 564 333 760 333 400 564 300 300 333 510 453 250 333 300 310 500 750 750 750 444 722 722 722 722 722 722 889 667 611 611 611 611 333 333 333 333 722 722 722 722 722 722 722 564 722 722 722 722 722 722 556 500 444 444 444 444 444 444 667 444 444 444 444 444 278 278 278 278 500 500 500 500 500 500 500 564 500 500 500 500 500 500 500 500]>>
+object 277 0: <</Ascent 898 /CapHeight 662 /Descent -218 /Flags 34 /FontBBox [-168 -218 1000 898] /FontName /Times-Roman /ItalicAngle 0 /StemV 84 /Type /FontDescriptor /XHeight 450>>
+object 278 0: <</Filter /FlateDecode /Length 4409 /Subtype /Type1C>> stream sha256=2998e58d3ac35b5622ad17900b7f151ca9506936d858008f1944d5eb253bccfb
+object 279 0: <</BaseFont /CLOOKE+Times-Bold /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 280 0 R /LastChar 122 /Subtype /Type1 /Type /Font /Widths [250 0 0 0 0 0 0 0 333 333 0 0 0 333 250 278 500 500 500 500 500 500 500 500 500 500 333 0 0 0 0 0 0 722 667 0 722 667 611 778 0 0 0 0 0 944 722 778 0 778 0 556 667 0 0 0 0 0 0 0 0 0 0 0 0 500 556 444 556 444 0 500 556 278 0 0 278 833 556 500 556 556 444 389 333 556 0 722 0 0 444]>>
+object 280 0: <</Ascent 699 /CapHeight 676 /CharSet <2f73706163652f412f6d2f702f682f692f622f6f2f6c2f742f652f752f6e2f706172656e6c6566742f612f706172656e72696768742f422f472f732f672f532f632f442f642f722f4d2f712f7a2f512f736c6173682f772f68797068656e2f706572696f642f6f6e652f74687265652f462f74776f2f666f75722f666976652f7369782f736576656e2f65696768742f6e696e652f7a65726f2f4e2f4f2f542f452f636f6c6f6e> /Descent -205 /Flags 262178 /FontBBox [-168 -218 1000 935] /FontFile3 278 0 R /FontName /CLOOKE+Times-Bold /ItalicAngle 0 /StemH 139 /StemV 139 /Type /FontDescriptor /XHeight 461>>
+object 281 0: <</BaseFont /CLOBBL+Univers-Condensed /Encoding /WinAnsiEncoding /FirstChar 0 /FontDescriptor 134 0 R /LastChar 255 /Subtype /Type1 /ToUnicode 43 0 R /Type /Font /Widths [222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 333 250 444 444 778 667 250 278 278 444 500 222 333 222 278 444 444 444 444 444 444 444 444 444 444 222 222 500 500 500 444 788 611 611 556 611 500 444 611 611 278 500 556 444 833 667 611 556 611 556 556 500 611 556 889 556 500 500 278 278 278 500 500 278 500 500 500 500 500 278 500 500 222 222 444 222 722 500 500 500 500 333 444 278 500 444 722 444 444 389 274 250 274 500 333 444 333 222 444 444 1000 444 444 278 889 556 222 833 333 500 333 333 222 222 444 444 333 500 1000 278 825 444 222 778 333 389 500 222 333 444 444 444 444 250 444 278 800 300 444 500 333 800 278 400 500 266 266 278 500 440 222 278 266 300 444 666 666 666 444 611 611 611 611 611 611 833 556 500 500 500 500 278 278 278 278 611 667 611 611 611 611 611 500 611 611 611 611 611 500 556 556 500 500 500 500 500 500 778 500 500 500 500 500 222 222 222 222 500 500 500 500 500 500 500 500 500 500 500 500 500 444 500 444]>>
+object 282 0: <</Filter /FlateDecode /Length 379 /Subtype /Type1C>> stream sha256=028a28a0e07a79b492a843786bf772039e3cde85b514a22121d90f6d99ffd2d7
+object 283 0: <</Ascent 718 /CapHeight 718 /CharSet <2f73706163652f6465677265652f71756f746573696e676c652f71756f746564626c> /Descent -207 /Flags 32 /FontBBox [-166 -225 1000 931] /FontFile3 282 0 R /FontName /CLOPFA+Helvetica /ItalicAngle 0 /StemH 88 /StemV 88 /Type /FontDescriptor /XHeight 523>>
+object 284 0: <</BaseFont /CLOPFA+Helvetica /Encoding /WinAnsiEncoding /FirstChar 34 /FontDescriptor 283 0 R /LastChar 176 /Subtype /Type1 /Type /Font /Widths [355 0 0 0 0 191 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 400]>>
+object 285 0: <</Filter /FlateDecode /Length 4854 /Subtype /Type1C>> stream sha256=efd7f89dad571824f23df50f3f872ba319cc22f3d06ae165790e54214027470b
+object 286 0: <</Ascent 699 /CapHeight 653 /CharSet <2f73706163652f622f6f2f722f652f682f6c2f772f612f692f6e2f702f742f642f752f632f7a2f732f657175616c2f656e646173682f6f6e652f6d2f542f662f672f6b2f762f68797068656e2f6a2f706572696f642f442f792f706172656e6c6566742f706172656e72696768742f492f71756f746564626c6c6566742f71756f746564626c72696768742f462f636f6d6d612f482f7a65726f2f6e696e652f74776f2f736576656e2f65696768742f666f75722f4c2f74687265652f636f6c6f6e2f736c617368> /Descent -205 /Flags 98 /FontBBox [-169 -217 1010 883] /FontFile3 285 0 R /FontName /CLPDEJ+Times-Italic /ItalicAngle -15.5 /StemH 76 /StemV 76 /Type /FontDescriptor /XHeight 441>>
+object 287 0: <</BaseFont /CLPDEJ+Times-Italic /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 286 0 R /LastChar 150 /Subtype /Type1 /Type /Font /Widths [250 0 0 0 0 0 0 0 333 333 0 0 250 333 250 278 500 500 500 500 500 0 0 500 500 500 333 0 0 675 0 0 0 0 0 0 722 0 611 0 722 333 0 0 556 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 0 0 0 0 0 500 500 444 500 444 278 500 500 278 278 444 278 722 500 500 500 0 389 389 278 500 444 667 0 444 389 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 0 500]>>
+object 288 0: <</BaseFont /ArialMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 50 0 R /LastChar 32 /Subtype /Type1 /Type /Font /Widths [556]>>
+object 289 0: <</Filter /FlateDecode /Length 1939 /Subtype /Type1C>> stream sha256=967ae82e97c0aa47f3efc6df6efc2dee7452e33f2d4e49ddf85321299e28a8e6
+object 290 0: <</BaseFont /CMAEHC+Times-BoldItalic /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 291 0 R /LastChar 109 /Subtype /Type1 /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 0 0 250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 667 667 667 722 667 0 0 0 389 0 0 0 0 722 0 0 0 0 556 0 0 0 889 0 0 0 0 0 0 0 0 0 500 0 0 0 444 0 500 0 0 0 0 0 778]>>
+object 291 0: <</Ascent 699 /CapHeight 669 /CharSet <2f4e2f532f452f572f432f706572696f642f412f422f442f492f6d2f612f672f652f7370616365> /Descent -205 /Flags 262242 /FontBBox [-200 -218 996 921] /FontFile3 289 0 R /FontName /CMAEHC+Times-BoldItalic /ItalicAngle -15 /StemH 121 /StemV 121 /Type /FontDescriptor /XHeight 462>>
+object 292 0: <</BaseFont /CLOGNP+Helvetica /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 272 0 R /LastChar 151 /Subtype /Type1 /Type /Font /Widths [278 0 0 0 0 0 0 0 333 333 0 0 278 333 278 278 556 556 556 556 556 556 556 556 556 556 278 278 0 0 0 0 0 667 667 722 722 667 611 778 722 278 500 0 556 833 722 778 667 778 722 667 611 722 667 944 0 667 0 0 0 0 0 0 0 556 556 500 556 556 278 556 556 222 222 500 222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1000]>>
+object 293 0: <</Filter /FlateDecode /Length 663 /Subtype /Type1C>> stream sha256=80aeaa09c6ac22a6be58ebbdf61c9ce84fdf12428dce50e03023901c286bb377
+object 294 0: <</BaseFont /CMANKL+Helvetica-BoldOblique /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 295 0 R /LastChar 68 /Subtype /Type1 /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 722 722 722 722]>>
+object 295 0: <</Ascent 718 /CapHeight 718 /CharSet <2f412f706572696f642f422f432f442f7370616365> /Descent -207 /Flags 262240 /FontBBox [-174 -228 1114 962] /FontFile3 293 0 R /FontName /CMANKL+Helvetica-BoldOblique /ItalicAngle -12 /StemH 140 /StemV 140 /Type /FontDescriptor /XHeight 532>>
+object 296 0: <</Count 10 /First 297 0 R /Last 298 0 R /Type /Outlines>>
+object 297 0: <</Count 3 /Dest <47322e313730333535> /First 344 0 R /Last 345 0 R /Next 309 0 R /Parent 296 0 R /Title <436f6e74656e7473>>>
+object 298 0: <</Dest <47352e31303238313834> /Parent 296 0 R /Prev 299 0 R /Title <5265666572656e636573204369746564>>>
+object 299 0: <</Count 0 /Dest <47352e31303238313635> /Next 298 0 R /Parent 296 0 R /Prev 300 0 R /Title <53756d6d61727920616e6420436f6e636c7573696f6e73>>>
+object 300 0: <</Count -2 /Dest <47352e31303139353831> /First 301 0 R /Last 302 0 R /Next 299 0 R /Parent 296 0 R /Prev 303 0 R /Title <487964726f67656f6c6f6769632044617461>>>
+object 301 0: <</Count -2 /Dest <47352e31303139353833> /First 338 0 R /Last 339 0 R /Next 302 0 R /Parent 300 0 R /Title <46726163747572652044617461>>>
+object 302 0: <</Count -4 /Dest <47352e31303236393936> /First 334 0 R /Last 335 0 R /Parent 300 0 R /Prev 301 0 R /Title <417175696665722d546573742044617461>>>
+object 303 0: <</Count -6 /Dest <47332e31303337303737> /First 304 0 R /Last 305 0 R /Next 300 0 R /Parent 296 0 R /Prev 306 0 R /Title <4d6574686f6473206f66204461746120436f6c6c656374696f6e20616e6420416e616c79736973>>>
+object 304 0: <</Count -3 /Dest <47332e31303337303739> /First 331 0 R /Last 332 0 R /Next 321 0 R /Parent 303 0 R /Title <546573742d57656c6c204472696c6c696e67>>>
+object 305 0: <</Dest <47352e31303139353432> /Parent 303 0 R /Prev 316 0 R /Title <57617465722d4c6576656c204d6f6e69746f72696e67>>>
+object 306 0: <</Count -5 /Dest <47332e31303132393438> /First 307 0 R /Last 308 0 R /Next 303 0 R /Parent 296 0 R /Prev 309 0 R /Title <496e74726f64756374696f6e>>>
+object 307 0: <</Dest <47332e31303133313335> /Next 312 0 R /Parent 306 0 R /Title <507572706f736520616e642053636f7065>>>
+object 308 0: <</Dest <47332e31303133333535> /Parent 306 0 R /Prev 310 0 R /Title <41636b6e6f776c6564676d656e7473>>>
+object 309 0: <</Dest <47332e31303132393432> /Next 306 0 R /Parent 296 0 R /Prev 297 0 R /Title <4162737472616374>>>
+object 310 0: <</Dest <47332e31303133333533> /Next 308 0 R /Parent 306 0 R /Prev 311 0 R /Title <537570706c656d656e74616c2044617461206f6e2043442d524f4d>>>
+object 311 0: <</Dest <47332e31303133333531> /Next 310 0 R /Parent 306 0 R /Prev 312 0 R /Title <57656c6c2d4e616d696e672053797374656d>>>
+object 312 0: <</Count -3 /Dest <47332e31303133313433> /First 313 0 R /Last 314 0 R /Next 311 0 R /Parent 306 0 R /Prev 307 0 R /Title <4465736372697074696f6e206f66207468652053747564792041726561>>>
+object 313 0: <</Dest <47332e31303133313435> /Next 315 0 R /Parent 312 0 R /Title <576174657220557365>>>
+object 314 0: <</Dest <47332e31303133313737> /Parent 312 0 R /Prev 315 0 R /Title <487964726f67656f6c6f6769632053657474696e67>>>
+object 315 0: <</Dest <47332e31303133313636> /Next 314 0 R /Parent 312 0 R /Prev 313 0 R /Title <47656f6c6f6769632053657474696e67>>>
+object 316 0: <</Dest <47352e31303139353337> /Next 305 0 R /Parent 303 0 R /Prev 317 0 R /Title <5061636b65722054657374696e67>>>
+object 317 0: <</Dest <47352e31303139353332> /Next 316 0 R /Parent 303 0 R /Prev 318 0 R /Title <417175696665722054657374696e67>>>
+object 318 0: <</Count -5 /Dest <47352e31303135383639> /First 319 0 R /Last 320 0 R /Next 317 0 R /Parent 303 0 R /Prev 321 0 R /Title <436861726163746572697a6174696f6e206f662046726163747572657320696e204f70656e20426f7265686f6c6573>>>
+object 319 0: <</Dest <47352e31303135383731> /Next 330 0 R /Parent 318 0 R /Title <44657465726d696e6174696f6e206f6620547970652c2044657074682c20616e64204f7269656e746174696f6e206f6620467261637475726573>>>
+object 320 0: <</Count 2 /Dest <47352e31303139353230> /First 328 0 R /Last 329 0 R /Parent 318 0 R /Prev 330 0 R /Title <457374696d6174696e67205969656c6420436f6e747269627574696f6e2066726f6d20496e646976696475616c2057617465722d42656172696e6720467261637475726573>>>
+object 321 0: <</Count -6 /Dest <47332e31303134363538> /First 322 0 R /Last 323 0 R /Next 318 0 R /Parent 303 0 R /Prev 304 0 R /Title <47656f706879736963616c204c6f6767696e6720616e6420426f7265686f6c652d43616d6572612053757276657973>>>
+object 322 0: <</Dest <47332e31303134363630> /Next 327 0 R /Parent 321 0 R /Title <43616c69706572204c6f6767696e67>>>
+object 323 0: <</Dest <47332e31303134373638> /Parent 321 0 R /Prev 324 0 R /Title <426f7265686f6c652d43616d6572612053757276657973>>>
+object 324 0: <</Dest <47332e31303134373636> /Next 323 0 R /Parent 321 0 R /Prev 325 0 R /Title <426f7265686f6c652d54656c6576696577657220496d6167696e67>>>
+object 325 0: <</Dest <47332e31303134373634> /Next 324 0 R /Parent 321 0 R /Prev 326 0 R /Title <466c7569642d54656d706572617475726520616e6420466c7569642d5265736973746976697479204c6f6767696e67>>>
+object 326 0: <</Dest <47332e31303134373632> /Next 325 0 R /Parent 321 0 R /Prev 327 0 R /Title <5265736973746976697479204c6f6767696e67>>>
+object 327 0: <</Dest <47332e31303134373630> /Next 326 0 R /Parent 321 0 R /Prev 322 0 R /Title <4e61747572616c2d47616d6d61204c6f6767696e67>>>
+object 328 0: <</Dest <47352e31303139353232> /Next 329 0 R /Parent 320 0 R /Title <457374696d6174696e67205969656c6420647572696e67204472696c6c696e67>>>
+object 329 0: <</Dest <47352e31303139353237> /Parent 320 0 R /Prev 328 0 R /Title <466c6f776d657465722053757276657973>>>
+object 330 0: <</Dest <47352e31303135383737> /Next 320 0 R /Parent 318 0 R /Prev 319 0 R /Title <4964656e74696669636174696f6e206f662057617465722d42656172696e6720467261637475726573>>>
+object 331 0: <</Dest <47332e31303337303831> /Next 333 0 R /Parent 304 0 R /Title <4169722d50657263757373696f6e20526f74617279204472696c6c696e6720616e642057656c6c20436f6e737472756374696f6e>>>
+object 332 0: <</Dest <47332e31303134363534> /Parent 304 0 R /Prev 333 0 R /Title <57656c6c20446576656c6f706d656e7420616e642053686f72742d5465726d205969656c64>>>
+object 333 0: <</Dest <47332e31303337303835> /Next 332 0 R /Parent 304 0 R /Prev 331 0 R /Title <4c6974686f6c6f6769632053616d706c696e6720616e642044657465726d696e6174696f6e206f6620526f636b2054797065>>>
+object 334 0: <</Dest <47352e31303237303233> /Next 337 0 R /Parent 302 0 R /Title <417175696665722d54657374205969656c642c2044726177646f776e2c20616e64205265636f76657279>>>
+object 335 0: <</Dest <47352e31303237323639> /Parent 302 0 R /Prev 336 0 R /Title <57617465722d4c6576656c2044617461>>>
+object 336 0: <</Dest <47352e31303237323632> /Next 335 0 R /Parent 302 0 R /Prev 337 0 R /Title <5061636b65722d546573742044617461>>>
+object 337 0: <</Dest <47352e31303237323537> /Next 336 0 R /Parent 302 0 R /Prev 334 0 R /Title <446972656374696f6e20616e64204d61676e6974756465206f662044726177646f776e>>>
+object 338 0: <</Count -4 /Dest <47352e31303139353836> /First 340 0 R /Last 341 0 R /Next 339 0 R /Parent 301 0 R /Title <496e646976696475616c204672616374757265205969656c64>>>
+object 339 0: <</Dest <47352e31303236373234> /Parent 301 0 R /Prev 338 0 R /Title <466c6f776d657465722053757276657973>>>
+object 340 0: <</Dest <47352e31303139353933> /Next 343 0 R /Parent 338 0 R /Title <4a6f696e74732c204f70656e204a6f696e74732c20616e64205a6f6e6573206f66204a6f696e7420436f6e63656e74726174696f6e>>>
+object 341 0: <</Dest <47352e31303236373232> /Parent 338 0 R /Prev 342 0 R /Title <4972726567756c61722d53686170656420566f69647320616e6420467261637475726573>>>
+object 342 0: <</Dest <47352e31303236373230> /Next 341 0 R /Parent 338 0 R /Prev 343 0 R /Title <446973736f6c7574696f6e204f70656e696e6773>>>
+object 343 0: <</Dest <47352e31303139353936> /Next 342 0 R /Parent 338 0 R /Prev 340 0 R /Title <466f6c696174696f6e2050617274696e677320616e64204d616a6f7220466f6c696174696f6e204f70656e696e6773>>>
+object 344 0: <</Count -8 /Dest <47322e313733363031> /First 357 0 R /Last 358 0 R /Next 346 0 R /Parent 297 0 R /Title <46696775726573>>>
+object 345 0: <</Dest <47322e313733313138> /Parent 297 0 R /Prev 346 0 R /Title <436f6e76657273696f6e20466163746f727320616e6420446174756d>>>
+object 346 0: <</Count -10 /Dest <47322e313732393737> /First 347 0 R /Last 348 0 R /Next 345 0 R /Parent 297 0 R /Prev 344 0 R /Title <5461626c6573>>>
+object 347 0: <</Count 0 /Dest <47332e31303133333331> /Next 356 0 R /Parent 346 0 R /Title <5461626c6520312e204465736372697074696f6e206f66207072696e636970616c206c6974686f6c6f67696320756e69747320696e20746865204c617772656e636576696c6c652c2047656f726769612c2061726561202866726f6d20436861706d616e20616e64206f74686572732c2031393939292e>>>
+object 348 0: <</Dest <47352e31303335353235> /Parent 346 0 R /Prev 349 0 R /Title <5461626c652031302e2052616e6765206f6620646174657320776865726520636f6e74696e756f75732077617465722d6c6576656c20646174612061726520617661696c61626c6520616e6420696e666c75656e63652066726f6d2070756d70696e672c204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 349 0: <</Dest <47352e31303237353331> /Next 348 0 R /Parent 346 0 R /Prev 350 0 R /Title <5461626c6520392e205761746572206c6576656c7320696e2077656c6c732c204f63746f6265722033312c20323030312c204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 350 0: <</Dest <47352e31303331313338> /Next 349 0 R /Parent 346 0 R /Prev 351 0 R /Title <5461626c6520382e2046726163747572652064657074682c207374726164646c65206465707468732c20616e64206879647261756c696320726573706f6e7365206f6273657276656420647572696e67207061636b65722074657374696e67206f662077656c6c203134464635392c204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 351 0: <</Count 0 /Dest <47352e31303335313934> /Next 350 0 R /Parent 346 0 R /Prev 352 0 R /Title <5461626c6520372e2044726177646f776e2c2070756d70696e6720726174652c20616e64207370656369666963206361706163697479206f662077656c6c7320647572696e67206171756966657220746573747320696e20746865204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 352 0: <</Count 0 /Dest <47352e31303335313535> /Next 351 0 R /Parent 346 0 R /Prev 353 0 R /Title <5461626c6520362e204f62736572766174696f6e732066726f6d20616d6269656e7420616e642070756d70696e6720666c6f776d6574657220737572766579732c204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 353 0: <</Count 0 /Dest <47352e31303238373036> /Next 352 0 R /Parent 346 0 R /Prev 354 0 R /Title <5461626c6520352e2044657074682c207969656c642c20616e64207374727563747572616c206665617475726573206f662077617465722d62656172696e67206672616374757265207a6f6e657320696e20746865204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 354 0: <</Count 0 /Dest <47342e31303335393632> /Next 353 0 R /Parent 346 0 R /Prev 355 0 R /Title <5461626c6520342e2047656f706879736963616c206c6f677320636f6c6c656374656420696e20746865204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 355 0: <</Count 0 /Dest <47332e31303134373039> /Next 354 0 R /Parent 346 0 R /Prev 356 0 R /Title <5461626c6520332e204465736372697074696f6e206f6620626f7265686f6c652067656f706879736963616c20746f6f6c73207573656420696e20746865204c617772656e636576696c6c652c2047656f726769612c20617265612e>>>
+object 356 0: <</Dest <47332e31303337313034> /Next 355 0 R /Parent 346 0 R /Prev 347 0 R /Title <5461626c6520322e204c6f636174696f6e20616e642077656c6c20636f6e737472756374696f6e20696e666f726d6174696f6e20666f7220746865204c617772656e636576696c6c652e2047656f726769612c20617265612e>>>
+object 357 0: <</Dest <47332e31303133313330> /Next 364 0 R /Parent 344 0 R /Title <46696775726520312e204c6f636174696f6e206f66207374756479206172656120696e204777696e6e65747420436f756e747920616e642077656c6c206c6f636174696f6e7320696e204c617772656e636576696c6c652c2047656f726769612e>>>
+object 358 0: <</Dest <47352e31303238363236> /Parent 344 0 R /Prev 359 0 R /Title <46696775726520382e205061727469616c207265636f7264206f662077617465722d6c6576656c20687964726f677261706820666f722077656c6c203134464630382073686f77696e6720656666656374206f662070756d70696e67206174207468652052686f646573204a6f7264616e2057656c6c6669656c642c204c617772656e636576696c6c652c2047656f726769612e>>>
+object 359 0: <</Count 0 /Dest <47352e31303237303134> /Next 358 0 R /Parent 344 0 R /Prev 360 0 R /Title <46696775726520372e202841202920466c6f776d65746572206c6f677320666f722077656c6c203133464632332c2073686f77696e6720696e666c6f7720616e64206f7574666c6f772066726f6d20626f7265686f6c652c204c617772656e636576696c6c652c2047656f726769612e20546f70206c6566742d666163696e672e2e2e>>>
+object 360 0: <</Dest <47352e31303233313831> /Next 359 0 R /Parent 344 0 R /Prev 361 0 R /Title <46696775726520362e204578616d706c6520737472756374757265206c6f67206669677572652073686f77696e6720726f636b2074797065732c206c6974686f6c6f67696320756e6974732c20746164706f6c6520706c6f74732c20626f7265686f6c6520696d616765732c20616e6420626f7265686f6c6520646576696174696f6e2c204c617772656e636576696c6c652c2047656f726769612e>>>
+object 361 0: <</Dest <47352e31303139363431> /Next 360 0 R /Parent 344 0 R /Prev 362 0 R /Title <46696775726520352e204578616d706c65206c6974686f6c6f67696320756e69747320616e642067656f706879736963616c206c6f67206669677572652073686f77696e672063616c697065722c2067616d6d612c206c61746572616c2072657369737469766974792c20666c7569642074656d70657261747572652c20616e6420666c7569642072657369737469766974792c204c617772656e636576696c6c652c2047656f726769612e>>>
+object 362 0: <</Dest <47352e31303139353439> /Next 361 0 R /Parent 344 0 R /Prev 363 0 R /Title <46696775726520342e20446f776e2d686f6c65207061636b657220617373656d626c79207573656420647572696e67207468652073747564792073686f77696e67202841202920736368656d61746963206f66207061636b657220617373656d626c792c20616e642070686f746f73206f6620284220292070726573737572652e2e2e>>>
+object 363 0: <</Count 0 /Dest <47352e31303135393334> /Next 362 0 R /Parent 344 0 R /Prev 364 0 R /Title <46696775726520332e20536368656d61746963206469616772616d7320696c6c757374726174696e6720686f772074686520737472696b6520616e6420646970206f66206120706c616e6172206665617475726520696e74657273656374696e67206120626f7265686f6c65206172652064657465726d696e65642e205468652063616c63756c6174696f6e20617373756d657320746865206665617475726520697320706c616e617220286e6f7420637572766564292e20436f7272656374696f6e7320617265206d61646520666f7220626f7265686f6c6520646576696174696f6e20616e64206d61676e65746963206465636c696e6174696f6e2e>>>
+object 364 0: <</Dest <47332e31303133333233> /Next 363 0 R /Parent 344 0 R /Prev 357 0 R /Title <46696775726520322e20446973747269627574696f6e206f66207072696e636970616c206c6974686f6c6f67696320756e69747320616e6420626564726f636b2077656c6c206c6f636174696f6e732c204c617772656e636576696c6c652c2047656f7267696120286d6f6469666965642066726f6d20436861706d616e20616e64206f74686572732c2031393939292e20536565207461626c65203120666f72206465736372697074696f6e206f66207072696e636970616c206c6974686f6c6f67696320756e6974732e>>>
+object 493 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1235 /Width 76>> stream sha256=90247ef0477594cf239a8bd91bacf02d7842ca07af46981389b58c7595800d7a
+object 494 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 34 /Width 76>> stream sha256=e68c62a7dbf87d68e1960b198dab23293560bef46e8c21c42cd49df906048453
+object 495 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 323 /Width 76>> stream sha256=cd57441bf20911bbbdf36b6f6bed335b19950003a11f853c51958b66c6bfaea1
+object 496 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 370 /Width 76>> stream sha256=353caaa7cc9fc2d5de1b57443adacae5835915f47ca22e4466f35c7ef9bb36d5
+object 497 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 618 /Width 76>> stream sha256=a11e6624da1104921ed3eba9cf402135065007464f291dcfd7ed94dc7592a339
+object 498 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 778 /Width 76>> stream sha256=1027c14ab1d8645516ee79b7d2b3901ce550caf4c3af7cb88154be907109d903
+object 499 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 458 /Width 76>> stream sha256=09e30fed104810e8ecd1ed41c3f68947eca194bba8e776080c6d1be5d77ff5ea
+object 500 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1305 /Width 76>> stream sha256=3a9ccd66467f8dcd46d5e3dfceafccc2fcbd8cbe79bcca4773ab562bc9e85b48
+object 501 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 76 /Length 1653 /Width 99>> stream sha256=1a5467589e7f04641aa261c5db98aabc5478f8e4f8cc01b37118f019c3e92f64
+object 502 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1385 /Width 76>> stream sha256=b28f2bf66174ced613b01f4bc0ce0758e3020bddd86e95f8e41527c4e2f05270
+object 503 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1500 /Width 76>> stream sha256=d6c6858b816ffe342bd8b598c09dd9d6f70c20c87d20e2d8944d50f96b14bf4c
+object 504 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1232 /Width 76>> stream sha256=e2db971d039b45ceca3ee0f8393c5221b7a436dcda6e53ce53ef267d737c55a3
+object 505 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1570 /Width 76>> stream sha256=08cc11db787d9e760ab2058150eb0ce3513b497d3a7e16ce65be64a68fd5ebf1
+object 506 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1244 /Width 76>> stream sha256=692a432dc89f6c842141401d495b0baa176b5139feca71669cc57c1e10490ffb
+object 507 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1395 /Width 76>> stream sha256=965efb49c9b2ea2aaca063e312b9213a07fdcc19e3d2be262da43e7e23688b37
+object 508 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1510 /Width 76>> stream sha256=756f05251b9298f024480ac528966285fff4dbcc6a249d6a03747e35c8272504
+object 509 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1324 /Width 76>> stream sha256=e9a32eed7cddee1cc5baebca910dbff5148b3ecaa057289b5c8d5a28a3684bb9
+object 510 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 76 /Length 748 /Width 99>> stream sha256=b79fa4849c431ea82ed0884a404d4e692d9a1c976e269dcf7f21e5a129606ee9
+object 511 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1491 /Width 76>> stream sha256=f5a41f7facd2f0b7530c4a89026b26180ea099d3e1f3286ebb0a5ee3321e6ff0
+object 512 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 949 /Width 76>> stream sha256=3f097cce3fa06442f788eefb768b38139c5f838ac062265ec51163618ad601bb
+object 513 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1533 /Width 76>> stream sha256=c7fe481dbf3a69c976d394de3813ecda0d106c1e2cb40a7f571902158df41de8
+object 514 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1477 /Width 76>> stream sha256=dd44e55b355b294e5cd2ebd50bc8ee6dfed095f0378a98fe0347563e34f6c35e
+object 515 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1380 /Width 76>> stream sha256=28e1deb81331047f6c05306a447a8bf5e124e541366acdee2360694f94d87631
+object 516 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1453 /Width 76>> stream sha256=6e249b3c1e390456180f58901eb742fa682dbbc97874f1fd15e05bed6437320b
+object 517 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 76 /Length 1344 /Width 99>> stream sha256=030d6a9e21dc573803e318f31fbe7d923bc4b5f0e6049efa0770e0e17c12b007
+object 518 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 76 /Length 1545 /Width 99>> stream sha256=bf706d2b29ee4c82d462ae37db911bffd2fb777688b317c7b00fa37d61291154
+object 519 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 947 /Width 76>> stream sha256=ca837c745c4ed62752d180381e19bfff95671858efe532dbff4fe461243befe3
+object 520 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1074 /Width 76>> stream sha256=55d301aac33eaa947fe2ec8c10b29a6616b887b6e52404107f057538697504ae
+object 521 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1017 /Width 76>> stream sha256=fb48e8c47efd458e2e482772b6806817ca8fa6a2432c292151df91d43ca4d28f
+object 522 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1426 /Width 76>> stream sha256=f66502d77a399e1dff33d885a6ad8294fc4959380d41df02ad9a38b9daa39d4d
+object 523 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1114 /Width 76>> stream sha256=f2709d21f0327c63f3bf0747706d729bc877b8aa0b2e340f7c69ea12c70d3c81
+object 524 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1282 /Width 76>> stream sha256=b3e558f5311c5a7a440aab3001dbdb785460851ccf590ea3a5dadd9655356462
+object 525 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1488 /Width 76>> stream sha256=86f92c8060fde44506c5ecb7eeb03eb7662ce0311b1685f5cdf6b3891ccf7f20
+object 526 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 889 /Width 76>> stream sha256=4c2b45cb4771f3d5c49e3b31bd7909034f320e3e1a5fc0cc18c38bf66f596002
+object 527 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1460 /Width 76>> stream sha256=039b1ecaba8437427ddbe946bc24086f9c75c48cddbcf61d4dbd55fdfa52ef64
+object 528 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1429 /Width 76>> stream sha256=4a5e13fb7f99c8c5f4a1f06ba09b8cc7d9bb4b85a7afb0acfd564da42f92c600
+object 529 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1138 /Width 76>> stream sha256=1d9545c7b9abaf7237b05eb3fa2a33d1e6a94276b79681844abec3be266d9ce5
+object 530 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 1452 /Width 76>> stream sha256=28bda219b55a43feac181cc1c625899964e94df7b50b1e7c988d24b5101b900e
+object 531 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 770 /Width 76>> stream sha256=86dcf226b7186442d0fe20dec5d00f3ba036a3a899727a8b5116c788553c15db
+object 532 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 125 /Width 76>> stream sha256=65f91b23c726781a3e2c7da2c8c8ac5f962df25b1840ae5a0272b40446c16ab3
+object 533 0: <</BitsPerComponent 8 /ColorSpace 120 0 R /Filter /FlateDecode /Height 99 /Length 187 /Width 76>> stream sha256=3cf9dfdcf8c234f2f5e3a2d501638bac3c75d6e524c77573cda93350e3548a8d
+object 534 0: <</Filter /FlateDecode /Length 3028 /Type /EmbeddedFile>> stream sha256=dd281453afe121a67725c9e6da7d72c943d19784c6e87660e452ab81e162e97e
+object 535 0: <</Kids [536 0 R 537 0 R]>>
+object 536 0: <</Limits [<47322e313730333535> <47352e31303236373234>] /Names [<47322e313730333535> 553 0 R <47322e313732393737> 554 0 R <47322e313733313138> 555 0 R <47322e313733363031> 556 0 R <47332e31303132393432> 557 0 R <47332e31303132393438> 558 0 R <47332e31303133313330> 559 0 R <47332e31303133313335> 560 0 R <47332e31303133313433> 561 0 R <47332e31303133313435> 562 0 R <47332e31303133313636> 563 0 R <47332e31303133313737> 564 0 R <47332e31303133333233> 565 0 R <47332e31303133333331> 566 0 R <47332e31303133333531> 567 0 R <47332e31303133333533> 568 0 R <47332e31303133333535> 569 0 R <47332e31303134363534> 570 0 R <47332e31303134363538> 571 0 R <47332e31303134363630> 572 0 R <47332e31303134373039> 573 0 R <47332e31303134373630> 574 0 R <47332e31303134373632> 575 0 R <47332e31303134373634> 576 0 R <47332e31303134373636> 577 0 R <47332e31303134373638> 578 0 R <47332e31303337303737> 579 0 R <47332e31303337303739> 580 0 R <47332e31303337303831> 581 0 R <47332e31303337303835> 582 0 R <47332e31303337313034> 583 0 R <47342e31303335393632> 584 0 R <47352e31303135383639> 585 0 R <47352e31303135383731> 586 0 R <47352e31303135383737> 587 0 R <47352e31303135393334> 588 0 R <47352e31303139353230> 589 0 R <47352e31303139353232> 590 0 R <47352e31303139353237> 591 0 R <47352e31303139353332> 592 0 R <47352e31303139353337> 593 0 R <47352e31303139353432> 594 0 R <47352e31303139353439> 595 0 R <47352e31303139353831> 596 0 R <47352e31303139353833> 597 0 R <47352e31303139353836> 598 0 R <47352e31303139353933> 599 0 R <47352e31303139353936> 600 0 R <47352e31303139363431> 601 0 R <47352e31303233313831> 602 0 R <47352e31303236373230> 603 0 R <47352e31303236373232> 604 0 R <47352e31303236373234> 605 0 R]>>
+object 537 0: <</Limits [<47352e31303236393936> <47352e31303335353235>] /Names [<47352e31303236393936> 538 0 R <47352e31303237303134> 539 0 R <47352e31303237303233> 540 0 R <47352e31303237323537> 541 0 R <47352e31303237323632> 542 0 R <47352e31303237323639> 543 0 R <47352e31303237353331> 544 0 R <47352e31303238313635> 545 0 R <47352e31303238313834> 546 0 R <47352e31303238363236> 547 0 R <47352e31303238373036> 548 0 R <47352e31303331313338> 549 0 R <47352e31303335313535> 550 0 R <47352e31303335313934> 551 0 R <47352e31303335353235> 552 0 R]>>
+object 538 0: <</D [92 0 R /XYZ 304 631 null]>>
+object 539 0: <</D [92 0 R /XYZ 64 142 null]>>
+object 540 0: <</D [96 0 R /XYZ 55 724 null]>>
+object 541 0: <</D [98 0 R /XYZ 43 724 null]>>
+object 542 0: <</D [98 0 R /XYZ 43 173 null]>>
+object 543 0: <</D [98 0 R /XYZ 307 291 null]>>
+object 544 0: <</D [102 0 R /XYZ 43 721 null]>>
+object 545 0: <</D [104 0 R /XYZ 315 725 null]>>
+object 546 0: <</D [110 0 R /XYZ 319 497 null]>>
+object 547 0: <</D [106 0 R /XYZ 42 380 null]>>
+object 548 0: <</D [84 0 R /XYZ 61 719 null]>>
+object 549 0: <</D [100 0 R /XYZ 55 713 null]>>
+object 550 0: <</D [90 0 R /XYZ 54 404 null]>>
+object 551 0: <</D [96 0 R /XYZ 82 359 null]>>
+object 552 0: <</D [104 0 R /XYZ 44 719 null]>>
+object 553 0: <</D [13 0 R /XYZ 55 695 null]>>
+object 554 0: <</D [15 0 R /XYZ 175 363 null]>>
+object 555 0: <</D [17 0 R /XYZ 55 689 null]>>
+object 556 0: <</D [15 0 R /XYZ 175 627 null]>>
+object 557 0: <</D [19 0 R /XYZ 55 557 null]>>
+object 558 0: <</D [19 0 R /XYZ 319 281 null]>>
+object 559 0: <</D [21 0 R /XYZ 533 48 null]>>
+object 560 0: <</D [30 0 R /XYZ 55 451 null]>>
+object 561 0: <</D [30 0 R /XYZ 319 724 null]>>
+object 562 0: <</D [30 0 R /XYZ 319 514 null]>>
+object 563 0: <</D [32 0 R /XYZ 43 724 null]>>
+object 564 0: <</D [32 0 R /XYZ 307 491 null]>>
+object 565 0: <</D [34 0 R /XYZ 55 97 null]>>
+object 566 0: <</D [39 0 R /XYZ 42 723 null]>>
+object 567 0: <</D [39 0 R /XYZ 316 726 null]>>
+object 568 0: <</D [39 0 R /XYZ 316 576 null]>>
+object 569 0: <</D [39 0 R /XYZ 316 378 null]>>
+object 570 0: <</D [46 0 R /XYZ 54 165 null]>>
+object 571 0: <</D [46 0 R /XYZ 318 429 null]>>
+object 572 0: <</D [46 0 R /XYZ 318 209 null]>>
+object 573 0: <</D [48 0 R /XYZ 44 725 null]>>
+object 574 0: <</D [48 0 R /XYZ 44 496 null]>>
+object 575 0: <</D [48 0 R /XYZ 44 396 null]>>
+object 576 0: <</D [48 0 R /XYZ 44 128 null]>>
+object 577 0: <</D [48 0 R /XYZ 308 407 null]>>
+object 578 0: <</D [48 0 R /XYZ 308 235 null]>>
+object 579 0: <</D [44 0 R /XYZ 55 458 null]>>
+object 580 0: <</D [44 0 R /XYZ 55 318 null]>>
+object 581 0: <</D [44 0 R /XYZ 55 180 null]>>
+object 582 0: <</D [44 0 R /XYZ 319 188 null]>>
+object 583 0: <</D [41 0 R /XYZ 43 719 null]>>
+object 584 0: <</D [51 0 R /XYZ 56 48 null]>>
+object 585 0: <</D [53 0 R /XYZ 43 724 null]>>
+object 586 0: <</D [53 0 R /XYZ 43 622 null]>>
+object 587 0: <</D [53 0 R /XYZ 307 431 null]>>
+object 588 0: <</D [55 0 R /XYZ 90 111 null]>>
+object 589 0: <</D [59 0 R /XYZ 43 724 null]>>
+object 590 0: <</D [59 0 R /XYZ 43 601 null]>>
+object 591 0: <</D [59 0 R /XYZ 307 531 null]>>
+object 592 0: <</D [61 0 R /XYZ 48 566 null]>>
+object 593 0: <</D [61 0 R /XYZ 313 674 null]>>
+object 594 0: <</D [61 0 R /XYZ 313 272 null]>>
+object 595 0: <</D [63 0 R /XYZ 99 117 null]>>
+object 596 0: <</D [70 0 R /XYZ 55 725 null]>>
+object 597 0: <</D [70 0 R /XYZ 55 576 null]>>
+object 598 0: <</D [70 0 R /XYZ 55 250 null]>>
+object 599 0: <</D [70 0 R /XYZ 319 724 null]>>
+object 600 0: <</D [70 0 R /XYZ 319 405 null]>>
+object 601 0: <</D [72 0 R /XYZ 525 48 null]>>
+object 602 0: <</D [76 0 R /XYZ 527 48 null]>>
+object 603 0: <</D [90 0 R /XYZ 55 724 null]>>
+object 604 0: <</D [90 0 R /XYZ 55 489 null]>>
+object 605 0: <</D [90 0 R /XYZ 319 551 null]>>
+object 606 0: <</Nums [0 607 0 R 2 608 0 R 7 609 0 R 39 610 0 R]>>
+object 607 0: <</P <436f7665722d> /S /D>>
+object 608 0: <</S /r>>
+object 609 0: <</S /D>>
+object 610 0: <</P <436f7665722d> /S /D /St 3>>
+object 611 0: <</Count 41 /Kids [612 0 R 613 0 R 614 0 R 615 0 R 616 0 R] /Type /Pages>>
+object 612 0: <</Count 7 /Kids [13426 0 R 1 0 R 3 0 R 9 0 R 13 0 R 15 0 R 17 0 R] /Parent 611 0 R /Type /Pages>>
+object 613 0: <</Count 5 /Kids [19 0 R 21 0 R 30 0 R 32 0 R 34 0 R] /Parent 611 0 R /Type /Pages>>
+object 614 0: <</Count 10 /Kids [39 0 R 41 0 R 44 0 R 46 0 R 48 0 R 51 0 R 53 0 R 55 0 R 59 0 R 61 0 R] /Parent 611 0 R /Type /Pages>>
+object 615 0: <</Count 10 /Kids [63 0 R 70 0 R 72 0 R 76 0 R 84 0 R 86 0 R 88 0 R 90 0 R 92 0 R 96 0 R] /Parent 611 0 R /Type /Pages>>
+object 616 0: <</Count 9 /Kids [98 0 R 100 0 R 102 0 R 104 0 R 106 0 R 110 0 R 112 0 R 114 0 R 116 0 R] /Parent 611 0 R /Type /Pages>>
+object 617 0: <</Kids [618 0 R]>>
+object 618 0: <</Limits [<feff00480069006700680020005100750061006c006900740079002e006a006f0062006f007000740069006f006e0073> <feff00480069006700680020005100750061006c006900740079002e006a006f0062006f007000740069006f006e0073>] /Names [<feff00480069006700680020005100750061006c006900740079002e006a006f0062006f007000740069006f006e0073> 619 0 R]>>
+object 619 0: <</EF <</F 534 0 R>> /F <48696768205175616c6974792e6a6f626f7074696f6e73> /Type /Filespec>>
+object 620 0: <</Length 4303 /Subtype /XML /Type /Metadata>> stream sha256=7e67c4cd8350355b5bd93e487b90e7fc6c8abd82f2b64c900fdd9b4e0274f534
+object 621 0: <</Author <4c6573746572204a2e2057696c6c69616d732c205068696c6c6970204e2e20416c62657274736f6e2c20446f6e6e6120442e205475636b65722c20616e64204a61696d6520412e205061696e746572> /CreationDate <443a32303035303130363037313533395a> /Creator <4672616d654d616b657220372e31> /Keywords <687964726f67656f6c6f67696320646174612c2067656f706879697363616c206c6f6767696e672c204c617772656e636576696c6c652c2047656f726769612c2067726f756e642077617465722c206372797374616c6c696e6520626564726f636b2c204777696e6e65747420436f756e7479> /ModDate <443a32303035303830383134323732342d303427303027> /Producer <4163726f6261742044697374696c6c657220362e302e31202857696e646f777329> /Subject <417373657373696e672067726f756e642d7761746572207265736f7572636573206f662061207374756479206172656120696e204777696e6e65747420436f756e74792c2047656f72676961> /Title <4d6574686f647320616e6420487964726f67656f6c6f67696320446174612066726f6d2054657374204472696c6c696e6720616e642047656f706879736963616c204c6f6767696e67205375727665797320696e20746865204c617772656e636576696c6c652c2047656f726769612c2041726561>>>
+object 13420 0: <</E 132399 /H [1228 1491] /L 2122217 /Linearized 1 /N 41 /O 13426 /T 1853767>>
+object 13421 0: <</MarkInfo <</Marked true>> /Metadata 620 0 R /Names 13425 0 R /OpenAction 13422 0 R /Outlines 296 0 R /PageLabels 606 0 R /PageMode /UseNone /Pages 611 0 R /StructTreeRoot 622 0 R /Threads 13423 0 R /Type /Catalog>>
+object 13422 0: <</D [13426 0 R /Fit] /S /GoTo>>
+object 13423 0: [13424 0 R]
+object 13424 0: <</F 4 0 R /I <</Title <41>>>>>
+object 13425 0: <</Dests 535 0 R /EmbeddedFiles 617 0 R>>
+object 13426 0: <</ArtBox [0.499 42.9902 612 792] /Contents [13427 0 R 13428 0 R 13429 0 R 13430 0 R 13431 0 R 13432 0 R 13440 0 R 13441 0 R] /CropBox [0 0 612 792] /Group 13459 0 R /LastModified <443a32303035303330323134333030392d303527303027> /MediaBox [0 0 612 792] /Parent 612 0 R /PieceInfo <</Illustrator 13460 0 R>> /Resources <</ExtGState <</GS0 13456 0 R /GS1 13457 0 R /GS2 13458 0 R>> /Font <</T1_0 13433 0 R /T1_1 13434 0 R /T1_2 13435 0 R /T1_3 13436 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC] /XObject <</Im0 13445 0 R /Im1 13446 0 R /Im2 13447 0 R /Im3 13448 0 R>>>> /Rotate 0 /StructParents 108 /Thumb 493 0 R /Type /Page>>
+object 13427 0: <</Filter /FlateDecode /Length 1049>> stream sha256=e17cd55d2488675e99708bffa92711348d1ad0352aa7ab259253ef8d095c80fa
+object 13428 0: <</Filter /FlateDecode /Length 1025>> stream sha256=1578032840d769bd08c281f1fce2a0853a5d8c9d1d2909c4a68e0b63cc5759dd
+object 13429 0: <</Filter /FlateDecode /Length 1055>> stream sha256=187d8480f4d91889dcf1fac860b62c9690ac4950a48f108132876abe3e6edd6c
+object 13430 0: <</Filter /FlateDecode /Length 1065>> stream sha256=4db6f6ff7c82400dd5a72e39b3af917477f61168002dd288fd3bf2724034a71b
+object 13431 0: <</Filter /FlateDecode /Length 982>> stream sha256=920942bebb791c9a6ec428590e1d5678af8cbd878b0c667eb2b7f855049cace2
+object 13432 0: <</Filter /FlateDecode /Length 1080>> stream sha256=6c87f38db2dd4ef2003c893a537fbe1c4fff4ac310335e6d5460c6f26772fc65
+object 13433 0: <</BaseFont /CLOCEI+Univers-CondensedOblique /Encoding 13450 0 R /FirstChar 0 /FontDescriptor 13439 0 R /LastChar 255 /Subtype /Type1 /ToUnicode 13449 0 R /Type /Font /Widths [222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 333 250 444 444 778 667 250 278 278 444 500 222 333 222 278 444 444 444 444 444 444 444 444 444 444 222 222 500 500 500 444 788 611 611 556 611 500 444 611 611 278 500 556 444 833 667 611 556 611 556 556 500 611 556 889 556 500 500 278 278 278 500 500 278 500 500 500 500 500 278 500 500 222 222 444 222 722 500 500 500 500 333 444 278 500 444 722 444 444 389 274 250 274 500 222 611 611 556 500 667 611 611 500 500 500 500 500 500 500 500 500 500 500 222 222 222 222 500 500 500 500 500 500 500 500 500 500 444 400 444 444 444 333 440 556 800 800 825 278 278 222 833 611 222 500 222 222 444 500 222 222 222 222 222 300 300 222 778 500 444 333 500 222 444 222 222 444 444 1000 222 611 611 611 833 778 500 1000 444 444 222 222 500 222 444 500 167 444 222 222 500 500 444 222 222 444 889 611 500 611 500 500 278 278 278 278 611 611 222 611 611 611 611 222 278 278 278 278 278 278 278 444 278 278]>>
+object 13434 0: <</BaseFont /CLOBAL+Univers-CondensedBold /Encoding 13450 0 R /FirstChar 0 /FontDescriptor 13437 0 R /LastChar 255 /Subtype /Type1 /ToUnicode 13451 0 R /Type /Font /Widths [222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 333 333 444 444 778 667 250 278 278 444 500 222 333 222 278 444 444 444 444 444 444 444 444 444 444 222 222 500 500 500 444 795 611 611 556 611 500 444 611 611 278 500 556 444 833 667 611 556 611 556 556 500 611 556 889 556 556 500 278 250 278 500 500 278 500 500 500 500 500 278 500 500 278 278 500 278 722 500 500 500 500 333 444 278 500 444 778 500 444 389 274 250 274 500 222 611 611 556 500 667 611 611 500 500 500 500 500 500 500 500 500 500 500 278 278 278 278 500 500 500 500 500 500 500 500 500 500 444 400 444 444 444 420 550 556 830 830 860 278 278 222 833 611 222 500 222 222 444 500 222 222 222 222 222 300 300 222 778 500 444 333 500 222 444 222 222 444 444 1000 222 611 611 611 833 778 500 1000 444 444 222 222 500 222 444 556 167 444 222 222 500 500 444 222 222 444 1000 611 500 611 500 500 278 278 278 278 611 611 222 611 611 611 611 278 278 278 278 278 278 278 278 445 278 278]>>
+object 13435 0: <</BaseFont /FYJISG+Helvetica /Encoding 13450 0 R /FirstChar 0 /FontDescriptor 13453 0 R /LastChar 255 /Subtype /Type1 /ToUnicode 13454 0 R /Type /Font /Widths [278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 278 355 556 556 889 667 191 333 333 389 584 278 333 278 278 556 556 556 556 556 556 556 556 556 556 278 278 584 584 584 556 1015 667 667 722 722 667 611 778 722 278 500 667 556 833 722 778 667 778 722 667 611 722 667 944 667 667 611 278 278 278 469 556 333 556 556 500 556 556 278 556 556 222 222 500 222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 334 260 334 584 278 667 667 722 667 722 778 722 556 556 556 556 556 556 500 556 556 556 556 278 278 278 278 556 556 556 556 556 556 556 556 556 556 556 400 556 556 556 350 537 611 737 737 1000 333 333 278 1000 778 278 584 278 278 556 578 278 278 278 278 278 370 365 278 889 611 611 333 584 278 556 278 278 556 556 1000 278 667 667 778 1000 944 556 1000 333 333 222 222 584 278 500 667 167 556 333 333 500 500 556 278 222 333 1000 667 667 667 667 667 278 278 278 278 778 778 278 778 722 722 722 278 333 333 333 333 333 333 333 333 333 333]>>
+object 13436 0: <</BaseFont /CLOBEM+Univers-CondensedLight /Encoding 13450 0 R /FirstChar 0 /FontDescriptor 13438 0 R /LastChar 255 /Subtype /Type1 /ToUnicode 13455 0 R /Type /Font /Widths [222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 222 333 309 444 444 778 611 198 222 222 444 444 222 278 222 333 444 444 444 444 444 444 444 444 444 444 222 222 444 444 444 389 800 556 500 500 556 444 389 556 556 222 444 500 389 778 611 556 444 556 500 500 444 556 500 833 500 500 444 222 222 222 444 500 278 444 444 389 444 444 278 444 444 222 222 389 222 667 444 444 444 444 278 389 278 444 389 667 389 389 333 351 222 351 444 222 556 556 500 444 611 556 556 444 444 444 444 444 444 389 444 444 444 444 222 222 222 222 444 444 444 444 444 444 444 444 444 444 444 400 444 444 444 606 564 500 800 800 722 278 278 222 778 556 222 444 222 222 444 444 222 222 222 222 222 266 266 222 722 444 389 333 444 222 444 222 222 389 389 1000 222 556 556 556 778 722 500 1000 389 389 222 222 444 222 389 500 167 444 222 222 444 444 444 222 222 389 889 556 444 556 444 444 222 222 222 222 556 556 222 556 556 556 556 222 278 278 278 278 278 278 278 278 278 278]>>
+object 13437 0: <</Ascent 722 /CapHeight 722 /Descent -217 /Flags 262176 /FontBBox [-83 -250 1000 969] /FontFile3 13442 0 R /FontName /CLOBAL+Univers-CondensedBold /ItalicAngle 0 /StemH 87 /StemV 141 /Type /FontDescriptor /XHeight 505>>
+object 13438 0: <</Ascent 722 /CapHeight 722 /Descent -217 /Flags 32 /FontBBox [-163 -250 1000 953] /FontFile3 13443 0 R /FontName /CLOBEM+Univers-CondensedLight /ItalicAngle 0 /StemH 48 /StemV 60 /Type /FontDescriptor /XHeight 505>>
+object 13439 0: <</Ascent 722 /CapHeight 722 /Descent -191 /Flags 96 /FontBBox [-172 -250 1064 989] /FontFile3 13444 0 R /FontName /CLOCEI+Univers-CondensedOblique /ItalicAngle -12 /StemH 62 /StemV 82 /Type /FontDescriptor /XHeight 505>>
+object 13440 0: <</Filter /FlateDecode /Length 1365>> stream sha256=957b959d69df049e60082ca743e9d804b87caca36d19e92acb0486d865f3f12a
+object 13441 0: <</Filter /FlateDecode /Length 1021>> stream sha256=4a9bb9aae56a7102b054cc90ec2f7ed63de87f1f531212ebb55f564588707337
+object 13442 0: <</Filter /FlateDecode /Length 3956 /Subtype /Type1C>> stream sha256=7d4c8c9f665c5da12a3e3a8d1675ea7ab184a806676b01fc37e3b2b265d1f2d0
+object 13443 0: <</Filter /FlateDecode /Length 3338 /Subtype /Type1C>> stream sha256=686439fac8982ad179d9623989e0efc191e640cfe48dde8fd3fb1b016f61f1e8
+object 13444 0: <</Filter /FlateDecode /Length 2540 /Subtype /Type1C>> stream sha256=f719927210887e2d321447d56e9430e5e6ef345ab5a99cc4d9bc34cf4bc30a06
+object 13445 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /JPXDecode /Height 172 /Intent /Perceptual /Length 8859 /Name /X /Subtype /Image /Type /XObject /Width 173>> stream partial=JPXDecode sha256=14de088a6370027c3dd354e8113cd3f76b91e0ae40655bf47828b25d4b1891ee
+object 13446 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 648 /Intent /Perceptual /Length 47378 /Name /X /Subtype /Image /Type /XObject /Width 395>> stream partial=JPXDecode sha256=328c82f4e3a88f4fab3f74bc5522d9860b7c3a9010448dcdba32959f79c00361
+object 13447 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 240 /Intent /Perceptual /Length 17683 /Name /X /Subtype /Image /Type /XObject /Width 320>> stream partial=JPXDecode sha256=7080d295b168617412a15da7267a1f82e2bbaf2597e84f221193fe07f8ed8da0
+object 13448 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /JPXDecode /Height 240 /Intent /Perceptual /Length 20742 /Name /X /Subtype /Image /Type /XObject /Width 320>> stream partial=JPXDecode sha256=37cefcbad0444ca97d35beadf5f34cb29dee1e06327ca1ab11c1a680b0b4b94e
+object 13449 0: <</Filter /FlateDecode /Length 1117>> stream sha256=7607c94c470c3d7249721ef329d582600579837b5f7a9b1b09198864866ac6cd
+object 13450 0: <</BaseEncoding /MacRomanEncoding /Differences [219 /Euro] /Type /Encoding>>
+object 13451 0: <</Filter /FlateDecode /Length 1116>> stream sha256=9a63cc926b1191bb1510db59503cf1b2b693100f69b960cb65b4741b8ea7717b
+object 13452 0: <</Filter /FlateDecode /Length 1814 /Subtype /Type1C>> stream sha256=6c4ed9af4dddc11a5c45585710ebb6329585aed7e1c35b758c70169716a80b23
+object 13453 0: <</Ascent 931 /CapHeight 718 /Descent -225 /Flags 32 /FontBBox [-166 -225 1000 931] /FontFile3 13452 0 R /FontName /FYJISG+Helvetica /ItalicAngle 0 /StemV 88 /Type /FontDescriptor /XHeight 523>>
+object 13454 0: <</Filter /FlateDecode /Length 1104>> stream sha256=52602a90ea2889ffc53c377298fb7a0a3aab9480cbfa8bc2b02ece277bcf1e5f
+object 13455 0: <</Filter /FlateDecode /Length 1118>> stream sha256=212d2343d764c63515f2a0c1969192a55ea1c3266fa0fec92fd487680a002677
+object 13456 0: <</OP false /OPM 0 /Type /ExtGState /op false>>
+object 13457 0: <</OP true /OPM 1 /Type /ExtGState /op true>>
+object 13458 0: <</OP true /OPM 1 /Type /ExtGState /op false>>
+object 13459 0: <</CS /DeviceCMYK /I false /K false /S /Transparency /Type /Group>>
+object 13460 0: <</LastModified <443a32303035303130363130323335352d303527303027> /Private 13461 0 R>>
+object 13461 0: <</AIMetaData 13462 0 R /ContainerVersion 9 /CreatorVersion 10>>
+object 13462 0: <</Filter /FlateDecode /Length 627>> stream sha256=ec8ca48960ffc70d04faf6ff2d25069d6f36841bd6678cc29a48b6d70c9b55c0
+object 13464 0: <</B 2158 /C 2067 /E 2035 /Filter /FlateDecode /I 2183 /L 2051 /Length 1362 /O 2019 /S 1434 /T 1920>> stream sha256=fdfe4347d1bc41db008e24ffd47a37f695bd570c2a76591cb80165db9a4d2e07

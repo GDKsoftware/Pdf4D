@@ -1,0 +1,24 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2013-07-30T16:50:13-04:00
+info Creator: File & Serve
+info ModDate: 2016-09-14T20:27:46+02:00
+info Producer: File & Serve
+xmp: 3157
+object 1 0: <</Length 3157 /Subtype /XML /Type /Metadata>> stream sha256=83a766ded9082a55fca8c5f5ac1fda9afdce856e164b2a87e83ee56db2bcec22
+object 5 0: <</Count 1 /Kids [9 0 R] /Type /Pages>>
+object 6 0: <</CreationDate <443a32303133303733303136353031332d303427303027> /Creator <46696c652026205365727665> /ModDate <443a32303136303931343230323734362b303227303027> /Producer <46696c652026205365727665>>>
+object 7 0: <</E 40277 /H [459 140] /L 44136 /Linearized 1 /N 1 /O 9 /T 43847>>
+object 8 0: <</Metadata 1 0 R /Pages 5 0 R /Type /Catalog>>
+object 9 0: <</Contents 10 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 5 0 R /Resources <</ProcSet [/PDF /Text /ImageB /ImageC /ImageI] /XObject <</Iabc6 14 0 R>>>> /Rotate 0 /Type /Page>>
+object 10 0: <</Length 46>> stream sha256=60304f881d1f3e5c0e8cc5196c1f407d4ee53eb3e4099e258c43396784e03efb
+object 12 0: <</Filter /FlateDecode /Length 37742 /Length1 108104>> stream sha256=c77583007d114668d7f75dcdce187bb7d726263385a126848c689631b62778ed
+object 13 0: <</Filter /FlateDecode /Length 350>> stream sha256=9731c372c6c8612dd039f3a38fd0be887279a2836ea0e25afbc18ded011d77fb
+object 14 0: <</BBox [0 0 612 792] /Filter /FlateDecode /Length 180 /Resources <</Font <</Fabc8 18 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /Subtype /Form /Type /XObject>> stream sha256=d58fef28bde6664c175972dbf98792fd2d8eb9efb1d6e2fd9c7d4f1f5fa1b478
+object 16 0: <</Ascent 891 /CapHeight 699 /Descent -216 /Flags 262178 /FontBBox [-558 -306 2000 1025] /FontFile2 12 0 R /FontName /RIRMDX+TimesNewRomanPS-BoldMT /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 17 0: <</BaseFont /RIRMDX+TimesNewRomanPS-BoldMT /CIDSystemInfo <</Ordering <> /Registry <> /Supplement 0>> /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 16 0 R /Subtype /CIDFontType2 /Type /Font /W [1 1 0 2 3 250 4 10 0 11 12 333 13 14 0 15 15 250 16 16 333 17 17 250 18 18 277 19 19 0 20 23 500 24 35 0 36 36 722 37 37 666 38 39 722 40 40 666 41 41 610 42 43 777 44 44 389 45 45 0 46 46 777 47 47 666 48 48 943 49 49 722 50 50 777 51 51 610 52 52 0 53 53 722 54 54 556 55 55 666 56 57 722 59 59 0 60 60 722 61 67 0 68 68 500 69 69 556 70 70 443 71 71 556 72 72 443 73 73 333 74 74 500 75 75 556 76 76 277 77 77 0 78 78 556 79 79 277 80 80 833 81 81 556 82 82 500 83 84 556 85 85 443 86 86 389 87 87 333 88 88 556 89 89 0 90 90 722 91 92 500 93 178 0 179 180 500 181 181 0 182 182 333 183 751 0 752 752 198 753 794 0 795 795 612 796 1126 0 1127 1127 125 1129 1129 2000 1130 65534 0]>>
+object 18 0: <</BaseFont /RIRMDX+TimesNewRomanPS-BoldMT /DescendantFonts [17 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 13 0 R /Type /Font>>
+object 19 0: <</Filter /FlateDecode /I 73 /Length 61 /S 36>> stream sha256=2cbe97e1ca74c865639f5d4f1d9123e7deda640a8091f4be024abbd19e70e9ef

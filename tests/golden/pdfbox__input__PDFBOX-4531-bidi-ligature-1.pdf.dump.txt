@@ -1,0 +1,22 @@
+version: 1.3
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=
+info CreationDate: 2023-02-22T05:54:47+00:00
+info Creator: Word
+info ModDate: 2023-02-22T05:54:47+00:00
+info Producer: macOS バージョン13.2.1（ビルド22D68） Quartz PDFContext
+xmp: none
+object 1 0: <</Contents 3 0 R /MediaBox [0 0 595 842] /Parent 2 0 R /Resources 4 0 R /Type /Page>>
+object 2 0: <</Count 1 /Kids [1 0 R] /MediaBox [0 0 595 842] /Type /Pages>>
+object 3 0: <</Filter /FlateDecode /Length 234>> stream sha256=4188484b38607ed493ae6c1c7c5b1ae3f45f1116bbb6543c31bfbed4d7aa0b52
+object 4 0: <</ColorSpace <</Cs1 5 0 R>> /Font <</TT2 7 0 R>> /ProcSet [/PDF /Text]>>
+object 5 0: [/ICCBased 8 0 R]
+object 7 0: <</BaseFont /AAAAAC+ArialMT /FirstChar 33 /FontDescriptor 10 0 R /LastChar 35 /Subtype /TrueType /ToUnicode 11 0 R /Type /Font /Widths [563 278 544]>>
+object 8 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2612 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 9 0: <</Pages 2 0 R /Type /Catalog>>
+object 10 0: <</Ascent 905 /AvgWidth 441 /CapHeight 716 /Descent -212 /Flags 4 /FontBBox [-665 -325 2000 1039] /FontFile2 12 0 R /FontName /AAAAAC+ArialMT /ItalicAngle 0 /Leading 33 /MaxWidth 2000 /StemV 0 /Type /FontDescriptor /XHeight 519>>
+object 11 0: <</Filter /FlateDecode /Length 240>> stream sha256=7d221d60ee6058716ac4dc98f357779b146236cd76ab542cf238e3ed6041f61a
+object 12 0: <</Filter /FlateDecode /Length 631 /Length1 848>> stream sha256=2585697d4a818ac9df0d5dada864a4e0a0a2293d295044f2da7c58f2ed0367ad
+object 13 0: <</CreationDate <443a32303233303232323035353434375a303027303027> /Creator <576f7264> /ModDate <443a32303233303232323035353434375a303027303027> /Producer <feff006d00610063004f0053002030d030fc30b830e730f300310033002e0032002e0031ff0830d330eb30c900320032004400360038ff09002000510075006100720074007a00200050004400460043006f006e0074006500780074>>>

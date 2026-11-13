@@ -1,0 +1,15 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources 5 0 R /Type /Page>>
+object 4 0: <</Length 98>> stream sha256=00965c3ea38a6e40697411267ada3fb949f0dfdacfba6d267068b4691c3e4a97
+object 5 0: <</Font 6 0 R>>
+object 6 0: <</F0 7 0 R>>
+object 7 0: <</BaseFont /CourierNewPSMT /Encoding 9 0 R /FirstChar 0 /FontDescriptor 8 0 R /LastChar 255 /Subtype /TrueType /Type /Font /Widths [600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600 600]>>
+object 8 0: <</Ascent 613 /CapHeight 570 /Descent -188 /Flags 33 /FontBBox [-21 -300 638 951] /FontName /Courier#20New /ItalicAngle 0 /StemV 88 /Type /FontDescriptor /XHeight 405>>
+object 9 0: <</BaseEncoding /WinAnsiEncoding /Differences [0 /.notdef /.notdef /.notdef 128 /.notdef 130 /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 142 /.notdef 145 /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 158 /.notdef /.notdef /space 173 /hyphen] /Type /Encoding>>

@@ -1,0 +1,30 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=1
+info CreationDate: 2009-02-04T20:34:30+01:00
+info Producer: Apache FOP Version svn-trunk
+xmp: 740
+object 1 0: <</Count 1 /Kids [8 0 R] /Type /Pages>>
+object 2 0: <</Metadata 7 0 R /PageLabels 9 0 R /Pages 1 0 R /Type /Catalog>>
+object 3 0: <</ColorSpace <</DefaultRGB 6 0 R>> /Font <</F1 22 0 R>> /ProcSet [/PDF /ImageB /ImageC /Text] /XObject <</Form1 15 0 R>>>>
+object 4 0: <</CreationDate <443a32303039303230343230333433302b303127303027> /Producer <41706163686520464f502056657273696f6e2073766e2d7472756e6b>>>
+object 5 0: <</Filter /FlateDecode /Length 16 0 R /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 6 0: [/ICCBased 5 0 R]
+object 7 0: <</Length 17 0 R /Subtype /XML /Type /Metadata>> stream sha256=94117022bfd34f0bb993351bd876fe613d59edbca9e39682328d9faca5bd378e
+object 8 0: <</BleedBox [0 0 595 842] /Contents 20 0 R /MediaBox [0 0 595 842] /Parent 1 0 R /Resources 3 0 R /TrimBox [0 0 595 842] /Type /Page>>
+object 9 0: <</Nums [0 <</P <31>>>]>>
+object 10 0: 2596
+object 11 0: <</Filter /FlateDecode /Length 18 0 R /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 12 0: [/ICCBased 11 0 R]
+object 13 0: <</ColorSpace <</DefaultRGB 12 0 R>> /ProcSet [/PDF /ImageB /ImageC /Text]>>
+object 14 0: 42451
+object 15 0: <</BBox [0 0 542 505] /Filter /FlateDecode /FormType 1 /Length 19 0 R /Matrix [0.0018 0 0 0.002 0 0] /Name /Form1 /Resources 13 0 R /Subtype /Form /Type /XObject>> stream sha256=623579fd4e389c115a0b453261a5aad7943c08d427922e351ec244a8f720e38c
+object 16 0: 2596
+object 17 0: 740
+object 18 0: 2596
+object 19 0: 42451
+object 20 0: <</Filter /FlateDecode /Length 21 0 R>> stream sha256=5e46b937bf728c48de272b66024e2661f9ae4f6e1483ce10793b0463d245f79c
+object 21 0: 183
+object 22 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>

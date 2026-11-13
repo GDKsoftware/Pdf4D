@@ -1,0 +1,38 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 6
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=90 label=
+page 2: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=90 label=
+page 3: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=180 label=
+page 4: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=180 label=
+page 5: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=270 label=
+page 6: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=270 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 6 /Kids [3 0 R 4 0 R 5 0 R 6 0 R 7 0 R 8 0 R] /Type /Pages>>
+object 3 0: <</Contents 9 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 10 0 R /Rotate 90 /Type /Page>>
+object 4 0: <</Contents 11 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 12 0 R /Rotate 90 /Type /Page>>
+object 5 0: <</Contents 13 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 14 0 R /Rotate 180 /Type /Page>>
+object 6 0: <</Contents 15 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 16 0 R /Rotate 180 /Type /Page>>
+object 7 0: <</Contents 17 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 18 0 R /Rotate 270 /Type /Page>>
+object 8 0: <</Contents 19 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 2 0 R /Resources 20 0 R /Rotate 270 /Type /Page>>
+object 9 0: <</Filter /FlateDecode /Length 107>> stream sha256=d91ad408e46b24a34eeb05fef97a570d97a6822e8d5cb5cca7fac88eee10c76b
+object 10 0: <</Font 21 0 R>>
+object 11 0: <</Filter /FlateDecode /Length 97>> stream sha256=9fdf60e88619614d84128f1886e3453482ccfe3b147145742b6c61e3c5ae4ef2
+object 12 0: <</Font 22 0 R>>
+object 13 0: <</Filter /FlateDecode /Length 110>> stream sha256=56afb93e034584b6c638056975024ffb4e788d23d563faa583fefe3778f24861
+object 14 0: <</Font 23 0 R>>
+object 15 0: <</Filter /FlateDecode /Length 102>> stream sha256=e94f2f9ecbb2f15e2b6f55617ae0d12ea171366d36d475d5d65cde713dcc6f03
+object 16 0: <</Font 24 0 R>>
+object 17 0: <</Filter /FlateDecode /Length 110>> stream sha256=696eed66c172e163f7cbe30e90e1fd04b079a72bd075fe39e501e9b1cfc4ebac
+object 18 0: <</Font 25 0 R>>
+object 19 0: <</Filter /FlateDecode /Length 102>> stream sha256=46c731a196c6663ec28e1b92db8a252b50b5db1d4b4cab5bc68e77d50dafbd09
+object 20 0: <</Font 26 0 R>>
+object 21 0: <</F1 27 0 R>>
+object 22 0: <</F1 27 0 R>>
+object 23 0: <</F1 27 0 R>>
+object 24 0: <</F1 27 0 R>>
+object 25 0: <</F1 27 0 R>>
+object 26 0: <</F1 27 0 R>>
+object 27 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>

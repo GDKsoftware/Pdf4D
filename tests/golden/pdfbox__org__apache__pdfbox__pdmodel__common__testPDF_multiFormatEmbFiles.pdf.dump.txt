@@ -1,0 +1,32 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+attachment: TestDos.txt | 55
+object 1 0: <</Names 3 0 R /Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [4 0 R] /Type /Pages>>
+object 3 0: <</EmbeddedFiles 5 0 R>>
+object 4 0: <</Contents 6 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources 7 0 R /Type /Page>>
+object 5 0: <</Kids [8 0 R]>>
+object 6 0: <</Filter [/FlateDecode] /Length 9 0 R>> stream sha256=0a192cae564b9675d9c238be0ad3a45fefdbeef536aa4d62eba68455cbebd2d6
+object 7 0: <</Font 10 0 R>>
+object 8 0: <</Limits [<4d79206669727374206174746163686d656e74> <4d79206669727374206174746163686d656e74>] /Names [<4d79206669727374206174746163686d656e74> 11 0 R]>>
+object 9 0: 88
+object 10 0: <</F0 12 0 R>>
+object 11 0: <</DOS <54657374446f732e747874> /EF 13 0 R /F <546573742e747874> /Mac <546573744d61632e747874> /Type /Filespec /Unix <54657374556e69782e747874>>>
+object 12 0: <</BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 13 0: <</DOS 16 0 R /F 14 0 R /Mac 15 0 R /Unix 17 0 R>>
+object 14 0: <</Length 19 0 R /Params 18 0 R /Subtype /text#2Fplain /Type /EmbeddedFile>> stream sha256=01d9ce810c3f8b8baf3f1377c95ae7672b7d3e01c4516c99185b62572ade5c0c
+object 15 0: <</Length 21 0 R /Params 20 0 R /Subtype /text#2Fplain /Type /EmbeddedFile>> stream sha256=5f6f3870f48a013d8173b58cab27b1f7131b7192e71aa3dede834cc42433a5e5
+object 16 0: <</Length 23 0 R /Params 22 0 R /Subtype /text#2Fplain /Type /EmbeddedFile>> stream sha256=575889c3ac9a2bbc9fe3742fe296224a1c302e8521a562b02f03ec6355d03e72
+object 17 0: <</Length 25 0 R /Params 24 0 R /Subtype /text#2Fplain /Type /EmbeddedFile>> stream sha256=7530cbc14e1826d37ea50f6fe44bbe91dbcf3865d77fcc0ee6da8b65c163e5f5
+object 18 0: <</CreationDate <443a32303134303732353039333434352d303427303027> /Size 55>>
+object 19 0: 55
+object 20 0: <</CreationDate <443a32303134303732353039333434352d303427303027> /Size 43>>
+object 21 0: 43
+object 22 0: <</CreationDate <443a32303134303732353039333434352d303427303027> /Size 55>>
+object 23 0: 43
+object 24 0: <</CreationDate <443a32303134303732353039333434352d303427303027> /Size 55>>
+object 25 0: 44

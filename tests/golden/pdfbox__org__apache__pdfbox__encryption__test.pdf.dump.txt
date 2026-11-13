@@ -1,0 +1,18 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=
+xmp: none
+object 1 0: <</Filter /FlateDecode /Length 2 0 R>> stream sha256=9e529a40a9e5327061668d80bc05a4661ed6faf19a03e3d2798fffad30bc409a
+object 2 0: 120
+object 3 0: <</Count 1 /Kids [4 0 R] /MediaBox [0 0 595 842] /Resources 11 0 R /Type /Pages>>
+object 4 0: <</Contents 1 0 R /MediaBox [0 0 595 842] /Parent 3 0 R /Type /Page>>
+object 5 0: <</Filter /FlateDecode /Length 6 0 R /Length1 22236>> stream sha256=04b120e3e11db92fea58b67bc687915f16fae961144d17f21e754d9e0b768a0d
+object 6 0: 10488
+object 7 0: <</Ascent 891 /CapHeight 1006 /Descent 216 /Flags 6 /FontBBox [-568 -306 2028 1007] /FontFile2 5 0 R /FontName /BAAAAA+TimesNewRomanPSMT /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 8 0: <</Filter /FlateDecode /Length 251>> stream sha256=1d7e64c45d94c4c761f175dccd055735acff09eecfd14e9030f2207eb21bf5c8
+object 9 0: <</BaseFont /BAAAAA+TimesNewRomanPSMT /FirstChar 0 /FontDescriptor 7 0 R /LastChar 4 /Subtype /TrueType /ToUnicode 8 0 R /Type /Font /Widths [777 610 443 389 277]>>
+object 10 0: <</F1 9 0 R>>
+object 11 0: <</Font 10 0 R /ProcSet [/PDF]>>
+object 12 0: <</Pages 3 0 R /Type /Catalog>>

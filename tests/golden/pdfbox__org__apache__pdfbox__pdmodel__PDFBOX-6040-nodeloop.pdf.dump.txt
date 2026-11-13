@@ -1,0 +1,9 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Counte /Page /Kids [4 0 R] /MediaBox [0 0 612 792] /Parent 2 0 R /Type /Pages>>
+object 4 0: <</MediaBox [0 0 612 792] /Parent 2 0 R /Type /Page>>

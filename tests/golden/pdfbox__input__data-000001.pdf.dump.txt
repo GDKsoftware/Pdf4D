@@ -1,0 +1,22 @@
+version: 1.2
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info Author: User: Unprivileged user [nobody]
+info CreationDate: 2001-06-05T22:15:55+00:00
+info Creator: A ClibPDF program
+info Keywords: ClibPDF
+info Producer: [ClibPDF Library 2.01-r2-2] FreeBSD
+info Subject: PDF clock CGI - generates PDF with analog and digital clock
+info Title: PDF clock CGI
+xmp: none
+object 1 0: <</Outlines 2 0 R /Pages 3 0 R /Type /Catalog>>
+object 2 0: <</Count 0 /Type /Outlines>>
+object 3 0: <</Count 1 /Kids [5 0 R] /Type /Pages>>
+object 4 0: [/PDF /Text]
+object 5 0: <</Contents 6 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 3 0 R /Resources <</Font <</Fcpdf0 7 0 R /Fcpdf1 8 0 R>> /ProcSet 4 0 R>> /Rotate 0 /Type /Page>>
+object 6 0: <</Filter [/FlateDecode] /Length 1221>> stream sha256=cd6fcd0ecb23afb8dc0bddd3ff052d6280b7dde1ce84df15964be9af1d7e2dba
+object 7 0: <</BaseFont /Times-Roman /Encoding /MacRomanEncoding /Name /Fcpdf0 /Subtype /Type1 /Type /Font>>
+object 8 0: <</BaseFont /Times-Italic /Encoding /MacRomanEncoding /Name /Fcpdf1 /Subtype /Type1 /Type /Font>>
+object 9 0: <</Author <557365723a20556e70726976696c656765642075736572205b6e6f626f64795d> /CreationDate <443a3230303130363035323231353535> /Creator <4120436c69625044462070726f6772616d> /Keywords <436c6962504446> /Producer <5b436c6962504446204c69627261727920322e30312d72322d325d2046726565425344> /Subject <50444620636c6f636b20434749202d2067656e65726174657320504446207769746820616e616c6f6720616e64206469676974616c20636c6f636b> /Title <50444620636c6f636b20434749>>>

@@ -1,0 +1,47 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2020-06-17T19:59:17+02:00
+info Creator: Adobe Acrobat 10.272
+info ModDate: 2020-06-18T16:12:13+02:00
+info Producer: Adobe Acrobat 10.272
+xmp: 3577
+outline: Blank Page -> 1
+field: Multiline | text | Multiline - Fixed
+field: Singleline | text | Singleline - Fixed
+field: MultilineAutoscale | text | Multiline - auto
+field: SinglelineAutoscale | text | Singleline - auto
+object 3 0: <</Length 3577 /Subtype /XML /Type /Metadata>> stream sha256=a68f4931e46c3d8b5c4a02e39f1517b23dcd6ab3215480c8773ffc90f564ce76
+object 7 0: <</Count 1 /First 8 0 R /Last 8 0 R /Type /Outlines>>
+object 8 0: <</A 9 0 R /Parent 7 0 R /Title <426c616e6b2050616765>>>
+object 9 0: <</D [17 0 R /XYZ 0 792 null] /S /GoTo>>
+object 10 0: <</BaseFont /Helvetica /Encoding 12 0 R /Name /Helv /Subtype /Type1 /Type /Font>>
+object 11 0: <</BaseFont /ZapfDingbats /Name /ZaDb /Subtype /Type1 /Type /Font>>
+object 12 0: <</Differences [24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis] /Type /Encoding>>
+object 13 0: <</Count 1 /Kids [17 0 R] /Type /Pages>>
+object 14 0: <</CreationDate <443a32303230303631373139353931372b303227303027> /Creator <41646f6265204163726f6261742031302e323732> /ModDate <443a32303230303631383136313231332b303227303027> /Producer <41646f6265204163726f6261742031302e323732>>>
+object 15 0: <</E 1147 /H [446 160] /L 6397 /Linearized 1 /N 1 /O 17 /T 6087>>
+object 16 0: <</AcroForm 20 0 R /Metadata 3 0 R /Outlines 7 0 R /Pages 13 0 R /Type /Catalog>>
+object 17 0: <</Annots 38 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 13 0 R /Resources <<>> /Rotate 0 /Type /Page>>
+object 20 0: <</DA <2f48656c7620302054662030206720> /DR <</Encoding <</PDFDocEncoding 12 0 R>> /Font <</Helv 10 0 R /ZaDb 11 0 R>>>> /Fields [22 0 R 25 0 R 28 0 R 29 0 R]>>
+object 21 0: [22 0 R]
+object 22 0: <</AP <</N 42 0 R>> /DA <2f48656c7620313220546620302067> /F 4 /FT /Tx /Ff 4194304 /MK <</BC [0 0 0]>> /P 17 0 R /Rect [56.7358 607.609 283.679 763.632] /Subtype /Widget /T <4d756c74696c696e65> /Type /Annot /V <4d756c74696c696e65202d204669786564>>>
+object 23 0: <</Filter /FlateDecode /I 104 /Length 70 /O 65 /S 38 /V 81>> stream sha256=bb34b2e9bcb63449fc418eb4a917ecc9e5d520666b953a81a08b668b90c4fb26
+object 25 0: <</AP <</N 41 0 R>> /DA <2f48656c7620313220546620302067> /F 4 /FT /Tx /Ff 4194304 /MK <</BC [0 0 0]>> /P 17 0 R /Rect [297.863 607.609 524.807 763.632] /Subtype /Widget /T <53696e676c656c696e65> /Type /Annot /V <53696e676c656c696e65202d204669786564>>>
+object 28 0: <</AP <</N 47 0 R>> /F 4 /FT /Tx /Ff 4198400 /MK <</BC [0 0 0]>> /P 17 0 R /Rect [56.7358 437.401 283.679 593.425] /Subtype /Widget /T <4d756c74696c696e654175746f7363616c65> /Type /Annot /V <4d756c74696c696e65202d206175746f>>>
+object 29 0: <</AP <</N 50 0 R>> /F 4 /FT /Tx /Ff 4194304 /MK <</BC [0 0 0]>> /P 17 0 R /Rect [297.863 437.401 524.807 593.425] /Subtype /Widget /T <53696e676c656c696e654175746f7363616c65> /Type /Annot /V <53696e676c656c696e65202d206175746f>>>
+object 30 0: [22 0 R 25 0 R 28 0 R 29 0 R]
+object 31 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 93 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=e6fd5d18d79221c32409203ad5d9f67c73a1b6233d675b68da8cf6c5a6cdc2b9
+object 32 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 93 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=e6fd5d18d79221c32409203ad5d9f67c73a1b6233d675b68da8cf6c5a6cdc2b9
+object 33 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 86 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=8c4378cd89862c6797a9857919b1a89ca85866c6d020d22eaa9c1f51379daaa2
+object 34 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 86 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=8c4378cd89862c6797a9857919b1a89ca85866c6d020d22eaa9c1f51379daaa2
+object 38 0: [22 0 R 25 0 R 28 0 R 29 0 R]
+object 39 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 184 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=5d09795e2ca9452d77a4af4af463a680f1239c5b11ce08b04f4c1b8cf7c2e092
+object 40 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 183 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=7cae65d85f160908793b2ecd27f92673ffc5a49eddcf80963490300d94e09a38
+object 41 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 176 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=e1be0fa1f8be8d718860fc0f379852635c6b0f6aba02d6a20e012e023f1a8656
+object 42 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 175 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=b7a449907655393186c5ae39337f3c36afc061c48d8f98e95430a86d548f3fd7
+object 46 0: <</BBox [0 0 226.944 156.024] /FormType 1 /Length 174 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=f88f7837230e03be79f35863d9e444d677c71987e330e7c228b251e89dd3fc54
+object 47 0: <</BBox [0 0 226.943 156.024] /FormType 1 /Length 175 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=f0aeffff7963862b683c3830b774bf1ee957ff80a8568e027d97151af3d5ffb0
+object 50 0: <</BBox [0 0 226.944 156.024] /FormType 1 /Length 180 /Matrix [1 0 0 1 0 0] /Resources <</Font <</Helv 10 0 R>> /ProcSet [/PDF /Text]>> /Subtype /Form /Type /XObject>> stream sha256=cdf2efeb35ab424603e923362a2e497eb03371b552689269f093eeff58cf3ab3

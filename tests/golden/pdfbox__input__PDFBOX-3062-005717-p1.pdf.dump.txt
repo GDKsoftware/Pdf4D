@@ -1,0 +1,27 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 432 648] crop=[0 0 432 648] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Annots [] /ArtBox [0 0 432 648] /BleedBox [0 0 432 648] /Contents 4 0 R /CropBox [0 0 432 648] /MediaBox [0 0 432 648] /Parent 2 0 R /Resources <</ColorSpace <</CS0 [/Separation /PANTONE#20485#20C /DeviceRGB 5 0 R]>> /ExtGState <</GS0 6 0 R /GS1 7 0 R /GS2 8 0 R>> /Font <</C0_0 9 0 R /C0_1 10 0 R>> /ProcSet [/PDF /Text /ImageC] /Properties <</MC0 <</Metadata 11 0 R>>>> /XObject <<>>>> /Rotate 0 /StructParents 0 /TrimBox [0 0 432 648] /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 712>> stream sha256=c3be4d09031aa6915e577bdc8caadfa91b33f9a62554b55b25dc4d835e62752c
+object 5 0: <</C0 [1 1 1] /C1 [0.7529 0.1412 0.1529] /Domain [0 1] /FunctionType 2 /N 1 /Range [0 1 0 1 0 1]>>
+object 6 0: <</OP false /OPM 1 /SA true /Type /ExtGState /op false>>
+object 7 0: <</OP true /OPM 1 /SA true /Type /ExtGState /op true>>
+object 8 0: <</OP false /OPM 0 /SA true /Type /ExtGState /op false>>
+object 9 0: <</BaseFont /ZZMSES+GoudySans-Medium /DescendantFonts [12 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 13 0 R /Type /Font>>
+object 10 0: <</BaseFont /YRCMQU+ACaslonPro-Regular /DescendantFonts [14 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 15 0 R /Type /Font>>
+object 11 0: <</Length 1694 /Subtype /XML /Type /Metadata>> stream sha256=6e2d081a969f4e0e07ef5f05a87fe8f4b575f5ed6a1256f1929fe0dd1e90fd61
+object 12 0: <</BaseFont /ZZMSES+GoudySans-Medium /CIDSystemInfo 16 0 R /DW 1000 /FontDescriptor 17 0 R /Subtype /CIDFontType0 /Type /Font /W [0 [250] 7 [232] 14 [268] 33 [642 517 589 624 446 410 624 642 268] 44 [428 802] 46 47 713 48 [482] 50 [553 464 553 713]]>>
+object 13 0: <</Filter /FlateDecode /Length 317>> stream sha256=dedc79f897dedf626178c39cc85464ee488764c8af66ce16bbd28e2c493f4e4f
+object 14 0: <</BaseFont /YRCMQU+ACaslonPro-Regular /CIDSystemInfo 18 0 R /DW 1000 /FontDescriptor 19 0 R /Subtype /CIDFontType0 /Type /Font /W [1 [254] 38 [690 598] 66 [427] 72 [485] 74 [267] 77 [256 806 532 498] 82 [508 341 356 319 506] 105 [360] 119 [360]]>>
+object 15 0: <</Filter /FlateDecode /Length 304>> stream sha256=a5561e7918d3185bae6d256234564ff909a3553346ec7f2cbb90d9e133b681c4
+object 16 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 17 0: <</Ascent 896 /CapHeight 667 /Descent -274 /Flags 6 /FontBBox [-132 -274 1057 896] /FontFile3 20 0 R /FontName /ZZMSES+GoudySans-Medium /ItalicAngle 0 /StemV 84 /Type /FontDescriptor /XHeight 466>>
+object 18 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 19 0: <</Ascent 1002 /CapHeight 689 /Descent -700 /Flags 6 /FontBBox [-190 -700 1501 1002] /FontFile3 21 0 R /FontName /YRCMQU+ACaslonPro-Regular /ItalicAngle 0 /StemV 72 /Type /FontDescriptor /XHeight 420>>
+object 20 0: <</Filter /FlateDecode /Length 2177 /Subtype /CIDFontType0C>> stream sha256=a9698be831eab93b68fbbee68297c51f9f92d82118e1e15ac746d2bd88021328
+object 21 0: <</Filter /FlateDecode /Length 3187 /Subtype /CIDFontType0C>> stream sha256=3c0415c9cc5ace8d974d643c18517511dc6fb6c8d3ab2982a6bfb70ddd14f352

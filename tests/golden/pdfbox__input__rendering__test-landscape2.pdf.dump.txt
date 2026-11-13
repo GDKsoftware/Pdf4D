@@ -1,0 +1,41 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=90 label=1
+info Author: R002325
+info Company: RWE
+info CreationDate: 2008-11-12T15:29:40+01:00
+info Creator: Acrobat PDFMaker 8.1 für Word
+info ModDate: 2008-11-12T15:29:43+01:00
+info Producer: Acrobat Distiller 8.1.0 (Windows)
+info SourceModified: D:20081112142931
+info Title:  
+xmp: 3870
+object 2 0: <</Nums [0 3 0 R]>>
+object 3 0: <</S /D>>
+object 4 0: <</Count 1 /Kids [21 0 R] /Type /Pages>>
+object 5 0: <</Length 3870 /Subtype /XML /Type /Metadata>> stream sha256=8191c2d1be0df3a0e9266f52bd7f7079463504bc226c3230d1f0aef25df4c932
+object 6 0: <</Author <52303032333235> /Company <525745> /CreationDate <443a32303038313131323135323934302b303127303027> /Creator <4163726f626174205044464d616b657220382e312066fc7220576f7264> /ModDate <443a32303038313131323135323934332b303127303027> /Producer <4163726f6261742044697374696c6c657220382e312e30202857696e646f777329> /SourceModified <443a3230303831313132313432393331> /Title <20>>>
+object 7 0: <</ClassMap 11 0 R /K 8 0 R /ParentTree 9 0 R /ParentTreeNextKey 1 /RoleMap 10 0 R /Type /StructTreeRoot>>
+object 8 0: <</K [14 0 R 18 0 R 17 0 R] /Lang <444500> /P 7 0 R /S /Sect>>
+object 9 0: <</Nums [0 13 0 R]>>
+object 10 0: <</DropCap /Figure /Endnote /Note /Footnote /Note /Frame /Div /InlineShape /Figure /Outline /Span /Shape /Figure /Standard /P /Strikeout /Span /Subscript /Span /Superscript /Span /TOA /TOC /TOAI /TOCI /TOF /TOC /TOFI /TOCI /TextBox /Div /Underline /Span>>
+object 11 0: <</Standard 12 0 R>>
+object 12 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 0 /WritingMode /LrTb>>
+object 13 0: [14 0 R 15 0 R 16 0 R]
+object 14 0: <</A 12 0 R /C /Standard /K 0 /P 8 0 R /Pg 21 0 R /S /Standard>>
+object 15 0: <</A 12 0 R /K 1 /P 18 0 R /Pg 21 0 R /S /Standard>>
+object 16 0: <</A 12 0 R /K 2 /P 17 0 R /Pg 21 0 R /S /Standard>>
+object 17 0: <</K 16 0 R /P 8 0 R /S /TextBox>>
+object 18 0: <</K 15 0 R /P 8 0 R /S /TextBox>>
+object 19 0: <</E 5116 /H [516 172] /L 10381 /Linearized 1 /N 1 /O 21 /T 9954>>
+object 20 0: <</Lang <feff00440045> /LastModified <443a3230303831313132313532393433> /MarkInfo <</LetterspaceFlags 0 /Marked true>> /Metadata 5 0 R /PageLabels 2 0 R /PageLayout /OneColumn /Pages 4 0 R /PieceInfo <</MarkedPDF <</LastModified <443a3230303831313132313532393433>>>>> /StructTreeRoot 7 0 R /Type /Catalog>>
+object 21 0: <</Contents 23 0 R /CropBox [0 0 595 842] /MediaBox [0 0 595 842] /Parent 4 0 R /Resources <</ColorSpace <</CS0 22 0 R>> /ExtGState <</GS0 27 0 R>> /Font <</TT0 24 0 R>> /ProcSet [/PDF /Text]>> /Rotate 90 /StructParents 0 /Type /Page>>
+object 22 0: [/ICCBased 25 0 R]
+object 23 0: <</Filter /FlateDecode /Length 274>> stream sha256=bbe8b471d2e83e3fd1b4712d165112370e883a6d256f4b7f04510f66a7d40a95
+object 24 0: <</BaseFont /TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 26 0 R /LastChar 119 /Subtype /TrueType /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 611 0 0 0 0 0 0 0 0 722 0 0 0 0 0 0 0 0 0 0 0 444 500 444 500 444 333 500 500 278 0 500 278 0 0 500 500 0 333 0 278 0 0 722]>>
+object 25 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2598 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 26 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight 453>>
+object 27 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 29 0: <</C 90 /Filter /FlateDecode /I 112 /L 74 /Length 82 /S 38>> stream sha256=28e7d1aeb1181842ba6f2c8a00cc66436e9d24c6e78c0ee3645d12cc02b918cb

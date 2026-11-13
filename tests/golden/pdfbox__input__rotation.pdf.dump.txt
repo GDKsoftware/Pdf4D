@@ -1,0 +1,30 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 2
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=90 label=2
+info Author: brianc
+info CreationDate: 2008-09-15T11:22:05-04:00
+info Creator: PScript5.dll Version 5.2.2
+info ModDate: 2008-09-15T11:22:05-04:00
+info Producer: Acrobat Distiller 8.1.0 (Windows)
+info Title: Microsoft Word - Document1
+xmp: 3590
+object 1 0: <</Contents 3 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 6 0 R /Resources 2 0 R /Rotate 90 /Type /Page>>
+object 2 0: <</ExtGState <</GS1 15 0 R>> /Font <</TT2 13 0 R>> /ProcSet [/PDF /Text]>>
+object 3 0: <</Filter /FlateDecode /Length 178>> stream sha256=573fd58425470b427d6aed011551a5104b1178d2e0da38bc255bab4da5379848
+object 4 0: <</Nums [0 5 0 R]>>
+object 5 0: <</S /D>>
+object 6 0: <</Count 2 /Kids [11 0 R 1 0 R] /Type /Pages>>
+object 7 0: <</Length 3590 /Subtype /XML /Type /Metadata>> stream sha256=aa513eafc1f83f97f9cfae4cd191711e2e214d4e5cdf14b1bc3bb63bc3fa4261
+object 8 0: <</Author <627269616e63> /CreationDate <443a32303038303931353131323230352d303427303027> /Creator <50536372697074352e646c6c2056657273696f6e20352e322e32> /ModDate <443a32303038303931353131323230352d303427303027> /Producer <4163726f6261742044697374696c6c657220382e312e30202857696e646f777329> /Title <4d6963726f736f667420576f7264202d20446f63756d656e7431>>>
+object 9 0: <</E 1906 /H [476 172] /L 6605 /Linearized 1 /N 2 /O 11 /T 6379>>
+object 10 0: <</Metadata 7 0 R /PageLabels 4 0 R /Pages 6 0 R /Type /Catalog>>
+object 11 0: <</Contents 16 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 6 0 R /Resources 12 0 R /Rotate 0 /Type /Page>>
+object 12 0: <</ExtGState <</GS1 15 0 R>> /Font <</TT2 13 0 R>> /ProcSet [/PDF /Text]>>
+object 13 0: <</BaseFont /TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 14 0 R /LastChar 121 /Subtype /TrueType /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 0 0 250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 333 0 0 0 0 0 0 0 0 0 556 611 0 0 0 0 0 0 0 0 0 0 0 0 444 0 444 500 444 333 500 500 278 0 0 278 778 500 500 500 0 333 389 278 500 500 722 0 500]>>
+object 14 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight -546>>
+object 15 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 16 0: <</Filter /FlateDecode /Length 190>> stream sha256=e9f2a96320b20d2c5c14f6b9386a27cf9aa938abd1b20575582ddf51709bf81d
+object 17 0: <</Filter /FlateDecode /I 98 /L 82 /Length 88 /S 50>> stream sha256=6eb291ae41f01f8a7388b9c70f6f4c64b27f3582c6023250185dc968c5f3200e

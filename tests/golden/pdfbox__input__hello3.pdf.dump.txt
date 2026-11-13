@@ -1,0 +1,41 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+info Author: Brian Carrier
+info Company: Basis Technology Corp.
+info CreationDate: 2008-08-19T14:15:17-04:00
+info Creator: Acrobat PDFMaker 8.1 for Word
+info ModDate: 2008-08-19T14:15:21-04:00
+info Producer: Acrobat Distiller 8.1.0 (Windows)
+info SourceModified: D:20080819181502
+info Title: Hello محمد World
+xmp: 4043
+object 2 0: <</Nums [0 3 0 R]>>
+object 3 0: <</S /D>>
+object 4 0: <</Count 1 /Kids [17 0 R] /Type /Pages>>
+object 5 0: <</Length 4043 /Subtype /XML /Type /Metadata>> stream sha256=6d4861c31cad25d2487ee8df32dafdec810fefc6bdb5b8cd82cf9657f954317d
+object 6 0: <</Author <427269616e2043617272696572> /Company <426173697320546563686e6f6c6f677920436f72702e> /CreationDate <443a32303038303831393134313531372d303427303027> /Creator <4163726f626174205044464d616b657220382e3120666f7220576f7264> /ModDate <443a32303038303831393134313532312d303427303027> /Producer <4163726f6261742044697374696c6c657220382e312e30202857696e646f777329> /SourceModified <443a3230303830383139313831353032> /Title <feff00480065006c006c006f00200645062d0645062f00200057006f0072006c0064>>>
+object 7 0: <</ClassMap 11 0 R /K 8 0 R /ParentTree 9 0 R /ParentTreeNextKey 1 /RoleMap 10 0 R /Type /StructTreeRoot>>
+object 8 0: <</K 14 0 R /P 7 0 R /S /Sect>>
+object 9 0: <</Nums [0 13 0 R]>>
+object 10 0: <</DropCap /Figure /Endnote /Note /Footnote /Note /Frame /Div /InlineShape /Figure /Normal /P /Outline /Span /Shape /Figure /Strikeout /Span /Subscript /Span /Superscript /Span /TOA /TOC /TOAI /TOCI /TOF /TOC /TOFI /TOCI /TextBox /Div /Underline /Span>>
+object 11 0: <</Normal 12 0 R>>
+object 12 0: <</EndIndent 0 /O /Layout /SpaceAfter 0 /SpaceBefore 0 /StartIndent 0 /TextAlign /Start /TextIndent 0 /WritingMode /LrTb>>
+object 13 0: [14 0 R]
+object 14 0: <</A 12 0 R /C /Normal /K 0 /P 8 0 R /Pg 17 0 R /S /Normal>>
+object 15 0: <</E 24925 /H [596 180] /L 30269 /Linearized 1 /N 1 /O 17 /T 29922>>
+object 16 0: <</LastModified <443a3230303830383139313431353231> /MarkInfo <</LetterspaceFlags 0 /Marked true>> /Metadata 5 0 R /PageLabels 2 0 R /PageLayout /OneColumn /Pages 4 0 R /PieceInfo <</MarkedPDF <</LastModified <443a3230303830383139313431353231>>>>> /StructTreeRoot 7 0 R /Type /Catalog>>
+object 17 0: <</Contents 18 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 4 0 R /Resources <</ExtGState <</GS0 27 0 R>> /Font <</C2_0 20 0 R /TT0 19 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 0 /Type /Page>>
+object 18 0: <</Filter /FlateDecode /Length 192>> stream sha256=d9c73aedd012c2d4c2db10d2eb8794bd1318c42e2cd5847aebe3b7650c3b5b84
+object 19 0: <</BaseFont /FFJICI+TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 22 0 R /LastChar 114 /Subtype /TrueType /Type /Font /Widths [250 0 0 0 0 0 0 0 0 0 0 0 0 0 250 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 722 0 0 0 0 0 0 0 0 0 0 0 0 0 0 944 0 0 0 0 0 0 0 0 0 0 0 0 500 444 0 0 0 0 0 0 278 0 0 500 0 0 333]>>
+object 20 0: <</BaseFont /FFJIAH+TimesNewRomanPSMT /DescendantFonts [25 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 26 0 R /Type /Font>>
+object 21 0: <</Filter /FlateDecode /Length 12460 /Length1 28544>> stream sha256=30836bc334401238f46855f0082d686f31dc08b5baadb45fca3475cc022ca4a7
+object 22 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontFile2 21 0 R /FontName /FFJICI+TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight -546>>
+object 23 0: <</Filter /FlateDecode /Length 8974 /Length1 23676>> stream sha256=2c065ad32ee89af75ebc1b8a86d0a3aa1906ac7c0a0e3aa858b97535863ee43d
+object 24 0: <</Ascent 891 /CapHeight 656 /Descent -216 /Flags 6 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontFile2 23 0 R /FontName /FFJIAH+TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight -546>>
+object 25 0: <</BaseFont /FFJIAH+TimesNewRomanPSMT /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /CIDToGIDMap /Identity /DW 1000 /FontDescriptor 24 0 R /Subtype /CIDFontType2 /Type /Font /W [932 [530] 938 [337] 995 996 394]>>
+object 26 0: <</Filter /FlateDecode /Length 243>> stream sha256=df96a0c7826ee3a982398e8b3e29f6905236017319bbe3062445879c2dbd1a3c
+object 27 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 29 0: <</C 100 /Filter /FlateDecode /I 122 /L 84 /Length 89 /S 38>> stream sha256=395b5302dbef1b3fd63c047480f6d589c8a2d00bc26d04daa2d150e8831d5983

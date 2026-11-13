@@ -1,0 +1,45 @@
+version: 1.3
+encrypted: false
+permissions: none
+pages: 2
+page 1: media=[0 0 595.28 841.89] crop=[10 10 585.28 831.89] rotate=0 label=
+page 2: media=[0 0 595.28 841.89] crop=[10 10 585.28 831.89] rotate=0 label=
+info CreationDate: 2015-11-16T16:07:18+00:00
+info Creator: Pages
+info ModDate: 2015-11-16T17:14:12+01:00
+info Producer: Mac OS X 10.11.1 Quartz PDFContext
+info Title: Erlkönig.pages
+xmp: 3501
+object 1 0: <</Metadata 2 0 R /Pages 3 0 R /Threads [4 0 R 5 0 R] /Type /Catalog>>
+object 2 0: <</Length 3501 /Subtype /XML /Type /Metadata>> stream sha256=c682a736a24094b58c3097586f72b858975a76223082c433bcf29f5d21f0bcde
+object 3 0: <</Count 2 /Kids [7 0 R 8 0 R] /MediaBox [0 0 595.28 841.89] /Type /Pages>>
+object 4 0: <</F 9 0 R /I 10 0 R>>
+object 5 0: <</F 11 0 R /I 12 0 R>>
+object 6 0: <</CreationDate <443a32303135313131363136303731385a> /Creator <5061676573> /ModDate <443a32303135313131363137313431322b303127303027> /Producer <4d6163204f5320582031302e31312e312051756172747a20504446436f6e74657874> /Title <feff00450072006c006b006f0308006e00690067002e00700061006700650073>>>
+object 7 0: <</B [9 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 11 0 R] /Contents 19 0 R /CropBox [10 10 585.28 831.89] /MediaBox [0 0 595.28 841.89] /Parent 3 0 R /Resources 20 0 R /Type /Page>>
+object 8 0: <</B [21 0 R 22 0 R 23 0 R] /Contents 24 0 R /CropBox [10 10 585.28 831.89] /MediaBox [0 0 595.28 841.89] /Parent 3 0 R /Resources 25 0 R /Type /Page>>
+object 9 0: <</N 13 0 R /P 7 0 R /R [49.1518 727.845 262.143 785.028] /T 4 0 R /V 18 0 R>>
+object 10 0: <</Title <45726c6bf66e6967>>>
+object 11 0: <</N 21 0 R /P 7 0 R /R [49.1518 203.881 552.877 516.139] /T 5 0 R /V 23 0 R>>
+object 12 0: <</Title <4d6f756c69e87265>>>
+object 13 0: <</N 14 0 R /P 7 0 R /R [304.869 714.031 552.877 785.028] /V 9 0 R>>
+object 14 0: <</N 15 0 R /P 7 0 R /R [49.1518 628.899 275.957 693.15] /V 13 0 R>>
+object 15 0: <</N 16 0 R /P 7 0 R /R [304.869 628.899 552.877 693.15] /V 14 0 R>>
+object 16 0: <</N 17 0 R /P 7 0 R /R [49.1518 544.088 290.092 600.95] /V 15 0 R>>
+object 17 0: <</N 18 0 R /P 7 0 R /R [304.869 551.156 552.877 600.95] /V 16 0 R>>
+object 18 0: <</N 9 0 R /P 7 0 R /R [49.1518 112.002 531.032 182.999] /V 17 0 R>>
+object 19 0: <</Filter /FlateDecode /Length 5348>> stream sha256=06bae5fa1e3d4db3a8fba73cabd6d16bdbfab97523e3e109a30626565912feb9
+object 20 0: <</ColorSpace <</Cs1 [/ICCBased 26 0 R] /Cs2 [/ICCBased 27 0 R]>> /Font <</TT1 28 0 R /TT2 29 0 R>> /ProcSet [/PDF /Text]>>
+object 21 0: <</N 22 0 R /P 8 0 R /R [56.8618 516.139 544.846 785.028] /V 11 0 R>>
+object 22 0: <</N 23 0 R /P 8 0 R /R [56.8618 445.142 544.846 516.139] /V 21 0 R>>
+object 23 0: <</N 11 0 R /P 8 0 R /R [56.8618 395.99 544.846 445.142] /V 22 0 R>>
+object 24 0: <</Filter /FlateDecode /Length 3533>> stream sha256=e09b7af53176c7e9646b498c2665d457bdc734dca8591224ebbba4a844b43f41
+object 25 0: <</ColorSpace <</Cs1 [/ICCBased 26 0 R] /Cs2 [/ICCBased 27 0 R]>> /Font <</TT1 28 0 R /TT2 29 0 R>> /ProcSet [/PDF /Text]>>
+object 26 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2612 /N 3>> stream sha256=2b3aa1645779a9e634744faf9b01e9102b0c9b88fd6deced7934df86b949af7e
+object 27 0: <</Alternate /DeviceGray /Filter /FlateDecode /Length 3367 /N 1>> stream sha256=ee2f821d16d12ec9e9f2958ac8865f40912d0ce1fb9625a31b594fab942b1caf
+object 28 0: <</BaseFont /QXCTPF+Helvetica /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 30 0 R /LastChar 227 /Subtype /TrueType /Type /Font /Widths [278 278 355 0 0 0 0 191 333 333 0 0 278 333 278 0 0 0 0 0 0 0 0 0 0 0 278 278 0 0 0 556 0 667 667 722 722 667 611 778 722 278 500 667 556 833 722 778 667 0 722 667 611 722 667 944 0 0 0 0 0 0 0 0 0 556 556 500 556 556 278 556 556 222 222 500 222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 556 0 0 0 556 556 556 0 0 0 278 0 0 0 0 556 556 0 0 0 0 556 0 0 0 0 0 0 0 611 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1000 333 0 0 222 0 0 0 0 0 0 0 0 500 0 0 0 0 333]>>
+object 29 0: <</BaseFont /DOPBHD+Helvetica-Oblique /Encoding /MacRomanEncoding /FirstChar 32 /FontDescriptor 31 0 R /LastChar 144 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 191 0 0 0 0 278 333 278 0 0 0 0 0 0 0 0 0 0 0 278 278 0 0 0 0 0 0 0 0 0 0 0 0 0 278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 500 556 556 278 556 556 222 222 0 222 833 556 556 556 0 333 500 278 556 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 0 0 0 0 0 0 0 556]>>
+object 30 0: <</Ascent 770 /AvgWidth 441 /CapHeight 717 /Descent -230 /Flags 32 /FontBBox [-951 -481 1445 1122] /FontFile2 32 0 R /FontName /QXCTPF+Helvetica /ItalicAngle 0 /MaxWidth 1500 /StemH 85 /StemV 98 /Type /FontDescriptor /XHeight 523>>
+object 31 0: <</Ascent 770 /AvgWidth -441 /CapHeight 717 /Descent -230 /Flags 96 /FontBBox [-933 -481 1571 1138] /FontFile2 33 0 R /FontName /DOPBHD+Helvetica-Oblique /ItalicAngle -6 /MaxWidth 1500 /StemH 85 /StemV 98 /Type /FontDescriptor /XHeight 523>>
+object 32 0: <</Filter /FlateDecode /Length 13873 /Length1 21012>> stream sha256=5229f1c40b79b797c97ded0f65fd37c7a7652ec3fb215894a090f0341f9cf153
+object 33 0: <</Filter /FlateDecode /Length 6865 /Length1 12936>> stream sha256=00cc62fdc3910526eeee2d90c850193493512d4a4ae0708009795d1081c80236

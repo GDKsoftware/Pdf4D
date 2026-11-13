@@ -1,0 +1,26 @@
+version: 1.6
+encrypted: true
+permissions: -3844
+pages: 2
+page 1: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+page 2: media=[0 0 595.2756 841.8898] crop=[0 0 595.2756 841.8898] rotate=0 label=
+info Author: Tëst Åuthor
+info CreationDate: 2024-01-02T03:04:05+01:00
+info Producer: Pdf4D test generator
+info Title: Pdf4D encrypted base
+xmp: 387
+object 1 0: <</Metadata 4 0 R /Pages 3 0 R /Type /Catalog /Version /1.6>>
+object 2 0: <</Author <54eb737420c57574686f72> /CreationDate <443a32303234303130323033303430352b303127303027> /Producer <506466344420746573742067656e657261746f72> /Title <506466344420656e637279707465642062617365>>>
+object 3 0: <</Count 2 /Kids [5 0 R 6 0 R] /Type /Pages>>
+object 4 0: <</Length 387 /Subtype /XML /Type /Metadata>> stream sha256=974de23158643f35ddfffb60cf5314710f97c1ec94bcceb51c99a9b9c765382e
+object 5 0: <</Contents 8 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 3 0 R /Resources 7 0 R /Type /Page>>
+object 6 0: <</Contents 10 0 R /MediaBox [0 0 595.2756 841.8898] /Parent 3 0 R /Resources 9 0 R /Type /Page>>
+object 7 0: <</Font 11 0 R>>
+object 8 0: <</Filter /FlateDecode /Length 68>> stream sha256=1ae01f3d22685a8c944d05bc0da195e6cac6d771d34622abc6f6a70ca0fa807c
+object 9 0: <</Font 12 0 R>>
+object 10 0: <</Filter /FlateDecode /Length 68>> stream sha256=596ac6c3a2f231855868b70e61625ad9aaeb7b5bebe5b3444b0c0c5b5274acc7
+object 11 0: <</F1 13 0 R>>
+object 12 0: <</F1 14 0 R>>
+object 13 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 14 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 18 0: <</Filter /Standard /Length 40 /O <c92422687facee686e373f10b5c7d04738053152f7e2ee30e11c69ec442576ab> /P -3844 /R 2 /U <f87592964169ad8209a87cb52ecc87996b35935a9986cb78d44b9390beb91303> /V 1>>

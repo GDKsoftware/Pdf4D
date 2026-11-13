@@ -1,0 +1,13 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+object 1 0: <</Lang <656e2d5553> /Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</F1 5 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /StructParents 0 /Tabs /S /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 238>> stream sha256=7b7ecb02c9733ec28f79ee2449463fa8287991b9b7fa69f2255bfd3cce760f5e
+object 5 0: <</BaseFont /ABCDEE+Cambria /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 6 0 R /LastChar 122 /Name /F1 /Subtype /TrueType /Type /Font /Widths [220 0 0 0 0 890 0 0 382 382 0 0 0 332 205 0 554 554 554 554 554 554 554 554 554 554 0 0 0 0 0 0 0 623 611 563 662 575 537 611 0 0 0 629 537 815 681 653 568 0 621 496 593 648 0 0 0 0 538 0 0 0 0 0 0 488 547 441 555 488 303 494 552 278 0 524 271 832 558 531 556 0 414 430 338 552 504 774 0 504 455]>>
+object 6 0: <</Ascent 950 /AvgWidth 615 /CapHeight 778 /Descent -222 /Flags 32 /FontBBox [-1475 -222 2868 778] /FontFile2 7 0 R /FontName /ABCDEE+Cambria /FontWeight 400 /ItalicAngle 0 /MaxWidth 4342 /StemV 61 /Type /FontDescriptor /XHeight 250>>
+object 7 0: <</Filter /FlateDecode /Length 109300 /Length1 236412>> stream sha256=d25ebc7e273d1645fe9b99f9ad96945595e2ed9859fc3c5bab25768bf162ef95

@@ -1,0 +1,12 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.4>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources 5 0 R /Type /Page>>
+object 4 0: <</Length 70>> stream sha256=930abff5be363dfb0f1d4cbb8b5112c850788a85d1edc37e335fd885d699c71c
+object 5 0: <</XObject <</Im1 6 0 R>>>>
+object 6 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 287 /Length 40336 /Subtype /Image /Type /XObject /Width 344>> stream partial=DCTDecode sha256=62d1a60080d90150bc32ca86bbe4eb15f9eb2ea03096f571e9afa7802feeaad5

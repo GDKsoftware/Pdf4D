@@ -1,0 +1,12 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 5 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</Font <</F1 4 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /StructParents 0 /Tabs /S /Type /Page>>
+object 4 0: <</BaseFont /Arial /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 6 0 R /LastChar 65 /Name /F1 /Subtype /TrueType /Type /Font /Widths [278 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 556 556 556 0 0 0 0 0 0 0 0 0 0 0 0 0 667]>>
+object 5 0: <</Length 267>> stream sha256=45ccfe2e4759d74821e4a1a5219a32b20c7d7a0866536c01303661a0ac87471f
+object 6 0: <</Ascent 905 /AvgWidth 441 /CapHeight 728 /Descent -210 /Flags 32 /FontBBox [-665 -210 2000 728] /FontName /Arial /FontWeight 400 /ItalicAngle 0 /Leading 33 /MaxWidth 2665 /StemV 44 /Type /FontDescriptor /XHeight 250>>

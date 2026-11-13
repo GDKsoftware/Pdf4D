@@ -1,0 +1,35 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 420.944 595.275] crop=[0 0 420.944 595.275] rotate=0 label=1
+info CreationDate: 2017-06-21T12:08:37+01:00
+info Creator: Smart Communications
+info ModDate: 2020-06-20T19:01:34+02:00
+info PDFVersion: 1.4
+info Producer: Smart Communications
+xmp: 3673
+field: filled | text | 123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789
+object 3 0: <</Length 3673 /Subtype /XML /Type /Metadata>> stream sha256=ee150fdb1f25bae4c20f95db404a27bdb8290c8e3bd1f609688711d1e52baf0c
+object 7 0: <</BaseFont /Helvetica /Encoding 9 0 R /Name /Helv /Subtype /Type1 /Type /Font>>
+object 8 0: <</BaseFont /ZapfDingbats /Name /ZaDb /Subtype /Type1 /Type /Font>>
+object 9 0: <</Differences [24 /breve /caron /circumflex /dotaccent /hungarumlaut /ogonek /ring /tilde 39 /quotesingle 96 /grave 128 /bullet /dagger /daggerdbl /ellipsis /emdash /endash /florin /fraction /guilsinglleft /guilsinglright /minus /perthousand /quotedblbase /quotedblleft /quotedblright /quoteleft /quoteright /quotesinglbase /trademark /fi /fl /Lslash /OE /Scaron /Ydieresis /Zcaron /dotlessi /lslash /oe /scaron /zcaron 160 /Euro 164 /currency 166 /brokenbar 168 /dieresis /copyright /ordfeminine 172 /logicalnot /.notdef /registered /macron /degree /plusminus /twosuperior /threesuperior /acute /mu 183 /periodcentered /cedilla /onesuperior /ordmasculine 188 /onequarter /onehalf /threequarters 192 /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis] /Type /Encoding>>
+object 10 0: <</Nums [0 <</S /D>>]>>
+object 11 0: <</Count 1 /Kids [15 0 R] /Type /Pages>>
+object 12 0: <</CreationDate <443a32303137303632313132303833372b303127303027> /Creator <536d61727420436f6d6d756e69636174696f6e73> /ModDate <443a32303230303632303139303133342b303227303027> /PDFVersion <312e34> /Producer <536d61727420436f6d6d756e69636174696f6e73>>>
+object 13 0: <</E 4652 /H [457 173] /L 9924 /Linearized 1 /N 1 /O 15 /T 9614>>
+object 14 0: <</AcroForm 21 0 R /Lang <782d756e6b6e6f776e> /Metadata 3 0 R /Names 22 0 R /PageLabels 10 0 R /Pages 11 0 R /Type /Catalog>>
+object 15 0: <</Annots 23 0 R /BleedBox [0 0 420.944 595.275] /Contents 19 0 R /CropBox [0 0 420.944 595.275] /MediaBox [0 0 420.944 595.275] /Parent 11 0 R /Resources 29 0 R /Rotate 0 /TrimBox [0 0 420.944 595.275] /Type /Page>>
+object 16 0: <</BBox [0 0 380.944 50] /Filter /FlateDecode /Length 134 /Resources 25 0 R>> stream sha256=8c235ab7251954bc53723e564751133703d6834aaf14f606938eb486fcb28ca9
+object 17 0: <</Filter /FlateDecode /Length 2592 /N 3>> stream sha256=9ddaaaa4bb5318f80d2a66465440fc2e0f62e1df34743dd091253c3b60af5576
+object 19 0: <</Filter /FlateDecode /Length 219>> stream sha256=beda3a7b9ec5c559b69d84a9780cdb7b33dfb433020859642b84366da4a610ba
+object 21 0: <</DA <2f48656c7620302054662030206720> /DR <</Encoding <</PDFDocEncoding 9 0 R>> /Font <</F1 26 0 R /Helv 7 0 R /ZaDb 8 0 R>>>> /Fields [24 0 R]>>
+object 22 0: <</Pages <</Names [<7061676531> 15 0 R]>>>>
+object 23 0: [24 0 R]
+object 24 0: <</AP <</N 16 0 R>> /DA <2f463120313220546620312030203020312030203020546d203020670a> /F 4 /FT /Tx /Ff 4096 /P 15 0 R /Rect [20 509.875 400.944 559.875] /Subtype /Widget /T <66696c6c6564> /Type /Annot /V <313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839313233343536373839>>>
+object 25 0: <</ColorSpace <</DefaultRGB 27 0 R>> /Font <</F1 26 0 R>> /ProcSet [/PDF /ImageB /ImageC /Text]>>
+object 26 0: <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 27 0: [/ICCBased 17 0 R]
+object 28 0: 2592
+object 29 0: <</Font <</F1 26 0 R>> /ProcSet [/PDF /ImageB /ImageC /Text]>>
+object 30 0: <</Filter /FlateDecode /I 111 /L 95 /Length 83 /S 39 /V 72>> stream sha256=6449a66f763d1c3fa095e8ce914fecb09ff9b11afa45241925381b6572ecc396

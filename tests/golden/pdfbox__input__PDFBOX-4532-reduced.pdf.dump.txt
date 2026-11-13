@@ -1,0 +1,22 @@
+version: 1.6
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2019-05-02T15:17:56+02:00
+info ModDate: 2019-05-02T15:17:56+02:00
+xmp: 2988
+object 1 0: <</Length 2988 /Subtype /XML /Type /Metadata>> stream sha256=9663cdf95a02a60ed8e267de1c5b451aa9c15c41bcaf2a4818d5793d928a994d
+object 5 0: <</Count 1 /Kids [9 0 R] /Type /Pages>>
+object 6 0: <</CreationDate <443a32303139303530323135313735362b303227303027> /ModDate <443a32303139303530323135313735362b303227303027>>>
+object 7 0: <</E 83081 /H [458 143] /L 86730 /Linearized 1 /N 1 /O 9 /T 86439>>
+object 8 0: <</Metadata 1 0 R /Pages 5 0 R /Type /Catalog>>
+object 9 0: <</Contents 11 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 5 0 R /Resources <</Font <</TT0 17 0 R>> /ProcSet [/PDF /Text] /Properties <</MC0 18 0 R>>>> /Rotate 0 /StructParents 1 /TrimBox [0 0 612 792] /Type /Page>>
+object 11 0: <</Filter /FlateDecode /Length 135>> stream sha256=9d7afc9e836f8edc370777dc0e8a590f4075575e183cc2727b7d26e2c66ca1d9
+object 12 0: <</Filter /FlateDecode /Length 45757 /Length1 81186>> stream sha256=9d4ff27e4faf5dcd02ddf1914d2e0f0059db135f013eaeb7d3f6e4139f011d19
+object 13 0: <</Filter /FlateDecode /Length 539>> stream sha256=ae1a779e0fe67f82b62ad984a57e978c68f451eab4d070167e16f91bbe67ca31
+object 14 0: <</Length 34932 /Subtype /XML /Type /Metadata>> stream sha256=095b05a52d954170bf4d841f1dfd72e6e057a652a64108715a5afbe75e24c2a4
+object 16 0: <</Ascent 1007 /CapHeight 662 /Descent -307 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontFile2 12 0 R /FontName /VYSXEI+TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 80 /Type /FontDescriptor /XHeight 448>>
+object 17 0: <</BaseFont /VYSXEI+TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 16 0 R /LastChar 169 /Subtype /TrueType /ToUnicode 13 0 R /Type /Font /Widths [250 0 0 0 500 833 778 0 0 333 0 0 250 0 250 278 500 500 500 500 500 500 500 500 500 500 278 278 0 0 0 0 0 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 0 667 556 611 722 722 944 0 722 0 0 0 0 0 0 0 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 333 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 760]>>
+object 18 0: <</Metadata 14 0 R>>
+object 19 0: <</Filter /FlateDecode /I 75 /Length 64 /S 38>> stream sha256=37f0668dc07777a772dbd238e15fd9df354c6c65055cbb8bdf757e4835ac6b8a

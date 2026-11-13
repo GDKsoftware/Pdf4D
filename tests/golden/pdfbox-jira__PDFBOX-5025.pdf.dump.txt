@@ -1,0 +1,19 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 200 50] crop=[0 0 200 50] rotate=0 label=
+xmp: none
+object 20 0: <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>>
+object 21 0: <</Filter /FlateDecode /Length 123>> stream sha256=67e8320b595c65a7aad33e7cc43d6bb634258578d425d2218f16231f4be786c2
+object 22 0: 74191
+object 23 0: <</Filter /FlateDecode /Length 37515 /Length1 22 0 R>> stream sha256=c33530bf320e79e527a0afe710a09c5de8381d18b5e4aee6f1501f1a5bf000ac
+object 24 0: <</Ascent 1491 /CapHeight 2060 /Descent -431 /Flags 32 /FontBBox [-1361 -665 4096 2060] /FontFile2 23 0 R /FontName /VASKKK+ArialMT /ItalicAngle 0 /StemV 0 /Type /FontDescriptor>>
+object 25 0: <</BaseFont /VASKKK+ArialMT /CIDSystemInfo 20 0 R /CIDToGIDMap 21 0 R /DW 1000 /FontDescriptor 24 0 R /Subtype /CIDFontType2 /Type /Font /W [32 [278] 39 [191] 40 [333] 41 [333] 44 [278] 45 [333] 46 [278] 48 [556] 49 [556] 50 [556] 51 [556] 52 [556] 53 [556] 54 [556] 55 [556] 56 [556] 58 [278] 61 [584] 65 [667] 66 [667] 67 [722] 68 [722] 69 [667] 70 [611] 71 [778] 72 [722] 73 [278] 74 [500] 75 [667] 76 [556] 77 [833] 78 [722] 79 [778] 80 [667] 82 [722] 83 [667] 84 [611] 85 [722] 86 [667] 87 [944] 90 [611] 92 [278] 95 [556] 97 [556] 98 [556] 99 [500] 100 [556] 101 [556] 102 [278] 103 [556] 104 [556] 105 [222] 106 [222] 108 [222] 109 [833] 110 [556] 111 [556] 112 [556] 113 [556] 114 [333] 115 [500] 116 [278] 117 [556] 118 [500] 120 [500] 121 [500] 224 [556] 226 [556] 233 [556] 8217 [222]]>>
+object 26 0: [25 0 R]
+object 27 0: <</CIDSystemInfo 20 0 R /CMapName /Ming-Lt-HKSCS-ExtB /Filter /FlateDecode /Length 386 /Type /CMap /WMode 0>> stream sha256=92e628d3e9648a29320770c621f7382a485bc297fd8a2154cb09658d2a69d5ac
+object 33 0: <</Pages 34 0 R /Type /Catalog>>
+object 34 0: <</Count 1 /Kids [35 0 R] /MediaBox [0 0 200 50] /Type /Pages>>
+object 35 0: <</Contents 37 0 R /Parent 34 0 R /Resources <</Font <</F1 36 0 R>>>> /Type /Page>>
+object 36 0: <</BaseFont /VASKKK+ArialMT /DescendantFonts 26 0 R /Encoding 27 0 R /Subtype /Type0 /ToUnicode /Identity-H /Type /Font>>
+object 37 0: <</Length 73>> stream sha256=00f99fb2907da7646694b8c41fea978bb196c765ed9299fac54cafdba4283c42

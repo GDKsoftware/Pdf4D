@@ -1,0 +1,212 @@
+version: 1.6
+encrypted: true
+permissions: -1084
+pages: 5
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=1
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=2
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=3
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=4
+page 5: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=5
+info Author: Department of Justice, U.S. Trustee Program
+info CreationDate: 2009-03-09T13:35:08-04:00
+info Creator: PScript5.dll Version 5.2.2
+info Keywords: TCI 2 Holdings, LLC, Case No.: 09-13654 (JHW)
+info ModDate: 2009-03-09T14:39:11-04:00
+info Producer: Acrobat Distiller 9.0.0 (Windows)
+info Subject: TCI 2 Holdings, LLC, Case No.: 09-13654 (JHW)
+info Title: TCI 2 Holdings, LLC, Case No.: 09-13654 (JHW)
+xmp: 4234
+object 1 0: <</Contents 2 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 179 0 R /Resources <</ExtGState <</GS0 192 0 R>> /Font <</T1_0 195 0 R /TT0 201 0 R /TT1 197 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 1 /Tabs /S /Type /Page>>
+object 2 0: <</Filter /FlateDecode /Length 2203>> stream sha256=f01714058f270d100bcdecf922b95058607a2e5305cee2ea25f3ff308417e14f
+object 3 0: <</Contents 4 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 179 0 R /Resources <</ExtGState <</GS0 192 0 R>> /Font <</TT0 197 0 R /TT1 199 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 2 /Tabs /S /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 648>> stream sha256=33d84af42012f661d4fa1d9a55080bf6e8d27712901412fff79a4c2155f01700
+object 5 0: <</Contents 6 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 179 0 R /Resources <</ExtGState <</GS0 192 0 R>> /Font <</T1_0 195 0 R /TT0 197 0 R /TT1 201 0 R /TT2 199 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 3 /Tabs /S /Type /Page>>
+object 6 0: <</Filter /FlateDecode /Length 2411>> stream sha256=2e356b3514e04057c337528815b10d0c6ca966c360b765e72984543a2cdf0e46
+object 7 0: <</Contents 8 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 179 0 R /Resources <</ExtGState <</GS0 192 0 R>> /Font <</T1_0 195 0 R /TT0 197 0 R /TT1 199 0 R /TT2 201 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 7 /Tabs /S /Type /Page>>
+object 8 0: <</Filter /FlateDecode /Length 707>> stream sha256=376e08be82cb7a2a1d94ff0a6caeb317173cc0a9e53a7821d883e4ff4a6604db
+object 12 0: <</Filter [/Crypt] /Length 4234 /Subtype /XML /Type /Metadata>> stream sha256=650bb40b5989ea13b35901ea2573a008cfffbaf392936412cc3476262b5ea722
+object 16 0: <</ClassMap 17 0 R /K [171 0 R 159 0 R 39 0 R 32 0 R] /ParentTree 18 0 R /ParentTreeNextKey 8 /RoleMap 19 0 R /Type /StructTreeRoot>>
+object 17 0: <</CM1 <</O /Layout /TextAlign /Center>> /CM10 <</O /Layout /SpaceAfter 18.125>> /CM11 <</O /Layout /SpaceAfter 11.5>> /CM12 <</O /Layout /SpaceAfter -11.5>> /CM2 <</LineHeight 14 /O /Layout /TextAlign /Justify /TextIndent 36>> /CM3 <</LineHeight 14 /O /Layout /TextIndent 36>> /CM4 <</LineHeight 14 /O /Layout>> /CM5 <</EndIndent 15.5 /LineHeight 14 /O /Layout /TextIndent 36>> /CM6 <</LineHeight 23.125 /O /Layout>> /CM7 <</LineHeight 11.5 /O /Layout /StartIndent 18 /TextIndent -18>> /CM8 <</O /Layout /SpaceAfter 28.625>> /CM9 <</O /Layout /SpaceAfter 13.75>>>>
+object 18 0: <</Nums [0 20 0 R 1 21 0 R 2 22 0 R 3 23 0 R 7 24 0 R]>>
+object 19 0: <</LI_Label /Lbl /LI_Title /LBody /StyleSpan /Span>>
+object 20 0: [141 0 R 142 0 R 143 0 R 144 0 R 145 0 R 146 0 R 147 0 R 148 0 R 149 0 R 150 0 R 151 0 R 152 0 R 153 0 R 154 0 R 155 0 R 156 0 R 157 0 R 157 0 R]
+object 21 0: [40 0 R 68 0 R 41 0 R 42 0 R 43 0 R 65 0 R 44 0 R 63 0 R 45 0 R 61 0 R 46 0 R]
+object 22 0: [59 0 R 47 0 R 48 0 R 49 0 R]
+object 23 0: [50 0 R 51 0 R 52 0 R 53 0 R 70 0 R 71 0 R 72 0 R 137 0 R 73 0 R 74 0 R 128 0 R 130 0 R 118 0 R 119 0 R 121 0 R 122 0 R 110 0 R 111 0 R 76 0 R 103 0 R 104 0 R 101 0 R 102 0 R 99 0 R 100 0 R 97 0 R 98 0 R 95 0 R 96 0 R 93 0 R 94 0 R 78 0 R 79 0 R 80 0 R 81 0 R]
+object 24 0: [25 0 R 26 0 R 27 0 R 28 0 R 29 0 R]
+object 25 0: <</A 140 0 R /K 0 /P 38 0 R /Pg 7 0 R /S /P>>
+object 26 0: <</A 37 0 R /C /CM9 /K 1 /P 38 0 R /Pg 7 0 R /S /P>>
+object 27 0: <</A 36 0 R /K 2 /P 32 0 R /Pg 7 0 R /S /H3>>
+object 28 0: <</A 35 0 R /K 3 /P 33 0 R /Pg 7 0 R /S /StyleSpan>>
+object 29 0: <</A 30 0 R /K 4 /P 31 0 R /Pg 7 0 R /S /P>>
+object 30 0: <</LineHeight 28 /O /Layout>>
+object 31 0: <</K [33 0 R 29 0 R] /P 32 0 R /S /Sect>>
+object 32 0: <</K [27 0 R 31 0 R] /P 16 0 R /S /Part>>
+object 33 0: <</A 34 0 R /K 28 0 R /P 31 0 R /S /H4>>
+object 34 0: <</LineHeight 14.125 /O /Layout /StartIndent 34.625>>
+object 35 0: <</O /Layout /TextDecorationType /Underline>>
+object 36 0: <</O /Layout /SpaceAfter 33.125 /StartIndent 120.125>>
+object 37 0: <</LineHeight 14.125 /O /Layout /TextAlign /Center>>
+object 38 0: <</K [70 0 R 71 0 R 72 0 R 73 0 R 74 0 R 75 0 R 76 0 R 77 0 R 78 0 R 79 0 R 80 0 R 81 0 R 25 0 R 26 0 R] /P 39 0 R /S /Sect>>
+object 39 0: <</K [40 0 R 41 0 R 42 0 R 43 0 R 44 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 53 0 R 38 0 R] /P 16 0 R /S /Part>>
+object 40 0: <</C [/CM1 /CM10] /K 0 /P 39 0 R /Pg 1 0 R /S /H3>>
+object 41 0: <</C [/CM4 /CM9] /K [68 0 R 2] /P 39 0 R /Pg 1 0 R /S /P>>
+object 42 0: <</A 67 0 R /C /CM9 /K 3 /P 39 0 R /Pg 1 0 R /S /P>>
+object 43 0: <</C [/CM5 /CM9] /K 4 /P 39 0 R /Pg 1 0 R /S /P>>
+object 44 0: <</C [/CM4 /CM9] /K [65 0 R 6] /P 39 0 R /Pg 1 0 R /S /P>>
+object 45 0: <</C [/CM4 /CM9] /K [63 0 R 8] /P 39 0 R /Pg 1 0 R /S /P>>
+object 46 0: <</C /CM4 /K [61 0 R 10] /P 39 0 R /Pg 1 0 R /S /P>>
+object 47 0: <</C [/CM4 /CM9] /K [59 0 R 1] /P 39 0 R /Pg 3 0 R /S /P>>
+object 48 0: <</A 58 0 R /C /CM5 /K 2 /P 39 0 R /Pg 3 0 R /S /P>>
+object 49 0: <</C /CM4 /K 3 /P 39 0 R /Pg 3 0 R /S /P>>
+object 50 0: <</A 57 0 R /K 0 /P 39 0 R /Pg 5 0 R /S /P>>
+object 51 0: <</A 56 0 R /C /CM11 /K 1 /P 39 0 R /Pg 5 0 R /S /P>>
+object 52 0: <</A 55 0 R /C /CM11 /K 2 /P 39 0 R /Pg 5 0 R /S /P>>
+object 53 0: <</A 54 0 R /K 3 /P 39 0 R /Pg 5 0 R /S /P>>
+object 54 0: <</EndIndent 151.25 /LineHeight 14 /O /Layout /StartIndent 108 /TextAlign /Justify /TextIndent -108>>
+object 55 0: <</O /Layout /StartIndent 68 /TextAlign /Justify>>
+object 56 0: <</O /Layout /StartIndent 133.25 /TextAlign /Justify>>
+object 57 0: <</LineHeight 11.625 /O /Layout /TextAlign /Center>>
+object 58 0: <</O /Layout /SpaceAfter 209.625>>
+object 59 0: <</A 60 0 R /K 0 /P 47 0 R /Pg 3 0 R /S /StyleSpan>>
+object 60 0: <</O /Layout /TextDecorationType /Underline>>
+object 61 0: <</A 62 0 R /K 9 /P 46 0 R /Pg 1 0 R /S /StyleSpan>>
+object 62 0: <</O /Layout /TextDecorationType /Underline>>
+object 63 0: <</A 64 0 R /K 7 /P 45 0 R /Pg 1 0 R /S /StyleSpan>>
+object 64 0: <</O /Layout /TextDecorationType /Underline>>
+object 65 0: <</A 66 0 R /K 5 /P 44 0 R /Pg 1 0 R /S /StyleSpan>>
+object 66 0: <</O /Layout /TextDecorationType /Underline>>
+object 67 0: <</EndIndent 3.875 /LineHeight 14 /O /Layout /TextIndent 36>>
+object 68 0: <</A 69 0 R /K 1 /P 41 0 R /Pg 1 0 R /S /StyleSpan>>
+object 69 0: <</O /Layout /TextDecorationType /Underline>>
+object 70 0: <</A 139 0 R /K 4 /P 38 0 R /Pg 5 0 R /S /H4>>
+object 71 0: <</C [/CM1 /CM9] /K 5 /P 38 0 R /Pg 5 0 R /S /P>>
+object 72 0: <</C [/CM6 /CM12] /K 6 /P 38 0 R /Pg 5 0 R /S /P>>
+object 73 0: <</A 136 0 R /C /CM12 /K [137 0 R 8] /P 38 0 R /Pg 5 0 R /S /P>>
+object 74 0: <</C [/CM6 /CM10] /K 9 /P 38 0 R /Pg 5 0 R /S /P>>
+object 75 0: <</A 106 0 R /K [107 0 R 108 0 R 109 0 R] /P 38 0 R /S /Table>>
+object 76 0: <</A 105 0 R /K 18 /P 38 0 R /Pg 5 0 R /S /P>>
+object 77 0: <</A 86 0 R /K [87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R] /P 38 0 R /S /L>>
+object 78 0: <</A 85 0 R /C /CM10 /K 31 /P 38 0 R /Pg 5 0 R /S /P>>
+object 79 0: <</A 84 0 R /K 32 /P 38 0 R /Pg 5 0 R /S /P>>
+object 80 0: <</A 83 0 R /K 33 /P 38 0 R /Pg 5 0 R /S /P>>
+object 81 0: <</A 82 0 R /K 34 /P 38 0 R /Pg 5 0 R /S /P>>
+object 82 0: <</EndIndent 21.625 /O /Layout /StartIndent 216 /TextAlign /None>>
+object 83 0: <</O /Layout /SpaceAfter 6.75 /TextAlign /Justify>>
+object 84 0: <</O /Layout /StartIndent 216 /TextAlign /None>>
+object 85 0: <</EndIndent 5.625 /LineHeight 11.5 /O /Layout>>
+object 86 0: <</ListNumbering /Decimal /O /List>>
+object 87 0: <</C [/CM7 /CM11] /K [103 0 R 104 0 R] /P 77 0 R /S /LI>>
+object 88 0: <</C [/CM7 /CM11] /K [101 0 R 102 0 R] /P 77 0 R /S /LI>>
+object 89 0: <</C [/CM7 /CM11] /K [99 0 R 100 0 R] /P 77 0 R /S /LI>>
+object 90 0: <</C [/CM7 /CM11] /K [97 0 R 98 0 R] /P 77 0 R /S /LI>>
+object 91 0: <</C [/CM7 /CM11] /K [95 0 R 96 0 R] /P 77 0 R /S /LI>>
+object 92 0: <</C [/CM7 /CM11] /K [93 0 R 94 0 R] /P 77 0 R /S /LI>>
+object 93 0: <</K 29 /P 92 0 R /Pg 5 0 R /S /LI_Label>>
+object 94 0: <</K 30 /P 92 0 R /Pg 5 0 R /S /LI_Title>>
+object 95 0: <</K 27 /P 91 0 R /Pg 5 0 R /S /LI_Label>>
+object 96 0: <</K 28 /P 91 0 R /Pg 5 0 R /S /LI_Title>>
+object 97 0: <</K 25 /P 90 0 R /Pg 5 0 R /S /LI_Label>>
+object 98 0: <</K 26 /P 90 0 R /Pg 5 0 R /S /LI_Title>>
+object 99 0: <</K 23 /P 89 0 R /Pg 5 0 R /S /LI_Label>>
+object 100 0: <</K 24 /P 89 0 R /Pg 5 0 R /S /LI_Title>>
+object 101 0: <</K 21 /P 88 0 R /Pg 5 0 R /S /LI_Label>>
+object 102 0: <</K 22 /P 88 0 R /Pg 5 0 R /S /LI_Title>>
+object 103 0: <</K 19 /P 87 0 R /Pg 5 0 R /S /LI_Label>>
+object 104 0: <</K 20 /P 87 0 R /Pg 5 0 R /S /LI_Title>>
+object 105 0: <</LineHeight 11.5 /O /Layout /SpaceAfter 47 /TextAlign /Justify>>
+object 106 0: <</BBox [72 442 533 496] /InlineAlign /Center /O /Layout /Placement /Block /SpaceAfter 13.625>>
+object 107 0: <</K [128 0 R 129 0 R 130 0 R] /P 75 0 R /S /TR>>
+object 108 0: <</K [118 0 R 119 0 R 120 0 R 121 0 R 122 0 R] /P 75 0 R /S /TR>>
+object 109 0: <</K [110 0 R 111 0 R 112 0 R] /P 75 0 R /S /TR>>
+object 110 0: <</A [116 0 R 117 0 R] /K 16 /P 109 0 R /Pg 5 0 R /S /TH>>
+object 111 0: <</A 115 0 R /K 17 /P 109 0 R /Pg 5 0 R /S /TD>>
+object 112 0: <</A [113 0 R 114 0 R] /P 109 0 R /S /TD>>
+object 113 0: <</ColSpan 2 /O /Table>>
+object 114 0: <</Height 14 /InlineAlign /Start /O /Layout /Width 246.75>>
+object 115 0: <</BlockAlign /After /Height 14 /InlineAlign /Start /O /Layout /Width 47.875>>
+object 116 0: <</ColSpan 2 /O /Table>>
+object 117 0: <</BlockAlign /After /Height 14 /InlineAlign /Start /O /Layout /Width 166.375>>
+object 118 0: <</A 127 0 R /K 12 /P 108 0 R /Pg 5 0 R /S /TH>>
+object 119 0: <</A 126 0 R /K 13 /P 108 0 R /Pg 5 0 R /S /TD>>
+object 120 0: <</A 125 0 R /P 108 0 R /S /TD>>
+object 121 0: <</A 124 0 R /K 14 /P 108 0 R /Pg 5 0 R /S /TD>>
+object 122 0: <</A 123 0 R /K 15 /P 108 0 R /Pg 5 0 R /S /TD>>
+object 123 0: <</BlockAlign /Middle /Height 23 /InlineAlign /Start /O /Layout /Width 169.375>>
+object 124 0: <</BlockAlign /Middle /Height 23 /InlineAlign /End /O /Layout /Width 77.25>>
+object 125 0: <</Height 23 /InlineAlign /Start /O /Layout /Width 47.875>>
+object 126 0: <</BlockAlign /Middle /Height 23 /InlineAlign /Start /O /Layout /Width 115.75>>
+object 127 0: <</BlockAlign /Middle /Height 23 /InlineAlign /Start /O /Layout /Width 50.5>>
+object 128 0: <</A [134 0 R 135 0 R] /K 10 /P 107 0 R /Pg 5 0 R /S /TH>>
+object 129 0: <</A 133 0 R /P 107 0 R /S /TH>>
+object 130 0: <</A [131 0 R 132 0 R] /K 11 /P 107 0 R /Pg 5 0 R /S /TH>>
+object 131 0: <</ColSpan 2 /O /Table>>
+object 132 0: <</BlockAlign /Before /Height 17 /InlineAlign /Start /O /Layout /Width 246.75>>
+object 133 0: <</Height 17 /InlineAlign /Start /O /Layout /Width 47.875>>
+object 134 0: <</ColSpan 2 /O /Table>>
+object 135 0: <</BlockAlign /Before /Height 17 /InlineAlign /Start /O /Layout /Width 166.375>>
+object 136 0: <</LineHeight 23.125 /O /Layout /TextIndent 12.625>>
+object 137 0: <</A 138 0 R /K 7 /P 73 0 R /Pg 5 0 R /S /StyleSpan>>
+object 138 0: <</O /Layout /TextDecorationType /Underline>>
+object 139 0: <</O /Layout /SpaceAfter 24.125 /StartIndent 144 /TextAlign /Justify>>
+object 140 0: <</LineHeight 14.125 /O /Layout /StartIndent 95.625 /TextIndent -81.375>>
+object 141 0: <</A 176 0 R /K 0 /P 173 0 R /Pg 184 0 R /S /TD>>
+object 142 0: <</A 175 0 R /K 1 /P 173 0 R /Pg 184 0 R /S /TD>>
+object 143 0: <</A 174 0 R /K 2 /P 170 0 R /Pg 184 0 R /S /TD>>
+object 144 0: <</A 169 0 R /K 3 /P 170 0 R /Pg 184 0 R /S /TD>>
+object 145 0: <</C [/CM1 /CM8] /K 4 /P 159 0 R /Pg 184 0 R /S /H3>>
+object 146 0: <</C [/CM2 /CM9] /K 5 /P 159 0 R /Pg 184 0 R /S /P>>
+object 147 0: <</C [/CM2 /CM9] /K 6 /P 159 0 R /Pg 184 0 R /S /P>>
+object 148 0: <</C [/CM2 /CM8] /K 7 /P 159 0 R /Pg 184 0 R /S /P>>
+object 149 0: <</A 168 0 R /K 8 /P 162 0 R /Pg 184 0 R /S /TD>>
+object 150 0: <</A 167 0 R /K 9 /P 162 0 R /Pg 184 0 R /S /TD>>
+object 151 0: <</A 166 0 R /K 10 /P 163 0 R /Pg 184 0 R /S /TD>>
+object 152 0: <</A 165 0 R /K 11 /P 163 0 R /Pg 184 0 R /S /TD>>
+object 153 0: <</C [/CM3 /CM9] /K 12 /P 159 0 R /Pg 184 0 R /S /P>>
+object 154 0: <</C [/CM3 /CM9] /K 13 /P 159 0 R /Pg 184 0 R /S /P>>
+object 155 0: <</A 164 0 R /C /CM3 /K 14 /P 159 0 R /Pg 184 0 R /S /P>>
+object 156 0: <</C [/CM4 /CM9] /K 15 /P 159 0 R /Pg 184 0 R /S /P>>
+object 157 0: <</A 158 0 R /K [16 17] /P 159 0 R /Pg 184 0 R /S /P>>
+object 158 0: <</LineHeight 13.875 /O /Layout /StartIndent 36 /TextIndent -36>>
+object 159 0: <</K [145 0 R 146 0 R 147 0 R 148 0 R 160 0 R 153 0 R 154 0 R 155 0 R 156 0 R 157 0 R] /P 16 0 R /S /Part>>
+object 160 0: <</A 161 0 R /K [162 0 R 163 0 R] /P 159 0 R /S /Table>>
+object 161 0: <</BBox [72 416 538 477] /InlineAlign /Center /O /Layout /Placement /Block /SpaceAfter 13.625>>
+object 162 0: <</K [149 0 R 150 0 R] /P 160 0 R /S /TR>>
+object 163 0: <</K [151 0 R 152 0 R] /P 160 0 R /S /TR>>
+object 164 0: <</O /Layout /SpaceAfter 41.875>>
+object 165 0: <</BlockAlign /Before /Height 44 /InlineAlign /Start /O /Layout /Width 333.25>>
+object 166 0: <</BlockAlign /Before /Height 44 /InlineAlign /End /O /Layout /Width 132.875>>
+object 167 0: <</BlockAlign /Before /Height 17.125 /InlineAlign /Start /O /Layout /Width 333.25>>
+object 168 0: <</BlockAlign /Before /Height 17.125 /InlineAlign /End /O /Layout /Width 132.875>>
+object 169 0: <</BlockAlign /After /Height 22.125 /InlineAlign /Start /O /Layout /Width 377.125>>
+object 170 0: <</K [143 0 R 144 0 R] /P 171 0 R /S /TR>>
+object 171 0: <</A 172 0 R /K [173 0 R 170 0 R] /P 16 0 R /S /Table>>
+object 172 0: <</BBox [72 685 508 754] /InlineAlign /Center /O /Layout /Placement /Block /SpaceAfter 12.625>>
+object 173 0: <</K [141 0 R 142 0 R] /P 171 0 R /S /TR>>
+object 174 0: <</BlockAlign /After /Height 22.125 /InlineAlign /Start /O /Layout /Width 59.125>>
+object 175 0: <</BlockAlign /Before /Height 47.25 /InlineAlign /Start /O /Layout /Width 377.125>>
+object 176 0: <</BlockAlign /Before /Height 47.25 /InlineAlign /Start /O /Layout /Width 59.125>>
+object 177 0: <</Nums [0 178 0 R]>>
+object 178 0: <</S /D>>
+object 179 0: <</Count 5 /Kids [184 0 R 1 0 R 3 0 R 5 0 R 7 0 R] /Type /Pages>>
+object 180 0: <</Author <4465706172746d656e74206f66204a7573746963652c20552e532e20547275737465652050726f6772616d> /CreationDate <443a32303039303330393133333530382d303427303027> /Creator <50536372697074352e646c6c2056657273696f6e20352e322e32> /Keywords <544349203220486f6c64696e67732c204c4c432c2043617365204e6f2e3a2030392d313336353420284a485729> /ModDate <443a32303039303330393134333931312d303427303027> /Producer <4163726f6261742044697374696c6c657220392e302e30202857696e646f777329> /Subject <544349203220486f6c64696e67732c204c4c432c2043617365204e6f2e3a2030392d313336353420284a485729> /Title <544349203220486f6c64696e67732c204c4c432c2043617365204e6f2e3a2030392d313336353420284a485729>>>
+object 181 0: <</E 6324 /H [488 218] /L 21917 /Linearized 1 /N 5 /O 184 /T 21550>>
+object 182 0: <</CF <</StdCF <</AuthEvent /DocOpen /CFM /V2 /Length 16>>>> /EncryptMetadata false /Filter /Standard /Length 128 /O <36451bd39d753b7c1d10922c28e6665aa4f3353fb0348b536893e3b1db5c579b> /P -1084 /R 4 /StmF /StdCF /StrF /StdCF /U <eaf07136c493086adb09fc11f82e8c1400000000000000000000000000000000> /V 4>>
+object 183 0: <</Lang <656e> /MarkInfo <</Marked true>> /Metadata 12 0 R /PageLabels 177 0 R /Pages 179 0 R /StructTreeRoot 16 0 R /Type /Catalog>>
+object 184 0: <</Contents 189 0 R /CropBox [0 0 612 792] /MediaBox [0 0 612 792] /Parent 179 0 R /Resources <</ExtGState <</GS0 192 0 R>> /Font <</T1_0 195 0 R /TT0 197 0 R /TT1 199 0 R /TT2 201 0 R>> /ProcSet [/PDF /Text]>> /Rotate 0 /StructParents 0 /Tabs /S /Type /Page>>
+object 186 0: <</Filter /FlateDecode /Length 379>> stream sha256=01b62ae9bc8f05cad2a88bfbed7fbac274636e673e860c56a5eac3efc89fed63
+object 187 0: <</Filter /FlateDecode /Length 369>> stream sha256=aa82ca4f633f20ddd3a9dde1f3fde19e313be298322856acfaff2c045895e829
+object 188 0: <</Filter /FlateDecode /Length 356>> stream sha256=c9bd082a060da48ebaa4cde6191ae26b482da44afbe784bb351f8bd4f11ac6bf
+object 189 0: <</Filter /FlateDecode /Length 1925>> stream sha256=f711272169ee44cc730ad9d1b10c3ca5b33fab2ce146d669c356ae13f4e02c24
+object 190 0: <</Filter /FlateDecode /Length 566>> stream sha256=3bdbf64ce6b903e9358bf2a82f31413f745c7540ea87a8ecc338a014754db78c
+object 192 0: <</OP false /OPM 1 /SA false /SM 0.02 /Type /ExtGState /op false>>
+object 193 0: [1 /hyphen 2 /space 3 /space]
+object 194 0: <</BaseEncoding /WinAnsiEncoding /Differences 193 0 R /Type /Encoding>>
+object 195 0: <</BaseFont /Times-Roman /Encoding 194 0 R /FirstChar 0 /LastChar 255 /Subtype /Type1 /ToUnicode 190 0 R /Type /Font /Widths [250 333 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 250 333 408 500 500 833 778 180 333 333 500 564 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 564 564 564 444 921 722 667 667 722 611 556 722 722 333 389 722 611 889 722 722 556 722 667 556 611 722 722 944 722 722 611 333 278 333 469 500 333 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 480 200 480 541 350 0 350 333 500 444 1000 500 500 333 1000 556 333 889 350 611 350 350 333 333 444 444 350 500 1000 333 980 389 333 722 350 444 722 0 333 500 500 500 500 200 500 333 760 276 500 564 0 760 333 400 564 300 300 333 500 453 250 333 300 310 500 750 750 750 444 722 722 722 722 722 722 889 667 611 611 611 611 333 333 333 333 722 722 722 722 722 722 722 564 722 722 722 722 722 722 556 500 444 444 444 444 444 444 667 444 444 444 444 444 278 278 278 278 500 500 500 500 500 500 500 564 500 500 500 500 500 500 500 500]>>
+object 196 0: <</Ascent 891 /CapHeight 1000 /Descent -216 /Flags 34 /FontBBox [-568 -307 2000 1007] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPSMT /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 82 /Type /FontDescriptor /XHeight 1000>>
+object 197 0: <</BaseFont /TimesNewRomanPSMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 196 0 R /LastChar 151 /Subtype /TrueType /ToUnicode 187 0 R /Type /Font /Widths [250 0 408 0 0 0 0 180 333 333 0 0 250 333 250 278 500 500 500 500 500 500 500 500 500 500 278 278 0 0 0 444 0 722 667 667 722 611 556 722 722 333 389 0 611 889 722 722 556 722 667 556 611 722 0 944 0 722 0 0 0 0 0 0 0 444 500 444 500 444 333 500 500 278 278 500 278 778 500 500 500 500 333 389 278 500 500 722 500 500 444 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1000]>>
+object 198 0: <</Ascent 891 /CapHeight 1000 /Descent -216 /Flags 34 /FontBBox [-558 -307 2000 1026] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPS-BoldMT /FontStretch /Normal /FontWeight 700 /ItalicAngle 0 /StemV 136 /Type /FontDescriptor /XHeight 1000>>
+object 199 0: <</BaseFont /TimesNewRomanPS-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 198 0 R /LastChar 146 /Subtype /TrueType /ToUnicode 188 0 R /Type /Font /Widths [250 0 0 0 0 0 0 278 333 333 0 0 250 333 250 278 500 500 500 500 500 500 500 500 0 500 333 0 0 0 0 0 0 722 667 722 722 667 611 0 778 389 500 0 667 944 722 778 0 778 722 556 667 722 0 1000 722 0 0 0 0 0 0 0 0 500 0 444 556 444 333 500 556 278 0 556 278 833 556 500 556 0 444 389 333 556 0 722 0 500 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 333]>>
+object 200 0: <</Ascent 891 /CapHeight 1000 /Descent -216 /Flags 98 /FontBBox [-547 -307 1206 1032] /FontFamily <54696d6573204e657720526f6d616e> /FontName /TimesNewRomanPS-BoldItalicMT /FontStretch /Normal /FontWeight 700 /ItalicAngle -15 /StemV 116.867 /Type /FontDescriptor /XHeight 1000>>
+object 201 0: <</BaseFont /TimesNewRomanPS-BoldItalicMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 200 0 R /LastChar 151 /Subtype /TrueType /ToUnicode 186 0 R /Type /Font /Widths [250 0 555 0 500 0 0 278 333 333 0 0 250 0 250 278 500 500 500 500 500 500 500 0 0 0 333 0 0 0 0 500 0 667 667 667 722 667 667 722 778 389 0 0 611 889 722 722 611 0 667 556 611 722 0 889 667 611 611 0 0 0 0 0 0 500 500 444 500 444 333 500 556 278 0 500 278 778 556 500 500 500 389 389 278 556 444 667 500 444 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1000]>>
+object 202 0: <</C 129 /Filter /FlateDecode /I 151 /L 113 /Length 124 /S 78>> stream sha256=c36367eb8b0e18898765032f6b0ae8c082fc76caccd9bb36de49541cd25b3a00

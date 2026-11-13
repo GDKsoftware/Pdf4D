@@ -1,0 +1,21 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2003-08-04T15:57:44-05:00
+info Producer: OpenOffice.org 1.1
+xmp: none
+object 1 0: <</Filter /FlateDecode /Length 2 0 R>> stream sha256=d07bbe3f64dc6bc873722917abd826d68357352493a63a05d623ea5308673fa3
+object 2 0: 147
+object 3 0: <</Count 1 /Kids [4 0 R] /MediaBox [0 0 595 842] /Resources 11 0 R /Type /Pages>>
+object 4 0: <</Contents 1 0 R /MediaBox [0 0 612 792] /Parent 3 0 R /Type /Page>>
+object 5 0: <</Filter /FlateDecode /Length 6 0 R /Length1 25168>> stream sha256=b892a9ac9026edeac73ee1ce3b99b44b42f5d3c7b457b75886e2c5c969c426d9
+object 6 0: 12795
+object 7 0: <</Ascent 891 /CapHeight 1006 /Descent 216 /Flags 6 /FontBBox [-568 -306 2028 1007] /FontFile2 5 0 R /FontName /BAAAAA+TimesNewRomanPSMT /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 8 0: <</Filter /FlateDecode /Length 288>> stream sha256=752b73c03569ecda902e4771b8c5ff44c0c59e14cc6bd872d38ee6dc83c55706
+object 9 0: <</BaseFont /BAAAAA+TimesNewRomanPSMT /FirstChar 0 /FontDescriptor 7 0 R /LastChar 12 /Subtype /TrueType /ToUnicode 8 0 R /Type /Font /Widths [777 333 250 443 777 389 277 500 277 443 500 333 250]>>
+object 10 0: <</F1 9 0 R>>
+object 11 0: <</Font 10 0 R /ProcSet [/PDF]>>
+object 12 0: <</Pages 3 0 R /Type /Catalog>>
+object 13 0: <</CreationDate <443a32303033303830343135353734342d303527303027> /Producer <feff004f00700065006e004f00660066006900630065002e006f0072006700200031002e0031>>>

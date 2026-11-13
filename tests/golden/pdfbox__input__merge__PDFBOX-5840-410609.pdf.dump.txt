@@ -1,0 +1,94 @@
+version: 1.5
+encrypted: false
+permissions: none
+pages: 6
+page 1: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 2: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 3: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 4: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 5: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+page 6: media=[0 0 612 792] crop=[0 0 612 792] rotate=0 label=
+info CreationDate: 2003-09-16T13:05:30+00:00
+info ModDate: 2003-09-16T13:05:30-04:00
+info Producer: Acrobat Web Capture 6.0
+info Title: Aquarium Fishes
+xmp: 3237
+outline: usda.gov -> ?
+outline:   Aquarium Fishes -> 1
+object 1 0: <</Metadata 78 0 R /Names 20 0 R /Outlines 6 0 R /Pages 2 0 R /SpiderInfo 64 0 R /StructTreeRoot 7 0 R /Type /Catalog>>
+object 2 0: <</Count 6 /Kids [11 0 R 23 0 R 28 0 R 30 0 R 38 0 R 40 0 R] /Type /Pages>>
+object 3 0: <</CreationDate <443a32303033303931363133303533305a> /ModDate <443a32303033303931363133303533302d303427303027> /Producer <4163726f62617420576562204361707475726520362e30> /Title <417175617269756d20466973686573>>>
+object 5 0: null
+object 6 0: <</Count 2 /First 76 0 R /Last 76 0 R /Type /Outlines>>
+object 7 0: <</ClassMap 8 0 R /K 9 0 R /ParentTree 12 0 R /ParentTreeNextKey 6 /Type /StructTreeRoot>>
+object 8 0: <</SpdrArt <</O /WebCapture>>>>
+object 9 0: <</K 10 0 R /P 7 0 R /S /Document>>
+object 10 0: <</C /SpdrArt /K [0 <</MCID 0 /Pg 23 0 R /Type /MCR>> <</MCID 0 /Pg 28 0 R /Type /MCR>> <</MCID 0 /Pg 30 0 R /Type /MCR>> <</MCID 0 /Pg 38 0 R /Type /MCR>> <</MCID 0 /Pg 40 0 R /Type /MCR>>] /P 9 0 R /Pg 11 0 R /S /Article>>
+object 11 0: <</Annots 15 0 R /Contents 51 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 48 0 R /T1_2 49 0 R>> /ProcSet [/PDF /Text]>> /StructParents 0 /Type /Page>>
+object 12 0: <</Nums [0 13 0 R 1 24 0 R 2 29 0 R 3 31 0 R 4 39 0 R 5 42 0 R]>>
+object 13 0: [10 0 R]
+object 14 0: <</A <</D <6aff6ffde16c22ad173845d2aad0b48967656e> /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d2367656e>>> /Rect [260.304 675.6 351.696 690.6] /Subtype /Link>>
+object 15 0: [14 0 R 16 0 R 17 0 R 18 0 R 19 0 R]
+object 16 0: <</A <</D <6aff6ffde16c22ad173845d2aad0b4896f726e> /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d236f726e>>> /Rect [211.318 642.8 289.872 657.8] /Subtype /Link>>
+object 17 0: <</A <</D <6aff6ffde16c22ad173845d2aad0b489776562> /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d23776562>>> /Rect [308.534 642.8 400.682 657.8] /Subtype /Link>>
+object 18 0: <</A <</D <6aff6ffde16c22ad173845d2aad0b4896465616c> /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d236465616c>>> /Rect [183.899 610 317.291 625] /Subtype /Link>>
+object 19 0: <</A <</D <6aff6ffde16c22ad173845d2aad0b48977656232> /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d2377656232>>> /Rect [335.953 610 428.101 625] /Subtype /Link>>
+object 20 0: <</Dests 21 0 R /IDS 74 0 R /URLS 75 0 R>>
+object 21 0: <</Names [<6aff6ffde16c22ad173845d2aad0b4896465616c> 37 0 R <6aff6ffde16c22ad173845d2aad0b48967656e> 22 0 R <6aff6ffde16c22ad173845d2aad0b4896f726e> 27 0 R <6aff6ffde16c22ad173845d2aad0b489776562> 32 0 R <6aff6ffde16c22ad173845d2aad0b48977656232> 41 0 R]>>
+object 22 0: [11 0 R /XYZ 0 552.8 null]
+object 23 0: <</Annots 26 0 R /Contents 53 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 49 0 R /T1_2 48 0 R>> /ProcSet [/PDF /Text]>> /StructParents 1 /Type /Page>>
+object 24 0: [10 0 R]
+object 25 0: <</A <</D [11 0 R /XYZ 0 792 null] /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d23746f70>>> /Rect [110.17 499.9 216.82 515.9] /Subtype /Link>>
+object 26 0: [25 0 R]
+object 27 0: [23 0 R /XYZ 0 443.4 null]
+object 28 0: <</Contents 55 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 49 0 R /T1_2 48 0 R>> /ProcSet [/PDF /Text]>> /StructParents 2 /Type /Page>>
+object 29 0: [10 0 R]
+object 30 0: <</Annots 34 0 R /Contents 58 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 48 0 R /T1_2 49 0 R /T1_3 56 0 R>> /ProcSet [/PDF /Text]>> /StructParents 3 /Type /Page>>
+object 31 0: [10 0 R]
+object 32 0: [30 0 R /XYZ 0 638.8 null]
+object 33 0: <</A <</S /URI /URI <687474703a2f2f7777772e617175617269756d636f756e63696c2e6f72672f64656661756c742e617370>>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /Rect [10 555.3939 258.472 570.3939] /Subtype /Link>>
+object 34 0: [33 0 R 35 0 R 36 0 R]
+object 35 0: <</A <</S /URI /URI <687474703a2f2f7777772e6f726e616d656e74616c666973682e6f72672f6173736f63696174696f6e2f636f64652f636f6e647563742f636f6e647563742e706870>>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /Rect [10 499.2439 400.796 514.2439] /Subtype /Link>>
+object 36 0: <</A <</D [11 0 R /XYZ 0 792 null] /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d23746f70>>> /Rect [110.17 434.5439 216.82 450.5439] /Subtype /Link>>
+object 37 0: [30 0 R /XYZ 0 378.0439 null]
+object 38 0: <</Contents 60 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 49 0 R /T1_2 48 0 R>> /ProcSet [/PDF /Text]>> /StructParents 4 /Type /Page>>
+object 39 0: [10 0 R]
+object 40 0: <</Annots 44 0 R /Contents 62 0 R /ID 70 0 R /MediaBox [0 0 612 792] /Parent 2 0 R /Resources <</Font <</T1_0 47 0 R /T1_1 56 0 R /T1_2 48 0 R>> /ProcSet [/PDF /Text]>> /StructParents 5 /Type /Page>>
+object 41 0: [40 0 R /XYZ 0 748 null]
+object 42 0: [10 0 R]
+object 43 0: <</A <</S /URI /URI <687474703a2f2f7777772e61706869732e757364612e676f762f61632f7075626c69636174696f6e732e68746d6c>>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /Rect [10 635.6 278.338 650.6] /Subtype /Link>>
+object 44 0: [43 0 R 45 0 R 46 0 R]
+object 45 0: <</A <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f6669736877656c666172652e68746d23636f6e74656e7473>>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /Rect [69.892 552 119.676 567] /Subtype /Link>>
+object 46 0: <</A <</D [11 0 R /XYZ 0 792 null] /S /GoTo>> /BS <</S /S /Type /Border /W 0>> /Border [0 0 0] /PA <</S /URI /URI <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d23746f70>>> /Rect [167.122 552 266.662 567] /Subtype /Link>>
+object 47 0: <</BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 48 0: <</BaseFont /Times-Bold /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 49 0: <</BaseFont /Times-Italic /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 50 0: 3548
+object 51 0: <</Length 50 0 R>> stream sha256=88b967ce53a102cae1b6889e62733db53d0f0cb5128cd5ba72e6bb8a82da1e6d
+object 52 0: 3895
+object 53 0: <</Length 52 0 R>> stream sha256=9efa12af90c1f2c44238516185a382db1fe3eef9402533a186d5f871d7b5d8c2
+object 54 0: 4221
+object 55 0: <</Length 54 0 R>> stream sha256=dfe22ae9e71c025a54e4146fe3fe2f548b4c5307036804e84d297aaec3b0b1ab
+object 56 0: <</BaseFont /Times-BoldItalic /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>
+object 57 0: 3714
+object 58 0: <</Length 57 0 R>> stream sha256=f1ac7416ac99ef15ec40165bd8d33851d37b42d3103d3ca00dfffcf1040003ce
+object 59 0: 4154
+object 60 0: <</Length 59 0 R>> stream sha256=471a0a8d5cbf0ccf570f189ddee4c3f554856e899c068954f292417847889acc
+object 61 0: 1221
+object 62 0: <</Length 61 0 R>> stream sha256=a8c965ecabde5991e39907ff8ed173f7e51f6260967db1f2730b4c878daf6ba5
+object 63 0: <417175617269756d20466973686573>
+object 64 0: <</C 68 0 R /V 1.25>>
+object 65 0: <</S 66 0 R /URL <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d>>>
+object 66 0: <</G 67 0 R>>
+object 67 0: <</AH 0 /AL 0 /AS 1 /AT 70 /CB 0 /M [10.08 10.08 26 36] /PO 0 /PS [792 612] /S 0 /SU 1>>
+object 68 0: [65 0 R]
+object 69 0: <687474703a2f2f7777772e6e616c2e757364612e676f762f617769632f707562732f4669736877656c666172652f61717561722e68746d>
+object 70 0: <6aff6ffde16c22ad173845d2aad0b489>
+object 71 0: <</CT <746578742f68746d6c> /ID 70 0 R /O [11 0 R 23 0 R 28 0 R 30 0 R 38 0 R 40 0 R] /S /SPS /SI 72 0 R /T 63 0 R /TID 73 0 R /TS <443a3230303330393136313730353330>>>
+object 72 0: <</AU 69 0 R /TS <443a3230303330393136313730353330>>>
+object 73 0: <6f88d2527d25ca7af03a4ffe6fe43bb6>
+object 74 0: <</Names [70 0 R 71 0 R]>>
+object 75 0: <</Names [69 0 R 71 0 R]>>
+object 76 0: <</Count 1 /First 77 0 R /Last 77 0 R /Parent 6 0 R /Title <757364612e676f76>>>
+object 77 0: <</Dest [11 0 R /XYZ 0 792 null] /Parent 76 0 R /SE 10 0 R /Title <417175617269756d20466973686573>>>
+object 78 0: <</Length 3237 /Subtype /XML /Type /Metadata>> stream sha256=4ca2e46da5362df0360db34665a6ad89c00f085bde797722c4382694f2a60acb
