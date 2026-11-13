@@ -40,7 +40,6 @@ type
     class function IsNumberStart(const Value: Integer): Boolean; static;
     class function IsNumberCharacter(const Value: Integer): Boolean; static;
     class function TryParseLong(const Text: string; out Value: Int64): Boolean; static;
-    class function ParseNumber(const Text: string): TCosNumber; static;
 
     function MaxNestingDepth: Integer;
     procedure GuardNestingDepth;
@@ -81,6 +80,8 @@ type
     procedure RaiseExpectedNumber(const What, Digits: string);
 
   protected
+    // COSNumber.get: the number that a text stands for
+    class function ParseNumber(const Text: string): TCosNumber; static;
     // PDFBox returns null for a skipped unexpected token in a content stream parser and COSNull otherwise
     function ReturnsNilForUnexpectedToken: Boolean; virtual;
 

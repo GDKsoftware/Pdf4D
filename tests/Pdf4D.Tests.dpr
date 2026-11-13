@@ -104,6 +104,7 @@ uses
   Pdf4D.Filter.Predictor.Tests in '..\src\Filter\Pdf4D.Filter.Predictor.Tests.pas',
   Pdf4D.Cos.Stream.Tests in '..\src\Cos\Pdf4D.Cos.Stream.Tests.pas',
   Pdf4D.Parser.Base.Tests in '..\src\Parser\Pdf4D.Parser.Base.Tests.pas',
+  Pdf4D.Parser.ContentStream.Tests in '..\src\Parser\Pdf4D.Parser.ContentStream.Tests.pas',
   Pdf4D.Tests.PdfBuilder in 'Support\Pdf4D.Tests.PdfBuilder.pas',
   Pdf4D.Parser.XrefTrailerResolver.Tests in '..\src\Parser\Pdf4D.Parser.XrefTrailerResolver.Tests.pas',
   Pdf4D.Parser.Xref.Tests in '..\src\Parser\Pdf4D.Parser.Xref.Tests.pas',
