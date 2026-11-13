@@ -38,7 +38,7 @@ type
     destructor Destroy; override;
 
     function Read: Integer; overload;
-    function Read(var Buffer: TBytes; const Offset, Count: Integer): Integer; overload;
+    function Read(const Buffer: TBytes; const Offset, Count: Integer): Integer; overload;
     function Peek: Integer;
     procedure Rewind(const Bytes: Integer);
     procedure Seek(const Position: Int64);
@@ -61,12 +61,24 @@ uses
 
 class function TRandomAccessRead.FromBytes(const Data: TBytes): TRandomAccessRead;
 begin
-  Result := TRandomAccessRead.Create(TBytesStream.Create(Data), True);
+  const Stream = TBytesStream.Create(Data);
+  try
+    Result := TRandomAccessRead.Create(Stream, True);
+  except
+    Stream.Free;
+    raise;
+  end;
 end;
 
 class function TRandomAccessRead.FromFile(const FileName: string): TRandomAccessRead;
 begin
-  Result := TRandomAccessRead.Create(TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite), True);
+  const Stream = TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  try
+    Result := TRandomAccessRead.Create(Stream, True);
+  except
+    Stream.Free;
+    raise;
+  end;
 end;
 
 constructor TRandomAccessRead.Create(const Source: TStream; const OwnsSource: Boolean);
@@ -83,7 +95,6 @@ begin
   FRangeStart := RangeStart;
   FRangeLength := RangeLength;
   FPosition := 0;
-  SetLength(FBuffer, BufferSize);
   FBufferStart := 0;
   FBufferLength := 0;
 end;
@@ -113,7 +124,7 @@ begin
   Inc(FPosition);
 end;
 
-function TRandomAccessRead.Read(var Buffer: TBytes; const Offset, Count: Integer): Integer;
+function TRandomAccessRead.Read(const Buffer: TBytes; const Offset, Count: Integer): Integer;
 begin
   GuardBufferRange(Buffer, Offset, Count);
 
@@ -209,7 +220,7 @@ end;
 
 function TRandomAccessRead.CreateView(const Start, Count: Int64): TRandomAccessRead;
 begin
-  const IsOutsideRange = ((Start < 0) or (Count < 0) or (Start + Count > FRangeLength));
+  const IsOutsideRange = ((Start < 0) or (Count < 0) or (Start > FRangeLength) or (Count > FRangeLength - Start));
   if IsOutsideRange then
   begin
     raise EPdfParseException.CreateFmt('View of %d bytes at %d lies outside the data of %d bytes',
@@ -226,6 +237,11 @@ end;
 
 procedure TRandomAccessRead.FillBuffer;
 begin
+  if System.Length(FBuffer) = 0 then
+  begin
+    SetLength(FBuffer, BufferSize);
+  end;
+
   const WantedCount = Integer(Min(Int64(BufferSize), FRangeLength - FPosition));
 
   FSource.Position := FRangeStart + FPosition;
@@ -241,7 +257,7 @@ end;
 
 procedure TRandomAccessRead.GuardBufferRange(const Buffer: TBytes; const Offset, Count: Integer);
 begin
-  const IsOutsideBuffer = ((Offset < 0) or (Count < 0) or (Offset + Count > System.Length(Buffer)));
+  const IsOutsideBuffer = ((Offset < 0) or (Count < 0) or (Offset > System.Length(Buffer)) or (Count > System.Length(Buffer) - Offset));
   if IsOutsideBuffer then
   begin
     raise EPdfParseException.CreateFmt('Range of %d bytes at offset %d lies outside a buffer of %d bytes',

@@ -37,6 +37,18 @@ type
     procedure TestViewOfViewAndInvalidView;
 
     [Test]
+    procedure TestHugeArgumentsDoNotOverflow;
+
+    [Test]
+    procedure TestParentAndViewInterleave;
+
+    [Test]
+    procedure TestViewLongerThanBuffer;
+
+    [Test]
+    procedure TestViewCrossingBufferBoundaryFromOffset;
+
+    [Test]
     procedure TestFromFile;
   end;
 
@@ -255,9 +267,112 @@ begin
   end;
 end;
 
+procedure TRandomAccessReadTests.TestHugeArgumentsDoNotOverflow;
+begin
+  const Reader = TRandomAccessRead.FromBytes(TextBytes('0123'));
+  try
+    Assert.WillRaise(
+      procedure
+      begin
+        var Buffer: TBytes;
+        SetLength(Buffer, 2);
+        Reader.Read(Buffer, High(Integer), 1);
+      end,
+      EPdfParseException, 'offset near High(Integer)');
+    Assert.WillRaise(
+      procedure
+      begin
+        var Buffer: TBytes;
+        SetLength(Buffer, 2);
+        Reader.Read(Buffer, 1, High(Integer));
+      end,
+      EPdfParseException, 'count near High(Integer)');
+    Assert.WillRaise(
+      procedure
+      begin
+        Reader.CreateView(High(Int64), 1);
+      end,
+      EPdfParseException, 'view start near High(Int64)');
+    Assert.WillRaise(
+      procedure
+      begin
+        Reader.CreateView(1, High(Int64));
+      end,
+      EPdfParseException, 'view count near High(Int64)');
+  finally
+    Reader.Free;
+  end;
+end;
+
+procedure TRandomAccessReadTests.TestParentAndViewInterleave;
+begin
+  const Source = SequenceBytes(LargeSize);
+  const Reader = TRandomAccessRead.FromBytes(Source);
+  try
+    const View = Reader.CreateView(1000, LargeSize - 1000);
+    try
+      Reader.Seek(65530);
+      View.Seek(64530);
+      for var Index := 0 to 20 do
+      begin
+        Assert.AreEqual<Integer>(Source[65530 + Index], Reader.Read, Format('Parent %d', [Index]));
+        Assert.AreEqual<Integer>(Source[65530 + Index], View.Read, Format('View %d', [Index]));
+      end;
+    finally
+      View.Free;
+    end;
+  finally
+    Reader.Free;
+  end;
+end;
+
+procedure TRandomAccessReadTests.TestViewLongerThanBuffer;
+begin
+  const Source = SequenceBytes(LargeSize);
+  const Reader = TRandomAccessRead.FromBytes(Source);
+  try
+    const View = Reader.CreateView(0, LargeSize);
+    try
+      Assert.AreEqual<Int64>(LargeSize, View.Length);
+      const Actual = View.ReadFully(LargeSize);
+      Assert.IsTrue(CompareMem(@Source[0], @Actual[0], LargeSize), 'View content differs from source');
+      Assert.AreEqual(-1, View.Read);
+    finally
+      View.Free;
+    end;
+  finally
+    Reader.Free;
+  end;
+end;
+
+procedure TRandomAccessReadTests.TestViewCrossingBufferBoundaryFromOffset;
+begin
+  const Source = SequenceBytes(LargeSize);
+  const Reader = TRandomAccessRead.FromBytes(Source);
+  try
+    const View = Reader.CreateView(60000, 8000);
+    try
+      for var Index := 0 to 7999 do
+      begin
+        const Actual = View.Read;
+        if Actual <> Source[60000 + Index] then
+        begin
+          Assert.AreEqual<Integer>(Source[60000 + Index], Actual, Format('View byte %d', [Index]));
+        end;
+      end;
+
+      Assert.AreEqual(-1, View.Read);
+    finally
+      View.Free;
+    end;
+  finally
+    Reader.Free;
+  end;
+end;
+
 procedure TRandomAccessReadTests.TestFromFile;
 begin
-  const FileName = TPath.Combine(TPath.GetTempPath, 'Pdf4D.RandomAccessRead.Tests.bin');
+  const FileName = TPath.Combine(TPath.GetTempPath, Format('Pdf4D.%s.bin', [TGUID.NewGuid.ToString]));
   TFile.WriteAllBytes(FileName, TextBytes('%PDF-1.7'));
   try
     const Reader = TRandomAccessRead.FromFile(FileName);

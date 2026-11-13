@@ -9,6 +9,7 @@ __recovery/
 *.rsm
 *.tds
 *.dsk
+*.res
 *.~*
 Win32/
 Win64/
@@ -21,4 +22,3 @@ tests/results-*.xml
 # Oracle tooling
 tools/oracle/lib/
 tools/oracle/jdk/
-*.res
