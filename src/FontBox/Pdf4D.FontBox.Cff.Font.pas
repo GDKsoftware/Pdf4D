@@ -1,6 +1,7 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
-// Port of: fontbox/src/main/java/org/apache/fontbox/cff/CFFFont.java and CFFType1Font.java (3.0.8)
+// Port of: fontbox/src/main/java/org/apache/fontbox/cff/CFFFont.java, CFFType1Font.java and CFFCIDFont.java (3.0.8)
+// Port of: fontbox/src/main/java/org/apache/fontbox/cff/FDSelect.java and the FDSelect classes inside CFFParser.java (3.0.8)
 unit Pdf4D.FontBox.Cff.Font;
 
 {$EXCESSPRECISION OFF}
@@ -16,6 +17,30 @@ uses
   Pdf4D.FontBox.Cff.Encoding;
 
 type
+  // A font DICT or private DICT of a CID-keyed font: numbers, strings and local subroutines by key. The parser fills it.
+  TCFFDictionary = class
+  private
+    FNumbers: TDictionary<string, TArray<Double>>;
+    FStrings: TDictionary<string, string>;
+    FSubrs: TArray<TBytes>;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure AddNumbers(const Key: string; const Values: TArray<Double>);
+    procedure AddString(const Key, Value: string);
+    procedure SetSubrs(const Subrs: TArray<TBytes>);
+
+    // The first number of the entry, or Default when there is none
+    function GetNumber(const Key: string; const Default: Double): Double;
+    function TryGetNumbers(const Key: string; out Values: TArray<Double>): Boolean;
+    function TryGetString(const Key: string; out Value: string): Boolean;
+
+    // Empty when the dictionary has no local subroutines
+    property Subrs: TArray<TBytes> read FSubrs;
+  end;
+
   // A font of a CFF font set. The parser makes it and fills it through the Set and Add methods; after that it does not
   // change. The font owns an embedded charset (not a predefined, shared one).
   TCFFFont = class abstract(TFontBoxFont)
@@ -63,7 +88,7 @@ type
     const DefaultNominalWidthX = 0;
 
   private
-    FPrivateDictNumbers: TDictionary<string, TArray<Double>>;
+    FPrivateDict: TCFFDictionary;
     FEncoding: TCFFEncoding;
     FOwnsEncoding: Boolean;
     FLocalSubrs: TArray<TBytes>;
@@ -74,7 +99,6 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure AddPrivateDictNumbers(const Key: string; const Values: TArray<Double>);
     // Takes ownership of the encoding when OwnsEncoding is true
     procedure SetEncoding(const Encoding: TCFFEncoding; const OwnsEncoding: Boolean);
     procedure SetLocalSubrs(const LocalSubrs: TArray<TBytes>);
@@ -92,6 +116,100 @@ type
 
     property Encoding: TCFFEncoding read FEncoding;
     property LocalSubrs: TArray<TBytes> read FLocalSubrs;
+    // The parser fills it
+    property PrivateDict: TCFFDictionary read FPrivateDict;
+  end;
+
+  // Tells which font DICT (and so which private DICT) a glyph belongs to
+  TCFFFDSelect = class abstract
+  public
+    // The index of the font DICT for the glyph; -1 when a format 3 sentinel ends before the glyph
+    function GetFDIndex(const GID: Integer): Integer; virtual; abstract;
+    // The highest index that GetFDIndex can give; -1 when there is none
+    function MaxFDIndex: Integer; virtual; abstract;
+  end;
+
+  TCFFFormat0FDSelect = class(TCFFFDSelect)
+  private
+    FFDs: TArray<Byte>;
+
+  public
+    // One index per glyph
+    constructor Create(const FDs: TArray<Byte>);
+
+    function GetFDIndex(const GID: Integer): Integer; override;
+    function MaxFDIndex: Integer; override;
+  end;
+
+  TCFFFormat3Range = record
+    First: Integer;
+    FD: Integer;
+  end;
+
+  TCFFFormat3FDSelect = class(TCFFFDSelect)
+  private
+    FRanges: TArray<TCFFFormat3Range>;
+    FSentinel: Integer;
+
+  public
+    constructor Create(const Ranges: TArray<TCFFFormat3Range>; const Sentinel: Integer);
+
+    function GetFDIndex(const GID: Integer): Integer; override;
+    function MaxFDIndex: Integer; override;
+
+    property Sentinel: Integer read FSentinel;
+  end;
+
+  // A CID-keyed CFF font. The font owns its font DICTs, private DICTs and FDSelect.
+  TCFFCIDFont = class(TCFFFont)
+  private
+    const DefaultDefaultWidthX = 1000;
+    const DefaultNominalWidthX = 0;
+    const SelectorPrefix = Char(92);
+
+  private
+    FRegistry: string;
+    FOrdering: string;
+    FSupplement: Integer;
+    FFontDicts: TObjectList<TCFFDictionary>;
+    FPrivDicts: TObjectList<TCFFDictionary>;
+    FFdSelect: TCFFFDSelect;
+
+    class function TryParseSelector(const Selector: string; out CID: Integer): Boolean; static;
+
+    function TryGetPrivateDict(const GID: Integer; out PrivateDict: TCFFDictionary): Boolean;
+    function PrivateWidth(const GID: Integer; const Key: string; const Default: Integer): Integer;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure SetROS(const Registry, Ordering: string; const Supplement: Integer);
+    // Takes ownership of the lists and of the FDSelect
+    procedure SetFontDicts(const FontDicts: TObjectList<TCFFDictionary>);
+    procedure SetPrivDicts(const PrivDicts: TObjectList<TCFFDictionary>);
+    procedure SetFdSelect(const FdSelect: TCFFFDSelect);
+
+    // 0 (.notdef) when the charset has no glyph for the CID. The result is not checked against the CharStrings.
+    function CIDToGID(const CID: Integer): Integer;
+    // 1000 when the glyph has no private DICT, as PDFBox
+    function GetDefaultWidthX(const GID: Integer): Integer;
+    // 0 when the glyph has no private DICT
+    function GetNominalWidthX(const GID: Integer): Integer;
+    // Empty when the glyph has no private DICT or the DICT has no local subroutines
+    function GetLocalSubrs(const GID: Integer): TArray<TBytes>;
+
+    // Widths follow with the charstring interpreter
+    function GetWidth(const Selector: string): Single; override;
+    // The selector is a CID in the form \ddddd. A selector that has another form raises EPdfParseException.
+    function HasGlyph(const Selector: string): Boolean; override;
+
+    property Registry: string read FRegistry;
+    property Ordering: string read FOrdering;
+    property Supplement: Integer read FSupplement;
+    property FontDicts: TObjectList<TCFFDictionary> read FFontDicts;
+    property PrivDicts: TObjectList<TCFFDictionary> read FPrivDicts;
+    property FdSelect: TCFFFDSelect read FFdSelect;
   end;
 
   // Java's conversions of a double
@@ -149,6 +267,60 @@ begin
     Exit(Single.NegativeInfinity);
   end;
   Result := Value;
+end;
+
+{ TCFFDictionary }
+
+constructor TCFFDictionary.Create;
+begin
+  inherited Create;
+  FNumbers := TDictionary<string, TArray<Double>>.Create;
+  FStrings := TDictionary<string, string>.Create;
+end;
+
+destructor TCFFDictionary.Destroy;
+begin
+  FStrings.Free;
+  FNumbers.Free;
+  inherited;
+end;
+
+procedure TCFFDictionary.AddNumbers(const Key: string; const Values: TArray<Double>);
+begin
+  FNumbers.AddOrSetValue(Key, Values);
+end;
+
+procedure TCFFDictionary.AddString(const Key, Value: string);
+begin
+  FStrings.AddOrSetValue(Key, Value);
+end;
+
+procedure TCFFDictionary.SetSubrs(const Subrs: TArray<TBytes>);
+begin
+  FSubrs := Subrs;
+end;
+
+function TCFFDictionary.GetNumber(const Key: string; const Default: Double): Double;
+begin
+  var Values: TArray<Double>;
+  if FNumbers.TryGetValue(Key, Values) and (System.Length(Values) > 0) then
+  begin
+    Result := Values[0];
+  end
+  else
+  begin
+    Result := Default;
+  end;
+end;
+
+function TCFFDictionary.TryGetNumbers(const Key: string; out Values: TArray<Double>): Boolean;
+begin
+  Result := FNumbers.TryGetValue(Key, Values);
+end;
+
+function TCFFDictionary.TryGetString(const Key: string; out Value: string): Boolean;
+begin
+  Result := FStrings.TryGetValue(Key, Value);
 end;
 
 { TCFFFont }
@@ -265,7 +437,7 @@ end;
 constructor TCFFType1Font.Create;
 begin
   inherited Create;
-  FPrivateDictNumbers := TDictionary<string, TArray<Double>>.Create;
+  FPrivateDict := TCFFDictionary.Create;
 end;
 
 destructor TCFFType1Font.Destroy;
@@ -274,13 +446,8 @@ begin
   begin
     FEncoding.Free;
   end;
-  FPrivateDictNumbers.Free;
+  FPrivateDict.Free;
   inherited;
-end;
-
-procedure TCFFType1Font.AddPrivateDictNumbers(const Key: string; const Values: TArray<Double>);
-begin
-  FPrivateDictNumbers.AddOrSetValue(Key, Values);
 end;
 
 procedure TCFFType1Font.SetEncoding(const Encoding: TCFFEncoding; const OwnsEncoding: Boolean);
@@ -316,20 +483,12 @@ end;
 
 function TCFFType1Font.GetPrivateDictNumber(const Key: string; const Default: Double): Double;
 begin
-  var Values: TArray<Double>;
-  if FPrivateDictNumbers.TryGetValue(Key, Values) and (Length(Values) > 0) then
-  begin
-    Result := Values[0];
-  end
-  else
-  begin
-    Result := Default;
-  end;
+  Result := FPrivateDict.GetNumber(Key, Default);
 end;
 
 function TCFFType1Font.TryGetPrivateDictArray(const Key: string; out Values: TArray<Double>): Boolean;
 begin
-  Result := FPrivateDictNumbers.TryGetValue(Key, Values);
+  Result := FPrivateDict.TryGetNumbers(Key, Values);
 end;
 
 function TCFFType1Font.GetPropertyNumber(const Key: string; const Default: Integer): Integer;
@@ -353,6 +512,246 @@ end;
 function TCFFType1Font.NominalWidthX: Integer;
 begin
   Result := GetPropertyNumber(NominalWidthXKey, DefaultNominalWidthX);
+end;
+
+{ TCFFFormat0FDSelect }
+
+constructor TCFFFormat0FDSelect.Create(const FDs: TArray<Byte>);
+begin
+  inherited Create;
+  FFDs := FDs;
+end;
+
+function TCFFFormat0FDSelect.GetFDIndex(const GID: Integer): Integer;
+begin
+  const IsInTable = ((GID >= 0) and (GID < System.Length(FFDs)));
+  if IsInTable then
+  begin
+    Result := FFDs[GID];
+  end
+  else
+  begin
+    Result := 0;
+  end;
+end;
+
+function TCFFFormat0FDSelect.MaxFDIndex: Integer;
+begin
+  Result := -1;
+  for var FD in FFDs do
+  begin
+    Result := Max(Result, Integer(FD));
+  end;
+end;
+
+{ TCFFFormat3FDSelect }
+
+constructor TCFFFormat3FDSelect.Create(const Ranges: TArray<TCFFFormat3Range>; const Sentinel: Integer);
+begin
+  inherited Create;
+  FRanges := Ranges;
+  FSentinel := Sentinel;
+end;
+
+function TCFFFormat3FDSelect.GetFDIndex(const GID: Integer): Integer;
+begin
+  for var Index := 0 to High(FRanges) do
+  begin
+    if FRanges[Index].First <= GID then
+    begin
+      const IsLastRange = (Index + 1 = System.Length(FRanges));
+      if not IsLastRange then
+      begin
+        if FRanges[Index + 1].First > GID then
+        begin
+          Exit(FRanges[Index].FD);
+        end;
+      end
+      else
+      begin
+        // The sentinel must be greater than the glyph
+        if FSentinel > GID then
+        begin
+          Exit(FRanges[Index].FD);
+        end;
+        Exit(-1);
+      end;
+    end;
+  end;
+  Result := 0;
+end;
+
+function TCFFFormat3FDSelect.MaxFDIndex: Integer;
+begin
+  Result := -1;
+  for var Range in FRanges do
+  begin
+    Result := Max(Result, Range.FD);
+  end;
+end;
+
+{ TCFFCIDFont }
+
+constructor TCFFCIDFont.Create;
+begin
+  inherited Create;
+  FFontDicts := TObjectList<TCFFDictionary>.Create(True);
+  FPrivDicts := TObjectList<TCFFDictionary>.Create(True);
+end;
+
+destructor TCFFCIDFont.Destroy;
+begin
+  FFdSelect.Free;
+  FPrivDicts.Free;
+  FFontDicts.Free;
+  inherited;
+end;
+
+procedure TCFFCIDFont.SetROS(const Registry, Ordering: string; const Supplement: Integer);
+begin
+  FRegistry := Registry;
+  FOrdering := Ordering;
+  FSupplement := Supplement;
+end;
+
+procedure TCFFCIDFont.SetFontDicts(const FontDicts: TObjectList<TCFFDictionary>);
+begin
+  if FFontDicts <> FontDicts then
+  begin
+    FFontDicts.Free;
+    FFontDicts := FontDicts;
+  end;
+end;
+
+procedure TCFFCIDFont.SetPrivDicts(const PrivDicts: TObjectList<TCFFDictionary>);
+begin
+  if FPrivDicts <> PrivDicts then
+  begin
+    FPrivDicts.Free;
+    FPrivDicts := PrivDicts;
+  end;
+end;
+
+procedure TCFFCIDFont.SetFdSelect(const FdSelect: TCFFFDSelect);
+begin
+  if FFdSelect <> FdSelect then
+  begin
+    FFdSelect.Free;
+    FFdSelect := FdSelect;
+  end;
+end;
+
+function TCFFCIDFont.CIDToGID(const CID: Integer): Integer;
+begin
+  Result := Charset.GetGIDForCID(CID);
+end;
+
+// A glyph whose FD index is missing or beyond the private DICTs has none, as in PDFBox
+function TCFFCIDFont.TryGetPrivateDict(const GID: Integer; out PrivateDict: TCFFDictionary): Boolean;
+begin
+  PrivateDict := nil;
+  if not Assigned(FFdSelect) then
+  begin
+    Exit(False);
+  end;
+
+  const FDIndex = FFdSelect.GetFDIndex(GID);
+  const IsIndexValid = ((FDIndex >= 0) and (FDIndex < FPrivDicts.Count));
+  if IsIndexValid then
+  begin
+    PrivateDict := FPrivDicts[FDIndex];
+  end;
+  Result := IsIndexValid;
+end;
+
+function TCFFCIDFont.PrivateWidth(const GID: Integer; const Key: string; const Default: Integer): Integer;
+begin
+  var PrivateDict: TCFFDictionary;
+  var Values: TArray<Double>;
+  const HasNumber = (TryGetPrivateDict(GID, PrivateDict) and PrivateDict.TryGetNumbers(Key, Values) and
+                     (System.Length(Values) > 0));
+  if HasNumber then
+  begin
+    Result := TCFFNumber.ToInt(Values[0]);
+  end
+  else
+  begin
+    Result := Default;
+  end;
+end;
+
+function TCFFCIDFont.GetDefaultWidthX(const GID: Integer): Integer;
+begin
+  Result := PrivateWidth(GID, DefaultWidthXKey, DefaultDefaultWidthX);
+end;
+
+function TCFFCIDFont.GetNominalWidthX(const GID: Integer): Integer;
+begin
+  Result := PrivateWidth(GID, NominalWidthXKey, DefaultNominalWidthX);
+end;
+
+function TCFFCIDFont.GetLocalSubrs(const GID: Integer): TArray<TBytes>;
+begin
+  var PrivateDict: TCFFDictionary;
+  if TryGetPrivateDict(GID, PrivateDict) then
+  begin
+    Result := PrivateDict.Subrs;
+  end
+  else
+  begin
+    Result := nil;
+  end;
+end;
+
+function TCFFCIDFont.GetWidth(const Selector: string): Single;
+begin
+  raise EPdfUnsupportedFeatureException.Create('Glyph widths of CFF fonts are not available yet');
+end;
+
+// Java's Integer.parseInt of the text after the backslash: an optional sign and decimal digits
+class function TCFFCIDFont.TryParseSelector(const Selector: string; out CID: Integer): Boolean;
+begin
+  CID := 0;
+  const HasPrefix = ((Selector.Length > 1) and (Selector[1] = SelectorPrefix));
+  if not HasPrefix then
+  begin
+    Exit(False);
+  end;
+
+  const Number = Selector.Substring(1);
+  const HasSign = ((Number[1] = '-') or (Number[1] = '+'));
+  var FirstDigit := 1;
+  if HasSign then
+  begin
+    FirstDigit := 2;
+  end;
+
+  const HasDigits = (FirstDigit <= Number.Length);
+  if not HasDigits then
+  begin
+    Exit(False);
+  end;
+
+  for var Position := FirstDigit to Number.Length do
+  begin
+    const IsDigit = ((Number[Position] >= '0') and (Number[Position] <= '9'));
+    if not IsDigit then
+    begin
+      Exit(False);
+    end;
+  end;
+
+  Result := TryStrToInt(Number, CID);
+end;
+
+function TCFFCIDFont.HasGlyph(const Selector: string): Boolean;
+begin
+  var CID: Integer;
+  if not TryParseSelector(Selector, CID) then
+  begin
+    raise EPdfParseException.CreateFmt('Invalid selector "%s"', [Selector]);
+  end;
+  Result := (CID <> 0);
 end;
 
 end.

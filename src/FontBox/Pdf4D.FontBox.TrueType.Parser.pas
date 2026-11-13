@@ -17,6 +17,7 @@ uses
 type
   // Parses a TrueType font with glyf outlines. A broken font raises EPdfParseException. The font that comes out has read all its
   // tables (ReadAllTables), so it can be shared. loca and glyf are only checked for presence: Pdf4D does not draw glyphs.
+  // The OpenType parser (TOTFParser) is a descendant that accepts CFF outlines.
   TTTFParser = class
   private
     const CffTag = 'CFF ';
@@ -27,13 +28,18 @@ type
     FIsEmbedded: Boolean;
     FLog: TPdfLog;
 
-    class function CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable; static;
-
     function TryReadTableDirectoryEntry(const Data: TTTFDataStream; out Table: TTTFTable): Boolean;
     procedure ReadTableDirectory(const Font: TTrueTypeFont; const Data: TTTFDataStream; const DirectoryOffset: Int64);
     procedure AddTableInsideData(const Font: TTrueTypeFont; const Table: TTTFTable);
     procedure GuardMandatoryTable(const Font: TTrueTypeFont; const Tag: string);
-    procedure GuardMandatoryTables(const Font: TTrueTypeFont);
+
+  protected
+    function NewFont(const Data: TTTFDataStream): TTrueTypeFont; virtual;
+    // A table of a known type, or a table that is only kept as bytes
+    function CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable; virtual;
+    function AllowCFF: Boolean; virtual;
+    function IsPostScript(const Font: TTrueTypeFont): Boolean; virtual;
+    procedure GuardMandatoryTables(const Font: TTrueTypeFont); virtual;
 
   public
     // The log is not owned and only used while Parse runs
@@ -61,7 +67,7 @@ begin
   FLog := Log;
 end;
 
-class function TTTFParser.CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable;
+function TTTFParser.CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable;
 begin
   if Tag = THeaderTable.TableTag then
   begin
@@ -107,6 +113,22 @@ begin
   begin
     Result := TTTFTable.Create(Tag, CheckSum, Offset, Length);
   end;
+end;
+
+function TTTFParser.NewFont(const Data: TTTFDataStream): TTrueTypeFont;
+begin
+  Result := TTrueTypeFont.Create(Data);
+end;
+
+function TTTFParser.AllowCFF: Boolean;
+begin
+  Result := False;
+end;
+
+function TTTFParser.IsPostScript(const Font: TTrueTypeFont): Boolean;
+begin
+  var CffTable: TTTFTable;
+  Result := Font.TryGetTable(CffTag, CffTable);
 end;
 
 // An empty table is dropped, except glyf: a font without outlines is valid
@@ -177,13 +199,6 @@ end;
 
 procedure TTTFParser.GuardMandatoryTables(const Font: TTrueTypeFont);
 begin
-  var CffTable: TTTFTable;
-  const HasCff = Font.TryGetTable(CffTag, CffTable);
-  if HasCff then
-  begin
-    raise EPdfParseException.Create('True Type fonts using CFF outlines are not supported');
-  end;
-
   GuardMandatoryTable(Font, THeaderTable.TableTag);
   GuardMandatoryTable(Font, THorizontalHeaderTable.TableTag);
   GuardMandatoryTable(Font, TMaximumProfileTable.TableTag);
@@ -192,8 +207,16 @@ begin
     GuardMandatoryTable(Font, TPostScriptTable.TableTag);
   end;
 
-  GuardMandatoryTable(Font, LocaTag);
-  GuardMandatoryTable(Font, GlyfTag);
+  if not IsPostScript(Font) then
+  begin
+    GuardMandatoryTable(Font, LocaTag);
+    GuardMandatoryTable(Font, GlyfTag);
+  end
+  else if not AllowCFF then
+  begin
+    raise EPdfParseException.Create('True Type fonts using CFF outlines are not supported');
+  end;
+
   if not FIsEmbedded then
   begin
     GuardMandatoryTable(Font, TNamingTable.TableTag);
@@ -215,7 +238,7 @@ function TTTFParser.Parse(const Data: TBytes; const DirectoryOffset: Int64): TTr
 begin
   const Stream = TTTFMemoryDataStream.Create(Data);
   // The font owns the stream from here on
-  Result := TTrueTypeFont.Create(Stream);
+  Result := NewFont(Stream);
   try
     Result.Log := FLog;
     try

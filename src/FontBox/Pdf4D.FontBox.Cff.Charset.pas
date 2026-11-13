@@ -1,7 +1,8 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
-// Port of: fontbox/src/main/java/org/apache/fontbox/cff/CFFCharset.java, CFFCharsetType1.java, CFFISOAdobeCharset.java,
-// CFFExpertCharset.java and CFFExpertSubsetCharset.java (3.0.8)
+// Port of: fontbox/src/main/java/org/apache/fontbox/cff/CFFCharset.java, CFFCharsetType1.java, CFFCharsetCID.java,
+// CFFISOAdobeCharset.java, CFFExpertCharset.java and CFFExpertSubsetCharset.java (3.0.8)
+// Port of: the charset classes inside fontbox/src/main/java/org/apache/fontbox/cff/CFFParser.java (3.0.8)
 unit Pdf4D.FontBox.Cff.Charset;
 
 {$EXCESSPRECISION OFF}
@@ -62,6 +63,51 @@ type
     function GetCIDForGID(const GID: Integer): Integer; override;
   end;
 
+  // The charset of a CID-keyed font: it maps glyph ids to CIDs. The SID and name methods raise EInvalidOpException.
+  TCFFCharsetCID = class(TCFFCharset)
+  private
+    FCIDToGID: TDictionary<Integer, Integer>;
+    FGIDToCID: TDictionary<Integer, Integer>;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    function IsCIDFont: Boolean; override;
+    procedure AddSID(const GID, SID: Integer; const Name: string); override;
+    procedure AddCID(const GID, CID: Integer); override;
+    function GetSIDForGID(const GID: Integer): Integer; override;
+    function GetGIDForSID(const SID: Integer): Integer; override;
+    function GetGIDForCID(const CID: Integer): Integer; override;
+    function GetSID(const Name: string): Integer; override;
+    function TryGetNameForGID(const GID: Integer; out Name: string): Boolean; override;
+    function GetCIDForGID(const GID: Integer): Integer; override;
+  end;
+
+  // A CID charset of format 1 or 2: ranges of consecutive CIDs. A range is only stored, so a range that reaches past the
+  // last glyph costs nothing. The first range that holds the value wins, as in PDFBox.
+  TCFFRangeCharsetCID = class(TCFFCharsetCID)
+  private
+    type
+      TRange = record
+        StartGID: Integer;
+        EndGID: Integer;
+        StartCID: Integer;
+        EndCID: Integer;
+      end;
+
+  private
+    FRanges: TArray<TRange>;
+    FRangeCount: Integer;
+
+  public
+    // The glyphs StartGID to StartGID + Left hold the CIDs First to First + Left
+    procedure AddRangeMapping(const StartGID, First, Left: Integer);
+
+    function GetGIDForCID(const CID: Integer): Integer; override;
+    function GetCIDForGID(const GID: Integer): Integer; override;
+  end;
+
   // Charset id 0
   TCFFISOAdobeCharset = class(TCFFCharsetType1)
   private
@@ -112,6 +158,7 @@ uses
 
 const
   NotACIDFont = 'Not a CIDFont';
+  NotAType1Font = 'Not a Type 1-equivalent font';
 
   ISOAdobeSIDs: array[0..228] of Word = (
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -237,6 +284,118 @@ end;
 function TCFFCharsetType1.GetCIDForGID(const GID: Integer): Integer;
 begin
   raise EInvalidOpException.Create(NotACIDFont);
+end;
+
+{ TCFFCharsetCID }
+
+constructor TCFFCharsetCID.Create;
+begin
+  inherited Create;
+  FCIDToGID := TDictionary<Integer, Integer>.Create(250);
+  FGIDToCID := TDictionary<Integer, Integer>.Create;
+end;
+
+destructor TCFFCharsetCID.Destroy;
+begin
+  FGIDToCID.Free;
+  FCIDToGID.Free;
+  inherited;
+end;
+
+function TCFFCharsetCID.IsCIDFont: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TCFFCharsetCID.AddSID(const GID, SID: Integer; const Name: string);
+begin
+  raise EInvalidOpException.Create(NotAType1Font);
+end;
+
+procedure TCFFCharsetCID.AddCID(const GID, CID: Integer);
+begin
+  FCIDToGID.AddOrSetValue(CID, GID);
+  FGIDToCID.AddOrSetValue(GID, CID);
+end;
+
+function TCFFCharsetCID.GetSIDForGID(const GID: Integer): Integer;
+begin
+  raise EInvalidOpException.Create(NotAType1Font);
+end;
+
+function TCFFCharsetCID.GetGIDForSID(const SID: Integer): Integer;
+begin
+  raise EInvalidOpException.Create(NotAType1Font);
+end;
+
+function TCFFCharsetCID.GetGIDForCID(const CID: Integer): Integer;
+begin
+  if not FCIDToGID.TryGetValue(CID, Result) then
+  begin
+    Result := 0;
+  end;
+end;
+
+function TCFFCharsetCID.GetSID(const Name: string): Integer;
+begin
+  raise EInvalidOpException.Create(NotAType1Font);
+end;
+
+function TCFFCharsetCID.TryGetNameForGID(const GID: Integer; out Name: string): Boolean;
+begin
+  raise EInvalidOpException.Create(NotAType1Font);
+end;
+
+function TCFFCharsetCID.GetCIDForGID(const GID: Integer): Integer;
+begin
+  if not FGIDToCID.TryGetValue(GID, Result) then
+  begin
+    Result := 0;
+  end;
+end;
+
+{ TCFFRangeCharsetCID }
+
+procedure TCFFRangeCharsetCID.AddRangeMapping(const StartGID, First, Left: Integer);
+begin
+  if FRangeCount = System.Length(FRanges) then
+  begin
+    SetLength(FRanges, (FRangeCount * 2) + 16);
+  end;
+
+  FRanges[FRangeCount].StartGID := StartGID;
+  FRanges[FRangeCount].EndGID := StartGID + Left;
+  FRanges[FRangeCount].StartCID := First;
+  FRanges[FRangeCount].EndCID := First + Left;
+  Inc(FRangeCount);
+end;
+
+function TCFFRangeCharsetCID.GetGIDForCID(const CID: Integer): Integer;
+begin
+  for var Index := 0 to FRangeCount - 1 do
+  begin
+    const Range = FRanges[Index];
+    const IsInRange = ((CID >= Range.StartCID) and (CID <= Range.EndCID));
+    if IsInRange then
+    begin
+      Exit(Range.StartGID + (CID - Range.StartCID));
+    end;
+  end;
+  Result := inherited GetGIDForCID(CID);
+end;
+
+function TCFFRangeCharsetCID.GetCIDForGID(const GID: Integer): Integer;
+begin
+  for var Index := 0 to FRangeCount - 1 do
+  begin
+    const Range = FRanges[Index];
+    const IsInRange = ((GID >= Range.StartGID) and (GID <= Range.EndGID));
+    if IsInRange then
+    begin
+      Exit(Range.StartCID + (GID - Range.StartGID));
+    end;
+  end;
+  Result := inherited GetCIDForGID(GID);
 end;
 
 { TCFFISOAdobeCharset }

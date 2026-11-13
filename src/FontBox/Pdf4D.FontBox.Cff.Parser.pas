@@ -61,10 +61,15 @@ type
     const MaxRealNumberLength = 128;
     const FirstCustomSID = 391;
     const NotDefName = '.notdef';
+    // The FD index is one byte in FDSelect formats 0 and 3, so a font cannot use more font DICTs than this
+    const MaxFontDicts = 256;
+    // A private DICT is a few hundred bytes; this keeps the cost of reading one per font DICT bounded
+    const MaxCIDPrivateDictSize = 65535;
 
   private
     FLog: TPdfLog;
     FStringIndex: TArray<string>;
+    FCIDSubrsBytes: Int64;
 
     class function Latin1String(const Bytes: TBytes): string; static;
     class function ResolveCffData(const Data: TBytes): TBytes; static;
@@ -90,21 +95,45 @@ type
     function ReadString(const Index: Integer): string;
     function TryGetString(const Dict: TCFFDictData; const Name: string; out Value: string): Boolean;
 
+    function TryReadFirstROS(const TopDictBytes: TBytes; out Registry, Ordering: string; out Supplement: Integer): Boolean;
     function ParseFont(const Input: TCFFDataInput; const Name: string; const TopDictBytes: TBytes): TCFFFont;
-    procedure RejectCIDFont(const TopDict: TCFFDictData);
+    function CreateFont(const TopDict: TCFFDictData): TCFFFont;
+    function TryReadROS(const TopDict: TCFFDictData; out Registry, Ordering: string; out Supplement: Integer): Boolean;
+    procedure FillFont(const Input: TCFFDataInput; const Name: string; const TopDict: TCFFDictData; const Font: TCFFFont);
     procedure AddTopDictValues(const Font: TCFFFont; const TopDict: TCFFDictData);
     function ReadCharStrings(const Input: TCFFDataInput; const TopDict: TCFFDictData): TArray<TBytes>;
     procedure ReadFontCharset(const Input: TCFFDataInput; const TopDict: TCFFDictData; const CharStringCount: Integer;
-                              const Font: TCFFFont);
+                              const Font: TCFFFont; const IsCIDFont: Boolean);
     procedure ParseType1Dicts(const Input: TCFFDataInput; const TopDict: TCFFDictData; const Font: TCFFType1Font);
     procedure ReadFontEncoding(const Input: TCFFDataInput; const TopDict: TCFFDictData; const Font: TCFFType1Font);
-    procedure ReadPrivateDict(const PrivateDict: TCFFDictData; const Font: TCFFType1Font);
-    procedure AddDeltaNumbers(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string);
-    procedure AddNumber(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string;
+    procedure ReadPrivateDict(const PrivateDict: TCFFDictData; const Target: TCFFDictionary);
+    procedure AddDeltaNumbers(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string);
+    procedure AddNumber(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string;
                         const Default: Double);
-    procedure AddOptionalNumber(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string);
+    procedure AddOptionalNumber(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string);
+    function ReadLocalSubrs(const Input: TCFFDataInput; const PrivateDict: TCFFDictData; const PrivateOffset: Integer): TArray<TBytes>;
 
-    function ReadCharset(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFCharsetType1;
+    procedure ParseCIDFontDicts(const Input: TCFFDataInput; const TopDict: TCFFDictData; const Font: TCFFCIDFont;
+                                const GlyphCount: Integer);
+    procedure ReadCIDDicts(const Input: TCFFDataInput; const FontDictBytes: TArray<TBytes>;
+                           const FontDicts, PrivateDicts: TObjectList<TCFFDictionary>);
+    function ReadCIDFontDict(const FontDict: TCFFDictData): TCFFDictionary;
+    function ReadCIDPrivateDict(const Input: TCFFDataInput; const PrivateEntry: TCFFDictEntry): TCFFDictionary;
+    procedure GuardSubrsBudget(const Input: TCFFDataInput; const Subrs: TArray<TBytes>);
+    function ReadFDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFDSelect;
+    function ReadFormat0FDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFormat0FDSelect;
+    function ReadFormat3FDSelect(const Input: TCFFDataInput): TCFFFormat3FDSelect;
+    procedure WarnAboutUnknownFDs(const FdSelect: TCFFFDSelect; const FontDictCount: Integer);
+    procedure ApplyCIDFontMatrix(const TopDict: TCFFDictData; const Font: TCFFCIDFont);
+    procedure ConcatenateFontMatrix(const Font: TCFFCIDFont; const Matrix, FontDictMatrix: TArray<Double>);
+
+    function ReadCharset(const Input: TCFFDataInput; const GlyphCount: Integer; const IsCIDFont: Boolean): TCFFCharset;
+    function ReadType1Charset(const Input: TCFFDataInput; const GlyphCount, Format: Integer): TCFFCharsetType1;
+    function ReadCIDCharset(const Input: TCFFDataInput; const GlyphCount, Format: Integer): TCFFCharsetCID;
+    procedure ReadCIDRanges(const Input: TCFFDataInput; const GlyphCount: Integer; const IsLeftOneByte: Boolean;
+                            const Charset: TCFFRangeCharsetCID);
+    class function CreateEmptyCIDCharset(const GlyphCount: Integer): TCFFCharsetCID; static;
+    class function CreateEmptyCharset(const IsCIDFont: Boolean): TCFFCharset; static;
     procedure ReadFormat0Charset(const Input: TCFFDataInput; const GlyphCount: Integer; const Charset: TCFFCharsetType1);
     procedure ReadFormat1Charset(const Input: TCFFDataInput; const GlyphCount: Integer; const Charset: TCFFCharsetType1);
     procedure ReadFormat2Charset(const Input: TCFFDataInput; const GlyphCount: Integer; const Charset: TCFFCharsetType1);
@@ -121,8 +150,12 @@ type
     // The log may be nil
     constructor Create(const Log: TPdfLog = nil);
 
-    // The caller owns the list and the fonts in it. A CID-keyed font raises EPdfUnsupportedFeatureException.
+    // The caller owns the list and the fonts in it. A CID-keyed font comes out as a TCFFCIDFont.
     function Parse(const Data: TBytes): TObjectList<TCFFFont>;
+    // The registry, ordering and supplement of the first font, which only reads as much of the data as that needs. False
+    // when that font is not CID-keyed, and for the cases where PDFBox records an error in its font headers (no names, no
+    // top DICT, a synthetic font). Malformed data raises EPdfParseException.
+    function ParseFirstSubFontROS(const Data: TBytes; out Registry, Ordering: string; out Supplement: Integer): Boolean;
   end;
 
 implementation
@@ -383,6 +416,59 @@ begin
     end;
   finally
     Input.Free;
+  end;
+end;
+
+function TCFFParser.ParseFirstSubFontROS(const Data: TBytes; out Registry, Ordering: string;
+                                         out Supplement: Integer): Boolean;
+begin
+  Registry := '';
+  Ordering := '';
+  Supplement := 0;
+
+  const Input = TCFFDataInput.Create(ResolveCffData(Data));
+  try
+    ReadHeader(Input);
+    const NameIndex = ReadStringIndexData(Input);
+    if Length(NameIndex) = 0 then
+    begin
+      Exit(False);
+    end;
+    const TopDictIndex = ReadIndexData(Input);
+    if Length(TopDictIndex) = 0 then
+    begin
+      Exit(False);
+    end;
+
+    // The strings are needed to read the registry and the ordering
+    FStringIndex := ReadStringIndexData(Input);
+    Result := TryReadFirstROS(TopDictIndex[0], Registry, Ordering, Supplement);
+  finally
+    Input.Free;
+  end;
+end;
+
+function TCFFParser.TryReadFirstROS(const TopDictBytes: TBytes; out Registry, Ordering: string;
+                                    out Supplement: Integer): Boolean;
+begin
+  const TopDictInput = TCFFDataInput.Create(TopDictBytes);
+  try
+    const TopDict = ReadDictData(TopDictInput, FLog);
+    try
+      var Entry: TCFFDictEntry;
+      if TopDict.TryGetEntry('SyntheticBase', Entry) then
+      begin
+        Registry := '';
+        Ordering := '';
+        Supplement := 0;
+        Exit(False);
+      end;
+      Result := TryReadROS(TopDict, Registry, Ordering, Supplement);
+    finally
+      TopDict.Free;
+    end;
+  finally
+    TopDictInput.Free;
   end;
 end;
 
@@ -753,21 +839,14 @@ begin
       begin
         raise EPdfParseException.Create('Synthetic Fonts are not supported');
       end;
-      RejectCIDFont(TopDict);
 
-      const Font = TCFFType1Font.Create;
+      Result := CreateFont(TopDict);
       try
-        Font.SetName(Name);
-        AddTopDictValues(Font, TopDict);
-        const CharStrings = ReadCharStrings(Input, TopDict);
-        ReadFontCharset(Input, TopDict, Length(CharStrings), Font);
-        Font.SetCharStrings(CharStrings);
-        ParseType1Dicts(Input, TopDict, Font);
+        FillFont(Input, Name, TopDict, Result);
       except
-        Font.Free;
+        Result.Free;
         raise;
       end;
-      Result := Font;
     finally
       TopDict.Free;
     end;
@@ -776,16 +855,61 @@ begin
   end;
 end;
 
-procedure TCFFParser.RejectCIDFont(const TopDict: TCFFDictData);
+// A top DICT with a ROS entry is a CID-keyed font
+function TCFFParser.CreateFont(const TopDict: TCFFDictData): TCFFFont;
 begin
+  var Registry: string;
+  var Ordering: string;
+  var Supplement: Integer;
+  if TryReadROS(TopDict, Registry, Ordering, Supplement) then
+  begin
+    const CIDFont = TCFFCIDFont.Create;
+    CIDFont.SetROS(Registry, Ordering, Supplement);
+    Result := CIDFont;
+  end
+  else
+  begin
+    Result := TCFFType1Font.Create;
+  end;
+end;
+
+function TCFFParser.TryReadROS(const TopDict: TCFFDictData; out Registry, Ordering: string;
+                               out Supplement: Integer): Boolean;
+begin
+  Registry := '';
+  Ordering := '';
+  Supplement := 0;
+
   var Entry: TCFFDictEntry;
-  if TopDict.TryGetEntry('ROS', Entry) then
+  Result := TopDict.TryGetEntry('ROS', Entry);
+  if Result then
   begin
     if Length(Entry.Operands) < 3 then
     begin
       raise EPdfParseException.Create('ROS entry must have 3 elements');
     end;
-    raise EPdfUnsupportedFeatureException.Create('CID-keyed CFF fonts are not supported');
+    Registry := ReadString(Entry.IntValue(0));
+    Ordering := ReadString(Entry.IntValue(1));
+    Supplement := Entry.IntValue(2);
+  end;
+end;
+
+procedure TCFFParser.FillFont(const Input: TCFFDataInput; const Name: string; const TopDict: TCFFDictData;
+                              const Font: TCFFFont);
+begin
+  const IsCIDFont = Font is TCFFCIDFont;
+  Font.SetName(Name);
+  AddTopDictValues(Font, TopDict);
+  const CharStrings = ReadCharStrings(Input, TopDict);
+  ReadFontCharset(Input, TopDict, Length(CharStrings), Font, IsCIDFont);
+  Font.SetCharStrings(CharStrings);
+  if IsCIDFont then
+  begin
+    ParseCIDFontDicts(Input, TopDict, TCFFCIDFont(Font), Length(CharStrings));
+  end
+  else
+  begin
+    ParseType1Dicts(Input, TopDict, TCFFType1Font(Font));
   end;
 end;
 
@@ -844,42 +968,76 @@ begin
   Result := ReadIndexData(Input);
 end;
 
+class function TCFFParser.CreateEmptyCIDCharset(const GlyphCount: Integer): TCFFCharsetCID;
+begin
+  Result := TCFFCharsetCID.Create;
+  Result.AddCID(0, 0);
+  // Adobe Reader treats the CID as the GID (PDFBOX-2571)
+  for var GID := 1 to GlyphCount do
+  begin
+    Result.AddCID(GID, GID);
+  end;
+end;
+
+// PDFBox gives a CID font an empty Type 1 charset here, whose CID lookups raise an exception; an empty CID charset is the
+// same without the failure
+class function TCFFParser.CreateEmptyCharset(const IsCIDFont: Boolean): TCFFCharset;
+begin
+  if IsCIDFont then
+  begin
+    Result := CreateEmptyCIDCharset(0);
+  end
+  else
+  begin
+    const Empty = TCFFCharsetType1.Create;
+    Empty.AddSID(0, 0, NotDefName);
+    Result := Empty;
+  end;
+end;
+
 procedure TCFFParser.ReadFontCharset(const Input: TCFFDataInput; const TopDict: TCFFDictData;
-                                     const CharStringCount: Integer; const Font: TCFFFont);
+                                     const CharStringCount: Integer; const Font: TCFFFont; const IsCIDFont: Boolean);
 begin
   var Entry: TCFFDictEntry;
   if (not TopDict.TryGetEntry('charset', Entry)) or (not Entry.HasOperands) then
   begin
-    Font.SetCharset(TCFFISOAdobeCharset.Instance, False);
+    if IsCIDFont then
+    begin
+      // A CID font with no charset does not default to any predefined charset
+      Font.SetCharset(CreateEmptyCIDCharset(CharStringCount), True);
+    end
+    else
+    begin
+      Font.SetCharset(TCFFISOAdobeCharset.Instance, False);
+    end;
     Exit;
   end;
 
   const CharsetId = Entry.IntValue(0);
-  case CharsetId of
-    0:
-      Font.SetCharset(TCFFISOAdobeCharset.Instance, False);
-    1:
-      Font.SetCharset(TCFFExpertCharset.Instance, False);
-    2:
-      Font.SetCharset(TCFFExpertSubsetCharset.Instance, False);
-    else
-      begin
-        if CharStringCount > 0 then
-        begin
-          Input.SetPosition(CharsetId);
-          Font.SetCharset(ReadCharset(Input, CharStringCount), True);
-        end
-        else
-        begin
-          if Assigned(FLog) then
-          begin
-            FLog.Debug('Couldn''t read CharStrings index - returning empty charset instead');
-          end;
-          const Empty = TCFFCharsetType1.Create;
-          Empty.AddSID(0, 0, NotDefName);
-          Font.SetCharset(Empty, True);
-        end;
-      end;
+  if (not IsCIDFont) and (CharsetId = 0) then
+  begin
+    Font.SetCharset(TCFFISOAdobeCharset.Instance, False);
+  end
+  else if (not IsCIDFont) and (CharsetId = 1) then
+  begin
+    Font.SetCharset(TCFFExpertCharset.Instance, False);
+  end
+  else if (not IsCIDFont) and (CharsetId = 2) then
+  begin
+    Font.SetCharset(TCFFExpertSubsetCharset.Instance, False);
+  end
+  else if CharStringCount > 0 then
+  begin
+    Input.SetPosition(CharsetId);
+    Font.SetCharset(ReadCharset(Input, CharStringCount, IsCIDFont), True);
+  end
+  else
+  begin
+    if Assigned(FLog) then
+    begin
+      FLog.Debug('Couldn''t read CharStrings index - returning empty charset instead');
+    end;
+    Font.SetCharset(CreateEmptyCharset(IsCIDFont), True);
   end;
 end;
 
@@ -898,22 +1056,30 @@ begin
   const PrivateSize = PrivateEntry.IntValue(0);
   const PrivateDict = ReadDictData(Input, PrivateOffset, PrivateSize, FLog);
   try
-    ReadPrivateDict(PrivateDict, Font);
-
-    var SubrsEntry: TCFFDictEntry;
-    if PrivateDict.TryGetEntry('Subrs', SubrsEntry) and SubrsEntry.HasOperands and SubrsEntry.Operands[0].IsInteger
-       and (SubrsEntry.IntValue(0) > 0) then
-    begin
-      const SubrsPosition = Int64(PrivateOffset) + SubrsEntry.IntValue(0);
-      if SubrsPosition > MaxInt then
-      begin
-        raise EPdfParseException.Create('The local subroutines lie outside the CFF data');
-      end;
-      Input.SetPosition(Integer(SubrsPosition));
-      Font.SetLocalSubrs(ReadIndexData(Input));
-    end;
+    ReadPrivateDict(PrivateDict, Font.PrivateDict);
+    Font.SetLocalSubrs(ReadLocalSubrs(Input, PrivateDict, PrivateOffset));
   finally
     PrivateDict.Free;
+  end;
+end;
+
+// The local subroutines of a private DICT; empty when it has none
+function TCFFParser.ReadLocalSubrs(const Input: TCFFDataInput; const PrivateDict: TCFFDictData;
+                                   const PrivateOffset: Integer): TArray<TBytes>;
+begin
+  Result := nil;
+  var SubrsEntry: TCFFDictEntry;
+  const HasSubrs = (PrivateDict.TryGetEntry('Subrs', SubrsEntry) and SubrsEntry.HasOperands and
+                    SubrsEntry.Operands[0].IsInteger and (SubrsEntry.IntValue(0) > 0));
+  if HasSubrs then
+  begin
+    const SubrsPosition = Int64(PrivateOffset) + SubrsEntry.IntValue(0);
+    if SubrsPosition > MaxInt then
+    begin
+      raise EPdfParseException.Create('The local subroutines lie outside the CFF data');
+    end;
+    Input.SetPosition(Integer(SubrsPosition));
+    Result := ReadIndexData(Input);
   end;
 end;
 
@@ -940,53 +1106,312 @@ begin
   end;
 end;
 
-procedure TCFFParser.ReadPrivateDict(const PrivateDict: TCFFDictData; const Font: TCFFType1Font);
+procedure TCFFParser.ReadPrivateDict(const PrivateDict: TCFFDictData; const Target: TCFFDictionary);
 begin
-  AddDeltaNumbers(PrivateDict, Font, 'BlueValues');
-  AddDeltaNumbers(PrivateDict, Font, 'OtherBlues');
-  AddDeltaNumbers(PrivateDict, Font, 'FamilyBlues');
-  AddDeltaNumbers(PrivateDict, Font, 'FamilyOtherBlues');
-  AddNumber(PrivateDict, Font, 'BlueScale', 0.039625);
-  AddNumber(PrivateDict, Font, 'BlueShift', 7);
-  AddNumber(PrivateDict, Font, 'BlueFuzz', 1);
-  AddOptionalNumber(PrivateDict, Font, 'StdHW');
-  AddOptionalNumber(PrivateDict, Font, 'StdVW');
-  AddDeltaNumbers(PrivateDict, Font, 'StemSnapH');
-  AddDeltaNumbers(PrivateDict, Font, 'StemSnapV');
+  AddDeltaNumbers(PrivateDict, Target, 'BlueValues');
+  AddDeltaNumbers(PrivateDict, Target, 'OtherBlues');
+  AddDeltaNumbers(PrivateDict, Target, 'FamilyBlues');
+  AddDeltaNumbers(PrivateDict, Target, 'FamilyOtherBlues');
+  AddNumber(PrivateDict, Target, 'BlueScale', 0.039625);
+  AddNumber(PrivateDict, Target, 'BlueShift', 7);
+  AddNumber(PrivateDict, Target, 'BlueFuzz', 1);
+  AddOptionalNumber(PrivateDict, Target, 'StdHW');
+  AddOptionalNumber(PrivateDict, Target, 'StdVW');
+  AddDeltaNumbers(PrivateDict, Target, 'StemSnapH');
+  AddDeltaNumbers(PrivateDict, Target, 'StemSnapV');
   const ForceBold: Double = Ord(PrivateDict.GetBoolean('ForceBold', False, FLog));
-  Font.AddPrivateDictNumbers('ForceBold', [ForceBold]);
-  AddNumber(PrivateDict, Font, 'LanguageGroup', 0);
-  AddNumber(PrivateDict, Font, 'ExpansionFactor', 0.06);
-  AddNumber(PrivateDict, Font, 'initialRandomSeed', 0);
-  AddNumber(PrivateDict, Font, 'defaultWidthX', 0);
-  AddNumber(PrivateDict, Font, 'nominalWidthX', 0);
+  Target.AddNumbers('ForceBold', [ForceBold]);
+  AddNumber(PrivateDict, Target, 'LanguageGroup', 0);
+  AddNumber(PrivateDict, Target, 'ExpansionFactor', 0.06);
+  AddNumber(PrivateDict, Target, 'initialRandomSeed', 0);
+  AddNumber(PrivateDict, Target, 'defaultWidthX', 0);
+  AddNumber(PrivateDict, Target, 'nominalWidthX', 0);
 end;
 
-procedure TCFFParser.AddDeltaNumbers(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string);
+procedure TCFFParser.AddDeltaNumbers(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string);
 begin
   var Values: TArray<Double>;
   if PrivateDict.TryGetDelta(Name, Values) then
   begin
-    Font.AddPrivateDictNumbers(Name, Values);
+    Target.AddNumbers(Name, Values);
   end;
 end;
 
-procedure TCFFParser.AddNumber(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string;
+procedure TCFFParser.AddNumber(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string;
                                const Default: Double);
 begin
-  Font.AddPrivateDictNumbers(Name, [PrivateDict.GetNumber(Name, Default)]);
+  Target.AddNumbers(Name, [PrivateDict.GetNumber(Name, Default)]);
 end;
 
-procedure TCFFParser.AddOptionalNumber(const PrivateDict: TCFFDictData; const Font: TCFFType1Font; const Name: string);
+procedure TCFFParser.AddOptionalNumber(const PrivateDict: TCFFDictData; const Target: TCFFDictionary; const Name: string);
 begin
   var Entry: TCFFDictEntry;
   if PrivateDict.TryGetEntry(Name, Entry) and Entry.HasOperands then
   begin
-    Font.AddPrivateDictNumbers(Name, [Entry.Operands[0].Value]);
+    Target.AddNumbers(Name, [Entry.Operands[0].Value]);
   end;
 end;
 
-function TCFFParser.ReadCharset(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFCharsetType1;
+procedure TCFFParser.ParseCIDFontDicts(const Input: TCFFDataInput; const TopDict: TCFFDictData;
+                                       const Font: TCFFCIDFont; const GlyphCount: Integer);
+begin
+  // In a CID-keyed font the private DICT is not in the top DICT but in a font DICT, found through FDArray and FDSelect
+  var Entry: TCFFDictEntry;
+  if (not TopDict.TryGetEntry('FDArray', Entry)) or (not Entry.HasOperands) then
+  begin
+    raise EPdfParseException.Create('FDArray is missing for a CIDKeyed Font.');
+  end;
+
+  Input.SetPosition(Entry.IntValue(0));
+  const FontDictBytes = ReadIndexData(Input);
+  if Length(FontDictBytes) = 0 then
+  begin
+    raise EPdfParseException.Create('Font dict index is missing for a CIDKeyed Font');
+  end;
+  if Length(FontDictBytes) > MaxFontDicts then
+  begin
+    raise EPdfParseException.CreateFmt('The font has %d font DICTs, more than the %d that FDSelect can select',
+                                       [Length(FontDictBytes), MaxFontDicts]);
+  end;
+
+  FCIDSubrsBytes := 0;
+  const FontDicts = TObjectList<TCFFDictionary>.Create(True);
+  const PrivateDicts = TObjectList<TCFFDictionary>.Create(True);
+  var FdSelect: TCFFFDSelect := nil;
+  try
+    ReadCIDDicts(Input, FontDictBytes, FontDicts, PrivateDicts);
+
+    if (not TopDict.TryGetEntry('FDSelect', Entry)) or (not Entry.HasOperands) then
+    begin
+      raise EPdfParseException.Create('FDSelect is missing or empty');
+    end;
+    Input.SetPosition(Entry.IntValue(0));
+    FdSelect := ReadFDSelect(Input, GlyphCount);
+    WarnAboutUnknownFDs(FdSelect, FontDicts.Count);
+  except
+    FdSelect.Free;
+    PrivateDicts.Free;
+    FontDicts.Free;
+    raise;
+  end;
+
+  Font.SetFontDicts(FontDicts);
+  Font.SetPrivDicts(PrivateDicts);
+  Font.SetFdSelect(FdSelect);
+  ApplyCIDFontMatrix(TopDict, Font);
+end;
+
+procedure TCFFParser.ReadCIDDicts(const Input: TCFFDataInput; const FontDictBytes: TArray<TBytes>;
+                                  const FontDicts, PrivateDicts: TObjectList<TCFFDictionary>);
+begin
+  var IsPrivateDictPopulated := False;
+  for var Bytes in FontDictBytes do
+  begin
+    const DictInput = TCFFDataInput.Create(Bytes);
+    try
+      const FontDict = ReadDictData(DictInput, FLog);
+      try
+        FontDicts.Add(ReadCIDFontDict(FontDict));
+
+        var PrivateEntry: TCFFDictEntry;
+        const HasPrivateDict = (FontDict.TryGetEntry('Private', PrivateEntry) and (Length(PrivateEntry.Operands) >= 2));
+        if HasPrivateDict then
+        begin
+          PrivateDicts.Add(ReadCIDPrivateDict(Input, PrivateEntry));
+          IsPrivateDictPopulated := True;
+        end
+        else
+        begin
+          // PDFBOX-5843: no private DICT leaves an empty one, so the indexes of both lists stay together
+          PrivateDicts.Add(TCFFDictionary.Create);
+        end;
+      finally
+        FontDict.Free;
+      end;
+    finally
+      DictInput.Free;
+    end;
+  end;
+
+  if not IsPrivateDictPopulated then
+  begin
+    raise EPdfParseException.Create('Font DICT invalid without "Private" entry');
+  end;
+end;
+
+function TCFFParser.ReadCIDFontDict(const FontDict: TCFFDictData): TCFFDictionary;
+begin
+  Result := TCFFDictionary.Create;
+  try
+    var Name: string;
+    if TryGetString(FontDict, 'FontName', Name) then
+    begin
+      Result.AddString('FontName', Name);
+    end;
+    Result.AddNumbers('FontType', [FontDict.GetNumber('FontType', 0)]);
+
+    var Values: TArray<Double>;
+    if FontDict.TryGetArray('FontBBox', Values) then
+    begin
+      Result.AddNumbers('FontBBox', Values);
+    end;
+    if FontDict.TryGetArray('FontMatrix', Values) then
+    begin
+      Result.AddNumbers('FontMatrix', Values);
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function TCFFParser.ReadCIDPrivateDict(const Input: TCFFDataInput; const PrivateEntry: TCFFDictEntry): TCFFDictionary;
+begin
+  const PrivateOffset = PrivateEntry.IntValue(1);
+  const PrivateSize = PrivateEntry.IntValue(0);
+  if PrivateSize > MaxCIDPrivateDictSize then
+  begin
+    raise EPdfParseException.CreateFmt('The private DICT of %d bytes is too large', [PrivateSize]);
+  end;
+
+  const PrivateDict = ReadDictData(Input, PrivateOffset, PrivateSize, FLog);
+  try
+    Result := TCFFDictionary.Create;
+    try
+      ReadPrivateDict(PrivateDict, Result);
+      const Subrs = ReadLocalSubrs(Input, PrivateDict, PrivateOffset);
+      GuardSubrsBudget(Input, Subrs);
+      Result.SetSubrs(Subrs);
+    except
+      Result.Free;
+      raise;
+    end;
+  finally
+    PrivateDict.Free;
+  end;
+end;
+
+// The local subroutines of a font do not overlap, so together they cannot be larger than the font. Font DICTs that point
+// to overlapping data would otherwise make a copy of it each.
+procedure TCFFParser.GuardSubrsBudget(const Input: TCFFDataInput; const Subrs: TArray<TBytes>);
+begin
+  for var Subr in Subrs do
+  begin
+    Inc(FCIDSubrsBytes, Length(Subr));
+  end;
+  if FCIDSubrsBytes > Input.GetLength then
+  begin
+    raise EPdfParseException.Create('The local subroutines of the font DICTs are larger than the font');
+  end;
+end;
+
+function TCFFParser.ReadFDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFDSelect;
+begin
+  const Format = Input.ReadUnsignedByte;
+  case Format of
+    0:
+      Result := ReadFormat0FDSelect(Input, GlyphCount);
+    3:
+      Result := ReadFormat3FDSelect(Input);
+    else
+      raise EPdfParseException.CreateFmt('Unsupported FDSelect format %d', [Format]);
+  end;
+end;
+
+function TCFFParser.ReadFormat0FDSelect(const Input: TCFFDataInput; const GlyphCount: Integer): TCFFFormat0FDSelect;
+begin
+  const Remaining = Input.GetLength - Input.GetPosition;
+  if GlyphCount > Remaining then
+  begin
+    raise EPdfParseException.CreateFmt('The FDSelect needs %d bytes, the data has %d left', [GlyphCount, Remaining]);
+  end;
+  Result := TCFFFormat0FDSelect.Create(Input.ReadBytes(GlyphCount));
+end;
+
+function TCFFParser.ReadFormat3FDSelect(const Input: TCFFDataInput): TCFFFormat3FDSelect;
+begin
+  const RangeCount = Input.ReadUnsignedShort;
+  // Each range is three bytes and the sentinel two
+  const Needed = (RangeCount * 3) + 2;
+  const Remaining = Input.GetLength - Input.GetPosition;
+  if Needed > Remaining then
+  begin
+    raise EPdfParseException.CreateFmt('The FDSelect needs %d bytes, the data has %d left', [Needed, Remaining]);
+  end;
+
+  var Ranges: TArray<TCFFFormat3Range>;
+  SetLength(Ranges, RangeCount);
+  for var Index := 0 to RangeCount - 1 do
+  begin
+    Ranges[Index].First := Input.ReadUnsignedShort;
+    Ranges[Index].FD := Input.ReadUnsignedByte;
+  end;
+  Result := TCFFFormat3FDSelect.Create(Ranges, Input.ReadUnsignedShort);
+end;
+
+procedure TCFFParser.WarnAboutUnknownFDs(const FdSelect: TCFFFDSelect; const FontDictCount: Integer);
+begin
+  const HighestFD = FdSelect.MaxFDIndex;
+  if (HighestFD >= FontDictCount) and Assigned(FLog) then
+  begin
+    FLog.Warning('The FDSelect refers to font DICT %d, but the font has %d font DICTs; the glyphs get the default widths',
+                 [HighestFD, FontDictCount]);
+  end;
+end;
+
+// Some malformed fonts have the FontMatrix in their font DICT (PDFBOX-2495)
+procedure TCFFParser.ApplyCIDFontMatrix(const TopDict: TCFFDictData; const Font: TCFFCIDFont);
+begin
+  var FontDictMatrix: TArray<Double>;
+  const HasFontDictMatrix = ((Font.FontDicts.Count > 0) and Font.FontDicts[0].TryGetNumbers('FontMatrix', FontDictMatrix));
+  if not HasFontDictMatrix then
+  begin
+    Exit;
+  end;
+
+  var Matrix: TArray<Double>;
+  if TopDict.TryGetArray('FontMatrix', Matrix) then
+  begin
+    ConcatenateFontMatrix(Font, Matrix, FontDictMatrix);
+  end
+  else
+  begin
+    Font.AddTopDictNumbers('FontMatrix', FontDictMatrix);
+  end;
+end;
+
+// The matrix of the top DICT is multiplied by that of the font DICT (PDFBOX-3579). The second entry of the result uses
+// d1 where a matrix product has d2; that is how PDFBox does it, so the widths and positions come out the same.
+procedure TCFFParser.ConcatenateFontMatrix(const Font: TCFFCIDFont; const Matrix, FontDictMatrix: TArray<Double>);
+begin
+  const HasSixNumbers = ((Length(Matrix) >= 6) and (Length(FontDictMatrix) >= 6));
+  if not HasSixNumbers then
+  begin
+    if Assigned(FLog) then
+    begin
+      FLog.Warning('A FontMatrix with fewer than 6 numbers is not combined with the FontMatrix of the font DICT');
+    end;
+    Exit;
+  end;
+
+  const A1 = Matrix[0];
+  const B1 = Matrix[1];
+  const C1 = Matrix[2];
+  const D1 = Matrix[3];
+  const X1 = Matrix[4];
+  const Y1 = Matrix[5];
+  const A2 = FontDictMatrix[0];
+  const B2 = FontDictMatrix[1];
+  const C2 = FontDictMatrix[2];
+  const D2 = FontDictMatrix[3];
+  const X2 = FontDictMatrix[4];
+  const Y2 = FontDictMatrix[5];
+  Font.AddTopDictNumbers('FontMatrix', [(A1 * A2) + (B1 * C2), (A1 * B2) + (B1 * D1), (C1 * A2) + (D1 * C2),
+                                        (C1 * B2) + (D1 * D2), (X1 * A2) + (Y1 * C2) + X2, (X1 * B2) + (Y1 * D2) + Y2]);
+end;
+
+function TCFFParser.ReadCharset(const Input: TCFFDataInput; const GlyphCount: Integer;
+                                const IsCIDFont: Boolean): TCFFCharset;
 begin
   const Format = Input.ReadUnsignedByte;
   if Format > 2 then
@@ -994,6 +1419,18 @@ begin
     raise EPdfParseException.CreateFmt('Incorrect charset format %d', [Format]);
   end;
 
+  if IsCIDFont then
+  begin
+    Result := ReadCIDCharset(Input, GlyphCount, Format);
+  end
+  else
+  begin
+    Result := ReadType1Charset(Input, GlyphCount, Format);
+  end;
+end;
+
+function TCFFParser.ReadType1Charset(const Input: TCFFDataInput; const GlyphCount, Format: Integer): TCFFCharsetType1;
+begin
   Result := TCFFCharsetType1.Create;
   try
     case Format of
@@ -1007,6 +1444,58 @@ begin
   except
     Result.Free;
     raise;
+  end;
+end;
+
+function TCFFParser.ReadCIDCharset(const Input: TCFFDataInput; const GlyphCount, Format: Integer): TCFFCharsetCID;
+begin
+  if Format = 0 then
+  begin
+    Result := TCFFCharsetCID.Create;
+  end
+  else
+  begin
+    Result := TCFFRangeCharsetCID.Create;
+  end;
+
+  try
+    Result.AddCID(0, 0);
+    if Format = 0 then
+    begin
+      for var GID := 1 to GlyphCount - 1 do
+      begin
+        Result.AddCID(GID, Input.ReadUnsignedShort);
+      end;
+    end
+    else
+    begin
+      ReadCIDRanges(Input, GlyphCount, Format = 1, TCFFRangeCharsetCID(Result));
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+// Every range takes at least three bytes and covers at least one glyph, so the loop ends with the data or the glyphs
+procedure TCFFParser.ReadCIDRanges(const Input: TCFFDataInput; const GlyphCount: Integer; const IsLeftOneByte: Boolean;
+                                   const Charset: TCFFRangeCharsetCID);
+begin
+  var GID := 1;
+  while GID < GlyphCount do
+  begin
+    const First = Input.ReadUnsignedShort;
+    var Left: Integer;
+    if IsLeftOneByte then
+    begin
+      Left := Input.ReadUnsignedByte;
+    end
+    else
+    begin
+      Left := Input.ReadUnsignedShort;
+    end;
+    Charset.AddRangeMapping(GID, First, Left);
+    Inc(GID, Left + 1);
   end;
 end;
 

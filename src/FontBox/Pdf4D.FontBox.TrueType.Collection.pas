@@ -14,11 +14,12 @@ uses
 
 type
   // A TrueType collection (ttcf). The collection keeps the file data; every font that comes out of it is a separate object with
-  // its own stream over that data and all its tables read, and belongs to the caller. Collections with OpenType (CFF) fonts are not
-  // supported: such a font raises EPdfParseException, as a plain TrueType font with CFF outlines does.
+  // its own stream over that data and all its tables read, and belongs to the caller. A font with CFF outlines (OTTO) comes out as
+  // a TOpenTypeFont.
   TTrueTypeCollection = class
   private
     const TagCollection = 'ttcf';
+    const TagOpenType = 'OTTO';
     const MaximumFonts = 1024;
     const MinimumVersionWithSignature = 2;
 
@@ -27,6 +28,8 @@ type
     FFontOffsets: TArray<Int64>;
 
     procedure ReadHeader;
+    function IsOpenTypeFont(const FontOffset: Int64): Boolean;
+    function ParseFont(const FontOffset: Int64): TTrueTypeFont;
 
   public
     constructor Create(const Data: TBytes);
@@ -42,6 +45,7 @@ implementation
 
 uses
   Pdf4D.Common.Defines,
+  Pdf4D.FontBox.OpenType,
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Parser;
 
@@ -103,11 +107,39 @@ begin
     raise EPdfParseException.CreateFmt('The collection has no font %d; it holds %d fonts', [Index, Count]);
   end;
 
-  const Parser = TTTFParser.Create;
+  Result := ParseFont(FFontOffsets[Index]);
+end;
+
+function TTrueTypeCollection.IsOpenTypeFont(const FontOffset: Int64): Boolean;
+begin
+  const Stream = TTTFMemoryDataStream.Create(FData);
   try
-    Result := Parser.Parse(FData, FFontOffsets[Index]);
+    Stream.Seek(FontOffset);
+    Result := (Stream.ReadTag = TagOpenType);
   finally
-    Parser.Free;
+    Stream.Free;
+  end;
+end;
+
+function TTrueTypeCollection.ParseFont(const FontOffset: Int64): TTrueTypeFont;
+begin
+  if IsOpenTypeFont(FontOffset) then
+  begin
+    const OpenTypeParser = TOTFParser.Create;
+    try
+      Result := OpenTypeParser.Parse(FData, FontOffset);
+    finally
+      OpenTypeParser.Free;
+    end;
+  end
+  else
+  begin
+    const Parser = TTTFParser.Create;
+    try
+      Result := Parser.Parse(FData, FontOffset);
+    finally
+      Parser.Free;
+    end;
   end;
 end;
 

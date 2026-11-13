@@ -200,7 +200,7 @@ type
     procedure TestEncodingFormat1;
 
     [Test]
-    procedure TestCIDFontIsUnsupported;
+    procedure TestCIDFontWithoutFDArrayRaises;
 
     [Test]
     procedure TestOpenTypeWithoutCffTableRaises;
@@ -298,7 +298,7 @@ uses
 
 class function TCFFDataInputTests.SampleData: TBytes;
 begin
-  Result := TCffBuilder.Bytes([0, 255, 2, 253, 4, 251, 6, 249, 8, 247]);
+  Result := TCffTestBuilder.Bytes([0, 255, 2, 253, 4, 251, 6, 249, 8, 247]);
 end;
 
 procedure TCFFDataInputTests.TestReadBytes;
@@ -312,10 +312,10 @@ begin
       end,
       EPdfParseException);
     Assert.AreEqual(0, Input.GetPosition);
-    Assert.AreEqual<TBytes>(TCffBuilder.Bytes([0]), Input.ReadBytes(1));
-    Assert.AreEqual<TBytes>(TCffBuilder.Bytes([255, 2, 253]), Input.ReadBytes(3));
+    Assert.AreEqual<TBytes>(TCffTestBuilder.Bytes([0]), Input.ReadBytes(1));
+    Assert.AreEqual<TBytes>(TCffTestBuilder.Bytes([255, 2, 253]), Input.ReadBytes(3));
     Input.SetPosition(6);
-    Assert.AreEqual<TBytes>(TCffBuilder.Bytes([6, 249, 8]), Input.ReadBytes(3));
+    Assert.AreEqual<TBytes>(TCffTestBuilder.Bytes([6, 249, 8]), Input.ReadBytes(3));
     Assert.WillRaise(
       procedure
       begin
@@ -431,7 +431,7 @@ end;
 
 procedure TCFFDataInputTests.TestReadShort;
 begin
-  const Input = TCFFDataInput.Create(TCffBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF]));
+  const Input = TCFFDataInput.Create(TCffTestBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF]));
   try
     Assert.AreEqual($000F, Integer(Input.ReadShort));
     Assert.AreEqual(SmallInt($AA00), Input.ReadShort);
@@ -449,7 +449,7 @@ end;
 
 procedure TCFFDataInputTests.TestReadUnsignedShort;
 begin
-  const Input = TCFFDataInput.Create(TCffBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF]));
+  const Input = TCFFDataInput.Create(TCffTestBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF]));
   try
     Assert.AreEqual($000F, Input.ReadUnsignedShort);
     Assert.AreEqual($AA00, Input.ReadUnsignedShort);
@@ -464,7 +464,7 @@ begin
     Input.Free;
   end;
 
-  const Short = TCFFDataInput.Create(TCffBuilder.Bytes([0]));
+  const Short = TCFFDataInput.Create(TCffTestBuilder.Bytes([0]));
   try
     Assert.WillRaise(
       procedure
@@ -479,7 +479,7 @@ end;
 
 procedure TCFFDataInputTests.TestReadInt;
 begin
-  const Input = TCFFDataInput.Create(TCffBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF, $30, $50]));
+  const Input = TCFFDataInput.Create(TCffTestBuilder.Bytes([$00, $0F, $AA, 0, $FE, $FF, $30, $50]));
   try
     Assert.AreEqual($000FAA00, Input.ReadInt);
     Assert.AreEqual(Integer($FEFF3050), Input.ReadInt);
@@ -493,7 +493,7 @@ begin
     Input.Free;
   end;
 
-  const Short = TCFFDataInput.Create(TCffBuilder.Bytes([$00, $0F, $AA]));
+  const Short = TCFFDataInput.Create(TCffTestBuilder.Bytes([$00, $0F, $AA]));
   try
     Assert.WillRaise(
       procedure
@@ -508,7 +508,7 @@ end;
 
 procedure TCFFDataInputTests.TestReadOffset;
 begin
-  const Input = TCFFDataInput.Create(TCffBuilder.Bytes([$12, $FF, $FF, $FF, $FF, $01, $02, $03]));
+  const Input = TCFFDataInput.Create(TCffTestBuilder.Bytes([$12, $FF, $FF, $FF, $FF, $01, $02, $03]));
   try
     Assert.AreEqual(Int64($12), Input.ReadOffset(1));
     Assert.AreEqual(Int64($FFFFFFFF), Input.ReadOffset(4));
@@ -716,7 +716,7 @@ begin
     Assert.AreEqual(256, Integer(Length(Encoded)));
     Assert.AreEqual<TBytes>(Bytes, TType1FontUtil.HexDecode(Encoded));
   end;
-  Assert.AreEqual('00FF10', TType1FontUtil.HexEncode(TCffBuilder.Bytes([0, 255, 16])));
+  Assert.AreEqual('00FF10', TType1FontUtil.HexEncode(TCffTestBuilder.Bytes([0, 255, 16])));
 end;
 
 procedure TType1FontUtilTests.TestHexDecodeOfBadTextRaises;
@@ -758,7 +758,7 @@ end;
 
 procedure TType1FontUtilTests.TestDecryptOfTooShortDataRaises;
 begin
-  const Short = TCffBuilder.Bytes([1, 2, 3]);
+  const Short = TCffTestBuilder.Bytes([1, 2, 3]);
   Assert.WillRaise(
     procedure
     begin
@@ -807,7 +807,7 @@ end;
 
 class procedure TCFFParserTests.CheckBytes(const Expected: array of Byte; const Actual: TBytes);
 begin
-  Assert.AreEqual<TBytes>(TCffBuilder.Bytes(Expected), Actual);
+  Assert.AreEqual<TBytes>(TCffTestBuilder.Bytes(Expected), Actual);
 end;
 
 class procedure TCFFParserTests.CheckNumbers(const Expected: array of Integer; const Actual: TArray<Double>);
@@ -987,12 +987,12 @@ begin
   Options.CharsetData := Charset;
   Options.EncodingData := Encoding;
   Options.GlyphCount := GlyphCount;
-  Result := TCffBuilder.Type1Font(Options);
+  Result := TCffTestBuilder.Type1Font(Options);
 end;
 
 procedure TCFFSyntheticFontTests.TestDefaultsOfAMinimalFont;
 begin
-  TCFFParserTests.WithFont(TCffBuilder.Type1Font(TCffType1Options.Standard),
+  TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(TCffType1Options.Standard),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual('TestFont', Font.Name);
@@ -1022,14 +1022,14 @@ end;
 procedure TCFFSyntheticFontTests.TestWidthsAndLocalSubrs;
 begin
   var Options := TCffType1Options.Standard;
-  Options.LocalSubrs := [TCffBuilder.Bytes([11]), TCffBuilder.Bytes([1, 2, 11])];
-  TCFFParserTests.WithFont(TCffBuilder.Type1Font(Options),
+  Options.LocalSubrs := [TCffTestBuilder.Bytes([11]), TCffTestBuilder.Bytes([1, 2, 11])];
+  TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(Options),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual(500, Font.DefaultWidthX);
       Assert.AreEqual(600, Font.NominalWidthX);
       Assert.AreEqual(2, Integer(Length(Font.LocalSubrs)));
-      Assert.AreEqual<TBytes>(TCffBuilder.Bytes([1, 2, 11]), Font.LocalSubrs[1]);
+      Assert.AreEqual<TBytes>(TCffTestBuilder.Bytes([1, 2, 11]), Font.LocalSubrs[1]);
     end);
 end;
 
@@ -1037,14 +1037,14 @@ procedure TCFFSyntheticFontTests.TestRealNumbersInTheTopDict;
 begin
   var Options := TCffType1Options.Standard;
   // FontMatrix 0.002 0 0 0 0 0.5
-  Options.ExtraTopDict := TCffBuilder.Concat([TCffBuilder.RealOperand([0, $A, 0, 0, 2, $F]),
-                                              TCffBuilder.IntegerOperand(0), TCffBuilder.IntegerOperand(0),
-                                              TCffBuilder.IntegerOperand(0), TCffBuilder.IntegerOperand(0),
-                                              TCffBuilder.RealOperand([0, $A, 5, $F]), TCffBuilder.Bytes([12, 7]),
+  Options.ExtraTopDict := TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([0, $A, 0, 0, 2, $F]),
+                                              TCffTestBuilder.IntegerOperand(0), TCffTestBuilder.IntegerOperand(0),
+                                              TCffTestBuilder.IntegerOperand(0), TCffTestBuilder.IntegerOperand(0),
+                                              TCffTestBuilder.RealOperand([0, $A, 5, $F]), TCffTestBuilder.Bytes([12, 7]),
                                               // ItalicAngle -1.5E-2
-                                              TCffBuilder.RealOperand([$E, 1, $A, 5, $C, 2, $F]),
-                                              TCffBuilder.Bytes([12, 2])]);
-  TCFFParserTests.WithFont(TCffBuilder.Type1Font(Options),
+                                              TCffTestBuilder.RealOperand([$E, 1, $A, 5, $C, 2, $F]),
+                                              TCffTestBuilder.Bytes([12, 2])]);
+  TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(Options),
     procedure(const Font: TCFFType1Font)
     begin
       const Matrix = Font.FontMatrix;
@@ -1059,8 +1059,8 @@ end;
 procedure TCFFSyntheticFontTests.TestMissingExponentIsReadAsZero;
 begin
   var Options := TCffType1Options.Standard;
-  Options.ExtraTopDict := TCffBuilder.Concat([TCffBuilder.RealOperand([2, $B, $F]), TCffBuilder.Bytes([12, 2])]);
-  TCFFParserTests.WithFont(TCffBuilder.Type1Font(Options),
+  Options.ExtraTopDict := TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([2, $B, $F]), TCffTestBuilder.Bytes([12, 2])]);
+  TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(Options),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual(Double(2), Font.GetTopDictNumber('ItalicAngle', 0));
@@ -1069,7 +1069,7 @@ end;
 
 procedure TCFFSyntheticFontTests.TestCharsetFormat0;
 begin
-  TCFFParserTests.WithFont(FontWith(TCffBuilder.Bytes([0, 0, 1, 0, 2]), nil),
+  TCFFParserTests.WithFont(FontWith(TCffTestBuilder.Bytes([0, 0, 1, 0, 2]), nil),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.IsFalse(Font.Charset is TCFFISOAdobeCharset);
@@ -1082,7 +1082,7 @@ end;
 
 procedure TCFFSyntheticFontTests.TestCharsetFormat1;
 begin
-  TCFFParserTests.WithFont(FontWith(TCffBuilder.Bytes([1, 0, 10, 1]), nil),
+  TCFFParserTests.WithFont(FontWith(TCffTestBuilder.Bytes([1, 0, 10, 1]), nil),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual(10, Font.Charset.GetSIDForGID(1));
@@ -1093,7 +1093,7 @@ end;
 
 procedure TCFFSyntheticFontTests.TestCharsetFormat2;
 begin
-  TCFFParserTests.WithFont(FontWith(TCffBuilder.Bytes([2, 0, 20, 0, 1]), nil),
+  TCFFParserTests.WithFont(FontWith(TCffTestBuilder.Bytes([2, 0, 20, 0, 1]), nil),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual(20, Font.Charset.GetSIDForGID(1));
@@ -1106,8 +1106,8 @@ begin
   var Options := TCffType1Options.Standard;
   Options.StringIndexEntries := ['custom'];
   // SID 391 is the first string of the String INDEX, SID 5000 is not in it
-  Options.CharsetData := TCffBuilder.Bytes([0, 1, $87, $13, $88]);
-  TCFFParserTests.WithFont(TCffBuilder.Type1Font(Options),
+  Options.CharsetData := TCffTestBuilder.Bytes([0, 1, $87, $13, $88]);
+  TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(Options),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.AreEqual('custom', Font.Charset.GetNameForGID(1));
@@ -1119,7 +1119,7 @@ end;
 procedure TCFFSyntheticFontTests.TestEncodingFormat0WithSupplement;
 begin
   // Format 0 with a supplement: one code for glyph 1, and code 200 for SID 3 (quotedbl)
-  TCFFParserTests.WithFont(FontWith(nil, TCffBuilder.Bytes([$80, 1, 65, 1, 200, 0, 3])),
+  TCFFParserTests.WithFont(FontWith(nil, TCffTestBuilder.Bytes([$80, 1, 65, 1, 200, 0, 3])),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.IsTrue(Font.Encoding is TCFFFormat0Encoding);
@@ -1133,7 +1133,7 @@ end;
 
 procedure TCFFSyntheticFontTests.TestEncodingFormat1;
 begin
-  TCFFParserTests.WithFont(FontWith(nil, TCffBuilder.Bytes([1, 1, 65, 1])),
+  TCFFParserTests.WithFont(FontWith(nil, TCffTestBuilder.Bytes([1, 1, 65, 1])),
     procedure(const Font: TCFFType1Font)
     begin
       Assert.IsTrue(Font.Encoding is TCFFFormat1Encoding);
@@ -1142,12 +1142,12 @@ begin
     end);
 end;
 
-procedure TCFFSyntheticFontTests.TestCIDFontIsUnsupported;
+procedure TCFFSyntheticFontTests.TestCIDFontWithoutFDArrayRaises;
 begin
   var Options := TCffType1Options.Standard;
   // ROS 0 0 0
-  Options.ExtraTopDict := TCffBuilder.Bytes([$8B, $8B, $8B, 12, 30]);
-  const Data = TCffBuilder.Type1Font(Options);
+  Options.ExtraTopDict := TCffTestBuilder.Bytes([$8B, $8B, $8B, 12, 30]);
+  const Data = TCffTestBuilder.Type1Font(Options);
   const Parser = TCFFParser.Create;
   try
     Assert.WillRaise(
@@ -1155,7 +1155,7 @@ begin
       begin
         Parser.Parse(Data).Free;
       end,
-      EPdfUnsupportedFeatureException);
+      EPdfParseException);
   finally
     Parser.Free;
   end;
@@ -1163,7 +1163,7 @@ end;
 
 procedure TCFFSyntheticFontTests.TestOpenTypeWithoutCffTableRaises;
 begin
-  const Data = TCffBuilder.Concat([TCffBuilder.AsciiBytes('OTTO'), TCffBuilder.Bytes([0, 0, 0, 0, 0, 0, 0, 0])]);
+  const Data = TCffTestBuilder.Concat([TCffTestBuilder.AsciiBytes('OTTO'), TCffTestBuilder.Bytes([0, 0, 0, 0, 0, 0, 0, 0])]);
   const Parser = TCFFParser.Create;
   try
     Assert.WillRaise(
@@ -1179,8 +1179,8 @@ end;
 
 procedure TCFFSyntheticFontTests.TestTrueTypeCollectionRaises;
 begin
-  const Collection = TCffBuilder.Concat([TCffBuilder.AsciiBytes('ttcf'), TCffBuilder.Bytes([0, 1, 0, 0])]);
-  const TrueType = TCffBuilder.Bytes([0, 1, 0, 0, 0, 0]);
+  const Collection = TCffTestBuilder.Concat([TCffTestBuilder.AsciiBytes('ttcf'), TCffTestBuilder.Bytes([0, 1, 0, 0])]);
+  const TrueType = TCffTestBuilder.Bytes([0, 1, 0, 0, 0, 0]);
   const Parser = TCFFParser.Create;
   try
     Assert.WillRaise(
@@ -1241,54 +1241,54 @@ end;
 
 class function TCFFHostileInputTests.RawFont(const TopDict: TBytes): TBytes;
 begin
-  Result := TCffBuilder.Concat([TCffBuilder.Bytes([1, 0, 4, 4]), TCffBuilder.Index([TCffBuilder.AsciiBytes('A')], 1),
-                                TCffBuilder.Index([TopDict], 2), TCffBuilder.Index(nil), TCffBuilder.Index(nil)]);
+  Result := TCffTestBuilder.Concat([TCffTestBuilder.Bytes([1, 0, 4, 4]), TCffTestBuilder.Index([TCffTestBuilder.AsciiBytes('A')], 1),
+                                TCffTestBuilder.Index([TopDict], 2), TCffTestBuilder.Index(nil), TCffTestBuilder.Index(nil)]);
 end;
 
 procedure TCFFHostileInputTests.TestIndexCountBeyondDataRaises;
 begin
   // 20 bytes: the header, then an INDEX that claims 65535 entries of 4-byte offsets
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, $FF, $FF, 4, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, $FF, $FF, 4, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexOffsetsGoingBackwardsRaise;
 begin
   // Name INDEX with one entry, offsets 5 and 1
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexOffsetBeyondDataRaises;
 begin
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, $FF, 0, 0, 0]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, $FF, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIndexEntryBeyondDataRaises;
 begin
   // The offsets are inside the data, but the entry would be longer than what is left of it
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, 12, 65, 66, 67, 68, 0, 0, 0]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 1, 1, 12, 65, 66, 67, 68, 0, 0, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestIllegalOffSizeRaises;
 begin
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, 0, 1, 0, 1, 2, 65]));
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 4, 0, 1, 5, 1, 2, 65]));
-  CheckRaises(TCffBuilder.Bytes([1, 0, 4, 0]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 0, 1, 2, 65]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 4, 0, 1, 5, 1, 2, 65]));
+  CheckRaises(TCffTestBuilder.Bytes([1, 0, 4, 0]));
 end;
 
 procedure TCFFHostileInputTests.TestDictWithBadRealIsLenient;
 begin
   // A real number that is only a minus sign has no value
-  CheckRaises(RawFont(TCffBuilder.Concat([TCffBuilder.RealOperand([$E, $F]), TCffBuilder.Bytes([12, 2])])),
+  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([$E, $F]), TCffTestBuilder.Bytes([12, 2])])),
              'Invalid real number');
   // A real number of two dots
-  CheckRaises(RawFont(TCffBuilder.Concat([TCffBuilder.RealOperand([1, $A, 2, $A, 3, $F]), TCffBuilder.Bytes([12, 2])])),
+  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, $A, 2, $A, 3, $F]), TCffTestBuilder.Bytes([12, 2])])),
              'Invalid real number');
 end;
 
 procedure TCFFHostileInputTests.TestDictWithUnterminatedRealRaises;
 begin
   // The real number has no $F nibble: the DICT ends inside it
-  CheckRaises(RawFont(TCffBuilder.Concat([TCffBuilder.RealOperand([1, 2, 3, 4])])), 'End of CFF data');
+  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand([1, 2, 3, 4])])), 'End of CFF data');
 end;
 
 procedure TCFFHostileInputTests.TestDictRealNumberLengthIsBounded;
@@ -1300,7 +1300,7 @@ begin
     Nibbles[Index] := 1;
   end;
   Nibbles[High(Nibbles)] := $F;
-  CheckRaises(RawFont(TCffBuilder.Concat([TCffBuilder.RealOperand(Nibbles), TCffBuilder.Bytes([12, 2])])), 'too long');
+  CheckRaises(RawFont(TCffTestBuilder.Concat([TCffTestBuilder.RealOperand(Nibbles), TCffTestBuilder.Bytes([12, 2])])), 'too long');
 end;
 
 procedure TCFFHostileInputTests.TestDictOperandStackIsBounded;
@@ -1311,21 +1311,21 @@ begin
   begin
     Operands[Index] := $8B;
   end;
-  CheckRaises(RawFont(TCffBuilder.Concat([Operands, TCffBuilder.Bytes([5])])), 'Too many operands');
+  CheckRaises(RawFont(TCffTestBuilder.Concat([Operands, TCffTestBuilder.Bytes([5])])), 'Too many operands');
 end;
 
 procedure TCFFHostileInputTests.TestDictWithInvalidByteRaises;
 begin
-  CheckRaises(RawFont(TCffBuilder.Bytes([$FF, 5])), 'invalid DICT');
-  CheckRaises(RawFont(TCffBuilder.Bytes([22, 5])), 'invalid DICT');
-  CheckRaises(RawFont(TCffBuilder.Bytes([31, 5])), 'invalid DICT');
+  CheckRaises(RawFont(TCffTestBuilder.Bytes([$FF, 5])), 'invalid DICT');
+  CheckRaises(RawFont(TCffTestBuilder.Bytes([22, 5])), 'invalid DICT');
+  CheckRaises(RawFont(TCffTestBuilder.Bytes([31, 5])), 'invalid DICT');
 end;
 
 procedure TCFFHostileInputTests.TestSyntheticBaseRaises;
 begin
   var Options := TCffType1Options.Standard;
-  Options.ExtraTopDict := TCffBuilder.Concat([TCffBuilder.IntegerOperand(0), TCffBuilder.Bytes([12, 20])]);
-  CheckRaises(TCffBuilder.Type1Font(Options), 'Synthetic');
+  Options.ExtraTopDict := TCffTestBuilder.Concat([TCffTestBuilder.IntegerOperand(0), TCffTestBuilder.Bytes([12, 20])]);
+  CheckRaises(TCffTestBuilder.Type1Font(Options), 'Synthetic');
 end;
 
 procedure TCFFHostileInputTests.TestCharsetBeyondDataRaises;
@@ -1333,15 +1333,15 @@ begin
   var Options := TCffType1Options.Standard;
   Options.GlyphCount := 65535;
   // Format 0 with room for one SID, where 65534 are needed
-  Options.CharsetData := TCffBuilder.Bytes([0, 0, 1]);
-  CheckRaises(TCffBuilder.Type1Font(Options));
+  Options.CharsetData := TCffTestBuilder.Bytes([0, 0, 1]);
+  CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestCharsetOfUnknownFormatRaises;
 begin
   var Options := TCffType1Options.Standard;
-  Options.CharsetData := TCffBuilder.Bytes([7, 0, 1]);
-  CheckRaises(TCffBuilder.Type1Font(Options));
+  Options.CharsetData := TCffTestBuilder.Bytes([7, 0, 1]);
+  CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestCharsetRangeStopsAtTheGlyphCount;
@@ -1353,13 +1353,13 @@ begin
     var Options := TCffType1Options.Standard;
     if Format = 2 then
     begin
-      Options.CharsetData := TCffBuilder.Bytes([2, 0, 1, $FF, $FF]);
+      Options.CharsetData := TCffTestBuilder.Bytes([2, 0, 1, $FF, $FF]);
     end
     else
     begin
-      Options.CharsetData := TCffBuilder.Bytes([1, 0, 1, $FF]);
+      Options.CharsetData := TCffTestBuilder.Bytes([1, 0, 1, $FF]);
     end;
-    TCFFParserTests.WithFont(TCffBuilder.Type1Font(Options),
+    TCFFParserTests.WithFont(TCffTestBuilder.Type1Font(Options),
       procedure(const Font: TCFFType1Font)
       begin
         Assert.AreEqual('space', Font.Charset.GetNameForGID(1));
@@ -1376,26 +1376,26 @@ end;
 procedure TCFFHostileInputTests.TestEncodingOfUnknownFormatRaises;
 begin
   var Options := TCffType1Options.Standard;
-  Options.EncodingData := TCffBuilder.Bytes([5, 0, 0]);
-  CheckRaises(TCffBuilder.Type1Font(Options));
+  Options.EncodingData := TCffTestBuilder.Bytes([5, 0, 0]);
+  CheckRaises(TCffTestBuilder.Type1Font(Options));
 end;
 
 procedure TCFFHostileInputTests.TestEncodingOffsetBeyondDataRaises;
 begin
   var Options := TCffType1Options.Standard;
   // A format 0 encoding that claims 255 codes, at the very end of the data
-  Options.EncodingData := TCffBuilder.Bytes([0, 255]);
-  const Data = TCffBuilder.Type1Font(Options);
+  Options.EncodingData := TCffTestBuilder.Bytes([0, 255]);
+  const Data = TCffTestBuilder.Type1Font(Options);
   CheckRaises(Copy(Data, 0, Length(Data) - 20));
 end;
 
 procedure TCFFHostileInputTests.TestTruncatedFontOnlyRaisesParseException;
 begin
   var Options := TCffType1Options.Standard;
-  Options.CharsetData := TCffBuilder.Bytes([1, 0, 1, 1]);
-  Options.EncodingData := TCffBuilder.Bytes([1, 1, 65, 1]);
-  Options.LocalSubrs := [TCffBuilder.Bytes([11])];
-  const Data = TCffBuilder.Type1Font(Options);
+  Options.CharsetData := TCffTestBuilder.Bytes([1, 0, 1, 1]);
+  Options.EncodingData := TCffTestBuilder.Bytes([1, 1, 65, 1]);
+  Options.LocalSubrs := [TCffTestBuilder.Bytes([11])];
+  const Data = TCffTestBuilder.Type1Font(Options);
   for var Size := 0 to Length(Data) - 1 do
   begin
     const Outcome = OutcomeOf(Copy(Data, 0, Size));
@@ -1418,15 +1418,15 @@ end;
 procedure TCFFHostileInputTests.TestChangedBytesNeverEndInAnotherException;
 begin
   var Options := TCffType1Options.Standard;
-  Options.CharsetData := TCffBuilder.Bytes([1, 0, 1, 1]);
-  Options.EncodingData := TCffBuilder.Bytes([1, 1, 65, 1]);
-  Options.LocalSubrs := [TCffBuilder.Bytes([11])];
-  const Original = TCffBuilder.Type1Font(Options);
+  Options.CharsetData := TCffTestBuilder.Bytes([1, 0, 1, 1]);
+  Options.EncodingData := TCffTestBuilder.Bytes([1, 1, 65, 1]);
+  Options.LocalSubrs := [TCffTestBuilder.Bytes([11])];
+  const Original = TCffTestBuilder.Type1Font(Options);
 
   const Stopwatch = TStopwatch.StartNew;
   for var Position := 0 to Length(Original) - 1 do
   begin
-    for var Value in TCffBuilder.Bytes([0, 1, 4, $7F, $80, $FF]) do
+    for var Value in TCffTestBuilder.Bytes([0, 1, 4, $7F, $80, $FF]) do
     begin
       var Changed := Copy(Original);
       Changed[Position] := Value;

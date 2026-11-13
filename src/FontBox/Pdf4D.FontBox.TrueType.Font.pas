@@ -47,6 +47,9 @@ type
     procedure ReadPostScriptNames;
     function TryGetPreferredUnicodeSubtable(const Cmap: TCmapTable; out Subtable: TCmapSubtable): Boolean;
 
+  protected
+    procedure SetVersion(const Value: Single); virtual;
+
   public
     // Takes ownership of the data stream
     constructor Create(const Data: TTTFDataStream);
@@ -54,6 +57,8 @@ type
 
     procedure AddTable(const Table: TTTFTable);
     function TableTags: TArray<string>;
+    // Whether the font has the table; the table is not read
+    function HasTable(const Tag: string): Boolean;
     function GetTableBytes(const Tag: string): TBytes;
     function TryGetTable(const Tag: string; out Table: TTTFTable): Boolean; override;
     procedure ReadAllTables;
@@ -90,7 +95,7 @@ type
     function GetWidth(const GlyphName: string): Single; override;
     function HasGlyph(const GlyphName: string): Boolean; override;
 
-    property Version: Single read FVersion write FVersion;
+    property Version: Single read FVersion write SetVersion;
   end;
 
 implementation
@@ -136,9 +141,19 @@ begin
   inherited Destroy;
 end;
 
+procedure TTrueTypeFont.SetVersion(const Value: Single);
+begin
+  FVersion := Value;
+end;
+
 procedure TTrueTypeFont.AddTable(const Table: TTTFTable);
 begin
   FTables.AddOrSetValue(Table.Tag, Table);
+end;
+
+function TTrueTypeFont.HasTable(const Tag: string): Boolean;
+begin
+  Result := FTables.ContainsKey(Tag);
 end;
 
 function TTrueTypeFont.TableTags: TArray<string>;
