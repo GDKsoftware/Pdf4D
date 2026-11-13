@@ -120,18 +120,14 @@ text: separators 1-2          pages 1-2 with the separators below
 
 The sections come in this order: all `default` pages, all `sorted` pages, `range`, `separators`. `pages` is the number of pages found by iterating the page tree (as in the dump). `range` and `separators` are always written, also when the document has fewer pages (the section is then empty).
 
-Every section uses a new `PDFTextStripper` with `setLineSeparator("
-")` and `setPageEnd("
-")`, and for the per-page sections `setStartPage(n)`, `setEndPage(n)`. All other settings are the PDFBox defaults.
-`separators` uses `setLineSeparator("<EOL>
-")`, `setWordSeparator("<W>")`, `setParagraphStart("<P>")`, `setParagraphEnd("</P>")`, `setPageStart("<PAGE>")`, `setPageEnd("</PAGE>
-")`, `setArticleStart("<A>")` and `setArticleEnd("</A>")`.
+Every section uses a new `PDFTextStripper` with `setLineSeparator("\n")` and `setPageEnd("\n")`, and for the per-page sections `setStartPage(n)`, `setEndPage(n)`. All other settings are the PDFBox defaults.
+`separators` uses `setLineSeparator("<EOL>\n")`, `setWordSeparator("<W>")`, `setParagraphStart("<P>")`, `setParagraphEnd("</P>")`, `setPageStart("<PAGE>")`, `setPageEnd("</PAGE>\n")`, `setArticleStart("<A>")` and `setArticleEnd("</A>")`.
 
 ### Lines
 
-The text is split at LF. The empty piece after the last LF is dropped (an empty text gives a section without lines). Every piece becomes `| ` + the text escaped as "Escaped text" above (so a CR is ``, a TAB is `	`); when the text ends in a space, that last space is written as ` ` so that no line ends in a space. A piece that is empty becomes `|`. Text that is outside the BMP is written as its UTF-8 sequence; an unpaired surrogate (which the stripper can produce from broken input) is written as `?` by the oracle.
+The text is split at LF. The empty piece after the last LF is dropped (an empty text gives a section without lines). Every piece becomes `| ` + the text escaped as "Escaped text" above (so a CR is `\r`, a TAB is `\t`); when the text ends in a space, that last space is written as `\x20` so that no line ends in a space. A piece that is empty becomes `|`. Text that is outside the BMP is written as its UTF-8 sequence; an unpaired surrogate (which the stripper can produce from broken input) is written as `?` by the oracle.
 
-When the stripper throws, the heading is followed by one line `error`. A file that cannot be opened gives only `load-error: <kind>` (kinds as for the dump).
+When the stripper throws, the heading is followed by one line `error`. A Pdf4D exception (any `EPdfException` descendant, or any other exception) raised while extracting a section maps to that same single `error` line; the message is not compared. A file that cannot be opened gives only `load-error: <kind>` (kinds as for the dump). When the oracle run for a text golden hits the time limit while the dump loaded, `generate-golden.ps1` writes `load-error: timeout` (a kind that only text goldens have). Pdf4D never produces it, so such a golden fails the comparison until the file is looked at; it is never silently accepted.
 
 ### Hermetic fonts
 
@@ -141,9 +137,18 @@ The oracle (every mode) installs a font provider without fonts in `FontMappers.i
 
 1. The list of headings must be exactly equal. A missing or extra section is a difference.
 2. For each section: when the lines are exactly equal, the section is fine.
-3. Otherwise compare leniently: remove the leading `| ` (or `|`) on both sides, undo the escapes, replace every run of spaces and tabs by one space, trim, and drop lines that are empty after that. When the two lists are then equal, the section is *leniently equal*: not an error, but counted and reported in the test output.
+3. Otherwise compare leniently, in this order, on both sides: (a) remove the leading `| ` (or `|`); (b) undo the escapes; (c) replace every run of spaces and tabs by one space ("space" is U+0020 only, so a no-break space U+00A0 is data and never collapsed); (d) trim, which removes U+0020 and TAB at both ends of the line; (e) drop lines that are empty after that. The leniency hides runs of spaces, leading indentation, a trailing `\x20`, and the number and position of blank lines. Paragraph structure is therefore only checked in the `separators` section, where the `<P>` and `</P>` markers are text. When the two lists are then equal, the section is *leniently equal*: not an error, but counted and reported in the test output.
 4. Otherwise the difference is the first line that differs, reported with section heading and line number.
-5. Known differences are listed in `tests/golden/<name>.text-known-differences.txt`, one per line: `<prefix of a heading> [<platform>] # <reason>`. The platform (`Win32`, `Win64` or `Linux64`) is optional. A section whose heading starts with the prefix is not compared on that platform (or on any platform). Empty lines and lines starting with `#` are ignored.
+5. Known differences are listed in `tests/golden/<name>.text-known-differences.txt`, one per line: `<heading> [<platform>] # <reason>`. `<heading>` is the complete heading, matched exactly: `text: default page 1` does not match `text: default page 10`. A line is skipped only when its heading text before the optional platform and the `#` (trailing spaces removed) equals the section heading. The platform (`Win32`, `Win64` or `Linux64`) is optional and written in literal square brackets. A section with a matching entry is not compared on that platform (or on any platform when there is none). Empty lines and lines starting with `#` are ignored.
+
+   Examples:
+
+   ```
+   text: default page 1 [Win64] # glyph order differs on Win64 only
+   text: sorted page 10 # differs on every platform
+   ```
+
+   The first line skips only `text: default page 1`, and only on Win64. The second skips only `text: sorted page 10`, on all platforms.
 6. This leniency applies only to `.text.txt`. The structure dump is compared exactly.
 
 ## Font width files

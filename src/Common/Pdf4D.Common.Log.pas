@@ -15,6 +15,9 @@ type
     procedure Write(const Level: TPdfLogLevel; const Message: string); overload;
     procedure Write(const Level: TPdfLogLevel; const Fmt: string; const Args: array of const); overload;
 
+    class function ArgumentText(const Arg: TVarRec): string; static;
+    class function RawText(const Fmt: string; const Args: array of const): string; static;
+
   public
     constructor Create(const OnLog: TPdfLogEvent);
 
@@ -99,6 +102,56 @@ begin
   end;
 end;
 
+class function TPdfLog.ArgumentText(const Arg: TVarRec): string;
+begin
+  case Arg.VType of
+    vtInteger:
+      Result := IntToStr(Arg.VInteger);
+    vtInt64:
+      Result := IntToStr(Arg.VInt64^);
+    vtBoolean:
+      Result := BoolToStr(Arg.VBoolean, True);
+    vtChar:
+      Result := QuotedStr(string(Arg.VChar));
+    vtWideChar:
+      Result := QuotedStr(Arg.VWideChar);
+    vtString:
+      Result := QuotedStr(string(Arg.VString^));
+    vtAnsiString:
+      Result := QuotedStr(string(AnsiString(Arg.VAnsiString)));
+    vtWideString:
+      Result := QuotedStr(WideString(Arg.VWideString));
+    vtUnicodeString:
+      Result := QuotedStr(string(Arg.VUnicodeString));
+    vtExtended:
+      Result := FloatToStr(Arg.VExtended^);
+    vtCurrency:
+      Result := CurrToStr(Arg.VCurrency^);
+    vtPointer:
+      Result := 'pointer';
+    vtObject:
+      Result := Arg.VObject.ClassName;
+    vtClass:
+      Result := Arg.VClass.ClassName;
+  else
+    Result := '?';
+  end;
+end;
+
+class function TPdfLog.RawText(const Fmt: string; const Args: array of const): string;
+begin
+  Result := Fmt + ' [';
+  for var Index := 0 to High(Args) do
+  begin
+    if Index > 0 then
+    begin
+      Result := Result + ', ';
+    end;
+    Result := Result + ArgumentText(Args[Index]);
+  end;
+  Result := Result + ']';
+end;
+
 procedure TPdfLog.Write(const Level: TPdfLogLevel; const Fmt: string; const Args: array of const);
 begin
   if not Assigned(FOnLog) then
@@ -110,10 +163,10 @@ begin
   try
     Message := Format(Fmt, Args);
   except
-    // A bad format string or arguments that do not fit it: the raw format is still better than nothing
+    // A bad format string or arguments that do not fit it: the raw format plus the arguments is still better than nothing
     on Exception do
     begin
-      Message := Fmt;
+      Message := RawText(Fmt, Args);
     end;
   end;
   Write(Level, Message);

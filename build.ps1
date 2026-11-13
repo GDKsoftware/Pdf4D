@@ -32,11 +32,12 @@ function Invoke-Build([string]$TargetPlatform) {
 
 # Shared state is published lazily and freed by class destructors; initialization and finalization sections are not allowed
 function Test-NoInitializationSections {
-    $offenders = Get-ChildItem -Path (Join-Path $PSScriptRoot 'src') -Filter '*.pas' -Recurse |
+    $folders = 'src', 'tests\Support', 'tests\Acceptance' | ForEach-Object { Join-Path $PSScriptRoot $_ } | Where-Object { Test-Path $_ }
+    $offenders = Get-ChildItem -Path $folders -Include '*.pas', '*.inc' -Recurse |
         Select-String -Pattern '^\s*(initialization|finalization)\b' -CaseSensitive:$false
     if ($offenders) {
         $offenders | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
-        throw 'Units under src must not have initialization or finalization sections'
+        throw 'Units under src, tests/Support and tests/Acceptance must not have initialization or finalization sections'
     }
 }
 

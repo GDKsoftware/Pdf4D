@@ -121,6 +121,11 @@ end;
 
 constructor TPDPageTree.Create(const Root: TCosDictionary; const Context: TPDDocumentContext);
 begin
+  if Context = nil then
+  begin
+    raise EArgumentNilException.Create('Context');
+  end;
+
   inherited Create;
   FRoot := Root;
   FContext := Context;

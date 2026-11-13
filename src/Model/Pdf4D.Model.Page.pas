@@ -61,6 +61,11 @@ uses
 
 constructor TPDPage.Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
 begin
+  if Context = nil then
+  begin
+    raise EArgumentNilException.Create('Context');
+  end;
+
   inherited Create;
   FDictionary := Dictionary;
   FContext := Context;

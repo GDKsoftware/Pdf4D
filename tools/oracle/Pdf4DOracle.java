@@ -107,6 +107,16 @@ public class Pdf4DOracle
         try
         {
             makeFontsHermetic();
+        }
+        catch (Throwable t)
+        {
+            // Never a golden: without the hermetic setup every result would depend on the installed fonts
+            System.err.println("Cannot set up the hermetic font mapper");
+            t.printStackTrace();
+            System.exit(1);
+        }
+        try
+        {
             if (args.length >= 2 && args[0].equals("--font-widths"))
             {
                 out.print(fontWidths(new File(args[1])));

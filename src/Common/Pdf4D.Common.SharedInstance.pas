@@ -106,6 +106,11 @@ begin
   end;
 
   const Candidate = Factory(Key);
+  if Candidate = nil then
+  begin
+    raise EArgumentException.Create('The factory of a shared cache must not return nil');
+  end;
+
   FLock.BeginWrite;
   try
     if FItems.TryGetValue(Key, Result) then
@@ -117,7 +122,12 @@ begin
     end
     else
     begin
-      FItems.Add(Key, Candidate);
+      try
+        FItems.Add(Key, Candidate);
+      except
+        Candidate.Free;
+        raise;
+      end;
       Result := Candidate;
     end;
   finally

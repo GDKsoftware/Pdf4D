@@ -1,7 +1,7 @@
 # Runs the oracle for every PDF in tests/corpus and writes tests/golden/<path with '/' replaced by '__'>.dump.txt
 # (-Mode Dump) and .text.txt (-Mode Text); the default -Mode All writes both.
 # A file whose manifest notes contain password=<x> is opened with that password.
-# Each file runs in its own JVM with a timeout; a timeout is recorded as "load-error: parse".
+# Each file runs in its own JVM with a timeout; a timeout is recorded as "load-error: parse" in a dump and as "load-error: timeout" in a text golden.
 # Files that end in a load-error get an "oracle:load-error-<kind>" note in the manifest.
 param([int]$TimeoutSeconds = 60, [int]$Parallel = 4, [string]$Filter = '', [ValidateSet('Dump','Text','All')][string]$Mode = 'All')
 $ErrorActionPreference = 'Stop'
@@ -22,7 +22,7 @@ $files = Get-ChildItem $corpus -Recurse -File -Filter *.pdf | Sort-Object FullNa
 if ($Filter) { $files = $files | Where-Object { $_.FullName -like "*$Filter*" } }
 $queue = New-Object System.Collections.Queue
 foreach ($f in $files) { foreach ($m in $modes) { $queue.Enqueue([pscustomobject]@{ File = $f; Mode = $m }) } }
-$total = $queue.Count
+$fileCount = $files.Count
 $running = @()
 $timeouts = @()
 $textTimeouts = @()
@@ -51,7 +51,8 @@ while ($queue.Count -gt 0 -or $running.Count -gt 0) {
         if (((Get-Date) - $r.Start).TotalSeconds -gt $TimeoutSeconds) {
             try { $r.Proc.Kill() } catch {}
             $r.Proc.WaitForExit()
-            [IO.File]::WriteAllText($r.Out, "load-error: parse`n", (New-Object Text.UTF8Encoding($false)))
+            $marker = if ($r.Mode -eq 'dump') { 'load-error: parse' } else { 'load-error: timeout' }
+            [IO.File]::WriteAllText($r.Out, "$marker`n", (New-Object Text.UTF8Encoding($false)))
             if ($r.Mode -eq 'dump') { $timeouts += $r.Rel } else { $textTimeouts += $r.Rel }
             Write-Warning "timeout ($($r.Mode)): $($r.Rel)"
         } else { $still += $r }
@@ -69,7 +70,7 @@ if ($modes -contains 'text') {
 }
 if ($modes -notcontains 'dump') { return }
 $dumps = Get-ChildItem $golden -Filter *.dump.txt
-Write-Host ("{0} files, {1} dumps" -f $total, $dumps.Count)
+Write-Host ("{0} files, {1} dumps" -f $fileCount, $dumps.Count)
 $errs = @{}
 $rows = Read-Manifest
 foreach ($d in $dumps) {

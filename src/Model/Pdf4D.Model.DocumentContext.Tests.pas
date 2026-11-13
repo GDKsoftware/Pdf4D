@@ -32,6 +32,12 @@ type
 
     [Test]
     procedure TestPageCarriesContext;
+
+    [Test]
+    procedure TestDifferentValueForTheSameKeyRaises;
+
+    [Test]
+    procedure TestModelConstructorsRejectNilContext;
   end;
 
 implementation
@@ -39,7 +45,11 @@ implementation
 uses
   Pdf4D.Common.Defines,
   Pdf4D.Common.SharedInstance.Tests,
-  Pdf4D.Model.DocumentContext;
+  Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.DocumentCatalog,
+  Pdf4D.Model.DocumentContext,
+  Pdf4D.Model.Page,
+  Pdf4D.Model.PageTree;
 
 { TDocumentContextTests }
 
@@ -123,6 +133,66 @@ begin
     Assert.IsNotNull(Document.Context.Log);
   finally
     Builder.Free;
+  end;
+end;
+
+procedure TDocumentContextTests.TestDifferentValueForTheSameKeyRaises;
+begin
+  const Key = TObject.Create;
+  try
+    const Context = TPDDocumentContext.Create(nil);
+    try
+      const First = TTrackedObject.Create;
+      Context.AddCachedObject(Key, First);
+
+      const Second = TTrackedObject.Create;
+      try
+        Assert.WillRaise(
+          procedure
+          begin
+            Context.AddCachedObject(Key, Second);
+          end,
+          EArgumentException);
+      finally
+        Second.Free;
+      end;
+
+      var Found: TObject;
+      Assert.IsTrue(Context.TryGetCachedObject(Key, Found));
+      Assert.AreSame(First, Found, 'The earlier value is kept and not freed');
+      Assert.AreEqual(1, TTrackedObject.Freed, 'Only Second was freed');
+    finally
+      Context.Free;
+    end;
+  finally
+    Key.Free;
+  end;
+end;
+
+procedure TDocumentContextTests.TestModelConstructorsRejectNilContext;
+begin
+  const Dictionary = TCosDictionary.Create;
+  try
+    Assert.WillRaise(
+      procedure
+      begin
+        TPDDocumentCatalog.Create(Dictionary, nil);
+      end,
+      EArgumentNilException);
+    Assert.WillRaise(
+      procedure
+      begin
+        TPDPageTree.Create(Dictionary, nil);
+      end,
+      EArgumentNilException);
+    Assert.WillRaise(
+      procedure
+      begin
+        TPDPage.Create(Dictionary, nil);
+      end,
+      EArgumentNilException);
+  finally
+    Dictionary.Free;
   end;
 end;
 

@@ -87,13 +87,13 @@ begin
       begin
         Log.Warning('Broken %d and %s', ['text']);
       end);
-    Assert.AreEqual('Broken %d and %s', ReceivedMessage);
+    Assert.AreEqual('Broken %d and %s [''text'']', ReceivedMessage);
 
     Log.Warning('Object %d of %s', [12]);
-    Assert.IsTrue(ReceivedMessage.StartsWith('Object %d of %s'));
+    Assert.AreEqual('Object %d of %s [12]', ReceivedMessage);
 
-    Log.Warning('Wrong %q', [1]);
-    Assert.AreEqual('Wrong %q', ReceivedMessage);
+    Log.Warning('Object %z missing', [12, 'abc']);
+    Assert.AreEqual('Object %z missing [12, ''abc'']', ReceivedMessage);
   finally
     Log.Free;
   end;

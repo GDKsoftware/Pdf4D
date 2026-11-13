@@ -38,11 +38,50 @@ type
     class function Cache: TTrackedCache; static;
   end;
 
-  // Waits for the start signal and then runs the body
+  // What every thread of one race does. The shared objects are fields, so no anonymous method that runs on another
+  // thread captures an inline declaration of the test (a known problem of the Delphi 13 Win64 compiler).
+  TRaceScenario = class
+  private
+    FThreadCount: Integer;
+    FWaitForAll: Boolean;
+    FArrived: Integer;
+    FResults: TArray<TObject>;
+
+    function GetResult(const Index: Integer): TObject;
+  protected
+    // Blocks until all threads have arrived, so all of them are inside a factory at the same time
+    procedure WaitInFactory;
+  public
+    constructor Create(const ThreadCount: Integer; const WaitForAll: Boolean);
+
+    procedure Run(const Index: Integer); virtual; abstract;
+
+    property ThreadCount: Integer read FThreadCount;
+    property Results[const Index: Integer]: TObject read GetResult;
+  end;
+
+  TInstanceRace = class(TRaceScenario)
+  private
+    FShared: TTrackedInstance;
+  public
+    procedure Run(const Index: Integer); override;
+    procedure Release;
+  end;
+
+  TCacheRace = class(TRaceScenario)
+  private
+    FCache: TTrackedCache;
+  public
+    constructor Create(const Cache: TTrackedCache; const ThreadCount: Integer; const WaitForAll: Boolean);
+
+    procedure Run(const Index: Integer); override;
+  end;
+
+  // Waits for the start signal and then runs its part of the scenario
   TTestWorker = class(TThread)
   private
     FStartSignal: TEvent;
-    FBody: TProc<Integer>;
+    FScenario: TRaceScenario;
     FIndex: Integer;
     FFailure: string;
 
@@ -50,7 +89,7 @@ type
     procedure Execute; override;
 
   public
-    constructor Create(const StartSignal: TEvent; const Body: TProc<Integer>; const Index: Integer);
+    constructor Create(const StartSignal: TEvent; const Scenario: TRaceScenario; const Index: Integer);
 
     property Failure: string read FFailure;
   end;
@@ -58,10 +97,8 @@ type
   [TestFixture]
   TSharedInstanceTests = class
   private
-    // Runs Body on ThreadCount threads that all start at the same moment. The first failure is raised afterwards.
-    class procedure RunConcurrently(const ThreadCount: Integer; const Body: TProc<Integer>); static;
-    // Blocks until ThreadCount threads have arrived, so all of them are inside a factory at the same time
-    class procedure WaitForAllThreads(var Arrived: Integer; const ThreadCount: Integer); static;
+    // Runs the scenario on its ThreadCount threads that all start at the same moment. A failure is raised afterwards.
+    class procedure RunConcurrently(const Scenario: TRaceScenario); static;
 
   public
     [Setup]
@@ -84,6 +121,9 @@ type
 
     [Test]
     procedure TestSharedCacheUnderContention;
+
+    [Test]
+    procedure TestSharedCacheNilFromFactoryRaises;
 
     [Test]
     procedure TestSharedCacheTryGetAndDestructorFreesValues;
@@ -130,13 +170,78 @@ begin
     end);
 end;
 
+{ TRaceScenario }
+
+constructor TRaceScenario.Create(const ThreadCount: Integer; const WaitForAll: Boolean);
+begin
+  inherited Create;
+  FThreadCount := ThreadCount;
+  FWaitForAll := WaitForAll;
+  SetLength(FResults, ThreadCount);
+end;
+
+function TRaceScenario.GetResult(const Index: Integer): TObject;
+begin
+  Result := FResults[Index];
+end;
+
+procedure TRaceScenario.WaitInFactory;
+begin
+  if not FWaitForAll then
+  begin
+    Exit;
+  end;
+
+  TInterlocked.Increment(FArrived);
+  const Deadline = TThread.GetTickCount64 + 10000;
+  while (TInterlocked.CompareExchange(FArrived, 0, 0) < FThreadCount) and (TThread.GetTickCount64 < Deadline) do
+  begin
+    TThread.Yield;
+  end;
+end;
+
+{ TInstanceRace }
+
+procedure TInstanceRace.Run(const Index: Integer);
+begin
+  FResults[Index] := FShared.Get(
+    function: TTrackedObject
+    begin
+      WaitInFactory;
+      Result := TTrackedObject.Create;
+    end);
+end;
+
+procedure TInstanceRace.Release;
+begin
+  FShared.Release;
+end;
+
+{ TCacheRace }
+
+constructor TCacheRace.Create(const Cache: TTrackedCache; const ThreadCount: Integer; const WaitForAll: Boolean);
+begin
+  inherited Create(ThreadCount, WaitForAll);
+  FCache := Cache;
+end;
+
+procedure TCacheRace.Run(const Index: Integer);
+begin
+  FResults[Index] := FCache.GetOrAdd('key',
+    function(Key: string): TTrackedObject
+    begin
+      WaitInFactory;
+      Result := TTrackedObject.Create;
+    end);
+end;
+
 { TTestWorker }
 
-constructor TTestWorker.Create(const StartSignal: TEvent; const Body: TProc<Integer>; const Index: Integer);
+constructor TTestWorker.Create(const StartSignal: TEvent; const Scenario: TRaceScenario; const Index: Integer);
 begin
   inherited Create(False);
   FStartSignal := StartSignal;
-  FBody := Body;
+  FScenario := Scenario;
   FIndex := Index;
 end;
 
@@ -144,11 +249,11 @@ procedure TTestWorker.Execute;
 begin
   FStartSignal.WaitFor(INFINITE);
   try
-    FBody(FIndex);
+    FScenario.Run(FIndex);
   except
     on Caught: Exception do
     begin
-      FFailure := Caught.ClassName + ': ' + Caught.Message;
+      FFailure := Format('%s: %s', [Caught.ClassName, Caught.Message]);
     end;
   end;
 end;
@@ -160,25 +265,15 @@ begin
   TTrackedObject.ResetCounters;
 end;
 
-class procedure TSharedInstanceTests.WaitForAllThreads(var Arrived: Integer; const ThreadCount: Integer);
-begin
-  TInterlocked.Increment(Arrived);
-  const Deadline = TThread.GetTickCount64 + 10000;
-  while (TInterlocked.CompareExchange(Arrived, 0, 0) < ThreadCount) and (TThread.GetTickCount64 < Deadline) do
-  begin
-    TThread.Yield;
-  end;
-end;
-
-class procedure TSharedInstanceTests.RunConcurrently(const ThreadCount: Integer; const Body: TProc<Integer>);
+class procedure TSharedInstanceTests.RunConcurrently(const Scenario: TRaceScenario);
 begin
   const StartSignal = TEvent.Create(nil, True, False, '');
   var Workers: TArray<TTestWorker>;
-  SetLength(Workers, ThreadCount);
+  SetLength(Workers, Scenario.ThreadCount);
   try
-    for var Index := 0 to ThreadCount - 1 do
+    for var Index := 0 to Scenario.ThreadCount - 1 do
     begin
-      Workers[Index] := TTestWorker.Create(StartSignal, Body, Index);
+      Workers[Index] := TTestWorker.Create(StartSignal, Scenario, Index);
     end;
 
     StartSignal.SetEvent;
@@ -204,31 +299,23 @@ begin
   const Rounds = 200;
   for var Round := 1 to Rounds do
   begin
-    var Shared: TTrackedInstance;
-    Shared := Default(TTrackedInstance);
-    var Results: TArray<TObject>;
-    SetLength(Results, ThreadCount);
     TTrackedObject.ResetCounters;
+    const Race = TInstanceRace.Create(ThreadCount, False);
+    try
+      RunConcurrently(Race);
 
-    RunConcurrently(ThreadCount,
-      procedure(Index: Integer)
+      for var Index := 1 to ThreadCount - 1 do
       begin
-        Results[Index] := Shared.Get(
-          function: TTrackedObject
-          begin
-            Result := TTrackedObject.Create;
-          end);
-      end);
+        Assert.AreSame(Race.Results[0], Race.Results[Index]);
+      end;
+      Assert.IsTrue(TTrackedObject.Created >= 1);
+      Assert.AreEqual(TTrackedObject.Created - 1, TTrackedObject.Freed, 'Every loser is freed, the winner stays');
 
-    for var Index := 1 to ThreadCount - 1 do
-    begin
-      Assert.AreSame(Results[0], Results[Index]);
+      Race.Release;
+      Assert.AreEqual(TTrackedObject.Created, TTrackedObject.Freed, 'Release frees the published instance');
+    finally
+      Race.Free;
     end;
-    Assert.IsTrue(TTrackedObject.Created >= 1);
-    Assert.AreEqual(TTrackedObject.Created - 1, TTrackedObject.Freed, 'Every loser is freed, the winner stays');
-
-    Shared.Release;
-    Assert.AreEqual(TTrackedObject.Created, TTrackedObject.Freed, 'Release frees the published instance');
   end;
 end;
 
@@ -236,31 +323,21 @@ procedure TSharedInstanceTests.TestEveryThreadMakesACandidateAndOneSurvives;
 begin
   // The factories wait for each other, so every thread has made a candidate before any of them can publish
   const ThreadCount = 8;
-  var Shared: TTrackedInstance;
-  Shared := Default(TTrackedInstance);
-  var Arrived := 0;
-  var Results: TArray<TObject>;
-  SetLength(Results, ThreadCount);
+  const Race = TInstanceRace.Create(ThreadCount, True);
+  try
+    RunConcurrently(Race);
 
-  RunConcurrently(ThreadCount,
-    procedure(Index: Integer)
+    Assert.AreEqual(ThreadCount, TTrackedObject.Created, 'All threads raced with a candidate');
+    Assert.AreEqual(ThreadCount - 1, TTrackedObject.Freed);
+    for var Index := 1 to ThreadCount - 1 do
     begin
-      Results[Index] := Shared.Get(
-        function: TTrackedObject
-        begin
-          WaitForAllThreads(Arrived, ThreadCount);
-          Result := TTrackedObject.Create;
-        end);
-    end);
-
-  Assert.AreEqual(ThreadCount, TTrackedObject.Created, 'All threads raced with a candidate');
-  Assert.AreEqual(ThreadCount - 1, TTrackedObject.Freed);
-  for var Index := 1 to ThreadCount - 1 do
-  begin
-    Assert.AreSame(Results[0], Results[Index]);
+      Assert.AreSame(Race.Results[0], Race.Results[Index]);
+    end;
+    Race.Release;
+    Assert.AreEqual(ThreadCount, TTrackedObject.Freed);
+  finally
+    Race.Free;
   end;
-  Shared.Release;
-  Assert.AreEqual(ThreadCount, TTrackedObject.Freed);
 end;
 
 procedure TSharedInstanceTests.TestFactoryExceptionPublishesNothing;
@@ -333,24 +410,16 @@ begin
   const ThreadCount = 8;
   const Cache = TTrackedCache.Create;
   try
-    var Arrived := 0;
-    var Results: TArray<TObject>;
-    SetLength(Results, ThreadCount);
+    const Race = TCacheRace.Create(Cache, ThreadCount, True);
+    try
+      RunConcurrently(Race);
 
-    RunConcurrently(ThreadCount,
-      procedure(Index: Integer)
+      for var Index := 1 to ThreadCount - 1 do
       begin
-        Results[Index] := Cache.GetOrAdd('key',
-          function(Key: string): TTrackedObject
-          begin
-            WaitForAllThreads(Arrived, ThreadCount);
-            Result := TTrackedObject.Create;
-          end);
-      end);
-
-    for var Index := 1 to ThreadCount - 1 do
-    begin
-      Assert.AreSame(Results[0], Results[Index]);
+        Assert.AreSame(Race.Results[0], Race.Results[Index]);
+      end;
+    finally
+      Race.Free;
     end;
     Assert.AreEqual(ThreadCount, TTrackedObject.Created);
     Assert.AreEqual(ThreadCount - 1, TTrackedObject.Freed);
@@ -358,6 +427,28 @@ begin
     Cache.Free;
   end;
   Assert.AreEqual(ThreadCount, TTrackedObject.Freed);
+end;
+
+procedure TSharedInstanceTests.TestSharedCacheNilFromFactoryRaises;
+begin
+  const Cache = TTrackedCache.Create;
+  try
+    Assert.WillRaise(
+      procedure
+      begin
+        Cache.GetOrAdd('nil',
+          function(Key: string): TTrackedObject
+          begin
+            Result := nil;
+          end);
+      end,
+      EArgumentException);
+
+    var Value: TTrackedObject;
+    Assert.IsFalse(Cache.TryGet('nil', Value), 'A nil is never stored');
+  finally
+    Cache.Free;
+  end;
 end;
 
 procedure TSharedInstanceTests.TestSharedCacheTryGetAndDestructorFreesValues;

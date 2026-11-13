@@ -32,7 +32,7 @@ type
 
     // Key is the identity of a dictionary or stream. Value stays owned by the context.
     function TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean;
-    // The context becomes the owner of Value. An earlier value for Key is freed.
+    // The context becomes the owner of Value. A second value for the same Key raises EArgumentException.
     procedure AddCachedObject(const Key: TObject; const Value: TObject);
 
     property CosDocument: TCosDocument read FCosDocument;
@@ -104,11 +104,15 @@ end;
 procedure TPDDocumentContext.AddCachedObject(const Key: TObject; const Value: TObject);
 begin
   var Existing: TObject;
-  if FObjects.TryGetValue(Key, Existing) and (Existing = Value) then
+  if FObjects.TryGetValue(Key, Existing) then
   begin
-    Exit;
+    if Existing = Value then
+    begin
+      Exit;
+    end;
+    raise EArgumentException.Create('The context already holds a different object for this key');
   end;
-  FObjects.AddOrSetValue(Key, Value);
+  FObjects.Add(Key, Value);
 end;
 
 end.
