@@ -43,10 +43,10 @@ Tests that read corpus files look for a `corpus` folder with a `manifest.csv`, s
 
 The glyph lists, the AFM files of the standard 14 fonts, the predefined CMaps and LiberationSans live in `src\Resources` as one `.res` file per group. Each source file is a zlib-compressed `RCDATA` resource, named by `TPdfResourceData.NameOf` (for example `PDF4D_CMAP_UNIGB_UCS2_H`), and one small unit per group (`Pdf4D.Resources.<Group>.pas`) links the `.res` with `{$R}`. The `.res` files, `resources.csv` (name, source, SHA-256 of the uncompressed bytes, licence) and `afm-MustRead.html` are committed; never edit them by hand.
 
-To rebuild them, run `toolsetch-pdfbox-src.ps1` once and then:
+To rebuild them, run `tools\fetch-pdfbox-src.ps1` once and then:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File toolsesourcesuild-resources.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\resources\build-resources.ps1
 ```
 
 The script needs `brcc32` from the Delphi `bin` folder (it calls `rsvars.bat`), fails on a duplicate resource name, and gives byte-identical output for identical sources. `TestResourceHashesMatchCsv` compares every resource with `resources.csv`.
