@@ -12,16 +12,21 @@ uses
   System.Generics.Collections,
   Pdf4D.FontBox.BoundingBox,
   Pdf4D.FontBox.TrueType.DataStream,
-  Pdf4D.FontBox.TrueType.Tables;
+  Pdf4D.FontBox.TrueType.Tables,
+  Pdf4D.FontBox.TrueType.Cmap,
+  Pdf4D.FontBox.TrueType.Post,
+  Pdf4D.FontBox.TrueType.Vertical;
 
 type
   // Tables are read when they are first asked for, as in PDFBox. That makes the font a single-threaded object until
-  // ReadAllTables has run: after it nothing changes any more and the font can be shared.
+  // ReadAllTables has run: after it nothing changes any more (the tables, the cached counts and the glyph name lookup are all
+  // filled) and the font can be shared. The parser calls it before it hands out a font.
   // The font owns its tables and its data stream.
   TTrueTypeFont = class(TTTFTableHost)
   private
     const DefaultAdvanceWidth = 250;
     const FontUnitsPerThousand = 1000.0;
+    const UnicodeNameLength = 7;
 
   private
     FData: TTTFDataStream;
@@ -29,11 +34,18 @@ type
     FVersion: Single;
     FNumberOfGlyphs: Integer;
     FUnitsPerEm: Integer;
+    FPostScriptNames: TDictionary<string, Integer>;
+
+    class function TryParseUnicodeName(const Name: string; out CodePoint: Integer): Boolean; static;
+    class function TryParseHexNumber(const Text: string; out Value: Integer): Boolean; static;
+    class function TryParseGlyphIdName(const Name: string; out GID: Integer): Boolean; static;
 
     function RequiredTable(const Tag: string): TTTFTable;
     function BoxScale: Single;
     procedure ReadTable(const Table: TTTFTable);
     procedure GuardTableRange(const Table: TTTFTable);
+    procedure ReadPostScriptNames;
+    function TryGetPreferredUnicodeSubtable(const Cmap: TCmapTable; out Subtable: TCmapSubtable): Boolean;
 
   public
     // Takes ownership of the data stream
@@ -53,6 +65,18 @@ type
     function HorizontalMetrics: THorizontalMetricsTable;
     function TryGetNaming(out Naming: TNamingTable): Boolean;
     function TryGetOS2Windows(out OS2Windows: TOS2WindowsMetricsTable): Boolean;
+    function TryGetCmap(out Cmap: TCmapTable): Boolean;
+    function TryGetPostScript(out PostScript: TPostScriptTable): Boolean;
+    function TryGetVerticalHeader(out VerticalHeader: TVerticalHeaderTable): Boolean;
+    function TryGetVerticalMetrics(out VerticalMetrics: TVerticalMetricsTable): Boolean;
+
+    // The best Unicode cmap of the font, in the order of PDFBox: Unicode full, Windows full, Unicode BMP, Windows BMP, Windows symbol,
+    // Unicode 1.1. When there is none a strict lookup fails; a lenient one takes the first subtable of the cmap, whatever its encoding.
+    function TryGetUnicodeCmapLookup(const IsStrict: Boolean; out Lookup: TCmapSubtable): Boolean;
+    // The strict lookup; raises EPdfParseException when the font has no Unicode cmap
+    function GetUnicodeCmapLookup: TCmapSubtable;
+    // The glyph for a PostScript name: the post table first, then uniXXXX through the Unicode cmap, then gNNN. 0 when there is none.
+    function NameToGID(const Name: string): Integer;
 
     function NumberOfGlyphs: Integer; override;
     function UnitsPerEm: Integer;
@@ -75,6 +99,24 @@ uses
   System.Generics.Defaults,
   Pdf4D.Common.Defines;
 
+type
+  TCmapPreference = record
+    PlatformId: Integer;
+    EncodingId: Integer;
+  end;
+
+const
+  UnicodePreferences: array[0..5] of TCmapPreference = (
+    (PlatformId: TCmapTable.PlatformUnicode; EncodingId: TCmapTable.EncodingUnicode20Full),
+    (PlatformId: TCmapTable.PlatformWindows; EncodingId: TCmapTable.EncodingWinUnicodeFull),
+    (PlatformId: TCmapTable.PlatformUnicode; EncodingId: TCmapTable.EncodingUnicode20Bmp),
+    (PlatformId: TCmapTable.PlatformWindows; EncodingId: TCmapTable.EncodingWinUnicodeBmp),
+    // Microsoft calls "Symbol" a Unicode encoding with a non-standard character set
+    (PlatformId: TCmapTable.PlatformWindows; EncodingId: TCmapTable.EncodingWinSymbol),
+    // PDFBOX-6015
+    (PlatformId: TCmapTable.PlatformUnicode; EncodingId: TCmapTable.EncodingUnicode11)
+  );
+
 { TTrueTypeFont }
 
 constructor TTrueTypeFont.Create(const Data: TTTFDataStream);
@@ -88,6 +130,7 @@ end;
 
 destructor TTrueTypeFont.Destroy;
 begin
+  FPostScriptNames.Free;
   FTables.Free;
   FData.Free;
   inherited Destroy;
@@ -177,6 +220,11 @@ begin
       ReadTable(Table);
     end;
   end;
+
+  // These fill the cached counts and the glyph name lookup, so a shared font never changes after this
+  NumberOfGlyphs;
+  UnitsPerEm;
+  ReadPostScriptNames;
 end;
 
 function TTrueTypeFont.RequiredTable(const Tag: string): TTTFTable;
@@ -232,6 +280,62 @@ begin
   else
   begin
     OS2Windows := nil;
+  end;
+end;
+
+function TTrueTypeFont.TryGetCmap(out Cmap: TCmapTable): Boolean;
+begin
+  var Table: TTTFTable;
+  Result := TryGetTable(TCmapTable.TableTag, Table);
+  if Result then
+  begin
+    Cmap := Table as TCmapTable;
+  end
+  else
+  begin
+    Cmap := nil;
+  end;
+end;
+
+function TTrueTypeFont.TryGetPostScript(out PostScript: TPostScriptTable): Boolean;
+begin
+  var Table: TTTFTable;
+  Result := TryGetTable(TPostScriptTable.TableTag, Table);
+  if Result then
+  begin
+    PostScript := Table as TPostScriptTable;
+  end
+  else
+  begin
+    PostScript := nil;
+  end;
+end;
+
+function TTrueTypeFont.TryGetVerticalHeader(out VerticalHeader: TVerticalHeaderTable): Boolean;
+begin
+  var Table: TTTFTable;
+  Result := TryGetTable(TVerticalHeaderTable.TableTag, Table);
+  if Result then
+  begin
+    VerticalHeader := Table as TVerticalHeaderTable;
+  end
+  else
+  begin
+    VerticalHeader := nil;
+  end;
+end;
+
+function TTrueTypeFont.TryGetVerticalMetrics(out VerticalMetrics: TVerticalMetricsTable): Boolean;
+begin
+  var Table: TTTFTable;
+  Result := TryGetTable(TVerticalMetricsTable.TableTag, Table);
+  if Result then
+  begin
+    VerticalMetrics := Table as TVerticalMetricsTable;
+  end
+  else
+  begin
+    VerticalMetrics := nil;
   end;
 end;
 
@@ -330,14 +434,206 @@ begin
   Result := [0.001 * Scale, 0, 0, 0.001 * Scale, 0, 0];
 end;
 
+procedure TTrueTypeFont.ReadPostScriptNames;
+begin
+  if Assigned(FPostScriptNames) then
+  begin
+    Exit;
+  end;
+
+  // Only a complete lookup is published; a failing post table leaves the font without one
+  const Names = TDictionary<string, Integer>.Create;
+  try
+    var PostScript: TPostScriptTable;
+    if TryGetPostScript(PostScript) then
+    begin
+      for var GID := 0 to PostScript.GlyphNameCount - 1 do
+      begin
+        var GlyphName: string;
+        if PostScript.TryGetName(GID, GlyphName) then
+        begin
+          Names.AddOrSetValue(GlyphName, GID);
+        end;
+      end;
+    end;
+  except
+    Names.Free;
+    raise;
+  end;
+  FPostScriptNames := Names;
+end;
+
+function TTrueTypeFont.TryGetPreferredUnicodeSubtable(const Cmap: TCmapTable; out Subtable: TCmapSubtable): Boolean;
+begin
+  for var Preference in UnicodePreferences do
+  begin
+    if Cmap.TryGetSubtable(Preference.PlatformId, Preference.EncodingId, Subtable) then
+    begin
+      Exit(True);
+    end;
+  end;
+
+  Subtable := nil;
+  Result := False;
+end;
+
+function TTrueTypeFont.TryGetUnicodeCmapLookup(const IsStrict: Boolean; out Lookup: TCmapSubtable): Boolean;
+begin
+  Lookup := nil;
+  var Cmap: TCmapTable;
+  if not TryGetCmap(Cmap) then
+  begin
+    Exit(False);
+  end;
+
+  if TryGetPreferredUnicodeSubtable(Cmap, Lookup) then
+  begin
+    Exit(True);
+  end;
+
+  // Falling back to the first subtable may give poor results, because it need not be Unicode
+  const CanFallBack = ((not IsStrict) and (Cmap.Subtables.Count > 0));
+  if CanFallBack then
+  begin
+    Lookup := Cmap.Subtables[0];
+  end;
+  Result := CanFallBack;
+end;
+
+function TTrueTypeFont.GetUnicodeCmapLookup: TCmapSubtable;
+begin
+  var Cmap: TCmapTable;
+  if not TryGetCmap(Cmap) then
+  begin
+    raise EPdfParseException.CreateFmt('The TrueType font %s does not contain a ''cmap'' table', [Name]);
+  end;
+
+  if not TryGetUnicodeCmapLookup(True, Result) then
+  begin
+    raise EPdfParseException.Create('The TrueType font does not contain a Unicode cmap');
+  end;
+end;
+
+// Java's Integer.parseInt(text, 16): an optional sign and hexadecimal digits
+class function TTrueTypeFont.TryParseHexNumber(const Text: string; out Value: Integer): Boolean;
+begin
+  Value := 0;
+  const HasSign = ((Text.Length > 0) and ((Text[1] = '-') or (Text[1] = '+')));
+  const IsNegative = ((Text.Length > 0) and (Text[1] = '-'));
+  var FirstDigit := 1;
+  if HasSign then
+  begin
+    FirstDigit := 2;
+  end;
+
+  if FirstDigit > Text.Length then
+  begin
+    Exit(False);
+  end;
+
+  for var Position := FirstDigit to Text.Length do
+  begin
+    const Digit = Pos(UpCase(Text[Position]), '0123456789ABCDEF') - 1;
+    if Digit < 0 then
+    begin
+      Exit(False);
+    end;
+    Value := (Value * 16) + Digit;
+  end;
+
+  if IsNegative then
+  begin
+    Value := -Value;
+  end;
+  Result := True;
+end;
+
+// uniXXXX with exactly one four-digit number, the form PDFBox accepts
+class function TTrueTypeFont.TryParseUnicodeName(const Name: string; out CodePoint: Integer): Boolean;
+begin
+  CodePoint := -1;
+  const HasUnicodeForm = ((Name.Length = UnicodeNameLength) and (Copy(Name, 1, 3) = 'uni'));
+  if not HasUnicodeForm then
+  begin
+    Exit(False);
+  end;
+
+  var Number: Integer;
+  if not TryParseHexNumber(Copy(Name, 4, 4), Number) then
+  begin
+    Exit(False);
+  end;
+
+  // The disallowed code area (the surrogates) gives an empty result
+  const IsDisallowed = ((Number > $D7FF) and (Number < $E000));
+  if IsDisallowed then
+  begin
+    Exit(False);
+  end;
+
+  CodePoint := Number and $FFFF;
+  Result := True;
+end;
+
+// PDFBOX-5604: gNNN is a glyph id. Java's "g\d+" and Integer.parseInt; a number that does not fit is no match.
+class function TTrueTypeFont.TryParseGlyphIdName(const Name: string; out GID: Integer): Boolean;
+begin
+  GID := 0;
+  const HasGlyphIdForm = ((Name.Length > 1) and (Name[1] = 'g'));
+  if not HasGlyphIdForm then
+  begin
+    Exit(False);
+  end;
+
+  for var Position := 2 to Name.Length do
+  begin
+    if (Name[Position] < '0') or (Name[Position] > '9') then
+    begin
+      Exit(False);
+    end;
+  end;
+
+  Result := TryStrToInt(Copy(Name, 2, Name.Length - 1), GID);
+end;
+
+function TTrueTypeFont.NameToGID(const Name: string): Integer;
+begin
+  ReadPostScriptNames;
+  var GID: Integer;
+  const IsInPostTable = (FPostScriptNames.TryGetValue(Name, GID) and (GID > 0) and (GID < NumberOfGlyphs));
+  if IsInPostTable then
+  begin
+    Exit(GID);
+  end;
+
+  var CodePoint: Integer;
+  if TryParseUnicodeName(Name, CodePoint) then
+  begin
+    // PDFBox fails on a missing cmap here; the glyph is then simply not there
+    var Lookup: TCmapSubtable;
+    if TryGetUnicodeCmapLookup(False, Lookup) then
+    begin
+      Exit(Lookup.GetGlyphId(CodePoint));
+    end;
+    Exit(0);
+  end;
+
+  if TryParseGlyphIdName(Name, GID) then
+  begin
+    Exit(GID);
+  end;
+
+  Result := 0;
+end;
+
 function TTrueTypeFont.GetWidth(const GlyphName: string): Single;
 begin
-  raise ENotImplemented.Create('Glyph names of a TrueType font need the post table, which is not ported yet');
+  Result := GetAdvanceWidth(NameToGID(GlyphName));
 end;
 
 function TTrueTypeFont.HasGlyph(const GlyphName: string): Boolean;
 begin
-  raise ENotImplemented.Create('Glyph names of a TrueType font need the post table, which is not ported yet');
+  Result := (NameToGID(GlyphName) <> 0);
 end;
 
 end.

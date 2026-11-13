@@ -15,15 +15,13 @@ uses
   Pdf4D.FontBox.TrueType.Font;
 
 type
-  // Parses a TrueType font with glyf outlines. A broken font raises EPdfParseException. The tables the later tasks port
-  // (cmap, post, loca, glyf) are only checked for presence here.
+  // Parses a TrueType font with glyf outlines. A broken font raises EPdfParseException. The font that comes out has read all its
+  // tables (ReadAllTables), so it can be shared. loca and glyf are only checked for presence: Pdf4D does not draw glyphs.
   TTTFParser = class
   private
     const CffTag = 'CFF ';
-    const PostTag = 'post';
     const LocaTag = 'loca';
     const GlyfTag = 'glyf';
-    const CmapTag = 'cmap';
 
   private
     FIsEmbedded: Boolean;
@@ -32,7 +30,7 @@ type
     class function CreateTable(const Tag: string; const CheckSum, Offset, Length: Int64): TTTFTable; static;
 
     function TryReadTableDirectoryEntry(const Data: TTTFDataStream; out Table: TTTFTable): Boolean;
-    procedure ReadTableDirectory(const Font: TTrueTypeFont; const Data: TTTFDataStream);
+    procedure ReadTableDirectory(const Font: TTrueTypeFont; const Data: TTTFDataStream; const DirectoryOffset: Int64);
     procedure AddTableInsideData(const Font: TTrueTypeFont; const Table: TTTFTable);
     procedure GuardMandatoryTable(const Font: TTrueTypeFont; const Tag: string);
     procedure GuardMandatoryTables(const Font: TTrueTypeFont);
@@ -41,13 +39,18 @@ type
     // The log is not owned and only used while Parse runs
     constructor Create(const IsEmbedded: Boolean = False; const Log: TPdfLog = nil);
 
-    function Parse(const Data: TBytes): TTrueTypeFont;
+    function Parse(const Data: TBytes): TTrueTypeFont; overload;
+    // For a font inside a collection: the table directory starts at DirectoryOffset and the table offsets count from the start of Data
+    function Parse(const Data: TBytes; const DirectoryOffset: Int64): TTrueTypeFont; overload;
   end;
 
 implementation
 
 uses
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.FontBox.TrueType.Cmap,
+  Pdf4D.FontBox.TrueType.Post,
+  Pdf4D.FontBox.TrueType.Vertical;
 
 { TTTFParser }
 
@@ -83,6 +86,22 @@ begin
   else if Tag = TOS2WindowsMetricsTable.TableTag then
   begin
     Result := TOS2WindowsMetricsTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TCmapTable.TableTag then
+  begin
+    Result := TCmapTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TPostScriptTable.TableTag then
+  begin
+    Result := TPostScriptTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TVerticalHeaderTable.TableTag then
+  begin
+    Result := TVerticalHeaderTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TVerticalMetricsTable.TableTag then
+  begin
+    Result := TVerticalMetricsTable.Create(Tag, CheckSum, Offset, Length);
   end
   else
   begin
@@ -128,8 +147,9 @@ begin
   end;
 end;
 
-procedure TTTFParser.ReadTableDirectory(const Font: TTrueTypeFont; const Data: TTTFDataStream);
+procedure TTTFParser.ReadTableDirectory(const Font: TTrueTypeFont; const Data: TTTFDataStream; const DirectoryOffset: Int64);
 begin
+  Data.Seek(DirectoryOffset);
   Font.Version := Data.Read32Fixed;
   const NumberOfTables = Data.ReadUnsignedShort;
   Data.ReadUnsignedShort; // search range
@@ -169,7 +189,7 @@ begin
   GuardMandatoryTable(Font, TMaximumProfileTable.TableTag);
   if not FIsEmbedded then
   begin
-    GuardMandatoryTable(Font, PostTag);
+    GuardMandatoryTable(Font, TPostScriptTable.TableTag);
   end;
 
   GuardMandatoryTable(Font, LocaTag);
@@ -182,11 +202,16 @@ begin
   GuardMandatoryTable(Font, THorizontalMetricsTable.TableTag);
   if not FIsEmbedded then
   begin
-    GuardMandatoryTable(Font, CmapTag);
+    GuardMandatoryTable(Font, TCmapTable.TableTag);
   end;
 end;
 
 function TTTFParser.Parse(const Data: TBytes): TTrueTypeFont;
+begin
+  Result := Parse(Data, 0);
+end;
+
+function TTTFParser.Parse(const Data: TBytes; const DirectoryOffset: Int64): TTrueTypeFont;
 begin
   const Stream = TTTFMemoryDataStream.Create(Data);
   // The font owns the stream from here on
@@ -194,7 +219,7 @@ begin
   try
     Result.Log := FLog;
     try
-      ReadTableDirectory(Result, Stream);
+      ReadTableDirectory(Result, Stream, DirectoryOffset);
       Result.ReadAllTables;
       GuardMandatoryTables(Result);
     finally
