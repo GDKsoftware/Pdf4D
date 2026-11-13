@@ -72,7 +72,8 @@ end;
 
 function TCosObjectKeyComparer.GetHashCode(const Value: TCosObjectKey): Integer;
 begin
-  const Mixed = UInt64(Value.Number) * UInt64(31) + UInt64(Cardinal(Value.Generation));
+  // The generation is below 2^32 and the factor too, so the product fits in 64 bits for every number
+  const Mixed = UInt64(Value.Number) xor (UInt64(Cardinal(Value.Generation)) * $9E3779B1);
   Result := Integer(Cardinal((Mixed xor (Mixed shr 32)) and $FFFFFFFF));
 end;
 

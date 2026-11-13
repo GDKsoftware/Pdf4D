@@ -207,7 +207,7 @@ begin
   var Seed: Cardinal := 987;
   for var Index := 0 to Length - 1 do
   begin
-    Seed := Seed * 1103515245 + 12345;
+    Seed := Cardinal((UInt64(Seed) * 1103515245 + 12345) and $FFFFFFFF);
     Result[Index] := Byte(Ord('a') + ((Seed shr 16) mod 6));
   end;
 end;

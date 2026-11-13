@@ -688,7 +688,7 @@ begin
     var Data := Copy(Valid);
     for var Change := 1 to 4 do
     begin
-      Seed := Seed * 1103515245 + 12345;
+      Seed := Cardinal((UInt64(Seed) * 1103515245 + 12345) and $FFFFFFFF);
       Data[(Seed shr 8) mod Cardinal(Length(Data))] := Byte(Seed shr 16);
     end;
 

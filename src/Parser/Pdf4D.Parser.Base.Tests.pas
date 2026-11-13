@@ -1006,7 +1006,7 @@ begin
     const TextLength = 1 + (Round mod 40);
     for var Index := 1 to TextLength do
     begin
-      Seed := Seed * 1664525 + 1013904223;
+      Seed := Cardinal((UInt64(Seed) * 1664525 + 1013904223) and $FFFFFFFF);
       Text := Text + Alphabet[1 + Integer((Seed shr 16) mod Cardinal(System.Length(Alphabet)))];
     end;
 
