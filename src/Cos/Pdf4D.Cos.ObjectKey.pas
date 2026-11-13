@@ -12,8 +12,11 @@ type
   TCosObjectKey = record
     Number: Int64;
     Generation: Integer;
+    // Port of COSObjectKey.getStreamIndex: the position inside the object stream, -1 when unknown. Not part of equality.
+    StreamIndex: Integer;
 
     class function Make(const Number: Int64; const Generation: Integer): TCosObjectKey; static;
+    class function MakeInObjectStream(const Number: Int64; const StreamIndex: Integer): TCosObjectKey; static;
     class operator Equal(const Left, Right: TCosObjectKey): Boolean;
     class operator NotEqual(const Left, Right: TCosObjectKey): Boolean;
 
@@ -36,6 +39,13 @@ class function TCosObjectKey.Make(const Number: Int64; const Generation: Integer
 begin
   Result.Number := Number;
   Result.Generation := Generation;
+  Result.StreamIndex := -1;
+end;
+
+class function TCosObjectKey.MakeInObjectStream(const Number: Int64; const StreamIndex: Integer): TCosObjectKey;
+begin
+  Result := Make(Number, 0);
+  Result.StreamIndex := StreamIndex;
 end;
 
 class operator TCosObjectKey.Equal(const Left, Right: TCosObjectKey): Boolean;
