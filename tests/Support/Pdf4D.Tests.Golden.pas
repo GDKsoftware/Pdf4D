@@ -10,6 +10,8 @@ type
   TGoldenComparer = record
   strict private
     class function Normalize(const Line: string): string; static;
+    class function IgnoredKeys(const Line: string; const KnownDifferences: TArray<string>): TArray<string>; static;
+    class function WithoutKeys(const Line: string; const Keys: TArray<string>): string; static;
     class function IsKnown(const Line: string; const KnownDifferences: TArray<string>): Boolean; static;
     class function AreNumbersEqual(const Expected, Actual: string): Boolean; static;
     class procedure SplitNumbers(const Line: string; out Skeleton: string; out Numbers: TArray<Double>); static;
@@ -19,7 +21,8 @@ type
     // matched by what identifies them: "object <n> <g>:", "page <i>:" and "info <key>:" by that start, the lines of the
     // other sections by their kind and their position in it. Numbers with a decimal point may differ by 0.001. Lines that
     // start with one of the KnownDifferences (for example "object 12 0:") are skipped, when it is the expected or the found
-    // line. The result holds one text per remaining difference.
+    // line. An entry "<prefix> ignore-key /Key" does not skip the line: for the lines that start with the prefix, the entry
+    // "/Key <value>" (an integer or a reference) is removed from both lines before they are compared. The result holds one text per remaining difference.
     class function Compare(const Expected, Actual: string; const KnownDifferences: TArray<string>): TArray<string>; static;
 
     // The prefixes of a known-differences file: per line the prefix, then " # " and the reason. A missing file gives none.
@@ -36,6 +39,7 @@ uses
 const
   FloatTolerance = 0.001;
   ReasonSeparator = ' # ';
+  IgnoreKeyMarker = ' ignore-key ';
   NumberMarker = #1;
   KeyedByStart: array[0..2] of string = ('object ', 'page ', 'info ');
 
@@ -73,9 +77,60 @@ begin
   Result := False;
   for var Prefix in KnownDifferences do
   begin
-    if Line.StartsWith(Prefix) then
+    if not Prefix.Contains(IgnoreKeyMarker) and Line.StartsWith(Prefix) then
     begin
       Exit(True);
+    end;
+  end;
+end;
+
+class function TGoldenComparer.IgnoredKeys(const Line: string; const KnownDifferences: TArray<string>): TArray<string>;
+begin
+  Result := nil;
+  for var Entry in KnownDifferences do
+  begin
+    const Stop = Entry.IndexOf(IgnoreKeyMarker);
+    if (Stop > 0) and Line.StartsWith(Entry.Substring(0, Stop)) then
+    begin
+      Result := Result + [Entry.Substring(Stop + IgnoreKeyMarker.Length) + ' '];
+    end;
+  end;
+end;
+
+// Removes "/Key <integer>" and "/Key <n> <g> R" when the key stands as a whole name
+class function TGoldenComparer.WithoutKeys(const Line: string; const Keys: TArray<string>): string;
+begin
+  Result := Line;
+  for var Key in Keys do
+  begin
+    var Start := Result.IndexOf(Key);
+    while Start >= 0 do
+    begin
+      var Stop := Start + Key.Length;
+      const ValueStart = Stop;
+      while (Stop < Result.Length) and CharInSet(Result[Stop + 1], ['0'..'9', '-']) do
+      begin
+        Inc(Stop);
+      end;
+      if Stop > ValueStart then
+      begin
+        const Reference = Result.Substring(Stop).StartsWith(' ');
+        var AfterGeneration := Stop + 1;
+        while Reference and (AfterGeneration < Result.Length) and CharInSet(Result[AfterGeneration + 1], ['0'..'9']) do
+        begin
+          Inc(AfterGeneration);
+        end;
+        if Reference and (AfterGeneration > Stop + 1) and Result.Substring(AfterGeneration).StartsWith(' R') then
+        begin
+          Stop := AfterGeneration + 2;
+        end;
+        Result := Normalize(Result.Remove(Start, Stop - Start));
+        Start := Result.IndexOf(Key);
+      end
+      else
+      begin
+        Start := Result.IndexOf(Key, Start + 1);
+      end;
     end;
   end;
 end;
@@ -171,11 +226,12 @@ class function TGoldenComparer.Compare(const Expected, Actual: string; const Kno
     try
       for var Raw in Text.Split([#10]) do
       begin
-        const Line = Normalize(Raw);
+        var Line := Normalize(Raw);
         if Line = '' then
         begin
           Continue;
         end;
+        Line := WithoutKeys(Line, IgnoredKeys(Line, KnownDifferences));
 
         var IsKeyedByStart := False;
         for var Prefix in KeyedByStart do

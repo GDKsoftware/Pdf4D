@@ -154,6 +154,7 @@
         <DCCReference Include="Support\Pdf4D.Tests.StructureDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Golden.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.Robustness.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

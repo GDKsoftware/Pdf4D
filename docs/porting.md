@@ -1,5 +1,32 @@
 # Porting from PDFBox
 
+## Status
+
+Milestone M1 (document structure) is complete: parsing with xref recovery, object streams, decryption (RC4 40/128, AES 128/256, revisions 2 to 6), the page tree, page boxes and labels, document information, outlines and destinations, name trees, form fields, embedded files and the public interface API. All 188 files of the test corpus load. 163 give a structure dump equal to the PDFBox 3.0.8 dump, 25 differ in documented ways (`tests/golden/*.known-differences.txt`, format in `golden-format.md`). Mutated corpus files only end in success or an `EPdfException` descendant and never hang (`tests/Acceptance/Pdf4D.Tests.Robustness.Tests.pas`). Text extraction, fonts and content streams belong to later milestones.
+
+## Ported PDFBox classes (M1)
+
+Taken from the `// Port of:` header of every unit.
+
+| PDFBox package | Classes |
+|---|---|
+| `pdfbox-io` | `RandomAccessRead`, `RandomAccessReadBuffer`, `RandomAccessReadBufferedFile` |
+| `cos` | `COSArray`, `COSBase`, `COSBoolean`, `COSDictionary`, `COSDocument`, `COSFloat`, `COSInteger`, `COSName`, `COSNull`, `COSNumber`, `COSObject`, `COSObjectKey`, `COSStream`, `COSString`, `ICOSParser`, `PDFDocEncoding` |
+| `filter` | `ASCII85Filter` (and `ASCII85InputStream`), `ASCIIHexFilter`, `Filter`, `FilterFactory`, `FlateFilter` (and `FlateFilterDecoderStream`), `IdentityFilter`, `LZWFilter`, `Predictor`, `RunLengthDecodeFilter`, `CryptFilter` |
+| `pdfparser` | `BaseParser`, `BruteForceParser`, `COSParser`, `EndstreamFilterStream`, `PDFObjectStreamParser`, `PDFParser`, `PDFXrefStreamParser`, `XrefTrailerResolver` |
+| `pdmodel` | `PDDocument`, `PDDocumentCatalog`, `PDDocumentInformation`, `PDEmbeddedFilesNameTreeNode`, `PDPage`, `PDPageTree` |
+| `pdmodel.common` | `PDNameTreeNode`, `PDNumberTreeNode`, `PDPageLabels`, `PDPageLabelRange`, `PDRectangle`, `PDComplexFileSpecification`, `PDEmbeddedFile` |
+| `pdmodel.encryption` | `AccessPermission`, `PDEncryption`, `PDCryptFilterDictionary`, `SaslPrep`, `SecurityHandler`, `StandardSecurityHandler` |
+| `pdmodel.interactive.documentnavigation` | `PDDestination`, `PDPageDestination`, `PDNamedDestination`, `PDDestinationNameTreeNode`, `PDDocumentNameDictionary`, `PDDocumentNameDestinationDictionary`, `PDDocumentOutline`, `PDOutlineNode`, `PDOutlineItem`, `PDOutlineItemIterator` |
+| `pdmodel.interactive.form` | `PDAcroForm`, `PDFieldFactory`, `PDField`, `PDFieldTree`, `PDNonTerminalField`, `PDTerminalField`, `PDVariableText`, `PDButton`, `PDCheckBox`, `PDRadioButton`, `PDPushButton`, `PDChoice`, `PDComboBox`, `PDListBox`, `PDTextField`, `PDSignatureField` (the field classes are one `TPDField` with a kind, see the deviations) |
+| `util` | `DateConverter` |
+
+Not ported from PDFBox, but written for Pdf4D: the AES and RC4 primitives, the Unicode normalization behind `SaslPrep`, the `Common` helpers and the whole `Api` layer.
+
+## Known deviations
+
+The list under "Deliberate deviations" below is the full list for M1. For the corpus, the differences that show up in the golden comparison are in `tests/golden/*.known-differences.txt` with a reason per object, and `golden-format.md` explains how they are written.
+
 ## Base version
 
 Apache PDFBox 3.0.8 (git tag `3.0.8`). Upstream fixes are carried over selectively.

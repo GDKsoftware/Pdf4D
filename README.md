@@ -10,7 +10,7 @@ Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0
 
 ## Status
 
-Early development. The repository currently holds the conventions and the test harness. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
+Milestone M1 (document structure) is complete: loading, decryption, pages, document information, outlines, form fields, attachments and the public API. Text extraction, fonts and content streams follow in later milestones. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
 
 ## Usage
 

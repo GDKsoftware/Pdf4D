@@ -87,3 +87,10 @@ Values are the decrypted values for encrypted files.
 ## Generated encrypted variants
 
 `tests/corpus/generated/encrypted/` holds files made by `tools/oracle/generate-encrypted.ps1` from `base.pdf` (an unencrypted file with an `/Info /Producer`, a `/Metadata` XMP stream and two content streams, made by `Pdf4DOracle.java --prepare`): `rc4-40` (R2), `rc4-128` (R3), `aes-128` (R4), `aes-256` (R6), each with `-empty` (empty user password) and `-user` (user password `user`, noted as `password=user` in the manifest), owner password `owner`; `aes-256-nometa.pdf` (R6, `/EncryptMetadata false`, XMP stored unencrypted); `r5-sample.pdf` (R5, copy of a PDFBox test file). All decrypt to the same content as `base.pdf`, so apart from `encrypted`, `permissions` and the Encrypt dictionary object, their dumps equal the dump of `base.pdf`.
+
+## Known differences
+
+`tests/golden/<name>.known-differences.txt` lists lines of a dump that are allowed to differ from the golden file. One entry per line, in the form `<prefix> # <reason>`. Lines starting with `#` and empty lines are ignored.
+
+- `<prefix>`: a line of the dump (expected or found) that starts with it is not compared, for example `object 12 0:`.
+- `<prefix> ignore-key /Key`: the line is still compared, but the entry `/Key <value>` (an integer or a reference `n g R`) is removed from both sides first. The hash of a stream and all other keys stay in the comparison. Example: `object 12 0: ignore-key /Length # reason`. This is used for the encrypted files, where PDFBox rewrites `/Length` of a stream dictionary to the decrypted size and Pdf4D keeps the value of the file.

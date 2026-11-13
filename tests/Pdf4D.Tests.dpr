@@ -82,7 +82,8 @@ uses
   Pdf4D.Tests.Corpus in 'Support\Pdf4D.Tests.Corpus.pas',
   Pdf4D.Tests.StructureDump in 'Support\Pdf4D.Tests.StructureDump.pas',
   Pdf4D.Tests.Golden in 'Support\Pdf4D.Tests.Golden.pas',
-  Pdf4D.Tests.Golden.Tests in 'Acceptance\Pdf4D.Tests.Golden.Tests.pas';
+  Pdf4D.Tests.Golden.Tests in 'Acceptance\Pdf4D.Tests.Golden.Tests.pas',
+  Pdf4D.Tests.Robustness.Tests in 'Acceptance\Pdf4D.Tests.Robustness.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
