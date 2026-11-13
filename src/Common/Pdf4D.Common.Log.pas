@@ -11,7 +11,8 @@ type
   private
     FOnLog: TPdfLogEvent;
 
-    procedure Write(const Level: TPdfLogLevel; const Message: string);
+    procedure Write(const Level: TPdfLogLevel; const Message: string); overload;
+    procedure Write(const Level: TPdfLogLevel; const Fmt: string; const Args: array of const); overload;
 
   public
     constructor Create(const OnLog: TPdfLogEvent);
@@ -46,7 +47,7 @@ end;
 
 procedure TPdfLog.Debug(const Fmt: string; const Args: array of const);
 begin
-  Write(TPdfLogLevel.Debug, Format(Fmt, Args));
+  Write(TPdfLogLevel.Debug, Fmt, Args);
 end;
 
 procedure TPdfLog.Info(const Message: string);
@@ -56,7 +57,7 @@ end;
 
 procedure TPdfLog.Info(const Fmt: string; const Args: array of const);
 begin
-  Write(TPdfLogLevel.Info, Format(Fmt, Args));
+  Write(TPdfLogLevel.Info, Fmt, Args);
 end;
 
 procedure TPdfLog.Warning(const Message: string);
@@ -66,7 +67,7 @@ end;
 
 procedure TPdfLog.Warning(const Fmt: string; const Args: array of const);
 begin
-  Write(TPdfLogLevel.Warning, Format(Fmt, Args));
+  Write(TPdfLogLevel.Warning, Fmt, Args);
 end;
 
 procedure TPdfLog.Error(const Message: string);
@@ -76,16 +77,45 @@ end;
 
 procedure TPdfLog.Error(const Fmt: string; const Args: array of const);
 begin
-  Write(TPdfLogLevel.Error, Format(Fmt, Args));
+  Write(TPdfLogLevel.Error, Fmt, Args);
 end;
 
 procedure TPdfLog.Write(const Level: TPdfLogLevel; const Message: string);
 begin
-  const HasCallback = Assigned(FOnLog);
-  if HasCallback then
+  if not Assigned(FOnLog) then
   begin
-    FOnLog(Level, Message);
+    Exit;
   end;
+
+  try
+    FOnLog(Level, Message);
+  except
+    // Logging must never break the parser: a callback that raises is the caller's mistake, and the document is still valid
+    on Exception do
+    begin
+      Exit;
+    end;
+  end;
+end;
+
+procedure TPdfLog.Write(const Level: TPdfLogLevel; const Fmt: string; const Args: array of const);
+begin
+  if not Assigned(FOnLog) then
+  begin
+    Exit;
+  end;
+
+  var Message: string;
+  try
+    Message := Format(Fmt, Args);
+  except
+    // A bad format string or arguments that do not fit it: the raw format is still better than nothing
+    on Exception do
+    begin
+      Message := Fmt;
+    end;
+  end;
+  Write(Level, Message);
 end;
 
 end.

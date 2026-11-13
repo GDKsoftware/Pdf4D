@@ -16,6 +16,15 @@ type
     procedure TestNilCallbackIsIgnored;
 
     [Test]
+    procedure TestBadFormatStringFallsBackToRawFormat;
+
+    [Test]
+    procedure TestRaisingCallbackIsSwallowed;
+
+    [Test]
+    procedure TestNoFormattingWithoutCallback;
+
+    [Test]
     procedure TestDefaultOptions;
   end;
 
@@ -57,6 +66,66 @@ begin
       begin
         Log.Error('Nobody listens');
         Log.Info('Object %d', [1]);
+      end);
+  finally
+    Log.Free;
+  end;
+end;
+
+procedure TPdfLogTests.TestBadFormatStringFallsBackToRawFormat;
+begin
+  var ReceivedMessage := '';
+  const Log = TPdfLog.Create(
+    procedure(const Level: TPdfLogLevel; const Message: string)
+    begin
+      ReceivedMessage := Message;
+    end);
+  try
+    Assert.WillNotRaise(
+      procedure
+      begin
+        Log.Warning('Broken %d and %s', ['text']);
+      end);
+    Assert.AreEqual('Broken %d and %s', ReceivedMessage);
+
+    Log.Warning('Wrong %q', [1]);
+    Assert.AreEqual('Wrong %q', ReceivedMessage);
+  finally
+    Log.Free;
+  end;
+end;
+
+procedure TPdfLogTests.TestRaisingCallbackIsSwallowed;
+begin
+  var CallCount := 0;
+  const Log = TPdfLog.Create(
+    procedure(const Level: TPdfLogLevel; const Message: string)
+    begin
+      Inc(CallCount);
+      raise EAbort.Create('Callback failure');
+    end);
+  try
+    Assert.WillNotRaise(
+      procedure
+      begin
+        Log.Info('Plain');
+        Log.Error('Object %d', [3]);
+      end);
+    Assert.AreEqual(2, CallCount);
+  finally
+    Log.Free;
+  end;
+end;
+
+procedure TPdfLogTests.TestNoFormattingWithoutCallback;
+begin
+  // A format string that would raise is never evaluated when nobody listens; observable only as not raising and not failing
+  const Log = TPdfLog.Create(nil);
+  try
+    Assert.WillNotRaise(
+      procedure
+      begin
+        Log.Debug('Broken %d', ['text']);
       end);
   finally
     Log.Free;
