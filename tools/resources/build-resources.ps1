@@ -7,7 +7,9 @@
 param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot '..\pdfbox-src'),
     [string]$OutputFolder = (Join-Path $PSScriptRoot '..\..\src\Resources'),
-    [string]$RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
+    [string]$RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat',
+    # Rebuilds only the .res file of this group (GLYPHLIST, AFM, CMAP, FONT or UNICODE); resources.csv always lists all groups.
+    [string]$OnlyGroup = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -61,8 +63,14 @@ function Get-ResourceName([string]$Group, [string]$Item) {
     return ('PDF4D_' + $Group + '_' + $Item).ToUpperInvariant() -replace '[^A-Z0-9]', '_'
 }
 
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+
 function Get-SourcePath([string]$FullPath) {
-    return $FullPath.Substring($SourceRoot.Length).TrimStart('\').Replace('\', '/')
+    # Files outside the PDFBox sources (the generated Unicode tables) are named relative to the repository root
+    if ($FullPath.StartsWith($SourceRoot)) {
+        return $FullPath.Substring($SourceRoot.Length).TrimStart('\').Replace('\', '/')
+    }
+    return $FullPath.Substring($repoRoot.Length).TrimStart('\').Replace('\', '/')
 }
 
 # Each group: output name, resource group token, and the list of (item name, file, license)
@@ -92,6 +100,11 @@ $groups += , @('CMap', 'CMAP', $cmapItems)
 $fontItems = @()
 $fontItems += , @('LiberationSans', (Join-Path $pdfboxResources 'ttf\LiberationSans-Regular.ttf'), 'OFL-1.1')
 $groups += , @('Fonts', 'FONT', $fontItems)
+
+$unicodeItems = @()
+$textTables = Join-Path $repoRoot 'tools\unicode\text-tables.txt'
+$unicodeItems += , @('TextTables', $textTables, 'Unicode-3.0')
+$groups += , @('Unicode', 'UNICODE', $unicodeItems)
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ('pdf4d-resources-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work | Out-Null
@@ -129,6 +142,9 @@ try {
         $rcPath = Join-Path $groupFolder "Pdf4D.Resources.$groupName.rc"
         [IO.File]::WriteAllLines($rcPath, $rcLines, (New-Object Text.UTF8Encoding($false)))
 
+        if ($OnlyGroup -ne '' -and $OnlyGroup -ne $groupToken) {
+            continue
+        }
         $resPath = Join-Path $OutputFolder "Pdf4D.Resources.$groupName.res"
         $command = "call `"$RsVars`" && cd /d `"$groupFolder`" && brcc32 -fo`"$resPath`" `"$rcPath`""
         $output = & cmd /c $command 2>&1 | ForEach-Object { "$_" }

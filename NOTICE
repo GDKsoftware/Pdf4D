@@ -52,3 +52,8 @@ not part of the Pdf4D library and are only used by the tests:
 - OpenSans-Regular.pfb (Open Sans) is licensed under the Apache License 2.0, LICENSE.
 - DejaVuSerifCondensed.pfb is licensed under the Bitstream Vera and DejaVu licence,
   licenses/DejaVu-Bitstream-Vera.txt.
+
+Includes tables generated with a JDK (java.text.Normalizer and Character.getType, Unicode 15.0) from data of the
+Unicode Character Database, as a resource in src/Resources (tools/unicode/text-tables.txt).
+Copyright (c) 1991-2022 Unicode, Inc. All rights reserved.
+Distributed under the Unicode License v3, https://www.unicode.org/license.txt. See licenses/Unicode-3.0.txt.

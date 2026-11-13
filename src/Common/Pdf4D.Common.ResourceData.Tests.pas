@@ -47,7 +47,7 @@ uses
   Pdf4D.Tests.Corpus;
 
 const
-  ExpectedResourceCount: Integer = 111;
+  ExpectedResourceCount: Integer = 112;
   CsvNameColumn = 0;
   CsvHashColumn = 2;
   CsvColumnCount: Integer = 4;

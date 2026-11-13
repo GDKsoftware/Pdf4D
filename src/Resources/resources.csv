@@ -110,3 +110,4 @@ PDF4D_CMAP_UNIKS_UTF16_H;fontbox/src/main/resources/org/apache/fontbox/cmap/UniK
 PDF4D_CMAP_UNIKS_UTF16_V;fontbox/src/main/resources/org/apache/fontbox/cmap/UniKS-UTF16-V;334ae271967e8bc786efd35283c615e99c23052b43e15039cc656b8954ee2a18;Adobe-CMap-BSD
 PDF4D_CMAP_V;fontbox/src/main/resources/org/apache/fontbox/cmap/V;8eea3990962a4c5dd9565fcdfd30497747b6004940bb8d71fa2e0b0669eb9237;Adobe-CMap-BSD
 PDF4D_FONT_LIBERATIONSANS;pdfbox/src/main/resources/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf;76d04c18ea243f426b7de1f3ad208e927008f961dc5945e5aad352d0dfde8ee8;OFL-1.1
+PDF4D_UNICODE_TEXTTABLES;tools/unicode/text-tables.txt;e982d34ef2914aeaaf06b3f54d4d9bb88588910a3739a05afa11663254b1e4a9;Unicode-3.0
