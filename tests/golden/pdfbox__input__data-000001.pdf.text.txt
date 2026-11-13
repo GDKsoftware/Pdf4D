@@ -1,0 +1,19 @@
+text: default page 1
+| Tue Jun  5 22:15:55 2001
+| [California Time]
+| Dynamic PDF CGI Demo
+| pad-cache2-1.cache.telstra.net
+| 165.228.129.12
+text: sorted page 1
+| Tue Jun  5 22:15:55 2001
+| [California Time]
+| Dynamic PDF CGI Demo
+| pad-cache2-1.cache.telstra.net
+| 165.228.129.12
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Tue Jun  5 22:15:55 2001<EOL>
+| </P><P>[California Time]<EOL>
+| Dynamic PDF CGI Demo<EOL>
+| </P><P>pad-cache2-1.cache.telstra.net<EOL>
+| 165.228.129.12</P></A></PAGE>

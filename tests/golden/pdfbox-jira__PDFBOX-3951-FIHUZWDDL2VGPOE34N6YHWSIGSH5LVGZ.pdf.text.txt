@@ -1,0 +1,1551 @@
+text: default page 1
+| State of New York
+| Department of Health
+| Office of Health Systems Management
+| Division of Primary and Acute Care Services
+| New York
+| Patient Occurrence Reporting and
+| Tracking System
+| Report
+| Antonia C. Novello, M.D., M.P.H., Dr.P.H.
+| Commissioner of Health
+| Hon. George E. Pataki
+| Governor – State of New York
+| 2002-2004
+text: default page 2
+| Table of Contents
+| NYPORTS  Report 2002/2003/2004
+| Executive Summary ……………………………………………. 1-2
+| Introduction and Background ………………………………. 3-6
+| Completeness of Reporting in NYPORTS
+| Matching four NYPORTS Codes …………………………………..
+| Process for Measuring Reporting of 401,402,604
+| and 808 Occurrences ……………………………………………..
+| Results of Process …………………………………………………
+| Examination of Regional Variation in Reporting NYPORTS
+| Data………………………………………………………………………………..
+| 7
+| 8
+| 9-10
+| 10-14
+| Changes in Reporting of Individual NYPORTS Code … 14-15
+| Analysis of Procedures Associated with NYPORTS
+| Codes……………………………………………………………….. 16-22
+| Analysis of Selected NYPORTS Codes
+| 911, 912 Analysis .........................……………………………..
+| 108-110 MedicationAnalysis............................................….
+| 22-23
+| 24
+| NYPORTS System Enhancements …………………………..
+| Date of awareness ………………………………………………..
+| Extensions for RCA’s ………………………………………………
+| Force function for 108-110 ……………………………………….
+| 25
+| 25
+| 25-26
+| 26
+| Patient Safety Initiatives
+| NYPORTS News and Alert ………………………………………
+| Agency for Healthcare Research and Quality Patient Safety
+| Grant..……………………………………………………………………………..
+| Patient Safety Awards …………………………………………….
+| 27-30
+| 30-33
+| 33-37
+| Patient Safety Improvement Corps, Development and
+| Implementation of Root Cause Analysis Protocol …………….
+| Statewide Patient Safety Training ……………………………….
+| “Working Together: Partnering for Patient Safety”
+| Conference….………………………………………………………
+| Publication of NYPORTS related projects ……….………………
+| 37-39
+| 39
+| 40-41
+| 42
+| Work in Progress ……………………………………………….
+| NYPORTS Systems Enhancements ……………….……………..
+| NYPORTS Code Revisions …….…………………………………..
+| Process Measures Project: Codes 401 and 604…………………….
+| 42
+| 43
+| 43
+| 44
+| Future NYPORTS Initiatives ………………………………… 44-45
+| Acknowledgements …………………………………………… 46
+| Appendix A- Counties by Region List
+| Appendix B-Includes/Excludes List
+| Appendix C-NYPORTS Code 911 and 912 Analyses
+| Appendix D-Root Cause Analysis Protocol
+text: default page 3
+| Appendix E- Publications: Lessons Learned form the
+| Evolution of Mandatory Adverse Reporting Systems
+| and Quantitative and Qualitative Analysis of
+| Medication Errors: The New York Experience.
+| Appendix F- News and Alert-Issues #11-14
+text: default page 4
+| 1
+| Executive Summary
+| Governor George E. Pataki and Antonia C. Novello, M.D., M.P.H., Dr. P.H.,
+| Commissioner of Health, have affirmed that the most important responsibility of the
+| Department and the healthcare community is to assure the highest quality of care
+| to patients in the safest possible manner.  Recently, Commissioner Novello stated,
+| “New York’s Patient Safety Initiatives and the tremendous commitment made by
+| healthcare providers across the state, build on Governor Pataki’s commitment to
+| ensuring New Yorkers access to one of the finest, most advanced healthcare
+| systems in the world.”
+| New York State has a long history of implementing efforts to improve patient
+| safety by mandating that hospitals report and initiate improvement actions based
+| on adverse events occurring at their facilities. The New York Patient Occurrence
+| Reporting and Tracking System (NYPORTS) is the third iteration of incident
+| reporting for New York State. The evolution of NYPORTS spans 21 years, initially
+| known as the Hospital Incident Reporting System (HIRS) followed by Patient Event
+| Tracking System (PETS). NYPORTS is a culmination of lessons learned through
+| analysis, evaluation and use of the systems.  It has been very positively affected by
+| the cooperative efforts of hospitals, hospital associations and a broad base of
+| experts across the state.
+| The current system, beginning in 1985, is a mandatory adverse event
+| reporting system statutorily based, pursuant to Article 28 Public Health Law 2805-l
+| and Section 405.8, Incident Reporting, of Title 10 New York Code, Rules and
+| Regulations. The system captures predefined events specifically coined
+| “occurrences”.  For the purpose of NYPORTS reporting, an occurrence is an
+| unintended adverse and undesirable development in an individual patient’s
+| condition. It is important to acknowledge that all adverse events collected in the
+| system are not medical errors and should not be considered as such.  NYPORTS
+| does collect reports on medical errors, but the volume of medical errors in the
+| system is a small percentage compared to the overall volume of reporting.
+|  The data collected in NYPORTS is used by the Department to assess the
+| incidence and management of adverse occurrences across the state, as well as a
+| basis for patient safety initiatives.  Additionally, NYPORTS has proven to be a
+| valuable tool for facilities in internal quality initiatives and medical error prevention.
+| As a national leader in the evolution of reporting systems, much has been learned
+| from NYPORTS.
+text: default page 5
+| 2
+| This report will highlight the Department’s commitment to patient safety
+| through quality initiatives inspired and supported by the data collected in NYPORTS.
+|  These include:
+| • Building quality initiatives around selected NYPORTS codes, first through an
+| Agency for Healthcare, Research and Quality (AHRQ) grant, and secondly
+| through a process measure project.
+| • Participation in the NYSDOH led delegation of the AHRQ and VA National
+| Center for Patient Safety (NCPS) sponsored Patient Safety Improvement
+| Corps (PSIC) National Training.
+| • Providing extensive patient safety education to facility NYPORTS coordinators
+| and quality improvement specialists of various disciplines across the state.
+| • Implementation of the first state protocol for thorough and credible Root
+| Cause Analysis.
+| • Sponsoring a statewide patient safety conference.
+| • Publishing two articles, Qualitative and Quantitative Analysis of Medication
+| Errors: The New York Experience and Lessons Learned from The Evolution of
+| a Mandatory Reporting System.
+| • Sharing lessons learned through articles published in the NYPORTS News and
+| Alert, presentations to the Statewide NYPORTS Council and regional hospital
+| associations.
+| • Annual New York State Patient Safety Awards.
+| • Restructuring of the NYPORTS reporting system.
+| • Comprehensive enhancements of the NYPORTS electronic system.
+| • Revised NYPORTS policies, procedures and manual.
+| • Ongoing NYPORTS data assessment in collaboration with the School of Public
+| Health.
+| The Department of Health acknowledges the efforts and improvement of New
+| York State Hospitals and Diagnostic and Treatment Centers with regard to
+| reporting. NYPORTS has been historically compared to data submitted to the
+| Statewide Planning and Research Cooperative System (SPARCS).  Below are some
+| of the statistics related to NYPORTS reporting for the years 2002-2004.
+| \x1F The number of inpatient discharges reported through SPARCS increased from
+| 2,466,849 in 2002, to 2,521,170 in 2003 and to 2,617,524 in 2004.
+| \x1F The number of reports submitted to NYPORTS increased from 30,416 cases
+| in 2002, to 31,029 in 2003, and to 31,154 in 2004.
+| \x1F Reporting has changed from 1,225 reports per 100,000 discharges in 2002,
+| to 1,203 reports per 100,000 discharges in 2003, to 1,150 reports per
+| 100,000 discharges in 2004.
+| \x1F NYPORTS reporting per 100,000 discharges has remained relatively constant
+| with a slight decrease of 6.1% from 2002 to 2004, largely due to increases in
+| inpatient discharges.
+text: default page 6
+| 3
+| Introduction and Background
+| The New York Patient Occurrence Reporting and Tracking System
+| (NYPORTS) is a mandatory adverse event reporting system implemented pursuant
+| to New York State Public Health Law Section 2805-L, Incident Reporting.  For the
+| purpose of NYPORTS reporting, an adverse occurrence is specifically defined as an
+| unintended adverse and undesirable development in an individual patient’s
+| condition. Some occurrences are meant to be tracked and trended as groups, while
+| the most serious occurrences (specifically defined as patient deaths or impairments
+| of body function in circumstances other than those related to the natural course of
+| illness, disease or proper treatment in accordance with generally accepted medical
+| standards), are investigated internally and require facilities to conduct a Root Cause
+| Analysis (RCA).  All adverse events are not medical errors and should not be
+| considered as such.
+|  NYPORTS does collect reports on medical errors, but the volume of medical
+| errors in the system is a small percentage compared to the overall volume of
+| reporting.  It should be noted that New York State Public Health Law Section 2805-m
+| Confidentiality prevents disclosure of incident reports under the Freedom of
+| Information Law.
+| This report will provide information regarding NYPORTS enhancements,
+| policy revision and analysis of data collected during the years 2002-2004.  In
+| addition, information relating to activities undertaken to assure optimal NYPORTS
+| reporting and future plans will be discussed. Future plans include: ongoing
+| improvement of the NYPORTS system, continued training and support and in-depth
+| data analysis by occurrence code. The overriding goal of these activities is to
+| improve the quality of care and safety of patients in facilities in New York State.
+| New York State has had a long history of implementing efforts to improve
+| patient safety by requiring hospitals to report and initiate actions based on adverse
+| events occurring in their facilities.  Since October 1, 1985, a mandatory incident
+| reporting system has been in place in New York State.  Initially, the incident
+| reporting system was a paper reporting system; later, an e-mail-based system was
+| developed.  Neither of these systems allowed adequate feedback to the hospitals,
+| which limited the use of the data for quality improvement.
+| At the direction of Governor Pataki through a regulatory reform effort,
+| NYPORTS was created to simplify reporting, streamline coding, coordinate with
+| other reporting systems to reduce duplication and most importantly allow hospitals
+| to obtain feedback on their own reporting patterns and compare them with other
+| facilities in the region and the State.
+text: default page 7
+| 4
+| The development of the electronic internet-based system began in 1995,
+| utilizing a statewide workgroup of industry experts including consumer
+| representative. The original workgroup included a practicing surgeon, a practicing
+| anesthesiologist, facility medical directors, internal medicine practitioners, nursing,
+| quality assurance and risk management professionals.
+| The Chair of the original workgroup, Dr. Robert Panzer, is the Chief Quality
+| Officer of The University of Rochester Medical Center and continues to Chair the
+| NYPORTS council today. The NYPORTS Council meets regularly; many of the
+| original members of the first workgroup sit on the panel.  The council sets goals
+| and prioritizes patient safety projects, participates in analysis of NYPORTS data as
+| well as clinical and system enhancements. The Department works in collaboration
+| with the NYPORTS council, providing necessary support to carry out development
+| and implementation activities.
+|  Statewide hospital associations and their regional affiliates also participated
+| in development and implementation of the group’s activities.  The resulting system
+| is based on objective criteria and provides hospitals with clear definitions of what
+| must be reported.  This electronic version was extensively field tested, refined, and
+| implemented on a statewide basis in April 1998.  The system made it easier for
+| hospitals to report adverse incidents, as required by law, and to obtain comparative
+| data.
+| NYPORTS is an Internet based system with all the required security
+| measures included in its construction.  Hospitals can query the database to
+| compare their experience with reported events to the statewide, regional or peer
+| group experience.  While the identity of individual hospitals in the comparative
+| groups is not disclosed, the comparative database is a useful tool in support of
+| hospital quality improvement activities.  Additionally, hospitals can use the system
+| to create comparative reports in a variety of graphic formats. With new Reports
+| functionality, hospitals can produce assorted reports of local, Regional, statewide or
+| peer group information.
+|   NYPORTS electronic reporting is dynamic, evolving as technological
+| advances and clinical changes necessitate. Significant system improvements were
+| implemented effective June 1, 2000. These improvements included: improved
+| definitions of reportable events, increased reporting requirements regarding
+| medication errors, a detailed definition manual, a revised and improved instructional
+| manual, and the ability to create root cause analysis reports (RCA’s) for all serious
+| occurrences.
+text: default page 8
+| 5
+| System improvements implemented in 2001 included the installation of a
+| new server, a "bulletin board" to post information and documents and a home
+| screen to display changes in case status. Following extensive analysis, significant
+| code revisions and technical changes were made to the electronic system, effective
+| in 2004 and 2005.  These changes included reprogramming the system using .net
+| technology, revised user screens, reports, help and search functions.
+| The Department believes that before patient safety improvements can be
+| made, there must be an awareness and recognition of adverse events by facilities
+| (i.e., before one can fix a problem, it must be identified). Therefore, the
+| Department views hospitals with the highest reporting rates as those most keenly
+| aware of occurrences within their facilities and in the best position to bring about
+| systems improvements.  For events with significant negative or lasting impact on
+| patients, facilities must conduct an internal investigation of the systems supporting
+| patient care.
+| These investigations, known as Root Cause Analyses, must identify the root
+| causes of such events, enact systems improvements and build in back-up,"fail-safe"
+| strategies to prevent reoccurrence.  Facilities are required to monitor the
+| implementation and effectiveness of identified system improvements through their
+| quality assurance activities, to assure strategies function as intended.  For events of
+| lesser patient consequence, facilities are expected to collect and aggregate data
+| regarding these occurrences, to identify system weaknesses before more
+| consequential events occur.
+| Through access to a comparative database, a hospital can identify through
+| its own reporting circumstances where the hospital stands by comparison. This
+| helps to identify the system of care upon which the hospital should focus its
+| attention and efforts and to monitor the effectiveness of improvement efforts.  By
+| completing this process, the number of adverse events will be reduced and the
+| quality of care and the level of safety for hospital patients will improve.
+| The Department oversees hospital compliance with NYPORTS reporting
+| responsibilities to ensure the process is fulfilled.  The Department also directly
+| investigates a portion of the most significant occurrences.  Further, through
+| NYPORTS system management and analysis, the Department identifies areas of
+| significant concern noted by individual hospitals and provides alerts to all hospitals
+| in the State.  It is expected that hospitals will institute measures, known as "risk
+| reduction strategies", to prevent or reduce these occurrences in their own facilities.
+| By sharing such pertinent information with all hospitals in the State, the
+| Department endeavors to bring about industry-wide improvement in patient safety.
+text: default page 9
+| 6
+| The National Academy for State Health Policy (NASHP) supports mandatory
+| reporting systems, such as NYPORTS, as a tool to address quality and safety issues
+| related to hospital care.  They cite, "Proponents of mandatory reporting view it as a
+| way to make healthcare organizations responsive to public expectations for safe,
+| high quality health care”.  “Mandatory reporting systems are intended to hold
+| providers accountable for performance in two ways: First, they may help assure
+| that serious mistakes are reported and investigated and that appropriate follow-up
+| action is taken and Second, they provide disincentives (e.g., citations, penalties,
+| sanctions, possible public exposure, and possible loss of business) for organizations
+| to continue unsafe practices”. By fulfilling and exceeding these criteria set forth by
+| NASHP, NYPORTS has distinguished itself as a model state reporting system.
+| 1
+| Completeness of Reporting in NYPORTS
+| As noted in previous NYPORTS annual reports, the completeness of reporting
+| is an important concern when using NYPORTS for quality improvement and adverse
+| event reduction purposes. If the data is not reported completely and accurately, the
+| occurrence frequency or the occurrence rate (number of occurrences per number of
+| discharges or number of occurrences per number of procedures of a given type) for
+| hospitals or region cannot be accurately computed.
+| Nationally it is recognized that a “gold standard” does not exist from which
+| complete reporting can be measured, however using the number of discharges
+| reported in the Statewide Planning and Research Cooperative System (SPARCS) as
+| a denominator allows for some measure of frequency. SPARCS is a database
+| containing information on all inpatient stays in New York State acute care hospitals.
+| The Department does take active steps to identify compliance with complete
+| reporting, stemming from statewide educational sessions and patient safety
+| projects to record reviews through the surveillance process and retrospective
+| review process.
+|                                                \x20
+| 1 Lynda Flowers and Trish Riley, “State-based Mandatory Reporting of Medical Errors: An analysis of the
+| legal and Policy Issues”, March 2001 pg.5.
+text: default page 10
+| 7
+| Matching Select NYPORTS Occurrences with Inpatient Hospital Discharge
+| Data from the Statewide Planning and Research Cooperative System -
+| SPARCS
+| Optimal reporting is crucial when utilizing NYPORTS data as a tool for quality
+| improvement and adverse event reduction efforts.  This report will show that
+| reporting for occurrence codes 401(New acute pulmonary embolism), 402 (new
+| documented deep vein thrombosis), 604 (acute myocardial infarction not related to
+| a cardiac procedure) and 808 (post-op wound infection requiring drainage during
+| the hospital stay or inpatient admission within 30 days) improved significantly in 15
+| New York State hospitals involved in an Agency for Healthcare, Research and
+| Quality (AHRQ) funded Patient Safety Demonstration Project.
+| The goals of the $5.4 million grant in support of patient safety improvements
+| were accomplished through two initiatives: assuring more complete reporting in
+| NYPORTS, for more meaningful analysis and oversight of three demonstration
+| projects involving hospital groups or networks that would study specific types of
+| adverse outcomes, then develop and test interventions that could reduce their
+| occurrence.
+| Findings from the projects have been distributed statewide so that other
+| facilities may also concentrate on identification of these occurrences and implement
+| or reinforce successful protocols.  The protocols included thrombo-prophylaxis to
+| reduce the incidence of thromboembolic episodes (deep vein thromboses or
+| pulmonary embolisms commonly referred to as “blood clots”), peri-operative risk
+| assessment and appropriate use of beta-blocker prophylaxis to prevent myocardial
+| infarction in a non cardiac related procedure; and standardized surgical anti-
+| microbial prophylaxis protocols to reduce post-operative wound infections.
+| Monitoring of occurrence reporting is a high priority for the Department of
+| Health. The Department continually seeks innovative ways to assist facilities in
+| meeting their mandatory reporting requirements. SPARCS was instrumental in
+| assessing completeness of reporting in the four NYPORTS codes (401/402, 604 and
+| 808) included in the AHRQ grant mentioned above.
+| Please see Appendix B for the list of NYPORTS codes with their
+| included and excluded criteria.
+text: default page 11
+| 8
+| By linking NYPORTS and SPARCS to identify potentially missed events, the
+| Department was successful in assisting hospitals to identify cases. The methods
+| used and results of this process are described below:
+| Process for Measuring Completeness of Reporting of Select Occurrences
+| 1. Use SPARCS data to identify all patients with specific diagnosis codes
+| identified in the International Classification of Diseases (ICD-9).
+| NYPORTS 401 (pulmonary embolism): ICD-9 diagnosis codes not in the
+| primary position, 415 Acute pulmonary heart disease (415.1, 415.11, 415.19,
+| 415.0), 673.2 Obstetrical blood-clot embolism.
+| NYPORTS 402 (deep vein thrombosis): ICD-9 diagnosis codes not in the
+| primary position, 451 Phlebitis and thrombophlebitis (451.1, 451.11, 451.19,
+| 451.2, 451.81, 451.83, 451.84, 451.89), 453 Other venous embolism and
+| thrombosis (453.2, 453.8, 453.9), 671 Venous complications in pregnancy
+| and the puerperium.
+| NYPORTS 808 (post-op wound infection): ICD-9 diagnosis code in any
+| diagnosis field, 998.5 other complications of procedures, postoperative
+| infection (998.51, 998.59, 998.5).
+| NYPORTS 604 (acute myocardial infarction) ICD-9 diagnosis code not in the
+| primary position, 410.X1 Acute myocardial infarction, initial episode of care.
+| 2. Match all of the patients identified in SPARCS (with the corresponding
+| diagnosis codes) with patients who were identified using administrative data
+| and reported in NYPORTS.
+| 3. Records identified in SPARCS as potential NYPORTS cases were provided to
+| an independent review agent, IPRO, for medical chart review. IPRO used
+| registered nurses to conduct retrospective medical record reviews using a
+| standard validation review instrument to determine if a reportable event
+| occurred.
+| 4. Hospitals entered cases into NYPORTS, which IPRO determined were
+| reportable and the hospitals agreed were reportable.
+| 5. The estimated completeness of reporting (percentage of cases that were
+| reported) is the total of matched cases (SPARCS and NYPORTS) divided by
+| the total number of cases identified in SPARCS using the diagnosis codes.
+text: default page 12
+| 9
+| Results of Process
+| The hospitals that participated in the demonstration project were evaluated
+| on the completeness of NYPORTS reporting for two time periods, the first half of
+| 2001 and the second half of 2001.
+| Using the methods described above, 67 SPARCS cases were identified as
+| reportable under NYPORTS occurrence code 401/402, from January 1, 2001 to May
+| 31, 2001 for the five hospitals participating in the DVT/PE demonstration project. Of
+| these patients, a total of 16 cases (24%) were reported by the hospitals to
+| NYPORTS as of June 18, 2002.
+| Using the same methods, 38 SPARCS cases were identified as reportable
+| under NYPORTS occurrence code 604, from January 1, 2001 to May 31, 2001 for
+| the five hospitals participating in the post operative AMI demonstration project. Of
+| these patients, a total of 11 cases (29%) were reported by the hospitals to
+| NYPORTS as of June 18, 2002.
+| For NYPORTS occurrence code 808, 43 SPARCS cases were identified as
+| reportable from January 1, 2001 to May 31, 2001 for the four hospitals participating
+| in the post operative wound infection demonstration project. Of these patients, a
+| total of 5 cases (12%) were reported by the hospitals to NYPORTS as of June 18,
+| 2002.
+| After the facilities were notified of the results of the evaluation of
+| completeness for the first half of 2001, the DOH directed them to initiate a process
+| of locating and re-evaluating these occurrences, with a goal of assessing and
+| making improvements to their own internal identification processes. After these
+| improvements were made, facilities were directed to identify and report any
+| 401/402, 604 or 808 events which had not been previously reported for the second
+| half of 2001.
+| The facilities were then re-evaluated by examining completeness of reporting
+| for the second half of 2001. For the facilities in the 401/402 demonstration project,
+| 128 SPARCS cases were identified as reportable to NYPORTS from June 1, 2001 to
+| December 31, 2001. Of these patients, a total of 113 cases (88%) were reported by
+| the hospitals to NYPORTS as of January 2003.
+| Using the same methods, 45 SPARCS cases were identified as reportable
+| under NYPORTS occurrence code 604, from June 1, 2001 to December 31, 2001 for
+| the five hospitals participating in the post operative AMI demonstration project. Of
+| these patients, a total of 21 cases (47%) were reported by the hospitals to
+| NYPORTS as of January 8, 2003.
+text: default page 13
+| 10
+| For NYPORTS occurrence code 808, 46 SPARCS cases were identified as
+| reportable from June 1, 2001 to December 31, 2001 for the four hospitals
+| participating in the post operative wound infection demonstration project. Of these
+| patients, a total of 38 cases (83%) were reported by the hospitals to NYPORTS as
+| of January 8, 2003.
+| Conclusion
+| The completeness of reporting of NYPORTS events identified by using
+| SPARCS data for code 401/402, increased from 24% to 88%. Completeness of
+| reporting for 604 increased from 29% to 47% and completeness of reporting for
+| 808 increased from 12% to 83%. This increase in reporting percentages is a direct
+| result of the efforts taken by the Department of Health to encourage reporting and
+| hospital compliance with reporting responsibilities
+| It should be noted that the process described above to measure completeness
+| used only records reported to NYPORTS that can be identified using SAPRCS data
+| with specific ICD9 diagnosis codes. The hospitals involved in the demonstration
+| projects did identify additional records using other methods, including Computerized
+| Patient Order Entry (CPOE), clinical laboratory results databases, imaging scans,
+| autopsy and infection control department reports.
+| Examination of Regional Variation in Reporting NYPORTS Data
+| A strategy for assessing the completeness of NYPORTS reporting is to
+| examine differences in reporting frequency among large groups of hospitals within
+| certain geographical regions of the state. In order to accomplish this goal, the
+| number of inpatient discharges was compared with the number of NYPORTS cases
+| per region. The statistic used is the number of NYPORTS cases per 100,000
+| discharges.
+text: default page 14
+| 11
+| The table below reflects the results of data collection that was entered into
+| the NYPORTS system as of December 31st of the following year (for example
+| NYPORTS occurrences in 2002, submitted to NYPORTS through the end of 2003).
+| The regions are defined as Western New York, Finger Lakes, Central New York,
+| Northeastern New York, Hudson Valley, Long Island, and New York City. The
+| counties comprising these regions are listed in Appendix A.
+| NYPORTS Cases Submitted/100,000 Discharges by Region: 2002, 2003
+| and 2004
+| 2002 2003 2004
+| Region NYPORTS SPARCS
+| Rate per
+| 100,000 NYPORTS SPARCS
+| Rate
+| per
+| 100,000 NYPORTS SPARCS
+| Rate per
+| 100,000
+| Central 2660 193421 1375.2 3012 199363 1510.8 3435 202446 1696.7
+| Finger Lakes 2464 148605 1658.1 2694 149472 1802.3 2678 153462 1745.1
+| Hudson
+| Valley 2717 251083 1082.1 2865 268244 1068.1 2703 276740 976.7
+| Long Island 4365 362795 1203.2 4059 357700 1134.7 4457 379736 1173.7
+| New York
+| City 12063 1153598 1045.7 12057 1183619 1018.7 11811 1239268 953.1
+| Northeastern 3191 171643 1859.1 3124 174255 1792.8 2703 177821 1520.1
+| Western 2766 185704 1489.5 2511 188517 1332.0 2315 188051 1231.0
+| Total
+| Inpatient 30226 2466849 1225.3 30322 2521170 1202.7 30102 2617524 1150.0
+| For the year 2002, there were 30,226 NYPORTS cases submitted for all of
+| the inpatient occurrence codes and 2,466,849 SPARCS cases submitted by
+| December 31, 2003. The number of NYPORTS cases submitted per 100,000
+| discharges for 2002 in New York State was 1,225.
+| As indicated in the table above, a total of 30,322 NYPORTS cases occurred in
+| 2003 and were submitted by December 31, 2004 for all inpatient occurrence codes
+| in NYPORTS, and a total of 2,521,170 patients were discharged from New York
+| State acute care hospitals in 2003, based on data submitted by December 31, 2004.
+| The number of NYPORTS cases submitted per 100,000 discharges for 2003 in New
+| York State was 1,202.
+| Also indicated in the table above, a total of 30,102 NYPORTS cases occurred
+| in 2004 and were submitted by December 31, 2005 for all inpatient occurrence
+| codes in NYPORTS, and a total of 2,617,524 patients were discharged from New
+| York State acute care hospitals in 2004, based on data submitted by December 31,
+| 2005. The number of NYPORTS cases submitted per 100,000 discharges for 2004 in
+| New York State was 1,150.
+text: default page 15
+| 12
+| The following bar chart compares the NYPORTS occurrences for year 2002
+| (submitted as of December 31, 2003, year 2003 (submitted as of December 31,
+| 2004) and year2004 (submitted as of December 31, 2005) by region and for the
+| entire state.
+| Regional Variation in NYPORTS Reporting 2002-2004
+| 0
+| 200
+| 400
+| 600
+| 800
+| 1000
+| 1200
+| 1400
+| 1600
+| 1800
+| 2000
+| Central Finger Lakes Hudson Valley Long Island New York City Northeastern Western Total Inpatient
+| Region
+| N
+| um
+| be
+| r\x20
+| of
+|  r
+| ep
+| or
+| ts
+|  p
+| er
+|  1
+| 00
+| ,0
+| 00
+|  d
+| is
+| ch
+| ar
+| ge
+| s
+| 2002
+| 2003
+| 2004
+| Changes In Statewide Reporting
+| The statewide number of NYPORTS cases reported per 100,000 discharges in
+| 2002 was 1,225. This rate was 1,150 NYPORTS cases reported per 100,000
+| discharges in 2004. Consequently, the NYPORTS reporting rate per 100,000
+| discharges has relatively constant, with a slight drop of 6.1% between 2002 and
+| 2004. Examining the number of NYPORTS events and the number of SPARCS
+| records reveals that this decline is due primarily to an increase in SPARCS records
+| between 2002 and 2004.
+| Changes In Reporting by Region
+| The percentage change in NYPORTS cases reported per 100,000 discharges
+| between 2002 and 2004 ranged from a decrease of  18.2% (from 1,859 to 1,520)
+| in the Northeast New York region to an increase of 23.4% (from 1,375 to 1,696) in
+| the Central New York region.
+text: default page 16
+| 13
+| For the year 2002, the number of NYPORTS cases submitted per 100,000
+| discharges per region varied by a factor of 1.7. This regional variation stayed
+| substantially the same in 2003 and 2004.
+| For the year 2002, two regions New York City and Hudson Valley had very
+| similar reporting rates (1045 and 1082 occurrences per 100,000 discharges
+| respectively). Northeastern New York had the highest reporting rate (1,859
+| occurrences per 100,000 discharges). New York City reported the fewest
+| occurrences per 100,000 discharges (1045).
+| For the year 2003, Finger Lakes and Northeastern New York had very similar
+| reporting rates (1,802 and 1,792 occurrences per 100,000 discharges respectively).
+| Finger Lakes had the highest reporting rate (1802). New York City again reported
+| the fewest occurrences per 100,000 discharges (1018).
+| For the year 2004, two regions New York City and Hudson Valley had very
+| similar reporting rates (953 and 976 occurrences per 100,000 discharges
+| respectively). Finger Lakes had the highest reporting rate (1,745 occurrences per
+| 100,000 discharges). New York City reported the fewest occurrences per 100,000
+| discharges (953).
+| All regions except for New York City, Hudson Valley and Long Island Regions
+| are above the statewide average for reporting for years 2002 and 2003. New York
+| City and Hudson Valley are below the statewide reporting average for 2004. These
+| variations in reporting frequencies could be a result of a variety of factors including
+| quality of care, types of hospital admissions, procedures performed, accuracy and
+| completeness of reporting.
+| It is likely that accuracy and completeness of reporting is the reason for most
+| of the differences in the table above. Since over-reporting is unlikely, under-
+| reporting in regions with the lowest reporting rates is likely the cause of variation.
+| Although the size of the regions are believed large enough to compensate for
+| variations, methodology must be further scrutinized to identify any impact of the
+| difference in types of facilities and procedures performed within a region.
+text: default page 17
+| 14
+| One of the strategies that the department employs to assess reporting is
+| medical record review (either through surveillance activities or retrospective chart
+| review processes). The Department does impose citations and in some instances,
+| fines for non-reporting or late reporting of statutorily mandated codes. To optimize
+| reporting the Department encourages re-evaluation of internal processes that
+| identify reportable events as well as collaboration in projects that assist facilities to
+| identify reportable events. The Department has provided extensive education and
+| support for interpretation and understanding of the system both clinically and
+| technically.
+| Changes in Reporting by Individual NYPORTS Codes
+| As indicated above, the total number of NYPORTS records reported
+| decreased from 1,225 per 100,000 discharges in 2002 to 1,150 per 100,000
+| discharges in 2004, resulting in an overall decrease in the occurrence rate of 6.1%.
+| The following bar charts present changes in reporting between 2002 and 2004 for
+| individual NYPORTS codes. The codes have been divided into two groups based on
+| volume. The first group is the top ten most serious codes.
+| Top Ten Most Serious Detail Codes
+| 0
+| 100
+| 200
+| 300
+| 400
+| 500
+| 600
+| 700
+| 800
+| 911 912 913 915 916 917 918 919 920 922
+| Detail Codes
+| Fr
+| eq
+| ue
+| nc
+| y
+| 2002
+| 2004
+| 2004
+| Code 911:  Wrong patient, wrong site surgical procedure Code 916:  Unexpected cardiac and/or respiratory arrest requiring
+| ACLS intervention
+| Code 912:  Incorrect procedure or treatment – invasive Code 917:  Loss of limb or organ
+| Code 913:  Unintentionally retained foreign body Code 918:  Impairment of limb
+| Code 915:  Unexpected death Code 919:  Loss/Impairment of body functions
+| Code 920:  Errors of omission/delay resulting in death or serious
+| injury related to the patients underlying condition
+| Code 922: Inpatient suicides or attempted suicides with
+| serious injury
+text: default page 18
+| 15
+| Short Form Codes
+| The ten short form NYPORTS codes with the highest volume are presented next.
+| The percentage change between 2002 and 2004 in these codes ranged from an
+| increase of 21.7% for code 401 (New, acute pulmonary embolism) to a decrease of
+| 13.6% for code 805 (Wound dehiscence requiring repair).
+| Top 10 Short Form Codes by Volume by Year
+| 0
+| 500
+| 1000
+| 1500
+| 2000
+| 2500
+| 3000
+| 3500
+| 4000
+| 4500
+| 5000
+| 401 402 604 751 801 803 805 806 808 819
+| Occurrence Code
+| Fr
+| eq
+| ue
+| nc
+| y
+| 2002
+| 2003
+| 2004
+| Code 401: New Pulmonary Embolus
+| Code 402: New Deep Vein Thrombosis
+| Code 604: Acute Myocardial Infarction, unrelated to a cardiac
+| procedure
+| Code 751: Falls resulting in x-ray proven fractures, subdural or
+| epiduralhematoma, cerebral contusion, traumatic
+| subarachnoid hemorrhage or internal trauma
+| Code 801: Procedure related injury requiring intervention
+| Code 803: Hemorrhage or hematoma requiring intervention
+| Code 805: Wound dehiscence requiring repair
+| Code 806: Displacement, migration or breakage of an implant, device,
+| graft or drain
+| Code 808: Post-operative wound infection
+| Code 819: Any unplanned operation or re-operation
+text: default page 19
+| 16
+| Analysis of Procedures Associated with NYPORTS Codes
+| As part of NYPORTS reporting, hospitals are required to enter the ICD-9-CM
+| procedure code most closely associated with the adverse event, if a procedure was
+| associated with the event. In support of its primary focus, improvement of patient
+| care and safety, NYPORTS continues to accumulate and analyze data reported to
+| the system, including the procedure code. Analysis of procedures associated with
+| reportable cases, however, is difficult due to the large number of individual
+| procedure codes that are reported to NYPORTS.
+| The Agency for Healthcare Research and Quality has developed a tool for
+| clustering patient diagnoses and procedures into a manageable number of clinically
+| meaningful categories. This tool is called Clinical Classifications Software (CCS).
+| This "clinical grouper" makes it easier to understand the types of procedures that
+| are most frequently reported to the NYPORTS system.
+| CCS aggregates procedures into 231 mutually exclusive categories, most
+| representing single types of procedures. Some procedures that occur infrequently
+| are grouped together by their clinical or administrative characteristics (for example,
+| operating room vs. non-operating room). Examples of CCS procedure categories are
+| heart valve procedures, coronary artery bypass graft (CABG), bone marrow biopsy
+| and procedures on the spleen.
+| The next page lists the procedure groups that represent the largest
+| proportion of all NYPORTS cases for the years 2002, 2003 and 2004. The
+| distribution of cases into CCS groups for these years was similar and therefore
+| combined. In other words, for adverse events reported to NYPORTS that occurred
+| in 2002, 2003 and 2004, the table lists the CCS groups that have the largest
+| number of cases. For example, cases in NYPORTS with the procedure codes partial
+| excision of large intestine, total intra-abdominal colectomy, pull-through
+| submucosal resection of rectum, other pull-through resection of rectum,
+| abdominoperineal resection of rectum, and other resection of rectum, are grouped
+| into the CCS group "colorectal resection". There are 3,590 cases in this group, or
+| 3.9% of the total cases in NYPORTS from 2002, 2003 and 2004 (3590/ 90650 =
+| 3.9).
+text: default page 20
+text: default page 21
+text: default page 22
+text: default page 23
+text: default page 24
+text: default page 25
+text: default page 26
+text: default page 27
+text: default page 28
+text: default page 29
+text: default page 30
+text: default page 31
+text: default page 32
+text: default page 33
+text: default page 34
+text: default page 35
+text: default page 36
+text: default page 37
+text: default page 38
+text: default page 39
+text: default page 40
+text: default page 41
+text: default page 42
+text: default page 43
+text: default page 44
+text: default page 45
+text: default page 46
+text: default page 47
+text: default page 48
+text: default page 49
+text: default page 50
+text: sorted page 1
+| State of New York
+| Department of Health
+| Office of Health Systems Management
+| Division of Primary and Acute Care Services
+| New York
+| Patient Occurrence Reporting and
+| Tracking System
+| Report
+| Antonia C. Novello, M.D., M.P.H., Dr.P.H.
+| Commissioner of Health
+| Hon. George E. Pataki
+| Governor – State of New York
+| 2002-2004
+text: sorted page 2
+| Table of Contents
+| NYPORTS  Report 2002/2003/2004
+| Executive Summary ……………………………………………. 1-2
+| Introduction and Background ………………………………. 3-6
+| Completeness of Reporting in NYPORTS
+| Matching four NYPORTS Codes ………………………………….. 7
+| Process for Measuring Reporting of 401,402,604
+| and 808 Occurrences …………………………………………….. 8
+| Results of Process ………………………………………………… 9-10
+| Examination of Regional Variation in Reporting NYPORTS
+| Data……………………………………………………………………………….. 10-14
+| Changes in Reporting of Individual NYPORTS Code … 14-15
+| Analysis of Procedures Associated with NYPORTS
+| Codes……………………………………………………………….. 16-22
+| Analysis of Selected NYPORTS Codes
+| 911, 912 Analysis .........................…………………………….. 22-23
+| 108-110 MedicationAnalysis............................................…. 24
+| NYPORTS System Enhancements ………………………….. 25
+| Date of awareness ……………………………………………….. 25
+| Extensions for RCA’s ……………………………………………… 25-26
+| Force function for 108-110 ………………………………………. 26
+| Patient Safety Initiatives
+| NYPORTS News and Alert ……………………………………… 27-30
+| Agency for Healthcare Research and Quality Patient Safety
+| Grant..…………………………………………………………………………….. 30-33
+| Patient Safety Awards ……………………………………………. 33-37
+| Patient Safety Improvement Corps, Development and
+| Implementation of Root Cause Analysis Protocol ……………. 37-39
+| Statewide Patient Safety Training ………………………………. 39
+| “Working Together: Partnering for Patient Safety”
+| Conference….……………………………………………………… 40-41
+| Publication of NYPORTS related projects ……….……………… 42
+| Work in Progress ………………………………………………. 42
+| NYPORTS Systems Enhancements ……………….…………….. 43
+| NYPORTS Code Revisions …….………………………………….. 43
+| Process Measures Project: Codes 401 and 604……………………. 44
+| Future NYPORTS Initiatives ………………………………… 44-45
+| Acknowledgements …………………………………………… 46
+| Appendix A- Counties by Region List
+| Appendix B-Includes/Excludes List
+| Appendix C-NYPORTS Code 911 and 912 Analyses
+| Appendix D-Root Cause Analysis Protocol
+text: sorted page 3
+| Appendix E- Publications: Lessons Learned form the
+| Evolution of Mandatory Adverse Reporting Systems
+| and Quantitative and Qualitative Analysis of
+| Medication Errors: The New York Experience.
+| Appendix F- News and Alert-Issues #11-14
+text: sorted page 4
+| Executive Summary
+| Governor George E. Pataki and Antonia C. Novello, M.D., M.P.H., Dr. P.H.,
+| Commissioner of Health, have affirmed that the most important responsibility of the
+| Department and the healthcare community is to assure the highest quality of care
+| to patients in the safest possible manner.  Recently, Commissioner Novello stated,
+| “New York’s Patient Safety Initiatives and the tremendous commitment made by
+| healthcare providers across the state, build on Governor Pataki’s commitment to
+| ensuring New Yorkers access to one of the finest, most advanced healthcare
+| systems in the world.”
+| New York State has a long history of implementing efforts to improve patient
+| safety by mandating that hospitals report and initiate improvement actions based
+| on adverse events occurring at their facilities. The New York Patient Occurrence
+| Reporting and Tracking System (NYPORTS) is the third iteration of incident
+| reporting for New York State. The evolution of NYPORTS spans 21 years, initially
+| known as the Hospital Incident Reporting System (HIRS) followed by Patient Event
+| Tracking System (PETS). NYPORTS is a culmination of lessons learned through
+| analysis, evaluation and use of the systems.  It has been very positively affected by
+| the cooperative efforts of hospitals, hospital associations and a broad base of
+| experts across the state.
+| The current system, beginning in 1985, is a mandatory adverse event
+| reporting system statutorily based, pursuant to Article 28 Public Health Law 2805-l
+| and Section 405.8, Incident Reporting, of Title 10 New York Code, Rules and
+| Regulations. The system captures predefined events specifically coined
+| “occurrences”.  For the purpose of NYPORTS reporting, an occurrence is an
+| unintended adverse and undesirable development in an individual patient’s
+| condition. It is important to acknowledge that all adverse events collected in the
+| system are not medical errors and should not be considered as such.  NYPORTS
+| does collect reports on medical errors, but the volume of medical errors in the
+| system is a small percentage compared to the overall volume of reporting.
+|  The data collected in NYPORTS is used by the Department to assess the
+| incidence and management of adverse occurrences across the state, as well as a
+| basis for patient safety initiatives.  Additionally, NYPORTS has proven to be a
+| valuable tool for facilities in internal quality initiatives and medical error prevention.
+| As a national leader in the evolution of reporting systems, much has been learned
+| from NYPORTS.
+| 1
+text: sorted page 5
+| This report will highlight the Department’s commitment to patient safety
+| through quality initiatives inspired and supported by the data collected in NYPORTS.
+|  These include:
+| • Building quality initiatives around selected NYPORTS codes, first through an
+| Agency for Healthcare, Research and Quality (AHRQ) grant, and secondly
+| through a process measure project.
+| • Participation in the NYSDOH led delegation of the AHRQ and VA National
+| Center for Patient Safety (NCPS) sponsored Patient Safety Improvement
+| Corps (PSIC) National Training.
+| • Providing extensive patient safety education to facility NYPORTS coordinators
+| and quality improvement specialists of various disciplines across the state.
+| • Implementation of the first state protocol for thorough and credible Root
+| Cause Analysis.
+| • Sponsoring a statewide patient safety conference.
+| • Publishing two articles, Qualitative and Quantitative Analysis of Medication
+| Errors: The New York Experience and Lessons Learned from The Evolution of
+| a Mandatory Reporting System.
+| • Sharing lessons learned through articles published in the NYPORTS News and
+| Alert, presentations to the Statewide NYPORTS Council and regional hospital
+| associations.
+| • Annual New York State Patient Safety Awards.
+| • Restructuring of the NYPORTS reporting system.
+| • Comprehensive enhancements of the NYPORTS electronic system.
+| • Revised NYPORTS policies, procedures and manual.
+| • Ongoing NYPORTS data assessment in collaboration with the School of Public
+| Health.
+| The Department of Health acknowledges the efforts and improvement of New
+| York State Hospitals and Diagnostic and Treatment Centers with regard to
+| reporting. NYPORTS has been historically compared to data submitted to the
+| Statewide Planning and Research Cooperative System (SPARCS).  Below are some
+| of the statistics related to NYPORTS reporting for the years 2002-2004.
+| \x1F The number of inpatient discharges reported through SPARCS increased from
+| 2,466,849 in 2002, to 2,521,170 in 2003 and to 2,617,524 in 2004.
+| \x1F The number of reports submitted to NYPORTS increased from 30,416 cases
+| in 2002, to 31,029 in 2003, and to 31,154 in 2004.
+| \x1F Reporting has changed from 1,225 reports per 100,000 discharges in 2002,
+| to 1,203 reports per 100,000 discharges in 2003, to 1,150 reports per
+| 100,000 discharges in 2004.
+| \x1F NYPORTS reporting per 100,000 discharges has remained relatively constant
+| with a slight decrease of 6.1% from 2002 to 2004, largely due to increases in
+| inpatient discharges.
+| 2
+text: sorted page 6
+| Introduction and Background
+| The New York Patient Occurrence Reporting and Tracking System
+| (NYPORTS) is a mandatory adverse event reporting system implemented pursuant
+| to New York State Public Health Law Section 2805-L, Incident Reporting.  For the
+| purpose of NYPORTS reporting, an adverse occurrence is specifically defined as an
+| unintended adverse and undesirable development in an individual patient’s
+| condition. Some occurrences are meant to be tracked and trended as groups, while
+| the most serious occurrences (specifically defined as patient deaths or impairments
+| of body function in circumstances other than those related to the natural course of
+| illness, disease or proper treatment in accordance with generally accepted medical
+| standards), are investigated internally and require facilities to conduct a Root Cause
+| Analysis (RCA).  All adverse events are not medical errors and should not be
+| considered as such.
+|  NYPORTS does collect reports on medical errors, but the volume of medical
+| errors in the system is a small percentage compared to the overall volume of
+| reporting.  It should be noted that New York State Public Health Law Section 2805-m
+| Confidentiality prevents disclosure of incident reports under the Freedom of
+| Information Law.
+| This report will provide information regarding NYPORTS enhancements,
+| policy revision and analysis of data collected during the years 2002-2004.  In
+| addition, information relating to activities undertaken to assure optimal NYPORTS
+| reporting and future plans will be discussed. Future plans include: ongoing
+| improvement of the NYPORTS system, continued training and support and in-depth
+| data analysis by occurrence code. The overriding goal of these activities is to
+| improve the quality of care and safety of patients in facilities in New York State.
+| New York State has had a long history of implementing efforts to improve
+| patient safety by requiring hospitals to report and initiate actions based on adverse
+| events occurring in their facilities.  Since October 1, 1985, a mandatory incident
+| reporting system has been in place in New York State.  Initially, the incident
+| reporting system was a paper reporting system; later, an e-mail-based system was
+| developed.  Neither of these systems allowed adequate feedback to the hospitals,
+| which limited the use of the data for quality improvement.
+| At the direction of Governor Pataki through a regulatory reform effort,
+| NYPORTS was created to simplify reporting, streamline coding, coordinate with
+| other reporting systems to reduce duplication and most importantly allow hospitals
+| to obtain feedback on their own reporting patterns and compare them with other
+| facilities in the region and the State.
+| 3
+text: sorted page 7
+| The development of the electronic internet-based system began in 1995,
+| utilizing a statewide workgroup of industry experts including consumer
+| representative. The original workgroup included a practicing surgeon, a practicing
+| anesthesiologist, facility medical directors, internal medicine practitioners, nursing,
+| quality assurance and risk management professionals.
+| The Chair of the original workgroup, Dr. Robert Panzer, is the Chief Quality
+| Officer of The University of Rochester Medical Center and continues to Chair the
+| NYPORTS council today. The NYPORTS Council meets regularly; many of the
+| original members of the first workgroup sit on the panel.  The council sets goals
+| and prioritizes patient safety projects, participates in analysis of NYPORTS data as
+| well as clinical and system enhancements. The Department works in collaboration
+| with the NYPORTS council, providing necessary support to carry out development
+| and implementation activities.
+|  Statewide hospital associations and their regional affiliates also participated
+| in development and implementation of the group’s activities.  The resulting system
+| is based on objective criteria and provides hospitals with clear definitions of what
+| must be reported.  This electronic version was extensively field tested, refined, and
+| implemented on a statewide basis in April 1998.  The system made it easier for
+| hospitals to report adverse incidents, as required by law, and to obtain comparative
+| data.
+| NYPORTS is an Internet based system with all the required security
+| measures included in its construction.  Hospitals can query the database to
+| compare their experience with reported events to the statewide, regional or peer
+| group experience.  While the identity of individual hospitals in the comparative
+| groups is not disclosed, the comparative database is a useful tool in support of
+| hospital quality improvement activities.  Additionally, hospitals can use the system
+| to create comparative reports in a variety of graphic formats. With new Reports
+| functionality, hospitals can produce assorted reports of local, Regional, statewide or
+| peer group information.
+|   NYPORTS electronic reporting is dynamic, evolving as technological
+| advances and clinical changes necessitate. Significant system improvements were
+| implemented effective June 1, 2000. These improvements included: improved
+| definitions of reportable events, increased reporting requirements regarding
+| medication errors, a detailed definition manual, a revised and improved instructional
+| manual, and the ability to create root cause analysis reports (RCA’s) for all serious
+| occurrences.
+| 4
+text: sorted page 8
+| System improvements implemented in 2001 included the installation of a
+| new server, a "bulletin board" to post information and documents and a home
+| screen to display changes in case status. Following extensive analysis, significant
+| code revisions and technical changes were made to the electronic system, effective
+| in 2004 and 2005.  These changes included reprogramming the system using .net
+| technology, revised user screens, reports, help and search functions.
+| The Department believes that before patient safety improvements can be
+| made, there must be an awareness and recognition of adverse events by facilities
+| (i.e., before one can fix a problem, it must be identified). Therefore, the
+| Department views hospitals with the highest reporting rates as those most keenly
+| aware of occurrences within their facilities and in the best position to bring about
+| systems improvements.  For events with significant negative or lasting impact on
+| patients, facilities must conduct an internal investigation of the systems supporting
+| patient care.
+| These investigations, known as Root Cause Analyses, must identify the root
+| causes of such events, enact systems improvements and build in back-up,"fail-safe"
+| strategies to prevent reoccurrence.  Facilities are required to monitor the
+| implementation and effectiveness of identified system improvements through their
+| quality assurance activities, to assure strategies function as intended.  For events of
+| lesser patient consequence, facilities are expected to collect and aggregate data
+| regarding these occurrences, to identify system weaknesses before more
+| consequential events occur.
+| Through access to a comparative database, a hospital can identify through
+| its own reporting circumstances where the hospital stands by comparison. This
+| helps to identify the system of care upon which the hospital should focus its
+| attention and efforts and to monitor the effectiveness of improvement efforts.  By
+| completing this process, the number of adverse events will be reduced and the
+| quality of care and the level of safety for hospital patients will improve.
+| The Department oversees hospital compliance with NYPORTS reporting
+| responsibilities to ensure the process is fulfilled.  The Department also directly
+| investigates a portion of the most significant occurrences.  Further, through
+| NYPORTS system management and analysis, the Department identifies areas of
+| significant concern noted by individual hospitals and provides alerts to all hospitals
+| in the State.  It is expected that hospitals will institute measures, known as "risk
+| reduction strategies", to prevent or reduce these occurrences in their own facilities.
+| By sharing such pertinent information with all hospitals in the State, the
+| Department endeavors to bring about industry-wide improvement in patient safety.
+| 5
+text: sorted page 9
+| The National Academy for State Health Policy (NASHP) supports mandatory
+| reporting systems, such as NYPORTS, as a tool to address quality and safety issues
+| related to hospital care.  They cite, "Proponents of mandatory reporting view it as a
+| way to make healthcare organizations responsive to public expectations for safe,
+| high quality health care”.  “Mandatory reporting systems are intended to hold
+| providers accountable for performance in two ways: First, they may help assure
+| that serious mistakes are reported and investigated and that appropriate follow-up
+| action is taken and Second, they provide disincentives (e.g., citations, penalties,
+| sanctions, possible public exposure, and possible loss of business) for organizations
+| to continue unsafe practices”. By fulfilling and exceeding these criteria set forth by
+| 1
+| NASHP, NYPORTS has distinguished itself as a model state reporting system.
+| Completeness of Reporting in NYPORTS
+| As noted in previous NYPORTS annual reports, the completeness of reporting
+| is an important concern when using NYPORTS for quality improvement and adverse
+| event reduction purposes. If the data is not reported completely and accurately, the
+| occurrence frequency or the occurrence rate (number of occurrences per number of
+| discharges or number of occurrences per number of procedures of a given type) for
+| hospitals or region cannot be accurately computed.
+| Nationally it is recognized that a “gold standard” does not exist from which
+| complete reporting can be measured, however using the number of discharges
+| reported in the Statewide Planning and Research Cooperative System (SPARCS) as
+| a denominator allows for some measure of frequency. SPARCS is a database
+| containing information on all inpatient stays in New York State acute care hospitals.
+| The Department does take active steps to identify compliance with complete
+| reporting, stemming from statewide educational sessions and patient safety
+| projects to record reviews through the surveillance process and retrospective
+| review process.
+|                                                \x20
+| 1 Lynda Flowers and Trish Riley, “State-based Mandatory Reporting of Medical Errors: An analysis of the
+| legal and Policy Issues”, March 2001 pg.5.
+| 6
+text: sorted page 10
+| Matching Select NYPORTS Occurrences with Inpatient Hospital Discharge
+| Data from the Statewide Planning and Research Cooperative System -
+| SPARCS
+| Optimal reporting is crucial when utilizing NYPORTS data as a tool for quality
+| improvement and adverse event reduction efforts.  This report will show that
+| reporting for occurrence codes 401(New acute pulmonary embolism), 402 (new
+| documented deep vein thrombosis), 604 (acute myocardial infarction not related to
+| a cardiac procedure) and 808 (post-op wound infection requiring drainage during
+| the hospital stay or inpatient admission within 30 days) improved significantly in 15
+| New York State hospitals involved in an Agency for Healthcare, Research and
+| Quality (AHRQ) funded Patient Safety Demonstration Project.
+| The goals of the $5.4 million grant in support of patient safety improvements
+| were accomplished through two initiatives: assuring more complete reporting in
+| NYPORTS, for more meaningful analysis and oversight of three demonstration
+| projects involving hospital groups or networks that would study specific types of
+| adverse outcomes, then develop and test interventions that could reduce their
+| occurrence.
+| Findings from the projects have been distributed statewide so that other
+| facilities may also concentrate on identification of these occurrences and implement
+| or reinforce successful protocols.  The protocols included thrombo-prophylaxis to
+| reduce the incidence of thromboembolic episodes (deep vein thromboses or
+| pulmonary embolisms commonly referred to as “blood clots”), peri-operative risk
+| assessment and appropriate use of beta-blocker prophylaxis to prevent myocardial
+| infarction in a non cardiac related procedure; and standardized surgical anti-
+| microbial prophylaxis protocols to reduce post-operative wound infections.
+| Monitoring of occurrence reporting is a high priority for the Department of
+| Health. The Department continually seeks innovative ways to assist facilities in
+| meeting their mandatory reporting requirements. SPARCS was instrumental in
+| assessing completeness of reporting in the four NYPORTS codes (401/402, 604 and
+| 808) included in the AHRQ grant mentioned above.
+| Please see Appendix B for the list of NYPORTS codes with their
+| included and excluded criteria.
+| 7
+text: sorted page 11
+| By linking NYPORTS and SPARCS to identify potentially missed events, the
+| Department was successful in assisting hospitals to identify cases. The methods
+| used and results of this process are described below:
+| Process for Measuring Completeness of Reporting of Select Occurrences
+| 1. Use SPARCS data to identify all patients with specific diagnosis codes
+| identified in the International Classification of Diseases (ICD-9).
+| NYPORTS 401 (pulmonary embolism): ICD-9 diagnosis codes not in the
+| primary position, 415 Acute pulmonary heart disease (415.1, 415.11, 415.19,
+| 415.0), 673.2 Obstetrical blood-clot embolism.
+| NYPORTS 402 (deep vein thrombosis): ICD-9 diagnosis codes not in the
+| primary position, 451 Phlebitis and thrombophlebitis (451.1, 451.11, 451.19,
+| 451.2, 451.81, 451.83, 451.84, 451.89), 453 Other venous embolism and
+| thrombosis (453.2, 453.8, 453.9), 671 Venous complications in pregnancy
+| and the puerperium.
+| NYPORTS 808 (post-op wound infection): ICD-9 diagnosis code in any
+| diagnosis field, 998.5 other complications of procedures, postoperative
+| infection (998.51, 998.59, 998.5).
+| NYPORTS 604 (acute myocardial infarction) ICD-9 diagnosis code not in the
+| primary position, 410.X1 Acute myocardial infarction, initial episode of care.
+| 2. Match all of the patients identified in SPARCS (with the corresponding
+| diagnosis codes) with patients who were identified using administrative data
+| and reported in NYPORTS.
+| 3. Records identified in SPARCS as potential NYPORTS cases were provided to
+| an independent review agent, IPRO, for medical chart review. IPRO used
+| registered nurses to conduct retrospective medical record reviews using a
+| standard validation review instrument to determine if a reportable event
+| occurred.
+| 4. Hospitals entered cases into NYPORTS, which IPRO determined were
+| reportable and the hospitals agreed were reportable.
+| 5. The estimated completeness of reporting (percentage of cases that were
+| reported) is the total of matched cases (SPARCS and NYPORTS) divided by
+| the total number of cases identified in SPARCS using the diagnosis codes.
+| 8
+text: sorted page 12
+| Results of Process
+| The hospitals that participated in the demonstration project were evaluated
+| on the completeness of NYPORTS reporting for two time periods, the first half of
+| 2001 and the second half of 2001.
+| Using the methods described above, 67 SPARCS cases were identified as
+| reportable under NYPORTS occurrence code 401/402, from January 1, 2001 to May
+| 31, 2001 for the five hospitals participating in the DVT/PE demonstration project. Of
+| these patients, a total of 16 cases (24%) were reported by the hospitals to
+| NYPORTS as of June 18, 2002.
+| Using the same methods, 38 SPARCS cases were identified as reportable
+| under NYPORTS occurrence code 604, from January 1, 2001 to May 31, 2001 for
+| the five hospitals participating in the post operative AMI demonstration project. Of
+| these patients, a total of 11 cases (29%) were reported by the hospitals to
+| NYPORTS as of June 18, 2002.
+| For NYPORTS occurrence code 808, 43 SPARCS cases were identified as
+| reportable from January 1, 2001 to May 31, 2001 for the four hospitals participating
+| in the post operative wound infection demonstration project. Of these patients, a
+| total of 5 cases (12%) were reported by the hospitals to NYPORTS as of June 18,
+| 2002.
+| After the facilities were notified of the results of the evaluation of
+| completeness for the first half of 2001, the DOH directed them to initiate a process
+| of locating and re-evaluating these occurrences, with a goal of assessing and
+| making improvements to their own internal identification processes. After these
+| improvements were made, facilities were directed to identify and report any
+| 401/402, 604 or 808 events which had not been previously reported for the second
+| half of 2001.
+| The facilities were then re-evaluated by examining completeness of reporting
+| for the second half of 2001. For the facilities in the 401/402 demonstration project,
+| 128 SPARCS cases were identified as reportable to NYPORTS from June 1, 2001 to
+| December 31, 2001. Of these patients, a total of 113 cases (88%) were reported by
+| the hospitals to NYPORTS as of January 2003.
+| Using the same methods, 45 SPARCS cases were identified as reportable
+| under NYPORTS occurrence code 604, from June 1, 2001 to December 31, 2001 for
+| the five hospitals participating in the post operative AMI demonstration project. Of
+| these patients, a total of 21 cases (47%) were reported by the hospitals to
+| NYPORTS as of January 8, 2003.
+| 9
+text: sorted page 13
+| For NYPORTS occurrence code 808, 46 SPARCS cases were identified as
+| reportable from June 1, 2001 to December 31, 2001 for the four hospitals
+| participating in the post operative wound infection demonstration project. Of these
+| patients, a total of 38 cases (83%) were reported by the hospitals to NYPORTS as
+| of January 8, 2003.
+| Conclusion
+| The completeness of reporting of NYPORTS events identified by using
+| SPARCS data for code 401/402, increased from 24% to 88%. Completeness of
+| reporting for 604 increased from 29% to 47% and completeness of reporting for
+| 808 increased from 12% to 83%. This increase in reporting percentages is a direct
+| result of the efforts taken by the Department of Health to encourage reporting and
+| hospital compliance with reporting responsibilities
+| It should be noted that the process described above to measure completeness
+| used only records reported to NYPORTS that can be identified using SAPRCS data
+| with specific ICD9 diagnosis codes. The hospitals involved in the demonstration
+| projects did identify additional records using other methods, including Computerized
+| Patient Order Entry (CPOE), clinical laboratory results databases, imaging scans,
+| autopsy and infection control department reports.
+| Examination of Regional Variation in Reporting NYPORTS Data
+| A strategy for assessing the completeness of NYPORTS reporting is to
+| examine differences in reporting frequency among large groups of hospitals within
+| certain geographical regions of the state. In order to accomplish this goal, the
+| number of inpatient discharges was compared with the number of NYPORTS cases
+| per region. The statistic used is the number of NYPORTS cases per 100,000
+| discharges.
+| 10
+text: sorted page 14
+| The table below reflects the results of data collection that was entered into
+| the NYPORTS system as of December 31st of the following year (for example
+| NYPORTS occurrences in 2002, submitted to NYPORTS through the end of 2003).
+| The regions are defined as Western New York, Finger Lakes, Central New York,
+| Northeastern New York, Hudson Valley, Long Island, and New York City. The
+| counties comprising these regions are listed in Appendix A.
+| NYPORTS Cases Submitted/100,000 Discharges by Region: 2002, 2003
+| and 2004
+| 2002 2003 2004
+| Rate
+| Rate per per Rate per
+| Region NYPORTS SPARCS 100,000 NYPORTS SPARCS 100,000 NYPORTS SPARCS 100,000
+| Central 2660 193421 1375.2 3012 199363 1510.8 3435 202446 1696.7
+| Finger Lakes 2464 148605 1658.1 2694 149472 1802.3 2678 153462 1745.1
+| Hudson
+| Valley 2717 251083 1082.1 2865 268244 1068.1 2703 276740 976.7
+| Long Island 4365 362795 1203.2 4059 357700 1134.7 4457 379736 1173.7
+| New York
+| City 12063 1153598 1045.7 12057 1183619 1018.7 11811 1239268 953.1
+| Northeastern 3191 171643 1859.1 3124 174255 1792.8 2703 177821 1520.1
+| Western 2766 185704 1489.5 2511 188517 1332.0 2315 188051 1231.0
+| Total
+| Inpatient 30226 2466849 1225.3 30322 2521170 1202.7 30102 2617524 1150.0
+| For the year 2002, there were 30,226 NYPORTS cases submitted for all of
+| the inpatient occurrence codes and 2,466,849 SPARCS cases submitted by
+| December 31, 2003. The number of NYPORTS cases submitted per 100,000
+| discharges for 2002 in New York State was 1,225.
+| As indicated in the table above, a total of 30,322 NYPORTS cases occurred in
+| 2003 and were submitted by December 31, 2004 for all inpatient occurrence codes
+| in NYPORTS, and a total of 2,521,170 patients were discharged from New York
+| State acute care hospitals in 2003, based on data submitted by December 31, 2004.
+| The number of NYPORTS cases submitted per 100,000 discharges for 2003 in New
+| York State was 1,202.
+| Also indicated in the table above, a total of 30,102 NYPORTS cases occurred
+| in 2004 and were submitted by December 31, 2005 for all inpatient occurrence
+| codes in NYPORTS, and a total of 2,617,524 patients were discharged from New
+| York State acute care hospitals in 2004, based on data submitted by December 31,
+| 2005. The number of NYPORTS cases submitted per 100,000 discharges for 2004 in
+| New York State was 1,150.
+| 11
+text: sorted page 15
+| The following bar chart compares the NYPORTS occurrences for year 2002
+| (submitted as of December 31, 2003, year 2003 (submitted as of December 31,
+| 2004) and year2004 (submitted as of December 31, 2005) by region and for the
+| entire state.
+| Regional Variation in NYPORTS Reporting 2002-2004
+| 2000
+| 2002
+| 1800 2003
+| 2004
+| 1600
+| 1400
+| 1200
+| 1000
+| 800
+| 600
+| 400
+| 200
+| 0
+| Central Finger Lakes Hudson Valley Long Island New York City Northeastern Western Total Inpatient
+| Region
+| Changes In Statewide Reporting
+| The statewide number of NYPORTS cases reported per 100,000 discharges in
+| 2002 was 1,225. This rate was 1,150 NYPORTS cases reported per 100,000
+| discharges in 2004. Consequently, the NYPORTS reporting rate per 100,000
+| discharges has relatively constant, with a slight drop of 6.1% between 2002 and
+| 2004. Examining the number of NYPORTS events and the number of SPARCS
+| records reveals that this decline is due primarily to an increase in SPARCS records
+| between 2002 and 2004.
+| Changes In Reporting by Region
+| The percentage change in NYPORTS cases reported per 100,000 discharges
+| between 2002 and 2004 ranged from a decrease of  18.2% (from 1,859 to 1,520)
+| in the Northeast New York region to an increase of 23.4% (from 1,375 to 1,696) in
+| the Central New York region.
+| 12
+| Number of reports per 100,000 discharges
+text: sorted page 16
+| For the year 2002, the number of NYPORTS cases submitted per 100,000
+| discharges per region varied by a factor of 1.7. This regional variation stayed
+| substantially the same in 2003 and 2004.
+| For the year 2002, two regions New York City and Hudson Valley had very
+| similar reporting rates (1045 and 1082 occurrences per 100,000 discharges
+| respectively). Northeastern New York had the highest reporting rate (1,859
+| occurrences per 100,000 discharges). New York City reported the fewest
+| occurrences per 100,000 discharges (1045).
+| For the year 2003, Finger Lakes and Northeastern New York had very similar
+| reporting rates (1,802 and 1,792 occurrences per 100,000 discharges respectively).
+| Finger Lakes had the highest reporting rate (1802). New York City again reported
+| the fewest occurrences per 100,000 discharges (1018).
+| For the year 2004, two regions New York City and Hudson Valley had very
+| similar reporting rates (953 and 976 occurrences per 100,000 discharges
+| respectively). Finger Lakes had the highest reporting rate (1,745 occurrences per
+| 100,000 discharges). New York City reported the fewest occurrences per 100,000
+| discharges (953).
+| All regions except for New York City, Hudson Valley and Long Island Regions
+| are above the statewide average for reporting for years 2002 and 2003. New York
+| City and Hudson Valley are below the statewide reporting average for 2004. These
+| variations in reporting frequencies could be a result of a variety of factors including
+| quality of care, types of hospital admissions, procedures performed, accuracy and
+| completeness of reporting.
+| It is likely that accuracy and completeness of reporting is the reason for most
+| of the differences in the table above. Since over-reporting is unlikely, under-
+| reporting in regions with the lowest reporting rates is likely the cause of variation.
+| Although the size of the regions are believed large enough to compensate for
+| variations, methodology must be further scrutinized to identify any impact of the
+| difference in types of facilities and procedures performed within a region.
+| 13
+text: sorted page 17
+| One of the strategies that the department employs to assess reporting is
+| medical record review (either through surveillance activities or retrospective chart
+| review processes). The Department does impose citations and in some instances,
+| fines for non-reporting or late reporting of statutorily mandated codes. To optimize
+| reporting the Department encourages re-evaluation of internal processes that
+| identify reportable events as well as collaboration in projects that assist facilities to
+| identify reportable events. The Department has provided extensive education and
+| support for interpretation and understanding of the system both clinically and
+| technically.
+| Changes in Reporting by Individual NYPORTS Codes
+| As indicated above, the total number of NYPORTS records reported
+| decreased from 1,225 per 100,000 discharges in 2002 to 1,150 per 100,000
+| discharges in 2004, resulting in an overall decrease in the occurrence rate of 6.1%.
+| The following bar charts present changes in reporting between 2002 and 2004 for
+| individual NYPORTS codes. The codes have been divided into two groups based on
+| volume. The first group is the top ten most serious codes.
+| Top Ten Most Serious Detail Codes
+| 800
+| 700
+| 600
+| 500 2002
+| 400 2004
+| 300 2004
+| 200
+| 100
+| 0
+| 911 912 913 915 916 917 918 919 920 922
+| Detail Codes
+| Code 911:  Wrong patient, wrong site surgical procedure Code 916:  Unexpected cardiac and/or respiratory arrest requiring
+| ACLS intervention
+| Code 912:  Incorrect procedure or treatment – invasive Code 917:  Loss of limb or organ
+| Code 913:  Unintentionally retained foreign body Code 918:  Impairment of limb
+| Code 915:  Unexpected death Code 919:  Loss/Impairment of body functions
+| Code 920:  Errors of omission/delay resulting in death or serious Code 922: Inpatient suicides or attempted suicides with
+| injury related to the patients underlying condition serious injury
+| 14
+| Frequency
+text: sorted page 18
+| Short Form Codes
+| The ten short form NYPORTS codes with the highest volume are presented next.
+| The percentage change between 2002 and 2004 in these codes ranged from an
+| increase of 21.7% for code 401 (New, acute pulmonary embolism) to a decrease of
+| 13.6% for code 805 (Wound dehiscence requiring repair).
+| Top 10 Short Form Codes by Volume by Year
+| 5000
+| 4500
+| 4000
+| 3500
+| 3000 2002
+| 2500 2003
+| 2000 2004
+| 1500
+| 1000
+| 500
+| 0
+| 401 402 604 751 801 803 805 806 808 819
+| Occurrence Code
+| Code 401: New Pulmonary Embolus
+| Code 402: New Deep Vein Thrombosis
+| Code 604: Acute Myocardial Infarction, unrelated to a cardiac
+| procedure
+| Code 751: Falls resulting in x-ray proven fractures, subdural or
+| epiduralhematoma, cerebral contusion, traumatic
+| subarachnoid hemorrhage or internal trauma
+| Code 801: Procedure related injury requiring intervention
+| Code 803: Hemorrhage or hematoma requiring intervention
+| Code 805: Wound dehiscence requiring repair
+| Code 806: Displacement, migration or breakage of an implant, device,
+| graft or drain
+| Code 808: Post-operative wound infection
+| Code 819: Any unplanned operation or re-operation
+| 15
+| Frequency
+text: sorted page 19
+| Analysis of Procedures Associated with NYPORTS Codes
+| As part of NYPORTS reporting, hospitals are required to enter the ICD-9-CM
+| procedure code most closely associated with the adverse event, if a procedure was
+| associated with the event. In support of its primary focus, improvement of patient
+| care and safety, NYPORTS continues to accumulate and analyze data reported to
+| the system, including the procedure code. Analysis of procedures associated with
+| reportable cases, however, is difficult due to the large number of individual
+| procedure codes that are reported to NYPORTS.
+| The Agency for Healthcare Research and Quality has developed a tool for
+| clustering patient diagnoses and procedures into a manageable number of clinically
+| meaningful categories. This tool is called Clinical Classifications Software (CCS).
+| This "clinical grouper" makes it easier to understand the types of procedures that
+| are most frequently reported to the NYPORTS system.
+| CCS aggregates procedures into 231 mutually exclusive categories, most
+| representing single types of procedures. Some procedures that occur infrequently
+| are grouped together by their clinical or administrative characteristics (for example,
+| operating room vs. non-operating room). Examples of CCS procedure categories are
+| heart valve procedures, coronary artery bypass graft (CABG), bone marrow biopsy
+| and procedures on the spleen.
+| The next page lists the procedure groups that represent the largest
+| proportion of all NYPORTS cases for the years 2002, 2003 and 2004. The
+| distribution of cases into CCS groups for these years was similar and therefore
+| combined. In other words, for adverse events reported to NYPORTS that occurred
+| in 2002, 2003 and 2004, the table lists the CCS groups that have the largest
+| number of cases. For example, cases in NYPORTS with the procedure codes partial
+| excision of large intestine, total intra-abdominal colectomy, pull-through
+| submucosal resection of rectum, other pull-through resection of rectum,
+| abdominoperineal resection of rectum, and other resection of rectum, are grouped
+| into the CCS group "colorectal resection". There are 3,590 cases in this group, or
+| 3.9% of the total cases in NYPORTS from 2002, 2003 and 2004 (3590/ 90650 =
+| 3.9).
+| 16
+text: sorted page 20
+text: sorted page 21
+text: sorted page 22
+text: sorted page 23
+text: sorted page 24
+text: sorted page 25
+text: sorted page 26
+text: sorted page 27
+text: sorted page 28
+text: sorted page 29
+text: sorted page 30
+text: sorted page 31
+text: sorted page 32
+text: sorted page 33
+text: sorted page 34
+text: sorted page 35
+text: sorted page 36
+text: sorted page 37
+text: sorted page 38
+text: sorted page 39
+text: sorted page 40
+text: sorted page 41
+text: sorted page 42
+text: sorted page 43
+text: sorted page 44
+text: sorted page 45
+text: sorted page 46
+text: sorted page 47
+text: sorted page 48
+text: sorted page 49
+text: sorted page 50
+text: range 2-3
+| Table of Contents
+| NYPORTS  Report 2002/2003/2004
+| Executive Summary ……………………………………………. 1-2
+| Introduction and Background ………………………………. 3-6
+| Completeness of Reporting in NYPORTS
+| Matching four NYPORTS Codes …………………………………..
+| Process for Measuring Reporting of 401,402,604
+| and 808 Occurrences ……………………………………………..
+| Results of Process …………………………………………………
+| Examination of Regional Variation in Reporting NYPORTS
+| Data………………………………………………………………………………..
+| 7
+| 8
+| 9-10
+| 10-14
+| Changes in Reporting of Individual NYPORTS Code … 14-15
+| Analysis of Procedures Associated with NYPORTS
+| Codes……………………………………………………………….. 16-22
+| Analysis of Selected NYPORTS Codes
+| 911, 912 Analysis .........................……………………………..
+| 108-110 MedicationAnalysis............................................….
+| 22-23
+| 24
+| NYPORTS System Enhancements …………………………..
+| Date of awareness ………………………………………………..
+| Extensions for RCA’s ………………………………………………
+| Force function for 108-110 ……………………………………….
+| 25
+| 25
+| 25-26
+| 26
+| Patient Safety Initiatives
+| NYPORTS News and Alert ………………………………………
+| Agency for Healthcare Research and Quality Patient Safety
+| Grant..……………………………………………………………………………..
+| Patient Safety Awards …………………………………………….
+| 27-30
+| 30-33
+| 33-37
+| Patient Safety Improvement Corps, Development and
+| Implementation of Root Cause Analysis Protocol …………….
+| Statewide Patient Safety Training ……………………………….
+| “Working Together: Partnering for Patient Safety”
+| Conference….………………………………………………………
+| Publication of NYPORTS related projects ……….………………
+| 37-39
+| 39
+| 40-41
+| 42
+| Work in Progress ……………………………………………….
+| NYPORTS Systems Enhancements ……………….……………..
+| NYPORTS Code Revisions …….…………………………………..
+| Process Measures Project: Codes 401 and 604…………………….
+| 42
+| 43
+| 43
+| 44
+| Future NYPORTS Initiatives ………………………………… 44-45
+| Acknowledgements …………………………………………… 46
+| Appendix A- Counties by Region List
+| Appendix B-Includes/Excludes List
+| Appendix C-NYPORTS Code 911 and 912 Analyses
+| Appendix D-Root Cause Analysis Protocol
+| Appendix E- Publications: Lessons Learned form the
+| Evolution of Mandatory Adverse Reporting Systems
+| and Quantitative and Qualitative Analysis of
+| Medication Errors: The New York Experience.
+| Appendix F- News and Alert-Issues #11-14
+text: separators 1-2
+| <PAGE><A><P>State of New York<EOL>
+| Department of Health<EOL>
+| </P><P>Office of Health Systems Management<EOL>
+| Division of Primary and Acute Care Services<EOL>
+| </P><P>New York<EOL>
+| Patient Occurrence Reporting and<EOL>
+| </P><P>Tracking System<EOL>
+| Report<EOL>
+| </P><P>Antonia C. Novello, M.D., M.P.H., Dr.P.H.<EOL>
+| Commissioner of Health<EOL>
+| </P><P>Hon. George E. Pataki<EOL>
+| Governor – State of New York<EOL>
+| </P><P>2002-2004</P></A></PAGE>
+| <PAGE><A><P>Table of Contents<EOL>
+| NYPORTS  Report 2002/2003/2004<EOL>
+| </P><P>Executive Summary …………………………………………….<W>1-2<EOL>
+| Introduction and Background ……………………………….<W>3-6<EOL>
+| Completeness of Reporting in NYPORTS<EOL>
+| Matching four NYPORTS Codes …………………………………..<EOL>
+| Process for Measuring Reporting of 401,402,604<EOL>
+| and 808 Occurrences ……………………………………………..<EOL>
+| Results of Process …………………………………………………<EOL>
+| Examination of Regional Variation in Reporting NYPORTS<EOL>
+| Data………………………………………………………………………………..<EOL>
+| </P><P>7<EOL>
+| </P><P>8<EOL>
+| 9-10<EOL>
+| </P><P>10-14<EOL>
+| Changes in Reporting of Individual NYPORTS Code …<W>14-15<EOL>
+| Analysis of Procedures Associated with NYPORTS<EOL>
+| Codes………………………………………………………………..<W>16-22<EOL>
+| Analysis of Selected NYPORTS Codes<EOL>
+| 911, 912 Analysis .........................……………………………..<EOL>
+| 108-110 MedicationAnalysis............................................….<EOL>
+| </P><P>22-23<EOL>
+| 24<EOL>
+| </P><P>NYPORTS System Enhancements …………………………..<EOL>
+| Date of awareness ………………………………………………..<EOL>
+| Extensions for RCA’s ………………………………………………<EOL>
+| Force function for 108-110 ……………………………………….<EOL>
+| </P><P>25<EOL>
+| 25<EOL>
+| 25-26<EOL>
+| 26<EOL>
+| </P><P>Patient Safety Initiatives<EOL>
+| NYPORTS News and Alert ………………………………………<EOL>
+| Agency for Healthcare Research and Quality Patient Safety<EOL>
+| Grant..……………………………………………………………………………..<EOL>
+| Patient Safety Awards …………………………………………….<EOL>
+| </P><P>27-30<EOL>
+| </P><P>30-33<EOL>
+| 33-37<EOL>
+| </P><P>Patient Safety Improvement Corps, Development and<EOL>
+| Implementation of Root Cause Analysis Protocol …………….<EOL>
+| Statewide Patient Safety Training ……………………………….<EOL>
+| “Working Together: Partnering for Patient Safety”<EOL>
+| Conference….………………………………………………………<EOL>
+| Publication of NYPORTS related projects ……….………………<EOL>
+| </P><P>37-39<EOL>
+| 39<EOL>
+| </P><P>40-41<EOL>
+| 42<EOL>
+| </P><P>Work in Progress ……………………………………………….<EOL>
+| NYPORTS Systems Enhancements ……………….……………..<EOL>
+| NYPORTS Code Revisions …….…………………………………..<EOL>
+| Process Measures Project: Codes 401 and 604…………………….<EOL>
+| </P><P>42<EOL>
+| 43<EOL>
+| 43<EOL>
+| 44<EOL>
+| </P><P>Future NYPORTS Initiatives …………………………………<W>44-45<EOL>
+| Acknowledgements ……………………………………………<W>46<EOL>
+| Appendix A- Counties by Region List<EOL>
+| Appendix B-Includes/Excludes List<EOL>
+| Appendix C-NYPORTS Code 911 and 912 Analyses<EOL>
+| Appendix D-Root Cause Analysis Protocol</P></A></PAGE>

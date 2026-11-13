@@ -29,3 +29,13 @@ CompositionExclusions.txt, Unicode 16.0.0), in
 src/Encryption/Pdf4D.Encryption.UnicodeData.pas.
 Copyright (c) 1991-2024 Unicode, Inc. All rights reserved.
 Distributed under the Unicode License v3, https://www.unicode.org/license.txt
+
+The test fonts in tests/fonts (see tests/fonts/manifest.csv for the source of each file) are
+not part of the Pdf4D library and are only used by the tests:
+- LiberationSans-Regular.ttf, JosefinSans-Italic.ttf, FoglihtenNo07.otf and SourceSansProBold.otf
+  are licensed under the SIL Open Font License 1.1, licenses/OFL-1.1.txt.
+  Josefin Sans: Copyright 2010 The Josefin Sans Project Authors. FoglihtenNo07: Copyright 2011-2024
+  Grzegorz Luk. Source Sans Pro: Copyright Adobe Systems Incorporated.
+- OpenSans-Regular.pfb (Open Sans) is licensed under the Apache License 2.0, LICENSE.
+- DejaVuSerifCondensed.pfb is licensed under the Bitstream Vera and DejaVu licence,
+  licenses/DejaVu-Bitstream-Vera.txt.

@@ -1,0 +1,7 @@
+text: default page 1
+| Go to Document->File Attachments to View Embedded Files
+text: sorted page 1
+| Go to Document->File Attachments to View Embedded Files
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Go to Document->File Attachments to View Embedded Files</P></A></PAGE>

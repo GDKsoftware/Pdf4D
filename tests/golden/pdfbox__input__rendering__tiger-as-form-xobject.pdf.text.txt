@@ -1,0 +1,7 @@
+text: default page 1
+| What follows is a PDF file embedded as a Form XObject using Apache FOP:
+text: sorted page 1
+| What follows is a PDF file embedded as a Form XObject using Apache FOP:
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>What follows is a PDF file embedded as a Form XObject using Apache FOP:</P></A></PAGE>

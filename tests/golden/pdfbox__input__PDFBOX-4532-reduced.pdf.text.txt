@@ -1,0 +1,7 @@
+text: default page 1
+| 0.1
+text: sorted page 1
+| 0.1
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>0.1</P></A></PAGE>

@@ -1,0 +1,7 @@
+text: default page 1
+| day. Some market watchers were
+text: sorted page 1
+| day. Some market watchers were
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>day.<W>Some<W>market<W>watchers<W>were</P></A></PAGE>

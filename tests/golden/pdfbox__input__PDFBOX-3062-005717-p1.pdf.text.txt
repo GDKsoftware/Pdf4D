@@ -1,0 +1,33 @@
+text: default page 1
+| HANS L. TREFOUSSE
+| ABRAHAM\x20
+| LINCOLN’S\x20
+| REPUTATION\x20
+| DURING HIS\x20
+| First
+| among\x20
+| Equals”
+| “
+| ADMINISTRATION
+text: sorted page 1
+| HANS L. TREFOUSSE
+| “First
+| among\x20
+| Equals”
+| ABRAHAM\x20
+| LINCOLN’S\x20
+| REPUTATION\x20
+| DURING HIS\x20
+| ADMINISTRATION
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>HANS L. TREFOUSSE<EOL>
+| </P><P>ABRAHAM <EOL>
+| LINCOLN’S <EOL>
+| </P><P>REPUTATION <EOL>
+| DURING HIS <EOL>
+| </P><P>First<EOL>
+| among <EOL>
+| Equals”<EOL>
+| </P><P>“<EOL>
+| </P><P>ADMINISTRATION</P></A></PAGE>

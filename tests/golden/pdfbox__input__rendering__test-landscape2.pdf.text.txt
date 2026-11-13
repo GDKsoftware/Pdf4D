@@ -1,0 +1,13 @@
+text: default page 1
+| Upper left red\x20
+| \x20
+| Lower right black\x20
+text: sorted page 1
+| Upper left red\x20
+| Lower right black\x20
+| \x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Upper left red <EOL>
+| </P><P> <EOL>
+| </P><P>Lower right black </P></A></PAGE>

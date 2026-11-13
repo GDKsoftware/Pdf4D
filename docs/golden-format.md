@@ -100,7 +100,56 @@ Values are the decrypted values for encrypted files.
 The acceptance test (`tests/Support/Pdf4D.Tests.Golden.pas`) compares the dump of Pdf4D with the golden file line by line:
 
 - A line is compared exactly. Only a CR and spaces or tabs at the end of a line are dropped. Leading and inner whitespace is data: the two spaces per level of an `outline:` line carry the nesting, and spaces in titles, labels, field values and info values are part of the value.
-- There is no whitespace leniency for any section of M1. A section may only get one by naming it here. The extracted text of M2 (`text:` sections) is expected to need one (the PDFBox text stripper and Pdf4D may differ in runs of spaces and line breaks); when it does, the rule is written down in this section for that section only: which section, which characters are collapsed or ignored, and why. Structure sections never get one.
+- There is no whitespace leniency for the structure dump. The extracted text (`.text.txt` files) has its own comparison rule, see "Text goldens". Structure sections never get leniency.
 - A number with a decimal point may differ by 0.001 from the golden value. The text around the numbers must be equal.
 - Lines are matched by `object <n> <g>:`, `page <i>:` and `info <key>:` as their start, all others by kind and position. A key that occurs twice in one dump is a difference.
 - Known differences (above) are the only other leniency.
+
+## Text goldens
+
+`tests/golden/<name>.text.txt` holds the text that the PDFBox 3.0.8 `PDFTextStripper` extracts, written by `Pdf4DOracle text <pdf> [password]` (`generate-golden.ps1 -Mode Text`). `<name>` and the password rule are the same as for the dump. UTF-8 without BOM, LF, no trailing spaces on a line, every line ends with LF.
+
+### Sections
+
+```
+text: default page <n>        one section per page n = 1 .. min(pages, 50)
+text: sorted page <n>         the same with setSortByPosition(true)
+text: range 2-3               setStartPage(2), setEndPage(3), one section
+text: separators 1-2          pages 1-2 with the separators below
+```
+
+The sections come in this order: all `default` pages, all `sorted` pages, `range`, `separators`. `pages` is the number of pages found by iterating the page tree (as in the dump). `range` and `separators` are always written, also when the document has fewer pages (the section is then empty).
+
+Every section uses a new `PDFTextStripper` with `setLineSeparator("
+")` and `setPageEnd("
+")`, and for the per-page sections `setStartPage(n)`, `setEndPage(n)`. All other settings are the PDFBox defaults.
+`separators` uses `setLineSeparator("<EOL>
+")`, `setWordSeparator("<W>")`, `setParagraphStart("<P>")`, `setParagraphEnd("</P>")`, `setPageStart("<PAGE>")`, `setPageEnd("</PAGE>
+")`, `setArticleStart("<A>")` and `setArticleEnd("</A>")`.
+
+### Lines
+
+The text is split at LF. The empty piece after the last LF is dropped (an empty text gives a section without lines). Every piece becomes `| ` + the text escaped as "Escaped text" above (so a CR is ``, a TAB is `	`); when the text ends in a space, that last space is written as ` ` so that no line ends in a space. A piece that is empty becomes `|`. Text that is outside the BMP is written as its UTF-8 sequence; an unpaired surrogate (which the stripper can produce from broken input) is written as `?` by the oracle.
+
+When the stripper throws, the heading is followed by one line `error`. A file that cannot be opened gives only `load-error: <kind>` (kinds as for the dump).
+
+### Hermetic fonts
+
+The oracle (every mode) installs a font provider without fonts in `FontMappers.instance()` (`FontMapperImpl.setProvider`, by reflection), so installed system fonts never influence the result. A non-embedded font that is not one of the standard 14 falls back to the built-in LiberationSans. This only affects the text and the width files, not the structure dump.
+
+### Comparison
+
+1. The list of headings must be exactly equal. A missing or extra section is a difference.
+2. For each section: when the lines are exactly equal, the section is fine.
+3. Otherwise compare leniently: remove the leading `| ` (or `|`) on both sides, undo the escapes, replace every run of spaces and tabs by one space, trim, and drop lines that are empty after that. When the two lists are then equal, the section is *leniently equal*: not an error, but counted and reported in the test output.
+4. Otherwise the difference is the first line that differs, reported with section heading and line number.
+5. Known differences are listed in `tests/golden/<name>.text-known-differences.txt`, one per line: `<prefix of a heading> [<platform>] # <reason>`. The platform (`Win32`, `Win64` or `Linux64`) is optional. A section whose heading starts with the prefix is not compared on that platform (or on any platform). Empty lines and lines starting with `#` are ignored.
+6. This leniency applies only to `.text.txt`. The structure dump is compared exactly.
+
+## Font width files
+
+`tests/fonts/<font file>.widths.txt` (for example `LiberationSans-Regular.ttf.widths.txt`) is written by `Pdf4DOracle --font-widths <font>` (`tools/oracle/generate-font-widths.ps1`) for the test fonts in `tests/fonts/` (sources and licences in `tests/fonts/manifest.csv`). One line `<key> <width>` per glyph, sorted by key in ordinal (character code) order, so `gid10` comes before `gid2`. Widths are in font units in float format.
+
+- Type 1 (`.pfb`): key is the glyph name, width is `Type1Font.getWidth(name)`.
+- CFF (also inside `.otf`): key `gid<n>` for n = 0 .. number of charstrings - 1, width is `CFFFont.getType2CharString(n).getWidth()`.
+- TrueType (`.ttf`, and `.otf` without CFF): key `gid<n>`, width is the advance width from `hmtx` (`TrueTypeFont.getAdvanceWidth(n)`).

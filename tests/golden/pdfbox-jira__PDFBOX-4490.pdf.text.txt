@@ -1,0 +1,313 @@
+text: default page 1
+| FILING FEE:  $145.00 (if you have more than one page listing officers and directors please add\x20
+| $5.00 a page for each additional page)\x20
+| Revised 01/10/2019           Neb. Rev. Stat. §21-2,205\x20
+| APPLICATION FOR CERTIFICATE OF AUTHORITY\x20
+| TO TRANSACT BUSINESS\x20
+| Robert B. Evnen, Secretary of State\x20
+| P.O. Box 94608\x20
+| Lincoln, NE 68509\x20
+| www.sos.ne.gov\x20
+| Attach a certificate of existence, or document of similar import, duly authenticated by the secretary of\x20
+| state or other official having custody of the corporate records in the state or country under whose law the\x20
+| corporation is incorporated.  Such certificate shall not be more than sixty (60) days old.  A certified copy\x20
+| of the articles of incorporation should not be submitted and is not acceptable in lieu of such certificate.\x20
+| Name of Corporation____________________________________________________________\x20
+| Fictitious Name of Corporation*___________________________________________________\x20
+|   (to be used only if actual corporate name is unavailable for use or does not comply with Nebraska law)\x20
+| *Must provide a resolution from the Board of Directors signed by the Secretary adopting this fictitious
+| name. Note: Fictitious name must contain one of the words incorporated, corporation, limited or an
+| abbreviation thereof.
+| Incorporated under the laws\x20
+| of_____________________________________________________\x20
+| Date of Incorporation____________________ Period of Duration_______________________\x20
+| Address of Principal Office_______________________________________________________\x20
+| Street Address City State Zip\x20
+| Registered Agent_______________________________________________________________\x20
+| Registered Office___________________________________________________NE_________\x20
+| Street Address and Post Office Box (if any) City Zip\x20
+| Effective date if other than the date filed __________________\x20
+| _________________________________  __________________________________\x20
+| Signature Printed Name/Title\x20
+| The Model Business Corporation Act requires that every filing be signed by the chairperson of the board of directors, the\x20
+| president, or one of the officers of the corporation.  If the corporation has not yet been formed or directors have not yet been\x20
+| selected, the filing shall be signed by an incorporator.  If the corporation is in the hands of a receiver, trustee, or other court\x20
+| appointed fiduciary, the filing shall be signed by that fiduciary.      \x20
+| NOTE: To complete this filing you must provide a list of officers and directors names and street\x20
+| addresses.\x20
+text: default page 2
+| OFFICERS:  DIRECTORS:\x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| Please Copy this page and submit additional pages if needed.\x20
+text: default page 3
+| Office of the Minnesota Secretary of State
+| Certificate of Good Standing
+|      I, Steve Simon, Secretary of State of Minnesota, do certify that:  The business entity\x20
+| listed below was filed pursuant to the Minnesota Chapter listed below with the Office of\x20
+| the Secretary of State on the date listed below and that this business entity is registered to\x20
+| do business and is in good standing at the time this certificate is issued.
+| Name: DOOLEY'S PETROLEUM, INC.
+| Date Filed: 03/13/1985
+| File Number: 4W-713
+| Minnesota Statutes, Chapter: 302A
+| Home Jurisdiction: Minnesota
+| This certificate has been issued on: 02/14/2019
+| Steve Simon
+| Secretary of State
+| State of Minnesota
+text: sorted page 1
+| APPLICATION FOR CERTIFICATE OF AUTHORITY\x20
+| TO TRANSACT BUSINESS\x20
+| Robert B. Evnen, Secretary of State\x20
+| P.O. Box 94608\x20
+| Lincoln, NE 68509\x20
+| www.sos.ne.gov\x20
+| Attach a certificate of existence, or document of similar import, duly authenticated by the secretary of\x20
+| state or other official having custody of the corporate records in the state or country under whose law the\x20
+| corporation is incorporated.  Such certificate shall not be more than sixty (60) days old.  A certified copy\x20
+| of the articles of incorporation should not be submitted and is not acceptable in lieu of such certificate.\x20
+| Name of Corporation____________________________________________________________\x20
+| Fictitious Name of Corporation*___________________________________________________\x20
+|   (to be used only if actual corporate name is unavailable for use or does not comply with Nebraska law)\x20
+| *Must provide a resolution from the Board of Directors signed by the Secretary adopting this fictitious
+| name. Note: Fictitious name must contain one of the words incorporated, corporation, limited or an
+| abbreviation thereof.
+| Incorporated under the laws\x20
+| of_____________________________________________________\x20
+| Date of Incorporation____________________ Period of Duration_______________________\x20
+| Address of Principal Office_______________________________________________________\x20
+| Street Address City State Zip\x20
+| Registered Agent_______________________________________________________________\x20
+| Registered Office___________________________________________________NE_________\x20
+| Street Address and Post Office Box (if any) City Zip\x20
+| Effective date if other than the date filed __________________\x20
+| _________________________________  __________________________________\x20
+| Signature Printed Name/Title\x20
+| The Model Business Corporation Act requires that every filing be signed by the chairperson of the board of directors, the\x20
+| president, or one of the officers of the corporation.  If the corporation has not yet been formed or directors have not yet been\x20
+| selected, the filing shall be signed by an incorporator.  If the corporation is in the hands of a receiver, trustee, or other court\x20
+| appointed fiduciary, the filing shall be signed by that fiduciary.      \x20
+| NOTE: To complete this filing you must provide a list of officers and directors names and street\x20
+| addresses.\x20
+| FILING FEE:  $145.00 (if you have more than one page listing officers and directors please add\x20
+| $5.00 a page for each additional page)\x20
+| Revised 01/10/2019           Neb. Rev. Stat. §21-2,205\x20
+text: sorted page 2
+| OFFICERS:  DIRECTORS:\x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| Please Copy this page and submit additional pages if needed.\x20
+text: sorted page 3
+| Office of the Minnesota Secretary of State
+| Certificate of Good Standing
+|      I, Steve Simon, Secretary of State of Minnesota, do certify that:  The business entity\x20
+| listed below was filed pursuant to the Minnesota Chapter listed below with the Office of\x20
+| the Secretary of State on the date listed below and that this business entity is registered to\x20
+| do business and is in good standing at the time this certificate is issued.
+| Name: DOOLEY'S PETROLEUM, INC.
+| Date Filed: 03/13/1985
+| File Number: 4W-713
+| Minnesota Statutes, Chapter: 302A
+| Home Jurisdiction: Minnesota
+| This certificate has been issued on: 02/14/2019
+| Steve Simon
+| Secretary of State
+| State of Minnesota
+text: range 2-3
+| OFFICERS:  DIRECTORS:\x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name \x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address\x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| _________________________________________ ________________________________________\x20
+| Name/Title Name\x20
+| _________________________________________ ________________________________________\x20
+| Street Address  Street Address \x20
+| _________________________________________ ________________________________________\x20
+| City   State        Zip  City   State        Zip \x20
+| Please Copy this page and submit additional pages if needed.\x20
+| Office of the Minnesota Secretary of State
+| Certificate of Good Standing
+|      I, Steve Simon, Secretary of State of Minnesota, do certify that:  The business entity\x20
+| listed below was filed pursuant to the Minnesota Chapter listed below with the Office of\x20
+| the Secretary of State on the date listed below and that this business entity is registered to\x20
+| do business and is in good standing at the time this certificate is issued.
+| Name: DOOLEY'S PETROLEUM, INC.
+| Date Filed: 03/13/1985
+| File Number: 4W-713
+| Minnesota Statutes, Chapter: 302A
+| Home Jurisdiction: Minnesota
+| This certificate has been issued on: 02/14/2019
+| Steve Simon
+| Secretary of State
+| State of Minnesota
+text: separators 1-2
+| <PAGE><A><P>FILING FEE:  $145.00 (if you have more than one page listing officers and directors please add <EOL>
+| $5.00 a page for each additional page) <EOL>
+| </P><P>Revised 01/10/2019 <W>          Neb. Rev. Stat. §21-2,205 <EOL>
+| </P><P>APPLICATION FOR CERTIFICATE OF AUTHORITY <EOL>
+| TO TRANSACT BUSINESS <EOL>
+| </P><P>Robert B. Evnen, Secretary of State <EOL>
+| P.O. Box 94608 <EOL>
+| </P><P>Lincoln, NE 68509 <EOL>
+| www.sos.ne.gov <EOL>
+| </P><P>Attach a certificate of existence, or document of similar import, duly authenticated by the secretary of <EOL>
+| state or other official having custody of the corporate records in the state or country under whose law the <EOL>
+| corporation is incorporated.  Such certificate shall not be more than sixty (60) days old.  A certified copy <EOL>
+| of the articles of incorporation should not be submitted and is not acceptable in lieu of such certificate. <EOL>
+| </P><P>Name of Corporation____________________________________________________________ <EOL>
+| </P><P>Fictitious Name of Corporation*___________________________________________________ <EOL>
+|   (to be used only if actual corporate name is unavailable for use or does not comply with Nebraska law) <EOL>
+| </P><P>*Must provide a resolution from the Board of Directors signed by the Secretary adopting this fictitious<EOL>
+| name. Note: Fictitious name must contain one of the words incorporated, corporation, limited or an<EOL>
+| abbreviation thereof.<EOL>
+| </P><P>Incorporated under the laws <EOL>
+| of_____________________________________________________ <EOL>
+| </P><P>Date of Incorporation____________________ <W>Period of Duration_______________________ <EOL>
+| </P><P>Address of Principal Office_______________________________________________________ <EOL>
+| Street Address <W>City <W>State <W>Zip <EOL>
+| </P><P>Registered Agent_______________________________________________________________ <EOL>
+| </P><P>Registered Office___________________________________________________NE_________ <EOL>
+| Street Address and Post Office Box (if any) <W>City <W>Zip <EOL>
+| </P><P>Effective date if other than the date filed __________________ <EOL>
+| </P><P>_________________________________  <W>__________________________________ <EOL>
+| Signature <W>Printed Name/Title <EOL>
+| </P><P>The Model Business Corporation Act requires that every filing be signed by the chairperson of the board of directors, the <EOL>
+| president, or one of the officers of the corporation.  If the corporation has not yet been formed or directors have not yet been <EOL>
+| selected, the filing shall be signed by an incorporator.  If the corporation is in the hands of a receiver, trustee, or other court <EOL>
+| appointed fiduciary, the filing shall be signed by that fiduciary.       <EOL>
+| </P><P>NOTE: To complete this filing you must provide a list of officers and directors names and street <EOL>
+| addresses. </P></A></PAGE>
+| <PAGE><A><P>OFFICERS: <W> DIRECTORS: <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name  <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Name/Title <W>Name <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| Street Address <W> <W>Street Address  <EOL>
+| </P><P>_________________________________________ <W>________________________________________ <EOL>
+| City <W> <W> <W>State <W>       Zip <W> <W>City <W> <W> <W>State <W>       Zip <W> <EOL>
+| </P><P>Please Copy this page and submit additional pages if needed. </P></A></PAGE>

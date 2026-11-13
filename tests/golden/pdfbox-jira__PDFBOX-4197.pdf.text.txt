@@ -1,0 +1,101 @@
+text: default page 1
+| Loren Ipsum Dolor
+| Delenit Augue
+| Fugit
+| Olypian quarrels et gorilla congolium sic ad nauseum. Souvlaki ignitus carborundum e\x20
+| pluribus unum.\x20
+| Objectives
+|  Quote meon an estimate et non interruptus stadium.
+|  Defacto lingo est igpay atinlay. Marquee selectus non provisio incongruous feline.\x20
+|  Glorious baklava ex librus hup hey ad infinitum.
+| Class Schedule
+| Week Topic Reading Assignment
+| 1 Introduction Chapter 1
+| 2 Stuff Chapters 2-3
+| 3 More stuff Chapters 4-7
+| 4 Less stuff Chapters 8-10
+| 5
+| Still more stuff til it’s\x20
+| coming out of your ears
+| Chapter 11-15
+| 6
+| A new view of stuff and\x20
+| its consequences
+| Chapters 15-18
+| 7 Review, final exam
+| Evaluation
+| Personal character wil be assessed with the following system.  Horrible will be a score\x20
+| less than 70, Miserable 70-80, Acceptable 80-90, Preferred 90-100.
+| \x20
+| Homework
+| Exams Projects
+| 1 2 Final 1 2 Final
+| 15% 15% 15% 20% 10% 10% 15%
+| Ce programme est également disponible en français sur demande.
+text: sorted page 1
+| Loren Ipsum Dolor
+| Delenit Augue
+| Fugit
+| Olypian quarrels et gorilla congolium sic ad nauseum. Souvlaki ignitus carborundum e\x20
+| pluribus unum.\x20
+| Objectives
+|  Quote meon an estimate et non interruptus stadium.
+|  Defacto lingo est igpay atinlay. Marquee selectus non provisio incongruous feline.\x20
+|  Glorious baklava ex librus hup hey ad infinitum.
+| Class Schedule
+| Week Topic Reading Assignment
+| 1 Introduction Chapter 1
+| 2 Stuff Chapters 2-3
+| 3 More stuff Chapters 4-7
+| 4 Less stuff Chapters 8-10
+| Still more stuff til it’s\x20
+| 5 Chapter 11-15
+| coming out of your ears
+| A new view of stuff and\x20
+| 6 Chapters 15-18
+| its consequences
+| 7 Review, final exam
+| Evaluation
+| Personal character wil be assessed with the following system.  Horrible will be a score\x20
+| less than 70, Miserable 70-80, Acceptable 80-90, Preferred 90-100.
+| \x20
+| Exams Projects
+| Homework
+| 1 2 Final 1 2 Final
+| 15% 15% 15% 20% 10% 10% 15%
+| Ce programme est également disponible en français sur demande.
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Loren Ipsum Dolor<EOL>
+| Delenit Augue<EOL>
+| </P><P>Fugit<EOL>
+| </P><P>Olypian quarrels et gorilla congolium sic ad nauseum. Souvlaki ignitus carborundum e <EOL>
+| pluribus unum. <EOL>
+| </P><P>Objectives<EOL>
+| </P><P><W>Quote meon an estimate et non interruptus stadium.<EOL>
+| <W>Defacto lingo est igpay atinlay. Marquee selectus non provisio incongruous feline. <EOL>
+| <W>Glorious baklava ex librus hup hey ad infinitum.<EOL>
+| </P><P>Class Schedule<EOL>
+| </P><P>Week<W>Topic<W>Reading Assignment<EOL>
+| </P><P>1<W>Introduction<W>Chapter 1<EOL>
+| </P><P>2<W>Stuff<W>Chapters 2-3<EOL>
+| </P><P>3<W>More stuff<W>Chapters 4-7<EOL>
+| </P><P>4<W>Less stuff<W>Chapters 8-10<EOL>
+| </P><P>5<EOL>
+| Still more stuff til it’s <EOL>
+| </P><P>coming out of your ears<EOL>
+| Chapter 11-15<EOL>
+| </P><P>6<EOL>
+| A new view of stuff and <EOL>
+| </P><P>its consequences<EOL>
+| Chapters 15-18<EOL>
+| </P><P>7<W>Review, final exam<EOL>
+| </P><P>Evaluation<EOL>
+| </P><P>Personal character wil be assessed with the following system.  Horrible will be a score <EOL>
+| less than 70, Miserable 70-80, Acceptable 80-90, Preferred 90-100.<EOL>
+|  <EOL>
+| </P><P>Homework<EOL>
+| Exams<W>Projects<EOL>
+| </P><P>1<W>2<W>Final<W>1<W>2<W>Final<EOL>
+| 15%<W>15%<W>15%<W>20%<W>10%<W>10%<W>15%<EOL>
+| </P><P>Ce programme est également disponible en français sur demande.</P></A></PAGE>

@@ -1,0 +1,7 @@
+text: default page 1
+| THAN N
+text: sorted page 1
+| THAN N
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>THAN<W>N</P></A></PAGE>

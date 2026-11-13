@@ -1,0 +1,61 @@
+text: default page 1
+| This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025\x20
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, &\x20
+| libraries that I tested.\x20
+| I first observed this encryption scheme in version 1.5 PDFs, purportedly created from "Adobe InDesign\x20
+| CS3 (5.0)" (application) using "Adobe PDF Library 8.0" (producer).
+| The unusual aspect is that while the encryption dictionary specifies R=4 and V=4, the key length is 40 bits\x20
+| (5 bytes). Commonly, V=4 is thought to require a 128-bit key, but it appears that Acrobat allows a shorter\x20
+| key and pads it to 128 bits before use - a behavior I cannot find described in existing PDF specifications.
+| Technical details:
+| User password: "" (empty / default)
+| Owner password: "ownerpass"
+| Metadata encrypted: false
+| Key: 0x0446615747
+| The 5-byte key is first used for user and owner password verification as described in the specification.\x20
+| However, before performing "Algorithm 1: Encryption of data using the RC4 or AES algorithms,"
+| the key needs to be extended to 16 bytes by appending NULLs.
+| This sample file was created by first using Acrobat Pro to make a RC4-encrypted file, and then manually\x20
+| re-encrypting the document to match the observed encryption scheme.
+| If you have any questions, feel free to reach out: ross at goldfynch dot com.
+text: sorted page 1
+| This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025\x20
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, &\x20
+| libraries that I tested.\x20
+| I first observed this encryption scheme in version 1.5 PDFs, purportedly created from "Adobe InDesign\x20
+| CS3 (5.0)" (application) using "Adobe PDF Library 8.0" (producer).
+| The unusual aspect is that while the encryption dictionary specifies R=4 and V=4, the key length is 40 bits\x20
+| (5 bytes). Commonly, V=4 is thought to require a 128-bit key, but it appears that Acrobat allows a shorter\x20
+| key and pads it to 128 bits before use - a behavior I cannot find described in existing PDF specifications.
+| Technical details:
+| User password: "" (empty / default)
+| Owner password: "ownerpass"
+| Metadata encrypted: false
+| Key: 0x0446615747
+| The 5-byte key is first used for user and owner password verification as described in the specification.\x20
+| However, before performing "Algorithm 1: Encryption of data using the RC4 or AES algorithms,"
+| the key needs to be extended to 16 bytes by appending NULLs.
+| This sample file was created by first using Acrobat Pro to make a RC4-encrypted file, and then manually\x20
+| re-encrypting the document to match the observed encryption scheme.
+| If you have any questions, feel free to reach out: ross at goldfynch dot com.
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025 <EOL>
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, & <EOL>
+| libraries that I tested. <EOL>
+| </P><P>I first observed this encryption scheme in version 1.5 PDFs, purportedly created from "Adobe InDesign <EOL>
+| CS3 (5.0)" (application) using "Adobe PDF Library 8.0" (producer).<EOL>
+| </P><P>The unusual aspect is that while the encryption dictionary specifies R=4 and V=4, the key length is 40 bits <EOL>
+| (5 bytes). Commonly, V=4 is thought to require a 128-bit key, but it appears that Acrobat allows a shorter <EOL>
+| key and pads it to 128 bits before use - a behavior I cannot find described in existing PDF specifications.<EOL>
+| </P><P>Technical details:<EOL>
+| </P><P>User password: "" (empty / default)<EOL>
+| Owner password: "ownerpass"<EOL>
+| Metadata encrypted: false<EOL>
+| Key: 0x0446615747<EOL>
+| </P><P>The 5-byte key is first used for user and owner password verification as described in the specification. <EOL>
+| However, before performing "Algorithm 1: Encryption of data using the RC4 or AES algorithms,"<EOL>
+| the key needs to be extended to 16 bytes by appending NULLs.<EOL>
+| </P><P>This sample file was created by first using Acrobat Pro to make a RC4-encrypted file, and then manually <EOL>
+| re-encrypting the document to match the observed encryption scheme.<EOL>
+| </P><P>If you have any questions, feel free to reach out: ross at goldfynch dot com.</P></A></PAGE>

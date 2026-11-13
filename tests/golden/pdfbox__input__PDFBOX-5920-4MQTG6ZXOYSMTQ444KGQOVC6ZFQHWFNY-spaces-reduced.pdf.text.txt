@@ -1,0 +1,7 @@
+text: default page 1
+| Ce guide va vous permettre de découvrir
+text: sorted page 1
+| Ce guide va vous permettre de découvrir
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Ce<W>guide<W>va<W>vous<W>permettre<W>de<W>découvrir</P></A></PAGE>

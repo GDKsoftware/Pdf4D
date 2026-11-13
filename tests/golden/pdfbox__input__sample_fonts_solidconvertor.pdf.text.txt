@@ -1,0 +1,31 @@
+text: default page 1
+| Courier: Toto je pokusný text s češtinou – ěščřžýáíé
+| Times: Toto je pokusný text s češtinou – ěščřžýáíé
+| Tahoma: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Narrow: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Black: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Rounded: Toto je pokusný text s češtinou – ěščřžýáíé
+| Verdana: Toto je pokusný text s češtinou – ěščřžýáíé
+| Sans serif: Toto je pokusný text s češtinou – ěščřžýáíé
+text: sorted page 1
+| Courier: Toto je pokusný text s češtinou – ěščřžýáíé
+| Times: Toto je pokusný text s češtinou – ěščřžýáíé
+| Tahoma: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Narrow: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Black: Toto je pokusný text s češtinou – ěščřžýáíé
+| Arial Rounded: Toto je pokusný text s češtinou – ěščřžýáíé
+| Verdana: Toto je pokusný text s češtinou – ěščřžýáíé
+| Sans serif: Toto je pokusný text s češtinou – ěščřžýáíé
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Courier: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Times: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Tahoma: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Arial: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Arial Narrow: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Arial Black: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Arial Rounded: Toto je pokusný text s<W>češtinou<W>–<W>ěščřžýáíé<EOL>
+| </P><P>Verdana: Toto je pokusný text s češtinou<W>– ěščřžýáíé<EOL>
+| </P><P>Sans serif: Toto je pokusný text s češtinou<W>– ěščřžýáíé</P></A></PAGE>

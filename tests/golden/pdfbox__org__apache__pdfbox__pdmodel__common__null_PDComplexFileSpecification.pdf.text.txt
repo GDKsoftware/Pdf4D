@@ -1,0 +1,7 @@
+text: default page 1
+| some content
+text: sorted page 1
+| some content
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>some content</P></A></PAGE>

@@ -1,0 +1,447 @@
+text: default page 1
+| October 1996
+| ANNEX
+| ANIMAL HEALTH CERTIFICATE
+| for importation of ova and embryos of the equine species
+| ANIMAL HEALTH
+| CERTIFICATE
+| No. ORIGINAL
+| 1. Consignor (name and full address)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 2. Third country of collection                  U.S.A.                                            \x20
+| 3. Consignee (name and full address)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 4. Competent authority  USDA/APHIS/Veterinary Services                                \x20
+| 5. Competent local authority   VS (State of Origin)                                          \x20
+| Notes
+| (a) A separate certificate must be issued for each consignment of ova/embryos
+| 6. Place of loading                                                                                                                 \x20
+|                                                                         \x20
+| 7. Name and address of the collection team
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 8. Means of transport                                                                                \x20
+| 9. Place and Member State of destination                                                                               \x20
+|                                                                              \x20
+| 10. Registration number of the collection team                                                                         \x20
+|                                                                               \x20
+| 11. Number and code-mark of containers                                                                                 \x20
+|                                                                               \x20
+text: default page 2
+| 12. Identification of consignment (ova/embryos) (1)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.1 Number of containers:
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.2 Date(s) of collection                                                                                                           \x20
+|                                                                          \x20
+| 12.3 Species                                                                                              \x20
+| 12.4 Breed                                                                                                \x20
+| 12.5 Donors identity                                                                                    \x20
+| (1) Delete as appropriate
+| 13. I, the undersigned official veterinarian of                    (insert name of exporting country)
+| have read and am familiar with Council Directive 92/65/EEC as amended and certify that:
+| 13.1.1. ova/embryos (1) described above were collected, processed and stored by a team
+| approved by the competent authority for collecting, processing and storing of
+| equine ova or embryos and placed under the general supervision and authority of
+| the official veterinarian who inspects the team, including associated laboratory
+| facilities, at least once a year to consider and to verify all matters relating to the
+| approval and supervision;
+| 13.1.2. the collection, processing, and storage of these ova/embryos (1) was carried out,
+| either by a team veterinarian (1) or under his direction by one or more technicians
+| (1) who are competently trained by the team veterinarian in the methods and
+| techniques of hygiene;
+| 13.1.3. ova/embryos (1) were collected at a place separated from other parts of the
+| premises or holding which is in good repair and was cleaned and disinfected prior
+| to the collection;
+| 13.1.4. ova/embryos (1) have been examined, processed and packed in laboratory facilities
+| which are not situated in a zone subject to prohibition or quarantine measures as
+| set out in 13.2, in a section which is separated from the section for storing
+| equipment and materials used in contact with donor animals and from the area
+| where the donor animals are handled;
+| 13.1.5. all records relating to the activities of the team in respect of these ova/embryos (1)
+| will be kept for 12 months after their dispatch;
+| 13.2 ova/embyros (1) were collected from donor mares which;
+text: default page 3
+| 13.2.1. have been continuously resident for three months (or since entry if they were
+| directly imported from a Member State of the European Union during the three
+| months period) on the territory or in the case of regionalization in a part of the
+| territory (1) of the country of export which was during that period free of:
+| -African horse sickness, in accordance with Community legislation,
+| -Venezuelan equine encephalomyelitis for two years,
+| -glanders for six months,
+| -dourine for six months,
+| 13.2.2. either originated from a country of export which was on the day of collection free
+| of vesicular stomatitis for six months (1)
+| or
+| were tested by a virus neutralization test for vesicular stomatitis on a blood sample taken
+| on                   (2) within 30 days prior to collection, with negative result at a serum
+| dilution of 1 in 12 (1);
+| 13.2.3. during the past 30 days prior to collection have been located in holdings under
+| veterinary supervision which were on the day of collection of ova/embryos (1)
+| until the date of their dispatch (1),
+| or
+| in the case of frozen ova/embryos (1), until the period of 30 days mandatory storage at
+| approved premises elapsed not subject to a prohibition order for animal health reasons
+| which laid down one of the following conditions:
+| 13.2.3.1. If not all the animals of species susceptible to the disease located on the holding
+| were slaughtered, the prohibition lasted for:
+| -six months, beginning on the day on which the equidae suffering from the disease
+| are slaughtered, in the case of equine encephalomyelitis,
+| -a period required to carry out with negative result two Coggins tests three months
+| apart on the animals remaining after the infected animals have been slaughtered, in
+| the case of infectious equine anaemia,
+| -six months, in the case of vesicular stomatitis,
+| -one month from the last recorded case, in the case of rabies,
+| -15 days from the last recorded case, in the case of anthrax.
+text: default page 4
+| 13.2.3.2. If all the animals of species susceptible to the disease located on the holding have
+| been slaughtered and the premises disinfected, the prohibition lasted for 30 days,
+| or 15 days in the case of anthrax, beginning on the day on which following the
+| destruction of the animals the disinfection of the premises was satisfactorily
+| completed.
+| 13.2.4. have been kept prior to the collection in holdings free from clinical signs of
+| contagious equine metritis for 60 days,
+| 13.2.5. have been subjected to the following health tests:
+| 13.2.5.1. an agargel-immunodiffusion test (Coggins test) for equine anaemia carried out
+| with negative result on a blood sample taken on                (2) during the past 30
+| days prior to collection;
+| 13.2.5.2. a test for contagious equine metritis carried out by isolation of Taylorella
+| equigenitalis on two occasions with an interval of seven days from genital swabs
+| taken at least from the clitorial fossa and the clitorial sinuses on                      (2)
+| and on                and on at least one occasion from swabs taken from the
+| endometrium during early oestrus on              during 30 days prior to collection of
+| ova/embryos (1);
+| 13.2.6. have not been used for natural breeding during the period of 30 days prior to the
+| collection;
+| 13.2.7. to the best of my knowledge and as far as I could ascertain, have not been in
+| contact with equidae suffering from an infectious or contagious disease during the
+| 15 days immediately preceding the collection:
+| 13.2.8. have on the day of collection not shown clinical signs of an infectious or
+| contagious disease;
+| 13.3. the semen used for the artificial insemination of the donor mares complies with the
+| requirements of Directive 92/65/EEC(1);
+| 13.4. the ova used for the in vivo production of embryos comply with the requirements of
+| Directive 93/65/EEC and in particular the requirements set up in 13.1 and 13.2 of this
+| certificate (1);
+| 13.5. ova/embryos(1) were collected, processed and stored according to the requirements of
+| Annex D of Directive 92/65/EEC and:
+| 13.5.1. they did not come into contact with other ova or embryos which do not meet the
+| requirements of Directive 92/65/EEC,
+text: default page 5
+| 13.5.2 products of animal origin used during their collection and processing and in the transport
+| medium were obtained from sources which present no risk to spread contagious or
+| infectious diseases to equidae or other species, or they were treated prior to use so that
+| such risk of spread is prevented,
+| 13.5.3. the zona pellucida was examined after washing over its entire surface area under a
+| magnification of at least 50 and proved to be intact and free from adherent
+| material,
+| 13.5.4. ova/embryos (1) were frozen in alcohol (1) or fresh liquid nitrogen (1) without
+| delay, (1)
+| 13.6. ova/embryos(1) have been stored at a suitable temperature in approved premises by use of
+| cryogenic agent which had not been used previously for other products of animal origin,
+| 13.7. ova/embryos (1) will be dispatched in containers according to Annex D of Directive
+| 92/65/EEC;
+| Done at                 , on                      \x20
+|                                         \x20
+| (Signature of the official veterinarian)
+| Stamp(1)
+|                                                              (Name and
+| qualification in block letters)
+| (1) Delete as appropriate.
+| (2) Insert date.
+| (3) Does not apply to ova.
+| (4) The signature and the stamp must be different in color to that of the printing.
+text: sorted page 1
+| October 1996
+| ANNEX
+| ANIMAL HEALTH CERTIFICATE
+| for importation of ova and embryos of the equine species
+| ANIMAL HEALTH
+| CERTIFICATE
+| No. ORIGINAL
+| 1. Consignor (name and full address)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 2. Third country of collection                  U.S.A.                                            \x20
+| 3. Consignee (name and full address)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 4. Competent authority  USDA/APHIS/Veterinary Services                                \x20
+| 5. Competent local authority   VS (State of Origin)                                          \x20
+| Notes
+| (a) A separate certificate must be issued for each consignment of ova/embryos
+| 6. Place of loading                                                                                                                 \x20
+|                                                                         \x20
+| 7. Name and address of the collection team
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 8. Means of transport                                                                                \x20
+| 9. Place and Member State of destination                                                                               \x20
+|                                                                              \x20
+| 10. Registration number of the collection team                                                                         \x20
+|                                                                               \x20
+| 11. Number and code-mark of containers                                                                                 \x20
+|                                                                               \x20
+text: sorted page 2
+| 12. Identification of consignment (ova/embryos) (1)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.1 Number of containers:
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.2 Date(s) of collection                                                                                                           \x20
+|                                                                          \x20
+| 12.3 Species                                                                                              \x20
+| 12.4 Breed                                                                                                \x20
+| 12.5 Donors identity                                                                                    \x20
+| (1) Delete as appropriate
+| 13. I, the undersigned official veterinarian of                    (insert name of exporting country)
+| have read and am familiar with Council Directive 92/65/EEC as amended and certify that:
+| 13.1.1. ova/embryos (1) described above were collected, processed and stored by a team
+| approved by the competent authority for collecting, processing and storing of
+| equine ova or embryos and placed under the general supervision and authority of
+| the official veterinarian who inspects the team, including associated laboratory
+| facilities, at least once a year to consider and to verify all matters relating to the
+| approval and supervision;
+| 13.1.2. the collection, processing, and storage of these ova/embryos (1) was carried out,
+| either by a team veterinarian (1) or under his direction by one or more technicians
+| (1) who are competently trained by the team veterinarian in the methods and
+| techniques of hygiene;
+| 13.1.3. ova/embryos (1) were collected at a place separated from other parts of the
+| premises or holding which is in good repair and was cleaned and disinfected prior
+| to the collection;
+| 13.1.4. ova/embryos (1) have been examined, processed and packed in laboratory facilities
+| which are not situated in a zone subject to prohibition or quarantine measures as
+| set out in 13.2, in a section which is separated from the section for storing
+| equipment and materials used in contact with donor animals and from the area
+| where the donor animals are handled;
+| 13.1.5. all records relating to the activities of the team in respect of these ova/embryos (1)
+| will be kept for 12 months after their dispatch;
+| 13.2 ova/embyros (1) were collected from donor mares which;
+text: sorted page 3
+| 13.2.1. have been continuously resident for three months (or since entry if they were
+| directly imported from a Member State of the European Union during the three
+| months period) on the territory or in the case of regionalization in a part of the
+| territory (1) of the country of export which was during that period free of:
+| -African horse sickness, in accordance with Community legislation,
+| -Venezuelan equine encephalomyelitis for two years,
+| -glanders for six months,
+| -dourine for six months,
+| 13.2.2. either originated from a country of export which was on the day of collection free
+| of vesicular stomatitis for six months (1)
+| or
+| were tested by a virus neutralization test for vesicular stomatitis on a blood sample taken
+| on                   (2) within 30 days prior to collection, with negative result at a serum
+| dilution of 1 in 12 (1);
+| 13.2.3. during the past 30 days prior to collection have been located in holdings under
+| veterinary supervision which were on the day of collection of ova/embryos (1)
+| until the date of their dispatch (1),
+| or
+| in the case of frozen ova/embryos (1), until the period of 30 days mandatory storage at
+| approved premises elapsed not subject to a prohibition order for animal health reasons
+| which laid down one of the following conditions:
+| 13.2.3.1. If not all the animals of species susceptible to the disease located on the holding
+| were slaughtered, the prohibition lasted for:
+| -six months, beginning on the day on which the equidae suffering from the disease
+| are slaughtered, in the case of equine encephalomyelitis,
+| -a period required to carry out with negative result two Coggins tests three months
+| apart on the animals remaining after the infected animals have been slaughtered, in
+| the case of infectious equine anaemia,
+| -six months, in the case of vesicular stomatitis,
+| -one month from the last recorded case, in the case of rabies,
+| -15 days from the last recorded case, in the case of anthrax.
+text: sorted page 4
+| 13.2.3.2. If all the animals of species susceptible to the disease located on the holding have
+| been slaughtered and the premises disinfected, the prohibition lasted for 30 days,
+| or 15 days in the case of anthrax, beginning on the day on which following the
+| destruction of the animals the disinfection of the premises was satisfactorily
+| completed.
+| 13.2.4. have been kept prior to the collection in holdings free from clinical signs of
+| contagious equine metritis for 60 days,
+| 13.2.5. have been subjected to the following health tests:
+| 13.2.5.1. an agargel-immunodiffusion test (Coggins test) for equine anaemia carried out
+| with negative result on a blood sample taken on                (2) during the past 30
+| days prior to collection;
+| 13.2.5.2. a test for contagious equine metritis carried out by isolation of Taylorella
+| equigenitalis on two occasions with an interval of seven days from genital swabs
+| taken at least from the clitorial fossa and the clitorial sinuses on                      (2)
+| and on                and on at least one occasion from swabs taken from the
+| endometrium during early oestrus on              during 30 days prior to collection of
+| ova/embryos (1);
+| 13.2.6. have not been used for natural breeding during the period of 30 days prior to the
+| collection;
+| 13.2.7. to the best of my knowledge and as far as I could ascertain, have not been in
+| contact with equidae suffering from an infectious or contagious disease during the
+| 15 days immediately preceding the collection:
+| 13.2.8. have on the day of collection not shown clinical signs of an infectious or
+| contagious disease;
+| 13.3. the semen used for the artificial insemination of the donor mares complies with the
+| requirements of Directive 92/65/EEC(1);
+| 13.4. the ova used for the in vivo production of embryos comply with the requirements of
+| Directive 93/65/EEC and in particular the requirements set up in 13.1 and 13.2 of this
+| certificate (1);
+| 13.5. ova/embryos(1) were collected, processed and stored according to the requirements of
+| Annex D of Directive 92/65/EEC and:
+| 13.5.1. they did not come into contact with other ova or embryos which do not meet the
+| requirements of Directive 92/65/EEC,
+text: sorted page 5
+| 13.5.2 products of animal origin used during their collection and processing and in the transport
+| medium were obtained from sources which present no risk to spread contagious or
+| infectious diseases to equidae or other species, or they were treated prior to use so that
+| such risk of spread is prevented,
+| 13.5.3. the zona pellucida was examined after washing over its entire surface area under a
+| magnification of at least 50 and proved to be intact and free from adherent
+| material,
+| 13.5.4. ova/embryos (1) were frozen in alcohol (1) or fresh liquid nitrogen (1) without
+| delay, (1)
+| 13.6. ova/embryos(1) have been stored at a suitable temperature in approved premises by use of
+| cryogenic agent which had not been used previously for other products of animal origin,
+| 13.7. ova/embryos (1) will be dispatched in containers according to Annex D of Directive
+| 92/65/EEC;
+| Done at                 , on                      \x20
+|                                         \x20
+| (Signature of the official veterinarian)
+| Stamp(1)
+|                                                              (Name and
+| qualification in block letters)
+| (1) Delete as appropriate.
+| (2) Insert date.
+| (3) Does not apply to ova.
+| (4) The signature and the stamp must be different in color to that of the printing.
+text: range 2-3
+| 12. Identification of consignment (ova/embryos) (1)
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.1 Number of containers:
+|                                                                                                                                           \x20
+|                                                                    \x20
+| 12.2 Date(s) of collection                                                                                                           \x20
+|                                                                          \x20
+| 12.3 Species                                                                                              \x20
+| 12.4 Breed                                                                                                \x20
+| 12.5 Donors identity                                                                                    \x20
+| (1) Delete as appropriate
+| 13. I, the undersigned official veterinarian of                    (insert name of exporting country)
+| have read and am familiar with Council Directive 92/65/EEC as amended and certify that:
+| 13.1.1. ova/embryos (1) described above were collected, processed and stored by a team
+| approved by the competent authority for collecting, processing and storing of
+| equine ova or embryos and placed under the general supervision and authority of
+| the official veterinarian who inspects the team, including associated laboratory
+| facilities, at least once a year to consider and to verify all matters relating to the
+| approval and supervision;
+| 13.1.2. the collection, processing, and storage of these ova/embryos (1) was carried out,
+| either by a team veterinarian (1) or under his direction by one or more technicians
+| (1) who are competently trained by the team veterinarian in the methods and
+| techniques of hygiene;
+| 13.1.3. ova/embryos (1) were collected at a place separated from other parts of the
+| premises or holding which is in good repair and was cleaned and disinfected prior
+| to the collection;
+| 13.1.4. ova/embryos (1) have been examined, processed and packed in laboratory facilities
+| which are not situated in a zone subject to prohibition or quarantine measures as
+| set out in 13.2, in a section which is separated from the section for storing
+| equipment and materials used in contact with donor animals and from the area
+| where the donor animals are handled;
+| 13.1.5. all records relating to the activities of the team in respect of these ova/embryos (1)
+| will be kept for 12 months after their dispatch;
+| 13.2 ova/embyros (1) were collected from donor mares which;
+| 13.2.1. have been continuously resident for three months (or since entry if they were
+| directly imported from a Member State of the European Union during the three
+| months period) on the territory or in the case of regionalization in a part of the
+| territory (1) of the country of export which was during that period free of:
+| -African horse sickness, in accordance with Community legislation,
+| -Venezuelan equine encephalomyelitis for two years,
+| -glanders for six months,
+| -dourine for six months,
+| 13.2.2. either originated from a country of export which was on the day of collection free
+| of vesicular stomatitis for six months (1)
+| or
+| were tested by a virus neutralization test for vesicular stomatitis on a blood sample taken
+| on                   (2) within 30 days prior to collection, with negative result at a serum
+| dilution of 1 in 12 (1);
+| 13.2.3. during the past 30 days prior to collection have been located in holdings under
+| veterinary supervision which were on the day of collection of ova/embryos (1)
+| until the date of their dispatch (1),
+| or
+| in the case of frozen ova/embryos (1), until the period of 30 days mandatory storage at
+| approved premises elapsed not subject to a prohibition order for animal health reasons
+| which laid down one of the following conditions:
+| 13.2.3.1. If not all the animals of species susceptible to the disease located on the holding
+| were slaughtered, the prohibition lasted for:
+| -six months, beginning on the day on which the equidae suffering from the disease
+| are slaughtered, in the case of equine encephalomyelitis,
+| -a period required to carry out with negative result two Coggins tests three months
+| apart on the animals remaining after the infected animals have been slaughtered, in
+| the case of infectious equine anaemia,
+| -six months, in the case of vesicular stomatitis,
+| -one month from the last recorded case, in the case of rabies,
+| -15 days from the last recorded case, in the case of anthrax.
+text: separators 1-2
+| <PAGE><A><P>October 1996<EOL>
+| ANNEX<EOL>
+| </P><P>ANIMAL HEALTH CERTIFICATE<EOL>
+| for importation of ova and embryos of the equine species<EOL>
+| </P><P>ANIMAL HEALTH<EOL>
+| CERTIFICATE<EOL>
+| No.<W>ORIGINAL<EOL>
+| </P><P>1.<W>Consignor (name and full address)<EOL>
+|                                                                                                                                            <EOL>
+|                                                                     <EOL>
+| </P><P>2.<W>Third country of collection                  U.S.A.                                             <EOL>
+| 3.<W>Consignee (name and full address)<EOL>
+| </P><P>                                                                                                                                           <EOL>
+|                                                                     <EOL>
+| </P><P>4.<W>Competent authority  USDA/APHIS/Veterinary Services                                 <EOL>
+| 5.<W>Competent local authority   VS (State of Origin)                                           <EOL>
+| Notes<EOL>
+| </P><P>(a)<W>A separate certificate must be issued for each consignment of ova/embryos<EOL>
+| </P><P>6.<W>Place of loading                                                                                                                  <EOL>
+|                                                                          <EOL>
+| </P><P>7.<W>Name and address of the collection team<EOL>
+|                                                                                                                                            <EOL>
+|                                                                     <EOL>
+| </P><P>8.<W>Means of transport                                                                                 <EOL>
+| 9.<W>Place and Member State of destination                                                                                <EOL>
+| </P><P>                                                                              <EOL>
+| 10.<W>Registration number of the collection team                                                                          <EOL>
+| </P><P>                                                                               <EOL>
+| 11.<W>Number and code-mark of containers                                                                                  <EOL>
+| </P><P>                                                                               </P></A></PAGE>
+| <PAGE><A><P>12.<W>Identification of consignment (ova/embryos) (1)<EOL>
+|                                                                                                                                            <EOL>
+|                                                                     <EOL>
+| </P><P>12.1<W>Number of containers:<EOL>
+|                                                                                                                                            <EOL>
+|                                                                     <EOL>
+| </P><P>12.2<W>Date(s) of collection                                                                                                            <EOL>
+|                                                                           <EOL>
+| </P><P>12.3<W>Species                                                                                               <EOL>
+| 12.4<W>Breed                                                                                                 <EOL>
+| 12.5<W>Donors identity                                                                                     <EOL>
+| (1) Delete as appropriate<EOL>
+| </P><P>13.<W>I, the undersigned official veterinarian of                    (insert name of exporting country)<EOL>
+| have read and am familiar with Council Directive 92/65/EEC as amended and certify that:<EOL>
+| </P><P>13.1.1.<W>ova/embryos (1) described above were collected, processed and stored by a team<EOL>
+| approved by the competent authority for collecting, processing and storing of<EOL>
+| equine ova or embryos and placed under the general supervision and authority of<EOL>
+| the official veterinarian who inspects the team, including associated laboratory<EOL>
+| facilities, at least once a year to consider and to verify all matters relating to the<EOL>
+| approval and supervision;<EOL>
+| </P><P>13.1.2.<W>the collection, processing, and storage of these ova/embryos (1) was carried out,<EOL>
+| either by a team veterinarian (1) or under his direction by one or more technicians<EOL>
+| (1) who are competently trained by the team veterinarian in the methods and<EOL>
+| techniques of hygiene;<EOL>
+| </P><P>13.1.3.<W>ova/embryos (1) were collected at a place separated from other parts of the<EOL>
+| premises or holding which is in good repair and was cleaned and disinfected prior<EOL>
+| to the collection;<EOL>
+| </P><P>13.1.4.<W>ova/embryos (1) have been examined, processed and packed in laboratory facilities<EOL>
+| which are not situated in a zone subject to prohibition or quarantine measures as<EOL>
+| set out in 13.2, in a section which is separated from the section for storing<EOL>
+| equipment and materials used in contact with donor animals and from the area<EOL>
+| where the donor animals are handled;<EOL>
+| </P><P>13.1.5.<W>all records relating to the activities of the team in respect of these ova/embryos (1)<EOL>
+| will be kept for 12 months after their dispatch;<EOL>
+| </P><P>13.2<W>ova/embyros (1) were collected from donor mares which;</P></A></PAGE>

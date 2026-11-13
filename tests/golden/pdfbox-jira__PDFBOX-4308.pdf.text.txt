@@ -1,0 +1,367 @@
+text: default page 1
+| 56 Case Management 1/2005
+| Impressum
+| Fax: 06221/437-109,
+| anzeigen@btman.de
+| Satz
+| Strassner ComputerSatz
+| 69181 Leimen
+| Druck
+| Druckhaus Darmstadt GmbH
+| 64295 Darmstadt
+| Bezug und -bedingungen
+| Inland € 29,- (zzgl. Versandspesen)
+| Studenten und Ausbildungsteilnehmer
+| € 25,- (zzgl. Versandspesen)
+| Alle Preise verstehen sich inkl. Mehrwert-
+| steuer. Der Abonnementpreis wird im Voraus
+| in Rechnung gestellt und umfasst 2 Ausga-
+| ben jährlich. Das Abonnement verlängert
+| sich zu den jeweils gültigen Bedingungen
+| um ein Jahr, wenn es nicht mit einer Frist von
+| 8 Wochen zum Ende des Bezugszeitraumes
+| gekündigt wird.
+| Erscheinungsweise
+| „Case Management“ erscheint jeweils zum
+| Ende des 2. und des 4. Quartals. Abonnen-
+| ten der Zeitschrift Betreuungsmanagement
+| (BtMan) erhalten die Zeitschrift kostenlos im
+| Rahmen ihres Abonnements.
+| Mitglieder der Deutschen Gesellschaft für
+| Care und Case Management (DGCC) erhal-
+| ten die Zeitschrift kostenlos im Rahmen ihrer
+| Mitgliedschaft.
+| Urheber- und Verlagsrechte
+| Die Zeitschrift und alle in ihr enthaltenen
+| Beiträge und Abbildungen sind urheber-
+| rechtlich geschützt. Jede Verwertung außer-
+| halb der engen Grenzen des Urheberrechts-
+| gesetzes ist ohne Zustimmung des Verlags
+| unzulässig und strafbar. Das gilt insbeson-
+| dere für Vervielfältigungen, Übersetzungen,
+| Mikroverfilmungen und die Einspeicherung
+| und Verarbeitung in elektronischen Syste-
+| men. Alle Rechte, auch das der Überset-
+| zung, bleiben vorbehalten.
+| Rechtseinräumung
+| Der Autor bestätigt und garantiert, dass er
+| uneingeschränkt über sämtliche Urheber-
+| rechte an seinem Beitrag einschließlich
+| eventueller Bildvorlagen, Zeichnungen, Plä-
+| ne, Karten, Skizzen und Tabellen verfügt und
+| dass der Beitrag keine Rechte Dritter verletzt
+| (dies gilt auch für die Wahrung der Anonymi-
+| tät des Patienten bei der Veröffentlichung
+| von Fallberichten).
+| Der Autor räumt – und zwar auch zur Ver-
+| wertung seines Beitrags außerhalb der ihn
+| enthaltenden Zeitschrift und unabhängig von
+| deren Veröffentlichung – dem Verlag räum-
+| lich und mengenmäßig unbeschränkt für die
+| Dauer des gesetzlichen Urheberrechts das
+| ausschließliche Recht der Vervielfältigung
+| und Verbreitung bzw. der unkörperlichen
+| Wiedergabe des Beitrags ein. Der Autor
+| räumt dem Verlag ferner die folgenden aus-
+| schließlichen Nutzungsrechte am Beitrag
+| ein:
+| a) Das Recht zum ganzen oder teilweisen
+| Vorabdruck und Nachdruck – auch in
+| Form eines Sonderdrucks, zur Überset-
+| zung in andere Sprachen, zur sonstigen
+| Bearbeitung und zur Erstellung von Zu-
+| sammenfassungen (Abstracts);
+| b) das Recht zur Veröffentlichung einer Mik-
+| ropie-, Mikrofiche- und Mikroformausga-
+| be, zur Nutzung im Wege von Bildschirm-
+| text, Videotext und ähnlichen Verfahren,
+| zur Aufzeichnung auf Bild- und/oder Ton-
+| träger und zu deren öffentlicher Wieder-
+| gabe durch Radio und Fernsehsen-
+| dungen;
+| c) das Recht zur maschinenlesbaren Erfas-
+| sung und elektronischen Speicherung auf
+| einem Datenträger (z.B. Diskette, CD-
+| Rom, Magnetband) und in einer eigenen
+| oder fremden Online-Datenbank, zum
+| Download in einem eigenen oder frem-
+| den Rechner, zur Wiedergabe am Bild-
+| schirm – sei es unmittelbar oder im Wege
+| der Datenfernübertragung –, sowie zur
+| Bereithaltung in einer eigenen oder frem-
+| den Online-Datenbank zur Nutzung
+| durch Dritte;
+| d) das Recht zu sonstiger Vervielfältigung,
+| insbesondere durch fotomechanische
+| und ähnliche Verfahren (z.B. Fotokopie,
+| Fernkopie), und zur Nutzung im Rahmen
+| eines sog. Kopienversandes auf Bestel-
+| lung;
+| e) das Recht zur Vergabe der vorgenannten
+| Nutzungsrechte an Dritte im In- und Aus-
+| land sowie die von der Verwertungsge-
+| sellschaft WORT wahrgenommenen
+| Rechte einschließlich der entsprechen-
+| den Vergütungsansprüche.
+| „Case Management“ begleitet die zentrale
+| Rolle der „Fallmanager“ bei der Umsetzung
+| des SGB II. Die Integrierte Versorgung in
+| der gesetzlichen Krankenversicherung setzt
+| im Netzwerk der Anbieter auf Case Manage-
+| ment als zentrale Steuerungsinstanz. Die
+| Krankenkassen setzen bei Disease Manage-
+| ment Programmen auf Case Management.
+| Das persönliche Budget in der Behinder-
+| tenhilfe und der Pflege: ohne Case Manage-
+| ment lässt es sich nicht (verantwortlich) im-
+| plementieren.
+| Relevante Modelle und Forschungsergebnis-
+| se werden unter verschiedenen Aspekten
+| beleuchtet und praxisnah aufbereitet. Die
+| Zeitschrift informiert in tief gehenden Fach-
+| artikeln ebenso wie in kurzen Nachrichten,
+| die aktuelle Entwicklungen schlaglichtartig
+| beleuchten.
+| Herausgeber
+| Economica
+| Verlagsgruppe Hüthig Jehle Rehm GmbH
+| Im Weiher 10
+| 69121 Heidelberg
+| Schriftleitung (V.i.S.d.P.)
+| Prof. Dr. Thomas Klie, Freiburg
+| Fachbeirat
+| Mona Frommelt, Hans-Weinberger-Akade-
+| mie, Fürth
+| Prof. Dr. Ulrike Höhmann, Ev. Fachhochschu-
+| le Darmstadt
+| Prof. Dr. Peter Löcherbach, Kath. Fachhoch-
+| schule Mainz
+| Dipl.-Psych. Michael Monzer, Case Manage-
+| ment-Ausbilder, Leinfelden-Echterdingen
+| Prof. Dr. Claus Reis, Fachhochschule Frank-
+| furt am Main
+| Prof. Dr. Wolf Rainer Wendt, Berufsakademie
+| Stuttgart
+| Prof. Dr. Michael Wissert, Fachhochschule
+| Ravensburg-Weingarten
+| Verlag
+| Economica, Verlagsgruppe Hüthig Jehle
+| Rehm GmbH, Im Weiher 10, 69121 Heidel-
+| berg, Annette Kerstein, Tel. 06221/489-318,
+| Fax: -529, annette.kerstein@hjr-verlag.de
+| Anzeigen
+| Claudia Kampmann-Schröder,
+| Tel. 06221/437-042,
+text: sorted page 1
+| Impressum
+| „Case Management“ begleitet die zentrale Fax: 06221/437-109, (dies gilt auch für die Wahrung der Anonymi-
+| Rolle der „Fallmanager“ bei der Umsetzung anzeigen@btman.de tät des Patienten bei der Veröffentlichung
+| des SGB II. Die Integrierte Versorgung in von Fallberichten).
+| der gesetzlichen Krankenversicherung setzt Satz Der Autor räumt – und zwar auch zur Ver-
+| im Netzwerk der Anbieter auf Case Manage- Strassner ComputerSatz wertung seines Beitrags außerhalb der ihn
+| ment als zentrale Steuerungsinstanz. Die 69181 Leimen enthaltenden Zeitschrift und unabhängig von
+| Krankenkassen setzen bei Disease Manage- Druck deren Veröffentlichung – dem Verlag räum-
+| ment Programmen auf Case Management. Druckhaus Darmstadt GmbH lich und mengenmäßig unbeschränkt für die
+| Das persönliche Budget in der Behinder- 64295 Darmstadt Dauer des gesetzlichen Urheberrechts das
+| tenhilfe und der Pflege: ohne Case Manage- ausschließliche Recht der Vervielfältigung
+| ment lässt es sich nicht (verantwortlich) im- Bezug und -bedingungen und Verbreitung bzw. der unkörperlichen
+| plementieren. Inland € 29,- (zzgl. Versandspesen) Wiedergabe des Beitrags ein. Der Autor
+| Relevante Modelle und Forschungsergebnis- Studenten und Ausbildungsteilnehmer räumt dem Verlag ferner die folgenden aus-
+| se werden unter verschiedenen Aspekten € 25,- (zzgl. Versandspesen) schließlichen Nutzungsrechte am Beitrag
+| beleuchtet und praxisnah aufbereitet. Die Alle Preise verstehen sich inkl. Mehrwert- ein:
+| Zeitschrift informiert in tief gehenden Fach- steuer. Der Abonnementpreis wird im Voraus a) Das Recht zum ganzen oder teilweisen
+| artikeln ebenso wie in kurzen Nachrichten, in Rechnung gestellt und umfasst 2 Ausga- Vorabdruck und Nachdruck – auch in
+| die aktuelle Entwicklungen schlaglichtartig ben jährlich. Das Abonnement verlängert Form eines Sonderdrucks, zur Überset-
+| beleuchten. sich zu den jeweils gültigen Bedingungen zung in andere Sprachen, zur sonstigen
+| um ein Jahr, wenn es nicht mit einer Frist von Bearbeitung und zur Erstellung von Zu-
+| Herausgeber 8 Wochen zum Ende des Bezugszeitraumes sammenfassungen (Abstracts);
+| Economica gekündigt wird. b) das Recht zur Veröffentlichung einer Mik-
+| Verlagsgruppe Hüthig Jehle Rehm GmbH ropie-, Mikrofiche- und Mikroformausga-
+| Im Weiher 10 Erscheinungsweise
+| 69121 Heidelberg „Case Management“ erscheint jeweils zum be, zur Nutzung im Wege von Bildschirm-
+| Ende des 2. und des 4. Quartals. Abonnen- text, Videotext und ähnlichen Verfahren,
+| Schriftleitung (V.i.S.d.P.) ten der Zeitschrift Betreuungsmanagement zur Aufzeichnung auf Bild- und/oder Ton-
+| (BtMan) erhalten die Zeitschrift kostenlos im träger und zu deren öffentlicher Wieder-
+| Prof. Dr. Thomas Klie, Freiburg
+| Rahmen ihres Abonnements. gabe durch Radio und Fernsehsen-
+| Fachbeirat Mitglieder der Deutschen Gesellschaft für dungen;
+| Mona Frommelt, Hans-Weinberger-Akade- Care und Case Management (DGCC) erhal- c) das Recht zur maschinenlesbaren Erfas-
+| mie, Fürth ten die Zeitschrift kostenlos im Rahmen ihrer sung und elektronischen Speicherung auf
+| Prof. Dr. Ulrike Höhmann, Ev. Fachhochschu- Mitgliedschaft. einem Datenträger (z.B. Diskette, CD-
+| le Darmstadt Rom, Magnetband) und in einer eigenen
+| Prof. Dr. Peter Löcherbach, Kath. Fachhoch- Urheber- und Verlagsrechte oder fremden Online-Datenbank, zum
+| schule Mainz Die Zeitschrift und alle in ihr enthaltenen Download in einem eigenen oder frem-
+| Dipl.-Psych. Michael Monzer, Case Manage- Beiträge und Abbildungen sind urheber- den Rechner, zur Wiedergabe am Bild-
+| ment-Ausbilder, Leinfelden-Echterdingen rechtlich geschützt. Jede Verwertung außer- schirm – sei es unmittelbar oder im Wege
+| Prof. Dr. Claus Reis, Fachhochschule Frank- halb der engen Grenzen des Urheberrechts- der Datenfernübertragung –, sowie zur
+| furt am Main gesetzes ist ohne Zustimmung des Verlags Bereithaltung in einer eigenen oder frem-
+| Prof. Dr. Wolf Rainer Wendt, Berufsakademie unzulässig und strafbar. Das gilt insbeson- den Online-Datenbank zur Nutzung
+| Stuttgart dere für Vervielfältigungen, Übersetzungen, durch Dritte;
+| Prof. Dr. Michael Wissert, Fachhochschule Mikroverfilmungen und die Einspeicherung d) das Recht zu sonstiger Vervielfältigung,
+| Ravensburg-Weingarten und Verarbeitung in elektronischen Syste- insbesondere durch fotomechanische
+| men. Alle Rechte, auch das der Überset- und ähnliche Verfahren (z.B. Fotokopie,
+| Verlag zung, bleiben vorbehalten. Fernkopie), und zur Nutzung im Rahmen
+| Economica, Verlagsgruppe Hüthig Jehle eines sog. Kopienversandes auf Bestel-
+| Rehm GmbH, Im Weiher 10, 69121 Heidel- Rechtseinräumung lung;
+| berg, Annette Kerstein, Tel. 06221/489-318, Der Autor bestätigt und garantiert, dass er e) das Recht zur Vergabe der vorgenannten
+| Fax: -529, annette.kerstein@hjr-verlag.de uneingeschränkt über sämtliche Urheber- Nutzungsrechte an Dritte im In- und Aus-
+| rechte an seinem Beitrag einschließlich land sowie die von der Verwertungsge-
+| Anzeigen eventueller Bildvorlagen, Zeichnungen, Plä- sellschaft WORT wahrgenommenen
+| Claudia Kampmann-Schröder, ne, Karten, Skizzen und Tabellen verfügt und Rechte einschließlich der entsprechen-
+| Tel. 06221/437-042, dass der Beitrag keine Rechte Dritter verletzt den Vergütungsansprüche.
+| 56 Case Management 1/2005
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>56<W>Case Management 1/2005<EOL>
+| </P><P>Impressum<EOL>
+| </P><P>Fax: 06221/437-109,<EOL>
+| anzeigen@btman.de<EOL>
+| </P><P>Satz<EOL>
+| Strassner ComputerSatz<EOL>
+| 69181 Leimen<EOL>
+| </P><P>Druck<EOL>
+| Druckhaus Darmstadt GmbH<EOL>
+| 64295 Darmstadt<EOL>
+| </P><P>Bezug und -bedingungen<EOL>
+| Inland € 29,- (zzgl. Versandspesen)<EOL>
+| Studenten <W>und <W>Ausbildungsteilnehmer<EOL>
+| € 25,- (zzgl. Versandspesen)<EOL>
+| Alle <W>Preise <W>verstehen <W>sich <W>inkl. <W>Mehrwert-<EOL>
+| steuer. Der Abonnementpreis wird im Voraus<EOL>
+| in Rechnung gestellt und umfasst 2 Ausga-<EOL>
+| ben <W>jährlich. <W>Das <W>Abonnement <W>verlängert<EOL>
+| sich <W>zu <W>den <W>jeweils <W>gültigen <W>Bedingungen<EOL>
+| um ein Jahr, wenn es nicht mit einer Frist von<EOL>
+| 8 Wochen zum Ende des Bezugszeitraumes<EOL>
+| gekündigt wird.<EOL>
+| </P><P>Erscheinungsweise<EOL>
+| „Case Management“ <W>erscheint <W>jeweils <W>zum<EOL>
+| Ende des 2. und des 4. Quartals. Abonnen-<EOL>
+| ten <W>der <W>Zeitschrift <W>Betreuungsmanagement<EOL>
+| (BtMan) erhalten die Zeitschrift kostenlos im<EOL>
+| Rahmen ihres Abonnements.<EOL>
+| Mitglieder <W>der <W>Deutschen <W>Gesellschaft <W>für<EOL>
+| Care und Case Management (DGCC) erhal-<EOL>
+| ten die Zeitschrift kostenlos im Rahmen ihrer<EOL>
+| Mitgliedschaft.<EOL>
+| </P><P>Urheber- und Verlagsrechte<EOL>
+| Die <W>Zeitschrift <W>und <W>alle <W>in <W>ihr <W>enthaltenen<EOL>
+| Beiträge <W>und <W>Abbildungen <W>sind <W>urheber-<EOL>
+| rechtlich geschützt. Jede Verwertung außer-<EOL>
+| halb der engen Grenzen des Urheberrechts-<EOL>
+| gesetzes <W>ist <W>ohne Zustimmung des Verlags<EOL>
+| unzulässig <W>und <W>strafbar. <W>Das <W>gilt <W>insbeson-<EOL>
+| dere <W>für <W>Vervielfältigungen, Übersetzungen,<EOL>
+| Mikroverfilmungen <W>und <W>die <W>Einspeicherung<EOL>
+| und <W>Verarbeitung <W>in <W>elektronischen <W>Syste-<EOL>
+| men. <W>Alle <W>Rechte, <W>auch <W>das <W>der <W>Überset-<EOL>
+| zung, bleiben vorbehalten.<EOL>
+| </P><P>Rechtseinräumung<EOL>
+| Der <W>Autor <W>bestätigt <W>und <W>garantiert, <W>dass <W>er<EOL>
+| uneingeschränkt <W>über <W>sämtliche <W>Urheber-<EOL>
+| rechte <W>an <W>seinem <W>Beitrag <W>einschließlich<EOL>
+| eventueller <W>Bildvorlagen, <W>Zeichnungen, <W>Plä-<EOL>
+| ne, Karten, Skizzen und Tabellen verfügt und<EOL>
+| dass der Beitrag keine Rechte Dritter verletzt<EOL>
+| </P><P>(dies gilt auch für die Wahrung der Anonymi-<EOL>
+| tät <W>des <W>Patienten <W>bei <W>der <W>Veröffentlichung<EOL>
+| von Fallberichten).<EOL>
+| Der Autor <W>räumt – und zwar auch zur Ver-<EOL>
+| wertung <W>seines <W>Beitrags <W>außerhalb <W>der <W>ihn<EOL>
+| enthaltenden Zeitschrift und unabhängig von<EOL>
+| deren Veröffentlichung – dem Verlag räum-<EOL>
+| lich und mengenmäßig unbeschränkt für die<EOL>
+| Dauer <W>des <W>gesetzlichen <W>Urheberrechts <W>das<EOL>
+| ausschließliche <W>Recht <W>der <W>Vervielfältigung<EOL>
+| und <W>Verbreitung <W>bzw. <W>der <W>unkörperlichen<EOL>
+| Wiedergabe <W>des <W>Beitrags <W>ein. <W>Der <W>Autor<EOL>
+| räumt dem Verlag ferner die folgenden aus-<EOL>
+| schließlichen <W>Nutzungsrechte <W>am <W>Beitrag<EOL>
+| ein:<EOL>
+| a)<W>Das <W>Recht <W>zum <W>ganzen <W>oder <W>teilweisen<EOL>
+| </P><P>Vorabdruck <W>und <W>Nachdruck <W>– <W>auch <W>in<EOL>
+| Form <W>eines <W>Sonderdrucks, <W>zur <W>Überset-<EOL>
+| zung <W>in andere Sprachen, <W>zur <W>sonstigen<EOL>
+| Bearbeitung <W>und <W>zur <W>Erstellung <W>von <W>Zu-<EOL>
+| sammenfassungen (Abstracts);<EOL>
+| </P><P>b)<W>das Recht zur Veröffentlichung einer Mik-<EOL>
+| ropie-, Mikrofiche- <W>und Mikroformausga-<EOL>
+| be, zur Nutzung im Wege von Bildschirm-<EOL>
+| text, Videotext und ähnlichen Verfahren,<EOL>
+| zur Aufzeichnung auf Bild- und/oder Ton-<EOL>
+| träger und zu deren öffentlicher Wieder-<EOL>
+| gabe <W>durch <W>Radio <W>und <W>Fernsehsen-<EOL>
+| dungen;<EOL>
+| </P><P>c)<W>das Recht zur maschinenlesbaren Erfas-<EOL>
+| sung und elektronischen Speicherung auf<EOL>
+| einem <W>Datenträger <W>(z.B. <W>Diskette, <W>CD-<EOL>
+| Rom, Magnetband) und in einer eigenen<EOL>
+| oder <W>fremden <W>Online-Datenbank, <W>zum<EOL>
+| Download <W>in einem eigenen oder <W>frem-<EOL>
+| den <W>Rechner, <W>zur <W>Wiedergabe <W>am <W>Bild-<EOL>
+| schirm – sei es unmittelbar oder im Wege<EOL>
+| der <W>Datenfernübertragung <W>–, <W>sowie <W>zur<EOL>
+| Bereithaltung in einer eigenen oder frem-<EOL>
+| den <W>Online-Datenbank <W>zur <W>Nutzung<EOL>
+| durch Dritte;<EOL>
+| </P><P>d)<W>das <W>Recht <W>zu <W>sonstiger <W>Vervielfältigung,<EOL>
+| insbesondere <W>durch <W>fotomechanische<EOL>
+| und <W>ähnliche <W>Verfahren <W>(z.B. <W>Fotokopie,<EOL>
+| Fernkopie), und zur Nutzung im Rahmen<EOL>
+| eines <W>sog. <W>Kopienversandes <W>auf <W>Bestel-<EOL>
+| lung;<EOL>
+| </P><P>e)<W>das Recht zur Vergabe der vorgenannten<EOL>
+| Nutzungsrechte an Dritte im In- und Aus-<EOL>
+| land <W>sowie <W>die <W>von <W>der <W>Verwertungsge-<EOL>
+| sellschaft <W>WORT <W>wahrgenommenen<EOL>
+| Rechte <W>einschließlich <W>der <W>entsprechen-<EOL>
+| den Vergütungsansprüche.<EOL>
+| </P><P>„Case <W>Management“ <W>begleitet <W>die <W>zentrale<EOL>
+| Rolle der „Fallmanager“ bei der Umsetzung<EOL>
+| des <W>SGB <W>II. <W>Die <W>Integrierte <W>Versorgung <W>in<EOL>
+| der <W>gesetzlichen Krankenversicherung <W>setzt<EOL>
+| im Netzwerk der Anbieter auf Case Manage-<EOL>
+| ment <W>als <W>zentrale <W>Steuerungsinstanz. <W>Die<EOL>
+| Krankenkassen setzen bei Disease Manage-<EOL>
+| ment Programmen auf Case Management.<EOL>
+| Das <W>persönliche <W>Budget <W>in <W>der <W>Behinder-<EOL>
+| tenhilfe und der Pflege: ohne Case Manage-<EOL>
+| ment lässt es sich nicht (verantwortlich) im-<EOL>
+| plementieren.<EOL>
+| Relevante Modelle und Forschungsergebnis-<EOL>
+| se <W>werden <W>unter <W>verschiedenen <W>Aspekten<EOL>
+| beleuchtet <W>und <W>praxisnah <W>aufbereitet. <W>Die<EOL>
+| Zeitschrift <W>informiert <W>in tief gehenden Fach-<EOL>
+| artikeln ebenso wie <W>in <W>kurzen Nachrichten,<EOL>
+| die <W>aktuelle <W>Entwicklungen <W>schlaglichtartig<EOL>
+| beleuchten.<EOL>
+| </P><P>Herausgeber<EOL>
+| Economica<EOL>
+| Verlagsgruppe Hüthig Jehle Rehm GmbH<EOL>
+| Im Weiher 10<EOL>
+| 69121 Heidelberg<EOL>
+| </P><P>Schriftleitung (V.i.S.d.P.)<EOL>
+| Prof. Dr. Thomas Klie, Freiburg<EOL>
+| </P><P>Fachbeirat<EOL>
+| Mona <W>Frommelt, <W>Hans-Weinberger-Akade-<EOL>
+| mie, Fürth<EOL>
+| Prof. Dr. Ulrike Höhmann, Ev. Fachhochschu-<EOL>
+| le Darmstadt<EOL>
+| Prof. Dr. Peter Löcherbach, Kath. Fachhoch-<EOL>
+| schule Mainz<EOL>
+| Dipl.-Psych. Michael Monzer, Case Manage-<EOL>
+| ment-Ausbilder, Leinfelden-Echterdingen<EOL>
+| Prof. Dr. Claus Reis, <W>Fachhochschule Frank-<EOL>
+| furt am Main<EOL>
+| Prof. Dr. Wolf Rainer Wendt, Berufsakademie<EOL>
+| Stuttgart<EOL>
+| Prof. <W>Dr. <W>Michael <W>Wissert, <W>Fachhochschule<EOL>
+| Ravensburg-Weingarten<EOL>
+| </P><P>Verlag<EOL>
+| Economica, <W>Verlagsgruppe <W>Hüthig <W>Jehle<EOL>
+| Rehm GmbH, Im Weiher 10, 69121 Heidel-<EOL>
+| berg, Annette Kerstein, Tel. 06221/489-318,<EOL>
+| Fax: -529, annette.kerstein@hjr-verlag.de<EOL>
+| </P><P>Anzeigen<EOL>
+| Claudia Kampmann-Schröder,<EOL>
+| Tel. 06221/437-042,</P></A></PAGE>

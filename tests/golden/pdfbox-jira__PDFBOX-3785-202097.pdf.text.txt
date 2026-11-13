@@ -1,0 +1,2413 @@
+text: default page 1
+| \x20
+| Los Alamos National Laboratory Vol. 2, No. 3 • March 1997
+| Reflections
+| Women\x20
+| in our
+| Workplace
+text: default page 2
+| \x20
+| 2
+| Reflections
+| Reflections
+| Reflections, the Laboratory monthly
+| publication for employees and
+| retirees, is published by Public
+| Information (PA-1). The staff is
+| located at TA-3, Building 100,\x20
+| and can be reached by e-mail at
+| newsbulletin@lanl.gov, by telephone
+| at 7-6103, by fax at 5-5552 or by
+| regular Lab mail at Mail Stop C318.
+| The individual telephone numbers
+| are listed below.
+| Editor:\x20
+| Jacqueline Paris-Chitanvis, 5-7779
+| Production coordinator:\x20
+| Denise Bjarke, 7-6103
+| Graphic designer:
+| Edwin Vigil, 5-9205
+| Photographer:\x20
+| Fred Rick, 5-9202
+| Staff writers:\x20
+| Steve Sandoval, 5-9206
+| Ternel Martinez, 5-7778
+| Editorial coordinator:\x20
+| John A. Webster, 7-5543
+| Los Alamos National Laboratory is an
+| Affirmative Action/Equal Opportunity
+| employer. It is operated by the University of
+| California for the U.S. Department of Energy.
+| About the cover …
+| This month’s cover, illustrating the wide
+| variety of jobs held by women at the
+| Lab, was prepared by photographer Fred
+| Rick and illustrator Ed Vigil. The
+| women shown at their workplaces,
+| beginning at the upper left corner and
+| proceeding clockwise, are Ruth Holt of
+| CIC-1, Tamara Johnson of CST-4,
+| Virginia Herrera of NIS-4, Beverly
+| Martin of CIC-12 on assignment to CST-
+| 18, Jane Gladson of NMT-4, Jenny Vigil
+| of BUS-4 and Stephanie Maez of PA-1.
+| Inside this issue …
+| Expanding your horizons . . Page 3
+| BUS report: TIPS  . . . . . . . . . Page 4
+| Reaching out: explosives  . . Page 5
+| Women’s\x20
+| History Month . . . . . . Pages 6 and 7
+| People  . . . . . . . . . . . Pages 8 and 9
+| Service anniversaries  . . . . . Page 9
+| Science fun: Eggshell  . . . . Page 10
+| Spotlight:\x20
+| You gotta love it  . . . . . . . . Page 12
+| Time will tell
+| While working on this latest issue of “Reflections,”
+| which highlights the Women’s Diversity Working Group
+| and mentoring efforts for women at the Lab, I couldn’t
+| help but think how “the face” of management at Los
+| Alamos has changed somewhat since I joined in 1989.\x20
+| Sure, the number of women and minorities in posi-
+| tions of “power and influence” at this national facility
+| are not what many of us would like it to be, considering
+| the makeup of the country. But I must admit, in recent
+| years I have noticed a concerted effort on the part of
+| some to make the Lab’s management a bit more diverse.\x20
+| Still, it was quite a culture shock nearly eight years
+| ago when I first skimmed the Lab’s management chart and found no women in top
+| management positions. (I previously worked for an organization in which all the
+| “power” positions, except for two, were held by women.) As I recall, in 1989, none of
+| the Lab’s associate directors (who then made up the Lab’ s senior management group)
+| were female. If there were women who wielded power and influence at the senior-most
+| management levels — and there very well may have been some — they were not
+| apparent to the casual observer. That is to say, I was not aware of them.
+| Fair or not, the message I got at the time was that upper management at the Lab
+| was a male province in which a woman’s role predominantly was that of worker bee.
+| True, many women — and many men — in technical, professional and administrative
+| positions have no interest whatsoever in being a manager, senior or otherwise. But at
+| the time, it struck me as strange that despite the women’s movement having peaked
+| across the country, women were nearly invisible at the Lab’s upper management levels.
+| But time brings change, and if we’re lucky, it’s change for the better. While the Lab
+| still has no permanent female director of a technical division, more women have
+| joined the senior management ranks. A quick look at some numbers supplied by the
+| Lab’s Diversity Office confirms this observation.
+| In 1989, there were 24 individuals in “Top Management” positions, which
+| included director, deputy director, associate director, center director, controller, Lab
+| counsel and their deputies. None of these positions were held by a female. Under the
+| heading “Associate Management,” which included division leaders, office directors,
+| program directors, test directors and their deputies, eight females were listed out of a
+| total of 97. Group leaders that year included 48 females (18 staff members; 30 admin-
+| istrative staff members) out of 444.
+| Stats from the end of 1996 indicate some progress has been made. Females held
+| six of 62 “Top Management” positions (“Top Management” titles being director,
+| deputy director, division director, program director, office director, Laboratory
+| counsel, director of institutional development and their deputies). The “Associate
+| Management” category has been dropped, but the “Group Leader” category shows
+| that females held 65 of the 376 group leader positions (40 technical staff members;
+| 25 specialist staff members).\x20
+| The increase in the number of female managers at the Lab, especially senior
+| managers, is by no stretch of the imagination awe inspiring. But I do think it’s a
+| noticeable step in the right direction.\x20
+| Will women continue to move into and up the management ranks at the Lab? Will
+| the proverbial glass ceiling that has stopped highly competent women in professions
+| across the country shatter or at least crack here at Los Alamos? I really don’t know, but
+| I do think continued progress is possible if we don’t rest on our laurels and actively
+| work to ensure that everyone gets her (or his) fair
+| chance. But as they say … time will tell.
+| March 1997
+text: default page 3
+| 3
+| Reflections
+| Expanding your horizons
+| March 1997
+| \x20
+| by John A. Webster
+| Since it began at the College of Santa Fe nearly 20 years ago, thousands of\x20
+| high school and middle school girls across Northern New Mexico have been intro-
+| duced to science and math as career possibilities through the Expanding Your
+| Horizons conferences.
+| This year’s conference, scheduled for March 20 at the Laboratory, is expected to
+| attract approximately 100 girls in grades 8 through 10. They will participate in
+| hands-on workshops with women who work in a variety of scientific and technical
+| fields at the Lab and elsewhere.
+| The first EYH conference was held in 1980 at the College of Santa Fe because it
+| had adequate facilities and seemed to be centrally
+| located for many of the participants, recalled Gloria
+| Cordova, group leader for Conference and Visit
+| Management (PA-4) and a member of the first
+| steering committee.
+| From the beginning, the program has been
+| received enthusiastically by the more than\x20
+| 13,000 participants. “They are excited and ener-
+| getic,” Cordova said. “I remember one wrote on
+| an evaluation form: ‘I never knew women did
+| these things.’”
+| Joyce Guzik of Thermonuclear Applications
+| (XTA), co-chair with Shirley Herrera of Business
+| Information Systems (CIC-13) for this year’s confer-
+| ence, said the program began because women in technical
+| professions saw a need.
+| “This is a time in a young woman’s education when she is
+| making important career and college preparation decisions,
+| and it can make a difference for her to be aware of opportuni-
+| ties that she may not have thought about before,” Guzik said.
+| “It’s important for these students to realize the possibility of a
+| career in science.”
+| The conference is conducted by Los Alamos Women in
+| Science, an organization that provides support and assistance
+| for women in scientific and engineering careers and provides
+| mentors and role models for young people. Other support is
+| given by the New Mexico Network for Women in Science and
+| Engineering, by a number of private firms and by organizations\x20
+| around the Laboratory.
+| Guzik said each student can participate in two workshops, one in the
+| morning and one in the afternoon. Workshops are planned in such areas as
+| computer science, life sciences and physical sciences, she said. Each one will
+| be about one hour and 15 minutes long, and they will be limited to about
+| eight girls so that each one can have a chance to participate actively.
+| While the students are participating in the workshops, the teachers and
+| mentors who accompany them from their schools will attend other activities
+| and science demonstrations.
+| All the young women also will participate in a team activity and have
+| the opportunity to hear speakers discuss general subjects of interest. Guzik
+| said the team activity this year will be an “egg drop,” in which the participants will
+| build egg-cradling containers that they hope will prevent the eggs from breaking
+| when dropped from various heights.
+| Above: Kathleen Ramsey of the Wildlife
+| Center in Española holds Roberta, a
+| bobcat who joined Ramsey at the 1994
+| Expanding Your Horizons conference.
+| File photo by James E. Rickman
+| Left: Karen Schultz Paige of
+| Environmental Systems and Waste
+| Characterization (CST-7) and Shevonne
+| Romero of San Diego Mission School
+| investigate lasers and light during\x20
+| a workshop at the 1996 conference.\x20
+| File photo by Fred Rick
+| Paige helps Veronica
+| Grace, left, of Capital
+| High School and
+| Tammy Martin of\x20
+| St. Michael’s High
+| School, center, during a
+| laser optics workshop
+| in 1994. \x20
+| File photo by LeRoy N. Sanchez
+| Kelley Mallette of Las Vegas Memorial
+| School tests water for its oxygen content
+| during the 1994 conference. \x20
+| File photo by LeRoy N. Sanchez
+text: default page 4
+| Reflections
+| 4
+| by Ternel Martinez
+| The Business Operations (BUS)
+| and Computing, Information and
+| Communication (CIC) divisions
+| recently took a major step in devel-
+| oping a paperless procurement
+| system by awarding a contract to
+| American Management Systems to
+| help the two organizations develop
+| a customized software package,
+| called the Total Integrated
+| Procurement System.
+| The process for determining
+| what the software package needed
+| to do to improve procurement
+| began about a year ago. That’s
+| when BUS formed focus teams of
+| buyers and representatives from
+| several groups in BUS that deal
+| with procurement in some fashion,
+| such as accounts receivable/
+| payable and receiving.\x20
+| In addition, BUS received\x20
+| input from others, including the
+| Nonproliferation and International
+| Security (NIS), Accelerator
+| Operations and Technology\x20
+| (AOT) and Dynamic
+| Experimentation (DX) divisions,\x20
+| the Science and Technology
+| Advisory Committee, the Product
+| Development/Product Evaluation
+| Committee and several vendors.\x20
+| Dave Delaney of Procurement
+| (BUS-5) and TIPS project leader in
+| BUS Division said AMS, based in
+| Fairfax, Va., was chosen to help
+| BUS and CIC develop TIPS because its
+| desktop software package best met the
+| defined requirements of the Lab’s
+| customers and buyers.\x20
+| “AMS has a proven track record\x20
+| in providing state of-the-art, auto-
+| mated procurement solutions for\x20
+| such entities as the U.S. Patent\x20
+| Office and the Canadian govern-
+| ment,” he said. “When completed,
+| TIPS will significantly reduce procure-
+| ment turnaround times and process
+| costs and improve vendor perfor-
+| mance monitoring.”
+| Specifically, he continued, TIPS will
+| allow requestors to submit all types of
+| requests online and buyers to perform
+| all other procurement functions online
+| as well. Other benefits will include
+| online guides instructing requestors
+| which procurement venue would best
+| suit their needs (for example, purchase
+| card, just-in-time or regular purchase
+| request), how to correctly fill out those
+| forms and the ability to monitor the
+| status of a request online.
+| “We understand how important the
+| procurement process and systems are
+| to the successful execution of programs
+| and projects within the Laboratory.
+| We’re excited by the anticipated
+| improvements TIPS will make to the
+| procurement process,” he added.\x20
+| He also emphasized that CIC and
+| AMS currently are exploring the use of
+| a World Wide Web interface that will
+| allow requestors and buyers to access
+| the new procurement system on any
+| computing platform.
+| Complete information on TIPS,
+| including the names of those involved
+| in the project, implementation plans,
+| strategies and the joint application
+| development reports, is available
+| online at http://www.bus.lanl.gov:
+| 8001/bus/business/tips/tips.html\x20
+| on the World Wide Web. Adobe
+| Acrobat Reader is required. For more
+| information on TIPS, contact Delaney
+| at 7-8583.
+| March 1997
+| TIPS to improve procurement
+| Illustration by Edwin Vigil
+text: default page 5
+| 5
+| Reflections
+| by Steve Sandoval
+| “Have explosive demonstration kit,
+| will travel.” That could be the motto of
+| Mary Campbell of High Explosives
+| Science and Technology (DX-2).
+| Campbell periodically takes small
+| wood blocks, several grams of high
+| explosives, heavy cylindrical steel
+| containers, matches, black powder,
+| which is used in firecrackers, and her
+| see-through Lexan assemble-on-the-fly
+| kit, in which she conducts her demon-
+| strations, and responds to invitations
+| from area schools to, as she puts it,
+| teach children to have “a little respect
+| for what small amounts of explosives
+| can do.”
+| Campbell, a chemist at the Lab for
+| 20 years, is one of several DX-2
+| employees who participate in this kind
+| of community outreach. One of her
+| most recent demonstrations was for 22
+| sixth- through eighth-grade students from the New Mexico
+| School for the Deaf in Santa Fe who came to the Lab.
+| Schools in Los Alamos and Santa Fe have seen Campbell’s
+| demonstration, and a once-a-year kindergarten through
+| sixth-grade program called “Careers and Curiosity in Math
+| and Science” has been used to show what a bang a few
+| milligrams of an explosive commonly found in the home can
+| make. The program is sponsored by the American
+| Association of University Women in partnership with the Lab
+| and Los Alamos Public Schools.
+| A component of the “Women in Science” career day called
+| “Expanding Your Horizons” includes a workshop about
+| explosives that Campbell also teaches, she said. This career
+| day encourages young women to consider a career in science
+| and engineering and is sponsored by the New Mexico
+| Network for Women in Science and Engineering.
+| “I think children watch cartoons and think that all explo-
+| sives do is burn their fingers,” said Campbell. “They think it
+| isn’t so bad.”
+| But Campbell is quick to dispel that myth, explaining that
+| as little as a half-gram of a high explosive called PETN,
+| which is primarily used in detonators, can turn a small wood
+| block into instant toothpicks.
+| She places the wood block in the steel container and uses a
+| fuse to set off the high explosive. The student observers, on
+| this occasion, were amazed by the explosive’s power.
+| Campbell usually begins her demonstration by showing
+| students viewgraphs that explain what explosives are —
+| essentially materials that react very fast and produce energy
+| and large amounts of gas — how an explosion starts and the
+| molecular process of an explosion.
+| She also shows photographs of explosives tests at the\x20
+| Lab, quick to point out that employees taking part in the
+| experiments are far away, or in protective concrete bunkers.
+| “During explosives experiments at the Lab, safety is a serious
+| consideration,” Campbell tells the students.
+| Another important point, Campbell tells students,\x20
+| is to make sure to have a bucket of water nearby when\x20
+| using fireworks.
+| To illustrate the ignition stimulus necessary to start the
+| explosives process, Campbell takes a match, places the match
+| head on top of a steel block and strikes it with a hammer. The
+| match ignites because of the force of the hammer and fric-
+| tion, Campbell explains.
+| Next, Campbell burns a string coated with some black
+| powder and partially wrapped with tape; it looks and smells
+| like a firecracker.
+| A fuse with a black powder core is attached to a cap
+| containing a half-gram of black powder and fit into a\x20
+| hole in a wood block. The explosion makes a loud noise\x20
+| but doesn’t break the wood block. One NMSD student likened
+| the bang to the popping sound of a firework. “It smells\x20
+| like fireworks,” another student told Campbell through\x20
+| an interpreter.
+| “Explosives are very useful if you want to move things,\x20
+| like if you want to build a road and have to move rock,”\x20
+| said Campbell.
+| However, as Campbell passed around a piece of\x20
+| shrapnel, a fragment of a piece of steel pipe destroyed in\x20
+| an explosion, she reminded students that explosives can
+| cause serious damage.
+| “You may think you know what the experiment will do,
+| but you have to carefully observe to find out what really
+| happens,” said Campbell. “With all but the tiniest amounts
+| of explosives, the observer must be protected and observed by
+| mirrors and cameras.”
+| Students get an explosive demonstration
+| March 1997
+| Teacher Margie Propp, center, reacts to an explosives demonstration while her New
+| Mexico School for the Deaf middle school students also watch. Mary Campbell of
+| High Explosives Science and Technology (DX-2), at left, conducts demonstrations on
+| the hazards and benefits of high explosives. Photo by Fred Rick
+text: default page 6
+| \x20
+| 6
+| Reflections
+| 7March 1997 March 1997
+| by Steve Sandoval
+| In today’s modern work world where women and minorities are
+| struggling to compete, the odds against succeeding sometimes
+| seem insurmountable. Sometimes you have to work harder, experi-
+| ment or try new approaches to solving problems.
+| At the Laboratory, a group of women employees in the Science
+| and Technology Base (STB) Programs Office formed Women
+| Helping Women to support and encourage women in their careers
+| by fostering personal and professional devel-
+| opment, said Gail Diedrich of STB.
+| Women employees of STB voluntarily can
+| join the group, said Diedrich. Women Helping
+| Women has a code of behavior and developed
+| a mission statement, goals and objectives,\x20
+| she said.
+| Since the group formed in November 1994,
+| two STB employees used their increased skills
+| and self-esteem to change fields and earn promotions at the Lab,
+| said Nadine Shea of Nuclear Weapons Technology (NWT) and a
+| former STB employee.
+| Diedrich represented the Lab at a New Mexico First Town\x20
+| Hall meeting on strategic planning for the state’s future last
+| summer in Taos, while Kay Coddens, also of STB, used the team-
+| building and self-confidence skills acquired through the group to
+| be a guest speaker at a “Women In Science” symposium\x20
+| last October.
+| Women Helping Women is in the process of creating a home
+| page on the World Wide Web for more online information.
+| Some group members also plan to help the Lab’s Women’s
+| Diversity Working Group to prepare and sponsor activities for
+| Women’s History Month (see accompanying article).
+| Women Helping Women actually came out of a conference
+| Warren “Pete” Miller, the Lab’s acting deputy director for science
+| and technology, attended. Miller was STB director at the time; he
+| met with some women scientists across the lab, and administrative
+| staff of STB to hear from them what kinds of problems they were
+| encountering at the Lab, Diedrich recalled.
+| As a result of these meet-
+| ings, Diedrich and Becky
+| Dilello, also of STB, decided to
+| schedule a meeting of women
+| employees at STB. The
+| response was overwheming,
+| Diedrich said.
+| “It sounded to me like we
+| were blaming others for all
+| our problems,” Diedrich summarized the outcome of the initial
+| meeting with STB administrators. “We thought there must be some
+| things we can do.”
+| At the monthly Women Helping Women meetings, one STB
+| member acts as chairperson; she sets the meeting agenda, sched-
+| ules guest speakers and/or facilitators and generally runs the
+| meeting, said Diedrich.
+| “A lot of women in this group had never led a meeting,”
+| Diedrich said. “They have found that they can do it. It is a very
+| satisfying, rewarding experience.”
+| Last September, Jennifer Siders of Electronic and
+| Electrochemical Materials and Devices (MST-11) talked to
+| Women Helping Women about “Gender Gap in College
+| Admission Tests.” Siders had spoken about the topic at an
+| American Physical Society convention and felt it would be
+| applicable for Women Helping Women.
+| “I wish I could attend their meetings all the time. I wish
+| more divisions had them,” Siders said. “They’re really useful
+| and informative seminars,” she said of the monthly meetings.
+| “It’s nice being in a roomful of women once a month instead\x20
+| of men.”
+| And while Women Helping Women counts several successes,
+| it hasn’t always been easy. “The group has struggled because
+| we are diverse,” said Diedrich.
+| But Shea and Diedrich are impressed by how STB women
+| employees have become more self-confident through Women
+| Helping Women.
+| “The best thing about the group is that participation is
+| voluntary, and we create our own agenda,” said Shea. “We’re
+| all there because we want to be there; the interaction has value
+| for us, both personally and professionally.”
+| 'Women Helping Women'
+| March is Women’s History Month
+| by Ternel Martinez
+| When the Women’s Diversity Working Group
+| first formed a little more than a year ago, it set
+| out to formally identify, evaluate, select and
+| prioritize the most significant issues facing
+| women at the Lab. The top four issues
+| chosen were mentoring,
+| career development,
+| recruitment and
+| dependent care, with
+| mentoring having
+| the\x20
+| highest priority.\x20
+| While one subcom-
+| mittee in the WDWG
+| currently is in the
+| process of developing a
+| formal mentoring
+| program for women,
+| another subcommittee —
+| the career development
+| subcommittee (a combina-
+| tion of the upward\x20
+| mobility and glass\x20
+| ceiling subcommittees) —
+| decided to create an\x20
+| award program recognizing and
+| applauding those who already
+| mentor women at the Lab, either
+| on a formal or informal basis.
+| Thus, seven Lab employees recently were
+| recognized for their outstanding mentoring
+| efforts in the inaugural 1997 Career
+| Development Mentor Awards Program.
+| Although the person being mentored had to be
+| a woman, both men and women were eligible
+| for the award.
+| The winners are Judith Mourant of
+| Bioscience/Biotechnology (CST-4); Kathleen
+| Jackson of the Computing, Information\x20
+| and Communication Division (CIC-DO);\x20
+| Ines Triay of Environmental System and\x20
+| Waste Characterization (CST-7); Bill McKerley\x20
+| of Inorganic Elemental Analysis (CST-8);\x20
+| Ron Conrad of Hazardous and Solid Waste
+| (ESH-19); Rebecca Phillips of the Human
+| Resources (HR) Division; and John Phillips of
+| the Nonproliferation and International Security
+| Division (NIS-DO).\x20
+| As of this writing, an awards ceremony is
+| scheduled from 5:15 to 7 p.m. March 10 in
+| the J. Robert Oppenheimer Study Center.
+| Director Sig Hecker is scheduled to be on
+| hand to present the winners with their
+| Outstanding Mentoring Award plaques.
+| Subcommittee chair Alice Naranjo said when
+| the call for nominations first went out late last
+| September, she expected only about
+| 20 responses. Instead, the
+| subcommittee received 50 nomi-
+| nation packets. In fact, some
+| nominees received multiple
+| nominations.
+| Naranjo added the
+| screening process was espe-
+| cially difficult. “The nomi-
+| nations were so strong, we
+| wanted to give everyone
+| an award,” she said.
+| Fellow subcommittee
+| member Carla Jacquez
+| said the number of
+| awards to be given
+| this time actually
+| increased from five
+| to seven because of
+| the quality of the
+| nominations.\x20
+| Judith Mourant
+| Kathleen Jackson
+| Ines Triay
+| Bill McKerley
+| Ron Conrad
+| Rebecca Phillips
+| John Phillips
+| Outstanding mentors
+| by Steve Sandoval
+| The Laboratory’s Women’s Diversity
+| Working Group is only one year old,
+| but it already counts many successes.
+| The 12-person committee has
+| formed several subcommittees to deal
+| with the issues of mentoring, recruit-
+| ment, career development and depen-
+| dent care, according to its outgoing
+| chairperson, Gail Diedrich of the
+| Science and Technology Base (STB)
+| Programs Office.
+| Diedrich said the group among
+| other things researched the develop-
+| ment of a Women’s Research Center at
+| the Lab, has participated in Diversity
+| External Advisory Council meetings,
+| endorsed the half-day science\x20
+| education program for girls called
+| Careers and Curiosity Program last
+| spring, and is interacting with the
+| Laboratory Leadership Council’s
+| mentoring, succession planning and
+| career development action team.
+| Other members of the Women’s
+| Diversity Working Group are Diane
+| Albert of Materials Technology:
+| Metallurgy (MST-6), incoming chair-
+| person Linda Anderman of the
+| Community Involvement and
+| Outreach (CIO) Office, Sandi Borrego of
+| the Staffing Group in the Human
+| Resources (HR) Division, Renita Gurule
+| Cook of Weapon Materials and
+| Manufacturing (ESA-WMM), Micheline
+| Devaurs of Waste Management
+| (EM/WM), Janie Enter of\x20
+| Environmental Science and Waste
+| Technology (CST-7), Carla Jacquez of
+| Water Quality and Hydrology (ESH-18),
+| Alice Naranjo of Operational
+| Integration (ESH-OIO), Mary Neu of
+| Nuclear and Radiochemistry (CST-11),
+| Amy Regan of Radio Frequency
+| Technology (AOT-5) and Laura Worl of
+| Advanced Technology (NMT-6).
+| The Women’s Diversity Working Group
+| was created to help address underutiliza-
+| tion in the workforce and to increase
+| communication on issues that impact the
+| Lab’s diversity and affirmative action
+| objectives. Employees interested in
+| learning more about the Women’s
+| Diversity Working Group are encour-
+| aged to call the Diversity Office at\x20
+| 7-8695 or any member of the group.
+| Women’s Diversity Working Groupa
+| ‘A lot of women in this group had
+| never led a meeting. They have found
+| that they can do it. It is a very\x20
+| satisfying, rewarding experience.’
+text: default page 7
+| 8
+| Reflections
+| March 1997
+| Darryl Butt of Materials
+| Technology/Metallurgy (MST-6) has
+| received the American Ceramic Society
+| Award for young scholars.
+| The Robert L. Coble Award for
+| Young Scholars is
+| named after the late
+| Massachusetts Institute
+| of Technology
+| professor, whose enthu-
+| siasm and creative
+| energy were directed
+| toward putting the field
+| of ceramics on a sound
+| scientific foundation.
+| The award recognizes Coble’s life-
+| long mission to enhance the achieve-
+| ment and advancement of young
+| ceramic scientists. The annual award
+| recognizes outstanding scholarship in
+| an individual under the age of 35.
+| Butt, leader of the corrosion\x20
+| and interfaces team in MST-6, was
+| recognized for his research, both
+| experimental and theoretical, in gas-
+| solid reactions, diffusion, thermody-
+| namics and laser diagnostics. The
+| award will be presented formally to
+| Butt at the annual meeting of the
+| American Ceramic Society in
+| Cincinnati in May.
+| Butt has worked at the Laboratory
+| since April 1991. He joined the Lab\x20
+| as a postdoctoral candidate in the
+| Nuclear Materials Technology\x20
+| (NMT) Division.
+| Butt has a bachelor’s degree in
+| ceramic science and engineering and
+| a doctoral degree in ceramic science,
+| both from Penn State University.
+| Petrovic garners
+| James I. Mueller
+| Memorial Award
+| John Petrovic of Ceramic Science and
+| Technology (MST-4)
+| received the American
+| Ceramic Society’s
+| James I. Mueller
+| Memorial Award.
+| Petrovic accepted
+| the award at the
+| Engineering
+| Ceramics Division’s
+| 21st annual confer-
+| ence on Composites, Advanced
+| Ceramics, Materials and Structures in
+| January in Cocoa Beach, Fla.
+| The award is the highest granted by
+| the Engineering Ceramics Division of
+| the American Ceramic Society. It signi-
+| fies outstanding ceramics research and
+| significant contributions to the
+| Engineering Ceramics Division.
+| At the Florida meeting, Petrovic
+| also presented the Mueller Memorial
+| Lecture on “High Temperature
+| Structural Silicides” to the starting
+| Plenary Session.
+| Petrovic is the current trustee of
+| ACS’ Engineering Ceramics Division.
+| Petrovic has been at the Lab 22
+| years. He has bachelor’s, master’s and\x20
+| continued on Page 9
+| Darryl Butt
+| Bivens named HBCU administrator
+| Pamela Bivens is the Laboratory’s new program administrator
+| for Historically Black Colleges and Universities.
+| The program is part of the Science and Technology
+| Base/University Programs (STB/UP) Office.
+| The Historically Black Colleges and Universities program at
+| the Lab focuses on ensuring that students and faculty of under-
+| represented groups in science and technology have a place
+| within their chosen fields of study.
+| The HBCU program offers internships for students to conduct
+| summer and year-long research with Lab scientists, said Bivens.
+| “I feel that my career has brought me to this point where I am in the
+| capacity to serve students and faculty at historically black colleges and univer-
+| sities,” said Bivens. “My vision for this program is to position the Lab as the
+| premier national lab for recruiting students and faculty from historically black
+| colleges and universities.”
+| Bivens earned her bachelor’s degree in 1984 in mass media arts from
+| Hampton University. She also has a master’s degree in education and human
+| development from George Washington University.
+| Bivens can be reached at 5-7692 or at mail stop F673. She is located at Technical
+| Area 3, Building 406, across the street from Occupational Medicine (ESH-2).
+| Pamela Bivens
+| John Petrovic
+| Laboratory technology captures
+| Popular Science readers choice award
+| Technology developed by Craig Taylor of
+| Organic Analysis (CST-12) and Dennis
+| Hjeresen of the Environmental Management
+| (EM) Programs Office recently won the
+| Readers Choice Award from Popular Science
+| magazine for the top achievement in science
+| and technology.
+| The annual award lets Popular Science
+| magazine readers vote online on the maga-
+| zine’s World Wide Web page.
+| Taylor and Hjeresen share the award with Hughes Environmental Systems
+| Inc., a subsidiary of Hughes Aircraft Co., which is commercializing the tech-
+| nology that could revolutionize the dry cleaning industry worldwide.
+| In November, the technology received a “Best of What’s New” from the maga-
+| zine for the system, which replaces harsh dry cleaning chemicals with a liquid
+| carbon dioxide cleaning process.
+| Craig TaylorDennis Hjeresen
+| Darryl Butt receives ceramics award
+text: default page 8
+| 9
+| Reflections
+| March 1997
+| Obituaries
+| Patrick Sanchez
+| Patrick Sanchez, 35, of Dixon died Jan. 13.
+| Sanchez worked as a machinist in Materials
+| Technology: Metallurgy (MST-6) from September 1980
+| through February 1996.
+| Survivors include his parents, Alfonso and Dila Sanchez
+| of Dixon; sisters, Margaret Romero of Española, Kathy
+| Sanchez of Dixon and Lisa Sisneros of New Braunfels, Texas.
+| Fredrick John Humphry
+| Fredrick John Humphry, 66, of Los
+| Alamos died Jan. 16.
+| Humphry worked in the Accelerator
+| Operations and Technology (AOT) Division
+| for 18 years before retiring in 1994.
+| He is survived by his wife Emily; one
+| daughter and one son all of Los Alamos; a
+| daughter in Boise, Idaho; two sons on Long
+| Island, N.Y.; a brother in Newport News,
+| Va.; and mother in Long Island, N.Y.
+| 30 years
+| Gary Powley, DX-7
+| Seferino Vigil, ESH-1
+| 25 years
+| James Elliott, EES-5
+| Michael Martinez, ESH-4
+| Alex Marusak, NIS-8
+| Linda Mullins, ESA-FM-ESH
+| 20 years
+| Hassan Dayem, CIC-DO
+| John Flower, CIC-9
+| Anthony Garcia, EES-1
+| Larry Glick, CST-3
+| Wayne Hansen, EES-15
+| Orval Hart Jr., ESA-TSE
+| Robert Holder, BUS-5
+| Norma Jorgensen, NWT-PO
+| Jack Markin, NIS-DO
+| Geraldine Martinez, EES-4
+| Norman Mayne Jr., FSS-21
+| Bill McCormick, ESA-FM-ESH
+| Lois McFarland, HR-5
+| Robert Naranjo, CIO
+| Valarie Prestwood, CIC-13
+| Ronald Rabie, DX-2
+| Yvonne Salaz, QP
+| Luis Salazar, NWT-PO
+| Ted Spitzmiller, CIC-6
+| James Stine, DX-2
+| Gary Sullivan, DX-6
+| Pamela Ulibarri, TSA-9
+| Yolanda Valdez, LS-4
+| Laurance Warner, AOT-9
+| 15 years
+| Jacobo Archuleta, NIS-4
+| Diana Armijo, AA-3
+| Ricky Baros, CST-7
+| Connie Butters, NWT-PO
+| Larry Byars, EM-ER
+| George Faulkner, P-24
+| Brad Gallimore, ESH-5
+| Gerald Galusha, DX-5
+| Kay Grady, TSA-3
+| Virginia Hamilton, CST-11
+| Brosl Hasslacher, T-13
+| Victor Hogsett, NIS-8
+| Michael Loibl, ESH-1
+| David Martinez, ESH-1
+| Paul Maudlin, T-3
+| Benjamin Montoya, NIS-6
+| Thomas Norris, TSA-7
+| Larry Pacheco, ESH-1
+| Virginia Rey, ESH-12
+| Richard Salazar, NMT-6
+| David Sanchez, ESH-14
+| W.K. Scarborough, MST-4
+| Richard Wood, AOT-1
+| 10 years
+| Mark Backus, BUS-5
+| 5 years
+| Angela Cantu, AA-IEO
+| Michael Duran, ESH-1
+| Mary Gobby, CST-26
+| Michael Johnson, CST-8
+| David Kilcrease, T-4
+| John Lyles, AOT-5
+| Glenn Olah, CST-4
+| Gregory Rand, ESA-TSE
+| Jeffrey Roberts, CST-12
+| Dianne Roybal, NIS-7
+| Matthew Sanchez, ESH-3
+| Donald Shired, CIC-13
+| Annette Swift, HR-5
+| Thomas Terwilliger, LS-8
+| February employee
+| service anniversaries
+| Fredrick John
+| Humphry
+| Petrovic garners …\x20
+| continued from Page 8
+| doctoral degrees in metallurgy from Case Western Reserve
+| University in Cleveland, Ohio. Petrovic also is a Lab Fellow
+| and a Fellow of the American Ceramic Society and the
+| American Society for Materials International.
+| Trewhella named\x20
+| member of study section
+| Jill Trewhella of Bioscience/Biotechnology
+| (CST-4) has been selected as a member of the
+| Molecular and Cellular Biophysics Study
+| Section, Division of Research Grants, for the
+| National Institutes of Health.
+| Trewhella’s appointment is through\x20
+| June 30, 2000.
+| Members are selected based on their
+| demonstrated competency and achievement
+| in their scientific discipline as evidenced by the
+| quality of their research accomplishments, publication in scien-
+| tific journals and other scientific activities and achievements.
+| Study sections review grant applications submitted to the
+| National Institutes of Health and make recommendations on
+| the applications to the appropriate national advisory council
+| or board of the institute. The study sections also survey the
+| status of research in their fields of science.
+| Jill Trewhella
+| There are 370
+| trash dumpsters
+| at the Lab.
+text: default page 9
+| Reflections
+| \x20
+| "Science at Home” is a publication developed
+| by Science Education Programs (STB/SE) to
+| interest children, particularly those in grades
+| four through eight, in science through hands-
+| on activities. We are reprinting experiments
+| from the book, along with other scientific
+| activities, for employees to share with their
+| families, or just to enjoy themselves.
+| Eggshell architecture
+| You’re walking along carrying a dozen eggs
+| when all of a sudden,
+| SPLAT! The kitchen
+| floor is covered
+| with the makings
+| of an omelette
+| that would make
+| Humpty Dumpty proud.
+| How can a chicken egg be so
+| fragile when it hits the floor, but so strong when
+| resting under a chicken?\x20
+| In this activity, you will learn the role that the
+| shape of an object plays in controlling its
+| strength, and in the process, draw some conclu-
+| sions on how forces can be managed so that
+| bridges and buildings can hold the load.
+| The stuff you’ll need
+| Six to 12 raw eggs, a dozen or more books
+| to use as weights, a bathroom scale, masking
+| tape, a butter knife, a bowl, a flat surface
+| protected with newspaper, a ruler and a pencil.
+| Here’s the plan
+| 1) Use the method below to crack the eggs.
+| You will need four round end shells and four
+| pointed end shells for each trial.
+| How to break an egg and save the shell
+| a) Hold an egg up on end.Use a pencil and
+| ruler to mark the midpoint. Hold the pencil point
+| gently against the shell at the mid-
+| point. Slowly rotate the egg so that a
+| line is drawn around the middle of the egg.
+| Place two pieces of masking tape around the egg,
+| one on each side of the middle line (diagram 1).
+| b) Use the blade of a butter knife to tap
+| along the middle line between the pieces\x20
+| of tape.
+| c) Once you have cracked the entire
+| center, hold the egg over the bowl and
+| slowly open it letting the insides drop out.
+| d) Refrigerate the raw eggs for future use.
+| 2) Place the round ended shells, with the
+| cracked edges down, on a flat surface.
+| 3) You will be placing books on top of the
+| shells, so adjust them so that each one fits
+| about a half inch from the corner of the first
+| book. Predict how many pounds of books, if any,
+| you think the shells will hold without breaking.
+| 4) Place the first book flat on the eggshells
+| (diagram 2).
+| 5) Continue adding books, keeping them as
+| centered as possible, until one of the egg shells
+| is crushed.
+| 6) Weigh and
+| record the weight
+| of the books the
+| egg shells held.
+| Do not include the
+| weight of the last
+| book that crushed the
+| egg shell. Replace any broken shells (crack
+| more eggs if needed) and repeat the experi-
+| ment two more times. Record your results
+| from each trial on a data sheet.When you
+| are finished, add the weights from
+| the three trials together and
+| divide by three; this is the
+| average weight that the four
+| round eggs can hold.
+| 7) Do you think the pointed end
+| shells will hold more or less
+| weight? Why? Repeat all steps
+| using the pointy eggshells. Predict how many
+| books they will hold. Be sure to record your
+| results. Repeat the experiment three times, and
+| then come up with an average.
+| 8) Based on your data, which shape
+| eggshell held more weight, the round
+| or the pointed?
+| What’s going\x20
+| on here?
+| Because eggs are easily
+| broken, most people don’t realize
+| just how strong an eggshell can
+| be.The staff at the Ontario Science Center in
+| Toronto demonstrated that a single egg standing
+| on end can support a 90 Kg (200 pound)
+| person.The secret behind this strength is the
+| way the shape of the shell transfers the forces
+| acting on it. All objects that support weight are in
+| a constant battle with the force of gravity. An
+| object’s weight is equal to its mass multiplied by
+| the force of gravity. On Earth’s surface, gravity is
+| always pulling things toward the center of the
+| planet, so the more weight resting on an object,
+| the greater the force acting on the object.
+| Scientists call this action compression.
+| In some objects, the ability to
+| withstand compression is
+| due to a strong, fairly
+| rigid internal structure.
+| We see this type of
+| support in things like
+| high-rise buildings and
+| human skeletons. Here,
+| compression is coun-
+| tered by the strength of the
+| steel\x20
+| (or bone) and a great deal\x20
+| of mass.
+| In an egg there is no internal structure, just a
+| bunch of slimy liquid.The shape of the external
+| shell pushes or transfers the compressive forces
+| to another area. When a chicken sits on an egg,
+| or when you stack books on it, the extra weight
+| generates a greater force of compression on the
+| top of the shell. Because the shell is round, this
+| force is then spread evenly in all directions to the
+| rest of the shell. As the individual shell sections
+| get compressed, they each take up some of the
+| stress so no one point on the shell gets over-
+| loaded. For this type of adjustment to take place
+| in the shell, the extra weight must be added in a
+| slow, steady fashion. If you were to simply drop
+| two or three books on the eggs, they would
+| immediately shatter because the compression is
+| applied too quickly.Time is a critical element in
+| allowing the egg to adjust to the stress.That’s
+| why when you drop an egg, it usually breaks no
+| matter what angle it lands at.
+| Where does this\x20
+| happen in real life?
+| Romans made extensive use of “eggshell
+| architecture”, using the principle in building
+| domes, arches, and bridges.The use of this
+| design eliminated the need for columns to
+| support a roof. Instead, the roof rested solely on
+| the outer walls of the building with the weight
+| distributed evenly throughout the roof.
+| Take a look at
+| different buildings
+| in your community
+| and see how many
+| of them employ
+| eggshell archi-
+| tecture. Look for things
+| like domes, arches
+| and trusses.
+| Another place that you can see
+| how “spreading the weight” helps
+| to eliminate problems is in a magician’s bed of
+| nails. If a person weighing 200 pounds were to
+| step barefoot on a nail, ouch! But by spreading
+| the 200 pounds over 400 nails, any one nail will
+| be getting less than 1 pound of compression
+| which is not even enough to dent the skin.
+| Now try this
+| A really fun experiment to test the compres-
+| sive strength of eggs involves trying to break a
+| raw egg in your bare hands. Have a friend place
+| a raw egg between the palms of your hands.
+| Lock your fingers together and then try to smash
+| the egg. Make sure that you push directly in on
+| the top and bottom and not on the sides. If you
+| do, the egg will break immediately. If you get the
+| compression just right, you’ll find that it is impos-
+| sible to break the egg! Just in case you’re a little
+| nervous about getting egg all over the place, it’s
+| a good idea to try this over a sink.
+| Copyright 1997, Curriculum Associates Inc., Billerica, Mass.
+| diagram 1
+| diagram 2
+| 10March 1997
+text: default page 10
+| This month
+| in history
+| March
+| 1862 — Confederate forces are
+| defeated in the Battle of Glorieta
+| Pass east of Santa Fe
+| 1941 — A group led by Glenn
+| Seaborg demonstrates that pluto-
+| nium is fissionable
+| 1943 — J. Robert Oppenheimer
+| arrives in Santa Fe with select staff to
+| begin setting up for work at the new
+| Laboratory
+| 1945 — The K-25 gaseous diffusion
+| plant at Oak Ridge begins produc-
+| tion of enriched uranium-235
+| 1947 — The New Mexico Legislature
+| passes a bill giving Los Alamos\x20
+| residents the right to vote in state
+| elections
+| 1947 — The first proposal is made to
+| employ Monte Carlo computational
+| techniques to solve complex\x20
+| problems
+| 1951 — Julius and Ethel Rosenberg
+| are sentenced to death for their
+| convictions of passing atomic secrets
+| to the Soviets
+| 1954 — The first thermonuclear
+| bomb containing solid fusion fuel is
+| tested in the Bravo shot in the
+| Pacific
+| 1967 — The last of the Western Area
+| homes in Los Alamos are sold to
+| private individuals
+| 1979 — Voyager I reaches Jupiter
+| 1983 — President Reagan calls on
+| U.S. scientists to develop technical
+| alternatives to the arms race,
+| leading to the Strategic Defense
+| Initiative
+| 1995 — A paper is submitted to
+| Physical Review Letters by Lab
+| researchers who may have found
+| indirect evidence that neutrinos
+| have mass
+| 11
+| Reflections
+| March 1997
+| \x20
+| Crossword
+| puzzle
+| ACROSS
+| 1 Dexterity, nimbleness
+| 7 Computational technique devel-
+| oped at Lab (followed by 23 down)
+| 12 Madness; folly
+| 13 Computer built at Lab under
+| direction of N. Metropolis
+| 14 Measure of volume (alt. sp.)
+| 15 Computer built by Lab\x20
+| and IBM in 1961
+| 16 Mister ___
+| 17 All right
+| 18 Quasi-military Nazi organization
+| 19 Pub
+| 21 First large-scale electronic computer
+| 24 Pretend not to see
+| 26 Gathered
+| 31 Overseer of a manor; steward
+| 32 Disorderly
+| 33 Separate; server
+| 35 State to be true
+| 36 Type of dance
+| 38 Lab division
+| 40 Lab program
+| 42 That is (L., abbrev.)
+| 43 Army rank (abbrev.)
+| 44 Type  of computer that operates
+| with numbers expressed directly
+| 48 High-speed network developed at
+| Lab (acronym)
+| 51 Type of computer that operates
+| with number represented by
+| measurable quantities
+| 52 Degrade; humble
+| 53 Insanely; wildly
+| 54 National genetic sequence data-
+| base set up at Lab
+| DOWN
+| 1 Total; entire
+| 2 Graphic user interface
+| 3 Global system of electronic
+| networks
+| 4 Hog fat
+| 5 Frozen water
+| 6 __ Cobb
+| 7 Spoil
+| 8 Units
+| 9 Young lice
+| 10 Terminal access control (acronym)
+| 11 Imitative repetition
+| 13 Metric ton (abbrev.)
+| 15 Winter sport
+| 17 Unit
+| 19 Feathered flyer
+| 20 US author
+| 21 Build
+| 22 Before noon
+| 23 See 7 across
+| 25 Eggs (L.)
+| 27 Sun
+| 28 Climbing annual plant (2 words)
+| 29 Rim
+| 30 Tints; hues
+| 34 Skeptical exclamation
+| 35 A long time
+| 37 Nothing
+| 39 Type of chees
+| 40 Euphemistic oath
+| 41 Machine for grinding
+| 43 Molecular biology database at Lab
+| (acronym)
+| 45 Woman's name
+| 46 Plaything
+| 47 Tom Udall’s job (abbrev.)
+| 48 Egg-layer
+| 49 Peter __
+| 50 Writing fluid
+| 52 Paseo __ Peralta
+| February solution
+| 1 2 3 4 5 6 7 8 9 10 11
+| 12 13
+| 14 15
+| 16 17 18
+| 19 20 21 22 23
+| 24 25 26 27 28 29 30
+| 31 32
+| 33 34 35
+| 36 37 38
+| 39 40 41 42 43
+| 44 45 46 47 48 49 50
+| 51 52
+| 53 54
+| \x20
+| Computers
+| ACROSS
+| 1 Dexterity, nimbleness
+| 7 Computational technique
+| developed at Lab (followed
+| by 23 down)
+| 1 2 Madness; folly
+| 1 3 Computer built at Lab
+| under direction of N.
+| Metropolis
+| 1 4 Measure of volume (alt.
+| sp.)
+| 1 5 Computer built by Lab and
+| IBM in 1961
+| 1 6 Mister _____
+| 1 7 All right
+| 1 8 Quasi-military Nazi
+| organization
+| 1 9 Pub
+| 2 1 First large-scale
+| electronic computer
+| 2 4 Pretend not to see
+| 2 6 Gathered
+| 3 1 Overseer of a manor;
+| steward
+| 3 2 Disorderly
+| 3 3 Separate; sever
+| 3 5 State to be true
+| 3 6 Type of dance
+| 3 8 Lab division
+| 4 0 Lab program
+| 4 2 That is (L., abbrev.)
+| 4 3 Army rank (abbrev.)
+| 4 4 Type of computer that
+| operates with numbers
+| expressed directly
+| 4 8 High-speed network
+| developed at Lab
+| (acronym)
+| 5 1 Type of computer that
+| operates with number
+| represented by
+| measurable quantities
+| 5 2 Degrade; humble
+| 5 3 Insanely; wildly
+| 5 4 National genetic sequence
+| database set up at Lab
+| DOWN
+| 1 Total; entire
+| 2 Graphic user interface
+| 3 Global system of
+| electronic networks
+| 4 Hog fat
+| 5 Frozen water
+| 6 ___ Cobb
+| 7 Spoil
+| 8 Units
+| 9 Young lice
+| 1 0 Terminal access control
+| (acronym)
+| 1 1 Imitative repetition
+| 1 3 Metric ton (abbrev.)
+| 1 5 Winter sport
+| 1 7 Unit
+| 1 9 Feathered flyer
+| 2 0 US author
+| 2 1 Build
+| 2 2 Before noon
+| 2 3 See 7 across
+| 2 5 Eggs (L.)
+| 2 7 Sun
+| 2 8 Climbing annual plant (2
+| words)
+| 2 9 Rim
+| 3 0 Tints; hues
+| 3 4 Skeptical exclamation
+| 3 5 A long time
+| 3 7 Nothing
+| 3 9 Type of cheese
+| 4 0 Euphemistic oath
+| 4 1 Machine for grinding
+| 4 3 Molecular biology
+| database at Lab
+| (acronym)
+| 4 5 Woman's name
+| 4 6 Plaything
+| 4 7 Tom Udall's job (abbrev.)
+| 4 8 Egg-layer
+| 4 9 Peter ______
+| 5 0 Writing fluid
+| 5 2 Paseo ___ Peralta
+| Syndicated material
+| removed at the
+| request of the
+| syndicate
+| Syndicated
+| material
+| removed at the
+| request of the
+| syndicate
+text: default page 11
+| by John R. Gustafson
+| Last fall I was at an\x20
+| 8th-grade basketball
+| game, wearing a
+| black-and-white
+| striped shirt and
+| carrying a whistle.
+| Toward the end of the
+| game a voice from the
+| stands called out, “Ref,
+| you stink!” only not so
+| politely phrased.
+| I probably did stink.
+| It was my first game
+| as a referee, I was
+| hesitant to blow the whistle and uncertain where to posi-
+| tion myself. And the fan prompted me to ask: Why
+| am I doing this?
+| Many Lab employees — perhaps 100 all told —
+| who spend their spare time officiating basketball, football,
+| soccer and other sports for schools and recreational
+| leagues can answer the question.
+| Phil Romero, a mechanical technician in Materials
+| Management (BUS-4) and leader of the Española basket-
+| ball officials, says, “I just love the sport.” He must. He
+| was in a gym for 18 days straight in
+| January, calling recreational games
+| and school contests.
+| Romero got started when he orga-
+| nized a city basketball league and
+| needed refs for the game. “I got the hang of it
+| quickly and I liked it,” he says. Twenty-one years later
+| he’s still at it.
+| For Kerry Coffelt, a property administrator in Business
+| Support Services (BUS-8) who has been calling varsity
+| sports since 1981, officiating continues a near-lifelong
+| association with sports. “I lived for baseball when I
+| was a kid,” Coffelt says, and as a player and ref “there
+| hasn’t been a summer that I haven’t been involved
+| with a ball game.”
+| Being a ref is “a chance to give something back to
+| the game,” says Matt Hardy, operations shift
+| supervisor in Accelerator Operations and Technical
+| Support (AOT-6), eight-year basketball ref and Los Alamos
+| association leader. “When I was growing up, it was nice to
+| have people involved who cared about the game as much as I
+| did.”
+| “There’s no way you’re going to call a perfect game,”says
+| Danny Lujan, a materials technician in Actinide Process
+| Chemistry (NMT-2), “but you want to work hard, be in
+| position on every play and know you’ve given the kids
+| all you could.”
+| Lujan, a 20-year ref and head of the Santa Fe football
+| and baseball officials, values his role as an
+| educator. “High school sports are an extension of
+| the classroom,” he says. “We are educators
+| working to promote sportsmanship.”
+| Kim Thomas, Physics Division chief of
+| staff, says promoting sportsmanship
+| extends to coaches and fans, too. Thomas,
+| the only woman selected last year to ref the
+| state high school soccer tournament, initiated a
+| local program of “field marshalls” who patrol
+| the sidelines and try to educate fans and coaches
+| on the rules. “Our hope is that as the kids grow,
+| they and their parents will have a better under-
+| standing of the game,” and not be so verbally
+| abusive to refs and opposing players, says
+| Thomas, an eight-year veteran.
+| Verbal — sometimes physical — abuse, travel
+| to distant games and using up a lot of vaca-
+| tion time and goodwill with the boss are some of the
+| negatives of being a ref. But other aspects of the work
+| turn it into an overall positive — otherwise why would
+| people do this?
+| Romero takes pride in providing opportunities for refs to
+| advance, the final reward being selected for state tourna-
+| ments. And, as Coffelt says, when refs let the game
+| proceed fairly and safely so the players alone determine
+| the outcome, they know they’ve called a good game.
+| “Without officials, kids wouldn’t get the opportunity to
+| play,” says Gary Rich, Business Information Systems\x20
+| (CIC-13) group leader and basketball and football ref. “The
+| kids deserve a good official and a fair game. Even after 18
+| years, I still love it. I still get butterflies everytime I walk
+| onto the court.”
+| After most of a season I’m a better ref, hopefully enough
+| improved that the loud-mouthed fan would notice a differ-
+| ence. As to why I’m doing this, I share the sentiments offered
+| above by the other refs. If I stick with ref’ing, I hope in time to
+| share their commitment and determination, too.
+| Reflections
+| Nonprofit Organization
+| U.S. Postage Paid
+| Albuquerque, NM
+| Permit No. 532
+| Reflections
+| Mail Stop C318
+| Los Alamos, NM 87545
+| 12
+| LALP-97-2
+| March 1997
+| You gotta love it
+| Blocking
+| Pushing
+| Technical foul
+| Photo by James E. Rickman; illustrations by Edwin Vigil
+text: sorted page 1
+| \x20
+| Reflections
+| Los Alamos National Laboratory Vol. 2, No. 3 • March 1997
+| Women\x20
+| in our
+| Workplace
+text: sorted page 2
+| \x20
+| Reflections
+| About the cover …
+| This month’s cover, illustrating the wide
+| variety of jobs held by women at the
+| Lab, was prepared by photographer Fred Time will tell
+| Rick and illustrator Ed Vigil. The
+| women shown at their workplaces, While working on this latest issue of “Reflections,”
+| beginning at the upper left corner and which highlights the Women’s Diversity Working Group
+| proceeding clockwise, are Ruth Holt of
+| CIC-1, Tamara Johnson of CST-4, and mentoring efforts for women at the Lab, I couldn’t
+| Virginia Herrera of NIS-4, Beverly help but think how “the face” of management at Los
+| Martin of CIC-12 on assignment to CST- Alamos has changed somewhat since I joined in 1989.\x20
+| 18, Jane Gladson of NMT-4, Jenny Vigil Sure, the number of women and minorities in posi-
+| of BUS-4 and Stephanie Maez of PA-1. tions of “power and influence” at this national facility
+| Inside this issue … are not what many of us would like it to be, considering
+| the makeup of the country. But I must admit, in recent
+| Expanding your horizons . . Page 3 years I have noticed a concerted effort on the part of
+| some to make the Lab’s management a bit more diverse.\x20
+| BUS report: TIPS  . . . . . . . . . Page 4 Still, it was quite a culture shock nearly eight years
+| Reaching out: explosives  . . Page 5 ago when I first skimmed the Lab’s management chart and found no women in top
+| management positions. (I previously worked for an organization in which all the
+| Women’s “power” positions, except for two, were held by women.) As I recall, in 1989, none of
+| History Month . . . . . . Pages 6 and 7 the Lab’s associate directors (who then made up the Lab’ s senior management group)
+| People  . . . . . . . . . . . Pages 8 and 9 were female. If there were women who wielded power and influence at the senior-most
+| management levels — and there very well may have been some — they were not
+| Service anniversaries  . . . . . Page 9 apparent to the casual observer. That is to say, I was not aware of them.
+| Science fun: Eggshell  . . . . Page 10 Fair or not, the message I got at the time was that upper management at the Lab
+| was a male province in which a woman’s role predominantly was that of worker bee.
+| Spotlight: True, many women — and many men — in technical, professional and administrative
+| You gotta love it  . . . . . . . . Page 12 positions have no interest whatsoever in being a manager, senior or otherwise. But at
+| the time, it struck me as strange that despite the women’s movement having peaked
+| across the country, women were nearly invisible at the Lab’s upper management levels.
+| Reflections But time brings change, and if we’re lucky, it’s change for the better. While the Lab
+| still has no permanent female director of a technical division, more women have
+| joined the senior management ranks. A quick look at some numbers supplied by the
+| Reflections, the Laboratory monthly Lab’s Diversity Office confirms this observation.
+| publication for employees and In 1989, there were 24 individuals in “Top Management” positions, which
+| retirees, is published by Public
+| Information (PA-1). The staff is included director, deputy director, associate director, center director, controller, Lab
+| located at TA-3, Building 100, counsel and their deputies. None of these positions were held by a female. Under the
+| and can be reached by e-mail at heading “Associate Management,” which included division leaders, office directors,
+| newsbulletin@lanl.gov, by telephone program directors, test directors and their deputies, eight females were listed out of a
+| at 7-6103, by fax at 5-5552 or by total of 97. Group leaders that year included 48 females (18 staff members; 30 admin-
+| regular Lab mail at Mail Stop C318. istrative staff members) out of 444.
+| The individual telephone numbers
+| are listed below. Stats from the end of 1996 indicate some progress has been made. Females held
+| six of 62 “Top Management” positions (“Top Management” titles being director,
+| Editor:\x20
+| Jacqueline Paris-Chitanvis, 5-7779 deputy director, division director, program director, office director, Laboratory
+| Production coordinator: counsel, director of institutional development and their deputies). The “Associate
+| Denise Bjarke, 7-6103 Management” category has been dropped, but the “Group Leader” category shows
+| Graphic designer: that females held 65 of the 376 group leader positions (40 technical staff members;
+| Edwin Vigil, 5-9205 25 specialist staff members).\x20
+| Photographer: The increase in the number of female managers at the Lab, especially senior
+| Fred Rick, 5-9202 managers, is by no stretch of the imagination awe inspiring. But I do think it’s a
+| Staff writers: noticeable step in the right direction.\x20
+| Steve Sandoval, 5-9206 Will women continue to move into and up the management ranks at the Lab? Will
+| Ternel Martinez, 5-7778 the proverbial glass ceiling that has stopped highly competent women in professions
+| Editorial coordinator: across the country shatter or at least crack here at Los Alamos? I really don’t know, but
+| John A. Webster, 7-5543 I do think continued progress is possible if we don’t rest on our laurels and actively
+| Los Alamos National Laboratory is an
+| Affirmative Action/Equal Opportunity work to ensure that everyone gets her (or his) fair
+| employer. It is operated by the University of chance. But as they say … time will tell.
+| California for the U.S. Department of Energy.
+| March 1997 2
+text: sorted page 3
+| \x20
+| Reflections
+| Expanding your horizons
+| by John A. Webster
+| Since it began at the College of Santa Fe nearly 20 years ago, thousands of\x20
+| high school and middle school girls across Northern New Mexico have been intro-
+| duced to science and math as career possibilities through the Expanding Your
+| Horizons conferences.
+| This year’s conference, scheduled for March 20 at the Laboratory, is expected to
+| attract approximately 100 girls in grades 8 through 10. They will participate in
+| hands-on workshops with women who work in a variety of scientific and technical
+| fields at the Lab and elsewhere.
+| The first EYH conference was held in 1980 at the College of Santa Fe because it
+| had adequate facilities and seemed to be centrally
+| located for many of the participants, recalled Gloria Above: Kathleen Ramsey of the Wildlife
+| Cordova, group leader for Conference and Visit Center in Española holds Roberta, a
+| Management (PA-4) and a member of the first bobcat who joined Ramsey at the 1994
+| steering committee. Expanding Your Horizons conference.
+| From the beginning, the program has been File photo by James E. Rickman
+| received enthusiastically by the more than\x20
+| 13,000 participants. “They are excited and ener- Left: Karen Schultz Paige of
+| getic,” Cordova said. “I remember one wrote on Environmental Systems and Waste
+| an evaluation form: ‘I never knew women did Characterization (CST-7) and Shevonne
+| Romero of San Diego Mission School
+| these things.’” investigate lasers and light during\x20
+| Joyce Guzik of Thermonuclear Applications a workshop at the 1996 conference.\x20
+| (XTA), co-chair with Shirley Herrera of Business
+| File photo by Fred Rick
+| Information Systems (CIC-13) for this year’s confer-
+| ence, said the program began because women in technical
+| professions saw a need.
+| “This is a time in a young woman’s education when she is Paige helps Veronica
+| making important career and college preparation decisions, Grace, left, of Capital
+| and it can make a difference for her to be aware of opportuni- High School and
+| ties that she may not have thought about before,” Guzik said. Tammy Martin of\x20
+| “It’s important for these students to realize the possibility of a St. Michael’s High
+| career in science.” School, center, during a
+| The conference is conducted by Los Alamos Women in laser optics workshop
+| Science, an organization that provides support and assistance in 1994. \x20
+| File photo by LeRoy N. Sanchez
+| for women in scientific and engineering careers and provides
+| mentors and role models for young people. Other support is
+| given by the New Mexico Network for Women in Science and
+| Engineering, by a number of private firms and by organizations\x20
+| around the Laboratory.
+| Guzik said each student can participate in two workshops, one in the
+| morning and one in the afternoon. Workshops are planned in such areas as
+| computer science, life sciences and physical sciences, she said. Each one will
+| be about one hour and 15 minutes long, and they will be limited to about
+| eight girls so that each one can have a chance to participate actively.
+| While the students are participating in the workshops, the teachers and
+| mentors who accompany them from their schools will attend other activities
+| and science demonstrations.
+| All the young women also will participate in a team activity and have
+| the opportunity to hear speakers discuss general subjects of interest. Guzik
+| said the team activity this year will be an “egg drop,” in which the participants will Kelley Mallette of Las Vegas Memorial
+| build egg-cradling containers that they hope will prevent the eggs from breaking School tests water for its oxygen content
+| during the 1994 conference. \x20
+| when dropped from various heights. File photo by LeRoy N. Sanchez
+| 3 March 1997
+text: sorted page 4
+| Reflections
+| TIPS to improve procurement
+| by Ternel Martinez
+| The Business Operations (BUS)
+| and Computing, Information and
+| Communication (CIC) divisions
+| recently took a major step in devel-
+| oping a paperless procurement
+| system by awarding a contract to
+| American Management Systems to
+| help the two organizations develop
+| a customized software package,
+| called the Total Integrated
+| Procurement System.
+| The process for determining
+| what the software package needed
+| to do to improve procurement
+| began about a year ago. That’s
+| when BUS formed focus teams of
+| buyers and representatives from
+| several groups in BUS that deal
+| with procurement in some fashion,
+| such as accounts receivable/
+| payable and receiving.\x20
+| In addition, BUS received\x20
+| input from others, including the
+| Nonproliferation and International
+| Security (NIS), Accelerator
+| Operations and Technology\x20
+| (AOT) and Dynamic
+| Experimentation (DX) divisions,\x20
+| the Science and Technology
+| Advisory Committee, the Product
+| Development/Product Evaluation
+| Committee and several vendors.\x20
+| Dave Delaney of Procurement
+| (BUS-5) and TIPS project leader in Illustration by Edwin Vigil
+| BUS Division said AMS, based in
+| Fairfax, Va., was chosen to help requests online and buyers to perform He also emphasized that CIC and
+| BUS and CIC develop TIPS because its all other procurement functions online AMS currently are exploring the use of
+| desktop software package best met the as well. Other benefits will include a World Wide Web interface that will
+| defined requirements of the Lab’s online guides instructing requestors allow requestors and buyers to access
+| customers and buyers. which procurement venue would best the new procurement system on any
+| “AMS has a proven track record suit their needs (for example, purchase computing platform.
+| in providing state of-the-art, auto- card, just-in-time or regular purchase Complete information on TIPS,
+| mated procurement solutions for request), how to correctly fill out those including the names of those involved
+| such entities as the U.S. Patent forms and the ability to monitor the in the project, implementation plans,
+| Office and the Canadian govern- status of a request online. strategies and the joint application
+| ment,” he said. “When completed, “We understand how important the development reports, is available
+| TIPS will significantly reduce procure- procurement process and systems are online at http://www.bus.lanl.gov:
+| ment turnaround times and process to the successful execution of programs 8001/bus/business/tips/tips.html\x20
+| costs and improve vendor perfor- and projects within the Laboratory. on the World Wide Web. Adobe
+| mance monitoring.” We’re excited by the anticipated Acrobat Reader is required. For more
+| Specifically, he continued, TIPS will improvements TIPS will make to the information on TIPS, contact Delaney
+| allow requestors to submit all types of procurement process,” he added. at 7-8583.
+| March 1997 4
+text: sorted page 5
+| Reflections
+| Students get an explosive demonstration
+| by Steve Sandoval
+| “Have explosive demonstration kit,
+| will travel.” That could be the motto of
+| Mary Campbell of High Explosives
+| Science and Technology (DX-2).
+| Campbell periodically takes small
+| wood blocks, several grams of high
+| explosives, heavy cylindrical steel
+| containers, matches, black powder,
+| which is used in firecrackers, and her
+| see-through Lexan assemble-on-the-fly
+| kit, in which she conducts her demon-
+| strations, and responds to invitations
+| from area schools to, as she puts it,
+| teach children to have “a little respect
+| for what small amounts of explosives
+| can do.”
+| Campbell, a chemist at the Lab for Teacher Margie Propp, center, reacts to an explosives demonstration while her New
+| 20 years, is one of several DX-2 Mexico School for the Deaf middle school students also watch. Mary Campbell of
+| employees who participate in this kind High Explosives Science and Technology (DX-2), at left, conducts demonstrations on
+| of community outreach. One of her the hazards and benefits of high explosives. Photo by Fred Rick
+| most recent demonstrations was for 22
+| sixth- through eighth-grade students from the New Mexico experiments are far away, or in protective concrete bunkers.
+| School for the Deaf in Santa Fe who came to the Lab. “During explosives experiments at the Lab, safety is a serious
+| Schools in Los Alamos and Santa Fe have seen Campbell’s consideration,” Campbell tells the students.
+| demonstration, and a once-a-year kindergarten through Another important point, Campbell tells students,\x20
+| sixth-grade program called “Careers and Curiosity in Math is to make sure to have a bucket of water nearby when\x20
+| and Science” has been used to show what a bang a few using fireworks.
+| milligrams of an explosive commonly found in the home can To illustrate the ignition stimulus necessary to start the
+| make. The program is sponsored by the American explosives process, Campbell takes a match, places the match
+| Association of University Women in partnership with the Lab head on top of a steel block and strikes it with a hammer. The
+| and Los Alamos Public Schools. match ignites because of the force of the hammer and fric-
+| A component of the “Women in Science” career day called tion, Campbell explains.
+| “Expanding Your Horizons” includes a workshop about Next, Campbell burns a string coated with some black
+| explosives that Campbell also teaches, she said. This career powder and partially wrapped with tape; it looks and smells
+| day encourages young women to consider a career in science like a firecracker.
+| and engineering and is sponsored by the New Mexico A fuse with a black powder core is attached to a cap
+| Network for Women in Science and Engineering. containing a half-gram of black powder and fit into a\x20
+| “I think children watch cartoons and think that all explo- hole in a wood block. The explosion makes a loud noise\x20
+| sives do is burn their fingers,” said Campbell. “They think it but doesn’t break the wood block. One NMSD student likened
+| isn’t so bad.” the bang to the popping sound of a firework. “It smells\x20
+| But Campbell is quick to dispel that myth, explaining that like fireworks,” another student told Campbell through\x20
+| as little as a half-gram of a high explosive called PETN, an interpreter.
+| which is primarily used in detonators, can turn a small wood “Explosives are very useful if you want to move things,\x20
+| block into instant toothpicks. like if you want to build a road and have to move rock,”\x20
+| She places the wood block in the steel container and uses a said Campbell.
+| fuse to set off the high explosive. The student observers, on However, as Campbell passed around a piece of\x20
+| this occasion, were amazed by the explosive’s power. shrapnel, a fragment of a piece of steel pipe destroyed in\x20
+| Campbell usually begins her demonstration by showing an explosion, she reminded students that explosives can
+| students viewgraphs that explain what explosives are — cause serious damage.
+| essentially materials that react very fast and produce energy “You may think you know what the experiment will do,
+| and large amounts of gas — how an explosion starts and the but you have to carefully observe to find out what really
+| molecular process of an explosion. happens,” said Campbell. “With all but the tiniest amounts
+| She also shows photographs of explosives tests at the of explosives, the observer must be protected and observed by
+| Lab, quick to point out that employees taking part in the mirrors and cameras.”
+| 5 March 1997
+text: sorted page 6
+| \x20
+| Reflections
+| March is Women’s History Month
+| Judith Mourant As of this writing, an awards ceremony is be a guest speaker at a “Women In Science” symposium\x20
+| Outstanding mentors scheduled from 5:15 to 7 p.m. March 10 in last October.
+| the J. Robert Oppenheimer Study Center. 'Women Helping Women' Women Helping Women is in the process of creating a home
+| Director Sig Hecker is scheduled to be on page on the World Wide Web for more online information.
+| by Ternel Martinez hand to present the winners with their
+| by Steve Sandoval Some group members also plan to help the Lab’s Women’s
+| Outstanding Mentoring Award plaques. Diversity Working Group to prepare and sponsor activities for
+| When the Women’s Diversity Working Group Subcommittee chair Alice Naranjo said when In today’s modern work world where women and minorities are Women’s History Month (see accompanying article).
+| first formed a little more than a year ago, it set the call for nominations first went out late last struggling to compete, the odds against succeeding sometimes Women Helping Women actually came out of a conference
+| out to formally identify, evaluate, select and September, she expected only about
+| Kathleen Jackson seem insurmountable. Sometimes you have to work harder, experi- Warren “Pete” Miller, the Lab’s acting deputy director for science
+| prioritize the most significant issues facing 20 responses. Instead, the ment or try new approaches to solving problems. and technology, attended. Miller was STB director at the time; he
+| women at the Lab. The top four issues subcommittee received 50 nomi- At the Laboratory, a group of women employees in the Science met with some women scientists across the lab, and administrative
+| chosen were mentoring, nation packets. In fact, some and Technology Base (STB) Programs Office formed Women staff of STB to hear from them what kinds of problems they were
+| career development, nominees received multiple Helping Women to support and encourage women in their careers encountering at the Lab, Diedrich recalled.
+| recruitment and nominations. by fostering personal and professional devel- As a result of these meet-
+| dependent care, with Naranjo added the opment, said Gail Diedrich of STB. ings, Diedrich and Becky
+| mentoring having screening process was espe- Women employees of STB voluntarily can ‘A lot of women in this group had Dilello, also of STB, decided to
+| the cially difficult. “The nomi- join the group, said Diedrich. Women Helping schedule a meeting of women
+| highest priority. nations were so strong, we never led a meeting. They have found
+| Ines Triay Women has a code of behavior and developed employees at STB. The
+| While one subcom- wanted to give everyone a mission statement, goals and objectives, that they can do it. It is a very response was overwheming,
+| mittee in the WDWG an award,” she said. she said. Diedrich said.
+| currently is in the Fellow subcommittee satisfying, rewarding experience.’
+| Since the group formed in November 1994, “It sounded to me like we
+| process of developing a member Carla Jacquez two STB employees used their increased skills were blaming others for all
+| formal mentoring said the number of and self-esteem to change fields and earn promotions at the Lab, our problems,” Diedrich summarized the outcome of the initial
+| program for women, awards to be given said Nadine Shea of Nuclear Weapons Technology (NWT) and a meeting with STB administrators. “We thought there must be some
+| another subcommittee — this time actually former STB employee. things we can do.”
+| the career development increased from five Diedrich represented the Lab at a New Mexico First Town At the monthly Women Helping Women meetings, one STB
+| subcommittee (a combina- to seven because of
+| Bill McKerley Hall meeting on strategic planning for the state’s future last member acts as chairperson; she sets the meeting agenda, sched-
+| tion of the upward the quality of the summer in Taos, while Kay Coddens, also of STB, used the team- ules guest speakers and/or facilitators and generally runs the
+| mobility and glass nominations. building and self-confidence skills acquired through the group to meeting, said Diedrich.
+| ceiling subcommittees) — “A lot of women in this group had never led a meeting,”
+| decided to create an Diedrich said. “They have found that they can do it. It is a very
+| award program recognizing and satisfying, rewarding experience.”
+| applauding those who already Women’s Diversity Working Groupa Last September, Jennifer Siders of Electronic and
+| mentor women at the Lab, either Electrochemical Materials and Devices (MST-11) talked to
+| on a formal or informal basis. by Steve Sandoval education program for girls called Environmental Science and Waste Women Helping Women about “Gender Gap in College
+| Thus, seven Lab employees recently were
+| Ron Conrad Careers and Curiosity Program last Technology (CST-7), Carla Jacquez of Admission Tests.” Siders had spoken about the topic at an
+| recognized for their outstanding mentoring The Laboratory’s Women’s Diversity spring, and is interacting with the Water Quality and Hydrology (ESH-18), American Physical Society convention and felt it would be
+| efforts in the inaugural 1997 Career Working Group is only one year old, Laboratory Leadership Council’s Alice Naranjo of Operational applicable for Women Helping Women.
+| Development Mentor Awards Program. but it already counts many successes. mentoring, succession planning and Integration (ESH-OIO), Mary Neu of “I wish I could attend their meetings all the time. I wish
+| Although the person being mentored had to be The 12-person committee has career development action team. Nuclear and Radiochemistry (CST-11), more divisions had them,” Siders said. “They’re really useful
+| a woman, both men and women were eligible formed several subcommittees to deal Other members of the Women’s Amy Regan of Radio Frequency and informative seminars,” she said of the monthly meetings.
+| for the award. with the issues of mentoring, recruit- Diversity Working Group are Diane Technology (AOT-5) and Laura Worl of “It’s nice being in a roomful of women once a month instead\x20
+| The winners are Judith Mourant of ment, career development and depen- Albert of Materials Technology: Advanced Technology (NMT-6). of men.”
+| Bioscience/Biotechnology (CST-4); Kathleen dent care, according to its outgoing Metallurgy (MST-6), incoming chair- The Women’s Diversity Working Group And while Women Helping Women counts several successes,
+| Jackson of the Computing, Information\x20
+| Rebecca Phillips chairperson, Gail Diedrich of the person Linda Anderman of the was created to help address underutiliza- it hasn’t always been easy. “The group has struggled because
+| and Communication Division (CIC-DO); Science and Technology Base (STB) Community Involvement and tion in the workforce and to increase we are diverse,” said Diedrich.
+| Ines Triay of Environmental System and Programs Office. Outreach (CIO) Office, Sandi Borrego of communication on issues that impact the But Shea and Diedrich are impressed by how STB women
+| Waste Characterization (CST-7); Bill McKerley Diedrich said the group among the Staffing Group in the Human Lab’s diversity and affirmative action employees have become more self-confident through Women
+| of Inorganic Elemental Analysis (CST-8); other things researched the develop- Resources (HR) Division, Renita Gurule objectives. Employees interested in Helping Women.
+| Ron Conrad of Hazardous and Solid Waste ment of a Women’s Research Center at Cook of Weapon Materials and learning more about the Women’s “The best thing about the group is that participation is
+| (ESH-19); Rebecca Phillips of the Human the Lab, has participated in Diversity Manufacturing (ESA-WMM), Micheline Diversity Working Group are encour- voluntary, and we create our own agenda,” said Shea. “We’re
+| Resources (HR) Division; and John Phillips of External Advisory Council meetings, Devaurs of Waste Management aged to call the Diversity Office at all there because we want to be there; the interaction has value
+| the Nonproliferation and International Security endorsed the half-day science (EM/WM), Janie Enter of 7-8695 or any member of the group. for us, both personally and professionally.”
+| Division (NIS-DO).\x20
+| John Phillips
+| March 1997 6 7 March 1997
+text: sorted page 7
+| Reflections
+| Bivens named HBCU administrator Petrovic garners
+| Pamela Bivens is the Laboratory’s new program administrator James I. Mueller
+| for Historically Black Colleges and Universities.
+| The program is part of the Science and Technology Memorial Award
+| Base/University Programs (STB/UP) Office. John Petrovic of Ceramic Science and
+| The Historically Black Colleges and Universities program at Technology (MST-4)
+| the Lab focuses on ensuring that students and faculty of under- received the American
+| represented groups in science and technology have a place Ceramic Society’s
+| within their chosen fields of study. James I. Mueller
+| Pamela Bivens The HBCU program offers internships for students to conduct Memorial Award.
+| summer and year-long research with Lab scientists, said Bivens. Petrovic accepted
+| “I feel that my career has brought me to this point where I am in the the award at the
+| capacity to serve students and faculty at historically black colleges and univer- Engineering
+| sities,” said Bivens. “My vision for this program is to position the Lab as the Ceramics Division’s
+| premier national lab for recruiting students and faculty from historically black John Petrovic
+| 21st annual confer-
+| colleges and universities.” ence on Composites, Advanced
+| Bivens earned her bachelor’s degree in 1984 in mass media arts from Ceramics, Materials and Structures in
+| Hampton University. She also has a master’s degree in education and human January in Cocoa Beach, Fla.
+| development from George Washington University. The award is the highest granted by
+| Bivens can be reached at 5-7692 or at mail stop F673. She is located at Technical the Engineering Ceramics Division of
+| Area 3, Building 406, across the street from Occupational Medicine (ESH-2). the American Ceramic Society. It signi-
+| fies outstanding ceramics research and
+| significant contributions to the
+| Engineering Ceramics Division.
+| Darryl Butt receives ceramics award At the Florida meeting, Petrovic
+| also presented the Mueller Memorial
+| Darryl Butt of Materials Butt has worked at the Laboratory Lecture on “High Temperature
+| Technology/Metallurgy (MST-6) has since April 1991. He joined the Lab Structural Silicides” to the starting
+| received the American Ceramic Society as a postdoctoral candidate in the Plenary Session.
+| Award for young scholars. Nuclear Materials Technology Petrovic is the current trustee of
+| The Robert L. Coble Award for (NMT) Division. ACS’ Engineering Ceramics Division.
+| Young Scholars is Butt has a bachelor’s degree in Petrovic has been at the Lab 22
+| named after the late ceramic science and engineering and years. He has bachelor’s, master’s and\x20
+| Massachusetts Institute a doctoral degree in ceramic science,
+| of Technology both from Penn State University. continued on Page 9
+| professor, whose enthu-
+| siasm and creative
+| energy were directed Laboratory technology captures
+| toward putting the field
+| Darryl Butt of ceramics on a sound Popular Science readers choice award
+| scientific foundation.
+| The award recognizes Coble’s life- Technology developed by Craig Taylor of
+| long mission to enhance the achieve- Organic Analysis (CST-12) and Dennis
+| ment and advancement of young Hjeresen of the Environmental Management
+| ceramic scientists. The annual award (EM) Programs Office recently won the
+| recognizes outstanding scholarship in Readers Choice Award from Popular Science
+| an individual under the age of 35. magazine for the top achievement in science
+| Butt, leader of the corrosion and technology.
+| and interfaces team in MST-6, was The annual award lets Popular Science
+| recognized for his research, both magazine readers vote online on the maga- Dennis Hjeresen Craig Taylor
+| experimental and theoretical, in gas- zine’s World Wide Web page.
+| solid reactions, diffusion, thermody- Taylor and Hjeresen share the award with Hughes Environmental Systems
+| namics and laser diagnostics. The Inc., a subsidiary of Hughes Aircraft Co., which is commercializing the tech-
+| award will be presented formally to nology that could revolutionize the dry cleaning industry worldwide.
+| Butt at the annual meeting of the In November, the technology received a “Best of What’s New” from the maga-
+| American Ceramic Society in zine for the system, which replaces harsh dry cleaning chemicals with a liquid
+| Cincinnati in May. carbon dioxide cleaning process.
+| March 1997 8
+text: sorted page 8
+| Reflections
+| Obituaries February employee
+| Patrick Sanchez service anniversaries
+| Patrick Sanchez, 35, of Dixon died Jan. 13. 30 years Ricky Baros, CST-7
+| Sanchez worked as a machinist in Materials Gary Powley, DX-7 Connie Butters, NWT-PO
+| Technology: Metallurgy (MST-6) from September 1980 Seferino Vigil, ESH-1 Larry Byars, EM-ER
+| through February 1996. George Faulkner, P-24
+| Survivors include his parents, Alfonso and Dila Sanchez 25 years Brad Gallimore, ESH-5
+| of Dixon; sisters, Margaret Romero of Española, Kathy James Elliott, EES-5 Gerald Galusha, DX-5
+| Sanchez of Dixon and Lisa Sisneros of New Braunfels, Texas. Michael Martinez, ESH-4 Kay Grady, TSA-3
+| Alex Marusak, NIS-8 Virginia Hamilton, CST-11
+| Linda Mullins, ESA-FM-ESH Brosl Hasslacher, T-13
+| Fredrick John Humphry Victor Hogsett, NIS-8
+| Fredrick John Humphry, 66, of Los 20 years Michael Loibl, ESH-1
+| Alamos died Jan. 16. Hassan Dayem, CIC-DO David Martinez, ESH-1
+| Humphry worked in the Accelerator John Flower, CIC-9 Paul Maudlin, T-3
+| Operations and Technology (AOT) Division Anthony Garcia, EES-1 Benjamin Montoya, NIS-6
+| for 18 years before retiring in 1994. Larry Glick, CST-3 Thomas Norris, TSA-7
+| He is survived by his wife Emily; one Wayne Hansen, EES-15 Larry Pacheco, ESH-1
+| daughter and one son all of Los Alamos; a Orval Hart Jr., ESA-TSE Virginia Rey, ESH-12
+| daughter in Boise, Idaho; two sons on Long Robert Holder, BUS-5 Richard Salazar, NMT-6
+| Fredrick John Island, N.Y.; a brother in Newport News, Norma Jorgensen, NWT-PO David Sanchez, ESH-14
+| Humphry Va.; and mother in Long Island, N.Y. Jack Markin, NIS-DO W.K. Scarborough, MST-4
+| Geraldine Martinez, EES-4 Richard Wood, AOT-1
+| Norman Mayne Jr., FSS-21
+| Bill McCormick, ESA-FM-ESH 10 years
+| Lois McFarland, HR-5 Mark Backus, BUS-5
+| Petrovic garners … Robert Naranjo, CIO 5 years
+| Valarie Prestwood, CIC-13 Angela Cantu, AA-IEO
+| continued from Page 8 Ronald Rabie, DX-2 Michael Duran, ESH-1
+| Yvonne Salaz, QP Mary Gobby, CST-26
+| doctoral degrees in metallurgy from Case Western Reserve Luis Salazar, NWT-PO Michael Johnson, CST-8
+| University in Cleveland, Ohio. Petrovic also is a Lab Fellow Ted Spitzmiller, CIC-6 David Kilcrease, T-4
+| and a Fellow of the American Ceramic Society and the James Stine, DX-2 John Lyles, AOT-5
+| American Society for Materials International. Gary Sullivan, DX-6 Glenn Olah, CST-4
+| Pamela Ulibarri, TSA-9 Gregory Rand, ESA-TSE
+| Trewhella named Yolanda Valdez, LS-4 Jeffrey Roberts, CST-12
+| Laurance Warner, AOT-9 Dianne Roybal, NIS-7
+| member of study section Matthew Sanchez, ESH-3
+| 15 years Donald Shired, CIC-13
+| Jill Trewhella of Bioscience/Biotechnology Jacobo Archuleta, NIS-4 Annette Swift, HR-5
+| (CST-4) has been selected as a member of the Diana Armijo, AA-3 Thomas Terwilliger, LS-8
+| Molecular and Cellular Biophysics Study
+| Section, Division of Research Grants, for the
+| National Institutes of Health.
+| Trewhella’s appointment is through\x20
+| June 30, 2000.
+| Members are selected based on their
+| demonstrated competency and achievement Jill Trewhella
+| in their scientific discipline as evidenced by the
+| quality of their research accomplishments, publication in scien-
+| tific journals and other scientific activities and achievements. There are 370
+| Study sections review grant applications submitted to the
+| National Institutes of Health and make recommendations on trash dumpsters
+| the applications to the appropriate national advisory council at the Lab.
+| or board of the institute. The study sections also survey the
+| status of research in their fields of science.
+| 9 March 1997
+text: sorted page 9
+| \x20
+| Reflections
+| "Science at Home” is a publication developed 6) Weigh and get compressed, they each take up some of the
+| by Science Education Programs (STB/SE) to record the weight stress so no one point on the shell gets over-
+| interest children, particularly those in grades of the books the loaded. For this type of adjustment to take place
+| four through eight, in science through hands- egg shells held. in the shell, the extra weight must be added in a
+| on activities. We are reprinting experiments Do not include the slow, steady fashion. If you were to simply drop
+| from the book, along with other scientific weight of the last two or three books on the eggs, they would
+| activities, for employees to share with their book that crushed the immediately shatter because the compression is
+| families, or just to enjoy themselves. egg shell. Replace any broken shells (crack applied too quickly.Time is a critical element in
+| more eggs if needed) and repeat the experi- allowing the egg to adjust to the stress.That’s
+| Eggshell architecture ment two more times. Record your results why when you drop an egg, it usually breaks no
+| from each trial on a data sheet.When you matter what angle it lands at.
+| You’re walking along carrying a dozen eggs are finished, add the weights from
+| when all of a sudden, the three trials together and Where does this\x20
+| SPLAT! The kitchen divide by three; this is the
+| floor is covered average weight that the four happen in real life?
+| with the makings round eggs can hold. Romans made extensive use of “eggshell
+| of an omelette 7) Do you think the pointed end architecture”, using the principle in building
+| that would make shells will hold more or less domes, arches, and bridges.The use of this
+| Humpty Dumpty proud. weight? Why? Repeat all steps design eliminated the need for columns to
+| How can a chicken egg be so using the pointy eggshells. Predict how many support a roof. Instead, the roof rested solely on
+| fragile when it hits the floor, but so strong when books they will hold. Be sure to record your the outer walls of the building with the weight
+| resting under a chicken? results. Repeat the experiment three times, and distributed evenly throughout the roof.
+| In this activity, you will learn the role that the then come up with an average. Take a look at
+| shape of an object plays in controlling its different buildings
+| 8) Based on your data, which shape
+| strength, and in the process, draw some conclu- in your community
+| eggshell held more weight, the round
+| sions on how forces can be managed so that and see how many
+| or the pointed?
+| bridges and buildings can hold the load. of them employ
+| eggshell archi-
+| The stuff you’ll need What’s going tecture. Look for things
+| like domes, arches
+| Six to 12 raw eggs, a dozen or more books on here? and trusses.
+| to use as weights, a bathroom scale, masking Because eggs are easily Another place that you can see
+| tape, a butter knife, a bowl, a flat surface broken, most people don’t realize diagram 2 how “spreading the weight” helps
+| protected with newspaper, a ruler and a pencil. just how strong an eggshell can to eliminate problems is in a magician’s bed of
+| be.The staff at the Ontario Science Center in nails. If a person weighing 200 pounds were to
+| Here’s the plan Toronto demonstrated that a single egg standing step barefoot on a nail, ouch! But by spreading
+| 1) Use the method below to crack the eggs. on end can support a 90 Kg (200 pound) the 200 pounds over 400 nails, any one nail will
+| You will need four round end shells and four person.The secret behind this strength is the be getting less than 1 pound of compression
+| pointed end shells for each trial. way the shape of the shell transfers the forces which is not even enough to dent the skin.
+| acting on it. All objects that support weight are in
+| How to break an egg and save the shell a constant battle with the force of gravity. An Now try this
+| a) Hold an egg up on end.Use a pencil and object’s weight is equal to its mass multiplied by
+| A really fun experiment to test the compres-
+| ruler to mark the midpoint. Hold the pencil point the force of gravity. On Earth’s surface, gravity is
+| sive strength of eggs involves trying to break a
+| gently against the shell at the mid- always pulling things toward the center of the
+| raw egg in your bare hands. Have a friend place
+| point. Slowly rotate the egg so that a planet, so the more weight resting on an object,
+| a raw egg between the palms of your hands.
+| line is drawn around the middle of the egg. the greater the force acting on the object.
+| Lock your fingers together and then try to smash
+| Place two pieces of masking tape around the egg, Scientists call this action compression.
+| the egg. Make sure that you push directly in on
+| one on each side of the middle line (diagram 1). In some objects, the ability to
+| the top and bottom and not on the sides. If you
+| b) Use the blade of a butter knife to tap withstand compression is
+| do, the egg will break immediately. If you get the
+| along the middle line between the pieces due to a strong, fairly
+| compression just right, you’ll find that it is impos-
+| of tape. rigid internal structure.
+| sible to break the egg! Just in case you’re a little
+| We see this type of
+| c) Once you have cracked the entire nervous about getting egg all over the place, it’s
+| support in things like
+| center, hold the egg over the bowl and a good idea to try this over a sink.
+| high-rise buildings and
+| slowly open it letting the insides drop out. human skeletons. Here, Copyright 1997, Curriculum Associates Inc., Billerica, Mass.
+| d) Refrigerate the raw eggs for future use. compression is coun-
+| 2) Place the round ended shells, with the tered by the strength of the
+| cracked edges down, on a flat surface. diagram 1 steel\x20
+| (or bone) and a great deal\x20
+| 3) You will be placing books on top of the of mass.
+| shells, so adjust them so that each one fits In an egg there is no internal structure, just a
+| about a half inch from the corner of the first bunch of slimy liquid.The shape of the external
+| book. Predict how many pounds of books, if any, shell pushes or transfers the compressive forces
+| you think the shells will hold without breaking. to another area. When a chicken sits on an egg,
+| 4) Place the first book flat on the eggshells or when you stack books on it, the extra weight
+| (diagram 2). generates a greater force of compression on the
+| 5) Continue adding books, keeping them as top of the shell. Because the shell is round, this
+| centered as possible, until one of the egg shells force is then spread evenly in all directions to the
+| is crushed. rest of the shell. As the individual shell sections
+| March 1997 10
+text: sorted page 10
+| \x20
+| \x20
+| Reflections
+| This month
+| in history Syndicated material
+| March
+| 1862 — Confederate forces are
+| defeated in the Battle of Glorieta removed at the
+| Pass east of Santa Fe
+| 1941 — A group led by Glenn
+| Seaborg demonstrates that pluto- request of the
+| nium is fissionable
+| 1943 — J. Robert Oppenheimer
+| arrives in Santa Fe with select staff to syndicate
+| begin setting up for work at the new
+| Laboratory
+| 1945 — The K-25 gaseous diffusion
+| plant at Oak Ridge begins produc-
+| tion of enriched uranium-235
+| 1947 — The New Mexico Legislature
+| passes a bill giving Los Alamos Crossword 48 High-speed network developed at 19 Feathered flyer
+| Lab (acronym) 20 US author
+| residents the right to vote in state 51 Type of computer that operates 21 Build
+| with number represented by 22 Before noon
+| elections puzzle measurable quantities 23 See 7 across
+| 52 Degrade; humble 25 Eggs (L.)
+| 1947 — The first proposal is made to 53 Insanely; wildly 27 Sun
+| ACROSS 54 National genetic sequence data- 28 Climbing annual plant (2 words)
+| employ Monte Carlo computational 1 Dexterity, nimbleness base set up at Lab 29 Rim
+| 7 Computational technique devel-
+| techniques to solve complex 30 Tints; hues
+| oped at Lab (followed by 23 down) DOWN 34 Skeptical exclamation
+| problems 12 Madness; folly 1 Total; entire 35 A long time
+| 13 Computer built at Lab under 2 Graphic user interface 37 Nothing
+| direction of N. Metropolis
+| 1951 — Julius and Ethel Rosenberg 3 Global system of electronic 39 Type of chees
+| 14 Measure of volume (alt. sp.) networks 40 Euphemistic oath
+| are sentenced to death for their 15 Computer built by Lab 4 Hog fat 41 Machine for grinding
+| and IBM in 1961 5 Frozen water 43 Molecular biology database at Lab
+| convictions of passing atomic secrets 16 Mister ___ 6 __ Cobb (acronym)
+| 17 All right
+| to the Soviets 7 Spoil 45 Woman's name
+| 18 Quasi-military Nazi organization 8 Units 46 Plaything
+| 19 Pub 9 Young lice 47 Tom Udall’s job (abbrev.)
+| 1954 — The first thermonuclear 21 First large-scale electronic computer 10 Terminal access control (acronym) 48 Egg-layer
+| bomb containing solid fusion fuel is 24 Pretend not to see 11 Imitative repetition 49 Peter __
+| 26 Gathered 13 Metric ton (abbrev.) 50 Writing fluid
+| tested in the Bravo shot in the 31 Overseer of a manor; steward 15 Winter sport 52 Paseo __ Peralta
+| 32 Disorderly
+| Pacific 17 Unit
+| 33 Separate; server
+| 35 State to be true Computers
+| 1967 — The last of the Western Area 36 Type of dance 1 2 3 4 5 6 7 8 9 10 11
+| 38 Lab division DOWN
+| homes in Los Alamos are sold to 40 Lab program 12 13
+| private individuals 42 That is (L., abbrev.) 1 Total; entire
+| 43 Army rank (abbrev.) 14 15 2 Graphic user interface
+| 44 Type  of computer that operates
+| 1979 — Voyager I reaches Jupiter with numbers expressed directly 16 17 18 3 Global system of
+| electronic networks
+| 1983 — President Reagan calls on February solution 19 20 21 22 23 4 Hog fat
+| U.S. scientists to develop technical 24 25 26 27 28 29 30 5 Frozen water
+| alternatives to the arms race, 6 ___ Cobb
+| Syndicated 31 32
+| leading to the Strategic Defense 7 Spoil
+| Initiative 33 34 35 8 Units
+| material 9 Young lice
+| 36 37 38
+| 1995 — A paper is submitted to 1 0 Terminal access control
+| Physical Review Letters by Lab removed at the 39 40 41 42 43 (acronym)
+| researchers who may have found request of the 1 1 Imitative repetition
+| 44 45 46 47 48 49 50
+| 1 3 Metric ton (abbrev.)
+| indirect evidence that neutrinos syndicate 51 52 1 5 Winter sport
+| have mass 1 7 Unit
+| 53 54
+| 1 9 Feathered flyer
+| 2 0 US author
+| ACROSS 3 3 Separate; sever 2 1 Build
+| 11 3 5 StaMte tao rbceh tr u1e997 2 2 Before noon
+| 1 Dexterity, nimbleness 3 6 Type of dance 2 3 See 7 across
+| 7 Computational technique 3 8 Lab division 2 5 Eggs (L.)
+| developed at Lab (followed 4 0 Lab program 2 7 Sun
+| by 23 down) 4 2 That is (L., abbrev.) 2 8 Climbing annual plant (2
+| 1 2 Madness; folly 4 3 Army rank (abbrev.) words)
+| 1 3 Computer built at Lab 4 4 Type of computer that 2 9 Rim
+| under direction of N. operates with numbers 3 0 Tints; hues
+| Metropolis expressed directly 3 4 Skeptical exclamation
+| 1 4 Measure of volume (alt. 4 8 High-speed network 3 5 A long time
+| sp.) developed at Lab 3 7 Nothing
+| 1 5 Computer built by Lab and (acronym) 3 9 Type of cheese
+| IBM in 1961 5 1 Type of computer that 4 0 Euphemistic oath
+| 1 6 Mister _____ operates with number 4 1 Machine for grinding
+| 1 7 All right represented by 4 3 Molecular biology
+| 1 8 Quasi-military Nazi measurable quantities database at Lab
+| organization 5 2 Degrade; humble (acronym)
+| 1 9 Pub 5 3 Insanely; wildly 4 5 Woman's name
+| 2 1 First large-scale 5 4 National genetic sequence 4 6 Plaything
+| electronic computer database set up at Lab 4 7 Tom Udall's job (abbrev.)
+| 2 4 Pretend not to see 4 8 Egg-layer
+| 2 6 Gathered 4 9 Peter ______
+| 3 1 Overseer of a manor; 5 0 Writing fluid
+| steward 5 2 Paseo ___ Peralta
+| 3 2 Disorderly
+text: sorted page 11
+| Reflections
+| You gotta love it
+| Chemistry (NMT-2), “but you want to work hard, be in
+| position on every play and know you’ve given the kids
+| all you could.”
+| Lujan, a 20-year ref and head of the Santa Fe football
+| and baseball officials, values his role as an
+| by John R. Gustafson educator. “High school sports are an extension of
+| the classroom,” he says. “We are educators
+| Last fall I was at an working to promote sportsmanship.”
+| 8th-grade basketball Kim Thomas, Physics Division chief of
+| game, wearing a staff, says promoting sportsmanship
+| black-and-white extends to coaches and fans, too. Thomas,
+| striped shirt and the only woman selected last year to ref the
+| carrying a whistle. state high school soccer tournament, initiated a
+| Toward the end of the local program of “field marshalls” who patrol
+| game a voice from the the sidelines and try to educate fans and coaches
+| stands called out, “Ref, on the rules. “Our hope is that as the kids grow,
+| you stink!” only not so they and their parents will have a better under-
+| politely phrased. standing of the game,” and not be so verbally
+| I probably did stink. abusive to refs and opposing players, says
+| It was my first game Thomas, an eight-year veteran.
+| Photo by James E. Rickman; illustrations by Edwin Vigil as a referee, I was Verbal — sometimes physical — abuse, travel Blocking
+| hesitant to blow the whistle and uncertain where to posi- to distant games and using up a lot of vaca-
+| tion myself. And the fan prompted me to ask: Why tion time and goodwill with the boss are some of the
+| am I doing this? negatives of being a ref. But other aspects of the work
+| Many Lab employees — perhaps 100 all told — turn it into an overall positive — otherwise why would
+| who spend their spare time officiating basketball, football, people do this?
+| soccer and other sports for schools and recreational Romero takes pride in providing opportunities for refs to
+| leagues can answer the question. advance, the final reward being selected for state tourna-
+| Phil Romero, a mechanical technician in Materials ments. And, as Coffelt says, when refs let the game
+| Management (BUS-4) and leader of the Española basket- proceed fairly and safely so the players alone determine
+| ball officials, says, “I just love the sport.” He must. He the outcome, they know they’ve called a good game.
+| was in a gym for 18 days straight in “Without officials, kids wouldn’t get the opportunity to
+| January, calling recreational games play,” says Gary Rich, Business Information Systems\x20
+| and school contests. (CIC-13) group leader and basketball and football ref. “The
+| Romero got started when he orga- kids deserve a good official and a fair game. Even after 18
+| nized a city basketball league and years, I still love it. I still get butterflies everytime I walk
+| needed refs for the game. “I got the hang of it Technical foul onto the court.”
+| quickly and I liked it,” he says. Twenty-one years later After most of a season I’m a better ref, hopefully enough
+| he’s still at it. improved that the loud-mouthed fan would notice a differ-
+| For Kerry Coffelt, a property administrator in Business ence. As to why I’m doing this, I share the sentiments offered
+| Support Services (BUS-8) who has been calling varsity above by the other refs. If I stick with ref’ing, I hope in time to
+| sports since 1981, officiating continues a near-lifelong share their commitment and determination, too.
+| association with sports. “I lived for baseball when I
+| was a kid,” Coffelt says, and as a player and ref “there Reflections Nonprofit Organization
+| U.S. Postage Paid
+| hasn’t been a summer that I haven’t been involved Mail Stop C318 Albuquerque, NM
+| with a ball game.” Los Alamos, NM 87545 Permit No. 532
+| Being a ref is “a chance to give something back to
+| Pushing the game,” says Matt Hardy, operations shift
+| supervisor in Accelerator Operations and Technical
+| Support (AOT-6), eight-year basketball ref and Los Alamos
+| association leader. “When I was growing up, it was nice to
+| have people involved who cared about the game as much as I
+| did.”
+| “There’s no way you’re going to call a perfect game,”says
+| Danny Lujan, a materials technician in Actinide Process LALP-97-2
+| March 1997 12
+text: range 2-3
+| \x20
+| 2
+| Reflections
+| Reflections
+| Reflections, the Laboratory monthly
+| publication for employees and
+| retirees, is published by Public
+| Information (PA-1). The staff is
+| located at TA-3, Building 100,\x20
+| and can be reached by e-mail at
+| newsbulletin@lanl.gov, by telephone
+| at 7-6103, by fax at 5-5552 or by
+| regular Lab mail at Mail Stop C318.
+| The individual telephone numbers
+| are listed below.
+| Editor:\x20
+| Jacqueline Paris-Chitanvis, 5-7779
+| Production coordinator:\x20
+| Denise Bjarke, 7-6103
+| Graphic designer:
+| Edwin Vigil, 5-9205
+| Photographer:\x20
+| Fred Rick, 5-9202
+| Staff writers:\x20
+| Steve Sandoval, 5-9206
+| Ternel Martinez, 5-7778
+| Editorial coordinator:\x20
+| John A. Webster, 7-5543
+| Los Alamos National Laboratory is an
+| Affirmative Action/Equal Opportunity
+| employer. It is operated by the University of
+| California for the U.S. Department of Energy.
+| About the cover …
+| This month’s cover, illustrating the wide
+| variety of jobs held by women at the
+| Lab, was prepared by photographer Fred
+| Rick and illustrator Ed Vigil. The
+| women shown at their workplaces,
+| beginning at the upper left corner and
+| proceeding clockwise, are Ruth Holt of
+| CIC-1, Tamara Johnson of CST-4,
+| Virginia Herrera of NIS-4, Beverly
+| Martin of CIC-12 on assignment to CST-
+| 18, Jane Gladson of NMT-4, Jenny Vigil
+| of BUS-4 and Stephanie Maez of PA-1.
+| Inside this issue …
+| Expanding your horizons . . Page 3
+| BUS report: TIPS  . . . . . . . . . Page 4
+| Reaching out: explosives  . . Page 5
+| Women’s\x20
+| History Month . . . . . . Pages 6 and 7
+| People  . . . . . . . . . . . Pages 8 and 9
+| Service anniversaries  . . . . . Page 9
+| Science fun: Eggshell  . . . . Page 10
+| Spotlight:\x20
+| You gotta love it  . . . . . . . . Page 12
+| Time will tell
+| While working on this latest issue of “Reflections,”
+| which highlights the Women’s Diversity Working Group
+| and mentoring efforts for women at the Lab, I couldn’t
+| help but think how “the face” of management at Los
+| Alamos has changed somewhat since I joined in 1989.\x20
+| Sure, the number of women and minorities in posi-
+| tions of “power and influence” at this national facility
+| are not what many of us would like it to be, considering
+| the makeup of the country. But I must admit, in recent
+| years I have noticed a concerted effort on the part of
+| some to make the Lab’s management a bit more diverse.\x20
+| Still, it was quite a culture shock nearly eight years
+| ago when I first skimmed the Lab’s management chart and found no women in top
+| management positions. (I previously worked for an organization in which all the
+| “power” positions, except for two, were held by women.) As I recall, in 1989, none of
+| the Lab’s associate directors (who then made up the Lab’ s senior management group)
+| were female. If there were women who wielded power and influence at the senior-most
+| management levels — and there very well may have been some — they were not
+| apparent to the casual observer. That is to say, I was not aware of them.
+| Fair or not, the message I got at the time was that upper management at the Lab
+| was a male province in which a woman’s role predominantly was that of worker bee.
+| True, many women — and many men — in technical, professional and administrative
+| positions have no interest whatsoever in being a manager, senior or otherwise. But at
+| the time, it struck me as strange that despite the women’s movement having peaked
+| across the country, women were nearly invisible at the Lab’s upper management levels.
+| But time brings change, and if we’re lucky, it’s change for the better. While the Lab
+| still has no permanent female director of a technical division, more women have
+| joined the senior management ranks. A quick look at some numbers supplied by the
+| Lab’s Diversity Office confirms this observation.
+| In 1989, there were 24 individuals in “Top Management” positions, which
+| included director, deputy director, associate director, center director, controller, Lab
+| counsel and their deputies. None of these positions were held by a female. Under the
+| heading “Associate Management,” which included division leaders, office directors,
+| program directors, test directors and their deputies, eight females were listed out of a
+| total of 97. Group leaders that year included 48 females (18 staff members; 30 admin-
+| istrative staff members) out of 444.
+| Stats from the end of 1996 indicate some progress has been made. Females held
+| six of 62 “Top Management” positions (“Top Management” titles being director,
+| deputy director, division director, program director, office director, Laboratory
+| counsel, director of institutional development and their deputies). The “Associate
+| Management” category has been dropped, but the “Group Leader” category shows
+| that females held 65 of the 376 group leader positions (40 technical staff members;
+| 25 specialist staff members).\x20
+| The increase in the number of female managers at the Lab, especially senior
+| managers, is by no stretch of the imagination awe inspiring. But I do think it’s a
+| noticeable step in the right direction.\x20
+| Will women continue to move into and up the management ranks at the Lab? Will
+| the proverbial glass ceiling that has stopped highly competent women in professions
+| across the country shatter or at least crack here at Los Alamos? I really don’t know, but
+| I do think continued progress is possible if we don’t rest on our laurels and actively
+| work to ensure that everyone gets her (or his) fair
+| chance. But as they say … time will tell.
+| March 1997
+| 3
+| Reflections
+| Expanding your horizons
+| March 1997
+| \x20
+| by John A. Webster
+| Since it began at the College of Santa Fe nearly 20 years ago, thousands of\x20
+| high school and middle school girls across Northern New Mexico have been intro-
+| duced to science and math as career possibilities through the Expanding Your
+| Horizons conferences.
+| This year’s conference, scheduled for March 20 at the Laboratory, is expected to
+| attract approximately 100 girls in grades 8 through 10. They will participate in
+| hands-on workshops with women who work in a variety of scientific and technical
+| fields at the Lab and elsewhere.
+| The first EYH conference was held in 1980 at the College of Santa Fe because it
+| had adequate facilities and seemed to be centrally
+| located for many of the participants, recalled Gloria
+| Cordova, group leader for Conference and Visit
+| Management (PA-4) and a member of the first
+| steering committee.
+| From the beginning, the program has been
+| received enthusiastically by the more than\x20
+| 13,000 participants. “They are excited and ener-
+| getic,” Cordova said. “I remember one wrote on
+| an evaluation form: ‘I never knew women did
+| these things.’”
+| Joyce Guzik of Thermonuclear Applications
+| (XTA), co-chair with Shirley Herrera of Business
+| Information Systems (CIC-13) for this year’s confer-
+| ence, said the program began because women in technical
+| professions saw a need.
+| “This is a time in a young woman’s education when she is
+| making important career and college preparation decisions,
+| and it can make a difference for her to be aware of opportuni-
+| ties that she may not have thought about before,” Guzik said.
+| “It’s important for these students to realize the possibility of a
+| career in science.”
+| The conference is conducted by Los Alamos Women in
+| Science, an organization that provides support and assistance
+| for women in scientific and engineering careers and provides
+| mentors and role models for young people. Other support is
+| given by the New Mexico Network for Women in Science and
+| Engineering, by a number of private firms and by organizations\x20
+| around the Laboratory.
+| Guzik said each student can participate in two workshops, one in the
+| morning and one in the afternoon. Workshops are planned in such areas as
+| computer science, life sciences and physical sciences, she said. Each one will
+| be about one hour and 15 minutes long, and they will be limited to about
+| eight girls so that each one can have a chance to participate actively.
+| While the students are participating in the workshops, the teachers and
+| mentors who accompany them from their schools will attend other activities
+| and science demonstrations.
+| All the young women also will participate in a team activity and have
+| the opportunity to hear speakers discuss general subjects of interest. Guzik
+| said the team activity this year will be an “egg drop,” in which the participants will
+| build egg-cradling containers that they hope will prevent the eggs from breaking
+| when dropped from various heights.
+| Above: Kathleen Ramsey of the Wildlife
+| Center in Española holds Roberta, a
+| bobcat who joined Ramsey at the 1994
+| Expanding Your Horizons conference.
+| File photo by James E. Rickman
+| Left: Karen Schultz Paige of
+| Environmental Systems and Waste
+| Characterization (CST-7) and Shevonne
+| Romero of San Diego Mission School
+| investigate lasers and light during\x20
+| a workshop at the 1996 conference.\x20
+| File photo by Fred Rick
+| Paige helps Veronica
+| Grace, left, of Capital
+| High School and
+| Tammy Martin of\x20
+| St. Michael’s High
+| School, center, during a
+| laser optics workshop
+| in 1994. \x20
+| File photo by LeRoy N. Sanchez
+| Kelley Mallette of Las Vegas Memorial
+| School tests water for its oxygen content
+| during the 1994 conference. \x20
+| File photo by LeRoy N. Sanchez
+text: separators 1-2
+| <PAGE><A><P> <EOL>
+| </P><P>Los Alamos National Laboratory<W>Vol. 2, No. 3 • March 1997<EOL>
+| </P><P>Reflections<EOL>
+| </P><P>Women <EOL>
+| in our<EOL>
+| </P><P>Workplace</P></A></PAGE>
+| <PAGE><A><P> <EOL>
+| </P><P>2<EOL>
+| </P><P>Reflections<EOL>
+| </P><P>Reflections<EOL>
+| Reflections, the Laboratory monthly<EOL>
+| publication for employees and<EOL>
+| retirees, is published by Public<EOL>
+| Information (PA-1). The staff is<EOL>
+| located at TA-3,<W>Building 100, <EOL>
+| and can be reached by e-mail at<EOL>
+| newsbulletin@lanl.gov, by telephone<EOL>
+| at 7-6103, by fax at 5-5552 or by<EOL>
+| regular Lab mail at Mail Stop C318.<EOL>
+| The individual telephone numbers<EOL>
+| are listed below.<EOL>
+| </P><P>Editor: <EOL>
+| Jacqueline Paris-Chitanvis, 5-7779<EOL>
+| </P><P>Production coordinator: <EOL>
+| Denise Bjarke, 7-6103<EOL>
+| </P><P>Graphic designer:<EOL>
+| Edwin Vigil, 5-9205<EOL>
+| </P><P>Photographer: <EOL>
+| Fred Rick, 5-9202<EOL>
+| </P><P>Staff writers: <EOL>
+| Steve Sandoval, 5-9206<EOL>
+| Ternel Martinez, 5-7778<EOL>
+| Editorial coordinator: <EOL>
+| John A. Webster, 7-5543<EOL>
+| </P><P>Los Alamos National Laboratory is an<EOL>
+| Affirmative Action/Equal Opportunity<EOL>
+| employer. It is operated by the University of<EOL>
+| California for the U.S. Department of Energy.<EOL>
+| </P><P>About the cover …<EOL>
+| This month’s cover, illustrating the wide<EOL>
+| variety of jobs held by women at the<EOL>
+| Lab, was prepared by photographer Fred<EOL>
+| Rick and illustrator Ed Vigil. The<EOL>
+| women shown at their workplaces,<EOL>
+| beginning at the upper left corner and<EOL>
+| proceeding clockwise, are Ruth Holt of<EOL>
+| CIC-1, Tamara Johnson of CST-4,<EOL>
+| Virginia Herrera of NIS-4, Beverly<EOL>
+| Martin of CIC-12 on assignment to CST-<EOL>
+| 18, Jane Gladson of NMT-4, Jenny Vigil<EOL>
+| of BUS-4 and Stephanie Maez of PA-1.<EOL>
+| </P><P>Inside this issue …<EOL>
+| Expanding your horizons . .<W>Page 3<EOL>
+| </P><P>BUS report: TIPS  . . . . . . . . .<W>Page 4<EOL>
+| </P><P>Reaching out: explosives  . .<W>Page 5<EOL>
+| </P><P>Women’s <EOL>
+| History Month . . . . . .<W>Pages 6 and 7<EOL>
+| </P><P>People<W> . . . . . . . . . . .<W>Pages 8 and 9<EOL>
+| </P><P>Service anniversaries<W> . . . . .<W>Page 9<EOL>
+| </P><P>Science fun: Eggshell <W> . . . .<W>Page 10<EOL>
+| </P><P>Spotlight: <EOL>
+| You gotta love it<W> . . . . . . . .<W>Page 12<EOL>
+| </P><P>Time will tell<EOL>
+| While working on this latest issue of “Reflections,”<EOL>
+| </P><P>which highlights the Women’s Diversity Working Group<EOL>
+| and mentoring efforts for women at the Lab, I couldn’t<EOL>
+| help but think how “the face” of management at Los<EOL>
+| Alamos has changed somewhat since I joined in 1989. <EOL>
+| </P><P>Sure, the number of women and minorities in posi-<EOL>
+| tions of “power and influence” at this national facility<EOL>
+| are not what many of us would like it to be, considering<EOL>
+| the makeup of the country. But I must admit, in recent<EOL>
+| years I have noticed a concerted effort on the part of<EOL>
+| some to make the Lab’s management a bit more diverse. <EOL>
+| </P><P>Still, it was quite a culture shock nearly eight years<EOL>
+| ago when I first skimmed the Lab’s management chart and found no women in top<EOL>
+| management positions. (I previously worked for an organization in which all the<EOL>
+| “power” positions, except for two, were held by women.) As I recall, in 1989, none of<EOL>
+| the Lab’s associate directors (who then made up the Lab’ s senior management group)<EOL>
+| were female. If there were women who wielded power and influence at the senior-most<EOL>
+| management levels — and there very well may have been some — they were not<EOL>
+| apparent to the casual observer. That is to say, I was not aware of them.<EOL>
+| </P><P>Fair or not, the message I got at the time was that upper management at the Lab<EOL>
+| was a male province in which a woman’s role predominantly was that of worker bee.<EOL>
+| True, many women — and many men — in technical, professional and administrative<EOL>
+| positions have no interest whatsoever in being a manager, senior or otherwise. But at<EOL>
+| the time, it struck me as strange that despite the women’s movement having peaked<EOL>
+| across the country, women were nearly invisible at the Lab’s upper management levels.<EOL>
+| </P><P>But time brings change, and if we’re lucky, it’s change for the better. While the Lab<EOL>
+| still has no permanent female director of a technical division, more women have<EOL>
+| joined the senior management ranks. A quick look at some numbers supplied by the<EOL>
+| Lab’s Diversity Office confirms this observation.<EOL>
+| </P><P>In 1989, there were 24 individuals in “Top Management” positions, which<EOL>
+| included director, deputy director, associate director, center director, controller, Lab<EOL>
+| counsel and their deputies. None of these positions were held by a female. Under the<EOL>
+| heading “Associate Management,” which included division leaders, office directors,<EOL>
+| program directors, test directors and their deputies, eight females were listed out of a<EOL>
+| total of 97. Group leaders that year included 48 females (18 staff members; 30 admin-<EOL>
+| istrative staff members) out of 444.<EOL>
+| </P><P>Stats from the end of 1996 indicate some progress has been made. Females held<EOL>
+| six of 62 “Top Management” positions (“Top Management” titles being director,<EOL>
+| deputy director, division director, program director, office director, Laboratory<EOL>
+| counsel, director of institutional development and their deputies). The “Associate<EOL>
+| Management” category has been dropped, but the “Group Leader” category shows<EOL>
+| that females held 65 of the 376 group leader positions (40 technical staff members;<EOL>
+| 25 specialist staff members). <EOL>
+| </P><P>The increase in the number of female managers at the Lab, especially senior<EOL>
+| managers, is by no stretch of the imagination awe inspiring. But I do think it’s a<EOL>
+| noticeable step in the right direction. <EOL>
+| </P><P>Will women continue to move into and up the management ranks at the Lab? Will<EOL>
+| the proverbial glass ceiling that has stopped highly competent women in professions<EOL>
+| across the country shatter or at least crack here at Los Alamos? I really don’t know, but<EOL>
+| I do think continued progress is possible if we don’t rest on our laurels and actively<EOL>
+| work to ensure that everyone gets her (or his) fair<EOL>
+| chance. But as they say … time will tell.<EOL>
+| </P><P>March 1997</P></A></PAGE>

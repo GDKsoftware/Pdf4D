@@ -1,0 +1,67 @@
+text: default page 1
+| Amazing title
+| Table of Contents
+| Document 2 heading 1..........................................................................................................................1
+| Here’s a 2nd heading.........................................................................................................................1
+| Another sub-section......................................................................................................................... 1
+| Subsection on a new page................................................................................................................2
+| Doc 3 H1...............................................................................................................................................3
+| third doc subheading........................................................................................................................3
+| Document 2 heading 1
+| Here’s a 2nd heading
+| And some related text
+| Another sub-section
+| And this sub section’s text
+text: default page 2
+| Subsection on a new page
+| Some great text
+text: default page 3
+| Doc 3 H1
+| Third chapter
+| third doc subheading
+| With some important contents
+text: sorted page 1
+| Amazing title
+| Table of Contents
+| Document 2 heading 1..........................................................................................................................1
+| Here’s a 2nd heading.........................................................................................................................1
+| Another sub-section......................................................................................................................... 1
+| Subsection on a new page................................................................................................................2
+| Doc 3 H1...............................................................................................................................................3
+| third doc subheading........................................................................................................................3
+| Document 2 heading 1
+| Here’s a 2nd heading
+| And some related text
+| Another sub-section
+| And this sub section’s text
+text: sorted page 2
+| Subsection on a new page
+| Some great text
+text: sorted page 3
+| Doc 3 H1
+| Third chapter
+| third doc subheading
+| With some important contents
+text: range 2-3
+| Subsection on a new page
+| Some great text
+| Doc 3 H1
+| Third chapter
+| third doc subheading
+| With some important contents
+text: separators 1-2
+| <PAGE><A><P>Amazing title<EOL>
+| </P><P>Table of Contents<EOL>
+| Document 2 heading 1..........................................................................................................................1<EOL>
+| </P><P>Here’s a 2nd heading.........................................................................................................................1<EOL>
+| Another sub-section.........................................................................................................................<W>1<EOL>
+| Subsection on a new page................................................................................................................2<EOL>
+| </P><P>Doc 3 H1...............................................................................................................................................3<EOL>
+| third doc subheading........................................................................................................................3<EOL>
+| </P><P>Document 2 heading 1<EOL>
+| </P><P>Here’s a 2nd heading<EOL>
+| </P><P>And some related text<EOL>
+| </P><P>Another sub-section<EOL>
+| </P><P>And this sub section’s text</P></A></PAGE>
+| <PAGE><A><P>Subsection on a new page<EOL>
+| Some great text</P></A></PAGE>

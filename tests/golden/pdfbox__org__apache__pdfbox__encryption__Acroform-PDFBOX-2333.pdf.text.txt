@@ -1,0 +1,10 @@
+text: default page 1
+| PDFBox Testfiles - Forms AlignmentTest
+| Copyright © 2014 The Apache Software Foundation
+text: sorted page 1
+| PDFBox Testfiles - Forms AlignmentTest
+| Copyright © 2014 The Apache Software Foundation
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>PDFBox Testfiles - Forms<W>AlignmentTest<EOL>
+| </P><P>Copyright © 2014 The Apache Software Foundation</P></A></PAGE>

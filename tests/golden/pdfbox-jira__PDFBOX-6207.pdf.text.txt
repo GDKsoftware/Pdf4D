@@ -1,0 +1,702 @@
+text: default page 1
+| privat geschäftlich
+| privat geschäftlich
+| Nur für den internen Gebrauch
+| Betriebsnummer: Berater:
+| Neuwagen
+| Gebrauchtwagen
+| Flotte
+| Service
+| PKW
+| PKW
+| PKW
+| PKW
+| Ersatzteilverkauf
+| Kundenmanagement CRM / KDM
+| smart
+| smart
+| smart
+| smart
+| Trapo
+| Trapo
+| Trapo
+| Trapo
+| BDC Call Center
+| Datenschutz- und Einwilligungserklärung
+| für Direktmarketing
+| Wir möchten Sie gerne individuell und Ihren Interessen entsprechend informieren und beraten (z.B. über
+| Probefahrten, Veranstaltungen, besondere Angebote, Serviceleistungen während eines Händlerbesuchs).
+| Deshalb bitten wir Sie, der Verwendung Ihrer Daten für diese Zwecke zuzustimmen. Wir werden diese
+| vertrauensvoll behandeln und sorgsam damit umgehen.
+| Name
+| Anrede / Titel
+| Adresszusatz (z.B. Firma)
+| Vorname
+| Straße, Haus-Nr.
+| E-Mail
+| Land, PLZ, Ort
+| Telefon
+| DSE_Blanko / Version 5.17.00 Seite 1 von 3
+text: default page 2
+| Unterschrift
+| Individuelle Einwilligung
+| Ja, ich möchte von der Jürgens Automobile GmbH,
+| Wittekindstraße 99, 44139 Dortmund, Deutschland individuell
+| und meinen Interessen entsprechend (Profilbildung) über
+| deren Produkte und Dienstleistungen sowie die der
+| Mercedes-Benz Group AG und ihrer verbundenen Unternehmen
+| wie folgt informiert und beraten werden:
+| Mercedes-Benz Ökosystem Einwilligung
+|   Ja, ich möchte unabhängig von der Individuellen
+|  Einwilligung über die oben von mir gewählten Formen der
+|  Ansprache auch von den Mercedes-Benz Ökosystem
+|  Gesellschaften individuell und meinen Interessen
+|  entsprechend (Profilbildung) über Produkte und
+|  Dienstleistungen der Mercedes-Benz Group AG und deren
+|  verbundene Unternehmen, einschließlich der Mercedes-
+|  Benz Ökosystem Gesellschaften informiert und beraten
+|  werden.
+| Durch Ankreuzen dieses Kästchens willige ich in die Verarbei-
+| tung und die Weitergabe meiner personenbezogenen Daten
+| von und unter den Mercedes-Benz Ökosystem Gesellschaften,
+| jeder als einzelner Verantwortlicher, für die vorstehenden
+| Zwecke ein.
+| Genutzte personenbezogene Daten
+| 1. Mein Name und meine Kontaktdaten (z.B. Anschrift, E-
+| Mailadresse, Telefonnummer, Messenger ID, Adresse in
+| sozialen Netzwerken),
+| 2. Details zu meiner Person (z.B. Hobbys, Interessen, Anzahl
+| an Personen, die in meinem Haushalt leben),
+| 3. Daten zu meinem Fahrzeug (z.B. Fahrzeugkonfiguration,
+| Kilometerstand, Daten aus dem digitalen Serviceheft), und
+| 4. Informationen über gekaufte Produkte und in Anspruch
+| genommene Services (z.B. Leasingverträge, gebuchte
+| Mercedes me Dienste, gespeicherte Fahrzeugkonfi-
+| gurationen)
+| Mercedes-Benz Ökosystem Gesellschaften
+| 1. Mercedes-Benz AG einschließlich ihres autorisierten
+| Händlers und autorisierten Servicepartners, die örtlich am
+| nächsten zu der von mir angegebenen Adresse gelegen
+| sind, der autorisierte Händler und autorisierte
+| Servicepartner der Mercedes-Benz AG, mit denen ich in
+| Kontakt getreten bin oder die ich als bevorzugte Händler
+| oder bevorzugte Servicepartner ausgewählt habe,
+| 2. Mercedes-Benz Bank AG,
+| 3. Mercedes-Benz Versicherung AG,
+| 4. Mercedes-Benz Automotive Mobility GmbH,
+| 5. Mercedes-Benz Connectivity Services GmbH,
+| 6. Mercedes-Benz Leasing Deutschland GmbH,
+| 7. Mercedes pay GmbH
+| 8. Mercedes-AMG GmbH
+| und deren Rechtsnachfolger.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von der  Jürgens Automobile GmbH,
+| Wittekindstraße 99, 44139 Dortmund, Deutschland
+| erhalten.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von allen anderen Mercedes-Benz Ökosystem
+| Gesellschaften erhalten.
+| Datum:\x20
+| per Telefon (persönliche Anrufe)
+| per elektronischer Post (insb. E-Mail, SMS, Messenger)
+| Durch Ankreuzen dieser Kästchen willige ich in die
+| Verarbeitung meiner personenbezogenen Daten zu den
+| vorstehenden Zwecken ein.
+| Freiwilligkeit und Widerspruchsrecht
+| Die Erklärung Ihrer Einwilligung(en) ist freiwillig. Sie können
+| Ihre Einwilligung(en) jederzeit widerrufen oder der Verarbei-
+| tung Ihrer personenbezogenen Daten zu Direktmarketing-
+| zwecken jederzeit widersprechen. Soweit Sie Ihre Einwilligung
+| nicht erklären oder sie widerrufen, können wir und/oder die
+| Mercedes-Benz Ökosystem Gesellschaften Sie nicht mit
+| Informationen und Beratung zu unseren Produkten und
+| Dienstleistungen kontaktieren.
+| Postalischer Versand
+| Unabhängig von der Einwilligung werden wir und /oder die
+| Mercedes-Benz Ökosystem Gesellschaften Ihre personenbe-
+| zogenen Daten jeweils auch nutzen, um Sie mit Informationen
+| und Beratung über unsere Produkte und Dienstleistungen per
+| Post zu kontaktieren.
+| Wenn Sie solche Informationen per Post nicht (mehr) erhalten
+| möchten, wählen Sie bitte die untenstehenden Kästchen aus:
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Profilbildung
+| Um Ihnen die vorstehenden individualisierten und Ihren
+| Interessen entsprechenden Informationen und Beratungen
+| schriftlich, persönlich oder über den von Ihnen gewählten
+| Kontaktkanal unterbreiten zu können, können Analyse-
+| verfahren einschließlich Profilbildung verwendet werden.
+| Keine Wirkung für andere Einwilligungen
+| Ob Sie Ihre Individuelle Einwilligung und/oder die Mercedes-
+| Benz Ökosystem Einwilligung erteilt haben oder nicht, hat
+| keine Auswirkung auf eine andere Individuelle Einwilligung, die
+| Sie in der Vergangenheit gegeben haben oder zukünftig geben
+| werden. Diese bleibt bis zum Widerruf wirksam. Wenn Sie
+| diese andere Individuelle Einwilligung widerrufen wollen oder
+| der Verarbeitung Ihrer personenbezogenen Daten für Direkt-
+| marketingzwecke durch eine einzelne Gesellschaft widerspre-
+| chen wollen, kontaktieren Sie bitte die jeweilige Gesellschaft
+| direkt.
+| Seite 2 von 3Name:\x20
+text: default page 3
+| Rechtsgrundlage
+| Die Verarbeitung Ihrer personenbezogenen Daten für die vor-
+| genannten Zwecke erfolgt auf Grundlage Ihrer Einwilligung(en)
+| nach Art. 6 (1) (a) der Datenschutz-Grundverordnung
+| („DS-GVO“). Die Verarbeitung zum Zwecke des postalischen
+| Versands und der Sicherstellung, dass Sie nur nach Ihren
+| Maßgaben kontaktiert werden, beruht auf einer Interessenab-
+| wägung und damit auf berechtigten Interessen gemäß
+| Art. 6 (1) (f) DS-GVO. Die berechtigten Interessen bestehen
+| darin, Sie individuell und Ihren Interessen entsprechend
+| informieren und beraten zu können und dass Sie keine
+| Informationen erhalten, die für Sie nicht relevant sind. Mehr
+| Informationen über die Interessenabwägung erhalten Sie auf
+| Anfrage.
+| Zusätzlich zu Vorstehendem können Ihre personen-
+| bezogenen Daten auch auf anderen Rechtsgrundlagen ver-
+| arbeitet werden. Soweit dies der Fall ist, werden Sie hierüber
+| entsprechend informiert.
+| Speicherdauer
+| Ihre personenbezogenen Daten werden von dem jeweiligen
+| Verantwortlichen nicht länger gespeichert als es erforderlich
+| ist, um die vorgenannten Zwecke zu erreichen, und maximal
+| für einen Zeitraum von fünf Jahren ab dem Zeitpunkt des
+| letzten Kontakts mit dem jeweiligen Verantwortlichen, oder
+| für einen längeren Zeitraum, soweit dies aufgrund von
+| Aufbewahrungspflichten erforderlich ist, die für den jeweiligen
+| Verantwortlichen gelten.
+| Andere Empfänger
+| Dieses Dokument wird an die Mercedes-Benz AG weiter-
+| gegeben. Diese Weitergabe erfolgt gemeinsam mit Ihren
+| Kontaktdaten, die für eine Zuordnung zu Ihnen erforderlich
+| sind. Die Unternehmen, die auf der Grundlage dieser
+| Einwilligungserklärung berechtigt sind, Sie zu kontaktieren,
+| können auf diese Einwilligungserklärung zugreifen, um sicher-
+| zustellen, dass Sie nur nach Ihren Maßgaben kontaktiert
+| werden. Zusätzlich kann jeder Verantwortliche externe Auf-
+| tragsverarbeiter wie IT-Dienstleister oder Marketingagenturen
+| einsetzen.
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Ihre Rechte
+| Wenn Sie Ihre Einwilligung zu einer Verarbeitungstätigkeit er-
+| teilt haben, können Sie diese Einwilligung jederzeit mit Wir-
+| kung für die Zukunft widerrufen. Durch einen solchen Widerruf
+| wird die Rechtmäßigkeit der aufgrund der Einwilligung bis zum
+| Widerruf erfolgten Verarbeitung nicht berührt.
+| Nach den anwendbaren Datenschutzgesetzen können Ihnen
+| folgende Rechte zustehen: das Recht auf Auskunft über Ihre
+| personenbezogenen Daten, das Recht auf Berichtigung Ihrer
+| personenbezogenen Daten, das Recht auf Löschung Ihrer
+| personenbezogenen Daten, das Recht auf Einschränkung der
+| Verarbeitung Ihrer personenbezogenen Daten, das Recht auf
+| Datenübertragbarkeit und das Recht, der Verarbeitung Ihrer
+| personenbezogenen Daten zu widersprechen. Bitte beachten
+| Sie, dass die vorgenannten Rechte durch nationales Recht
+| eingeschränkt sein können. Sie haben zudem das Recht, eine
+| Beschwerde an die zuständige Aufsichtsbehörde zu richten.
+| Zur Ausübung Ihrer Rechte können Sie sich jederzeit an uns
+| wenden:
+| Jürgens Automobile GmbH
+| Wittekindstraße 99, 44139 Dortmund
+| Mercedes-Benz AG
+| HPC V421, 10878 Berlin, Deutschland
+| kundenrechte_mb@daimler.com
+| +49 800/623-2229
+| Unter gewissen Umständen haben Sie das Recht, aus
+| Gründen, die sich aus Ihrer besonderen Situation ergeben, der
+| Verarbeitung der Sie betreffenden personenbezogenen Daten
+| zu widersprechen und wir können verpflichtet sein, Ihre Daten
+| nicht länger zu verarbeiten. Sie haben zusätzlich das Recht auf
+| Widerspruch in Bezug auf die Verarbeitung Ihrer
+| personenbezogenen Daten zu Direktmarketingzwecken bzw. in
+| Bezug auf die Verarbeitung einschließlich der Profilbildung,
+| soweit diese im Zusammenhang mit Direktmarketing steht.
+| Datenschutzbeauftragte und Datenschutzkontakte
+| Den Datenschutzbeauftragten („DSB”) oder, wenn kein
+| Datenschutzbeauftragter benannt wurde, die Kontaktpersonen
+| für Datenschutzbelange, erreichen Sie wie folgt (wenn mit
+| einem „*” gekennzeichnet, wurde kein DSB benannt): Für (0)
+| Jürgens Automobile GmbH, Wittekindstraße 99, 44139
+| Dortmund: Herr Sebastian Feldmann, ext.
+| Datenschutzbeauftragter, Unterer Markt 1, 49477 Ibbenbüren,
+| Deutschland, info@prico.de; für (1) Mercedes-Benz AG, (2)
+| Mercedes-Benz Bank AG, (3) Mercedes-Benz Versicherung AG,
+| (4) Mercedes-Benz Automotive Mobility GmbH, (5)
+| Mercedes-Benz Connectivity Services GmbH, (6)
+| Mercedes-Benz Leasing Deutschland GmbH, (7) Mercedes pay
+| GmbH, (8) Mercedes-AMG GmbH: Konzernbeauftragter für den
+| Datenschutz, HPC W079, 70546 Stuttgart, Deutschland,
+| data.protection@mercedes-benz.com.
+| Seite 3 von 3
+text: sorted page 1
+| Datenschutz- und Einwilligungserklärung
+| für Direktmarketing
+| Wir möchten Sie gerne individuell und Ihren Interessen entsprechend informieren und beraten (z.B. über
+| Probefahrten, Veranstaltungen, besondere Angebote, Serviceleistungen während eines Händlerbesuchs).
+| Deshalb bitten wir Sie, der Verwendung Ihrer Daten für diese Zwecke zuzustimmen. Wir werden diese
+| vertrauensvoll behandeln und sorgsam damit umgehen.
+| Anrede / Titel
+| Name
+| Vorname
+| Adresszusatz (z.B. Firma)
+| Straße, Haus-Nr.
+| Land, PLZ, Ort
+| Telefon
+| privat geschäftlich
+| E-Mail
+| privat geschäftlich
+| Nur für den internen Gebrauch
+| Betriebsnummer: Berater:
+| Neuwagen PKW smart Trapo
+| Gebrauchtwagen PKW smart Trapo
+| Flotte PKW smart Trapo
+| Service PKW smart Trapo
+| Ersatzteilverkauf
+| Kundenmanagement CRM / KDM BDC Call Center
+| DSE_Blanko / Version 5.17.00 Seite 1 von 3
+text: sorted page 2
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Individuelle Einwilligung Genutzte personenbezogene Daten
+| Ja, ich möchte von der Jürgens Automobile GmbH, 1. Mein Name und meine Kontaktdaten (z.B. Anschrift, E-
+| Wittekindstraße 99, 44139 Dortmund, Deutschland individuell Mailadresse, Telefonnummer, Messenger ID, Adresse in
+| und meinen Interessen entsprechend (Profilbildung) über sozialen Netzwerken),
+| deren Produkte und Dienstleistungen sowie die der 2. Details zu meiner Person (z.B. Hobbys, Interessen, Anzahl
+| Mercedes-Benz Group AG und ihrer verbundenen Unternehmen an Personen, die in meinem Haushalt leben),
+| wie folgt informiert und beraten werden: 3. Daten zu meinem Fahrzeug (z.B. Fahrzeugkonfiguration,
+| Kilometerstand, Daten aus dem digitalen Serviceheft), und
+| per Telefon (persönliche Anrufe) 4. Informationen über gekaufte Produkte und in Anspruch
+| per elektronischer Post (insb. E-Mail, SMS, Messenger) genommene Services (z.B. Leasingverträge, gebuchte
+| Durch Ankreuzen dieser Kästchen willige ich in die Mercedes me Dienste, gespeicherte Fahrzeugkonfi-
+| Verarbeitung meiner personenbezogenen Daten zu den gurationen)
+| vorstehenden Zwecken ein.
+| Mercedes-Benz Ökosystem Einwilligung Mercedes-Benz Ökosystem Gesellschaften
+|   Ja, ich möchte unabhängig von der Individuellen 1. Mercedes-Benz AG einschließlich ihres autorisierten
+|  Einwilligung über die oben von mir gewählten Formen der Händlers und autorisierten Servicepartners, die örtlich am
+|  Ansprache auch von den Mercedes-Benz Ökosystem nächsten zu der von mir angegebenen Adresse gelegen
+|  Gesellschaften individuell und meinen Interessen sind, der autorisierte Händler und autorisierte
+|  entsprechend (Profilbildung) über Produkte und Servicepartner der Mercedes-Benz AG, mit denen ich in
+|  Dienstleistungen der Mercedes-Benz Group AG und deren Kontakt getreten bin oder die ich als bevorzugte Händler
+|  verbundene Unternehmen, einschließlich der Mercedes- oder bevorzugte Servicepartner ausgewählt habe,
+|  Benz Ökosystem Gesellschaften informiert und beraten 2. Mercedes-Benz Bank AG,
+|  werden. 3. Mercedes-Benz Versicherung AG,
+| Durch Ankreuzen dieses Kästchens willige ich in die Verarbei- 4. Mercedes-Benz Automotive Mobility GmbH,
+| tung und die Weitergabe meiner personenbezogenen Daten 5. Mercedes-Benz Connectivity Services GmbH,
+| von und unter den Mercedes-Benz Ökosystem Gesellschaften, 6. Mercedes-Benz Leasing Deutschland GmbH,
+| jeder als einzelner Verantwortlicher, für die vorstehenden 7. Mercedes pay GmbH
+| Zwecke ein. 8. Mercedes-AMG GmbH
+| und deren Rechtsnachfolger.
+| Freiwilligkeit und Widerspruchsrecht Profilbildung
+| Die Erklärung Ihrer Einwilligung(en) ist freiwillig. Sie können Um Ihnen die vorstehenden individualisierten und Ihren
+| Ihre Einwilligung(en) jederzeit widerrufen oder der Verarbei- Interessen entsprechenden Informationen und Beratungen
+| tung Ihrer personenbezogenen Daten zu Direktmarketing- schriftlich, persönlich oder über den von Ihnen gewählten
+| zwecken jederzeit widersprechen. Soweit Sie Ihre Einwilligung Kontaktkanal unterbreiten zu können, können Analyse-
+| nicht erklären oder sie widerrufen, können wir und/oder die verfahren einschließlich Profilbildung verwendet werden.
+| Mercedes-Benz Ökosystem Gesellschaften Sie nicht mit Keine Wirkung für andere Einwilligungen
+| Informationen und Beratung zu unseren Produkten und Ob Sie Ihre Individuelle Einwilligung und/oder die Mercedes-
+| Dienstleistungen kontaktieren. Benz Ökosystem Einwilligung erteilt haben oder nicht, hat
+| Postalischer Versand keine Auswirkung auf eine andere Individuelle Einwilligung, die
+| Unabhängig von der Einwilligung werden wir und /oder die Sie in der Vergangenheit gegeben haben oder zukünftig geben
+| Mercedes-Benz Ökosystem Gesellschaften Ihre personenbe- werden. Diese bleibt bis zum Widerruf wirksam. Wenn Sie
+| zogenen Daten jeweils auch nutzen, um Sie mit Informationen diese andere Individuelle Einwilligung widerrufen wollen oder
+| und Beratung über unsere Produkte und Dienstleistungen per der Verarbeitung Ihrer personenbezogenen Daten für Direkt-
+| Post zu kontaktieren. marketingzwecke durch eine einzelne Gesellschaft widerspre-
+| Wenn Sie solche Informationen per Post nicht (mehr) erhalten chen wollen, kontaktieren Sie bitte die jeweilige Gesellschaft
+| möchten, wählen Sie bitte die untenstehenden Kästchen aus: direkt.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von der  Jürgens Automobile GmbH,
+| Wittekindstraße 99, 44139 Dortmund, Deutschland
+| erhalten.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von allen anderen Mercedes-Benz Ökosystem
+| Gesellschaften erhalten.
+| Datum: Name: Unterschrift Seite 2 von 3
+text: sorted page 3
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Rechtsgrundlage Ihre Rechte
+| Die Verarbeitung Ihrer personenbezogenen Daten für die vor- Wenn Sie Ihre Einwilligung zu einer Verarbeitungstätigkeit er-
+| genannten Zwecke erfolgt auf Grundlage Ihrer Einwilligung(en) teilt haben, können Sie diese Einwilligung jederzeit mit Wir-
+| nach Art. 6 (1) (a) der Datenschutz-Grundverordnung kung für die Zukunft widerrufen. Durch einen solchen Widerruf
+| („DS-GVO“). Die Verarbeitung zum Zwecke des postalischen wird die Rechtmäßigkeit der aufgrund der Einwilligung bis zum
+| Versands und der Sicherstellung, dass Sie nur nach Ihren Widerruf erfolgten Verarbeitung nicht berührt.
+| Maßgaben kontaktiert werden, beruht auf einer Interessenab- Nach den anwendbaren Datenschutzgesetzen können Ihnen
+| wägung und damit auf berechtigten Interessen gemäß folgende Rechte zustehen: das Recht auf Auskunft über Ihre
+| Art. 6 (1) (f) DS-GVO. Die berechtigten Interessen bestehen personenbezogenen Daten, das Recht auf Berichtigung Ihrer
+| darin, Sie individuell und Ihren Interessen entsprechend personenbezogenen Daten, das Recht auf Löschung Ihrer
+| informieren und beraten zu können und dass Sie keine personenbezogenen Daten, das Recht auf Einschränkung der
+| Informationen erhalten, die für Sie nicht relevant sind. Mehr Verarbeitung Ihrer personenbezogenen Daten, das Recht auf
+| Informationen über die Interessenabwägung erhalten Sie auf Datenübertragbarkeit und das Recht, der Verarbeitung Ihrer
+| Anfrage. personenbezogenen Daten zu widersprechen. Bitte beachten
+| Zusätzlich zu Vorstehendem können Ihre personen- Sie, dass die vorgenannten Rechte durch nationales Recht
+| bezogenen Daten auch auf anderen Rechtsgrundlagen ver- eingeschränkt sein können. Sie haben zudem das Recht, eine
+| arbeitet werden. Soweit dies der Fall ist, werden Sie hierüber Beschwerde an die zuständige Aufsichtsbehörde zu richten.
+| entsprechend informiert. Zur Ausübung Ihrer Rechte können Sie sich jederzeit an uns
+| Speicherdauer wenden:
+| Ihre personenbezogenen Daten werden von dem jeweiligen Jürgens Automobile GmbH
+| Verantwortlichen nicht länger gespeichert als es erforderlich Wittekindstraße 99, 44139 Dortmund
+| ist, um die vorgenannten Zwecke zu erreichen, und maximal Mercedes-Benz AG
+| für einen Zeitraum von fünf Jahren ab dem Zeitpunkt des HPC V421, 10878 Berlin, Deutschland
+| letzten Kontakts mit dem jeweiligen Verantwortlichen, oder kundenrechte_mb@daimler.com
+| für einen längeren Zeitraum, soweit dies aufgrund von +49 800/623-2229
+| Aufbewahrungspflichten erforderlich ist, die für den jeweiligen
+| Unter gewissen Umständen haben Sie das Recht, aus
+| Verantwortlichen gelten.
+| Gründen, die sich aus Ihrer besonderen Situation ergeben, der
+| Andere Empfänger Verarbeitung der Sie betreffenden personenbezogenen Daten
+| Dieses Dokument wird an die Mercedes-Benz AG weiter- zu widersprechen und wir können verpflichtet sein, Ihre Daten
+| gegeben. Diese Weitergabe erfolgt gemeinsam mit Ihren nicht länger zu verarbeiten. Sie haben zusätzlich das Recht auf
+| Kontaktdaten, die für eine Zuordnung zu Ihnen erforderlich Widerspruch in Bezug auf die Verarbeitung Ihrer
+| sind. Die Unternehmen, die auf der Grundlage dieser personenbezogenen Daten zu Direktmarketingzwecken bzw. in
+| Einwilligungserklärung berechtigt sind, Sie zu kontaktieren, Bezug auf die Verarbeitung einschließlich der Profilbildung,
+| können auf diese Einwilligungserklärung zugreifen, um sicher- soweit diese im Zusammenhang mit Direktmarketing steht.
+| zustellen, dass Sie nur nach Ihren Maßgaben kontaktiert
+| werden. Zusätzlich kann jeder Verantwortliche externe Auf-
+| tragsverarbeiter wie IT-Dienstleister oder Marketingagenturen
+| einsetzen.
+| Datenschutzbeauftragte und Datenschutzkontakte
+| Den Datenschutzbeauftragten („DSB”) oder, wenn kein
+| Datenschutzbeauftragter benannt wurde, die Kontaktpersonen
+| für Datenschutzbelange, erreichen Sie wie folgt (wenn mit
+| einem „*” gekennzeichnet, wurde kein DSB benannt): Für (0)
+| Jürgens Automobile GmbH, Wittekindstraße 99, 44139
+| Dortmund: Herr Sebastian Feldmann, ext.
+| Datenschutzbeauftragter, Unterer Markt 1, 49477 Ibbenbüren,
+| Deutschland, info@prico.de; für (1) Mercedes-Benz AG, (2)
+| Mercedes-Benz Bank AG, (3) Mercedes-Benz Versicherung AG,
+| (4) Mercedes-Benz Automotive Mobility GmbH, (5)
+| Mercedes-Benz Connectivity Services GmbH, (6)
+| Mercedes-Benz Leasing Deutschland GmbH, (7) Mercedes pay
+| GmbH, (8) Mercedes-AMG GmbH: Konzernbeauftragter für den
+| Datenschutz, HPC W079, 70546 Stuttgart, Deutschland,
+| data.protection@mercedes-benz.com.
+| Seite 3 von 3
+text: range 2-3
+| Unterschrift
+| Individuelle Einwilligung
+| Ja, ich möchte von der Jürgens Automobile GmbH,
+| Wittekindstraße 99, 44139 Dortmund, Deutschland individuell
+| und meinen Interessen entsprechend (Profilbildung) über
+| deren Produkte und Dienstleistungen sowie die der
+| Mercedes-Benz Group AG und ihrer verbundenen Unternehmen
+| wie folgt informiert und beraten werden:
+| Mercedes-Benz Ökosystem Einwilligung
+|   Ja, ich möchte unabhängig von der Individuellen
+|  Einwilligung über die oben von mir gewählten Formen der
+|  Ansprache auch von den Mercedes-Benz Ökosystem
+|  Gesellschaften individuell und meinen Interessen
+|  entsprechend (Profilbildung) über Produkte und
+|  Dienstleistungen der Mercedes-Benz Group AG und deren
+|  verbundene Unternehmen, einschließlich der Mercedes-
+|  Benz Ökosystem Gesellschaften informiert und beraten
+|  werden.
+| Durch Ankreuzen dieses Kästchens willige ich in die Verarbei-
+| tung und die Weitergabe meiner personenbezogenen Daten
+| von und unter den Mercedes-Benz Ökosystem Gesellschaften,
+| jeder als einzelner Verantwortlicher, für die vorstehenden
+| Zwecke ein.
+| Genutzte personenbezogene Daten
+| 1. Mein Name und meine Kontaktdaten (z.B. Anschrift, E-
+| Mailadresse, Telefonnummer, Messenger ID, Adresse in
+| sozialen Netzwerken),
+| 2. Details zu meiner Person (z.B. Hobbys, Interessen, Anzahl
+| an Personen, die in meinem Haushalt leben),
+| 3. Daten zu meinem Fahrzeug (z.B. Fahrzeugkonfiguration,
+| Kilometerstand, Daten aus dem digitalen Serviceheft), und
+| 4. Informationen über gekaufte Produkte und in Anspruch
+| genommene Services (z.B. Leasingverträge, gebuchte
+| Mercedes me Dienste, gespeicherte Fahrzeugkonfi-
+| gurationen)
+| Mercedes-Benz Ökosystem Gesellschaften
+| 1. Mercedes-Benz AG einschließlich ihres autorisierten
+| Händlers und autorisierten Servicepartners, die örtlich am
+| nächsten zu der von mir angegebenen Adresse gelegen
+| sind, der autorisierte Händler und autorisierte
+| Servicepartner der Mercedes-Benz AG, mit denen ich in
+| Kontakt getreten bin oder die ich als bevorzugte Händler
+| oder bevorzugte Servicepartner ausgewählt habe,
+| 2. Mercedes-Benz Bank AG,
+| 3. Mercedes-Benz Versicherung AG,
+| 4. Mercedes-Benz Automotive Mobility GmbH,
+| 5. Mercedes-Benz Connectivity Services GmbH,
+| 6. Mercedes-Benz Leasing Deutschland GmbH,
+| 7. Mercedes pay GmbH
+| 8. Mercedes-AMG GmbH
+| und deren Rechtsnachfolger.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von der  Jürgens Automobile GmbH,
+| Wittekindstraße 99, 44139 Dortmund, Deutschland
+| erhalten.
+| Nein, ich möchte keine Information und Beratung (mehr)
+| per Post von allen anderen Mercedes-Benz Ökosystem
+| Gesellschaften erhalten.
+| Datum:\x20
+| per Telefon (persönliche Anrufe)
+| per elektronischer Post (insb. E-Mail, SMS, Messenger)
+| Durch Ankreuzen dieser Kästchen willige ich in die
+| Verarbeitung meiner personenbezogenen Daten zu den
+| vorstehenden Zwecken ein.
+| Freiwilligkeit und Widerspruchsrecht
+| Die Erklärung Ihrer Einwilligung(en) ist freiwillig. Sie können
+| Ihre Einwilligung(en) jederzeit widerrufen oder der Verarbei-
+| tung Ihrer personenbezogenen Daten zu Direktmarketing-
+| zwecken jederzeit widersprechen. Soweit Sie Ihre Einwilligung
+| nicht erklären oder sie widerrufen, können wir und/oder die
+| Mercedes-Benz Ökosystem Gesellschaften Sie nicht mit
+| Informationen und Beratung zu unseren Produkten und
+| Dienstleistungen kontaktieren.
+| Postalischer Versand
+| Unabhängig von der Einwilligung werden wir und /oder die
+| Mercedes-Benz Ökosystem Gesellschaften Ihre personenbe-
+| zogenen Daten jeweils auch nutzen, um Sie mit Informationen
+| und Beratung über unsere Produkte und Dienstleistungen per
+| Post zu kontaktieren.
+| Wenn Sie solche Informationen per Post nicht (mehr) erhalten
+| möchten, wählen Sie bitte die untenstehenden Kästchen aus:
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Profilbildung
+| Um Ihnen die vorstehenden individualisierten und Ihren
+| Interessen entsprechenden Informationen und Beratungen
+| schriftlich, persönlich oder über den von Ihnen gewählten
+| Kontaktkanal unterbreiten zu können, können Analyse-
+| verfahren einschließlich Profilbildung verwendet werden.
+| Keine Wirkung für andere Einwilligungen
+| Ob Sie Ihre Individuelle Einwilligung und/oder die Mercedes-
+| Benz Ökosystem Einwilligung erteilt haben oder nicht, hat
+| keine Auswirkung auf eine andere Individuelle Einwilligung, die
+| Sie in der Vergangenheit gegeben haben oder zukünftig geben
+| werden. Diese bleibt bis zum Widerruf wirksam. Wenn Sie
+| diese andere Individuelle Einwilligung widerrufen wollen oder
+| der Verarbeitung Ihrer personenbezogenen Daten für Direkt-
+| marketingzwecke durch eine einzelne Gesellschaft widerspre-
+| chen wollen, kontaktieren Sie bitte die jeweilige Gesellschaft
+| direkt.
+| Seite 2 von 3Name:\x20
+| Rechtsgrundlage
+| Die Verarbeitung Ihrer personenbezogenen Daten für die vor-
+| genannten Zwecke erfolgt auf Grundlage Ihrer Einwilligung(en)
+| nach Art. 6 (1) (a) der Datenschutz-Grundverordnung
+| („DS-GVO“). Die Verarbeitung zum Zwecke des postalischen
+| Versands und der Sicherstellung, dass Sie nur nach Ihren
+| Maßgaben kontaktiert werden, beruht auf einer Interessenab-
+| wägung und damit auf berechtigten Interessen gemäß
+| Art. 6 (1) (f) DS-GVO. Die berechtigten Interessen bestehen
+| darin, Sie individuell und Ihren Interessen entsprechend
+| informieren und beraten zu können und dass Sie keine
+| Informationen erhalten, die für Sie nicht relevant sind. Mehr
+| Informationen über die Interessenabwägung erhalten Sie auf
+| Anfrage.
+| Zusätzlich zu Vorstehendem können Ihre personen-
+| bezogenen Daten auch auf anderen Rechtsgrundlagen ver-
+| arbeitet werden. Soweit dies der Fall ist, werden Sie hierüber
+| entsprechend informiert.
+| Speicherdauer
+| Ihre personenbezogenen Daten werden von dem jeweiligen
+| Verantwortlichen nicht länger gespeichert als es erforderlich
+| ist, um die vorgenannten Zwecke zu erreichen, und maximal
+| für einen Zeitraum von fünf Jahren ab dem Zeitpunkt des
+| letzten Kontakts mit dem jeweiligen Verantwortlichen, oder
+| für einen längeren Zeitraum, soweit dies aufgrund von
+| Aufbewahrungspflichten erforderlich ist, die für den jeweiligen
+| Verantwortlichen gelten.
+| Andere Empfänger
+| Dieses Dokument wird an die Mercedes-Benz AG weiter-
+| gegeben. Diese Weitergabe erfolgt gemeinsam mit Ihren
+| Kontaktdaten, die für eine Zuordnung zu Ihnen erforderlich
+| sind. Die Unternehmen, die auf der Grundlage dieser
+| Einwilligungserklärung berechtigt sind, Sie zu kontaktieren,
+| können auf diese Einwilligungserklärung zugreifen, um sicher-
+| zustellen, dass Sie nur nach Ihren Maßgaben kontaktiert
+| werden. Zusätzlich kann jeder Verantwortliche externe Auf-
+| tragsverarbeiter wie IT-Dienstleister oder Marketingagenturen
+| einsetzen.
+| Datenschutz- und Einwilligungserklärung für Direktmarketing von:\x20
+| Ihre Rechte
+| Wenn Sie Ihre Einwilligung zu einer Verarbeitungstätigkeit er-
+| teilt haben, können Sie diese Einwilligung jederzeit mit Wir-
+| kung für die Zukunft widerrufen. Durch einen solchen Widerruf
+| wird die Rechtmäßigkeit der aufgrund der Einwilligung bis zum
+| Widerruf erfolgten Verarbeitung nicht berührt.
+| Nach den anwendbaren Datenschutzgesetzen können Ihnen
+| folgende Rechte zustehen: das Recht auf Auskunft über Ihre
+| personenbezogenen Daten, das Recht auf Berichtigung Ihrer
+| personenbezogenen Daten, das Recht auf Löschung Ihrer
+| personenbezogenen Daten, das Recht auf Einschränkung der
+| Verarbeitung Ihrer personenbezogenen Daten, das Recht auf
+| Datenübertragbarkeit und das Recht, der Verarbeitung Ihrer
+| personenbezogenen Daten zu widersprechen. Bitte beachten
+| Sie, dass die vorgenannten Rechte durch nationales Recht
+| eingeschränkt sein können. Sie haben zudem das Recht, eine
+| Beschwerde an die zuständige Aufsichtsbehörde zu richten.
+| Zur Ausübung Ihrer Rechte können Sie sich jederzeit an uns
+| wenden:
+| Jürgens Automobile GmbH
+| Wittekindstraße 99, 44139 Dortmund
+| Mercedes-Benz AG
+| HPC V421, 10878 Berlin, Deutschland
+| kundenrechte_mb@daimler.com
+| +49 800/623-2229
+| Unter gewissen Umständen haben Sie das Recht, aus
+| Gründen, die sich aus Ihrer besonderen Situation ergeben, der
+| Verarbeitung der Sie betreffenden personenbezogenen Daten
+| zu widersprechen und wir können verpflichtet sein, Ihre Daten
+| nicht länger zu verarbeiten. Sie haben zusätzlich das Recht auf
+| Widerspruch in Bezug auf die Verarbeitung Ihrer
+| personenbezogenen Daten zu Direktmarketingzwecken bzw. in
+| Bezug auf die Verarbeitung einschließlich der Profilbildung,
+| soweit diese im Zusammenhang mit Direktmarketing steht.
+| Datenschutzbeauftragte und Datenschutzkontakte
+| Den Datenschutzbeauftragten („DSB”) oder, wenn kein
+| Datenschutzbeauftragter benannt wurde, die Kontaktpersonen
+| für Datenschutzbelange, erreichen Sie wie folgt (wenn mit
+| einem „*” gekennzeichnet, wurde kein DSB benannt): Für (0)
+| Jürgens Automobile GmbH, Wittekindstraße 99, 44139
+| Dortmund: Herr Sebastian Feldmann, ext.
+| Datenschutzbeauftragter, Unterer Markt 1, 49477 Ibbenbüren,
+| Deutschland, info@prico.de; für (1) Mercedes-Benz AG, (2)
+| Mercedes-Benz Bank AG, (3) Mercedes-Benz Versicherung AG,
+| (4) Mercedes-Benz Automotive Mobility GmbH, (5)
+| Mercedes-Benz Connectivity Services GmbH, (6)
+| Mercedes-Benz Leasing Deutschland GmbH, (7) Mercedes pay
+| GmbH, (8) Mercedes-AMG GmbH: Konzernbeauftragter für den
+| Datenschutz, HPC W079, 70546 Stuttgart, Deutschland,
+| data.protection@mercedes-benz.com.
+| Seite 3 von 3
+text: separators 1-2
+| <PAGE><A><P>privat<W>geschäftlich<EOL>
+| </P><P>privat<W>geschäftlich<EOL>
+| </P><P>Nur für den internen Gebrauch<EOL>
+| </P><P>Betriebsnummer:<W>Berater:<EOL>
+| </P><P>Neuwagen<EOL>
+| </P><P>Gebrauchtwagen<EOL>
+| </P><P>Flotte<EOL>
+| </P><P>Service<EOL>
+| </P><P>PKW<EOL>
+| </P><P>PKW<EOL>
+| </P><P>PKW<EOL>
+| </P><P>PKW<EOL>
+| </P><P>Ersatzteilverkauf<EOL>
+| </P><P>Kundenmanagement<W>CRM / KDM<EOL>
+| </P><P>smart<EOL>
+| </P><P>smart<EOL>
+| </P><P>smart<EOL>
+| </P><P>smart<EOL>
+| </P><P>Trapo<EOL>
+| </P><P>Trapo<EOL>
+| </P><P>Trapo<EOL>
+| </P><P>Trapo<EOL>
+| </P><P>BDC<W>Call Center<EOL>
+| </P><P>Datenschutz- und Einwilligungserklärung<EOL>
+| für Direktmarketing<EOL>
+| Wir möchten Sie gerne individuell und Ihren Interessen entsprechend informieren und beraten (z.B. über<EOL>
+| Probefahrten, Veranstaltungen, besondere Angebote, Serviceleistungen während eines Händlerbesuchs).<EOL>
+| Deshalb bitten wir Sie, der Verwendung Ihrer Daten für diese Zwecke zuzustimmen. Wir werden diese<EOL>
+| vertrauensvoll behandeln und sorgsam damit umgehen.<EOL>
+| </P><P>Name<EOL>
+| </P><P>Anrede / Titel<EOL>
+| </P><P>Adresszusatz (z.B. Firma)<EOL>
+| </P><P>Vorname<EOL>
+| </P><P>Straße, Haus-Nr.<EOL>
+| </P><P>E-Mail<EOL>
+| </P><P>Land, PLZ, Ort<EOL>
+| </P><P>Telefon<EOL>
+| </P><P>DSE_Blanko / Version 5.17.00<W>Seite 1 von 3</P></A></PAGE>
+| <PAGE><A><P>Unterschrift<EOL>
+| </P><P>Individuelle Einwilligung<EOL>
+| </P><P>Ja, ich möchte von der Jürgens Automobile GmbH,<EOL>
+| Wittekindstraße 99, 44139 Dortmund, Deutschland individuell<EOL>
+| und meinen Interessen entsprechend (Profilbildung) über<EOL>
+| deren Produkte und Dienstleistungen sowie die der<EOL>
+| Mercedes-Benz Group AG und ihrer verbundenen Unternehmen<EOL>
+| wie folgt informiert und beraten werden:<EOL>
+| </P><P>Mercedes-Benz Ökosystem Einwilligung<EOL>
+| </P><P>  Ja, ich möchte unabhängig von der Individuellen<EOL>
+|  Einwilligung über die oben von mir gewählten Formen der<EOL>
+|  Ansprache auch von den Mercedes-Benz Ökosystem<EOL>
+|  Gesellschaften individuell und meinen Interessen<EOL>
+|  entsprechend (Profilbildung) über Produkte und<EOL>
+|  Dienstleistungen der Mercedes-Benz Group AG und deren<EOL>
+|  verbundene Unternehmen, einschließlich der Mercedes-<EOL>
+|  Benz Ökosystem Gesellschaften informiert und beraten<EOL>
+|  werden.<EOL>
+| </P><P>Durch Ankreuzen dieses Kästchens willige ich in die Verarbei-<EOL>
+| tung und die Weitergabe meiner personenbezogenen Daten<EOL>
+| von und unter den Mercedes-Benz Ökosystem Gesellschaften,<EOL>
+| jeder als einzelner Verantwortlicher, für die vorstehenden<EOL>
+| Zwecke ein.<EOL>
+| </P><P>Genutzte personenbezogene Daten<EOL>
+| </P><P>1.<W>Mein Name und meine Kontaktdaten (z.B. Anschrift, E-<EOL>
+| Mailadresse, Telefonnummer, Messenger ID, Adresse in<EOL>
+| sozialen Netzwerken),<EOL>
+| </P><P>2.<W>Details zu meiner Person (z.B. Hobbys, Interessen, Anzahl<EOL>
+| an Personen, die in meinem Haushalt leben),<EOL>
+| </P><P>3.<W>Daten zu meinem Fahrzeug (z.B. Fahrzeugkonfiguration,<EOL>
+| Kilometerstand, Daten aus dem digitalen Serviceheft), und<EOL>
+| </P><P>4.<W>Informationen über gekaufte Produkte und in Anspruch<EOL>
+| genommene Services (z.B. Leasingverträge, gebuchte<EOL>
+| Mercedes me Dienste, gespeicherte Fahrzeugkonfi-<EOL>
+| gurationen)<EOL>
+| </P><P>Mercedes-Benz Ökosystem Gesellschaften<EOL>
+| </P><P>1.<W>Mercedes-Benz AG einschließlich ihres autorisierten<EOL>
+| Händlers und autorisierten Servicepartners, die örtlich am<EOL>
+| nächsten zu der von mir angegebenen Adresse gelegen<EOL>
+| sind, der autorisierte Händler und autorisierte<EOL>
+| Servicepartner der Mercedes-Benz AG, mit denen ich in<EOL>
+| Kontakt getreten bin oder die ich als bevorzugte Händler<EOL>
+| oder bevorzugte Servicepartner ausgewählt habe,<EOL>
+| </P><P>2.<W>Mercedes-Benz Bank AG,<EOL>
+| 3.<W>Mercedes-Benz Versicherung AG,<EOL>
+| 4.<W>Mercedes-Benz Automotive Mobility GmbH,<EOL>
+| 5.<W>Mercedes-Benz Connectivity Services GmbH,<EOL>
+| 6.<W>Mercedes-Benz Leasing Deutschland GmbH,<EOL>
+| 7.<W>Mercedes pay GmbH<EOL>
+| 8.<W>Mercedes-AMG GmbH<EOL>
+| und deren Rechtsnachfolger.<EOL>
+| </P><P>Nein, ich möchte keine Information und Beratung (mehr)<EOL>
+| per Post von der  Jürgens Automobile GmbH,<EOL>
+| Wittekindstraße 99, 44139 Dortmund, Deutschland<EOL>
+| erhalten.<EOL>
+| </P><P>Nein, ich möchte keine Information und Beratung (mehr)<EOL>
+| per Post von allen anderen Mercedes-Benz Ökosystem<EOL>
+| Gesellschaften erhalten.<EOL>
+| </P><P>Datum: <EOL>
+| </P><P>per Telefon (persönliche Anrufe)<EOL>
+| per elektronischer Post (insb. E-Mail, SMS, Messenger)<EOL>
+| </P><P>Durch Ankreuzen dieser Kästchen willige ich in die<EOL>
+| Verarbeitung meiner personenbezogenen Daten zu den<EOL>
+| vorstehenden Zwecken ein.<EOL>
+| </P><P>Freiwilligkeit und Widerspruchsrecht<EOL>
+| </P><P>Die Erklärung Ihrer Einwilligung(en) ist freiwillig. Sie können<EOL>
+| Ihre Einwilligung(en) jederzeit widerrufen oder der Verarbei-<EOL>
+| tung Ihrer personenbezogenen Daten zu Direktmarketing-<EOL>
+| zwecken jederzeit widersprechen. Soweit Sie Ihre Einwilligung<EOL>
+| nicht erklären oder sie widerrufen, können wir und/oder die<EOL>
+| Mercedes-Benz Ökosystem Gesellschaften Sie nicht mit<EOL>
+| Informationen und Beratung zu unseren Produkten und<EOL>
+| Dienstleistungen kontaktieren.<EOL>
+| </P><P>Postalischer Versand<EOL>
+| </P><P>Unabhängig von der Einwilligung werden wir und /oder die<EOL>
+| Mercedes-Benz Ökosystem Gesellschaften Ihre personenbe-<EOL>
+| zogenen Daten jeweils auch nutzen, um Sie mit Informationen<EOL>
+| und Beratung über unsere Produkte und Dienstleistungen per<EOL>
+| Post zu kontaktieren.<EOL>
+| Wenn Sie solche Informationen per Post nicht (mehr) erhalten<EOL>
+| möchten, wählen Sie bitte die untenstehenden Kästchen aus:<EOL>
+| </P><P>Datenschutz- und Einwilligungserklärung für Direktmarketing von: <EOL>
+| </P><P>Profilbildung<EOL>
+| </P><P>Um Ihnen die vorstehenden individualisierten und Ihren<EOL>
+| Interessen entsprechenden Informationen und Beratungen<EOL>
+| schriftlich, persönlich oder über den von Ihnen gewählten<EOL>
+| Kontaktkanal unterbreiten zu können, können Analyse-<EOL>
+| verfahren einschließlich Profilbildung verwendet werden.<EOL>
+| </P><P>Keine Wirkung für andere Einwilligungen<EOL>
+| </P><P>Ob Sie Ihre Individuelle Einwilligung und/oder die Mercedes-<EOL>
+| Benz Ökosystem Einwilligung erteilt haben oder nicht, hat<EOL>
+| keine Auswirkung auf eine andere Individuelle Einwilligung, die<EOL>
+| Sie in der Vergangenheit gegeben haben oder zukünftig geben<EOL>
+| werden. Diese bleibt bis zum Widerruf wirksam. Wenn Sie<EOL>
+| diese andere Individuelle Einwilligung widerrufen wollen oder<EOL>
+| der Verarbeitung Ihrer personenbezogenen Daten für Direkt-<EOL>
+| marketingzwecke durch eine einzelne Gesellschaft widerspre-<EOL>
+| chen wollen, kontaktieren Sie bitte die jeweilige Gesellschaft<EOL>
+| direkt.<EOL>
+| </P><P>Seite 2 von 3Name: </P></A></PAGE>

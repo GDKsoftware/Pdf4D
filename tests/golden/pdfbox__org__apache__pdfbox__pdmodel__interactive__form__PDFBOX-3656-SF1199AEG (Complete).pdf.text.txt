@@ -1,0 +1,817 @@
+text: default page 1
+| Standard Form 1199A (EG)
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department
+| Treasury Dept. Cir. 1076
+| DIRECT DEPOSIT SIGN-UP FORM
+| OMB No. 1510-0007
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form
+| and fill in the information requested in Sections 1 and 2. Then take or
+| mail this form to the financial institution.  The financial institution will
+| verify the information in Sections 1 and 2, and will complete Section 3.\x20
+| The completed form will be returned to the Government agency
+| identified below.
+| A separate form must be completed for each type of payment to be
+| sent by Direct Deposit.
+| The claim number and type of payment are printed on Government
+| checks.  (See the sample check on the back of this form.)  This
+| information is also stated on beneficiary/annuitant award letters and
+| other documents from the Government agency.
+| Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| remain qualified for payments.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| NAME OF PAYEE (last, first, middle initial)A
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE
+| TELEPHONE NUMBER   \x20
+|        AREA CODE         \x20
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB
+| CLAIM OR PAYROLL ID NUMBERC
+|        Prefix      Suffix   \x20
+| TYPE OF DEPOSITOR ACCOUNTD CHECKING  SAVINGS
+| DEPOSITOR ACCOUNT NUMBERE
+| TYPE OF PAYMENT (Check only one)F
+| Social Security
+| Supplemental Security Income
+| Railroad Retirement
+| Civil Service Retirement (OPM)
+| VA Compensation or Pension
+| Fed. Salary/Mil. Civilian Pay
+| Mil. Active
+| Mil. Retire.
+| Mil. Survivor
+| Other
+| (specify)
+| THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G
+| TYPE AMOUNT
+| PAYEE/JOINT PAYEE CERTIFICATION
+| I certify that I am entitled to the payment identified above, and that I have
+| read and understood the back of this form. In signing this form, I
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I have read and understood the back of this form,
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 GOVERNMENT AGENCY COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: default page 2
+| Standard Form 1199A (EG)
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department
+| Treasury Dept. Cir. 1076
+| DIRECT DEPOSIT SIGN-UP FORM
+| OMB No. 1510-0007
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form
+| and fill in the information requested in Sections 1 and 2. Then take or
+| mail this form to the financial institution.  The financial institution will
+| verify the information in Sections 1 and 2, and will complete Section 3.\x20
+| The completed form will be returned to the Government agency
+| identified below.
+| A separate form must be completed for each type of payment to be
+| sent by Direct Deposit.
+| The claim number and type of payment are printed on Government
+| checks.  (See the sample check on the back of this form.)  This
+| information is also stated on beneficiary/annuitant award letters and
+| other documents from the Government agency.
+| Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| remain qualified for payments.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| NAME OF PAYEE (last, first, middle initial)A
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE
+| TELEPHONE NUMBER   \x20
+|        AREA CODE         \x20
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB
+| CLAIM OR PAYROLL ID NUMBERC
+|        Prefix      Suffix   \x20
+| TYPE OF DEPOSITOR ACCOUNTD CHECKING  SAVINGS
+| DEPOSITOR ACCOUNT NUMBERE
+| TYPE OF PAYMENT (Check only one)F
+| Social Security
+| Supplemental Security Income
+| Railroad Retirement
+| Civil Service Retirement (OPM)
+| VA Compensation or Pension
+| Fed. Salary/Mil. Civilian Pay
+| Mil. Active
+| Mil. Retire.
+| Mil. Survivor
+| Other
+| (specify)
+| THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G
+| TYPE AMOUNT
+| PAYEE/JOINT PAYEE CERTIFICATION
+| I certify that I am entitled to the payment identified above, and that I have
+| read and understood the back of this form. In signing this form, I
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I have read and understood the back of this form,
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 FINANCIAL INSTITUTION COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: default page 3
+| Standard Form 1199A (EG)
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department
+| Treasury Dept. Cir. 1076
+| DIRECT DEPOSIT SIGN-UP FORM
+| OMB No. 1510-0007
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form
+| and fill in the information requested in Sections 1 and 2. Then take or
+| mail this form to the financial institution.  The financial institution will
+| verify the information in Sections 1 and 2, and will complete Section 3.\x20
+| The completed form will be returned to the Government agency
+| identified below.
+| A separate form must be completed for each type of payment to be
+| sent by Direct Deposit.
+| The claim number and type of payment are printed on Government
+| checks.  (See the sample check on the back of this form.)  This
+| information is also stated on beneficiary/annuitant award letters and
+| other documents from the Government agency.
+| Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| remain qualified for payments.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| NAME OF PAYEE (last, first, middle initial)A
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE
+| TELEPHONE NUMBER   \x20
+|        AREA CODE         \x20
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB
+| CLAIM OR PAYROLL ID NUMBERC
+|        Prefix      Suffix   \x20
+| TYPE OF DEPOSITOR ACCOUNTD CHECKING  SAVINGS
+| DEPOSITOR ACCOUNT NUMBERE
+| TYPE OF PAYMENT (Check only one)F
+| Social Security
+| Supplemental Security Income
+| Railroad Retirement
+| Civil Service Retirement (OPM)
+| VA Compensation or Pension
+| Fed. Salary/Mil. Civilian Pay
+| Mil. Active
+| Mil. Retire.
+| Mil. Survivor
+| Other
+| (specify)
+| THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G
+| TYPE AMOUNT
+| PAYEE/JOINT PAYEE CERTIFICATION
+| I certify that I am entitled to the payment identified above, and that I have
+| read and understood the back of this form. In signing this form, I
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I have read and understood the back of this form,
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 PAYEE COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: default page 4
+| BURDEN ESTIMATE STATEMENT
+| The estimated average burden associated with this collection of information is 10 minutes per respondent or recordkeeper,
+| depending on individual circumstances.  Comments concerning the accuracy of this burden estimate and suggestions for
+| reducing this burden should be directed to the Financial Management Service, Facilities Management Division, Property &
+| Supply Section, Room B-101, 3700 East-West Highway, Hyattsville, MD 20782 or the Office of Management and Budget,
+| Paperwork Reduction Project (1510-0007), Washington, D.C. 20503.
+| PLEASE READ THIS CAREFULLY
+|      All information on this form, including the individual claim number, is required under 31 USC 3322, 31 CFR 209 and/or
+| 210.  The information is confidential and is needed to prove entitlement to payments.  The information will be used to
+| process payment data from the Federal agency to the financial institution and/or its agent.  Failure to provide the requested
+| information may affect the processing of this form and may delay or prevent the receipt of payments through the Direct
+| Deposit/Electronic Funds Transfer Program.
+| INFORMATION FOUND ON CHECKS
+|     Most of the information needed to complete boxes A,
+| C, and F in Section 1 is printed on your government
+| check:
+| Be sure that payee’s name is written exactly as it ap-
+| pears on the check.  Be sure current address is shown.
+| Claim numbers and suffixes are printed here on checks
+| beneath the date for the type of payment shown here.
+| Check the Green Book for the location of prefixes and
+| suffixes for other types of payments.
+| Type of payment is printed to the left of the amount.
+| SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS
+|      Joint account holders should immediately advise both the Government agency and the financial institution of the death
+| of a beneficiary.  Funds deposited after the date of death or ineligibility, except for salary payments, are to be returned to
+| the Government agency.  The Government agency will then make a determination regarding survivor rights, calculate
+| survivor benefit payments, if any, and begin payments.
+| CANCELLATION
+|      The agreement represented by this authorization remains in effect until cancelled by the recipient by notice to the
+| Federal agency or by the death or legal incapacity of the recipient.  Upon cancellation by the recipient, the recipient should
+| notify the receiving financial institution that he/she is doing so.
+|      The agreement represented by this authorization may be cancelled by the financial institution by providing the recipient
+| a written notice 30 days in advance of the cancellation date.  The recipient must immediately advise the Federal agency if
+| the authorization is cancelled by the financial institution.  The financial institution cannot cancel the authorization by advice
+| to the Government agency.
+| CHANGING RECEIVING FINANCIAL INSTITUTIONS
+|      The payee’s Direct Deposit will continue to be received by the selected financial institution until the Government agency
+| is notified by the payee that the payee wishes to change the financial institution receiving the Direct Deposit.  To effect this
+| change, the payee will complete a new SF 1199A at the newly selected financial institution. It is recommended that the
+| payee maintain accounts at both financial institutions until the transition is complete, i.e. after the new financial institution
+| receives the payee’s Direct Deposit payment.
+| FALSE STATEMENTS OR FRAUDULENT CLAIMS
+|      Federal law provides a fine of not more than $10,000 or imprisonment for not more than five (5) years or both for
+| presenting a false statement or making a fraudulent claim.
+| A
+| C
+| F
+| United States Treasury 15-51
+| 000
+| AUSTIN, TEXAS Check No.
+| 0000  415785
+| Month Day  Year\x20
+| 08 31 84
+| 29-693-775     00
+| Pay to
+| the order of JOHN DOE
+| 123 BRISTOL STREET
+| HAWKINS BRANCH  TX  76543
+| DOLLARS      CTS\x20
+| $****100 00
+|      28       28
+| VA  COMP
+| NOT NEGOTIABLE
+| ’:00000518’:  041571926"
+| C
+| A
+| F
+| SF 1199A (Back)
+text: sorted page 1
+| Standard Form 1199A (EG) OMB No. 1510-0007
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department DIRECT DEPOSIT SIGN-UP FORM
+| Treasury Dept. Cir. 1076
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form The claim number and type of payment are printed on Government
+| and fill in the information requested in Sections 1 and 2. Then take or checks.  (See the sample check on the back of this form.)  This
+| mail this form to the financial institution.  The financial institution will information is also stated on beneficiary/annuitant award letters and
+| verify the information in Sections 1 and 2, and will complete Section 3. other documents from the Government agency.
+| The completed form will be returned to the Government agency
+| identified below. Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| A separate form must be completed for each type of payment to be remain qualified for payments.
+| sent by Direct Deposit.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| A NAME OF PAYEE (last, first, middle initial)
+| D TYPE OF DEPOSITOR ACCOUNT CHECKING  SAVINGS
+| E DEPOSITOR ACCOUNT NUMBER
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE F TYPE OF PAYMENT (Check only one)
+| Social Security Fed. Salary/Mil. Civilian Pay
+| TELEPHONE NUMBER    Supplemental Security Income Mil. Active
+| Railroad Retirement Mil. Retire.
+|        AREA CODE         \x20
+| Civil Service Retirement (OPM) Mil. Survivor
+| B NAME OF PERSON(S) ENTITLED TO PAYMENT
+| VA Compensation or Pension Other
+| (specify)
+| C CLAIM OR PAYROLL ID NUMBER G THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)
+| TYPE AMOUNT
+|        Prefix      Suffix   \x20
+| PAYEE/JOINT PAYEE CERTIFICATION JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I am entitled to the payment identified above, and that I have I certify that I have read and understood the back of this form,
+| read and understood the back of this form. In signing this form, I including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| SIGNATURE DATE SIGNATURE DATE
+| SIGNATURE DATE SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 GOVERNMENT AGENCY COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: sorted page 2
+| Standard Form 1199A (EG) OMB No. 1510-0007
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department DIRECT DEPOSIT SIGN-UP FORM
+| Treasury Dept. Cir. 1076
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form The claim number and type of payment are printed on Government
+| and fill in the information requested in Sections 1 and 2. Then take or checks.  (See the sample check on the back of this form.)  This
+| mail this form to the financial institution.  The financial institution will information is also stated on beneficiary/annuitant award letters and
+| verify the information in Sections 1 and 2, and will complete Section 3. other documents from the Government agency.
+| The completed form will be returned to the Government agency
+| identified below. Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| A separate form must be completed for each type of payment to be remain qualified for payments.
+| sent by Direct Deposit.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| A NAME OF PAYEE (last, first, middle initial)
+| D TYPE OF DEPOSITOR ACCOUNT CHECKING  SAVINGS
+| E DEPOSITOR ACCOUNT NUMBER
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE F TYPE OF PAYMENT (Check only one)
+| Social Security Fed. Salary/Mil. Civilian Pay
+| TELEPHONE NUMBER    Supplemental Security Income Mil. Active
+| Railroad Retirement Mil. Retire.
+|        AREA CODE         \x20
+| Civil Service Retirement (OPM) Mil. Survivor
+| B NAME OF PERSON(S) ENTITLED TO PAYMENT
+| VA Compensation or Pension Other
+| (specify)
+| C CLAIM OR PAYROLL ID NUMBER G THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)
+| TYPE AMOUNT
+|        Prefix      Suffix   \x20
+| PAYEE/JOINT PAYEE CERTIFICATION JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I am entitled to the payment identified above, and that I have I certify that I have read and understood the back of this form,
+| read and understood the back of this form. In signing this form, I including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| SIGNATURE DATE SIGNATURE DATE
+| SIGNATURE DATE SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 FINANCIAL INSTITUTION COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: sorted page 3
+| Standard Form 1199A (EG) OMB No. 1510-0007
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department DIRECT DEPOSIT SIGN-UP FORM
+| Treasury Dept. Cir. 1076
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form The claim number and type of payment are printed on Government
+| and fill in the information requested in Sections 1 and 2. Then take or checks.  (See the sample check on the back of this form.)  This
+| mail this form to the financial institution.  The financial institution will information is also stated on beneficiary/annuitant award letters and
+| verify the information in Sections 1 and 2, and will complete Section 3. other documents from the Government agency.
+| The completed form will be returned to the Government agency
+| identified below. Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| A separate form must be completed for each type of payment to be remain qualified for payments.
+| sent by Direct Deposit.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| A NAME OF PAYEE (last, first, middle initial)
+| D TYPE OF DEPOSITOR ACCOUNT CHECKING  SAVINGS
+| E DEPOSITOR ACCOUNT NUMBER
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE F TYPE OF PAYMENT (Check only one)
+| Social Security Fed. Salary/Mil. Civilian Pay
+| TELEPHONE NUMBER    Supplemental Security Income Mil. Active
+| Railroad Retirement Mil. Retire.
+|        AREA CODE         \x20
+| Civil Service Retirement (OPM) Mil. Survivor
+| B NAME OF PERSON(S) ENTITLED TO PAYMENT
+| VA Compensation or Pension Other
+| (specify)
+| C CLAIM OR PAYROLL ID NUMBER G THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)
+| TYPE AMOUNT
+|        Prefix      Suffix   \x20
+| PAYEE/JOINT PAYEE CERTIFICATION JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I am entitled to the payment identified above, and that I have I certify that I have read and understood the back of this form,
+| read and understood the back of this form. In signing this form, I including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| SIGNATURE DATE SIGNATURE DATE
+| SIGNATURE DATE SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 PAYEE COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: sorted page 4
+| SF 1199A (Back)
+| BURDEN ESTIMATE STATEMENT
+| The estimated average burden associated with this collection of information is 10 minutes per respondent or recordkeeper,
+| depending on individual circumstances.  Comments concerning the accuracy of this burden estimate and suggestions for
+| reducing this burden should be directed to the Financial Management Service, Facilities Management Division, Property &
+| Supply Section, Room B-101, 3700 East-West Highway, Hyattsville, MD 20782 or the Office of Management and Budget,
+| Paperwork Reduction Project (1510-0007), Washington, D.C. 20503.
+| PLEASE READ THIS CAREFULLY
+|      All information on this form, including the individual claim number, is required under 31 USC 3322, 31 CFR 209 and/or
+| 210.  The information is confidential and is needed to prove entitlement to payments.  The information will be used to
+| process payment data from the Federal agency to the financial institution and/or its agent.  Failure to provide the requested
+| information may affect the processing of this form and may delay or prevent the receipt of payments through the Direct
+| Deposit/Electronic Funds Transfer Program.
+| INFORMATION FOUND ON CHECKS
+|     Most of the information needed to complete boxes A,
+| C, and F in Section 1 is printed on your government United States Treasury 15-51
+| 000
+| Month Day  Year\x20
+| check: AUSTIN, TEXAS Check No.
+| 08 31 84 0000  415785
+| A Be sure that payee’s name is written exactly as it ap- 29-693-775     00 C      28       28 DOLLARS      CTS\x20
+| pears on the check.  Be sure current address is shown. Pay to VA  COMP $****100 00
+| the order of JOHN DOE
+| C Claim numbers and suffixes are printed here on checks 123 BRISTOL STREET F
+| beneath the date for the type of payment shown here. HAWKINS BRANCH  TX  76543
+| Check the Green Book for the location of prefixes and
+| suffixes for other types of payments. A NOT NEGOTIABLE
+| F Type of payment is printed to the left of the amount.
+| ’:00000518’:  041571926"
+| SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS
+|      Joint account holders should immediately advise both the Government agency and the financial institution of the death
+| of a beneficiary.  Funds deposited after the date of death or ineligibility, except for salary payments, are to be returned to
+| the Government agency.  The Government agency will then make a determination regarding survivor rights, calculate
+| survivor benefit payments, if any, and begin payments.
+| CANCELLATION
+|      The agreement represented by this authorization remains in effect until cancelled by the recipient by notice to the
+| Federal agency or by the death or legal incapacity of the recipient.  Upon cancellation by the recipient, the recipient should
+| notify the receiving financial institution that he/she is doing so.
+|      The agreement represented by this authorization may be cancelled by the financial institution by providing the recipient
+| a written notice 30 days in advance of the cancellation date.  The recipient must immediately advise the Federal agency if
+| the authorization is cancelled by the financial institution.  The financial institution cannot cancel the authorization by advice
+| to the Government agency.
+| CHANGING RECEIVING FINANCIAL INSTITUTIONS
+|      The payee’s Direct Deposit will continue to be received by the selected financial institution until the Government agency
+| is notified by the payee that the payee wishes to change the financial institution receiving the Direct Deposit.  To effect this
+| change, the payee will complete a new SF 1199A at the newly selected financial institution. It is recommended that the
+| payee maintain accounts at both financial institutions until the transition is complete, i.e. after the new financial institution
+| receives the payee’s Direct Deposit payment.
+| FALSE STATEMENTS OR FRAUDULENT CLAIMS
+|      Federal law provides a fine of not more than $10,000 or imprisonment for not more than five (5) years or both for
+| presenting a false statement or making a fraudulent claim.
+text: range 2-3
+| Standard Form 1199A (EG)
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department
+| Treasury Dept. Cir. 1076
+| DIRECT DEPOSIT SIGN-UP FORM
+| OMB No. 1510-0007
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form
+| and fill in the information requested in Sections 1 and 2. Then take or
+| mail this form to the financial institution.  The financial institution will
+| verify the information in Sections 1 and 2, and will complete Section 3.\x20
+| The completed form will be returned to the Government agency
+| identified below.
+| A separate form must be completed for each type of payment to be
+| sent by Direct Deposit.
+| The claim number and type of payment are printed on Government
+| checks.  (See the sample check on the back of this form.)  This
+| information is also stated on beneficiary/annuitant award letters and
+| other documents from the Government agency.
+| Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| remain qualified for payments.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| NAME OF PAYEE (last, first, middle initial)A
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE
+| TELEPHONE NUMBER   \x20
+|        AREA CODE         \x20
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB
+| CLAIM OR PAYROLL ID NUMBERC
+|        Prefix      Suffix   \x20
+| TYPE OF DEPOSITOR ACCOUNTD CHECKING  SAVINGS
+| DEPOSITOR ACCOUNT NUMBERE
+| TYPE OF PAYMENT (Check only one)F
+| Social Security
+| Supplemental Security Income
+| Railroad Retirement
+| Civil Service Retirement (OPM)
+| VA Compensation or Pension
+| Fed. Salary/Mil. Civilian Pay
+| Mil. Active
+| Mil. Retire.
+| Mil. Survivor
+| Other
+| (specify)
+| THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G
+| TYPE AMOUNT
+| PAYEE/JOINT PAYEE CERTIFICATION
+| I certify that I am entitled to the payment identified above, and that I have
+| read and understood the back of this form. In signing this form, I
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I have read and understood the back of this form,
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 FINANCIAL INSTITUTION COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+| Standard Form 1199A (EG)
+| (Rev. June 1987)
+| Prescribed by Treasury
+|      Department
+| Treasury Dept. Cir. 1076
+| DIRECT DEPOSIT SIGN-UP FORM
+| OMB No. 1510-0007
+| DIRECTIONS
+| To sign up for Direct Deposit, the payee is to read the back of this form
+| and fill in the information requested in Sections 1 and 2. Then take or
+| mail this form to the financial institution.  The financial institution will
+| verify the information in Sections 1 and 2, and will complete Section 3.\x20
+| The completed form will be returned to the Government agency
+| identified below.
+| A separate form must be completed for each type of payment to be
+| sent by Direct Deposit.
+| The claim number and type of payment are printed on Government
+| checks.  (See the sample check on the back of this form.)  This
+| information is also stated on beneficiary/annuitant award letters and
+| other documents from the Government agency.
+| Payees must keep the Government agency informed of any address
+| changes in order to receive important information about benefits and to
+| remain qualified for payments.
+| SECTION 1 (TO BE COMPLETED BY PAYEE)
+| NAME OF PAYEE (last, first, middle initial)A
+| ADDRESS (street, route, P.O. Box, APO/FPO)
+| CITY STATE ZIP CODE
+| TELEPHONE NUMBER   \x20
+|        AREA CODE         \x20
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB
+| CLAIM OR PAYROLL ID NUMBERC
+|        Prefix      Suffix   \x20
+| TYPE OF DEPOSITOR ACCOUNTD CHECKING  SAVINGS
+| DEPOSITOR ACCOUNT NUMBERE
+| TYPE OF PAYMENT (Check only one)F
+| Social Security
+| Supplemental Security Income
+| Railroad Retirement
+| Civil Service Retirement (OPM)
+| VA Compensation or Pension
+| Fed. Salary/Mil. Civilian Pay
+| Mil. Active
+| Mil. Retire.
+| Mil. Survivor
+| Other
+| (specify)
+| THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G
+| TYPE AMOUNT
+| PAYEE/JOINT PAYEE CERTIFICATION
+| I certify that I am entitled to the payment identified above, and that I have
+| read and understood the back of this form. In signing this form, I
+| authorize my payment to be sent to the financial institution named below
+| to be deposited to the designated account.
+| JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)
+| I certify that I have read and understood the back of this form,
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SIGNATURE DATE
+| SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)
+| GOVERNMENT AGENCY NAME GOVERNMENT AGENCY ADDRESS
+| SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION ROUTING NUMBER CHECK
+| DIGIT
+| DEPOSITOR ACCOUNT TITLE
+| FINANCIAL INSTITUTION CERTIFICATION
+| I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I
+| certify that the financial institution agrees to receive and deposit the payment identified above in accordance with 31 CFR Parts 240, 209, and
+| 210.
+| PRINT OR TYPE REPRESENTATIVE’S NAME SIGNATURE OF REPRESENTATIVE TELEPHONE NUMBER DATE
+| Financial institutions should refer to the GREEN BOOK for further instructions.
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.
+| NSN 7540-01-058-0224 PAYEE COPY 1199-207
+| Designed using Perform Pro, WHS/DIOR, Mar 97
+text: separators 1-2
+| <PAGE><A><P>Standard Form 1199A (EG)<EOL>
+| (Rev. June 1987)<EOL>
+| Prescribed by Treasury<EOL>
+|      Department<EOL>
+| Treasury Dept. Cir. 1076<EOL>
+| </P><P>DIRECT DEPOSIT SIGN-UP FORM<EOL>
+| OMB No. 1510-0007<EOL>
+| </P><P>DIRECTIONS<EOL>
+| To sign up for Direct Deposit, the payee is to read the back of this form<EOL>
+| and fill <W>in the <W>information requested in Sections 1 and 2. Then take or<EOL>
+| mail <W>this <W>form <W>to <W>the <W>financial <W>institution. <W> <W>The <W>financial <W>institution <W>will<EOL>
+| verify the information in Sections 1 and 2, and will complete Section 3. <EOL>
+| The <W>completed <W>form <W>will <W>be <W>returned <W>to <W>the <W>Government <W>agency<EOL>
+| identified below.<EOL>
+| </P><P>A <W>separate <W>form <W>must <W>be <W>completed <W>for <W>each <W>type <W>of <W>payment <W>to <W>be<EOL>
+| sent by Direct Deposit.<EOL>
+| </P><P>The <W>claim <W>number <W>and <W>type <W>of <W>payment <W>are <W>printed <W>on <W>Government<EOL>
+| checks. <W> <W>(See <W>the <W>sample <W>check <W>on <W>the <W>back <W>of <W>this <W>form.) <W> <W>This<EOL>
+| information <W>is <W>also <W>stated <W>on <W>beneficiary/annuitant <W>award <W>letters <W>and<EOL>
+| other documents from the Government agency.<EOL>
+| </P><P>Payees <W>must <W>keep <W>the <W>Government <W>agency <W>informed <W>of <W>any <W>address<EOL>
+| changes in order to receive important information about benefits and to<EOL>
+| remain qualified for payments.<EOL>
+| </P><P>SECTION 1 (TO BE COMPLETED BY PAYEE)<EOL>
+| NAME OF PAYEE (last, first, middle initial)A<EOL>
+| </P><P>ADDRESS (street, route, P.O. Box, APO/FPO)<EOL>
+| </P><P>CITY<W>STATE<W>ZIP CODE<EOL>
+| </P><P>TELEPHONE NUMBER    <EOL>
+| </P><P>       AREA CODE          <EOL>
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB<EOL>
+| </P><P>CLAIM OR PAYROLL ID NUMBERC<EOL>
+| </P><P>       Prefix      <W>Suffix    <EOL>
+| </P><P>TYPE OF DEPOSITOR ACCOUNTD<W>CHECKING<W> SAVINGS<EOL>
+| </P><P>DEPOSITOR ACCOUNT NUMBERE<EOL>
+| </P><P>TYPE OF PAYMENT (Check only one)F<EOL>
+| Social Security<EOL>
+| </P><P>Supplemental Security Income<EOL>
+| </P><P>Railroad Retirement<EOL>
+| </P><P>Civil Service Retirement (OPM)<EOL>
+| </P><P>VA Compensation or Pension<EOL>
+| </P><P>Fed. Salary/Mil. Civilian Pay<EOL>
+| </P><P>Mil. Active<EOL>
+| </P><P>Mil. Retire.<EOL>
+| </P><P>Mil. Survivor<EOL>
+| </P><P>Other<EOL>
+| (specify)<EOL>
+| </P><P>THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G<EOL>
+| TYPE<W>AMOUNT<EOL>
+| </P><P>PAYEE/JOINT PAYEE CERTIFICATION<EOL>
+| </P><P>I certify that I am entitled to the payment identified above, and that I have<EOL>
+| read <W>and <W>understood <W>the <W>back <W>of <W>this <W>form. <W>In <W>signing <W>this <W>form, <W>I<EOL>
+| authorize my payment to be sent to the financial institution named below<EOL>
+| to be deposited to the designated account.<EOL>
+| </P><P>JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)<EOL>
+| </P><P>I <W>certify <W>that <W>I <W>have <W>read <W>and <W>understood <W>the <W>back <W>of <W>this <W>form,<EOL>
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)<EOL>
+| GOVERNMENT AGENCY NAME<W>GOVERNMENT AGENCY ADDRESS<EOL>
+| </P><P>SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)<EOL>
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION<W>ROUTING NUMBER<W>CHECK<EOL>
+| </P><P>DIGIT<EOL>
+| </P><P>DEPOSITOR ACCOUNT TITLE<EOL>
+| </P><P>FINANCIAL INSTITUTION CERTIFICATION<EOL>
+| </P><P>I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I<EOL>
+| certify <W>that <W>the financial <W>institution agrees to receive and deposit <W>the payment <W>identified above in accordance with 31 CFR Parts 240, 209, and<EOL>
+| 210.<EOL>
+| </P><P>PRINT OR TYPE REPRESENTATIVE’S NAME<W>SIGNATURE OF REPRESENTATIVE<W>TELEPHONE NUMBER<W>DATE<EOL>
+| </P><P>Financial institutions should refer to the GREEN BOOK for further instructions.<EOL>
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.<EOL>
+| </P><P>NSN 7540-01-058-0224<W>GOVERNMENT AGENCY COPY<W>1199-207<EOL>
+| Designed using Perform Pro, WHS/DIOR, Mar 97</P></A></PAGE>
+| <PAGE><A><P>Standard Form 1199A (EG)<EOL>
+| (Rev. June 1987)<EOL>
+| Prescribed by Treasury<EOL>
+|      Department<EOL>
+| Treasury Dept. Cir. 1076<EOL>
+| </P><P>DIRECT DEPOSIT SIGN-UP FORM<EOL>
+| OMB No. 1510-0007<EOL>
+| </P><P>DIRECTIONS<EOL>
+| To sign up for Direct Deposit, the payee is to read the back of this form<EOL>
+| and fill <W>in the <W>information requested in Sections 1 and 2. Then take or<EOL>
+| mail <W>this <W>form <W>to <W>the <W>financial <W>institution. <W> <W>The <W>financial <W>institution <W>will<EOL>
+| verify the information in Sections 1 and 2, and will complete Section 3. <EOL>
+| The <W>completed <W>form <W>will <W>be <W>returned <W>to <W>the <W>Government <W>agency<EOL>
+| identified below.<EOL>
+| </P><P>A <W>separate <W>form <W>must <W>be <W>completed <W>for <W>each <W>type <W>of <W>payment <W>to <W>be<EOL>
+| sent by Direct Deposit.<EOL>
+| </P><P>The <W>claim <W>number <W>and <W>type <W>of <W>payment <W>are <W>printed <W>on <W>Government<EOL>
+| checks. <W> <W>(See <W>the <W>sample <W>check <W>on <W>the <W>back <W>of <W>this <W>form.) <W> <W>This<EOL>
+| information <W>is <W>also <W>stated <W>on <W>beneficiary/annuitant <W>award <W>letters <W>and<EOL>
+| other documents from the Government agency.<EOL>
+| </P><P>Payees <W>must <W>keep <W>the <W>Government <W>agency <W>informed <W>of <W>any <W>address<EOL>
+| changes in order to receive important information about benefits and to<EOL>
+| remain qualified for payments.<EOL>
+| </P><P>SECTION 1 (TO BE COMPLETED BY PAYEE)<EOL>
+| NAME OF PAYEE (last, first, middle initial)A<EOL>
+| </P><P>ADDRESS (street, route, P.O. Box, APO/FPO)<EOL>
+| </P><P>CITY<W>STATE<W>ZIP CODE<EOL>
+| </P><P>TELEPHONE NUMBER    <EOL>
+| </P><P>       AREA CODE          <EOL>
+| NAME OF PERSON(S) ENTITLED TO PAYMENTB<EOL>
+| </P><P>CLAIM OR PAYROLL ID NUMBERC<EOL>
+| </P><P>       Prefix      <W>Suffix    <EOL>
+| </P><P>TYPE OF DEPOSITOR ACCOUNTD<W>CHECKING<W> SAVINGS<EOL>
+| </P><P>DEPOSITOR ACCOUNT NUMBERE<EOL>
+| </P><P>TYPE OF PAYMENT (Check only one)F<EOL>
+| Social Security<EOL>
+| </P><P>Supplemental Security Income<EOL>
+| </P><P>Railroad Retirement<EOL>
+| </P><P>Civil Service Retirement (OPM)<EOL>
+| </P><P>VA Compensation or Pension<EOL>
+| </P><P>Fed. Salary/Mil. Civilian Pay<EOL>
+| </P><P>Mil. Active<EOL>
+| </P><P>Mil. Retire.<EOL>
+| </P><P>Mil. Survivor<EOL>
+| </P><P>Other<EOL>
+| (specify)<EOL>
+| </P><P>THIS BOX FOR ALLOTMENT OF PAYMENT ONLY (if applicable)G<EOL>
+| TYPE<W>AMOUNT<EOL>
+| </P><P>PAYEE/JOINT PAYEE CERTIFICATION<EOL>
+| </P><P>I certify that I am entitled to the payment identified above, and that I have<EOL>
+| read <W>and <W>understood <W>the <W>back <W>of <W>this <W>form. <W>In <W>signing <W>this <W>form, <W>I<EOL>
+| authorize my payment to be sent to the financial institution named below<EOL>
+| to be deposited to the designated account.<EOL>
+| </P><P>JOINT ACCOUNT HOLDERS’ CERTIFICATION (optional)<EOL>
+| </P><P>I <W>certify <W>that <W>I <W>have <W>read <W>and <W>understood <W>the <W>back <W>of <W>this <W>form,<EOL>
+| including the SPECIAL NOTICE TO JOINT ACCOUNT HOLDERS.<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SIGNATURE<W>DATE<EOL>
+| </P><P>SECTION 2 (TO BE COMPLETED BY PAYEE OR FINANCIAL INSTITUTION)<EOL>
+| GOVERNMENT AGENCY NAME<W>GOVERNMENT AGENCY ADDRESS<EOL>
+| </P><P>SECTION 3 (TO BE COMPLETED BY FINANCIAL INSTITUTION)<EOL>
+| NAME AND ADDRESS OF FINANCIAL INSTITUTION<W>ROUTING NUMBER<W>CHECK<EOL>
+| </P><P>DIGIT<EOL>
+| </P><P>DEPOSITOR ACCOUNT TITLE<EOL>
+| </P><P>FINANCIAL INSTITUTION CERTIFICATION<EOL>
+| </P><P>I confirm the identity of the above-named payee(s) and the account number and title.  As representative of the above-named financial institution, I<EOL>
+| certify <W>that <W>the financial <W>institution agrees to receive and deposit <W>the payment <W>identified above in accordance with 31 CFR Parts 240, 209, and<EOL>
+| 210.<EOL>
+| </P><P>PRINT OR TYPE REPRESENTATIVE’S NAME<W>SIGNATURE OF REPRESENTATIVE<W>TELEPHONE NUMBER<W>DATE<EOL>
+| </P><P>Financial institutions should refer to the GREEN BOOK for further instructions.<EOL>
+| THE FINANCIAL INSTITUTION SHOULD MAIL THE COMPLETED FORM TO THE GOVERNMENT AGENCY IDENTIFIED ABOVE.<EOL>
+| </P><P>NSN 7540-01-058-0224<W>FINANCIAL INSTITUTION COPY<W>1199-207<EOL>
+| Designed using Perform Pro, WHS/DIOR, Mar 97</P></A></PAGE>

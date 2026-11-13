@@ -1,0 +1,22 @@
+text: default page 1
+| Page1
+text: default page 2
+| Page2
+text: default page 3
+| Page3
+text: default page 4
+| Page4
+text: sorted page 1
+| Page1
+text: sorted page 2
+| Page2
+text: sorted page 3
+| Page3
+text: sorted page 4
+| Page4
+text: range 2-3
+| Page2
+| Page3
+text: separators 1-2
+| <PAGE><A><P>Page1</P></A></PAGE>
+| <PAGE><A><P>Page2</P></A></PAGE>

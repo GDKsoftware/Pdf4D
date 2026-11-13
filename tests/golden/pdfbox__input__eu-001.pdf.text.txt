@@ -1,0 +1,634 @@
+text: default page 1
+| E-PRTR pollutants and their thresholds\x20
+| \x20
+| A facility has to report data under E-PRTR if it fulfils the following criteria: \x20
+| • the facility falls under at least one of the 65 E-PRTR economic activities. The\x20
+| activities are also reported using a statistical classification of economic activities\x20
+| (NACE rev 2) \x20
+| • the facility has a capacity exceeding at least one of the E-PRTR capacity\x20
+| thresholds \x20
+| • the facility releases pollutants or transfers waste off-site which exceed specific\x20
+| thresholds set out in Article 5 of the E-PRTR Regulation. These thresholds for\x20
+| releases of pollutants are specified for each media - air, water and land - in Annex\x20
+| II of the E-PRTR Regulation.\x20
+| \x20
+| In the following tables you will find the 91 E-PRTR pollutants and their thresholds broken\x20
+| down by the 7 groups used in all the searches of the E-PRTR website.\x20
+| \x20
+| \x20
+| Greenhouse gases\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Carbon dioxide (CO2) 100 million - -\x20
+| Hydro-fluorocarbons (HFCs) 100 - -\x20
+| Methane (CH4) 100 000 - -\x20
+| Nitrous oxide (N2O) 10 000 - -\x20
+| Perfluorocarbons (PFCs) 100 - -\x20
+| Sulphur hexafluoride (SF6) 50 - -\x20
+| \x20
+| Other gases\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Ammonia (NH3) 10 000 - -\x20
+| Carbon monoxide (CO) 500 000 - -\x20
+| Chlorine and inorganic compounds\x20
+| (as HCl) 10 000 - -\x20
+| Chlorofluorocarbons (CFCs) 1 - -\x20
+| Flourine and inorganic compounds\x20
+| (as HF) 5 000 - -\x20
+| Halons 1 - -\x20
+| Hydrochlorofluorocarbons (HCFCs) 1 - -\x20
+| Hydrogen Cyanide (HCN) 200 - -\x20
+| Nitrogen oxides (NOx/NO2) 100 000 - -\x20
+| Non-methane volatile organic\x20
+| compounds (NMVOC) 100 000 - -\x20
+| Sulphur oxides (SOx/SO2) 150 000 - -\x20
+| \x20
+| Heavy metals\x20
+|  \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Arsenic and compounds (as As) 20 5 5\x20
+| Cadmium and compounds (as Cd) 10 5 5\x20
+| Chromium and compounds (as Cr) 100 50 50\x20
+| Copper and compounds (as Cu) 100 50 50\x20
+| Lead and compounds (as Pb) 200 20 20\x20
+| Mercury and compounds (as Hg) 10 1 1\x20
+| Nickel and compounds (as Ni) 50 20 20\x20
+| Zinc and compounds (as Zn) 200 100 100\x20
+| \x20
+text: default page 2
+| Pesticides \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| 1,2,3,4,5,6- hexachlorocyclohexane\x20
+| (HCH) 10 1 1\x20
+| Alachlor - 1 1\x20
+| Aldrin 1 1 1\x20
+| Atrazine - 1 1\x20
+| Chlordane 1 1 1\x20
+| Chlordecone 1 1 1\x20
+| Chlorfenvinphos - 1 1\x20
+| Chlorpyrifos - 1 1\x20
+| DDT 1 1 1\x20
+| Diuron - 1 1\x20
+| Endosulphan - 1 1\x20
+| Endrin 1 1 1\x20
+| Heptachlor 1 1 1\x20
+| Isodrin - 1 -\x20
+| Isoproturon - 1 1\x20
+| Lindane 1 1 1\x20
+| Mirex 1 1 1\x20
+| Simazine - 1 1\x20
+| Toxaphene 1 1 1\x20
+| Tributylin and compounds - 1 1\x20
+| Trifluralin - 1 1\x20
+| Triphenyltin and compounds - 1 1\x20
+| \x20
+| Chlorinated organic substances \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| 1,1,1-trichloroethane 100 - -\x20
+| 1,1,2,2-tetrachloroethane 50 - -\x20
+| 1,2-dichloroethane (EDC) 1 000 10 10\x20
+| Brominated diphenylethers (PBDE) - 1 1\x20
+| Chloro-alkanes, C10-C13 - 1 1\x20
+| Dichloromethane (DCM) 1 000 10 10\x20
+| Dieldrin 1 1 1\x20
+| Halogenated Organic Compounds (AOX) - 1 000 1 000\x20
+| Hexabromobifenyl 0,1 0,1 0,1\x20
+| Hexachlorobenzene (HCB) 10 1 1\x20
+| Hexachlorobutadiene (HCBD) - 1 1\x20
+| PCDD+PCFD (Dioxins+furans) (as Teq) 0,0001 0,0001 0,0001\x20
+| Pentachlorobenzene 1 1 1\x20
+| Pentachlorophenol (PCP) 10 1 1\x20
+| Polychlorinated biphenyls (PCB) 0,1 0,1 0,1\x20
+| Tetrachloroethylene (PER) 2 000 10 -\x20
+| Tetrachloromethane (TCM) 100 1 -\x20
+| Trichlorobenzenes (TCBs) (all isomers) 10 1 -\x20
+| Trichloroethylene 2 000 10 -\x20
+| Trichloromethane 500 10 -\x20
+| Vynil chloride 1 000 10 10\x20
+| \x20
+| \x20
+text: default page 3
+| Other organic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Anthracene 50 1 1\x20
+| Benzene 1 000 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Benzo(g,h,i)perylene - 1 -\x20
+| Di-(2-ethyl hexyl) phthalate (DEHP) 10 1 1\x20
+| Ethyl benzene - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Ethylene oxide 1 000 10 10\x20
+| Fluoranthene - 1 -\x20
+| Naphthalene 100 10 10\x20
+| Nonylphenol and Nonylphenol ethoxylates\x20
+| (NP/NPEs) - 1 1\x20
+| Octylphenols and octylphenol ethoxylates - 1 -\x20
+| Organotin compounds (as total Sn) - 50 50\x20
+| Phenols (as total C) - 20 20\x20
+| Polycyclic Aromatic hydrocarbons (PAHs) 50 5 5\x20
+| Toluene - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Total Organic Carbon (TOC) (as total C or\x20
+| COD/3) - 50 000 -\x20
+| Xylenes - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| \x20
+| \x20
+| Inorganic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Asbestos 1 1 1\x20
+| Chlorides (as total Cl) - 2 million 2 million\x20
+| Cyanides (as total CN) - 50 50\x20
+| Fluorides (as total F) - 2 000 2 000\x20
+| Particulate matter (PM10) 50 000 - -\x20
+| Total Nitrogen - 50 000 50 000\x20
+| Total Phosphorus - 5 000 5 000\x20
+| \x20
+| \x20
+text: sorted page 1
+| E-PRTR pollutants and their thresholds\x20
+| \x20
+| A facility has to report data under E-PRTR if it fulfils the following criteria: \x20
+| • the facility falls under at least one of the 65 E-PRTR economic activities. The\x20
+| activities are also reported using a statistical classification of economic activities\x20
+| (NACE rev 2) \x20
+| • the facility has a capacity exceeding at least one of the E-PRTR capacity\x20
+| thresholds \x20
+| • the facility releases pollutants or transfers waste off-site which exceed specific\x20
+| thresholds set out in Article 5 of the E-PRTR Regulation. These thresholds for\x20
+| releases of pollutants are specified for each media - air, water and land - in Annex\x20
+| II of the E-PRTR Regulation.\x20
+| \x20
+| In the following tables you will find the 91 E-PRTR pollutants and their thresholds broken\x20
+| down by the 7 groups used in all the searches of the E-PRTR website.\x20
+| \x20
+| \x20
+| Greenhouse gases\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| Carbon dioxide (CO2) 100 million - -\x20
+| Hydro-fluorocarbons (HFCs) 100 - -\x20
+| Methane (CH4) 100 000 - -\x20
+| Nitrous oxide (N2O) 10 000 - -\x20
+| Perfluorocarbons (PFCs) 100 - -\x20
+| Sulphur hexafluoride (SF6) 50 - -\x20
+| \x20
+| Other gases\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| Ammonia (NH3) 10 000 - -\x20
+| Carbon monoxide (CO) 500 000 - -\x20
+| Chlorine and inorganic compounds\x20
+| (as HCl) 10 000 - -\x20
+| Chlorofluorocarbons (CFCs) 1 - -\x20
+| Flourine and inorganic compounds\x20
+| (as HF) 5 000 - -\x20
+| Halons 1 - -\x20
+| Hydrochlorofluorocarbons (HCFCs) 1 - -\x20
+| Hydrogen Cyanide (HCN) 200 - -\x20
+| Nitrogen oxides (NOx/NO2) 100 000 - -\x20
+| Non-methane volatile organic\x20
+| compounds (NMVOC) 100 000 - -\x20
+| Sulphur oxides (SOx/SO2) 150 000 - -\x20
+| \x20
+| Heavy metals\x20
+|  \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| Arsenic and compounds (as As) 20 5 5\x20
+| Cadmium and compounds (as Cd) 10 5 5\x20
+| Chromium and compounds (as Cr) 100 50 50\x20
+| Copper and compounds (as Cu) 100 50 50\x20
+| Lead and compounds (as Pb) 200 20 20\x20
+| Mercury and compounds (as Hg) 10 1 1\x20
+| Nickel and compounds (as Ni) 50 20 20\x20
+| Zinc and compounds (as Zn) 200 100 100\x20
+| \x20
+text: sorted page 2
+| Pesticides \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| 1,2,3,4,5,6- hexachlorocyclohexane\x20
+| (HCH) 10 1 1\x20
+| Alachlor - 1 1\x20
+| Aldrin 1 1 1\x20
+| Atrazine - 1 1\x20
+| Chlordane 1 1 1\x20
+| Chlordecone 1 1 1\x20
+| Chlorfenvinphos - 1 1\x20
+| Chlorpyrifos - 1 1\x20
+| DDT 1 1 1\x20
+| Diuron - 1 1\x20
+| Endosulphan - 1 1\x20
+| Endrin 1 1 1\x20
+| Heptachlor 1 1 1\x20
+| Isodrin - 1 -\x20
+| Isoproturon - 1 1\x20
+| Lindane 1 1 1\x20
+| Mirex 1 1 1\x20
+| Simazine - 1 1\x20
+| Toxaphene 1 1 1\x20
+| Tributylin and compounds - 1 1\x20
+| Trifluralin - 1 1\x20
+| Triphenyltin and compounds - 1 1\x20
+| \x20
+| Chlorinated organic substances \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| 1,1,1-trichloroethane 100 - -\x20
+| 1,1,2,2-tetrachloroethane 50 - -\x20
+| 1,2-dichloroethane (EDC) 1 000 10 10\x20
+| Brominated diphenylethers (PBDE) - 1 1\x20
+| Chloro-alkanes, C10-C13 - 1 1\x20
+| Dichloromethane (DCM) 1 000 10 10\x20
+| Dieldrin 1 1 1\x20
+| Halogenated Organic Compounds (AOX) - 1 000 1 000\x20
+| Hexabromobifenyl 0,1 0,1 0,1\x20
+| Hexachlorobenzene (HCB) 10 1 1\x20
+| Hexachlorobutadiene (HCBD) - 1 1\x20
+| PCDD+PCFD (Dioxins+furans) (as Teq) 0,0001 0,0001 0,0001\x20
+| Pentachlorobenzene 1 1 1\x20
+| Pentachlorophenol (PCP) 10 1 1\x20
+| Polychlorinated biphenyls (PCB) 0,1 0,1 0,1\x20
+| Tetrachloroethylene (PER) 2 000 10 -\x20
+| Tetrachloromethane (TCM) 100 1 -\x20
+| Trichlorobenzenes (TCBs) (all isomers) 10 1 -\x20
+| Trichloroethylene 2 000 10 -\x20
+| Trichloromethane 500 10 -\x20
+| Vynil chloride 1 000 10 10\x20
+| \x20
+| \x20
+text: sorted page 3
+| Other organic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| Anthracene 50 1 1\x20
+| Benzene 1 000 200 (as 200 (as\x20
+| BTEX) BTEX)\x20
+| Benzo(g,h,i)perylene - 1 -\x20
+| Di-(2-ethyl hexyl) phthalate (DEHP) 10 1 1\x20
+| Ethyl benzene - 200 (as 200 (as\x20
+| BTEX) BTEX)\x20
+| Ethylene oxide 1 000 10 10\x20
+| Fluoranthene - 1 -\x20
+| Naphthalene 100 10 10\x20
+| Nonylphenol and Nonylphenol ethoxylates\x20
+| (NP/NPEs) - 1 1\x20
+| Octylphenols and octylphenol ethoxylates - 1 -\x20
+| Organotin compounds (as total Sn) - 50 50\x20
+| Phenols (as total C) - 20 20\x20
+| Polycyclic Aromatic hydrocarbons (PAHs) 50 5 5\x20
+| Toluene - 200 (as 200 (as\x20
+| BTEX) BTEX)\x20
+| Total Organic Carbon (TOC) (as total C or\x20
+| COD/3) - 50 000 -\x20
+| Xylenes - 200 (as 200 (as\x20
+| BTEX) BTEX)\x20
+| \x20
+| \x20
+| Inorganic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air to water to land\x20
+| kg/year kg/year kg/year\x20
+| Asbestos 1 1 1\x20
+| Chlorides (as total Cl) - 2 million 2 million\x20
+| Cyanides (as total CN) - 50 50\x20
+| Fluorides (as total F) - 2 000 2 000\x20
+| Particulate matter (PM10) 50 000 - -\x20
+| Total Nitrogen - 50 000 50 000\x20
+| Total Phosphorus - 5 000 5 000\x20
+| \x20
+| \x20
+text: range 2-3
+| Pesticides \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| 1,2,3,4,5,6- hexachlorocyclohexane\x20
+| (HCH) 10 1 1\x20
+| Alachlor - 1 1\x20
+| Aldrin 1 1 1\x20
+| Atrazine - 1 1\x20
+| Chlordane 1 1 1\x20
+| Chlordecone 1 1 1\x20
+| Chlorfenvinphos - 1 1\x20
+| Chlorpyrifos - 1 1\x20
+| DDT 1 1 1\x20
+| Diuron - 1 1\x20
+| Endosulphan - 1 1\x20
+| Endrin 1 1 1\x20
+| Heptachlor 1 1 1\x20
+| Isodrin - 1 -\x20
+| Isoproturon - 1 1\x20
+| Lindane 1 1 1\x20
+| Mirex 1 1 1\x20
+| Simazine - 1 1\x20
+| Toxaphene 1 1 1\x20
+| Tributylin and compounds - 1 1\x20
+| Trifluralin - 1 1\x20
+| Triphenyltin and compounds - 1 1\x20
+| \x20
+| Chlorinated organic substances \x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| 1,1,1-trichloroethane 100 - -\x20
+| 1,1,2,2-tetrachloroethane 50 - -\x20
+| 1,2-dichloroethane (EDC) 1 000 10 10\x20
+| Brominated diphenylethers (PBDE) - 1 1\x20
+| Chloro-alkanes, C10-C13 - 1 1\x20
+| Dichloromethane (DCM) 1 000 10 10\x20
+| Dieldrin 1 1 1\x20
+| Halogenated Organic Compounds (AOX) - 1 000 1 000\x20
+| Hexabromobifenyl 0,1 0,1 0,1\x20
+| Hexachlorobenzene (HCB) 10 1 1\x20
+| Hexachlorobutadiene (HCBD) - 1 1\x20
+| PCDD+PCFD (Dioxins+furans) (as Teq) 0,0001 0,0001 0,0001\x20
+| Pentachlorobenzene 1 1 1\x20
+| Pentachlorophenol (PCP) 10 1 1\x20
+| Polychlorinated biphenyls (PCB) 0,1 0,1 0,1\x20
+| Tetrachloroethylene (PER) 2 000 10 -\x20
+| Tetrachloromethane (TCM) 100 1 -\x20
+| Trichlorobenzenes (TCBs) (all isomers) 10 1 -\x20
+| Trichloroethylene 2 000 10 -\x20
+| Trichloromethane 500 10 -\x20
+| Vynil chloride 1 000 10 10\x20
+| \x20
+| \x20
+| Other organic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Anthracene 50 1 1\x20
+| Benzene 1 000 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Benzo(g,h,i)perylene - 1 -\x20
+| Di-(2-ethyl hexyl) phthalate (DEHP) 10 1 1\x20
+| Ethyl benzene - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Ethylene oxide 1 000 10 10\x20
+| Fluoranthene - 1 -\x20
+| Naphthalene 100 10 10\x20
+| Nonylphenol and Nonylphenol ethoxylates\x20
+| (NP/NPEs) - 1 1\x20
+| Octylphenols and octylphenol ethoxylates - 1 -\x20
+| Organotin compounds (as total Sn) - 50 50\x20
+| Phenols (as total C) - 20 20\x20
+| Polycyclic Aromatic hydrocarbons (PAHs) 50 5 5\x20
+| Toluene - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| Total Organic Carbon (TOC) (as total C or\x20
+| COD/3) - 50 000 -\x20
+| Xylenes - 200 (as\x20
+| BTEX)\x20
+| 200 (as\x20
+| BTEX)\x20
+| \x20
+| \x20
+| Inorganic substances\x20
+| \x20
+|  THRESHOLD FOR RELEASES\x20
+|  to air\x20
+| kg/year\x20
+| to water\x20
+| kg/year\x20
+| to land\x20
+| kg/year\x20
+| Asbestos 1 1 1\x20
+| Chlorides (as total Cl) - 2 million 2 million\x20
+| Cyanides (as total CN) - 50 50\x20
+| Fluorides (as total F) - 2 000 2 000\x20
+| Particulate matter (PM10) 50 000 - -\x20
+| Total Nitrogen - 50 000 50 000\x20
+| Total Phosphorus - 5 000 5 000\x20
+| \x20
+| \x20
+text: separators 1-2
+| <PAGE><A><P>E-PRTR pollutants and their thresholds <EOL>
+|  <EOL>
+| A facility has to report data under E-PRTR if it fulfils the following criteria:  <EOL>
+| </P><P>• <W>the facility falls under at least one of the 65 E-PRTR economic activities. The <EOL>
+| activities are also reported using a statistical classification of economic activities <EOL>
+| (NACE rev 2)  <EOL>
+| </P><P>• <W>the facility has a capacity exceeding at least one of the E-PRTR capacity <EOL>
+| thresholds  <EOL>
+| </P><P>• <W>the facility releases pollutants or transfers waste off-site which exceed specific <EOL>
+| thresholds set out in Article 5 of the E-PRTR Regulation. These thresholds for <EOL>
+| releases of pollutants are specified for each media - air, water and land - in Annex <EOL>
+| II of the E-PRTR Regulation. <EOL>
+| </P><P> <EOL>
+| In the following tables you will find the 91 E-PRTR pollutants and their thresholds broken <EOL>
+| down by the 7 groups used in all the searches of the E-PRTR website. <EOL>
+|  <EOL>
+|  <EOL>
+| </P><P>Greenhouse gases <EOL>
+|  <EOL>
+| </P><P> <W>THRESHOLD FOR RELEASES <EOL>
+|  <W>to air <EOL>
+| </P><P>kg/year <EOL>
+| to water <EOL>
+| kg/year <EOL>
+| </P><P>to land <EOL>
+| kg/year <EOL>
+| </P><P>Carbon dioxide (CO2) <W>100 million <W>- <W>- <EOL>
+| Hydro-fluorocarbons (HFCs) <W>100 <W>- <W>- <EOL>
+| Methane (CH4) <W>100 000 <W>- <W>- <EOL>
+| Nitrous oxide (N2O) <W>10 000 <W>- <W>- <EOL>
+| Perfluorocarbons (PFCs) <W>100 <W>- <W>- <EOL>
+| Sulphur hexafluoride (SF6) <W>50 <W>- <W>- <EOL>
+| </P><P> <EOL>
+| Other gases <EOL>
+| </P><P> <EOL>
+|  <W>THRESHOLD FOR RELEASES <EOL>
+|  <W>to air <EOL>
+| </P><P>kg/year <EOL>
+| to water <EOL>
+| kg/year <EOL>
+| </P><P>to land <EOL>
+| kg/year <EOL>
+| </P><P>Ammonia (NH3) <W>10 000 <W>- <W>- <EOL>
+| Carbon monoxide (CO) <W>500 000 <W>- <W>- <EOL>
+| Chlorine and inorganic compounds <EOL>
+| (as HCl) <W>10 000 <W>- <W>- <EOL>
+| </P><P>Chlorofluorocarbons (CFCs) <W>1 <W>- <W>- <EOL>
+| Flourine and inorganic compounds <EOL>
+| (as HF) <W>5 000 <W>- <W>- <EOL>
+| </P><P>Halons <W>1 <W>- <W>- <EOL>
+| Hydrochlorofluorocarbons (HCFCs) <W>1 <W>- <W>- <EOL>
+| Hydrogen Cyanide (HCN) <W>200 <W>- <W>- <EOL>
+| Nitrogen oxides (NOx/NO2) <W>100 000 <W>- <W>- <EOL>
+| Non-methane volatile organic <EOL>
+| compounds (NMVOC) <W>100 000 <W>- <W>- <EOL>
+| </P><P>Sulphur oxides (SOx/SO2) <W>150 000 <W>- <W>- <EOL>
+|  <EOL>
+| </P><P>Heavy metals <EOL>
+|  <W> <EOL>
+| </P><P> <W>THRESHOLD FOR RELEASES <EOL>
+|  <W>to air <EOL>
+| </P><P>kg/year <EOL>
+| to water <EOL>
+| kg/year <EOL>
+| </P><P>to land <EOL>
+| kg/year <EOL>
+| </P><P>Arsenic and compounds (as As) <W>20 <W>5 <W>5 <EOL>
+| Cadmium and compounds (as Cd) <W>10 <W>5 <W>5 <EOL>
+| Chromium and compounds (as Cr) <W>100 <W>50 <W>50 <EOL>
+| Copper and compounds (as Cu) <W>100 <W>50 <W>50 <EOL>
+| Lead and compounds (as Pb) <W>200 <W>20 <W>20 <EOL>
+| Mercury and compounds (as Hg) <W>10 <W>1 <W>1 <EOL>
+| Nickel and compounds (as Ni) <W>50 <W>20 <W>20 <EOL>
+| Zinc and compounds (as Zn) <W>200 <W>100 <W>100 <EOL>
+| </P><P> </P></A></PAGE>
+| <PAGE><A><P>Pesticides <W> <EOL>
+|  <EOL>
+| </P><P> <W>THRESHOLD FOR RELEASES <EOL>
+|  <W>to air <EOL>
+| </P><P>kg/year <EOL>
+| to water <EOL>
+| kg/year <EOL>
+| </P><P>to land <EOL>
+| kg/year <EOL>
+| </P><P>1,2,3,4,5,6- hexachlorocyclohexane <EOL>
+| (HCH) <W>10 <W>1 <W>1 <EOL>
+| </P><P>Alachlor <W>- <W>1 <W>1 <EOL>
+| Aldrin <W>1 <W>1 <W>1 <EOL>
+| Atrazine <W>- <W>1 <W>1 <EOL>
+| Chlordane <W>1 <W>1 <W>1 <EOL>
+| Chlordecone <W>1 <W>1 <W>1 <EOL>
+| Chlorfenvinphos <W>- <W>1 <W>1 <EOL>
+| Chlorpyrifos <W>- <W>1 <W>1 <EOL>
+| DDT <W>1 <W>1 <W>1 <EOL>
+| Diuron <W>- <W>1 <W>1 <EOL>
+| Endosulphan <W>- <W>1 <W>1 <EOL>
+| Endrin <W>1 <W>1 <W>1 <EOL>
+| Heptachlor <W>1 <W>1 <W>1 <EOL>
+| Isodrin <W>- <W>1 <W>- <EOL>
+| Isoproturon <W>- <W>1 <W>1 <EOL>
+| Lindane <W>1 <W>1 <W>1 <EOL>
+| Mirex <W>1 <W>1 <W>1 <EOL>
+| Simazine <W>- <W>1 <W>1 <EOL>
+| Toxaphene <W>1 <W>1 <W>1 <EOL>
+| Tributylin and compounds <W>- <W>1 <W>1 <EOL>
+| Trifluralin <W>- <W>1 <W>1 <EOL>
+| Triphenyltin and compounds <W>- <W>1 <W>1 <EOL>
+| </P><P> <EOL>
+| Chlorinated organic substances  <EOL>
+| </P><P> <EOL>
+|  <W>THRESHOLD FOR RELEASES <EOL>
+|  <W>to air <EOL>
+| </P><P>kg/year <EOL>
+| to water <EOL>
+| kg/year <EOL>
+| </P><P>to land <EOL>
+| kg/year <EOL>
+| </P><P>1,1,1-trichloroethane <W>100 <W>- <W>- <EOL>
+| 1,1,2,2-tetrachloroethane <W>50 <W>- <W>- <EOL>
+| 1,2-dichloroethane (EDC) <W>1 000 <W>10 <W>10 <EOL>
+| Brominated diphenylethers (PBDE) <W>- <W>1 <W>1 <EOL>
+| Chloro-alkanes, C10-C13 <W>- <W>1 <W>1 <EOL>
+| Dichloromethane (DCM) <W>1 000 <W>10 <W>10 <EOL>
+| Dieldrin <W>1 <W>1 <W>1 <EOL>
+| Halogenated Organic Compounds (AOX) <W>- <W>1 000 <W>1 000 <EOL>
+| Hexabromobifenyl <W>0,1 <W>0,1 <W>0,1 <EOL>
+| Hexachlorobenzene (HCB) <W>10 <W>1 <W>1 <EOL>
+| Hexachlorobutadiene (HCBD) <W>- <W>1 <W>1 <EOL>
+| PCDD+PCFD (Dioxins+furans) (as Teq) <W>0,0001 <W>0,0001 <W>0,0001 <EOL>
+| Pentachlorobenzene <W>1 <W>1 <W>1 <EOL>
+| Pentachlorophenol (PCP) <W>10 <W>1 <W>1 <EOL>
+| Polychlorinated biphenyls (PCB) <W>0,1 <W>0,1 <W>0,1 <EOL>
+| Tetrachloroethylene (PER) <W>2 000 <W>10 <W>- <EOL>
+| Tetrachloromethane (TCM) <W>100 <W>1 <W>- <EOL>
+| Trichlorobenzenes (TCBs) (all isomers) <W>10 <W>1 <W>- <EOL>
+| Trichloroethylene <W>2 000 <W>10 <W>- <EOL>
+| Trichloromethane <W>500 <W>10 <W>- <EOL>
+| Vynil chloride <W>1 000 <W>10 <W>10 <EOL>
+| </P><P> <EOL>
+|  </P></A></PAGE>

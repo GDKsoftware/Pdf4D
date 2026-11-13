@@ -1,0 +1,16 @@
+text: default page 1
+| bbc
+| Batch Sequences
+| Adobe® Acrobat® SDK
+| Version 8.0
+text: sorted page 1
+| bbc
+| Batch Sequences
+| Adobe® Acrobat® SDK
+| Version 8.0
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>bbc<EOL>
+| </P><P>Batch Sequences<EOL>
+| </P><P>Adobe® Acrobat® SDK<EOL>
+| Version 8.0</P></A></PAGE>

@@ -1,0 +1,38 @@
+text: default page 1
+| \x20
+| \x20
+| This is my first page with normal layout.\x20
+| This is the second line on the page.\x20
+| \x20
+| \x20
+| \x20
+| \x20
+text: default page 2
+| This is my second page.  It will have a landscape layout.\x20
+| Second line here.\x20
+text: sorted page 1
+| \x20
+| \x20
+| This is my first page with normal layout.\x20
+| This is the second line on the page.\x20
+| \x20
+| \x20
+| \x20
+| \x20
+text: sorted page 2
+| This is my second page.  It will have a landscape layout.\x20
+| Second line here.\x20
+text: range 2-3
+| This is my second page.  It will have a landscape layout.\x20
+| Second line here.\x20
+text: separators 1-2
+| <PAGE><A><P> <EOL>
+|  <EOL>
+| This is my first page with normal layout. <EOL>
+| This is the second line on the page. <EOL>
+|  <EOL>
+|  <EOL>
+|  <EOL>
+|  </P></A></PAGE>
+| <PAGE><A><P>This is my second page.  It will have a landscape layout. <EOL>
+| Second line here. </P></A></PAGE>

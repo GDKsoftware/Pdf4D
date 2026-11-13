@@ -1,0 +1,37 @@
+text: default page 1
+| Line 1\x20
+| Line 2\x20
+| \x20
+| Line 4\x20
+| Underline 5\x20
+| BoldLine 6\x20
+| \x20
+| ItalicLine 8\x20
+| \x20
+| \x20
+| \x20
+text: sorted page 1
+| Line 1\x20
+| Line 2\x20
+| \x20
+| Line 4\x20
+| Underline 5\x20
+| BoldLine 6\x20
+| \x20
+| ItalicLine 8\x20
+| \x20
+| \x20
+| \x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Line 1 <EOL>
+| Line 2 <EOL>
+|  <EOL>
+| Line 4 <EOL>
+| Underline 5 <EOL>
+| BoldLine 6 <EOL>
+|  <EOL>
+| ItalicLine 8 <EOL>
+|  <EOL>
+|  <EOL>
+|  </P></A></PAGE>

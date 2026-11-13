@@ -1,0 +1,489 @@
+text: default page 1
+| Instructions MT-EZ Form (086-0-22) FEB 11    6\x20
+| \x20
+|  Other – All other structure types not listed above including, but not limited to split levels, structures on piers,\x20
+| mobile homes, etc.  Please be as detailed as possible.\x20
+| \x20
+| Number 3 – Geographic Coordinate Data\x20
+| \x20
+| The surveyor or engineer must provide the latitude and longitude of the property in decimal degrees to the nearest fifth\x20
+| decimal place (00.00000), and indicate the appropriate horizontal datum, WGS 84, NAD 83 or NAD 27.\x20
+| \x20
+| Number 4 - Flood Insurance Rate Map Information\x20
+| \x20
+| In the first box, the surveyor or engineer must provide the six digit NFIP community number as it appears in the Title Block\x20
+| of the FIRM (or FHBM) panel that shows the area where the property is located.  In the second box, the surveyor or\x20
+| engineer must provide the map panel number.  For additional information on reading FIRM panels interested parties may\x20
+| consult the tutorial “How to Read a FIRM” on DHS-FEMA’s Flood Hazard Mapping website at\x20
+| http://www.fema.gov/plan/prevent/fhm/ot_firmr.shtm.  \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| In the third box, the surveyor or engineer should provide the BFE, if available.  FEMA will verify the BFE during the review\x20
+| process.  In the fourth box, the surveyor or engineer must provide the source of the BFE.  The surveyor or engineer may\x20
+| obtain the BFE by locating the property on the effective FIRM for the community in which the property is located. Upon\x20
+| locating the property on the FIRM, the engineer or surveyor should determine the type of flooding and the flood zone\x20
+| where the property is located.  The summary below provides guidance as to how to determine the BFE as a result of the\x20
+| flooding type and flood zone determination.  \x20
+|  Riverine Flooding Systems (Zones AE or A1-A30) – Consult the FIS report for the community in which the property\x20
+| is located.  Locate the flood profile for the flooding source by name.  Estimate the property’s location along the\x20
+| flood profile and interpolate the BFE using the 100-year flood profile line.\x20
+| \x20
+text: default page 2
+| Instructions MT-EZ Form (086-0-22) FEB 11    7\x20
+|  Lacustrine (Stillwater) Flooding Systems – Consult the FIS report for the community in which the property is\x20
+| located. Locate the Summary of Stillwater Elevations table.  Locate the flooding source, by name, and use the BFE\x20
+| listed in the table.  The flooding source’s BFE is normally shown to the nearest 0.1 foot.  If the flooding source is\x20
+| not listed in the Summary of Stillwater Elevations table, use the BFE as shown on the FIRM.\x20
+| \x20
+|  Coastal Flooding Systems (Zones AE or A1-A30 and VE or V1-V30) – Obtain the BFE from the FIRM panel. Consult\x20
+| the FIS report for the community in which the property is located. Locate the Summary of Stillwater Elevations\x20
+| table in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table. Compare the BFE\x20
+| listed in this table to the BFE obtained from the FIRM.  If the stillwater elevation listed in the table is less than or\x20
+| equal to the whole-foot BFE shown on the FIRM minus 0.5 foot, a wave height, wave runup, and/or wave setup\x20
+| component exists.  In this case, use the whole-foot BFE shown on the FIRM.  If the stillwater elevation listed in the\x20
+| table is greater than the whole-foot BFE shown on the FIRM minus 0.4 foot, use the stillwater elevation shown in\x20
+| the table as the BFE.  (Any structure/parcel of land located seaward of the landward toe of the primary frontal\x20
+| dune may not be removed from a Zone VE or V1-V30.)\x20
+| \x20
+|  Zone A Flooding – If the property is located in Zone A, an area of approximate flooding with no BFEs determined,\x20
+| determine a BFE.  Consult with a Federal, State, or local government agency to determine if that agency has\x20
+| developed a BFE.  Such agencies include the U.S. Army Corps of Engineers; the U.S. Geological Survey; the State’s\x20
+| Department of Natural Resources, Department of Environmental Quality, or Department of Transportation; or the\x20
+| local Planning and Zoning Department.  If one has been developed, all supporting data and calculations used to\x20
+| develop the BFE must be submitted. If a BFE has not previously been developed, consult DHS-FEMA 265, Managing\x20
+| Floodplain Development in Approximate Zone A Areas, A Guide for Obtaining and Developing Base (100-Year) Flood\x20
+| Elevations, available on the DHS-FEMA website at http://www.fema.gov/library/viewRecord.do?id=2215.  This\x20
+| publication is an excellent resource that details the appropriate methods for determining BFEs in SFHAs designated\x20
+| Zone A.  To obtain additional information about developing BFEs, contact the DHS-FEMA Map Information\x20
+| eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  If the property is greater than 50 lots or 5 acres,\x20
+| whichever is the lesser, the engineer or surveyor must determine a BFE in accordance with Paragraph 60.3(b)(3) of\x20
+| the NFIP regulations, available online at http://www.access.gpo.gov/nara/cfr/waisidx_03/44cfr60_03.html.\x20
+| \x20
+|  Shallow Flooding (Zone AH) – For a property located in Zone AH, locate the Summary of Stillwater Elevations table\x20
+| in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table.  If no Summary of\x20
+| Stillwater Elevations table exists, use the BFE shown on the FIRM.  If different elevations appear within the same\x20
+| SFHA, the BFE is obtained by linear interpolation between two adjacent BFE lines.  \x20
+| \x20
+|  Shallow/Sheet Flooding (Zone AO) – For a property located in Zone AO, the characteristics of the Zone AO area\x20
+| shown on the NFIP map will determine the appropriate methodology to be used to develop the BFE for the\x20
+| property.  If the flooding is conveyed by the street, provide the highest top of curb or crown of street elevation\x20
+| (whichever is higher) along the property line and add this to the depth of flooding.  The lowest adjacent grade\x20
+| elevation must be above the curb or street elevation by an amount equal to or greater than the depth of flooding\x20
+| shown on the NFIP map.  If the entire property is inundated by the SFHA and the flow is not conveyed by the\x20
+| street, add the depth of flooding to the average surrounding grade.  If the property is partially inundated by the\x20
+| SFHA and the street does not convey the flow, add the depth of flooding to the lowest lot elevation.  Along with\x20
+| the information required for one of the above-mentioned methods, provide sufficient certified topographic\x20
+| information, including flow paths, to show that the structure is located on high ground relative to the depth\x20
+| indicated on the NFIP map.\x20
+| \x20
+| Number 5 – Elevation Information\x20
+| \x20
+| Lowest Adjacent Grade (LAG) to the Structure – For requests involving a structure, provide the LAG elevation (the elevation\x20
+| of the lowest ground touching the structure including attached patios, stairs, deck supports or garages), to the nearest 0.1\x20
+| foot.  If the FIRM shows BFEs in meters, the accuracy of the LAG elevation must be to the nearest 0.1 meter. \x20
+| \x20
+| Lowest Lot Elevation – For requests involving property, or a portion thereof, not a structure, provide the lowest lot\x20
+| elevation to the nearest 0.1 foot.  If the FIRM shows BFEs in meters, the accuracy of the lowest lot elevation must be to the\x20
+| nearest 0.1 meter.  If the BFE varies across the property, please provide a certified site plan showing the range of elevations\x20
+| across the property.\x20
+text: default page 3
+| Instructions MT-EZ Form (086-0-22) FEB 11    8\x20
+| \x20
+| Elevation Datum – Provide the elevation datum (e.g., National Geodetic Vertical Datum of 1929, North American Vertical\x20
+| Datum of 1988 or other specified) for which the property elevations shown on the form are referenced.  If the datum being\x20
+| referenced is different than the datum used to produce the effective FIS, provide the datum conversion.  Please note that\x20
+| Mean Sea Level Datum is used within the Commonwealth of Puerto Rico and Local Tidal Datum is used within the U.S.\x20
+| Virgin Islands.\x20
+| \x20
+| Subsidence or Uplift – Land subsidence is the lowering of the ground as a result of water, oil, gas extraction, as well as other\x20
+| phenomena such as soil compaction, decomposition of organic material, and tectonic movement.  Periodically, the National\x20
+| Geodetic Survey relevels some benchmarks to determine new elevations above the National Geodetic Vertical Datum of\x20
+| 1929 or above the North American Vertical Datum of 1988; however, not all benchmarks are releveled each time.\x20
+| \x20
+| Check “yes” if the area of the property is in an area of subsidence or uplift, and provide the date of the current releveling;\x20
+| check “no” if the area of the property is not in an area of subsidence or uplift.  In areas experiencing ground subsidence\x20
+| (e.g., Harris County, Texas, and Incorporated Areas); the most recently adjusted Elevation Reference Mark (ERM) must be\x20
+| used for accurate ground and structure elevations.  Consult the effective FIS report for the community where the property\x20
+| is located or the local floodplain administrator for the most current ERM data.\x20
+| \x20
+| In general, the effects of subsidence can be accounted for by determining ground and structure elevations using benchmark\x20
+| elevations with the same releveling date as the benchmarks used to develop the BFEs on the FIRM.  Benchmark releveling\x20
+| dates may be different for different flooding sources.  No adjustment is necessary to the BFEs on the FIRM.\x20
+| \x20
+| Certification (by a Licensed Land Surveyor, Registered Professional Engineer, or Architect)\x20
+| \x20
+| The certifier must provide his or her name, license number and expiration date, his or her company name, telephone\x20
+| number and, if applicable, his or her fax number and email address.  The certifier’s seal, if available, may be provided here. \x20
+| The certifier must sign and date the Elevation Form, where indicated, to certify the accuracy of the information provided. \x20
+| Not all states authorize architects and engineers to certify elevation information.  Consult the state board of registration for\x20
+| more information.\x20
+| \x20
+| Submitting the Package to DHS-FEMA\x20
+| \x20
+| In addition to the completed MT-EZ form, all requests must include one copy of the subdivision plat map (with recordation\x20
+| data and stamp of the Recorder’s Office) or a copy of the property deed (with recordation data and stamp of the Recorder’s\x20
+| Office), accompanied by a tax assessor’s map or other suitable map showing the surveyed location of the property with\x20
+| respect to local streets and watercourses; a copy of the effective FIRM panel; and a map scale and North arrow for all maps\x20
+| submitted.  Please do not submit original documents.  Please retain a copy of all submitted documents for your records.\x20
+| \x20
+| DHS-FEMA encourages the submission of all required data in digital format (e.g. scanned documents on a CD).\x20
+| \x20
+| All LOMA requests should be sent to the address listed below.\x20
+| \x20
+| LOMC CLEARINGHOUSE\x20
+| 847 SOUTH PICKETT STREET\x20
+| ALEXANDRIA, VA 22304-4605\x20
+| Attn.: LOMA Manager\x20
+| \x20
+| Interested parties who have any additional questions about the LOMA request process may consult the DHS-FEMA Flood\x20
+| Hazard Mapping website at http://www.fema.gov/plan/prevent/fhm/fmc_loma.shtm or call the DHS-FEMA Map\x20
+| Information eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  For information on the status of a particular LOMA\x20
+| request, interested parties may also consult DHS-FEMA’s Mapping Information Platform (MIP) at https://hazards.fema.gov.\x20
+text: default page 4
+error
+text: sorted page 1
+| \x20
+|  Other – All other structure types not listed above including, but not limited to split levels, structures on piers,\x20
+| mobile homes, etc.  Please be as detailed as possible.\x20
+| \x20
+| Number 3 – Geographic Coordinate Data\x20
+| \x20
+| The surveyor or engineer must provide the latitude and longitude of the property in decimal degrees to the nearest fifth\x20
+| decimal place (00.00000), and indicate the appropriate horizontal datum, WGS 84, NAD 83 or NAD 27.\x20
+| \x20
+| Number 4 - Flood Insurance Rate Map Information\x20
+| \x20
+| In the first box, the surveyor or engineer must provide the six digit NFIP community number as it appears in the Title Block\x20
+| of the FIRM (or FHBM) panel that shows the area where the property is located.  In the second box, the surveyor or\x20
+| engineer must provide the map panel number.  For additional information on reading FIRM panels interested parties may\x20
+| consult the tutorial “How to Read a FIRM” on DHS-FEMA’s Flood Hazard Mapping website at\x20
+| http://www.fema.gov/plan/prevent/fhm/ot_firmr.shtm.  \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| In the third box, the surveyor or engineer should provide the BFE, if available.  FEMA will verify the BFE during the review\x20
+| process.  In the fourth box, the surveyor or engineer must provide the source of the BFE.  The surveyor or engineer may\x20
+| obtain the BFE by locating the property on the effective FIRM for the community in which the property is located. Upon\x20
+| locating the property on the FIRM, the engineer or surveyor should determine the type of flooding and the flood zone\x20
+| where the property is located.  The summary below provides guidance as to how to determine the BFE as a result of the\x20
+| flooding type and flood zone determination.  \x20
+|  Riverine Flooding Systems (Zones AE or A1-A30) – Consult the FIS report for the community in which the property\x20
+| is located.  Locate the flood profile for the flooding source by name.  Estimate the property’s location along the\x20
+| flood profile and interpolate the BFE using the 100-year flood profile line.\x20
+| \x20
+| Instructions MT-EZ Form (086-0-22) FEB 11    6\x20
+text: sorted page 2
+|  Lacustrine (Stillwater) Flooding Systems – Consult the FIS report for the community in which the property is\x20
+| located. Locate the Summary of Stillwater Elevations table.  Locate the flooding source, by name, and use the BFE\x20
+| listed in the table.  The flooding source’s BFE is normally shown to the nearest 0.1 foot.  If the flooding source is\x20
+| not listed in the Summary of Stillwater Elevations table, use the BFE as shown on the FIRM.\x20
+| \x20
+|  Coastal Flooding Systems (Zones AE or A1-A30 and VE or V1-V30) – Obtain the BFE from the FIRM panel. Consult\x20
+| the FIS report for the community in which the property is located. Locate the Summary of Stillwater Elevations\x20
+| table in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table. Compare the BFE\x20
+| listed in this table to the BFE obtained from the FIRM.  If the stillwater elevation listed in the table is less than or\x20
+| equal to the whole-foot BFE shown on the FIRM minus 0.5 foot, a wave height, wave runup, and/or wave setup\x20
+| component exists.  In this case, use the whole-foot BFE shown on the FIRM.  If the stillwater elevation listed in the\x20
+| table is greater than the whole-foot BFE shown on the FIRM minus 0.4 foot, use the stillwater elevation shown in\x20
+| the table as the BFE.  (Any structure/parcel of land located seaward of the landward toe of the primary frontal\x20
+| dune may not be removed from a Zone VE or V1-V30.)\x20
+| \x20
+|  Zone A Flooding – If the property is located in Zone A, an area of approximate flooding with no BFEs determined,\x20
+| determine a BFE.  Consult with a Federal, State, or local government agency to determine if that agency has\x20
+| developed a BFE.  Such agencies include the U.S. Army Corps of Engineers; the U.S. Geological Survey; the State’s\x20
+| Department of Natural Resources, Department of Environmental Quality, or Department of Transportation; or the\x20
+| local Planning and Zoning Department.  If one has been developed, all supporting data and calculations used to\x20
+| develop the BFE must be submitted. If a BFE has not previously been developed, consult DHS-FEMA 265, Managing\x20
+| Floodplain Development in Approximate Zone A Areas, A Guide for Obtaining and Developing Base (100-Year) Flood\x20
+| Elevations, available on the DHS-FEMA website at http://www.fema.gov/library/viewRecord.do?id=2215.  This\x20
+| publication is an excellent resource that details the appropriate methods for determining BFEs in SFHAs designated\x20
+| Zone A.  To obtain additional information about developing BFEs, contact the DHS-FEMA Map Information\x20
+| eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  If the property is greater than 50 lots or 5 acres,\x20
+| whichever is the lesser, the engineer or surveyor must determine a BFE in accordance with Paragraph 60.3(b)(3) of\x20
+| the NFIP regulations, available online at http://www.access.gpo.gov/nara/cfr/waisidx_03/44cfr60_03.html.\x20
+| \x20
+|  Shallow Flooding (Zone AH) – For a property located in Zone AH, locate the Summary of Stillwater Elevations table\x20
+| in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table.  If no Summary of\x20
+| Stillwater Elevations table exists, use the BFE shown on the FIRM.  If different elevations appear within the same\x20
+| SFHA, the BFE is obtained by linear interpolation between two adjacent BFE lines.  \x20
+| \x20
+|  Shallow/Sheet Flooding (Zone AO) – For a property located in Zone AO, the characteristics of the Zone AO area\x20
+| shown on the NFIP map will determine the appropriate methodology to be used to develop the BFE for the\x20
+| property.  If the flooding is conveyed by the street, provide the highest top of curb or crown of street elevation\x20
+| (whichever is higher) along the property line and add this to the depth of flooding.  The lowest adjacent grade\x20
+| elevation must be above the curb or street elevation by an amount equal to or greater than the depth of flooding\x20
+| shown on the NFIP map.  If the entire property is inundated by the SFHA and the flow is not conveyed by the\x20
+| street, add the depth of flooding to the average surrounding grade.  If the property is partially inundated by the\x20
+| SFHA and the street does not convey the flow, add the depth of flooding to the lowest lot elevation.  Along with\x20
+| the information required for one of the above-mentioned methods, provide sufficient certified topographic\x20
+| information, including flow paths, to show that the structure is located on high ground relative to the depth\x20
+| indicated on the NFIP map.\x20
+| \x20
+| Number 5 – Elevation Information\x20
+| \x20
+| Lowest Adjacent Grade (LAG) to the Structure – For requests involving a structure, provide the LAG elevation (the elevation\x20
+| of the lowest ground touching the structure including attached patios, stairs, deck supports or garages), to the nearest 0.1\x20
+| foot.  If the FIRM shows BFEs in meters, the accuracy of the LAG elevation must be to the nearest 0.1 meter. \x20
+| \x20
+| Lowest Lot Elevation – For requests involving property, or a portion thereof, not a structure, provide the lowest lot\x20
+| elevation to the nearest 0.1 foot.  If the FIRM shows BFEs in meters, the accuracy of the lowest lot elevation must be to the\x20
+| nearest 0.1 meter.  If the BFE varies across the property, please provide a certified site plan showing the range of elevations\x20
+| across the property.\x20
+| Instructions MT-EZ Form (086-0-22) FEB 11    7\x20
+text: sorted page 3
+| \x20
+| Elevation Datum – Provide the elevation datum (e.g., National Geodetic Vertical Datum of 1929, North American Vertical\x20
+| Datum of 1988 or other specified) for which the property elevations shown on the form are referenced.  If the datum being\x20
+| referenced is different than the datum used to produce the effective FIS, provide the datum conversion.  Please note that\x20
+| Mean Sea Level Datum is used within the Commonwealth of Puerto Rico and Local Tidal Datum is used within the U.S.\x20
+| Virgin Islands.\x20
+| \x20
+| Subsidence or Uplift – Land subsidence is the lowering of the ground as a result of water, oil, gas extraction, as well as other\x20
+| phenomena such as soil compaction, decomposition of organic material, and tectonic movement.  Periodically, the National\x20
+| Geodetic Survey relevels some benchmarks to determine new elevations above the National Geodetic Vertical Datum of\x20
+| 1929 or above the North American Vertical Datum of 1988; however, not all benchmarks are releveled each time.\x20
+| \x20
+| Check “yes” if the area of the property is in an area of subsidence or uplift, and provide the date of the current releveling;\x20
+| check “no” if the area of the property is not in an area of subsidence or uplift.  In areas experiencing ground subsidence\x20
+| (e.g., Harris County, Texas, and Incorporated Areas); the most recently adjusted Elevation Reference Mark (ERM) must be\x20
+| used for accurate ground and structure elevations.  Consult the effective FIS report for the community where the property\x20
+| is located or the local floodplain administrator for the most current ERM data.\x20
+| \x20
+| In general, the effects of subsidence can be accounted for by determining ground and structure elevations using benchmark\x20
+| elevations with the same releveling date as the benchmarks used to develop the BFEs on the FIRM.  Benchmark releveling\x20
+| dates may be different for different flooding sources.  No adjustment is necessary to the BFEs on the FIRM.\x20
+| \x20
+| Certification (by a Licensed Land Surveyor, Registered Professional Engineer, or Architect)\x20
+| \x20
+| The certifier must provide his or her name, license number and expiration date, his or her company name, telephone\x20
+| number and, if applicable, his or her fax number and email address.  The certifier’s seal, if available, may be provided here. \x20
+| The certifier must sign and date the Elevation Form, where indicated, to certify the accuracy of the information provided. \x20
+| Not all states authorize architects and engineers to certify elevation information.  Consult the state board of registration for\x20
+| more information.\x20
+| \x20
+| Submitting the Package to DHS-FEMA\x20
+| \x20
+| In addition to the completed MT-EZ form, all requests must include one copy of the subdivision plat map (with recordation\x20
+| data and stamp of the Recorder’s Office) or a copy of the property deed (with recordation data and stamp of the Recorder’s\x20
+| Office), accompanied by a tax assessor’s map or other suitable map showing the surveyed location of the property with\x20
+| respect to local streets and watercourses; a copy of the effective FIRM panel; and a map scale and North arrow for all maps\x20
+| submitted.  Please do not submit original documents.  Please retain a copy of all submitted documents for your records.\x20
+| \x20
+| DHS-FEMA encourages the submission of all required data in digital format (e.g. scanned documents on a CD).\x20
+| \x20
+| All LOMA requests should be sent to the address listed below.\x20
+| \x20
+| LOMC CLEARINGHOUSE\x20
+| 847 SOUTH PICKETT STREET\x20
+| ALEXANDRIA, VA 22304-4605\x20
+| Attn.: LOMA Manager\x20
+| \x20
+| Interested parties who have any additional questions about the LOMA request process may consult the DHS-FEMA Flood\x20
+| Hazard Mapping website at http://www.fema.gov/plan/prevent/fhm/fmc_loma.shtm or call the DHS-FEMA Map\x20
+| Information eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  For information on the status of a particular LOMA\x20
+| request, interested parties may also consult DHS-FEMA’s Mapping Information Platform (MIP) at https://hazards.fema.gov.\x20
+| Instructions MT-EZ Form (086-0-22) FEB 11    8\x20
+text: sorted page 4
+error
+text: range 2-3
+| Instructions MT-EZ Form (086-0-22) FEB 11    7\x20
+|  Lacustrine (Stillwater) Flooding Systems – Consult the FIS report for the community in which the property is\x20
+| located. Locate the Summary of Stillwater Elevations table.  Locate the flooding source, by name, and use the BFE\x20
+| listed in the table.  The flooding source’s BFE is normally shown to the nearest 0.1 foot.  If the flooding source is\x20
+| not listed in the Summary of Stillwater Elevations table, use the BFE as shown on the FIRM.\x20
+| \x20
+|  Coastal Flooding Systems (Zones AE or A1-A30 and VE or V1-V30) – Obtain the BFE from the FIRM panel. Consult\x20
+| the FIS report for the community in which the property is located. Locate the Summary of Stillwater Elevations\x20
+| table in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table. Compare the BFE\x20
+| listed in this table to the BFE obtained from the FIRM.  If the stillwater elevation listed in the table is less than or\x20
+| equal to the whole-foot BFE shown on the FIRM minus 0.5 foot, a wave height, wave runup, and/or wave setup\x20
+| component exists.  In this case, use the whole-foot BFE shown on the FIRM.  If the stillwater elevation listed in the\x20
+| table is greater than the whole-foot BFE shown on the FIRM minus 0.4 foot, use the stillwater elevation shown in\x20
+| the table as the BFE.  (Any structure/parcel of land located seaward of the landward toe of the primary frontal\x20
+| dune may not be removed from a Zone VE or V1-V30.)\x20
+| \x20
+|  Zone A Flooding – If the property is located in Zone A, an area of approximate flooding with no BFEs determined,\x20
+| determine a BFE.  Consult with a Federal, State, or local government agency to determine if that agency has\x20
+| developed a BFE.  Such agencies include the U.S. Army Corps of Engineers; the U.S. Geological Survey; the State’s\x20
+| Department of Natural Resources, Department of Environmental Quality, or Department of Transportation; or the\x20
+| local Planning and Zoning Department.  If one has been developed, all supporting data and calculations used to\x20
+| develop the BFE must be submitted. If a BFE has not previously been developed, consult DHS-FEMA 265, Managing\x20
+| Floodplain Development in Approximate Zone A Areas, A Guide for Obtaining and Developing Base (100-Year) Flood\x20
+| Elevations, available on the DHS-FEMA website at http://www.fema.gov/library/viewRecord.do?id=2215.  This\x20
+| publication is an excellent resource that details the appropriate methods for determining BFEs in SFHAs designated\x20
+| Zone A.  To obtain additional information about developing BFEs, contact the DHS-FEMA Map Information\x20
+| eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  If the property is greater than 50 lots or 5 acres,\x20
+| whichever is the lesser, the engineer or surveyor must determine a BFE in accordance with Paragraph 60.3(b)(3) of\x20
+| the NFIP regulations, available online at http://www.access.gpo.gov/nara/cfr/waisidx_03/44cfr60_03.html.\x20
+| \x20
+|  Shallow Flooding (Zone AH) – For a property located in Zone AH, locate the Summary of Stillwater Elevations table\x20
+| in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table.  If no Summary of\x20
+| Stillwater Elevations table exists, use the BFE shown on the FIRM.  If different elevations appear within the same\x20
+| SFHA, the BFE is obtained by linear interpolation between two adjacent BFE lines.  \x20
+| \x20
+|  Shallow/Sheet Flooding (Zone AO) – For a property located in Zone AO, the characteristics of the Zone AO area\x20
+| shown on the NFIP map will determine the appropriate methodology to be used to develop the BFE for the\x20
+| property.  If the flooding is conveyed by the street, provide the highest top of curb or crown of street elevation\x20
+| (whichever is higher) along the property line and add this to the depth of flooding.  The lowest adjacent grade\x20
+| elevation must be above the curb or street elevation by an amount equal to or greater than the depth of flooding\x20
+| shown on the NFIP map.  If the entire property is inundated by the SFHA and the flow is not conveyed by the\x20
+| street, add the depth of flooding to the average surrounding grade.  If the property is partially inundated by the\x20
+| SFHA and the street does not convey the flow, add the depth of flooding to the lowest lot elevation.  Along with\x20
+| the information required for one of the above-mentioned methods, provide sufficient certified topographic\x20
+| information, including flow paths, to show that the structure is located on high ground relative to the depth\x20
+| indicated on the NFIP map.\x20
+| \x20
+| Number 5 – Elevation Information\x20
+| \x20
+| Lowest Adjacent Grade (LAG) to the Structure – For requests involving a structure, provide the LAG elevation (the elevation\x20
+| of the lowest ground touching the structure including attached patios, stairs, deck supports or garages), to the nearest 0.1\x20
+| foot.  If the FIRM shows BFEs in meters, the accuracy of the LAG elevation must be to the nearest 0.1 meter. \x20
+| \x20
+| Lowest Lot Elevation – For requests involving property, or a portion thereof, not a structure, provide the lowest lot\x20
+| elevation to the nearest 0.1 foot.  If the FIRM shows BFEs in meters, the accuracy of the lowest lot elevation must be to the\x20
+| nearest 0.1 meter.  If the BFE varies across the property, please provide a certified site plan showing the range of elevations\x20
+| across the property.\x20
+| Instructions MT-EZ Form (086-0-22) FEB 11    8\x20
+| \x20
+| Elevation Datum – Provide the elevation datum (e.g., National Geodetic Vertical Datum of 1929, North American Vertical\x20
+| Datum of 1988 or other specified) for which the property elevations shown on the form are referenced.  If the datum being\x20
+| referenced is different than the datum used to produce the effective FIS, provide the datum conversion.  Please note that\x20
+| Mean Sea Level Datum is used within the Commonwealth of Puerto Rico and Local Tidal Datum is used within the U.S.\x20
+| Virgin Islands.\x20
+| \x20
+| Subsidence or Uplift – Land subsidence is the lowering of the ground as a result of water, oil, gas extraction, as well as other\x20
+| phenomena such as soil compaction, decomposition of organic material, and tectonic movement.  Periodically, the National\x20
+| Geodetic Survey relevels some benchmarks to determine new elevations above the National Geodetic Vertical Datum of\x20
+| 1929 or above the North American Vertical Datum of 1988; however, not all benchmarks are releveled each time.\x20
+| \x20
+| Check “yes” if the area of the property is in an area of subsidence or uplift, and provide the date of the current releveling;\x20
+| check “no” if the area of the property is not in an area of subsidence or uplift.  In areas experiencing ground subsidence\x20
+| (e.g., Harris County, Texas, and Incorporated Areas); the most recently adjusted Elevation Reference Mark (ERM) must be\x20
+| used for accurate ground and structure elevations.  Consult the effective FIS report for the community where the property\x20
+| is located or the local floodplain administrator for the most current ERM data.\x20
+| \x20
+| In general, the effects of subsidence can be accounted for by determining ground and structure elevations using benchmark\x20
+| elevations with the same releveling date as the benchmarks used to develop the BFEs on the FIRM.  Benchmark releveling\x20
+| dates may be different for different flooding sources.  No adjustment is necessary to the BFEs on the FIRM.\x20
+| \x20
+| Certification (by a Licensed Land Surveyor, Registered Professional Engineer, or Architect)\x20
+| \x20
+| The certifier must provide his or her name, license number and expiration date, his or her company name, telephone\x20
+| number and, if applicable, his or her fax number and email address.  The certifier’s seal, if available, may be provided here. \x20
+| The certifier must sign and date the Elevation Form, where indicated, to certify the accuracy of the information provided. \x20
+| Not all states authorize architects and engineers to certify elevation information.  Consult the state board of registration for\x20
+| more information.\x20
+| \x20
+| Submitting the Package to DHS-FEMA\x20
+| \x20
+| In addition to the completed MT-EZ form, all requests must include one copy of the subdivision plat map (with recordation\x20
+| data and stamp of the Recorder’s Office) or a copy of the property deed (with recordation data and stamp of the Recorder’s\x20
+| Office), accompanied by a tax assessor’s map or other suitable map showing the surveyed location of the property with\x20
+| respect to local streets and watercourses; a copy of the effective FIRM panel; and a map scale and North arrow for all maps\x20
+| submitted.  Please do not submit original documents.  Please retain a copy of all submitted documents for your records.\x20
+| \x20
+| DHS-FEMA encourages the submission of all required data in digital format (e.g. scanned documents on a CD).\x20
+| \x20
+| All LOMA requests should be sent to the address listed below.\x20
+| \x20
+| LOMC CLEARINGHOUSE\x20
+| 847 SOUTH PICKETT STREET\x20
+| ALEXANDRIA, VA 22304-4605\x20
+| Attn.: LOMA Manager\x20
+| \x20
+| Interested parties who have any additional questions about the LOMA request process may consult the DHS-FEMA Flood\x20
+| Hazard Mapping website at http://www.fema.gov/plan/prevent/fhm/fmc_loma.shtm or call the DHS-FEMA Map\x20
+| Information eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  For information on the status of a particular LOMA\x20
+| request, interested parties may also consult DHS-FEMA’s Mapping Information Platform (MIP) at https://hazards.fema.gov.\x20
+text: separators 1-2
+| <PAGE><A><P>Instructions MT-EZ Form (086-0-22) FEB 11 <W> <W> <W> <W>6 <EOL>
+| </P><P> <EOL>
+|  <W>Other – All other structure types not listed above including, but not limited to split levels, structures on piers, <EOL>
+| </P><P>mobile homes, etc.  Please be as detailed as possible. <EOL>
+|  <EOL>
+| </P><P>Number 3 – Geographic Coordinate Data <EOL>
+|  <EOL>
+| </P><P>The surveyor or engineer must provide the latitude and longitude of the property in decimal degrees to the nearest fifth <EOL>
+| decimal place (00.00000), and indicate the appropriate horizontal datum, WGS 84, NAD 83 or NAD 27. <EOL>
+|  <EOL>
+| </P><P>Number 4 - Flood Insurance Rate Map Information <EOL>
+|  <EOL>
+| </P><P>In the first box, the surveyor or engineer must provide the six digit NFIP community number as it appears in the Title Block <EOL>
+| of the FIRM (or FHBM) panel that shows the area where the property is located.  In the second box, the surveyor or <EOL>
+| engineer must provide the map panel number.  For additional information on reading FIRM panels interested parties may <EOL>
+| consult the tutorial “How to Read a FIRM” on DHS-FEMA’s Flood Hazard Mapping website at <EOL>
+| http://www.fema.gov/plan/prevent/fhm/ot_firmr.shtm.   <EOL>
+|  <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+|  <EOL>
+| In the third box, the surveyor or engineer should provide the BFE, if available.  FEMA will verify the BFE during the review <EOL>
+| process.  In the fourth box, the surveyor or engineer must provide the source of the BFE.  The surveyor or engineer may <EOL>
+| obtain the BFE by locating the property on the effective FIRM for the community in which the property is located. Upon <EOL>
+| locating the property on the FIRM, the engineer or surveyor should determine the type of flooding and the flood zone <EOL>
+| where the property is located.  The summary below provides guidance as to how to determine the BFE as a result of the <EOL>
+| flooding type and flood zone determination.   <EOL>
+| </P><P> <W>Riverine Flooding Systems (Zones AE or A1-A30) – Consult the FIS report for the community in which the property <EOL>
+| is located.  Locate the flood profile for the flooding source by name.  Estimate the property’s location along the <EOL>
+| flood profile and interpolate the BFE using the 100-year flood profile line. <EOL>
+| </P><P> </P></A></PAGE>
+| <PAGE><A><P>Instructions MT-EZ Form (086-0-22) FEB 11 <W> <W> <W> <W>7 <EOL>
+| </P><P> <W>Lacustrine (Stillwater) Flooding Systems – Consult the FIS report for the community in which the property is <EOL>
+| located. Locate the Summary of Stillwater Elevations table.  Locate the flooding source, by name, and use the BFE <EOL>
+| listed in the table.  The flooding source’s BFE is normally shown to the nearest 0.1 foot.  If the flooding source is <EOL>
+| not listed in the Summary of Stillwater Elevations table, use the BFE as shown on the FIRM. <EOL>
+| </P><P> <EOL>
+| </P><P> <W>Coastal Flooding Systems (Zones AE or A1-A30 and VE or V1-V30) – Obtain the BFE from the FIRM panel. Consult <EOL>
+| the FIS report for the community in which the property is located. Locate the Summary of Stillwater Elevations <EOL>
+| table in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table. Compare the BFE <EOL>
+| listed in this table to the BFE obtained from the FIRM.  If the stillwater elevation listed in the table is less than or <EOL>
+| equal to the whole-foot BFE shown on the FIRM minus 0.5 foot, a wave height, wave runup, and/or wave setup <EOL>
+| component exists.  In this case, use the whole-foot BFE shown on the FIRM.  If the stillwater elevation listed in the <EOL>
+| table is greater than the whole-foot BFE shown on the FIRM minus 0.4 foot, use the stillwater elevation shown in <EOL>
+| the table as the BFE.  (Any structure/parcel of land located seaward of the landward toe of the primary frontal <EOL>
+| dune may not be removed from a Zone VE or V1-V30.) <EOL>
+| </P><P> <EOL>
+| </P><P> <W>Zone A Flooding – If the property is located in Zone A, an area of approximate flooding with no BFEs determined, <EOL>
+| determine a BFE.  Consult with a Federal, State, or local government agency to determine if that agency has <EOL>
+| developed a BFE.  Such agencies include the U.S. Army Corps of Engineers; the U.S. Geological Survey; the State’s <EOL>
+| Department of Natural Resources, Department of Environmental Quality, or Department of Transportation; or the <EOL>
+| local Planning and Zoning Department.  If one has been developed, all supporting data and calculations used to <EOL>
+| develop the BFE must be submitted. If a BFE has not previously been developed, consult DHS-FEMA 265, Managing <EOL>
+| Floodplain Development in Approximate Zone A Areas, A Guide for Obtaining and Developing Base (100-Year) Flood <EOL>
+| Elevations, available on the DHS-FEMA website at http://www.fema.gov/library/viewRecord.do?id=2215.  This <EOL>
+| publication is an excellent resource that details the appropriate methods for determining BFEs in SFHAs designated <EOL>
+| Zone A.  To obtain additional information about developing BFEs, contact the DHS-FEMA Map Information <EOL>
+| eXchange, toll free, at 1-877-FEMA MAP (1-877-336-2627).  If the property is greater than 50 lots or 5 acres, <EOL>
+| whichever is the lesser, the engineer or surveyor must determine a BFE in accordance with Paragraph 60.3(b)(3) of <EOL>
+| </P><P>the NFIP regulations, available online at http://www.access.gpo.gov/nara/cfr/waisidx_03/44cfr60_03.html. <EOL>
+|  <EOL>
+| </P><P> <W>Shallow Flooding (Zone AH) – For a property located in Zone AH, locate the Summary of Stillwater Elevations table <EOL>
+| in the FIS report.  Identify the flooding source, by name, and use the BFE listed in the table.  If no Summary of <EOL>
+| Stillwater Elevations table exists, use the BFE shown on the FIRM.  If different elevations appear within the same <EOL>
+| SFHA, the BFE is obtained by linear interpolation between two adjacent BFE lines.   <EOL>
+| </P><P> <EOL>
+| </P><P> <W>Shallow/Sheet Flooding (Zone AO) – For a property located in Zone AO, the characteristics of the Zone AO area <EOL>
+| shown on the NFIP map will determine the appropriate methodology to be used to develop the BFE for the <EOL>
+| property.  If the flooding is conveyed by the street, provide the highest top of curb or crown of street elevation <EOL>
+| (whichever is higher) along the property line and add this to the depth of flooding.  The lowest adjacent grade <EOL>
+| elevation must be above the curb or street elevation by an amount equal to or greater than the depth of flooding <EOL>
+| shown on the NFIP map.  If the entire property is inundated by the SFHA and the flow is not conveyed by the <EOL>
+| street, add the depth of flooding to the average surrounding grade.  If the property is partially inundated by the <EOL>
+| SFHA and the street does not convey the flow, add the depth of flooding to the lowest lot elevation.  Along with <EOL>
+| the information required for one of the above-mentioned methods, provide sufficient certified topographic <EOL>
+| information, including flow paths, to show that the structure is located on high ground relative to the depth <EOL>
+| indicated on the NFIP map. <EOL>
+| </P><P> <EOL>
+| </P><P>Number 5 – Elevation Information <EOL>
+|  <EOL>
+| </P><P>Lowest Adjacent Grade (LAG) to the Structure – For requests involving a structure, provide the LAG elevation (the elevation <EOL>
+| of the lowest ground touching the structure including attached patios, stairs, deck supports or garages), to the nearest 0.1 <EOL>
+| foot.  If the FIRM shows BFEs in meters, the accuracy of the LAG elevation must be to the nearest 0.1 meter.  <EOL>
+|  <EOL>
+| Lowest Lot Elevation – For requests involving property, or a portion thereof, not a structure, provide the lowest lot <EOL>
+| elevation to the nearest 0.1 foot.  If the FIRM shows BFEs in meters, the accuracy of the lowest lot elevation must be to the <EOL>
+| nearest 0.1 meter.  If the BFE varies across the property, please provide a certified site plan showing the range of elevations <EOL>
+| across the property. </P></A></PAGE>

@@ -1,0 +1,16 @@
+text: default page 1
+|  אּ
+| \x20
+|  لا
+| \x20
+text: sorted page 1
+|  אּ
+| \x20
+|  لا
+| \x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P> אּ<EOL>
+| </P><P> <EOL>
+| </P><P> لا<EOL>
+| </P><P> </P></A></PAGE>

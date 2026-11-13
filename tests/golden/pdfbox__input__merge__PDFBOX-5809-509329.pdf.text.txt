@@ -1,0 +1,508 @@
+text: default page 1
+| Endocrine Disruptors and Testis Development\x20
+| \x20
+| Project Scope\x20
+| Declines in human and animal male fertility\x20
+| have been observed in recent years by\x20
+| several researchers.  Possibly related\x20
+| declines also have been observed in sperm\x20
+| concentrations and related indicators of\x20
+| semen quality.  Rates of testicular cancer and\x20
+| congenital abnormalities such as\x20
+| cryptorchidism and hypospadias also appear\x20
+| to be increasing.  The declines in semen\x20
+| quality vary regionally, suggesting an\x20
+| association with exposure to endocrine\x20
+| disrupting chemicals (EDCs), which can\x20
+| influence normal sex determination, testis\x20
+| development, and sperm viability.  The\x20
+| objective of this grant was to develop a better\x20
+| understanding of how endocrine disruptors\x20
+| affect testis development and function in\x20
+| mammals. \x20
+| \x20
+| The development of the testis requires the\x20
+| coordination of the growth and differentiation\x20
+| of several cell types. The testis is formed\x20
+| initially from an undifferentiated bipotential\x20
+| gonad. The first sign of male development is\x20
+| the differentiation of precursor Sertoli cells,\x20
+| which then aggregate with germ cells and\x20
+| undergo a transition from mesenchyme to\x20
+| epithelia to form testicular cords.  Another\x20
+| characteristic of the development of the testis\x20
+| after the formation of cords is rapid growth\x20
+| compared to the analogous ovarian\x20
+| precursor. The peak of Sertoli cell\x20
+| proliferation occurs just before birth, and cell\x20
+| proliferation in the embryonic and early\x20
+| postnatal periods is crucial for establishing\x20
+| the mature adult size of the testis.  In addition, this proliferation is necessary for reproductive function, in\x20
+| order to maintain a sufficient population of sperm-producing Sertoli cells during adulthood. \x20
+| Grant Title and Principal Investigator\x20
+| Endocrine Disruptors and Testis Development\x20
+| Michael K. Skinner – Center for Reproductive Biology,\x20
+| Washington State University, Pullman, WA\x20
+| EPA STAR Grant #R827405\x20
+| \x20
+| Key Findings and Implications\x20
+| • An embryonic testis organ culture system was\x20
+| developed to assess the effects of endocrine disruptors\x20
+| on organ morphogenesis and tissue function.  Methods\x20
+| also were developed to assess transforming growth\x20
+| factor (TGF) and neurotropin (NT) gene expression and\x20
+| gene product levels. \x20
+| • Endocrine disruptors (e.g., methoxychlor [MXC] and\x20
+| vinclozolin) were found to alter early embryonic testis\x20
+| development when maternal exposures occurred at the\x20
+| time of fetal sex determination and testis morpho-
+| genesis. \x20
+| • In vivo exposure of gestating rats to MXC\x20
+| demonstrated a heritable reduction in sperm function\x20
+| and increased spermatogenic cell apoptosis affecting\x20
+| males in generations F1 through F4. Studies show that\x20
+| this heritable effect may be associated with alteration of\x20
+| the DNA methylation patterns in male germ cell\x20
+| precursors.\x20
+| \x20
+| Publications include ten peer reviewed articles.\x20
+| \x20
+| Project Period: August 1999 to July 2002\x20
+| \x20
+| Preliminary research indicates that two families of paracrine growth factors directly influence testis\x20
+| development and function.  Members of the transforming growth factor family (for example, TGF-")\x20
+| appear to be critical for embryonic testis growth, and at least one neurotropin (neurotropin 3 or NT3)\x20
+| appears to have a critical role in the morphogenesis of testis development.  Abnormal testis development\x20
+| and male infertility caused by endocrine disruptors may, in part, be mediated through pathways involving\x20
+| these factors. \x20
+| \x20
+| Thus, the hypothess initially tested under this grant was that endocrine distruptors affect locally produced\x20
+| paracrine growth factors that are essential for testicular cell growth and differentiation during embryonic\x20
+| and postnatal development.  The adverse developmental effects can later manifest themselves as\x20
+| reduced male fertility and sperm production.  Experiments investigated the effects of endocrine disruptors\x20
+| on TGFs  and neurotropins during testis development effects on male fertility.  Environmental agents with\x20
+| estrogenic activity (i.e., methoxychlor [MXC], a general use organochlorine pesticide) and antiandrogenic\x20
+| activity (i.e., vinclozoline, a selective contact fungicide) were assessed using a rat embryonic testis organ\x20
+| culture system and a rat in vivo model.  \x20
+| \x20
+|  1 \x20
+text: default page 2
+| \x20
+| Project Results and Implications\x20
+|   \x20
+| Treatment of gestating mothers had no major effect on fetal sex determination or gross testis histology at\x20
+| any time during development.  However, animals exposed in utero between embryonic day 8 (E8) and\x20
+| E15 experienced pubertal and adult spermatogenic defects in the F1 generation. Treated animals also\x20
+| had an increase in spermatogenic cell apoptosis (programmed cell death).  Similar results were observed\x20
+| at postnatal day 20 (P20) or P60 for MCX and vinclozoline.  In addition to this decreased spermatogenic\x20
+| cell survival, sperm motility was impaired and morphology was abnormal.  Interestingly, animals exposed\x20
+| in utero to the same dose of endocrine disruptor later in development (E25-E20) had no spermatogenic\x20
+| cell defects. This finding is consistent with the occurrence of critical processes such as germ cell DNA\x20
+| remethylation, cord formation, and sex determination during the E10-E15 period, which are complete after\x20
+| E15. \x20
+| \x20
+| These studies has provided insight into the mechanisms by which endocrine disruptors influence testis\x20
+| growth and function.  One key observation was the transgenerational effects of a transient in utero\x20
+| exposure to the endocrine disruptors MXC and vinclozolin on testis function and gametogenesis. In\x20
+| particular, these studies demonstrated the ability of MXC and vinclozolin to promote a transgenerational\x20
+| phenotype in spermatogenic cells\x20
+| \x20
+| Additional experiments were conducted that demonstrated the effects of exposure of endocrine disruptors\x20
+| on the F1 offspring could be passed to subsequent generations.  When the male rats of the F2 generation\x20
+| (derived from the animals discussed above) were examined, the same increased apoptosis rate in\x20
+| spermatogenesc cells was identified as the F1 generation.  Specifically, a three- to five-fold increase in\x20
+| apoptosis was observed in F2 rats at maturity.  Also, an approximately 20 percent decrease in sperm\x20
+| motility and forward movement also was observed.  These experiments show that EDC exposures to a\x20
+| gestating dam at the critical period of fetal sex determination and testis morphogenesis (i.e., cord\x20
+| formation) appears to cause a germline effect, i.e., a decrease in spermatogenic capacity and sperm\x20
+| viability that seems to be heritable in the male.  This experiment was repeated with four different gestating\x20
+| mothers, and similar results were observed through the F4 generation.  An outcross of an affected treated\x20
+| male with a wild type untreated female slightly reduced the magnitude of the effect, but the basic feature\x20
+| of the phenotype (i.e., increased spermatogenic apoptosis) remained.\x20
+| \x20
+| Researchers postulated that the transgenerational effect of maternal EDC exposures male\x20
+| spermatogenesis arises through disruption of DNA methylation in the male germline.  This hypothesis\x20
+| was investigated by exposing gestating dams to 100 mg/kg MXC from E8-E15, and collecting testes for\x20
+| analysis on P6.  DNA was isolated and methylation state determined with methylation-sensitive restriction\x20
+| enzymes and polymerase chain reaction (PCR) methods.  A number of PCR products with altered\x20
+| methylation patterns were detected in MXC-treated cells.  This observation further supports the proposal\x20
+| that the epigenetic effects of MXC on spermatogenesis are mediated by changes in DNA methylation.  \x20
+| \x20
+| \x20
+| \x20
+| Relevance to ORD’s Multi-Year Research Plan\x20
+| This project contributes to all three of ORD’s Multi-Year Plan long-term goals (LTGs 1-3), in particular\x20
+| (1) providing a better understanding of the science underlying the effects and assessment of\x20
+| endocrine disruptors, (2) determining the extent of the impact of endocrine disruptors on humans and\x20
+| wildlife, and (3) supporting EPA’s screening and testing program.  More specifically, the results\x20
+| address the effects of early developmental exposure to endocrine disrupting pesticides on\x20
+| reproductive function in adults, toxicant-induced alterations in mammalian reproductive development,\x20
+| dose response relationships, critical periods of exposure, in vivo tissue levels of the active toxicant, in\x20
+| vivo and in vitro mechanisms of action, androgenic and anti-androgenic activity, the effects of\x20
+| endocrine disruptors on growth factors and receptors that control spermatogenesis and growth and\x20
+| development of the testis, and in vitro and in vivo  assessment methods.\x20
+|  2 \x20
+text: default page 3
+| \x20
+| \x20
+| Investigators\x20
+| Michael K. Skinner – Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Andrea S. Cupp - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Elena Levine - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| \x20
+| For More Information\x20
+| Center for Reproductive Biology\x20
+| http://www.crb.wsu.edu/3FacultyPages/Skinner.html
+| Skinner Laboratory\x20
+| http://www.skinner.wsu.edu/
+| \x20
+| NCER Project Abstract and Reports:\x20
+| http://cfpub2.epa.gov/ncer_abstracts/index.cfm/fuseaction/display.abstractDetail/abstract/992/report/0
+|  3 \x20
+text: sorted page 1
+| Endocrine Disruptors and Testis Development\x20
+| \x20
+| Project Scope\x20
+| Declines in human and animal male fertility\x20
+| have been observed in recent years by Grant Title and Principal Investigator\x20
+| several researchers.  Possibly related Endocrine Disruptors and Testis Development\x20
+| declines also have been observed in sperm Michael K. Skinner – Center for Reproductive Biology,\x20
+| concentrations and related indicators of Washington State University, Pullman, WA\x20
+| semen quality.  Rates of testicular cancer and\x20
+| congenital abnormalities such as EPA STAR Grant #R827405\x20
+| cryptorchidism and hypospadias also appear \x20
+| to be increasing.  The declines in semen Key Findings and Implications\x20
+| quality vary regionally, suggesting an\x20
+| association with exposure to endocrine • An embryonic testis organ culture system was\x20
+| disrupting chemicals (EDCs), which can developed to assess the effects of endocrine disruptors\x20
+| influence normal sex determination, testis on organ morphogenesis and tissue function.  Methods\x20
+| development, and sperm viability.  The also were developed to assess transforming growth\x20
+| objective of this grant was to develop a better factor (TGF) and neurotropin (NT) gene expression and\x20
+| understanding of how endocrine disruptors gene product levels. \x20
+| affect testis development and function in • Endocrine disruptors (e.g., methoxychlor [MXC] and\x20
+| mammals.  vinclozolin) were found to alter early embryonic testis\x20
+|  development when maternal exposures occurred at the\x20
+| The development of the testis requires the time of fetal sex determination and testis morpho-
+| coordination of the growth and differentiation genesis. \x20
+| of several cell types. The testis is formed • In vivo exposure of gestating rats to MXC\x20
+| initially from an undifferentiated bipotential demonstrated a heritable reduction in sperm function\x20
+| gonad. The first sign of male development is and increased spermatogenic cell apoptosis affecting\x20
+| the differentiation of precursor Sertoli cells, males in generations F1 through F4. Studies show that\x20
+| which then aggregate with germ cells and this heritable effect may be associated with alteration of\x20
+| undergo a transition from mesenchyme to the DNA methylation patterns in male germ cell\x20
+| epithelia to form testicular cords.  Another precursors.\x20
+| characteristic of the development of the testis \x20
+| after the formation of cords is rapid growth Publications include ten peer reviewed articles.\x20
+| compared to the analogous ovarian \x20
+| precursor. The peak of Sertoli cell Project Period: August 1999 to July 2002\x20
+| proliferation occurs just before birth, and cell\x20
+| proliferation in the embryonic and early\x20
+| postnatal periods is crucial for establishing\x20
+| the mature adult size of the testis.  In addition, this proliferation is necessary for reproductive function, in\x20
+| order to maintain a sufficient population of sperm-producing Sertoli cells during adulthood. \x20
+| \x20
+| Preliminary research indicates that two families of paracrine growth factors directly influence testis\x20
+| development and function.  Members of the transforming growth factor family (for example, TGF-")\x20
+| appear to be critical for embryonic testis growth, and at least one neurotropin (neurotropin 3 or NT3)\x20
+| appears to have a critical role in the morphogenesis of testis development.  Abnormal testis development\x20
+| and male infertility caused by endocrine disruptors may, in part, be mediated through pathways involving\x20
+| these factors. \x20
+| \x20
+| Thus, the hypothess initially tested under this grant was that endocrine distruptors affect locally produced\x20
+| paracrine growth factors that are essential for testicular cell growth and differentiation during embryonic\x20
+| and postnatal development.  The adverse developmental effects can later manifest themselves as\x20
+| reduced male fertility and sperm production.  Experiments investigated the effects of endocrine disruptors\x20
+| on TGFs  and neurotropins during testis development effects on male fertility.  Environmental agents with\x20
+| estrogenic activity (i.e., methoxychlor [MXC], a general use organochlorine pesticide) and antiandrogenic\x20
+| activity (i.e., vinclozoline, a selective contact fungicide) were assessed using a rat embryonic testis organ\x20
+| culture system and a rat in vivo model.  \x20
+| \x20
+|  1 \x20
+text: sorted page 2
+| \x20
+| Project Results and Implications\x20
+|   \x20
+| Treatment of gestating mothers had no major effect on fetal sex determination or gross testis histology at\x20
+| any time during development.  However, animals exposed in utero between embryonic day 8 (E8) and\x20
+| E15 experienced pubertal and adult spermatogenic defects in the F1 generation. Treated animals also\x20
+| had an increase in spermatogenic cell apoptosis (programmed cell death).  Similar results were observed\x20
+| at postnatal day 20 (P20) or P60 for MCX and vinclozoline.  In addition to this decreased spermatogenic\x20
+| cell survival, sperm motility was impaired and morphology was abnormal.  Interestingly, animals exposed\x20
+| in utero to the same dose of endocrine disruptor later in development (E25-E20) had no spermatogenic\x20
+| cell defects. This finding is consistent with the occurrence of critical processes such as germ cell DNA\x20
+| remethylation, cord formation, and sex determination during the E10-E15 period, which are complete after\x20
+| E15. \x20
+| \x20
+| These studies has provided insight into the mechanisms by which endocrine disruptors influence testis\x20
+| growth and function.  One key observation was the transgenerational effects of a transient in utero\x20
+| exposure to the endocrine disruptors MXC and vinclozolin on testis function and gametogenesis. In\x20
+| particular, these studies demonstrated the ability of MXC and vinclozolin to promote a transgenerational\x20
+| phenotype in spermatogenic cells\x20
+| \x20
+| Additional experiments were conducted that demonstrated the effects of exposure of endocrine disruptors\x20
+| on the F1 offspring could be passed to subsequent generations.  When the male rats of the F2 generation\x20
+| (derived from the animals discussed above) were examined, the same increased apoptosis rate in\x20
+| spermatogenesc cells was identified as the F1 generation.  Specifically, a three- to five-fold increase in\x20
+| apoptosis was observed in F2 rats at maturity.  Also, an approximately 20 percent decrease in sperm\x20
+| motility and forward movement also was observed.  These experiments show that EDC exposures to a\x20
+| gestating dam at the critical period of fetal sex determination and testis morphogenesis (i.e., cord\x20
+| formation) appears to cause a germline effect, i.e., a decrease in spermatogenic capacity and sperm\x20
+| viability that seems to be heritable in the male.  This experiment was repeated with four different gestating\x20
+| mothers, and similar results were observed through the F4 generation.  An outcross of an affected treated\x20
+| male with a wild type untreated female slightly reduced the magnitude of the effect, but the basic feature\x20
+| of the phenotype (i.e., increased spermatogenic apoptosis) remained.\x20
+| \x20
+| Researchers postulated that the transgenerational effect of maternal EDC exposures male\x20
+| spermatogenesis arises through disruption of DNA methylation in the male germline.  This hypothesis\x20
+| was investigated by exposing gestating dams to 100 mg/kg MXC from E8-E15, and collecting testes for\x20
+| analysis on P6.  DNA was isolated and methylation state determined with methylation-sensitive restriction\x20
+| enzymes and polymerase chain reaction (PCR) methods.  A number of PCR products with altered\x20
+| methylation patterns were detected in MXC-treated cells.  This observation further supports the proposal\x20
+| that the epigenetic effects of MXC on spermatogenesis are mediated by changes in DNA methylation.  \x20
+| \x20
+| \x20
+| Relevance to ORD’s Multi-Year Research Plan\x20
+| This project contributes to all three of ORD’s Multi-Year Plan long-term goals (LTGs 1-3), in particular\x20
+| (1) providing a better understanding of the science underlying the effects and assessment of\x20
+| endocrine disruptors, (2) determining the extent of the impact of endocrine disruptors on humans and\x20
+| wildlife, and (3) supporting EPA’s screening and testing program.  More specifically, the results\x20
+| address the effects of early developmental exposure to endocrine disrupting pesticides on\x20
+| reproductive function in adults, toxicant-induced alterations in mammalian reproductive development,\x20
+| dose response relationships, critical periods of exposure, in vivo tissue levels of the active toxicant, in\x20
+| vivo and in vitro mechanisms of action, androgenic and anti-androgenic activity, the effects of\x20
+| endocrine disruptors on growth factors and receptors that control spermatogenesis and growth and\x20
+| development of the testis, and in vitro and in vivo  assessment methods.\x20
+| \x20
+|  2 \x20
+text: sorted page 3
+| \x20
+| \x20
+| Investigators\x20
+| Michael K. Skinner – Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Andrea S. Cupp - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Elena Levine - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| \x20
+| For More Information\x20
+| Center for Reproductive Biology\x20
+| http://www.crb.wsu.edu/3FacultyPages/Skinner.html
+| Skinner Laboratory\x20
+| http://www.skinner.wsu.edu/
+| \x20
+| NCER Project Abstract and Reports:\x20
+| http://cfpub2.epa.gov/ncer_abstracts/index.cfm/fuseaction/display.abstractDetail/abstract/992/report/0
+|  3 \x20
+text: range 2-3
+| \x20
+| Project Results and Implications\x20
+|   \x20
+| Treatment of gestating mothers had no major effect on fetal sex determination or gross testis histology at\x20
+| any time during development.  However, animals exposed in utero between embryonic day 8 (E8) and\x20
+| E15 experienced pubertal and adult spermatogenic defects in the F1 generation. Treated animals also\x20
+| had an increase in spermatogenic cell apoptosis (programmed cell death).  Similar results were observed\x20
+| at postnatal day 20 (P20) or P60 for MCX and vinclozoline.  In addition to this decreased spermatogenic\x20
+| cell survival, sperm motility was impaired and morphology was abnormal.  Interestingly, animals exposed\x20
+| in utero to the same dose of endocrine disruptor later in development (E25-E20) had no spermatogenic\x20
+| cell defects. This finding is consistent with the occurrence of critical processes such as germ cell DNA\x20
+| remethylation, cord formation, and sex determination during the E10-E15 period, which are complete after\x20
+| E15. \x20
+| \x20
+| These studies has provided insight into the mechanisms by which endocrine disruptors influence testis\x20
+| growth and function.  One key observation was the transgenerational effects of a transient in utero\x20
+| exposure to the endocrine disruptors MXC and vinclozolin on testis function and gametogenesis. In\x20
+| particular, these studies demonstrated the ability of MXC and vinclozolin to promote a transgenerational\x20
+| phenotype in spermatogenic cells\x20
+| \x20
+| Additional experiments were conducted that demonstrated the effects of exposure of endocrine disruptors\x20
+| on the F1 offspring could be passed to subsequent generations.  When the male rats of the F2 generation\x20
+| (derived from the animals discussed above) were examined, the same increased apoptosis rate in\x20
+| spermatogenesc cells was identified as the F1 generation.  Specifically, a three- to five-fold increase in\x20
+| apoptosis was observed in F2 rats at maturity.  Also, an approximately 20 percent decrease in sperm\x20
+| motility and forward movement also was observed.  These experiments show that EDC exposures to a\x20
+| gestating dam at the critical period of fetal sex determination and testis morphogenesis (i.e., cord\x20
+| formation) appears to cause a germline effect, i.e., a decrease in spermatogenic capacity and sperm\x20
+| viability that seems to be heritable in the male.  This experiment was repeated with four different gestating\x20
+| mothers, and similar results were observed through the F4 generation.  An outcross of an affected treated\x20
+| male with a wild type untreated female slightly reduced the magnitude of the effect, but the basic feature\x20
+| of the phenotype (i.e., increased spermatogenic apoptosis) remained.\x20
+| \x20
+| Researchers postulated that the transgenerational effect of maternal EDC exposures male\x20
+| spermatogenesis arises through disruption of DNA methylation in the male germline.  This hypothesis\x20
+| was investigated by exposing gestating dams to 100 mg/kg MXC from E8-E15, and collecting testes for\x20
+| analysis on P6.  DNA was isolated and methylation state determined with methylation-sensitive restriction\x20
+| enzymes and polymerase chain reaction (PCR) methods.  A number of PCR products with altered\x20
+| methylation patterns were detected in MXC-treated cells.  This observation further supports the proposal\x20
+| that the epigenetic effects of MXC on spermatogenesis are mediated by changes in DNA methylation.  \x20
+| \x20
+| \x20
+| \x20
+| Relevance to ORD’s Multi-Year Research Plan\x20
+| This project contributes to all three of ORD’s Multi-Year Plan long-term goals (LTGs 1-3), in particular\x20
+| (1) providing a better understanding of the science underlying the effects and assessment of\x20
+| endocrine disruptors, (2) determining the extent of the impact of endocrine disruptors on humans and\x20
+| wildlife, and (3) supporting EPA’s screening and testing program.  More specifically, the results\x20
+| address the effects of early developmental exposure to endocrine disrupting pesticides on\x20
+| reproductive function in adults, toxicant-induced alterations in mammalian reproductive development,\x20
+| dose response relationships, critical periods of exposure, in vivo tissue levels of the active toxicant, in\x20
+| vivo and in vitro mechanisms of action, androgenic and anti-androgenic activity, the effects of\x20
+| endocrine disruptors on growth factors and receptors that control spermatogenesis and growth and\x20
+| development of the testis, and in vitro and in vivo  assessment methods.\x20
+|  2 \x20
+| \x20
+| \x20
+| Investigators\x20
+| Michael K. Skinner – Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Andrea S. Cupp - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| Elena Levine - Center for Reproductive Biology, Washington State University, Pullman, WA\x20
+| \x20
+| For More Information\x20
+| Center for Reproductive Biology\x20
+| http://www.crb.wsu.edu/3FacultyPages/Skinner.html
+| Skinner Laboratory\x20
+| http://www.skinner.wsu.edu/
+| \x20
+| NCER Project Abstract and Reports:\x20
+| http://cfpub2.epa.gov/ncer_abstracts/index.cfm/fuseaction/display.abstractDetail/abstract/992/report/0
+|  3 \x20
+text: separators 1-2
+| <PAGE><A><P>Endocrine Disruptors and Testis Development <EOL>
+|  <EOL>
+| Project Scope <EOL>
+| Declines in human and animal male fertility <EOL>
+| have been observed in recent years by <EOL>
+| several researchers.  Possibly related <EOL>
+| declines also have been observed in sperm <EOL>
+| concentrations and related indicators of <EOL>
+| semen quality.  Rates of testicular cancer and <EOL>
+| congenital abnormalities such as <EOL>
+| cryptorchidism and hypospadias also appear <EOL>
+| to be increasing.  The declines in semen <EOL>
+| quality vary regionally, suggesting an <EOL>
+| association with exposure to endocrine <EOL>
+| disrupting chemicals (EDCs), which can <EOL>
+| influence normal sex determination, testis <EOL>
+| development, and sperm viability.  The <EOL>
+| objective of this grant was to develop a better <EOL>
+| understanding of how endocrine disruptors <EOL>
+| affect testis development and function in <EOL>
+| mammals.  <EOL>
+|  <EOL>
+| The development of the testis requires the <EOL>
+| coordination of the growth and differentiation <EOL>
+| of several cell types. The testis is formed <EOL>
+| initially from an undifferentiated bipotential <EOL>
+| gonad. The first sign of male development is <EOL>
+| the differentiation of precursor Sertoli cells, <EOL>
+| which then aggregate with germ cells and <EOL>
+| undergo a transition from mesenchyme to <EOL>
+| epithelia to form testicular cords.  Another <EOL>
+| characteristic of the development of the testis <EOL>
+| after the formation of cords is rapid growth <EOL>
+| compared to the analogous ovarian <EOL>
+| precursor. The peak of Sertoli cell <EOL>
+| proliferation occurs just before birth, and cell <EOL>
+| proliferation in the embryonic and early <EOL>
+| postnatal periods is crucial for establishing <EOL>
+| the mature adult size of the testis.  In addition, this proliferation is necessary for reproductive function, in <EOL>
+| order to maintain a sufficient population of sperm-producing Sertoli cells during adulthood.  <EOL>
+| </P><P>Grant Title and Principal Investigator <EOL>
+| Endocrine Disruptors and Testis Development <EOL>
+| Michael K. Skinner – Center for Reproductive Biology, <EOL>
+| Washington State University, Pullman, WA <EOL>
+| </P><P>EPA STAR Grant #R827405 <EOL>
+| </P><P> <EOL>
+| Key Findings and Implications <EOL>
+| • <W>An embryonic testis organ culture system was <EOL>
+| </P><P>developed to assess the effects of endocrine disruptors <EOL>
+| on organ morphogenesis and tissue function.  Methods <EOL>
+| also were developed to assess transforming growth <EOL>
+| factor (TGF) and neurotropin (NT) gene expression and <EOL>
+| gene product levels.  <EOL>
+| </P><P>• <W>Endocrine disruptors (e.g., methoxychlor [MXC] and <EOL>
+| vinclozolin) were found to alter early embryonic testis <EOL>
+| development when maternal exposures occurred at the <EOL>
+| time of fetal sex determination and testis morpho-<EOL>
+| genesis.  <EOL>
+| </P><P>• <W>In vivo exposure of gestating rats to MXC <EOL>
+| demonstrated a heritable reduction in sperm function <EOL>
+| and increased spermatogenic cell apoptosis affecting <EOL>
+| males in generations F1 through F4. Studies show that <EOL>
+| this heritable effect may be associated with alteration of <EOL>
+| the DNA methylation patterns in male germ cell <EOL>
+| precursors. <EOL>
+| </P><P> <EOL>
+| Publications include ten peer reviewed articles. <EOL>
+|  <EOL>
+| Project Period: August 1999 to July 2002 <EOL>
+| </P><P> <EOL>
+| Preliminary research indicates that two families of paracrine growth factors directly influence testis <EOL>
+| development and function.  Members of the transforming growth factor family (for example, TGF-") <EOL>
+| appear to be critical for embryonic testis growth, and at least one neurotropin (neurotropin 3 or NT3) <EOL>
+| appears to have a critical role in the morphogenesis of testis development.  Abnormal testis development <EOL>
+| and male infertility caused by endocrine disruptors may, in part, be mediated through pathways involving <EOL>
+| these factors.  <EOL>
+|  <EOL>
+| Thus, the hypothess initially tested under this grant was that endocrine distruptors affect locally produced <EOL>
+| paracrine growth factors that are essential for testicular cell growth and differentiation during embryonic <EOL>
+| and postnatal development.  The adverse developmental effects can later manifest themselves as <EOL>
+| reduced male fertility and sperm production.  Experiments investigated the effects of endocrine disruptors <EOL>
+| on TGFs  and neurotropins during testis development effects on male fertility.  Environmental agents with <EOL>
+| estrogenic activity (i.e., methoxychlor [MXC], a general use organochlorine pesticide) and antiandrogenic <EOL>
+| activity (i.e., vinclozoline, a selective contact fungicide) were assessed using a rat embryonic testis organ <EOL>
+| culture system and a rat in vivo model.   <EOL>
+|  <EOL>
+| </P><P> <W>1 <W> </P></A></PAGE>
+| <PAGE><A><P> <EOL>
+| Project Results and Implications <EOL>
+|    <EOL>
+| Treatment of gestating mothers had no major effect on fetal sex determination or gross testis histology at <EOL>
+| any time during development.  However, animals exposed in utero between embryonic day 8 (E8) and <EOL>
+| E15 experienced pubertal and adult spermatogenic defects in the F1 generation. Treated animals also <EOL>
+| had an increase in spermatogenic cell apoptosis (programmed cell death).  Similar results were observed <EOL>
+| at postnatal day 20 (P20) or P60 for MCX and vinclozoline.  In addition to this decreased spermatogenic <EOL>
+| cell survival, sperm motility was impaired and morphology was abnormal.  Interestingly, animals exposed <EOL>
+| in utero to the same dose of endocrine disruptor later in development (E25-E20) had no spermatogenic <EOL>
+| cell defects. This finding is consistent with the occurrence of critical processes such as germ cell DNA <EOL>
+| remethylation, cord formation, and sex determination during the E10-E15 period, which are complete after <EOL>
+| E15.  <EOL>
+|  <EOL>
+| These studies has provided insight into the mechanisms by which endocrine disruptors influence testis <EOL>
+| growth and function.  One key observation was the transgenerational effects of a transient in utero <EOL>
+| exposure to the endocrine disruptors MXC and vinclozolin on testis function and gametogenesis. In <EOL>
+| particular, these studies demonstrated the ability of MXC and vinclozolin to promote a transgenerational <EOL>
+| phenotype in spermatogenic cells <EOL>
+|  <EOL>
+| Additional experiments were conducted that demonstrated the effects of exposure of endocrine disruptors <EOL>
+| on the F1 offspring could be passed to subsequent generations.  When the male rats of the F2 generation <EOL>
+| (derived from the animals discussed above) were examined, the same increased apoptosis rate in <EOL>
+| spermatogenesc cells was identified as the F1 generation.  Specifically, a three- to five-fold increase in <EOL>
+| apoptosis was observed in F2 rats at maturity.  Also, an approximately 20 percent decrease in sperm <EOL>
+| motility and forward movement also was observed.  These experiments show that EDC exposures to a <EOL>
+| gestating dam at the critical period of fetal sex determination and testis morphogenesis (i.e., cord <EOL>
+| formation) appears to cause a germline effect, i.e., a decrease in spermatogenic capacity and sperm <EOL>
+| viability that seems to be heritable in the male.  This experiment was repeated with four different gestating <EOL>
+| mothers, and similar results were observed through the F4 generation.  An outcross of an affected treated <EOL>
+| male with a wild type untreated female slightly reduced the magnitude of the effect, but the basic feature <EOL>
+| of the phenotype (i.e., increased spermatogenic apoptosis) remained. <EOL>
+|  <EOL>
+| Researchers postulated that the transgenerational effect of maternal EDC exposures male <EOL>
+| spermatogenesis arises through disruption of DNA methylation in the male germline.  This hypothesis <EOL>
+| was investigated by exposing gestating dams to 100 mg/kg MXC from E8-E15, and collecting testes for <EOL>
+| analysis on P6.  DNA was isolated and methylation state determined with methylation-sensitive restriction <EOL>
+| enzymes and polymerase chain reaction (PCR) methods.  A number of PCR products with altered <EOL>
+| methylation patterns were detected in MXC-treated cells.  This observation further supports the proposal <EOL>
+| that the epigenetic effects of MXC on spermatogenesis are mediated by changes in DNA methylation.   <EOL>
+|  <EOL>
+|  <EOL>
+| </P><P> <EOL>
+| </P><P>Relevance to ORD’s Multi-Year Research Plan <EOL>
+| This project contributes to all three of ORD’s Multi-Year Plan long-term goals (LTGs 1-3), in particular <EOL>
+| (1) providing a better understanding of the science underlying the effects and assessment of <EOL>
+| endocrine disruptors, (2) determining the extent of the impact of endocrine disruptors on humans and <EOL>
+| wildlife, and (3) supporting EPA’s screening and testing program.  More specifically, the results <EOL>
+| address the effects of early developmental exposure to endocrine disrupting pesticides on <EOL>
+| reproductive function in adults, toxicant-induced alterations in mammalian reproductive development, <EOL>
+| dose response relationships, critical periods of exposure, in vivo tissue levels of the active toxicant, in <EOL>
+| vivo and in vitro mechanisms of action, androgenic and anti-androgenic activity, the effects of <EOL>
+| endocrine disruptors on growth factors and receptors that control spermatogenesis and growth and <EOL>
+| development of the testis, and in vitro and in vivo  assessment methods. <EOL>
+| </P><P> <W>2 <W> </P></A></PAGE>

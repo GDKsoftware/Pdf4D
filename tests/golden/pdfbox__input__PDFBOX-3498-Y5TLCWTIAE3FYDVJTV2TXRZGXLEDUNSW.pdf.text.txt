@@ -1,0 +1,7 @@
+text: default page 1
+| IN THE COURT OF CHANCERY OF THE STATE OF DELAWARE 
+text: sorted page 1
+| IN THE COURT OF CHANCERY OF THE STATE OF DELAWARE 
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>IN THE COURT OF CHANCERY OF THE STATE OF DELAWARE </P></A></PAGE>

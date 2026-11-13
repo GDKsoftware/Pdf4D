@@ -1,0 +1,18 @@
+text: default page 1
+| First Page
+text: default page 2
+| Second Page
+text: default page 3
+| Third Page
+text: sorted page 1
+| First Page
+text: sorted page 2
+| Second Page
+text: sorted page 3
+| Third Page
+text: range 2-3
+| Second Page
+| Third Page
+text: separators 1-2
+| <PAGE><A><P>First Page</P></A></PAGE>
+| <PAGE><A><P>Second Page</P></A></PAGE>

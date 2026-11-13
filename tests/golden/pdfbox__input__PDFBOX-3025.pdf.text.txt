@@ -1,0 +1,7 @@
+text: default page 1
+| Jeanette
+text: sorted page 1
+| Jeanette
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Jeanette</P></A></PAGE>

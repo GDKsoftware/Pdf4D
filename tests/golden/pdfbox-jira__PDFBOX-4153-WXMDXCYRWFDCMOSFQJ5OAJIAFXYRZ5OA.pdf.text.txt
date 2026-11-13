@@ -1,0 +1,905 @@
+text: default page 1
+| Abstract-An animal-shaped toy was provided as a therapeutic
+| tool to patients with severe dementia during a therapeutic
+| program and after dinner. The occupational therapist delivered
+| three animal -shaped toys—a gorilla, a tiger and a dog—during
+| the therapeutic program. These toys performed amusing
+| actions. The occupational therapist observed the activities of the
+| patients and classified them into six categories (no reaction,
+| close observation, talking, clapping, patting the toy, taking care
+| of the toy). The total duration of activities during the period of
+| the therapeutic program was recorded. Most of the patients
+| were interested in the toys, and they looked much happier and
+| less agitated. They became accustomed to the toy dog day by
+| day. The animal-shaped toy is a useful tool for occupational
+| therapy.
+| Keywords - Therapeutic tool, diversional therapy, toy
+| I. INTRODUCTION
+| Pet therapy has been used to heal the dementia patients [1-4].
+| Dogs are one of the most popular companion animals, but
+| there are some risks: hazards for the dog, hazards for the
+| patient, sensory overload, dislike of the pet, and so on. On
+| the other hand, a few animal-shaped toys based on robot
+| technology have been developed. Doll therapy has also been
+| applied as a diversional therapy for dementia patients in
+| Australia [5]. In this study, we tried providing animal-shaped
+| toys as a diversional therapy for patients with severe
+| dementia, to decrease the frequency of their agitation and
+| wandering.
+| II. METHOD
+| Occupational therapy was administered during daytime
+| working hours in Green Home, a nursing home for elderly
+| patients with severe dementia . Formal approval for the study
+| was obtained from the Ethics Committee of the Fujimoto-
+| Hayasuzu Hospital before the toys were delivered to the
+| patients.
+| A. Comparison of toys
+| Three animal-shaped toys were prepared as tools for the
+| therapeutic program. Fig. 1 is a photo of the toys: a gorilla, a
+| tiger and a dog. Each toy performed amusing dancing,
+| jumping and walking actions. During the therapeutic
+| program, the occupational therapist (OTR) showed the three
+| toys for 90 seconds each to a small group of three or four
+| patients . The OTR observed the patients ’ activities and
+| classified them into six categories (no reaction, close
+| observation, talking, clapping, patting the toy, taking care of
+| the toy). The total number and duration of activities during
+| the period of the therapeutic program were recorded.
+| B. Delivery of toy dog after dinner
+| After dinner, patients with severe dementia generally
+| become agitated or wander. We expected a decrease in the
+| frequency of agitation and wandering after using the toy dog,
+| which was the most popular animal. A whistle that caused
+| the dog to bark was removed for the convenience of the care
+| staff. The patients came to the main lounge after dinner. The
+| OTR delivered two toy dogs to the main lounge for 40
+| minutes. The OTR then observed the patients ’ activities for
+| one hour and classified them into four categories (no reaction,
+| agitation or wandering, showing interest in something,
+| communicating with other residents). The toy dogs were
+| delivered for six days in total. As a reference, the after-
+| dinner activities of patients without the delivery of the toy
+| dogs were observed for four days in total.
+| C. Individual activity analysis
+| The most active patient (67 years, female, Mini-Mental
+| State = 14) was selected for a study to determine the
+| therapeutic efficiency of the toy dog. The OTR analyzed her
+| activities in detail and classified them into five categories
+| (pleasant activity, unpleasant activity, no reaction, wandering,
+| communicating with other residents). The patient’s activities
+| were observed for three successive days, with and without
+| delivery of the toy dog.
+| ANIMAL-SHAPED TOYS AS THERAPEUTIC TOOLS FOR
+| PATIENTS WITH SEVERE DEMENTIA
+| K. Nakajima*1, K. Nakamura2, S. Yonemitsu3, D. Oikawa3, A. Ito2,
+| Y. Higashi3, T. Fujimoto3, M. Nambu1, T. Tamura1
+| 1Department of Gerontechnology, National Institute for Longevity Sciences, Obu, Aichi, Japan
+| 2Green Home for Elderly Nursing Home, Kitamorokata, Miyazaki, Japan
+| 3Fujimoto-Hayasuzu Hospital, Miyakonojo, Miyazaki, Japan
+| This study was partly supported by Comprehensive Research on Aging
+| and Health (H11-CRAH-042) and a Research Grant for Longevity
+| Sciences (11C-05) from the Ministry of Health, Labor and Welfare.
+| Asterisk indicates corresponding author.
+text: default page 2
+| Report Documentation Page
+| Report Date\x20
+| 25OCT2001
+| Report Type\x20
+| N/A
+| Dates Covered (from... to)\x20
+| -\x20
+| Title and Subtitle\x20
+| Animal-Shaped Toys as Therapeutic Tools for Patients with
+| Severe Dementia
+| Contract Number\x20
+| Grant Number\x20
+| Program Element Number\x20
+| Author(s) Project Number\x20
+| Task Number\x20
+| Work Unit Number\x20
+| Performing Organization Name(s) and Address(es)\x20
+| Department of Gerontechnology, National Institute for
+| Longevity Sciences, Obu, Aichi, Japan
+| Performing Organization Report Number\x20
+| Sponsoring/Monitoring Agency Name(s) and Address(es)\x20
+| US Army Research Development & Standardization Group
+| (UK) PSC 803 Box 15 FPO AE 09499-1500
+| Sponsor/Monitor’s Acronym(s)\x20
+| Sponsor/Monitor’s Report Number(s)\x20
+| Distribution/Availability Statement\x20
+| Approved for public release, distribution unlimited
+| Supplementary Notes\x20
+| Papers from the 23rd Annual International conference of the IEEE Engineering in Medicine and Biology Society,
+| October 25-28, 2001, held in Istanbul, Turkey. See also ADM001351 for entire conference on cd-rom., The original
+| document contains color images.
+| Abstract\x20
+| Subject Terms\x20
+| Report Classification\x20
+| unclassified
+| Classification of this page\x20
+| unclassified
+| Classification of Abstract\x20
+| unclassified\x20
+| Limitation of Abstract\x20
+| UU
+| Number of Pages\x20
+| 3
+text: default page 3
+| III. RESULTS
+| A. Comparison of toys
+| The activities of patients are summarized in Fig. 2.
+| Although no significant differences were observed between
+| responses to the three different toys, the total time spent in
+| active behavior (talk, pat and take care of the toy) was
+| relatively longer with the toy dog. A longer total time was
+| spent in look, talk and clap with the toy gorilla.
+| B. Delivery of toy dog after dinner
+| Fig. 3 shows the average number of participants. About
+| 20 participants came to the main lounge every day. Of these,
+| about 10 participants showed no reaction and a few
+| participants wandered or were agitated during this period.
+| The average number of participants showing no reaction was
+| decreased, and the average number showing interest was
+| increased by the delivery of the toy dog. A few participants
+| fended off the toy dog.
+| C. Individual activity analysis
+| Fig. 4 shows the results from three successive days with
+| and without delivery of the toy dog. Without the delivery,
+| the main activities were wondering, communicating with
+| other residents and no reaction. Pleasant activity was
+| increased by the appearance of the dog on 7 June, but the
+| total duration of pleasant activity decreased day by day.
+| There was little wondering.
+| IV. DISCUSSION
+| We tried providing animal-shaped toys as a diversional
+| therapy for patients with severe dementia . In this study, no
+| significant differences were observed between responses to
+| the three different toys, although patients were more familiar
+| with the dog shape than with the gorilla or the tiger shapes,
+| and they wondered about, or were afraid of, the amusing
+| actions of the toy gorilla and tiger.
+| Most of the patients were interested in the toy dog after
+| dinner, and they looked much happier and less agitated,
+| although a few fended off from it. We noticed that the
+| patients became accustomed to the toy dog day by day (see
+| Fig. 4). Although the therapeutic program requires
+| improvement, for instance regarding the accommodation of
+| groups and the frequency of delivery, the toy dog was a
+|             (a)                         (b)                        (c)
+| Fig. 1. Animal-shaped toys as therapeutic tools:
+| (a) gorilla (b) tiger (c) dog.
+| 0:00:00
+| 0:02:00
+| 0:04:00
+| 0:06:00
+| 0:08:00
+| 0:10:00
+| 0:12:00
+| no
+|  re
+| act
+| ion
+| clo
+| se\x20
+| ob
+| ser
+| va
+| tio
+| n
+| tal
+| kin
+| g
+| cla
+| pp
+| ing
+| pa
+| ttin
+| g
+| car
+| e
+| Activities
+| T
+| ot
+| al
+|  ti
+| m
+| e
+| Gorilla
+| Tiger
+| Dog
+| Fig. 2. Comparison of patients’ activities
+|  when presented with three animal-shaped toys.
+| 0
+| 1 0
+| 2 0
+| 6:
+| 00
+| 6:
+| 10
+| 6:
+| 20
+| 6:
+| 30
+| 6:
+| 40
+| 6:
+| 50
+| 7:
+| 00
+| T i m e
+| A
+| ve
+| ra
+| ge
+|  n
+| um
+| be
+| r
+| n o  r e a c t i o n
+| w a n d e r i n g
+| c o m m u n i c a t i n g
+| s h o w i n g  i n t e r e s t
+| 0
+| 1 0
+| 2 0
+| 6:
+| 00
+| 6:
+| 10
+| 6:
+| 20
+| 6:
+| 30
+| 6:
+| 40
+| 6:
+| 50
+| 7:
+| 00
+| T i m e
+| A
+| ve
+| ra
+| ge
+|  n
+| um
+| be
+| r
+| n o  r e a c t i o n
+| w a n d e r i n g
+| c o m m u n i c a t i n g
+| s h o w i n g  i n t e r e s t
+| d o g  a v a i l a b l e
+| D o g ( + )
+| D o g ( - )
+| Fig. 3. Average number of participants in the activities
+| in the main lounge after dinner.
+text: default page 4
+| useful therapeutic tool for patients with severe dementia. Pet
+| therapy is popular, although some risks associated with
+| animal behavior cannot be avoided. On the other hand, these
+| toys are safe, clean and offer the same quality to all patients.
+| Moreover, the toys are relatively inexpensive. Since patient
+| activity varied according to the delivery of the toys, further
+| evaluation is required.
+| V. CONCLUSION
+| Animal-shaped toys (a gorilla, a tiger and a dog) were
+| provided as therapeutic tools to patients with severe
+| dementia. The occupational therapist observed the patients ’
+| activities. The total time spent in various kinds of activity
+| was recorded. Most of the patients were interested in the toys,
+| and they looked much happier and less agitated. They
+| became accustomed to the toys day by day.
+| REFERENCES
+| [1] L.G. Kongable, J.M. Stolley, K.C. Buckwalter, “Pet therapy for
+| Alzheimer's patients: A survey,” J. Long-term Care Adm., vol. 18, pp. 17-21,
+| 1990.
+| [2] M.H. Zisselman, B.W. Rovner, Y. Shmuely, P. Ferrie, “A pet therapy
+| intervention with geriatric psychiatry inpatients, ” Am. J Occupat. Therapy,
+| vol. 50, pp. 47-51, 1996.
+| [3] D.A. Forbes, “Strategies for managing behavioural symptomatology
+| associated with dementia of the Alzheimer type: A systematic overview,”
+| Canadian J. Nurs. Res. , vol. 30, pp. 67-86, 1998.
+| [4] S.J. Brodie, F.C. Biley, “An exploration of the potential benefits of pet-
+| facilitated therapy,” J. Clin. Nurs., vol. 8, pp. 329-337, 1999.
+| [5] S. Godfrey, “Doll therapy,” Australian J. Ageing,  vol. 13, p. 46, 1995.
+| pleasant
+| unpleasant
+| no reaction
+| wandering
+| communication
+| June 12
+| June 13
+| June 14
+| June 7
+| June 8
+| June 9
+| Dog (-)Dog (+)
+| 6:
+| 00
+| 6:
+| 10
+| 6:
+| 30
+| 6:
+| 50
+| 7:
+| 00
+| Time
+| 6:
+| 00
+| 6:
+| 30
+| 7:
+| 00
+| Time
+| 6
+| 3
+| 0
+| 6
+| 3
+| 0
+| 6
+| 3
+| 0
+| 6
+| 3
+| 0
+| 6
+| 3
+| 0
+| 6
+| 3
+| 0
+| T
+| ot
+| al
+|  ti
+| m
+| e\x20
+| (m
+| in
+| )
+| T
+| ot
+| al
+|  ti
+| m
+| e\x20
+| (m
+| in
+| )
+| Fig. 4 Total time of the activities of a patient (female, 67 years)  for three successive days, with and without delivery of a toy dog.
+text: sorted page 1
+| ANIMAL-SHAPED TOYS AS THERAPEUTIC TOOLS FOR
+| PATIENTS WITH SEVERE DEMENTIA
+| K. Nakajima*1, K. Nakamura2, S. Yonemitsu3, D. Oikawa3, A. Ito2,
+| Y. Higashi3, T. Fujimoto3, M. Nambu1, T. Tamura1
+| 1Department of Gerontechnology, National Institute for Longevity Sciences, Obu, Aichi, Japan
+| 2Green Home for Elderly Nursing Home, Kitamorokata, Miyazaki, Japan
+| 3Fujimoto-Hayasuzu Hospital, Miyakonojo, Miyazaki, Japan
+| Abstract-An animal-shaped toy was provided as a therapeutic A. Comparison of toys
+| tool to patients with severe dementia during a therapeutic
+| program and after dinner. The occupational therapist delivered Three animal-shaped toys were prepared as tools for the
+| three animal -shaped toys—a gorilla, a tiger and a dog—during
+| the therapeutic program. These toys performed amusing therapeutic program. Fig. 1 is a photo of the toys: a gorilla, a
+| actions. The occupational therapist observed the activities of the tiger and a dog. Each toy performed amusing dancing,
+| patients and classified them into six categories (no reaction, jumping and walking actions. During the therapeutic
+| close observation, talking, clapping, patting the toy, taking care program, the occupational therapist (OTR) showed the three
+| of the toy). The total duration of activities during the period of toys for 90 seconds each to a small group of three or four
+| the therapeutic program was recorded. Most of the patients patients . The OTR observed the patients ’ activities and
+| were interested in the toys, and they looked much happier and classified them into six categories (no reaction, close
+| less agitated. They became accustomed to the toy dog day by observation, talking, clapping, patting the toy, taking care of
+| day. The animal-shaped toy is a useful tool for occupational the toy). The total number and duration of activities during
+| therapy.
+| Keywords - Therapeutic tool, diversional therapy, toy the period of the therapeutic program were recorded.
+| B. Delivery of toy dog after dinner
+| I. INTRODUCTION
+| Pet therapy has been used to heal the dementia patients [1-4]. After dinner, patients with severe dementia generally
+| become agitated or wander. We expected a decrease in the
+| Dogs are one of the most popular companion animals, but frequency of agitation and wandering after using the toy dog,
+| there are some risks: hazards for the dog, hazards for the
+| patient, sensory overload, dislike of the pet, and so on. On which was the most popular animal. A whistle that caused
+| the dog to bark was removed for the convenience of the care
+| the other hand, a few animal-shaped toys based on robot staff. The patients came to the main lounge after dinner. The
+| technology have been developed. Doll therapy has also been
+| applied as a diversional therapy for dementia patients in OTR delivered two toy dogs to the main lounge for 40
+| minutes. The OTR then observed the patients ’ activities for
+| Australia [5]. In this study, we tried providing animal-shaped one hour and classified them into four categories (no reaction,
+| toys as a diversional therapy for patients with severe
+| dementia, to decrease the frequency of their agitation and agitation or wandering, showing interest in something,
+| communicating with other residents). The toy dogs were
+| wandering. delivered for six days in total. As a reference, the after-
+| dinner activities of patients without the delivery of the toy
+| II. METHOD dogs were observed for four days in total.
+| Occupational therapy was administered during daytime C. Individual activity analysis
+| working hours in Green Home, a nursing home for elderly
+| patients with severe dementia . Formal approval for the study The most active patient (67 years, female, Mini-Mental
+| was obtained from the Ethics Committee of the Fujimoto- State = 14) was selected for a study to determine the
+| Hayasuzu Hospital before the toys were delivered to the therapeutic efficiency of the toy dog. The OTR analyzed her
+| patients. activities in detail and classified them into five categories
+| (pleasant activity, unpleasant activity, no reaction, wandering,
+| communicating with other residents). The patient’s activities
+| were observed for three successive days, with and without
+| This study was partly supported by Comprehensive Research on Aging delivery of the toy dog.
+| and Health (H11-CRAH-042) and a Research Grant for Longevity
+| Sciences (11C-05) from the Ministry of Health, Labor and Welfare.
+| Asterisk indicates corresponding author.
+text: sorted page 2
+| Report Documentation Page
+| Report Date Report Type Dates Covered (from... to)\x20
+| 25OCT2001 N/A -\x20
+| Title and Subtitle Contract Number\x20
+| Animal-Shaped Toys as Therapeutic Tools for Patients with
+| Severe Dementia Grant Number\x20
+| Program Element Number\x20
+| Author(s) Project Number\x20
+| Task Number\x20
+| Work Unit Number\x20
+| Performing Organization Name(s) and Address(es) Performing Organization Report Number\x20
+| Department of Gerontechnology, National Institute for
+| Longevity Sciences, Obu, Aichi, Japan
+| Sponsoring/Monitoring Agency Name(s) and Address(es) Sponsor/Monitor’s Acronym(s)\x20
+| US Army Research Development & Standardization Group
+| (UK) PSC 803 Box 15 FPO AE 09499-1500 Sponsor/Monitor’s Report Number(s)\x20
+| Distribution/Availability Statement\x20
+| Approved for public release, distribution unlimited
+| Supplementary Notes\x20
+| Papers from the 23rd Annual International conference of the IEEE Engineering in Medicine and Biology Society,
+| October 25-28, 2001, held in Istanbul, Turkey. See also ADM001351 for entire conference on cd-rom., The original
+| document contains color images.
+| Abstract\x20
+| Subject Terms\x20
+| Report Classification Classification of this page\x20
+| unclassified unclassified
+| Classification of Abstract Limitation of Abstract\x20
+| unclassified UU
+| Number of Pages\x20
+| 3
+text: sorted page 3
+| D o g ( + )
+| n o  r e a c t i o n
+| 2 0
+| w a n d e r i n g
+| 1 0 c o m m u n i c a t i n g
+| s h o w i n g  i n t e r e s t
+| 0
+| d o g  a v a i l a b l e
+|             (a)                         (b)                        (c)
+| T i m e
+| Fig. 1. Animal-shaped toys as therapeutic tools:
+| (a) gorilla (b) tiger (c) dog.
+| D o g ( - )
+| 2 0 n o  r e a c t i o n
+| 0:12:00 w a n d e r i n g
+| Gorilla 1 0 c o m m u n i c a t i n g
+| 0:10:00 Tiger s h o w i n g  i n t e r e s t
+| Dog 0
+| 0:08:00
+| 0:06:00
+| T i m e
+| 0:04:00
+| 0:02:00 Fig. 3. Average number of participants in the activities
+| in the main lounge after dinner.
+| 0:00:00
+| no
+|  re
+| act
+| ion
+| clo
+| se\x20
+| ob
+| ser
+| va
+| tio
+| n
+| tal
+| kin
+| g
+| cla
+| pp
+| ing
+| pa
+| ttin
+| g
+| car
+| e
+| decreased, and the average number showing interest was
+| increased by the delivery of the toy dog. A few participants
+| fended off the toy dog.
+| Activities C. Individual activity analysis
+| Fig. 2. Comparison of patients’ activities Fig. 4 shows the results from three successive days with
+|  when presented with three animal-shaped toys. and without delivery of the toy dog. Without the delivery,
+| the main activities were wondering, communicating with
+| other residents and no reaction. Pleasant activity was
+| increased by the appearance of the dog on 7 June, but the
+| total duration of pleasant activity decreased day by day.
+| There was little wondering.
+| III. RESULTS
+| A. Comparison of toys IV. DISCUSSION
+| The activities of patients are summarized in Fig. 2. We tried providing animal-shaped toys as a diversional
+| Although no significant differences were observed between therapy for patients with severe dementia . In this study, no
+| responses to the three different toys, the total time spent in significant differences were observed between responses to
+| active behavior (talk, pat and take care of the toy) was the three different toys, although patients were more familiar
+| relatively longer with the toy dog. A longer total time was with the dog shape than with the gorilla or the tiger shapes,
+| spent in look, talk and clap with the toy gorilla. and they wondered about, or were afraid of, the amusing
+| actions of the toy gorilla and tiger.
+| B. Delivery of toy dog after dinner Most of the patients were interested in the toy dog after
+| dinner, and they looked much happier and less agitated,
+| Fig. 3 shows the average number of participants. About although a few fended off from it. We noticed that the
+| 20 participants came to the main lounge every day. Of these, patients became accustomed to the toy dog day by day (see
+| about 10 participants showed no reaction and a few Fig. 4). Although the therapeutic program requires
+| participants wandered or were agitated during this period. improvement, for instance regarding the accommodation of
+| The average number of participants showing no reaction was groups and the frequency of delivery, the toy dog was a
+| Total time
+| Average number Average number
+| 6:00 6:00
+| 6:10 6:10
+| 6:20 6:20
+| 6:30 6:30
+| 6:40 6:40
+| 6:50 6:50
+| 7:00 7:00
+text: sorted page 4
+| Dog (+) Dog (-)
+| 6 June 7 6 June 12
+| pleasant
+| unpleasant
+| 3 3 no reaction
+| wandering
+| communication
+| 0 0
+| 6 June 8 6 June 13
+| 3 3
+| 0 0
+| 6 June 9 6 June 14
+| 3 3
+| 0 0
+| Time Time
+| Fig. 4 Total time of the activities of a patient (female, 67 years)  for three successive days, with and without delivery of a toy dog.
+| useful therapeutic tool for patients with severe dementia. Pet and they looked much happier and less agitated. They
+| therapy is popular, although some risks associated with became accustomed to the toys day by day.
+| animal behavior cannot be avoided. On the other hand, these
+| toys are safe, clean and offer the same quality to all patients.
+| Moreover, the toys are relatively inexpensive. Since patient REFERENCES
+| activity varied according to the delivery of the toys, further
+| [1] L.G. Kongable, J.M. Stolley, K.C. Buckwalter, “Pet therapy for
+| evaluation is required. Alzheimer's patients: A survey,” J. Long-term Care Adm., vol. 18, pp. 17-21,
+| 1990.
+| [2] M.H. Zisselman, B.W. Rovner, Y. Shmuely, P. Ferrie, “A pet therapy
+| V. CONCLUSION intervention with geriatric psychiatry inpatients, ” Am. J Occupat. Therapy,
+| vol. 50, pp. 47-51, 1996.
+| Animal-shaped toys (a gorilla, a tiger and a dog) were [3] D.A. Forbes, “Strategies for managing behavioural symptomatology
+| associated with dementia of the Alzheimer type: A systematic overview,”
+| provided as therapeutic tools to patients with severe Canadian J. Nurs. Res. , vol. 30, pp. 67-86, 1998.
+| dementia. The occupational therapist observed the patients ’ [4] S.J. Brodie, F.C. Biley, “An exploration of the potential benefits of pet-
+| activities. The total time spent in various kinds of activity facilitated therapy,” J. Clin. Nurs., vol. 8, pp. 329-337, 1999.
+| was recorded. Most of the patients were interested in the toys, [5] S. Godfrey, “Doll therapy,” Australian J. Ageing,  vol. 13, p. 46, 1995.
+| Total time (min)
+| 6:00
+| 6:10
+| 6:30
+| 6:50
+| 7:00
+| Total time (min)
+| 6:00
+| 6:30
+| 7:00
+text: range 2-3
+| Report Documentation Page
+| Report Date\x20
+| 25OCT2001
+| Report Type\x20
+| N/A
+| Dates Covered (from... to)\x20
+| -\x20
+| Title and Subtitle\x20
+| Animal-Shaped Toys as Therapeutic Tools for Patients with
+| Severe Dementia
+| Contract Number\x20
+| Grant Number\x20
+| Program Element Number\x20
+| Author(s) Project Number\x20
+| Task Number\x20
+| Work Unit Number\x20
+| Performing Organization Name(s) and Address(es)\x20
+| Department of Gerontechnology, National Institute for
+| Longevity Sciences, Obu, Aichi, Japan
+| Performing Organization Report Number\x20
+| Sponsoring/Monitoring Agency Name(s) and Address(es)\x20
+| US Army Research Development & Standardization Group
+| (UK) PSC 803 Box 15 FPO AE 09499-1500
+| Sponsor/Monitor’s Acronym(s)\x20
+| Sponsor/Monitor’s Report Number(s)\x20
+| Distribution/Availability Statement\x20
+| Approved for public release, distribution unlimited
+| Supplementary Notes\x20
+| Papers from the 23rd Annual International conference of the IEEE Engineering in Medicine and Biology Society,
+| October 25-28, 2001, held in Istanbul, Turkey. See also ADM001351 for entire conference on cd-rom., The original
+| document contains color images.
+| Abstract\x20
+| Subject Terms\x20
+| Report Classification\x20
+| unclassified
+| Classification of this page\x20
+| unclassified
+| Classification of Abstract\x20
+| unclassified\x20
+| Limitation of Abstract\x20
+| UU
+| Number of Pages\x20
+| 3
+| III. RESULTS
+| A. Comparison of toys
+| The activities of patients are summarized in Fig. 2.
+| Although no significant differences were observed between
+| responses to the three different toys, the total time spent in
+| active behavior (talk, pat and take care of the toy) was
+| relatively longer with the toy dog. A longer total time was
+| spent in look, talk and clap with the toy gorilla.
+| B. Delivery of toy dog after dinner
+| Fig. 3 shows the average number of participants. About
+| 20 participants came to the main lounge every day. Of these,
+| about 10 participants showed no reaction and a few
+| participants wandered or were agitated during this period.
+| The average number of participants showing no reaction was
+| decreased, and the average number showing interest was
+| increased by the delivery of the toy dog. A few participants
+| fended off the toy dog.
+| C. Individual activity analysis
+| Fig. 4 shows the results from three successive days with
+| and without delivery of the toy dog. Without the delivery,
+| the main activities were wondering, communicating with
+| other residents and no reaction. Pleasant activity was
+| increased by the appearance of the dog on 7 June, but the
+| total duration of pleasant activity decreased day by day.
+| There was little wondering.
+| IV. DISCUSSION
+| We tried providing animal-shaped toys as a diversional
+| therapy for patients with severe dementia . In this study, no
+| significant differences were observed between responses to
+| the three different toys, although patients were more familiar
+| with the dog shape than with the gorilla or the tiger shapes,
+| and they wondered about, or were afraid of, the amusing
+| actions of the toy gorilla and tiger.
+| Most of the patients were interested in the toy dog after
+| dinner, and they looked much happier and less agitated,
+| although a few fended off from it. We noticed that the
+| patients became accustomed to the toy dog day by day (see
+| Fig. 4). Although the therapeutic program requires
+| improvement, for instance regarding the accommodation of
+| groups and the frequency of delivery, the toy dog was a
+|             (a)                         (b)                        (c)
+| Fig. 1. Animal-shaped toys as therapeutic tools:
+| (a) gorilla (b) tiger (c) dog.
+| 0:00:00
+| 0:02:00
+| 0:04:00
+| 0:06:00
+| 0:08:00
+| 0:10:00
+| 0:12:00
+| no
+|  re
+| act
+| ion
+| clo
+| se\x20
+| ob
+| ser
+| va
+| tio
+| n
+| tal
+| kin
+| g
+| cla
+| pp
+| ing
+| pa
+| ttin
+| g
+| car
+| e
+| Activities
+| T
+| ot
+| al
+|  ti
+| m
+| e
+| Gorilla
+| Tiger
+| Dog
+| Fig. 2. Comparison of patients’ activities
+|  when presented with three animal-shaped toys.
+| 0
+| 1 0
+| 2 0
+| 6:
+| 00
+| 6:
+| 10
+| 6:
+| 20
+| 6:
+| 30
+| 6:
+| 40
+| 6:
+| 50
+| 7:
+| 00
+| T i m e
+| A
+| ve
+| ra
+| ge
+|  n
+| um
+| be
+| r
+| n o  r e a c t i o n
+| w a n d e r i n g
+| c o m m u n i c a t i n g
+| s h o w i n g  i n t e r e s t
+| 0
+| 1 0
+| 2 0
+| 6:
+| 00
+| 6:
+| 10
+| 6:
+| 20
+| 6:
+| 30
+| 6:
+| 40
+| 6:
+| 50
+| 7:
+| 00
+| T i m e
+| A
+| ve
+| ra
+| ge
+|  n
+| um
+| be
+| r
+| n o  r e a c t i o n
+| w a n d e r i n g
+| c o m m u n i c a t i n g
+| s h o w i n g  i n t e r e s t
+| d o g  a v a i l a b l e
+| D o g ( + )
+| D o g ( - )
+| Fig. 3. Average number of participants in the activities
+| in the main lounge after dinner.
+text: separators 1-2
+| <PAGE><A><P>Abstract-An <W>animal-shaped toy <W>was provided as <W>a <W>therapeutic<EOL>
+| tool <W>to <W>patients <W>with <W>severe <W>dementia <W>during <W>a <W>therapeutic<EOL>
+| program and after dinner. The occupational therapist delivered<EOL>
+| three animal<W>-shaped toys—a gorilla, a tiger and <W>a dog—during<EOL>
+| the <W>therapeutic <W>program. <W>These <W>toys <W>performed <W>amusing<EOL>
+| actions. The occupational therapist observed the activities of the<EOL>
+| patients and classified <W>them <W>into <W>six <W>categories <W>(no <W>reaction,<EOL>
+| close observation, talking, clapping, patting the toy, taking care<EOL>
+| of the toy). The total duration of activities during the period of<EOL>
+| the <W>therapeutic <W>program <W>was <W>recorded. <W>Most <W>of <W>the <W>patients<EOL>
+| were interested in the toys, and they looked much happier and<EOL>
+| less agitated. They <W>became <W>accustomed <W>to <W>the <W>toy <W>dog <W>day <W>by<EOL>
+| day. <W>The <W>animal-shaped <W>toy <W>is <W>a <W>useful <W>tool <W>for <W>occupational<EOL>
+| therapy.<EOL>
+| Keywords - Therapeutic tool, diversional therapy, toy<EOL>
+| </P><P>I. INTRODUCTION<EOL>
+| </P><P>Pet therapy has been used to heal the dementia patients [1-4].<EOL>
+| Dogs <W>are <W>one of the <W>most <W>popular <W>companion <W>animals, <W>but<EOL>
+| there <W>are <W>some <W>risks: <W>hazards <W>for <W>the <W>dog, <W>hazards <W>for <W>the<EOL>
+| patient, <W>sensory overload, dislike of <W>the pet, <W>and <W>so on. On<EOL>
+| the <W>other <W>hand, <W>a <W>few <W>animal-shaped <W>toys <W>based <W>on <W>robot<EOL>
+| technology have been developed. Doll therapy has also been<EOL>
+| applied <W>as <W>a <W>diversional <W>therapy <W>for <W>dementia <W>patients <W>in<EOL>
+| Australia [5]. In this study, we tried providing animal-shaped<EOL>
+| toys <W>as <W>a <W>diversional <W>therapy <W>for <W>patients <W>with <W>severe<EOL>
+| dementia, <W>to <W>decrease <W>the <W>frequency <W>of <W>their <W>agitation <W>and<EOL>
+| wandering.<EOL>
+| </P><P>II. METHOD<EOL>
+| </P><P>Occupational <W>therapy was <W>administered <W>during <W>daytime<EOL>
+| working hours <W>in <W>Green <W>Home, <W>a <W>nursing <W>home <W>for <W>elderly<EOL>
+| patients with severe dementia<W>. Formal approval for the study<EOL>
+| was obtained <W>from <W>the <W>Ethics <W>Committee of <W>the <W>Fujimoto-<EOL>
+| Hayasuzu <W>Hospital <W>before <W>the <W>toys <W>were <W>delivered <W>to <W>the<EOL>
+| patients.<EOL>
+| </P><P>A. Comparison of toys<EOL>
+| </P><P>Three animal-shaped toys were prepared as tools for the<EOL>
+| therapeutic program. Fig. 1 <W>is a photo of the toys: a gorilla, a<EOL>
+| tiger <W>and <W>a <W>dog. <W>Each <W>toy <W>performed <W>amusing <W>dancing,<EOL>
+| jumping <W>and <W>walking <W>actions. <W>During <W>the <W>therapeutic<EOL>
+| program, the occupational therapist (OTR) showed the three<EOL>
+| toys for 90 <W>seconds <W>each <W>to <W>a <W>small <W>group <W>of <W>three <W>or <W>four<EOL>
+| patients<W>. <W>The <W>OTR <W>observed <W>the <W>patients<W>’ <W>activities <W>and<EOL>
+| classified <W>them <W>into <W>six <W>categories <W>(no <W>reaction, <W>close<EOL>
+| observation, talking, clapping, patting the toy, taking care of<EOL>
+| the <W>toy). The <W>total number and duration of activities during<EOL>
+| the period of the therapeutic program were recorded.<EOL>
+| </P><P>B. Delivery of toy dog after dinner<EOL>
+| </P><P>After <W>dinner, <W>patients <W>with <W>severe <W>dementia <W>generally<EOL>
+| become agitated or wander. We expected <W>a <W>decrease <W>in <W>the<EOL>
+| frequency of agitation and wandering after using the toy dog,<EOL>
+| which <W>was <W>the <W>most <W>popular <W>animal. <W>A <W>whistle <W>that <W>caused<EOL>
+| the dog to bark was removed for the convenience of the care<EOL>
+| staff. The patients came to the main <W>lounge after dinner. The<EOL>
+| OTR <W>delivered <W>two <W>toy <W>dogs <W>to <W>the <W>main <W>lounge <W>for <W>40<EOL>
+| minutes. The <W>OTR then <W>observed the <W>patients<W>’ activities for<EOL>
+| one hour and classified them into four categories (no reaction,<EOL>
+| agitation <W>or <W>wandering, <W>showing <W>interest <W>in <W>something,<EOL>
+| communicating <W>with <W>other <W>residents). <W>The <W>toy <W>dogs <W>were<EOL>
+| delivered <W>for <W>six <W>days <W>in <W>total. <W>As <W>a <W>reference, <W>the <W>after-<EOL>
+| dinner <W>activities of <W>patients without <W>the delivery of <W>the <W>toy<EOL>
+| dogs were observed for four days in total.<EOL>
+| </P><P>C. Individual activity analysis<EOL>
+| </P><P>The most active patient (67 <W>years, <W>female, <W>Mini-Mental<EOL>
+| State <W>= <W>14) <W>was <W>selected <W>for <W>a <W>study <W>to <W>determine <W>the<EOL>
+| therapeutic efficiency of the toy dog. The OTR analyzed her<EOL>
+| activities <W>in <W>detail <W>and <W>classified <W>them <W>into <W>five <W>categories<EOL>
+| (pleasant activity, unpleasant activity, no reaction, wandering,<EOL>
+| communicating with other residents). The patient’s activities<EOL>
+| were observed <W>for <W>three <W>successive <W>days, <W>with <W>and <W>without<EOL>
+| delivery of the toy dog.<EOL>
+| </P><P>ANIMAL-SHAPED TOYS AS THERAPEUTIC TOOLS FOR<EOL>
+| PATIENTS WITH SEVERE DEMENTIA<EOL>
+| </P><P>K. Nakajima*1, K. Nakamura2, S. Yonemitsu3, D. Oikawa3, A. Ito2,<EOL>
+| Y. Higashi3, T. Fujimoto3, M. Nambu1, T. Tamura1<EOL>
+| </P><P>1Department of Gerontechnology, National Institute for Longevity Sciences, Obu, Aichi, Japan<EOL>
+| 2Green Home for Elderly Nursing Home, Kitamorokata, Miyazaki, Japan<EOL>
+| </P><P>3Fujimoto-Hayasuzu Hospital, Miyakonojo, Miyazaki, Japan<EOL>
+| </P><P>This study was partly supported by Comprehensive Research on Aging<EOL>
+| and <W>Health <W>(H11-CRAH-042) <W>and <W>a <W>Research <W>Grant <W>for <W>Longevity<EOL>
+| Sciences <W>(11C-05) <W>from <W>the Ministry of Health, Labor and <W>Welfare.<EOL>
+| Asterisk indicates corresponding author.</P></A></PAGE>
+| <PAGE><A><P>Report Documentation Page<EOL>
+| </P><P>Report Date <EOL>
+| 25OCT2001<EOL>
+| </P><P>Report Type <EOL>
+| N/A<EOL>
+| </P><P>Dates Covered (from... to) <EOL>
+| - <EOL>
+| </P><P>Title and Subtitle <EOL>
+| Animal-Shaped Toys as Therapeutic Tools for Patients with<EOL>
+| Severe Dementia<EOL>
+| </P><P>Contract Number <EOL>
+| </P><P>Grant Number <EOL>
+| </P><P>Program Element Number <EOL>
+| </P><P>Author(s) <W>Project Number <EOL>
+| </P><P>Task Number <EOL>
+| </P><P>Work Unit Number <EOL>
+| </P><P>Performing Organization Name(s) and Address(es) <EOL>
+| Department of Gerontechnology, National Institute for<EOL>
+| Longevity Sciences, Obu, Aichi, Japan<EOL>
+| </P><P>Performing Organization Report Number <EOL>
+| </P><P>Sponsoring/Monitoring Agency Name(s) and Address(es) <EOL>
+| US Army Research Development & Standardization Group<EOL>
+| (UK) PSC 803 Box 15 FPO AE 09499-1500<EOL>
+| </P><P>Sponsor/Monitor’s Acronym(s) <EOL>
+| </P><P>Sponsor/Monitor’s Report Number(s) <EOL>
+| </P><P>Distribution/Availability Statement <EOL>
+| Approved for public release, distribution unlimited<EOL>
+| </P><P>Supplementary Notes <EOL>
+| Papers from the 23rd Annual International conference of the IEEE Engineering in Medicine and Biology Society,<EOL>
+| October 25-28, 2001, held in Istanbul, Turkey. See also ADM001351 for entire conference on cd-rom., The original<EOL>
+| document contains color images.<EOL>
+| </P><P>Abstract <EOL>
+| </P><P>Subject Terms <EOL>
+| </P><P>Report Classification <EOL>
+| unclassified<EOL>
+| </P><P>Classification of this page <EOL>
+| unclassified<EOL>
+| </P><P>Classification of Abstract <EOL>
+| unclassified <EOL>
+| </P><P>Limitation of Abstract <EOL>
+| UU<EOL>
+| </P><P>Number of Pages <EOL>
+| 3</P></A></PAGE>

@@ -1,0 +1,13 @@
+text: default page 1
+| Title in a big font some text with
+| a smaller font
+| on multiple lines
+text: sorted page 1
+| Title in a big font some text with
+| a smaller font
+| on multiple lines
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Title in a big font<W>some text with<EOL>
+| a smaller font<EOL>
+| on multiple lines</P></A></PAGE>

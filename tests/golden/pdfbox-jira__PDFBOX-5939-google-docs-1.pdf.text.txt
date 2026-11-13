@@ -1,0 +1,40 @@
+text: default page 1
+| Test Export From Google Docs\x20
+| Section 1\x20
+| ●​ Do something\x20
+| Section 2\x20
+| ●​ Section 2.1\x20
+| ●​ Section 2.2\x20
+| ●​ Section 2.3\x20
+| ●​ Section 2.4\x20
+| Scheduled 101s\x20
+| ​New Hire Orientation\x20
+| ​Company Overview\x20
+| ​Marketing 101\x20
+text: sorted page 1
+| Test Export From Google Docs\x20
+| Section 1\x20
+| ●​ Do something\x20
+| Section 2\x20
+| ●​ Section 2.1\x20
+| ●​ Section 2.2\x20
+| ●​ Section 2.3\x20
+| ●​ Section 2.4\x20
+| Scheduled 101s\x20
+| ​New Hire Orientation\x20
+| ​Company Overview\x20
+| ​Marketing 101\x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Test Export From Google Docs <EOL>
+| </P><P>Section 1 <EOL>
+| ●​<W>Do something <EOL>
+| </P><P>Section 2 <EOL>
+| ●​<W>Section 2.1 <EOL>
+| ●​<W>Section 2.2 <EOL>
+| ●​<W>Section 2.3 <EOL>
+| ●​<W>Section 2.4 <EOL>
+| </P><P>Scheduled 101s <EOL>
+| ​New Hire Orientation <EOL>
+| ​Company Overview <EOL>
+| ​Marketing 101 </P></A></PAGE>

@@ -1,0 +1,710 @@
+text: default page 1
+| Long Beach, California\x20
+| \x20
+| People and Place\x20
+| Location\x20
+| Long Beach, covering 50.44 square miles of land and 15.43 square miles of water,\x20
+| is located just south of Los Angeles along U.S. Highway 1 near the Los Angeles Harbor.\x20
+| The community is situated in Los Angeles County at 33°46’01”N, 118°11’18”W. \x20
+| \x20
+| Demographic Profile\x20
+|  According to the 2000 U.S. Census, the population of Long Beach was 461,522, a\x20
+| 7.5% increase from the 1990 U.S. Census. In 2000 the gender structure was evenly\x20
+| divided with slightly more females (50.9%) than males (49.1%). The median age of the\x20
+| population in 2000 was 30.8, slightly lower than the national median of 35.3 for the same\x20
+| year. According to the same data, 49.2% of the population was between the ages of 22\x20
+| and 54, and 29.2% were age 17 or below. For the population 18 years and over, 71.9%\x20
+| had a high school education or higher, 21.2% had attained a bachelor’s degree or higher,\x20
+| and 7.0% earned a graduate or professional degree. The highest level of educational\x20
+| attainment was a high school diploma/equivalency for 19.9% of the population. In 2000,\x20
+| 79.8% of the population lived in family households. \x20
+|  The 2000 U.S. Census shows that the racial composition was predominantly\x20
+| White (45.2%), followed by Black or African American (14.9%), Asian (12.0%), and\x20
+| Native Hawaiian and Other Pacific Islander (1.2%). American Indian and Alaskan native\x20
+| represented less than one percent at 0.8%. Overall, 20.6% classified themselves as\x20
+| belonging to some other race and 5.3% of the population identified themselves with two\x20
+| or more races. A total of 35.8% identified themselves as Hispanic or Latino.\x20
+| Approximately 28.6% of the population was foreign-born, with 51.0% born in Mexico\x20
+| and 10.3% in the Philippines.\x20
+| \x20
+| \x20
+| History\x20
+| The Chumash are one of the earliest peoples to inhabit the greater Los Angeles\x20
+| metropolitan and surrounding areas. They first settled there sometime between 5000 and\x20
+| 2000 B.P.1,2 They relied heavily on a maritime economy for centuries (e.g., gathering\x20
+| and fishing). By 500 AD, the Tongva Indians arrived in Southern California from the\x20
+| Mojave Desert. At the onset of European migration into North America it is estimated\x20
+| there were 300,000 Native Americans in California. This number was drastically reduced\x20
+| as European diseases killed off approximately two-thirds of the native population during\x20
+| the colonial era3. Today the Gabrieleno/Tongva Tribe is headquartered within the Los\x20
+| Angeles Metropolitan Area in San Gabriel. They have sought federal recognition since\x20
+| 1994 and may obtain federally recognized fishing rights as their historic use of marine\x20
+| resources is well known. In 1542, before the Spaniard Juan Rodriguez Cabrillo landed on\x20
+| the California coast he was met by Tongva Indians on their boats. Cabrillo was the first\x20
+| European to enter what would be the Los Angeles area.4,5
+| \x20
+| \x20
+text: default page 2
+| After growing as a seaside resort – subsequent to its history as a prime ranching\x20
+| region throughout the 1800s – Long beach became a booming port town. Long Beach is\x20
+| now California's fifth largest city. The optimum combination of strategic location,\x20
+| excellent climate, shoreline beauty, and Southern California lifestyle has attracted high\x20
+| levels of trade, tourism and industry. The community’s fishing history is intimately\x20
+| linked to that of Los Angeles, the urban hub of the region. Significant regional networks\x20
+| exist between Long Beach and other communities that satellite the metropolitan area,\x20
+| such as Long Beach’s once large Japanese-American population who worked in fish\x20
+| canneries on Terminal Island.\x20
+| \x20
+| Infrastructure\x20
+| Current Economy\x20
+| The City of Long Beach community development department lists Long Beach\x20
+| Unified School District, Boeing, the City of Long Beach, California State University –\x20
+| Long Beach, and Long Beach Memorial Medical Center as the city’s top five major\x20
+| employers.6 According to the 2000 U.S. Census, 55.9% of the potential labor force was\x20
+| employed and there was a 9.4% unemployment rate (calculated by dividing the\x20
+| unemployed population by the labor force). Of the population over the age of 16, 38.3%\x20
+| were not in the labor force. Of the employed civilian population, 21.1% worked in\x20
+| “Educational, health and social services,” 14.4% worked in “Manufacturing,” 10.3%\x20
+| worked in “Retail trade,” and 8.6% worked in “Arts, entertainment, recreation,\x20
+| accommodation and food services.” The local, state, or federal government employed a\x20
+| total of 15.9% of the employed civilian population in 2000; however less than one\x20
+| percent (0.1%) were reported as working for the government in the “Agriculture, forestry,\x20
+| fishing, and mining” industries. Less than one percent (0.1%) of the employed civilian\x20
+| population over the age of 16 was involved in “Agriculture, forestry, fishing, and\x20
+| hunting” according to the 2000 U.S. Census.\x20
+|  Long Beach’s per capita income in 1999 was $19,040 according to the U.S.\x20
+| Census, while the median household income was $37,270. In 1999 a total of 22.8% of the\x20
+| population was below the poverty level. In 2000 there were 171,632 housing units in\x20
+| Long Beach, 95.0% of which were occupied and 5.0% were vacant. Of the occupied\x20
+| housing units, 41.1% were owner occupied and 59% were renter occupied. Of the vacant\x20
+| housing units, 49.1% were “For rent” and 17.3% were “For sale only.”\x20
+| \x20
+| Governance\x20
+| Long Beach is a Charter City with a Mayor-Council form of government. The\x20
+| Mayor is elected at-large and there are nine Council members, each elected to represent a\x20
+| district. Long Beach has an 8.25% sales and use tax rate. Los Angeles County uses a\x20
+| 12.0% Transient Lodging tax rate, which earned $10,202,899 in revenue for the 2000-
+| 2001 fiscal year.7 \x20
+| California state law assesses commercial vessels, charter boats, and\x20
+| oceanographic research vessels at 4% of their full cash value.8 Vessels registered in\x20
+| California with either the Department of Motor Vehicles or the U.S. Coast Guard\x20
+| (USCG) are assessed property taxes by the county tax collector where it is moored.9\x20
+| Some commercial vessels are also subject to a Ballast Water Management Fee of about\x20
+| $500 per voyage.10 California levies a fuel tax of $0.18 per gallon, a portion of which\x20
+text: default page 3
+| goes toward marine safety and education programs and boating facility administration\x20
+| and development.11
+| The State of California levies landing taxes that must be paid by fishermen and\x20
+| fish processors involved in the retail sale of fish products. These taxes vary by species\x20
+| and range between $.0013 and $.0125 per pound of fish.12 The California Department of\x20
+| Agriculture also administers two commodity commissions, the California Salmon\x20
+| Council and the California Sea Urchin Commission, which charge fees for marketing and\x20
+| lobbying on behalf of fishermen involved in these specific fisheries.13
+|  There is a California Department of Fish and Game Marine Region Filed Office\x20
+| located approximately 12 miles away in Los Alamitos. The National Oceanic and\x20
+| Atmospheric Administration’s (NOAA) Southwest Regional office is located in Long\x20
+| Beach. Eight Coast Guard vessels are stationed at the U.S. Coast Guard Marine Safety\x20
+| Office/Group Los Angeles – Long Beach located in San Pedro. Del mar and San Diego,\x20
+| the nearest cities that hold Pacific Fisheries Management Council meetings, are\x20
+| approximately 92 miles and 110 miles away respectively. There is a U.S. Citizenship and\x20
+| Immigration Services District Office located in Los Angeles.\x20
+| \x20
+| Facilities\x20
+| Long Beach lies south of Los Angeles and is accessible by several highways.\x20
+| Long Beach Airport, situated midway between Los Angeles and Orange County, is a\x20
+| general aviation airport, which also serves privately owned aircraft. A full array of\x20
+| aviation support, manufacturing and business services is readily available. \x20
+| The Long Beach Unified School District serves the cities of Long Beach,\x20
+| Lakewood, Signal Hill, and Avalon on Catalina Island, and encompasses a total of 95\x20
+| schools. The District employs more than 8000 people, making it the largest employer in\x20
+| Long Beach.14 Public safety is provided by the Long Beach Police Department and Long\x20
+| Beach Health and Human Services provides comprehensive health services. The City of\x20
+| Long Beach Public Works Department administers gas, water, sewer, and refuse services.\x20
+| Long Beach has an extensive tourism industry with a well-established infrastructure,\x20
+| including accommodations, catering to a multitude of tourism activities. \x20
+| The Long Beach Harbor Department, which operates under the direction of the\x20
+| Board of Harbor Commissioners, is the city agency responsible for management of the\x20
+| Port of Long Beach, the largest port on the West Coast. Nearly $100 billion in\x20
+| international trade of commercial goods, 90% coming from East Asian trade, moves\x20
+| through the Port each year. Funding for port development and maintenance is sourced\x20
+| from the lease of shipping terminals to private firms; taxpayers do not fund port\x20
+| operations. The Port of Long Beach, established in 1911, now encompasses over 3000\x20
+| acres of land and has plans of expansion that will alleviate pressures at the nearby Port of\x20
+| Terminal Island. The Long Beach Board of Harbor Commissioners has adopted a wide-
+| ranging policy, the Green Port Policy, making environmental protection a top priority at\x20
+| the Port of Long Beach.15 The Port’s Small Business Enterprise Program is being\x20
+| inaugurated with the signing of an agreement so the Port and the Metropolitan Water\x20
+| District can share small business contractor information. The MWD has operated one of\x20
+| the regions most successful small business outreach programs with more than 2000\x20
+| businesses participating.16
+text: default page 4
+|  The Long Beach Marina accommodates recreational vessels ranging from 18 to\x20
+| 90 feet. Commercial vessel up to 200 feet may also utilize the Long Beach Marina. Most\x20
+| of the slips in Long Beach are constructed of wood and come with a private dock box,\x20
+| water, and power. Eight launch ramps are available for a fee of $8.00 per day. Extensive\x20
+| drydock facilities are also available. Both the marina slips and drydocks usually have\x20
+| long waiting lists.17
+| \x20
+| Involvement in West Coast Fisheries\x20
+| Commercial Fishing\x20
+| In 2000 landings were delivered to Long Beach by 32 vessels, all of which were\x20
+| commercially registered. In 2000, landings in Long Beach were made in the following\x20
+| West Coast fisheries (data shown represents landings in metric tons/value of said\x20
+| landings/number of vessels landing): groundfish (confidential/confidential/3), highly\x20
+| migratory species (3.8 t/$18,453), and other species (3.2 t/$14,080/6). \x20
+| There were 23 commercial vessels owned by Long Beach residents in 2000, eight\x20
+| of which participated in the Federally Managed Groundfish fishery. Recorded data\x20
+| indicates that the number of vessels owned by Long Beach residents in 2000 that\x20
+| participated in each said fishery by state (WA/OR/CA) was: groundfish (0/0/NA), highly\x20
+| migratory species (NA/0/NA), salmon (0/0/1), shellfish (NA/0/NA), shrimp (NA/0/2),\x20
+| and other species (0/0/2).18 \x20
+| In 2000, there were no federal groundfish permits held by community members.\x20
+| In the same year, recorded data indicates that the number of Long Beach residents\x20
+| holding permits in each said fishery by state (WA/OR/CA) was: coastal pelagic (0/0/1),\x20
+| groundfish (0/0/12), highly migratory species (NA/0/6), salmon (0/0/3), shellfish\x20
+| (0/0/NA), shrimp (0/0/7), and other species (0/0/53).19 \x20
+| According to available data, there were at least 123 commercial fishing permits,\x20
+| all state registered, held by Long Beach residents in 2000. Recorded data indicates that\x20
+| the number of state permits held by Long Beach residents in each said fishery by state\x20
+| (WA/OR/CA) was: coastal pelagic (0/0/3), groundfish (0/0/15), highly migratory species\x20
+| (NA/0/8), other species (0/0/83), salmon (0/0/4), shellfish (0/0/NA), and shrimp\x20
+| (0/0/10).20 \x20
+| There were at least three seafood processors operating in Long Beach in 2000.\x20
+| They primarily produced salmon steaks, halibut steaks, tuna fillets, and sea urchin roe.\x20
+| However, specific information (estimated pounds of product/value of product) is\x20
+| confidential. \x20
+| \x20
+| Sportfishing\x20
+| A number of charter vessels operate out of Long Beach targeting sea bass,\x20
+| rockfish, and flatfish among others. Many of these charter vessels also offer seasonal\x20
+| whale watching tours. In 2002, at least nine charter businesses serviced sport fishermen\x20
+| and tourists in Long Beach. There are ten license agents selling sportfishing licenses in\x20
+| Long Beach. In 2000 Los Angeles County residents purchased: 76,385 resident\x20
+| sportfishing licenses, 59 non-resident sportfishing licenses, 164 sport salmon punch\x20
+| cards, and 174 abalone report cards. In the port group consisting of Seal Beach, Long\x20
+| Beach, and San Pedro a total of 54 commercial passenger fishing vessels served 148,977\x20
+| anglers in 2000. These vessels reported 883,806 landings composed of more than two\x20
+text: default page 5
+| dozen species. Sea bass (various species), barracuda, flatfishes (unspecified), and\x20
+| rockfishes (unspecified) accounted for 47.6%, 14.1%, 10.4%, and 9.2% of the landings\x20
+| respectively.\x20
+| \x20
+| Subsistence\x20
+| Local tribal and nontribal community members might be engaged in subsistence\x20
+| fishing in the Long Beach area. However, specific information on subsistence fishing in\x20
+| Long Beach is not discussed in detail in this Community Profile due to the lack of\x20
+| available data. The California Department of Fish and Game uses the term “recreational”\x20
+| to refer to fishermen that do not earn revenue from their catch but rather fish for pleasure\x20
+| and/or to provide food for personal consumption. Therefore information on subsistence\x20
+| fishing in California is captured, to some degree, within the above sportfishing data. \x20
+| \x20
+| Involvement in North Pacific Fisheries\x20
+| Commercial Fishing\x20
+| In 2000 there were no vessels owned by Long Beach residents that participated in\x20
+| North Pacific fisheries. However, eight Long Beach residents worked as crewmembers\x20
+| aboard vessels involved in North Pacific fisheries in 2000. In the same year, one\x20
+| community resident held a single state permit, a Commercial Fisheries Entry Commission\x20
+| salmon permit. \x20
+| \x20
+| Sportfishing\x20
+| While the majority of the sport fishermen in Long Beach target West Coast\x20
+| fisheries, 314 Long Beach community members purchased Alaska sportfishing licenses\x20
+| in 2000.\x20
+|                                                 \x20
+| 1 The Santa Barbara Museum of Natural History. 2002. Chumash Indian Life, [Online]. Available: URL:\x20
+| http://www.sbnature.org/research/anthro/chumash/index.htm (access date - July 2004)\x20
+| 2 Los Angeles Almanac. 2004. Los Angeles County – Pre-History to 1799, [Online]. Available: URL:\x20
+| http://www.losangelesalmanac.com/topics/History/hi01a.htm (access date - July 2004).\x20
+| 3 United States Geological Survey. 2004. Regional Trends in Biological Resources: California, [Online]. In\x20
+| Status and Trends of the Nations Biological Resources. Available: URL:\x20
+| http://biology.usgs.gov/s+t/SNT/noframe/ca162.htm (access date - July 2004).\x20
+| 4 Los Angeles Almanac. 2004. Where did the name Los Angeles come from, [Online]. Available: URL:\x20
+| http://www.losangelesalmanac.com/topics/History/hi03a.htm (access date - July 2004).\x20
+| 5 Gabrieleno/Tongva. 2004. Gabrieleno/Tongva, [Online]. Available: URL: http://www.tongva.com/\x20
+| (access date - July 2004)\x20
+| 6 City of Long Beach. 2004. Community Development Department: Economic Development, [Online].\x20
+| Available URL: http://www.longbeach.gov/ecd/attraction/smart_location/fast_facts/major_employers.asp \x20
+| (access date - November 2004).\x20
+| 7 State of California. 2004. California Counties Transient Lodging Tax Revenue, [Online]. Available URL:\x20
+| http://www.sco.ca.gov/ard/local/locrep/adhoc/county/0001cotranslodgtax.pdf (access date - July 2004).\x20
+| 8 State of California Board of Equalization. No date. Property Tax Rules, Rule 151. Vessels Subject to the\x20
+| Four Percent Assessment, [Online]. Available: URL: http://www.boe.ca.gov/proptaxes/pdf/r151.pdf\x20
+| (access date - July 2004).\x20
+| 9 California Department of Motor Vehicles. 2003. How to register a vessel, [Online]. Available: URL:\x20
+| http://www.dmv.ca.gov/boatsinfo/boatreg.htm#how (access date - July 2004).\x20
+text: default page 6
+|                                                                                                                                                 \x20
+| 10 State of California Board of Equalization. 2004. Ballast Water Management Fee, [Online]. Available:\x20
+| URL: http://www.boe.ca.gov/sptaxprog/bllstweb12.htm (access date - July 2004).\x20
+| 11 U.S. Department of Transportation. 2001. Provisions Governing the Distribution of State Motor Fuel Tax\x20
+| Receipts: California, [Online]. Available: URL:\x20
+| http://www.fhwa.dot.gov/ohim/hwytaxes/2001/california.htm (access date - July 2004).\x20
+| 12 State of California. No date. Fish and Game Code Section 8040-8070, [Online]. Available: URL:\x20
+| http://www.leginfo.ca.gov/cgi-bin/displaycod?section=fgc&group=08001-8070 (access date – July\x20
+| 2004).\x20
+| 13 State of California Department of Agriculture. 2004. List of Marketing Programs, [Online]. Available:\x20
+| URL: http://www.cdfa.ca.gov/mkt/mkt/mktbrds.html (access date - July 2004).\x20
+| 14 Long Beach Unified School District. No date. About the District, [Online] Available: URL:\x20
+| http://www.lbusd.k12.ca.us/district/AboutLBUSD.asp (access date - February 2005)\x20
+| 15 The Port of Long Beach. 2005. Board Adopts Sweeping Environmental Policy: Guidelines Formalize\x20
+| Long Beach as "Green Port," [Online]. Available: URL: http://www.polb.com/html/1_about/news5.html\x20
+| (access date - February 2005).\x20
+| 16 The City of Long Beach California. No Date. ‘Port Reaches Out to Small Businesses’ [Online]\x20
+| Available: http://www.longbeach.gov/news/displaynews.asp?NewsID=867.  (access date - February\x20
+| 2005)\x20
+| 17 City of Long Beach California. No date. Long Beach Marine Bureau, [Online] Available: URL:\x20
+| http://www.longbeach.gov/park/marine.asp (access date - February 2005).\x20
+| 18 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| 19 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| 20 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| \x20
+text: sorted page 1
+| Long Beach, California\x20
+| \x20
+| People and Place\x20
+| Location\x20
+| Long Beach, covering 50.44 square miles of land and 15.43 square miles of water,\x20
+| is located just south of Los Angeles along U.S. Highway 1 near the Los Angeles Harbor.\x20
+| The community is situated in Los Angeles County at 33°46’01”N, 118°11’18”W. \x20
+| \x20
+| Demographic Profile\x20
+|  According to the 2000 U.S. Census, the population of Long Beach was 461,522, a\x20
+| 7.5% increase from the 1990 U.S. Census. In 2000 the gender structure was evenly\x20
+| divided with slightly more females (50.9%) than males (49.1%). The median age of the\x20
+| population in 2000 was 30.8, slightly lower than the national median of 35.3 for the same\x20
+| year. According to the same data, 49.2% of the population was between the ages of 22\x20
+| and 54, and 29.2% were age 17 or below. For the population 18 years and over, 71.9%\x20
+| had a high school education or higher, 21.2% had attained a bachelor’s degree or higher,\x20
+| and 7.0% earned a graduate or professional degree. The highest level of educational\x20
+| attainment was a high school diploma/equivalency for 19.9% of the population. In 2000,\x20
+| 79.8% of the population lived in family households. \x20
+|  The 2000 U.S. Census shows that the racial composition was predominantly\x20
+| White (45.2%), followed by Black or African American (14.9%), Asian (12.0%), and\x20
+| Native Hawaiian and Other Pacific Islander (1.2%). American Indian and Alaskan native\x20
+| represented less than one percent at 0.8%. Overall, 20.6% classified themselves as\x20
+| belonging to some other race and 5.3% of the population identified themselves with two\x20
+| or more races. A total of 35.8% identified themselves as Hispanic or Latino.\x20
+| Approximately 28.6% of the population was foreign-born, with 51.0% born in Mexico\x20
+| and 10.3% in the Philippines.\x20
+| \x20
+| \x20
+| History\x20
+| The Chumash are one of the earliest peoples to inhabit the greater Los Angeles\x20
+| metropolitan and surrounding areas. They first settled there sometime between 5000 and\x20
+| 2000 B.P.1,2 They relied heavily on a maritime economy for centuries (e.g., gathering\x20
+| and fishing). By 500 AD, the Tongva Indians arrived in Southern California from the\x20
+| Mojave Desert. At the onset of European migration into North America it is estimated\x20
+| there were 300,000 Native Americans in California. This number was drastically reduced\x20
+| as European diseases killed off approximately two-thirds of the native population during\x20
+| the colonial era3. Today the Gabrieleno/Tongva Tribe is headquartered within the Los\x20
+| Angeles Metropolitan Area in San Gabriel. They have sought federal recognition since\x20
+| 1994 and may obtain federally recognized fishing rights as their historic use of marine\x20
+| resources is well known. In 1542, before the Spaniard Juan Rodriguez Cabrillo landed on\x20
+| the California coast he was met by Tongva Indians on their boats. Cabrillo was the first\x20
+| European to enter what would be the Los Angeles area.4,5
+| \x20
+| \x20
+text: sorted page 2
+| After growing as a seaside resort – subsequent to its history as a prime ranching\x20
+| region throughout the 1800s – Long beach became a booming port town. Long Beach is\x20
+| now California's fifth largest city. The optimum combination of strategic location,\x20
+| excellent climate, shoreline beauty, and Southern California lifestyle has attracted high\x20
+| levels of trade, tourism and industry. The community’s fishing history is intimately\x20
+| linked to that of Los Angeles, the urban hub of the region. Significant regional networks\x20
+| exist between Long Beach and other communities that satellite the metropolitan area,\x20
+| such as Long Beach’s once large Japanese-American population who worked in fish\x20
+| canneries on Terminal Island.\x20
+| \x20
+| Infrastructure\x20
+| Current Economy\x20
+| The City of Long Beach community development department lists Long Beach\x20
+| Unified School District, Boeing, the City of Long Beach, California State University –\x20
+| Long Beach, and Long Beach Memorial Medical Center as the city’s top five major\x20
+| employers.6 According to the 2000 U.S. Census, 55.9% of the potential labor force was\x20
+| employed and there was a 9.4% unemployment rate (calculated by dividing the\x20
+| unemployed population by the labor force). Of the population over the age of 16, 38.3%\x20
+| were not in the labor force. Of the employed civilian population, 21.1% worked in\x20
+| “Educational, health and social services,” 14.4% worked in “Manufacturing,” 10.3%\x20
+| worked in “Retail trade,” and 8.6% worked in “Arts, entertainment, recreation,\x20
+| accommodation and food services.” The local, state, or federal government employed a\x20
+| total of 15.9% of the employed civilian population in 2000; however less than one\x20
+| percent (0.1%) were reported as working for the government in the “Agriculture, forestry,\x20
+| fishing, and mining” industries. Less than one percent (0.1%) of the employed civilian\x20
+| population over the age of 16 was involved in “Agriculture, forestry, fishing, and\x20
+| hunting” according to the 2000 U.S. Census.\x20
+|  Long Beach’s per capita income in 1999 was $19,040 according to the U.S.\x20
+| Census, while the median household income was $37,270. In 1999 a total of 22.8% of the\x20
+| population was below the poverty level. In 2000 there were 171,632 housing units in\x20
+| Long Beach, 95.0% of which were occupied and 5.0% were vacant. Of the occupied\x20
+| housing units, 41.1% were owner occupied and 59% were renter occupied. Of the vacant\x20
+| housing units, 49.1% were “For rent” and 17.3% were “For sale only.”\x20
+| \x20
+| Governance\x20
+| Long Beach is a Charter City with a Mayor-Council form of government. The\x20
+| Mayor is elected at-large and there are nine Council members, each elected to represent a\x20
+| district. Long Beach has an 8.25% sales and use tax rate. Los Angeles County uses a\x20
+| 12.0% Transient Lodging tax rate, which earned $10,202,899 in revenue for the 2000-
+| 2001 fiscal year.7 \x20
+| California state law assesses commercial vessels, charter boats, and\x20
+| oceanographic research vessels at 4% of their full cash value.8 Vessels registered in\x20
+| California with either the Department of Motor Vehicles or the U.S. Coast Guard\x20
+| (USCG) are assessed property taxes by the county tax collector where it is moored.9\x20
+| Some commercial vessels are also subject to a Ballast Water Management Fee of about\x20
+| $500 per voyage.10 California levies a fuel tax of $0.18 per gallon, a portion of which\x20
+text: sorted page 3
+| goes toward marine safety and education programs and boating facility administration\x20
+| and development.11
+| The State of California levies landing taxes that must be paid by fishermen and\x20
+| fish processors involved in the retail sale of fish products. These taxes vary by species\x20
+| and range between $.0013 and $.0125 per pound of fish.12 The California Department of\x20
+| Agriculture also administers two commodity commissions, the California Salmon\x20
+| Council and the California Sea Urchin Commission, which charge fees for marketing and\x20
+| lobbying on behalf of fishermen involved in these specific fisheries.13
+|  There is a California Department of Fish and Game Marine Region Filed Office\x20
+| located approximately 12 miles away in Los Alamitos. The National Oceanic and\x20
+| Atmospheric Administration’s (NOAA) Southwest Regional office is located in Long\x20
+| Beach. Eight Coast Guard vessels are stationed at the U.S. Coast Guard Marine Safety\x20
+| Office/Group Los Angeles – Long Beach located in San Pedro. Del mar and San Diego,\x20
+| the nearest cities that hold Pacific Fisheries Management Council meetings, are\x20
+| approximately 92 miles and 110 miles away respectively. There is a U.S. Citizenship and\x20
+| Immigration Services District Office located in Los Angeles.\x20
+| \x20
+| Facilities\x20
+| Long Beach lies south of Los Angeles and is accessible by several highways.\x20
+| Long Beach Airport, situated midway between Los Angeles and Orange County, is a\x20
+| general aviation airport, which also serves privately owned aircraft. A full array of\x20
+| aviation support, manufacturing and business services is readily available. \x20
+| The Long Beach Unified School District serves the cities of Long Beach,\x20
+| Lakewood, Signal Hill, and Avalon on Catalina Island, and encompasses a total of 95\x20
+| schools. The District employs more than 8000 people, making it the largest employer in\x20
+| Long Beach.14 Public safety is provided by the Long Beach Police Department and Long\x20
+| Beach Health and Human Services provides comprehensive health services. The City of\x20
+| Long Beach Public Works Department administers gas, water, sewer, and refuse services.\x20
+| Long Beach has an extensive tourism industry with a well-established infrastructure,\x20
+| including accommodations, catering to a multitude of tourism activities. \x20
+| The Long Beach Harbor Department, which operates under the direction of the\x20
+| Board of Harbor Commissioners, is the city agency responsible for management of the\x20
+| Port of Long Beach, the largest port on the West Coast. Nearly $100 billion in\x20
+| international trade of commercial goods, 90% coming from East Asian trade, moves\x20
+| through the Port each year. Funding for port development and maintenance is sourced\x20
+| from the lease of shipping terminals to private firms; taxpayers do not fund port\x20
+| operations. The Port of Long Beach, established in 1911, now encompasses over 3000\x20
+| acres of land and has plans of expansion that will alleviate pressures at the nearby Port of\x20
+| Terminal Island. The Long Beach Board of Harbor Commissioners has adopted a wide-
+| ranging policy, the Green Port Policy, making environmental protection a top priority at\x20
+| the Port of Long Beach.15 The Port’s Small Business Enterprise Program is being\x20
+| inaugurated with the signing of an agreement so the Port and the Metropolitan Water\x20
+| District can share small business contractor information. The MWD has operated one of\x20
+| the regions most successful small business outreach programs with more than 2000\x20
+| businesses participating.16
+text: sorted page 4
+|  The Long Beach Marina accommodates recreational vessels ranging from 18 to\x20
+| 90 feet. Commercial vessel up to 200 feet may also utilize the Long Beach Marina. Most\x20
+| of the slips in Long Beach are constructed of wood and come with a private dock box,\x20
+| water, and power. Eight launch ramps are available for a fee of $8.00 per day. Extensive\x20
+| drydock facilities are also available. Both the marina slips and drydocks usually have\x20
+| long waiting lists.17
+| \x20
+| Involvement in West Coast Fisheries\x20
+| Commercial Fishing\x20
+| In 2000 landings were delivered to Long Beach by 32 vessels, all of which were\x20
+| commercially registered. In 2000, landings in Long Beach were made in the following\x20
+| West Coast fisheries (data shown represents landings in metric tons/value of said\x20
+| landings/number of vessels landing): groundfish (confidential/confidential/3), highly\x20
+| migratory species (3.8 t/$18,453), and other species (3.2 t/$14,080/6). \x20
+| There were 23 commercial vessels owned by Long Beach residents in 2000, eight\x20
+| of which participated in the Federally Managed Groundfish fishery. Recorded data\x20
+| indicates that the number of vessels owned by Long Beach residents in 2000 that\x20
+| participated in each said fishery by state (WA/OR/CA) was: groundfish (0/0/NA), highly\x20
+| migratory species (NA/0/NA), salmon (0/0/1), shellfish (NA/0/NA), shrimp (NA/0/2),\x20
+| and other species (0/0/2).18 \x20
+| In 2000, there were no federal groundfish permits held by community members.\x20
+| In the same year, recorded data indicates that the number of Long Beach residents\x20
+| holding permits in each said fishery by state (WA/OR/CA) was: coastal pelagic (0/0/1),\x20
+| groundfish (0/0/12), highly migratory species (NA/0/6), salmon (0/0/3), shellfish\x20
+| (0/0/NA), shrimp (0/0/7), and other species (0/0/53).19 \x20
+| According to available data, there were at least 123 commercial fishing permits,\x20
+| all state registered, held by Long Beach residents in 2000. Recorded data indicates that\x20
+| the number of state permits held by Long Beach residents in each said fishery by state\x20
+| (WA/OR/CA) was: coastal pelagic (0/0/3), groundfish (0/0/15), highly migratory species\x20
+| (NA/0/8), other species (0/0/83), salmon (0/0/4), shellfish (0/0/NA), and shrimp\x20
+| (0/0/10).20 \x20
+| There were at least three seafood processors operating in Long Beach in 2000.\x20
+| They primarily produced salmon steaks, halibut steaks, tuna fillets, and sea urchin roe.\x20
+| However, specific information (estimated pounds of product/value of product) is\x20
+| confidential. \x20
+| \x20
+| Sportfishing\x20
+| A number of charter vessels operate out of Long Beach targeting sea bass,\x20
+| rockfish, and flatfish among others. Many of these charter vessels also offer seasonal\x20
+| whale watching tours. In 2002, at least nine charter businesses serviced sport fishermen\x20
+| and tourists in Long Beach. There are ten license agents selling sportfishing licenses in\x20
+| Long Beach. In 2000 Los Angeles County residents purchased: 76,385 resident\x20
+| sportfishing licenses, 59 non-resident sportfishing licenses, 164 sport salmon punch\x20
+| cards, and 174 abalone report cards. In the port group consisting of Seal Beach, Long\x20
+| Beach, and San Pedro a total of 54 commercial passenger fishing vessels served 148,977\x20
+| anglers in 2000. These vessels reported 883,806 landings composed of more than two\x20
+text: sorted page 5
+| dozen species. Sea bass (various species), barracuda, flatfishes (unspecified), and\x20
+| rockfishes (unspecified) accounted for 47.6%, 14.1%, 10.4%, and 9.2% of the landings\x20
+| respectively.\x20
+| \x20
+| Subsistence\x20
+| Local tribal and nontribal community members might be engaged in subsistence\x20
+| fishing in the Long Beach area. However, specific information on subsistence fishing in\x20
+| Long Beach is not discussed in detail in this Community Profile due to the lack of\x20
+| available data. The California Department of Fish and Game uses the term “recreational”\x20
+| to refer to fishermen that do not earn revenue from their catch but rather fish for pleasure\x20
+| and/or to provide food for personal consumption. Therefore information on subsistence\x20
+| fishing in California is captured, to some degree, within the above sportfishing data. \x20
+| \x20
+| Involvement in North Pacific Fisheries\x20
+| Commercial Fishing\x20
+| In 2000 there were no vessels owned by Long Beach residents that participated in\x20
+| North Pacific fisheries. However, eight Long Beach residents worked as crewmembers\x20
+| aboard vessels involved in North Pacific fisheries in 2000. In the same year, one\x20
+| community resident held a single state permit, a Commercial Fisheries Entry Commission\x20
+| salmon permit. \x20
+| \x20
+| Sportfishing\x20
+| While the majority of the sport fishermen in Long Beach target West Coast\x20
+| fisheries, 314 Long Beach community members purchased Alaska sportfishing licenses\x20
+| in 2000.\x20
+|                                                 \x20
+| 1 The Santa Barbara Museum of Natural History. 2002. Chumash Indian Life, [Online]. Available: URL:\x20
+| http://www.sbnature.org/research/anthro/chumash/index.htm (access date - July 2004)\x20
+| 2 Los Angeles Almanac. 2004. Los Angeles County – Pre-History to 1799, [Online]. Available: URL:\x20
+| http://www.losangelesalmanac.com/topics/History/hi01a.htm (access date - July 2004).\x20
+| 3 United States Geological Survey. 2004. Regional Trends in Biological Resources: California, [Online]. In\x20
+| Status and Trends of the Nations Biological Resources. Available: URL:\x20
+| http://biology.usgs.gov/s+t/SNT/noframe/ca162.htm (access date - July 2004).\x20
+| 4 Los Angeles Almanac. 2004. Where did the name Los Angeles come from, [Online]. Available: URL:\x20
+| http://www.losangelesalmanac.com/topics/History/hi03a.htm (access date - July 2004).\x20
+| 5 Gabrieleno/Tongva. 2004. Gabrieleno/Tongva, [Online]. Available: URL: http://www.tongva.com/\x20
+| (access date - July 2004)\x20
+| 6 City of Long Beach. 2004. Community Development Department: Economic Development, [Online].\x20
+| Available URL: http://www.longbeach.gov/ecd/attraction/smart_location/fast_facts/major_employers.asp \x20
+| (access date - November 2004).\x20
+| 7 State of California. 2004. California Counties Transient Lodging Tax Revenue, [Online]. Available URL:\x20
+| http://www.sco.ca.gov/ard/local/locrep/adhoc/county/0001cotranslodgtax.pdf (access date - July 2004).\x20
+| 8 State of California Board of Equalization. No date. Property Tax Rules, Rule 151. Vessels Subject to the\x20
+| Four Percent Assessment, [Online]. Available: URL: http://www.boe.ca.gov/proptaxes/pdf/r151.pdf\x20
+| (access date - July 2004).\x20
+| 9 California Department of Motor Vehicles. 2003. How to register a vessel, [Online]. Available: URL:\x20
+| http://www.dmv.ca.gov/boatsinfo/boatreg.htm#how (access date - July 2004).\x20
+text: sorted page 6
+|                                                                                                                                                 \x20
+| 10 State of California Board of Equalization. 2004. Ballast Water Management Fee, [Online]. Available:\x20
+| URL: http://www.boe.ca.gov/sptaxprog/bllstweb12.htm (access date - July 2004).\x20
+| 11 U.S. Department of Transportation. 2001. Provisions Governing the Distribution of State Motor Fuel Tax\x20
+| Receipts: California, [Online]. Available: URL:\x20
+| http://www.fhwa.dot.gov/ohim/hwytaxes/2001/california.htm (access date - July 2004).\x20
+| 12 State of California. No date. Fish and Game Code Section 8040-8070, [Online]. Available: URL:\x20
+| http://www.leginfo.ca.gov/cgi-bin/displaycod?section=fgc&group=08001-8070 (access date – July\x20
+| 2004).\x20
+| 13 State of California Department of Agriculture. 2004. List of Marketing Programs, [Online]. Available:\x20
+| URL: http://www.cdfa.ca.gov/mkt/mkt/mktbrds.html (access date - July 2004).\x20
+| 14 Long Beach Unified School District. No date. About the District, [Online] Available: URL:\x20
+| http://www.lbusd.k12.ca.us/district/AboutLBUSD.asp (access date - February 2005)\x20
+| 15 The Port of Long Beach. 2005. Board Adopts Sweeping Environmental Policy: Guidelines Formalize\x20
+| Long Beach as "Green Port," [Online]. Available: URL: http://www.polb.com/html/1_about/news5.html\x20
+| (access date - February 2005).\x20
+| 16 The City of Long Beach California. No Date. ‘Port Reaches Out to Small Businesses’ [Online]\x20
+| Available: http://www.longbeach.gov/news/displaynews.asp?NewsID=867.  (access date - February\x20
+| 2005)\x20
+| 17 City of Long Beach California. No date. Long Beach Marine Bureau, [Online] Available: URL:\x20
+| http://www.longbeach.gov/park/marine.asp (access date - February 2005).\x20
+| 18 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| 19 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| 20 ‘NA’ refers to data which was not available, for example, due to few or no recorded permit numbers, or\x20
+| the partially permitted nature of a fishery in 2000.\x20
+| \x20
+text: range 2-3
+| After growing as a seaside resort – subsequent to its history as a prime ranching\x20
+| region throughout the 1800s – Long beach became a booming port town. Long Beach is\x20
+| now California's fifth largest city. The optimum combination of strategic location,\x20
+| excellent climate, shoreline beauty, and Southern California lifestyle has attracted high\x20
+| levels of trade, tourism and industry. The community’s fishing history is intimately\x20
+| linked to that of Los Angeles, the urban hub of the region. Significant regional networks\x20
+| exist between Long Beach and other communities that satellite the metropolitan area,\x20
+| such as Long Beach’s once large Japanese-American population who worked in fish\x20
+| canneries on Terminal Island.\x20
+| \x20
+| Infrastructure\x20
+| Current Economy\x20
+| The City of Long Beach community development department lists Long Beach\x20
+| Unified School District, Boeing, the City of Long Beach, California State University –\x20
+| Long Beach, and Long Beach Memorial Medical Center as the city’s top five major\x20
+| employers.6 According to the 2000 U.S. Census, 55.9% of the potential labor force was\x20
+| employed and there was a 9.4% unemployment rate (calculated by dividing the\x20
+| unemployed population by the labor force). Of the population over the age of 16, 38.3%\x20
+| were not in the labor force. Of the employed civilian population, 21.1% worked in\x20
+| “Educational, health and social services,” 14.4% worked in “Manufacturing,” 10.3%\x20
+| worked in “Retail trade,” and 8.6% worked in “Arts, entertainment, recreation,\x20
+| accommodation and food services.” The local, state, or federal government employed a\x20
+| total of 15.9% of the employed civilian population in 2000; however less than one\x20
+| percent (0.1%) were reported as working for the government in the “Agriculture, forestry,\x20
+| fishing, and mining” industries. Less than one percent (0.1%) of the employed civilian\x20
+| population over the age of 16 was involved in “Agriculture, forestry, fishing, and\x20
+| hunting” according to the 2000 U.S. Census.\x20
+|  Long Beach’s per capita income in 1999 was $19,040 according to the U.S.\x20
+| Census, while the median household income was $37,270. In 1999 a total of 22.8% of the\x20
+| population was below the poverty level. In 2000 there were 171,632 housing units in\x20
+| Long Beach, 95.0% of which were occupied and 5.0% were vacant. Of the occupied\x20
+| housing units, 41.1% were owner occupied and 59% were renter occupied. Of the vacant\x20
+| housing units, 49.1% were “For rent” and 17.3% were “For sale only.”\x20
+| \x20
+| Governance\x20
+| Long Beach is a Charter City with a Mayor-Council form of government. The\x20
+| Mayor is elected at-large and there are nine Council members, each elected to represent a\x20
+| district. Long Beach has an 8.25% sales and use tax rate. Los Angeles County uses a\x20
+| 12.0% Transient Lodging tax rate, which earned $10,202,899 in revenue for the 2000-
+| 2001 fiscal year.7 \x20
+| California state law assesses commercial vessels, charter boats, and\x20
+| oceanographic research vessels at 4% of their full cash value.8 Vessels registered in\x20
+| California with either the Department of Motor Vehicles or the U.S. Coast Guard\x20
+| (USCG) are assessed property taxes by the county tax collector where it is moored.9\x20
+| Some commercial vessels are also subject to a Ballast Water Management Fee of about\x20
+| $500 per voyage.10 California levies a fuel tax of $0.18 per gallon, a portion of which\x20
+| goes toward marine safety and education programs and boating facility administration\x20
+| and development.11
+| The State of California levies landing taxes that must be paid by fishermen and\x20
+| fish processors involved in the retail sale of fish products. These taxes vary by species\x20
+| and range between $.0013 and $.0125 per pound of fish.12 The California Department of\x20
+| Agriculture also administers two commodity commissions, the California Salmon\x20
+| Council and the California Sea Urchin Commission, which charge fees for marketing and\x20
+| lobbying on behalf of fishermen involved in these specific fisheries.13
+|  There is a California Department of Fish and Game Marine Region Filed Office\x20
+| located approximately 12 miles away in Los Alamitos. The National Oceanic and\x20
+| Atmospheric Administration’s (NOAA) Southwest Regional office is located in Long\x20
+| Beach. Eight Coast Guard vessels are stationed at the U.S. Coast Guard Marine Safety\x20
+| Office/Group Los Angeles – Long Beach located in San Pedro. Del mar and San Diego,\x20
+| the nearest cities that hold Pacific Fisheries Management Council meetings, are\x20
+| approximately 92 miles and 110 miles away respectively. There is a U.S. Citizenship and\x20
+| Immigration Services District Office located in Los Angeles.\x20
+| \x20
+| Facilities\x20
+| Long Beach lies south of Los Angeles and is accessible by several highways.\x20
+| Long Beach Airport, situated midway between Los Angeles and Orange County, is a\x20
+| general aviation airport, which also serves privately owned aircraft. A full array of\x20
+| aviation support, manufacturing and business services is readily available. \x20
+| The Long Beach Unified School District serves the cities of Long Beach,\x20
+| Lakewood, Signal Hill, and Avalon on Catalina Island, and encompasses a total of 95\x20
+| schools. The District employs more than 8000 people, making it the largest employer in\x20
+| Long Beach.14 Public safety is provided by the Long Beach Police Department and Long\x20
+| Beach Health and Human Services provides comprehensive health services. The City of\x20
+| Long Beach Public Works Department administers gas, water, sewer, and refuse services.\x20
+| Long Beach has an extensive tourism industry with a well-established infrastructure,\x20
+| including accommodations, catering to a multitude of tourism activities. \x20
+| The Long Beach Harbor Department, which operates under the direction of the\x20
+| Board of Harbor Commissioners, is the city agency responsible for management of the\x20
+| Port of Long Beach, the largest port on the West Coast. Nearly $100 billion in\x20
+| international trade of commercial goods, 90% coming from East Asian trade, moves\x20
+| through the Port each year. Funding for port development and maintenance is sourced\x20
+| from the lease of shipping terminals to private firms; taxpayers do not fund port\x20
+| operations. The Port of Long Beach, established in 1911, now encompasses over 3000\x20
+| acres of land and has plans of expansion that will alleviate pressures at the nearby Port of\x20
+| Terminal Island. The Long Beach Board of Harbor Commissioners has adopted a wide-
+| ranging policy, the Green Port Policy, making environmental protection a top priority at\x20
+| the Port of Long Beach.15 The Port’s Small Business Enterprise Program is being\x20
+| inaugurated with the signing of an agreement so the Port and the Metropolitan Water\x20
+| District can share small business contractor information. The MWD has operated one of\x20
+| the regions most successful small business outreach programs with more than 2000\x20
+| businesses participating.16
+text: separators 1-2
+| <PAGE><A><P>Long Beach, California <EOL>
+|  <EOL>
+| People and Place <EOL>
+| Location <EOL>
+| </P><P>Long Beach, covering 50.44 square miles of land and 15.43 square miles of water, <EOL>
+| is located just south of Los Angeles along U.S. Highway 1 near the Los Angeles Harbor. <EOL>
+| The community is situated in Los Angeles County at 33°46’01”N, 118°11’18”W.  <EOL>
+|  <EOL>
+| Demographic Profile <EOL>
+|  <W>According to the 2000 U.S. Census, the population of Long Beach was 461,522, a <EOL>
+| 7.5% increase from the 1990 U.S. Census. In 2000 the gender structure was evenly <EOL>
+| divided with slightly more females (50.9%) than males (49.1%). The median age of the <EOL>
+| population in 2000 was 30.8, slightly lower than the national median of 35.3 for the same <EOL>
+| year. According to the same data, 49.2% of the population was between the ages of 22 <EOL>
+| and 54, and 29.2% were age 17 or below. For the population 18 years and over, 71.9% <EOL>
+| had a high school education or higher, 21.2% had attained a bachelor’s degree or higher, <EOL>
+| and 7.0% earned a graduate or professional degree. The highest level of educational <EOL>
+| attainment was a high school diploma/equivalency for 19.9% of the population. In 2000, <EOL>
+| 79.8% of the population lived in family households.  <EOL>
+|  <W>The 2000 U.S. Census shows that the racial composition was predominantly <EOL>
+| White (45.2%), followed by Black or African American (14.9%), Asian (12.0%), and <EOL>
+| Native Hawaiian and Other Pacific Islander (1.2%). American Indian and Alaskan native <EOL>
+| represented less than one percent at 0.8%. Overall, 20.6% classified themselves as <EOL>
+| belonging to some other race and 5.3% of the population identified themselves with two <EOL>
+| or more races. A total of 35.8% identified themselves as Hispanic or Latino. <EOL>
+| Approximately 28.6% of the population was foreign-born, with 51.0% born in Mexico <EOL>
+| and 10.3% in the Philippines. <EOL>
+|  <EOL>
+|  <EOL>
+| History <EOL>
+| </P><P>The Chumash are one of the earliest peoples to inhabit the greater Los Angeles <EOL>
+| metropolitan and surrounding areas. They first settled there sometime between 5000 and <EOL>
+| 2000 B.P.1,2 They relied heavily on a maritime economy for centuries (e.g., gathering <EOL>
+| and fishing). By 500 AD, the Tongva Indians arrived in Southern California from the <EOL>
+| Mojave Desert. At the onset of European migration into North America it is estimated <EOL>
+| there were 300,000 Native Americans in California. This number was drastically reduced <EOL>
+| as European diseases killed off approximately two-thirds of the native population during <EOL>
+| the colonial era3. Today the Gabrieleno/Tongva Tribe is headquartered within the Los <EOL>
+| Angeles Metropolitan Area in San Gabriel. They have sought federal recognition since <EOL>
+| 1994 and may obtain federally recognized fishing rights as their historic use of marine <EOL>
+| resources is well known. In 1542, before the Spaniard Juan Rodriguez Cabrillo landed on <EOL>
+| the California coast he was met by Tongva Indians on their boats. Cabrillo was the first <EOL>
+| European to enter what would be the Los Angeles area.4,5<EOL>
+| </P><P> <EOL>
+|  </P></A></PAGE>
+| <PAGE><A><P>After growing as a seaside resort – subsequent to its history as a prime ranching <EOL>
+| region throughout the 1800s – Long beach became a booming port town. Long Beach is <EOL>
+| now California's fifth largest city. The optimum combination of strategic location, <EOL>
+| excellent climate, shoreline beauty, and Southern California lifestyle has attracted high <EOL>
+| levels of trade, tourism and industry. The community’s fishing history is intimately <EOL>
+| linked to that of Los Angeles, the urban hub of the region. Significant regional networks <EOL>
+| exist between Long Beach and other communities that satellite the metropolitan area, <EOL>
+| such as Long Beach’s once large Japanese-American population who worked in fish <EOL>
+| canneries on Terminal Island. <EOL>
+|  <EOL>
+| Infrastructure <EOL>
+| Current Economy <EOL>
+| </P><P>The City of Long Beach community development department lists Long Beach <EOL>
+| Unified School District, Boeing, the City of Long Beach, California State University – <EOL>
+| Long Beach, and Long Beach Memorial Medical Center as the city’s top five major <EOL>
+| employers.6 According to the 2000 U.S. Census, 55.9% of the potential labor force was <EOL>
+| employed and there was a 9.4% unemployment rate (calculated by dividing the <EOL>
+| unemployed population by the labor force). Of the population over the age of 16, 38.3% <EOL>
+| were not in the labor force. Of the employed civilian population, 21.1% worked in <EOL>
+| “Educational, health and social services,” 14.4% worked in “Manufacturing,” 10.3% <EOL>
+| worked in “Retail trade,” and 8.6% worked in “Arts, entertainment, recreation, <EOL>
+| accommodation and food services.” The local, state, or federal government employed a <EOL>
+| total of 15.9% of the employed civilian population in 2000; however less than one <EOL>
+| percent (0.1%) were reported as working for the government in the “Agriculture, forestry, <EOL>
+| fishing, and mining” industries. Less than one percent (0.1%) of the employed civilian <EOL>
+| population over the age of 16 was involved in “Agriculture, forestry, fishing, and <EOL>
+| hunting” according to the 2000 U.S. Census. <EOL>
+|  <W>Long Beach’s per capita income in 1999 was $19,040 according to the U.S. <EOL>
+| Census, while the median household income was $37,270. In 1999 a total of 22.8% of the <EOL>
+| population was below the poverty level. In 2000 there were 171,632 housing units in <EOL>
+| Long Beach, 95.0% of which were occupied and 5.0% were vacant. Of the occupied <EOL>
+| housing units, 41.1% were owner occupied and 59% were renter occupied. Of the vacant <EOL>
+| housing units, 49.1% were “For rent” and 17.3% were “For sale only.” <EOL>
+|  <EOL>
+| Governance <EOL>
+| </P><P>Long Beach is a Charter City with a Mayor-Council form of government. The <EOL>
+| Mayor is elected at-large and there are nine Council members, each elected to represent a <EOL>
+| district. Long Beach has an 8.25% sales and use tax rate. Los Angeles County uses a <EOL>
+| 12.0% Transient Lodging tax rate, which earned $10,202,899 in revenue for the 2000-<EOL>
+| 2001 fiscal year.7  <EOL>
+| </P><P>California state law assesses commercial vessels, charter boats, and <EOL>
+| oceanographic research vessels at 4% of their full cash value.8 Vessels registered in <EOL>
+| California with either the Department of Motor Vehicles or the U.S. Coast Guard <EOL>
+| (USCG) are assessed property taxes by the county tax collector where it is moored.9 <EOL>
+| Some commercial vessels are also subject to a Ballast Water Management Fee of about <EOL>
+| $500 per voyage.10 California levies a fuel tax of $0.18 per gallon, a portion of which </P></A></PAGE>

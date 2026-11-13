@@ -1,0 +1,533 @@
+text: default page 1
+| Learning
+| This first section contains a tour through XMLUnit’s features, the next sections will cover them in more detail. Note
+| that it has a strong focus on using the XMLTestCase class which is one option to use XMLUnit, but not the only
+| one. XMLUnit’s features can be fully used without any dependency on JUnit at all. XMLUnit enables JUnit-style
+| assertions to be made about the content and structure of XML1. It is an open source project hosted at
+| http://xmlunit.sourceforge.net/ that grew out of a need to test a system that generated and received custom XML
+| messages. The problem that we faced was how to verify that the system generated the correct message from a
+| known set of inputs. Obviously we could use a DTD or a schema to validate the message output, but this approach
+| wouldn’t allow us to distinguish between valid XML with correct content and valid XML with incorrect content.
+| What we really wanted was an assertXMLEqual() method, so we could compare the message that we expected the
+| system to generate and the message that the system actually generated. And that was the beginning of XMLUnit.
+| XMLUnit provides a single JUnit extension class, XMLTestCase, and a set of supporting classes that allow asser-
+| tions to be made about: The differences between two pieces of XML (via Diff and DetailedDiff classes).The validity
+| of a piece of XML (via Validator class).The outcome of transforming a piece< [1] of XML using XSLT (via Transform
+| class).The evaluation of an XPath expression on a piece of XML (via classes implementing the XpathEngine
+| interface).Individual nodes in a piece of XML that are exposed by DOM Traversal (via NodeTest class)XMLUnit can
+| also treat HTML content, even badly-formed HTML, as valid XML to allow these assertions to be made about web
+| pages (via the HTMLDocumentBuilder class).
+| As with many projects some words in XMLUnit have particular meanings so here is a quick overview. A piece of
+| XML is a DOM Document, a String containing marked-up content, or a Source or Reader that allows access to
+| marked-up content within some resource. XMLUnit compares the expected control XML to some actual test XML.
+| The comparison can reveal that two pieces of XML are identical, similar or different. The unit of measurement used
+| by the comparison is a difference, and differences can be either recoverable or unrecoverable. Two pieces of XML
+| are identical if there are no differences between them, similar if there are only recoverable differences between
+| them, and different if there are any unrecoverable differences between them.
+| XMLUnit requires a JAXP compliant XML parser virtually everywhere. Several features of XMLUnit also require a
+| JAXP compliant XSLT transformer. If it is available, a JAXP compliant XPath engine will be used for XPath tests.
+| To build XMLUnit at least JAXP 1.2 is required, this is the version provided by the Java class library in JDK 1.4.
+| The JAXP 1.3 (i.e. Java5 and above) XPath engine can only be built when JAXP 1.3 is available. As long as you
+| don’t require support for XML Namespaces or XML Schema, any JAXP 1.1 compliant implementations should
+| work at runtime. For namespace and schema support you will need a parser that complies to JAXP 1.2 and supports
+| the required feature. The XML parser shipping with JDK 1.4 (a version of Apache Crimson) for example is compli-
+| ant to JAXP 1.2 but doesn’t support Schema validation. XMLUnit is supposed to build and run on any Java version
+| after 1.3 (at least no new hard JDK 1.4 dependencies have been added in XMLUnit 1.1), but it has only been tested
+| on JDK 1.4.2 and above. To build XMLUnit JUnit 3.x (only tested with JUnit 3.8.x) is required. It is not required at
+| runtime unless you intend to use the XMLTestCase or XMLAssert classes. XMLUnit consists of a few classes all
+| living in the org.custommonkey.xmlunit package. You can use these classes directly from your code, no matter
+| whether you are writing a unit test or want to use XMLUnit’s features for any other purpose. This section provides
+| a few hints of where to start if you want to use a certain feature of XMLUnit, more details can be found in the
+| more specific sections later in this document. Heart and soul of XMLUnit’s comparison engine is DifferenceEngine
+| but most of the time you will use it indirectly via the Diff class. You can influence the engine by providing (cus-
+| tom) implementations for various interfaces and by setting a couple of options on the XMLUnit class. More infor-
+| mation is available in Section 3. All validation happens in the Validator class. The default is to validate against a
+| DTD, but XML Schema validation can be enabled by an option (see Validator.useXMLSchema). Several options of
+| the XMLUnit class affect validation. More information is available in Section 4. The Transform class provides an
+| easy to use layer on top of JAXP’s transformations. An instance of this class is initialized with the source document
+| and a stylesheet and the result of the transformation can be retrieved as a String or DOM Document. The output of
+| Transform can be used as input to comparisons, validations, XPath tests and so on. There is no detailed sections on
+| transformations since they are really only a different way to create input for the rest of XMLUnit < [2] machinery.
+| Examples can be found in Section 1.6. It is possible to provide a custom < [3] javax.xml.transform.URIResolver via
+| the XMLUnit.setURIResolver method. You can access the underlying XSLT transformer via XMLUnit.getTransformer-
+| Factory. The central piece of XMLUnit’s XPath support is the XpathEngine interface. Currently two implementations
+| of the interface exist, SimpleXpathEngine and org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine. SimpleXpa-
+| thEngine is a very basic implementation that uses your XSLT transformer under the covers. This also means it will
+| expose you to the bugs found in your transformer like the transformer claiming a stylesheet couldn’t be compiled for
+| very basic XPath expressions. This has been reported to be the case for JDK 1.5.
+| org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine uses JAXP 1.3’s javax.xml.xpath package and seems to work
+| more reliable, stable and performant than SimpleXpathEngine. You use the XMLUnit.newXpathEngine method to
+| obtain an instance of the XpathEngine. As of XMLUnit 1.1 this will try to use JAXP 1.3 if it is available and fall back
+| to SimpleXpathEngine. Instances of XpathEngine can return the results of XPath queries either as DOM NodeList or
+text: default page 2
+| plain Strings. More information is available in Section 5. To test pieces of XML by traversing the DOM tree you use
+| the NodeTester class. Each DOM Node will be passed to a NodeTester implementation you provide. The
+| AbstractNodeTester class is provided as a NullObject Pattern base class for implementations of your own. More
+| information is available in Section 6. Initially XMLUnit was tightly coupled to JUnit and the recommended approach
+| was to write unit tests by inheriting from the XMLTestCase class. XMLTestCase provides a pretty long list of assert...
+| methods that may simplify your interaction with XMLUnit’s internals in many common cases. The XMLAssert class
+| provides the same set of assert...s as static methods. Use XMLAssert instead of XMLTestCase for your unit tests if you
+| can’t or don’t want to inherit from XMLTestCase. All power of XMLUnit is available whether you use XMLTestCase
+| and/or XMLAssert or the underlying API directly. If you are using JUnit 3.x then using the specific classes may prove
+| to be more convenient.
+| If you are using a JDK 1.4 or later, your Java class library already contains the required XML parsers and XSLT
+| transformers. Still you may want to use a different parser/transformer than the one of your JDK - in particular since
+| the versions shipping with some JDKs are known to contain serious bugs. As described in Section 1.4 there are two
+| main approaches to choose the XML parser of XSLT transformer: System properties and setters in the XMLUnit
+| class. If you use system properties you have the advantage that your choice affects the whole JAXP system, whether
+| it is used inside of XMLUnit or not. If you are using JDK 1.4 or later you may also want to review the Endorsed
+| Standards Override Mechanism to use a different parser/transformer than the one shipping with your JDK. The sec-
+| ond option - using the XMLUnit class - allows you to use different parsers for control and test documents, it even
+| allows you to use different parsers for different test cases, if you really want to stretch it that far. It may also work
+| for JDK 1.4 and above, even if you don’t override the endorsed standards libraries. You can access the underlying
+| JAXP parser by XMLUnit.newControlParser, XMLUnit.newTestParser, XMLUnit. getControlDocumentBuilderFac-
+| tory, XMLUnit.getTestDocumentBuilderFactory and XMLUnit.getSAXParserFactory (used by Validator). Note that
+| all these methods return factories or parsers that are namespace aware. The various build... methods in XMLUnit
+| provide convenience layers for building DOM Documents using the configured parsers. You can also set the class
+| name for the XPathFactory to use when using JAXP 1.3 by passing the class name to XMLUnit- .setXPathFactory.
+| At the center of XMLUnit’s support for comparisons is the DifferenceEngine class. In practice you rarely deal with
+| it directly but rather use it via instances of Diff or DetailedDiff classes (see Section 3.5). The DifferenceEngine
+| walks two trees of DOM Nodes, the control and the test tree, and compares the nodes. Whenever it detects a differ-
+| ence, it sends a message to a configured DifferenceListener (see Section 3.3) and asks a Comparison- Controller
+| (see Section 3.2) whether the current comparison should be halted. In some cases the order of elements in two
+| pieces of XML may not be significant. If this is true, the DifferenceEngine needs help to determine which Elements
+| to compare. This is the job of an ElementQualifier (see Section 3.4). The types of differences DifferenceEngine can
+| detect are enumerated in the DifferenceConstants interface and represented by instances of the Difference class. A
+| Difference can be recoverable; recoverable Differences make the Diff class consider two pieces of XML similar
+| while non-recoverable Differences render the two pieces different. The types of Differences that are currently de-
+| tected are listed in Table 1 to Table 4 (the first two columns refer to the DifferenceConstants class). Note that some
+| of the differences listed may be ignored by the DifferenceEngine if certain configuration options have been speci-
+| fied. See Section 3.8 for details. DifferenceEngine passes differences found around as instances of the Difference
+| class. In addition to the type of of difference this class also holds information on the nodes that have been found to
+| be different. The nodes are described by NodeDetail instances that encapsulate the DOM Node instance as well as
+| the XPath expression that locates the Node inside the given piece of XML. NodeDetail also contains a ″value″ that
+| provides more information on the actual values that have been found to be different, the concrete interpretation de-
+| pends on the type of difference as can be seen in Table 5. As said in the first paragraph you won’t deal with Differ-
+| enceEngine directly in most cases. In cases where Diff or DetailedDiff don’t provide what you need you’d create an
+| instance of DifferenceEngine passing a ComparisonController in the constructor and invoke compare with your
+| DOM trees to compare as well as a DifferenceListener and ElementQualifier. The listener will be called on any dif-
+| ferences while the control method is executing.
+| IgnoreTextAndAttributeValuesDifferenceListener doesn’t do anything in skippedComparison. It ″downgrades″ Dif-
+| ferences of type ATTR_VALUE, ATTR_VALUE_EXPLICITLY_SPECIFIED and TEXT_VALUE to recoverable
+| differences. This means if instances of IgnoreTextAndAttributeValuesDifferenceListener are used together with Diff
+| then two pieces of XML will be considered similar if they have the same basic structure. They are not considered
+| identical, though. Note that the list of ignored differences doesn’t cover all textual differences. You should configure
+| XMLUnit to ignore comments and whitespace and to consider CDATA sections and text nodes to be the same (see
+| Section 3.8) in order to cover COMMENT_- VALUE and CDATA_VALUE as well.
+| Only Elements with the same name - and Namespace URI if present - qualify. In Example 3.4 this means control
+| node 1 will be compared to test node 2. Then control node 2 will be compared to test node 3 because DifferenceEn-
+| Page 2 of 3
+text: default page 3
+| gine will start to search for the matching test Element at the second test node, the same sequence number the con-
+| trol node is at. Control node 3 is compared to test node 3 as well and control node 4 to test node 4.
+| MultiLevelElementNameAndTextQualifier has in a way been the predecessor of Section 3.4.4. It also matches ele-
+| ment names and those of nested child elements until it finds matches, but unlike RecursiveElementNameAndText-
+| Qualifier, you must tell MultiLevelElementNameAndTextQualifier at which nesting level it should expect the nested
+| text. MultiLevelElementNameAndTextQualifier’s constructor expects a single argument which is the nesting level of
+| the expected text. If you use an argument of 1, MultiLevelElementNameAndTextQualifier is identical to Element-
+| NameAndTextQualifier. In Example 3.5 a value of 2 would be needed. By default MultiLevelElementNameAndTex-
+| tQualifier will not ignore whitespace between the elements leading up to the nested text. If your piece of XML con-
+| tains this sort of whitespace (like Example 3.5 which contains a newline and several space characters between) you
+| can either instruct XMLUnit to ignore whitespace completely (see Section 3.8.1) or use the two-arg constructor of
+| MultiLevelElementNameAndTextQualifier introduced with XMLUnit 1.2 and set the ignoreEmptyTexts argument to
+| true. In general RecursiveElementNameAndTextQualifier requires less knowledge upfront and its whitespace-
+| handling is more intuitive.
+| Diff and DetailedDiff provide simplified access to DifferenceEngine by implementing the ComparisonController and
+| DifferenceListener interfaces themselves. They cover the two most common use cases for comparing two pieces of
+| XML: checking whether the pieces are different (this is what Diff does) and finding all differences between them
+| (this is what DetailedDiff does). DetailedDiff is a subclass of Diff and can only be constructed by creating a Diff
+| instance first. The major difference between them is their implementation of the ComparisonController interface:
+| DetailedDiff will never stop the comparison since it wants to collect all differences. Diff in turn will halt the com-
+| parison as soon as the first Difference is found that is not recoverable. In addition DetailedDiff collects all Differ-
+| ences in a list and provides access to it. By default Diff will consider two pieces of XML as identical if no differ-
+| ences have been found at all, similar if all differences that have been found have been recoverable (see Table 1 to
+| Table 4) and different as soon as any non-recoverable difference has been found. It is possible to specify a Differ-
+| enceListener to Diff using the overrideDifferenceListener method. In this case each Difference will be evaluated by
+| the passed in DifferenceListener. By returning RETURN_IGNORE- _DIFFERENCE_NODES_IDENTICAL the cus-
+| tom listener can make Diff ignore the difference completely. Likewise any Difference for which the custom listener
+| returns RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR will be treated as if the Difference was recoverable.
+| There are several overloads of the Diff constructor that allow you to specify your piece of XML in many ways.
+| There are overloads that accept additional DifferenceEngine and ElementQualifier arguments. Passing in a Differen-
+| ceEngine of your own is the only way to use a ComparisonController other than Diff. Note that Diff and Detailed-
+| Diff use ElementNameQualifier as their default ElementQualifier. This is different from DifferenceEngine which
+| defaults to no ElementQualifier at all. To use a custom ElementQualifier you can also use the overrideEle-
+| mentQualifier method. Use this with an argument of null to unset the default ElementQualifier as well.
+| ANNOTATIONS
+| 1. My first annotation
+| 2. My second annotation
+| 3. My third annotation
+| Page 3 of 3
+text: sorted page 1
+| Learning
+| This first section contains a tour through XMLUnit’s features, the next sections will cover them in more detail. Note
+| that it has a strong focus on using the XMLTestCase class which is one option to use XMLUnit, but not the only
+| one. XMLUnit’s features can be fully used without any dependency on JUnit at all. XMLUnit enables JUnit-style
+| assertions to be made about the content and structure of XML1. It is an open source project hosted at
+| http://xmlunit.sourceforge.net/ that grew out of a need to test a system that generated and received custom XML
+| messages. The problem that we faced was how to verify that the system generated the correct message from a
+| known set of inputs. Obviously we could use a DTD or a schema to validate the message output, but this approach
+| wouldn’t allow us to distinguish between valid XML with correct content and valid XML with incorrect content.
+| What we really wanted was an assertXMLEqual() method, so we could compare the message that we expected the
+| system to generate and the message that the system actually generated. And that was the beginning of XMLUnit.
+| XMLUnit provides a single JUnit extension class, XMLTestCase, and a set of supporting classes that allow asser-
+| tions to be made about: The differences between two pieces of XML (via Diff and DetailedDiff classes).The validity
+| of a piece of XML (via Validator class).The outcome of transforming a piece< [1] of XML using XSLT (via Transform
+| class).The evaluation of an XPath expression on a piece of XML (via classes implementing the XpathEngine
+| interface).Individual nodes in a piece of XML that are exposed by DOM Traversal (via NodeTest class)XMLUnit can
+| also treat HTML content, even badly-formed HTML, as valid XML to allow these assertions to be made about web
+| pages (via the HTMLDocumentBuilder class).
+| As with many projects some words in XMLUnit have particular meanings so here is a quick overview. A piece of
+| XML is a DOM Document, a String containing marked-up content, or a Source or Reader that allows access to
+| marked-up content within some resource. XMLUnit compares the expected control XML to some actual test XML.
+| The comparison can reveal that two pieces of XML are identical, similar or different. The unit of measurement used
+| by the comparison is a difference, and differences can be either recoverable or unrecoverable. Two pieces of XML
+| are identical if there are no differences between them, similar if there are only recoverable differences between
+| them, and different if there are any unrecoverable differences between them.
+| XMLUnit requires a JAXP compliant XML parser virtually everywhere. Several features of XMLUnit also require a
+| JAXP compliant XSLT transformer. If it is available, a JAXP compliant XPath engine will be used for XPath tests.
+| To build XMLUnit at least JAXP 1.2 is required, this is the version provided by the Java class library in JDK 1.4.
+| The JAXP 1.3 (i.e. Java5 and above) XPath engine can only be built when JAXP 1.3 is available. As long as you
+| don’t require support for XML Namespaces or XML Schema, any JAXP 1.1 compliant implementations should
+| work at runtime. For namespace and schema support you will need a parser that complies to JAXP 1.2 and supports
+| the required feature. The XML parser shipping with JDK 1.4 (a version of Apache Crimson) for example is compli-
+| ant to JAXP 1.2 but doesn’t support Schema validation. XMLUnit is supposed to build and run on any Java version
+| after 1.3 (at least no new hard JDK 1.4 dependencies have been added in XMLUnit 1.1), but it has only been tested
+| on JDK 1.4.2 and above. To build XMLUnit JUnit 3.x (only tested with JUnit 3.8.x) is required. It is not required at
+| runtime unless you intend to use the XMLTestCase or XMLAssert classes. XMLUnit consists of a few classes all
+| living in the org.custommonkey.xmlunit package. You can use these classes directly from your code, no matter
+| whether you are writing a unit test or want to use XMLUnit’s features for any other purpose. This section provides
+| a few hints of where to start if you want to use a certain feature of XMLUnit, more details can be found in the
+| more specific sections later in this document. Heart and soul of XMLUnit’s comparison engine is DifferenceEngine
+| but most of the time you will use it indirectly via the Diff class. You can influence the engine by providing (cus-
+| tom) implementations for various interfaces and by setting a couple of options on the XMLUnit class. More infor-
+| mation is available in Section 3. All validation happens in the Validator class. The default is to validate against a
+| DTD, but XML Schema validation can be enabled by an option (see Validator.useXMLSchema). Several options of
+| the XMLUnit class affect validation. More information is available in Section 4. The Transform class provides an
+| easy to use layer on top of JAXP’s transformations. An instance of this class is initialized with the source document
+| and a stylesheet and the result of the transformation can be retrieved as a String or DOM Document. The output of
+| Transform can be used as input to comparisons, validations, XPath tests and so on. There is no detailed sections on
+| transformations since they are really only a different way to create input for the rest of XMLUnit < [2] machinery.
+| Examples can be found in Section 1.6. It is possible to provide a custom < [3] javax.xml.transform.URIResolver via
+| the XMLUnit.setURIResolver method. You can access the underlying XSLT transformer via XMLUnit.getTransformer-
+| Factory. The central piece of XMLUnit’s XPath support is the XpathEngine interface. Currently two implementations
+| of the interface exist, SimpleXpathEngine and org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine. SimpleXpa-
+| thEngine is a very basic implementation that uses your XSLT transformer under the covers. This also means it will
+| expose you to the bugs found in your transformer like the transformer claiming a stylesheet couldn’t be compiled for
+| very basic XPath expressions. This has been reported to be the case for JDK 1.5.
+| org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine uses JAXP 1.3’s javax.xml.xpath package and seems to work
+| more reliable, stable and performant than SimpleXpathEngine. You use the XMLUnit.newXpathEngine method to
+| obtain an instance of the XpathEngine. As of XMLUnit 1.1 this will try to use JAXP 1.3 if it is available and fall back
+| to SimpleXpathEngine. Instances of XpathEngine can return the results of XPath queries either as DOM NodeList or
+text: sorted page 2
+| Page 2 of 3
+| plain Strings. More information is available in Section 5. To test pieces of XML by traversing the DOM tree you use
+| the NodeTester class. Each DOM Node will be passed to a NodeTester implementation you provide. The
+| AbstractNodeTester class is provided as a NullObject Pattern base class for implementations of your own. More
+| information is available in Section 6. Initially XMLUnit was tightly coupled to JUnit and the recommended approach
+| was to write unit tests by inheriting from the XMLTestCase class. XMLTestCase provides a pretty long list of assert...
+| methods that may simplify your interaction with XMLUnit’s internals in many common cases. The XMLAssert class
+| provides the same set of assert...s as static methods. Use XMLAssert instead of XMLTestCase for your unit tests if you
+| can’t or don’t want to inherit from XMLTestCase. All power of XMLUnit is available whether you use XMLTestCase
+| and/or XMLAssert or the underlying API directly. If you are using JUnit 3.x then using the specific classes may prove
+| to be more convenient.
+| If you are using a JDK 1.4 or later, your Java class library already contains the required XML parsers and XSLT
+| transformers. Still you may want to use a different parser/transformer than the one of your JDK - in particular since
+| the versions shipping with some JDKs are known to contain serious bugs. As described in Section 1.4 there are two
+| main approaches to choose the XML parser of XSLT transformer: System properties and setters in the XMLUnit
+| class. If you use system properties you have the advantage that your choice affects the whole JAXP system, whether
+| it is used inside of XMLUnit or not. If you are using JDK 1.4 or later you may also want to review the Endorsed
+| Standards Override Mechanism to use a different parser/transformer than the one shipping with your JDK. The sec-
+| ond option - using the XMLUnit class - allows you to use different parsers for control and test documents, it even
+| allows you to use different parsers for different test cases, if you really want to stretch it that far. It may also work
+| for JDK 1.4 and above, even if you don’t override the endorsed standards libraries. You can access the underlying
+| JAXP parser by XMLUnit.newControlParser, XMLUnit.newTestParser, XMLUnit. getControlDocumentBuilderFac-
+| tory, XMLUnit.getTestDocumentBuilderFactory and XMLUnit.getSAXParserFactory (used by Validator). Note that
+| all these methods return factories or parsers that are namespace aware. The various build... methods in XMLUnit
+| provide convenience layers for building DOM Documents using the configured parsers. You can also set the class
+| name for the XPathFactory to use when using JAXP 1.3 by passing the class name to XMLUnit- .setXPathFactory.
+| At the center of XMLUnit’s support for comparisons is the DifferenceEngine class. In practice you rarely deal with
+| it directly but rather use it via instances of Diff or DetailedDiff classes (see Section 3.5). The DifferenceEngine
+| walks two trees of DOM Nodes, the control and the test tree, and compares the nodes. Whenever it detects a differ-
+| ence, it sends a message to a configured DifferenceListener (see Section 3.3) and asks a Comparison- Controller
+| (see Section 3.2) whether the current comparison should be halted. In some cases the order of elements in two
+| pieces of XML may not be significant. If this is true, the DifferenceEngine needs help to determine which Elements
+| to compare. This is the job of an ElementQualifier (see Section 3.4). The types of differences DifferenceEngine can
+| detect are enumerated in the DifferenceConstants interface and represented by instances of the Difference class. A
+| Difference can be recoverable; recoverable Differences make the Diff class consider two pieces of XML similar
+| while non-recoverable Differences render the two pieces different. The types of Differences that are currently de-
+| tected are listed in Table 1 to Table 4 (the first two columns refer to the DifferenceConstants class). Note that some
+| of the differences listed may be ignored by the DifferenceEngine if certain configuration options have been speci-
+| fied. See Section 3.8 for details. DifferenceEngine passes differences found around as instances of the Difference
+| class. In addition to the type of of difference this class also holds information on the nodes that have been found to
+| be different. The nodes are described by NodeDetail instances that encapsulate the DOM Node instance as well as
+| the XPath expression that locates the Node inside the given piece of XML. NodeDetail also contains a ″value″ that
+| provides more information on the actual values that have been found to be different, the concrete interpretation de-
+| pends on the type of difference as can be seen in Table 5. As said in the first paragraph you won’t deal with Differ-
+| enceEngine directly in most cases. In cases where Diff or DetailedDiff don’t provide what you need you’d create an
+| instance of DifferenceEngine passing a ComparisonController in the constructor and invoke compare with your
+| DOM trees to compare as well as a DifferenceListener and ElementQualifier. The listener will be called on any dif-
+| ferences while the control method is executing.
+| IgnoreTextAndAttributeValuesDifferenceListener doesn’t do anything in skippedComparison. It ″downgrades″ Dif-
+| ferences of type ATTR_VALUE, ATTR_VALUE_EXPLICITLY_SPECIFIED and TEXT_VALUE to recoverable
+| differences. This means if instances of IgnoreTextAndAttributeValuesDifferenceListener are used together with Diff
+| then two pieces of XML will be considered similar if they have the same basic structure. They are not considered
+| identical, though. Note that the list of ignored differences doesn’t cover all textual differences. You should configure
+| XMLUnit to ignore comments and whitespace and to consider CDATA sections and text nodes to be the same (see
+| Section 3.8) in order to cover COMMENT_- VALUE and CDATA_VALUE as well.
+| Only Elements with the same name - and Namespace URI if present - qualify. In Example 3.4 this means control
+| node 1 will be compared to test node 2. Then control node 2 will be compared to test node 3 because DifferenceEn-
+text: sorted page 3
+| Page 3 of 3
+| gine will start to search for the matching test Element at the second test node, the same sequence number the con-
+| trol node is at. Control node 3 is compared to test node 3 as well and control node 4 to test node 4.
+| MultiLevelElementNameAndTextQualifier has in a way been the predecessor of Section 3.4.4. It also matches ele-
+| ment names and those of nested child elements until it finds matches, but unlike RecursiveElementNameAndText-
+| Qualifier, you must tell MultiLevelElementNameAndTextQualifier at which nesting level it should expect the nested
+| text. MultiLevelElementNameAndTextQualifier’s constructor expects a single argument which is the nesting level of
+| the expected text. If you use an argument of 1, MultiLevelElementNameAndTextQualifier is identical to Element-
+| NameAndTextQualifier. In Example 3.5 a value of 2 would be needed. By default MultiLevelElementNameAndTex-
+| tQualifier will not ignore whitespace between the elements leading up to the nested text. If your piece of XML con-
+| tains this sort of whitespace (like Example 3.5 which contains a newline and several space characters between) you
+| can either instruct XMLUnit to ignore whitespace completely (see Section 3.8.1) or use the two-arg constructor of
+| MultiLevelElementNameAndTextQualifier introduced with XMLUnit 1.2 and set the ignoreEmptyTexts argument to
+| true. In general RecursiveElementNameAndTextQualifier requires less knowledge upfront and its whitespace-
+| handling is more intuitive.
+| Diff and DetailedDiff provide simplified access to DifferenceEngine by implementing the ComparisonController and
+| DifferenceListener interfaces themselves. They cover the two most common use cases for comparing two pieces of
+| XML: checking whether the pieces are different (this is what Diff does) and finding all differences between them
+| (this is what DetailedDiff does). DetailedDiff is a subclass of Diff and can only be constructed by creating a Diff
+| instance first. The major difference between them is their implementation of the ComparisonController interface:
+| DetailedDiff will never stop the comparison since it wants to collect all differences. Diff in turn will halt the com-
+| parison as soon as the first Difference is found that is not recoverable. In addition DetailedDiff collects all Differ-
+| ences in a list and provides access to it. By default Diff will consider two pieces of XML as identical if no differ-
+| ences have been found at all, similar if all differences that have been found have been recoverable (see Table 1 to
+| Table 4) and different as soon as any non-recoverable difference has been found. It is possible to specify a Differ-
+| enceListener to Diff using the overrideDifferenceListener method. In this case each Difference will be evaluated by
+| the passed in DifferenceListener. By returning RETURN_IGNORE- _DIFFERENCE_NODES_IDENTICAL the cus-
+| tom listener can make Diff ignore the difference completely. Likewise any Difference for which the custom listener
+| returns RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR will be treated as if the Difference was recoverable.
+| There are several overloads of the Diff constructor that allow you to specify your piece of XML in many ways.
+| There are overloads that accept additional DifferenceEngine and ElementQualifier arguments. Passing in a Differen-
+| ceEngine of your own is the only way to use a ComparisonController other than Diff. Note that Diff and Detailed-
+| Diff use ElementNameQualifier as their default ElementQualifier. This is different from DifferenceEngine which
+| defaults to no ElementQualifier at all. To use a custom ElementQualifier you can also use the overrideEle-
+| mentQualifier method. Use this with an argument of null to unset the default ElementQualifier as well.
+| ANNOTATIONS
+| 1. My first annotation
+| 2. My second annotation
+| 3. My third annotation
+text: range 2-3
+| plain Strings. More information is available in Section 5. To test pieces of XML by traversing the DOM tree you use
+| the NodeTester class. Each DOM Node will be passed to a NodeTester implementation you provide. The
+| AbstractNodeTester class is provided as a NullObject Pattern base class for implementations of your own. More
+| information is available in Section 6. Initially XMLUnit was tightly coupled to JUnit and the recommended approach
+| was to write unit tests by inheriting from the XMLTestCase class. XMLTestCase provides a pretty long list of assert...
+| methods that may simplify your interaction with XMLUnit’s internals in many common cases. The XMLAssert class
+| provides the same set of assert...s as static methods. Use XMLAssert instead of XMLTestCase for your unit tests if you
+| can’t or don’t want to inherit from XMLTestCase. All power of XMLUnit is available whether you use XMLTestCase
+| and/or XMLAssert or the underlying API directly. If you are using JUnit 3.x then using the specific classes may prove
+| to be more convenient.
+| If you are using a JDK 1.4 or later, your Java class library already contains the required XML parsers and XSLT
+| transformers. Still you may want to use a different parser/transformer than the one of your JDK - in particular since
+| the versions shipping with some JDKs are known to contain serious bugs. As described in Section 1.4 there are two
+| main approaches to choose the XML parser of XSLT transformer: System properties and setters in the XMLUnit
+| class. If you use system properties you have the advantage that your choice affects the whole JAXP system, whether
+| it is used inside of XMLUnit or not. If you are using JDK 1.4 or later you may also want to review the Endorsed
+| Standards Override Mechanism to use a different parser/transformer than the one shipping with your JDK. The sec-
+| ond option - using the XMLUnit class - allows you to use different parsers for control and test documents, it even
+| allows you to use different parsers for different test cases, if you really want to stretch it that far. It may also work
+| for JDK 1.4 and above, even if you don’t override the endorsed standards libraries. You can access the underlying
+| JAXP parser by XMLUnit.newControlParser, XMLUnit.newTestParser, XMLUnit. getControlDocumentBuilderFac-
+| tory, XMLUnit.getTestDocumentBuilderFactory and XMLUnit.getSAXParserFactory (used by Validator). Note that
+| all these methods return factories or parsers that are namespace aware. The various build... methods in XMLUnit
+| provide convenience layers for building DOM Documents using the configured parsers. You can also set the class
+| name for the XPathFactory to use when using JAXP 1.3 by passing the class name to XMLUnit- .setXPathFactory.
+| At the center of XMLUnit’s support for comparisons is the DifferenceEngine class. In practice you rarely deal with
+| it directly but rather use it via instances of Diff or DetailedDiff classes (see Section 3.5). The DifferenceEngine
+| walks two trees of DOM Nodes, the control and the test tree, and compares the nodes. Whenever it detects a differ-
+| ence, it sends a message to a configured DifferenceListener (see Section 3.3) and asks a Comparison- Controller
+| (see Section 3.2) whether the current comparison should be halted. In some cases the order of elements in two
+| pieces of XML may not be significant. If this is true, the DifferenceEngine needs help to determine which Elements
+| to compare. This is the job of an ElementQualifier (see Section 3.4). The types of differences DifferenceEngine can
+| detect are enumerated in the DifferenceConstants interface and represented by instances of the Difference class. A
+| Difference can be recoverable; recoverable Differences make the Diff class consider two pieces of XML similar
+| while non-recoverable Differences render the two pieces different. The types of Differences that are currently de-
+| tected are listed in Table 1 to Table 4 (the first two columns refer to the DifferenceConstants class). Note that some
+| of the differences listed may be ignored by the DifferenceEngine if certain configuration options have been speci-
+| fied. See Section 3.8 for details. DifferenceEngine passes differences found around as instances of the Difference
+| class. In addition to the type of of difference this class also holds information on the nodes that have been found to
+| be different. The nodes are described by NodeDetail instances that encapsulate the DOM Node instance as well as
+| the XPath expression that locates the Node inside the given piece of XML. NodeDetail also contains a ″value″ that
+| provides more information on the actual values that have been found to be different, the concrete interpretation de-
+| pends on the type of difference as can be seen in Table 5. As said in the first paragraph you won’t deal with Differ-
+| enceEngine directly in most cases. In cases where Diff or DetailedDiff don’t provide what you need you’d create an
+| instance of DifferenceEngine passing a ComparisonController in the constructor and invoke compare with your
+| DOM trees to compare as well as a DifferenceListener and ElementQualifier. The listener will be called on any dif-
+| ferences while the control method is executing.
+| IgnoreTextAndAttributeValuesDifferenceListener doesn’t do anything in skippedComparison. It ″downgrades″ Dif-
+| ferences of type ATTR_VALUE, ATTR_VALUE_EXPLICITLY_SPECIFIED and TEXT_VALUE to recoverable
+| differences. This means if instances of IgnoreTextAndAttributeValuesDifferenceListener are used together with Diff
+| then two pieces of XML will be considered similar if they have the same basic structure. They are not considered
+| identical, though. Note that the list of ignored differences doesn’t cover all textual differences. You should configure
+| XMLUnit to ignore comments and whitespace and to consider CDATA sections and text nodes to be the same (see
+| Section 3.8) in order to cover COMMENT_- VALUE and CDATA_VALUE as well.
+| Only Elements with the same name - and Namespace URI if present - qualify. In Example 3.4 this means control
+| node 1 will be compared to test node 2. Then control node 2 will be compared to test node 3 because DifferenceEn-
+| Page 2 of 3
+| gine will start to search for the matching test Element at the second test node, the same sequence number the con-
+| trol node is at. Control node 3 is compared to test node 3 as well and control node 4 to test node 4.
+| MultiLevelElementNameAndTextQualifier has in a way been the predecessor of Section 3.4.4. It also matches ele-
+| ment names and those of nested child elements until it finds matches, but unlike RecursiveElementNameAndText-
+| Qualifier, you must tell MultiLevelElementNameAndTextQualifier at which nesting level it should expect the nested
+| text. MultiLevelElementNameAndTextQualifier’s constructor expects a single argument which is the nesting level of
+| the expected text. If you use an argument of 1, MultiLevelElementNameAndTextQualifier is identical to Element-
+| NameAndTextQualifier. In Example 3.5 a value of 2 would be needed. By default MultiLevelElementNameAndTex-
+| tQualifier will not ignore whitespace between the elements leading up to the nested text. If your piece of XML con-
+| tains this sort of whitespace (like Example 3.5 which contains a newline and several space characters between) you
+| can either instruct XMLUnit to ignore whitespace completely (see Section 3.8.1) or use the two-arg constructor of
+| MultiLevelElementNameAndTextQualifier introduced with XMLUnit 1.2 and set the ignoreEmptyTexts argument to
+| true. In general RecursiveElementNameAndTextQualifier requires less knowledge upfront and its whitespace-
+| handling is more intuitive.
+| Diff and DetailedDiff provide simplified access to DifferenceEngine by implementing the ComparisonController and
+| DifferenceListener interfaces themselves. They cover the two most common use cases for comparing two pieces of
+| XML: checking whether the pieces are different (this is what Diff does) and finding all differences between them
+| (this is what DetailedDiff does). DetailedDiff is a subclass of Diff and can only be constructed by creating a Diff
+| instance first. The major difference between them is their implementation of the ComparisonController interface:
+| DetailedDiff will never stop the comparison since it wants to collect all differences. Diff in turn will halt the com-
+| parison as soon as the first Difference is found that is not recoverable. In addition DetailedDiff collects all Differ-
+| ences in a list and provides access to it. By default Diff will consider two pieces of XML as identical if no differ-
+| ences have been found at all, similar if all differences that have been found have been recoverable (see Table 1 to
+| Table 4) and different as soon as any non-recoverable difference has been found. It is possible to specify a Differ-
+| enceListener to Diff using the overrideDifferenceListener method. In this case each Difference will be evaluated by
+| the passed in DifferenceListener. By returning RETURN_IGNORE- _DIFFERENCE_NODES_IDENTICAL the cus-
+| tom listener can make Diff ignore the difference completely. Likewise any Difference for which the custom listener
+| returns RETURN_IGNORE_DIFFERENCE_NODES_SIMILAR will be treated as if the Difference was recoverable.
+| There are several overloads of the Diff constructor that allow you to specify your piece of XML in many ways.
+| There are overloads that accept additional DifferenceEngine and ElementQualifier arguments. Passing in a Differen-
+| ceEngine of your own is the only way to use a ComparisonController other than Diff. Note that Diff and Detailed-
+| Diff use ElementNameQualifier as their default ElementQualifier. This is different from DifferenceEngine which
+| defaults to no ElementQualifier at all. To use a custom ElementQualifier you can also use the overrideEle-
+| mentQualifier method. Use this with an argument of null to unset the default ElementQualifier as well.
+| ANNOTATIONS
+| 1. My first annotation
+| 2. My second annotation
+| 3. My third annotation
+| Page 3 of 3
+text: separators 1-2
+| <PAGE><A><P>Learning<EOL>
+| </P><P>This<W>first<W>section<W>contains<W>a<W>tour<W>through<W>XMLUnit’s<W>features,<W>the<W>next<W>sections<W>will<W>cover<W>them<W>in<W>more<W>detail.<W>Note<EOL>
+| that<W>it<W>has<W>a<W>strong<W>focus<W>on<W>using<W>the<W>XMLTestCase<W>class<W>which<W>is<W>one<W>option<W>to<W>use<W>XMLUnit,<W>but<W>not<W>the<W>only<EOL>
+| one.<W>XMLUnit’s<W>features<W>can<W>be<W>fully<W>used<W>without<W>any<W>dependency<W>on<W>JUnit<W>at<W>all.<W>XMLUnit<W>enables<W>JUnit-style<EOL>
+| assertions<W>to<W>be<W>made<W>about<W>the<W>content<W>and<W>structure<W>of<W>XML1.<W>It<W>is<W>an<W>open<W>source<W>project<W>hosted<W>at<EOL>
+| http://xmlunit.sourceforge.net/<W>that<W>grew<W>out<W>of<W>a<W>need<W>to<W>test<W>a<W>system<W>that<W>generated<W>and<W>received<W>custom<W>XML<EOL>
+| messages.<W>The<W>problem<W>that<W>we<W>faced<W>was<W>how<W>to<W>verify<W>that<W>the<W>system<W>generated<W>the<W>correct<W>message<W>from<W>a<EOL>
+| known<W>set<W>of<W>inputs.<W>Obviously<W>we<W>could<W>use<W>a<W>DTD<W>or<W>a<W>schema<W>to<W>validate<W>the<W>message<W>output,<W>but<W>this<W>approach<EOL>
+| wouldn’t<W>allow<W>us<W>to<W>distinguish<W>between<W>valid<W>XML<W>with<W>correct<W>content<W>and<W>valid<W>XML<W>with<W>incorrect<W>content.<EOL>
+| What<W>we<W>really<W>wanted<W>was<W>an<W>assertXMLEqual()<W>method,<W>so<W>we<W>could<W>compare<W>the<W>message<W>that<W>we<W>expected<W>the<EOL>
+| system<W>to<W>generate<W>and<W>the<W>message<W>that<W>the<W>system<W>actually<W>generated.<W>And<W>that<W>was<W>the<W>beginning<W>of<W>XMLUnit.<EOL>
+| XMLUnit<W>provides<W>a<W>single<W>JUnit<W>extension<W>class,<W>XMLTestCase,<W>and<W>a<W>set<W>of<W>supporting<W>classes<W>that<W>allow<W>asser-<EOL>
+| tions<W>to<W>be<W>made<W>about:<W>The<W>differences<W>between<W>two<W>pieces<W>of<W>XML<W>(via<W>Diff<W>and<W>DetailedDiff<W>classes).The<W>validity<EOL>
+| of<W>a<W>piece<W>of<W>XML<W>(via<W>Validator<W>class).The<W>outcome<W>of<W>transforming<W>a<W>piece<<W>[1]<W>of<W>XML<W>using<W>XSLT<W>(via<W>Transform<EOL>
+| class).The<W>evaluation<W>of<W>an<W>XPath<W>expression<W>on<W>a<W>piece<W>of<W>XML<W>(via<W>classes<W>implementing<W>the<W>XpathEngine<EOL>
+| interface).Individual<W>nodes<W>in<W>a<W>piece<W>of<W>XML<W>that<W>are<W>exposed<W>by<W>DOM<W>Traversal<W>(via<W>NodeTest<W>class)XMLUnit<W>can<EOL>
+| also<W>treat<W>HTML<W>content,<W>even<W>badly-formed<W>HTML,<W>as<W>valid<W>XML<W>to<W>allow<W>these<W>assertions<W>to<W>be<W>made<W>about<W>web<EOL>
+| pages<W>(via<W>the<W>HTMLDocumentBuilder<W>class).<EOL>
+| </P><P>As<W>with<W>many<W>projects<W>some<W>words<W>in<W>XMLUnit<W>have<W>particular<W>meanings<W>so<W>here<W>is<W>a<W>quick<W>overview.<W>A<W>piece<W>of<EOL>
+| XML<W>is<W>a<W>DOM<W>Document,<W>a<W>String<W>containing<W>marked-up<W>content,<W>or<W>a<W>Source<W>or<W>Reader<W>that<W>allows<W>access<W>to<EOL>
+| marked-up<W>content<W>within<W>some<W>resource.<W>XMLUnit<W>compares<W>the<W>expected<W>control<W>XML<W>to<W>some<W>actual<W>test<W>XML.<EOL>
+| The<W>comparison<W>can<W>reveal<W>that<W>two<W>pieces<W>of<W>XML<W>are<W>identical,<W>similar<W>or<W>different.<W>The<W>unit<W>of<W>measurement<W>used<EOL>
+| by<W>the<W>comparison<W>is<W>a<W>difference,<W>and<W>differences<W>can<W>be<W>either<W>recoverable<W>or<W>unrecoverable.<W>Two<W>pieces<W>of<W>XML<EOL>
+| are<W>identical<W>if<W>there<W>are<W>no<W>differences<W>between<W>them,<W>similar<W>if<W>there<W>are<W>only<W>recoverable<W>differences<W>between<EOL>
+| them,<W>and<W>different<W>if<W>there<W>are<W>any<W>unrecoverable<W>differences<W>between<W>them.<EOL>
+| </P><P>XMLUnit<W>requires<W>a<W>JAXP<W>compliant<W>XML<W>parser<W>virtually<W>everywhere.<W>Several<W>features<W>of<W>XMLUnit<W>also<W>require<W>a<EOL>
+| JAXP<W>compliant<W>XSLT<W>transformer.<W>If<W>it<W>is<W>available,<W>a<W>JAXP<W>compliant<W>XPath<W>engine<W>will<W>be<W>used<W>for<W>XPath<W>tests.<EOL>
+| To<W>build<W>XMLUnit<W>at<W>least<W>JAXP<W>1.2<W>is<W>required,<W>this<W>is<W>the<W>version<W>provided<W>by<W>the<W>Java<W>class<W>library<W>in<W>JDK<W>1.4.<EOL>
+| The<W>JAXP<W>1.3<W>(i.e.<W>Java5<W>and<W>above)<W>XPath<W>engine<W>can<W>only<W>be<W>built<W>when<W>JAXP<W>1.3<W>is<W>available.<W>As<W>long<W>as<W>you<EOL>
+| don’t<W>require<W>support<W>for<W>XML<W>Namespaces<W>or<W>XML<W>Schema,<W>any<W>JAXP<W>1.1<W>compliant<W>implementations<W>should<EOL>
+| work<W>at<W>runtime.<W>For<W>namespace<W>and<W>schema<W>support<W>you<W>will<W>need<W>a<W>parser<W>that<W>complies<W>to<W>JAXP<W>1.2<W>and<W>supports<EOL>
+| the<W>required<W>feature.<W>The<W>XML<W>parser<W>shipping<W>with<W>JDK<W>1.4<W>(a<W>version<W>of<W>Apache<W>Crimson)<W>for<W>example<W>is<W>compli-<EOL>
+| ant<W>to<W>JAXP<W>1.2<W>but<W>doesn’t<W>support<W>Schema<W>validation.<W>XMLUnit<W>is<W>supposed<W>to<W>build<W>and<W>run<W>on<W>any<W>Java<W>version<EOL>
+| after<W>1.3<W>(at<W>least<W>no<W>new<W>hard<W>JDK<W>1.4<W>dependencies<W>have<W>been<W>added<W>in<W>XMLUnit<W>1.1),<W>but<W>it<W>has<W>only<W>been<W>tested<EOL>
+| on<W>JDK<W>1.4.2<W>and<W>above.<W>To<W>build<W>XMLUnit<W>JUnit<W>3.x<W>(only<W>tested<W>with<W>JUnit<W>3.8.x)<W>is<W>required.<W>It<W>is<W>not<W>required<W>at<EOL>
+| runtime<W>unless<W>you<W>intend<W>to<W>use<W>the<W>XMLTestCase<W>or<W>XMLAssert<W>classes.<W>XMLUnit<W>consists<W>of<W>a<W>few<W>classes<W>all<EOL>
+| living<W>in<W>the<W>org.custommonkey.xmlunit<W>package.<W>You<W>can<W>use<W>these<W>classes<W>directly<W>from<W>your<W>code,<W>no<W>matter<EOL>
+| whether<W>you<W>are<W>writing<W>a<W>unit<W>test<W>or<W>want<W>to<W>use<W>XMLUnit’s<W>features<W>for<W>any<W>other<W>purpose.<W>This<W>section<W>provides<EOL>
+| a<W>few<W>hints<W>of<W>where<W>to<W>start<W>if<W>you<W>want<W>to<W>use<W>a<W>certain<W>feature<W>of<W>XMLUnit,<W>more<W>details<W>can<W>be<W>found<W>in<W>the<EOL>
+| more<W>specific<W>sections<W>later<W>in<W>this<W>document.<W>Heart<W>and<W>soul<W>of<W>XMLUnit’s<W>comparison<W>engine<W>is<W>DifferenceEngine<EOL>
+| but<W>most<W>of<W>the<W>time<W>you<W>will<W>use<W>it<W>indirectly<W>via<W>the<W>Diff<W>class.<W>You<W>can<W>influence<W>the<W>engine<W>by<W>providing<W>(cus-<EOL>
+| tom)<W>implementations<W>for<W>various<W>interfaces<W>and<W>by<W>setting<W>a<W>couple<W>of<W>options<W>on<W>the<W>XMLUnit<W>class.<W>More<W>infor-<EOL>
+| mation<W>is<W>available<W>in<W>Section<W>3.<W>All<W>validation<W>happens<W>in<W>the<W>Validator<W>class.<W>The<W>default<W>is<W>to<W>validate<W>against<W>a<EOL>
+| DTD,<W>but<W>XML<W>Schema<W>validation<W>can<W>be<W>enabled<W>by<W>an<W>option<W>(see<W>Validator.useXMLSchema).<W>Several<W>options<W>of<EOL>
+| the<W>XMLUnit<W>class<W>affect<W>validation.<W>More<W>information<W>is<W>available<W>in<W>Section<W>4.<W>The<W>Transform<W>class<W>provides<W>an<EOL>
+| easy<W>to<W>use<W>layer<W>on<W>top<W>of<W>JAXP’s<W>transformations.<W>An<W>instance<W>of<W>this<W>class<W>is<W>initialized<W>with<W>the<W>source<W>document<EOL>
+| and<W>a<W>stylesheet<W>and<W>the<W>result<W>of<W>the<W>transformation<W>can<W>be<W>retrieved<W>as<W>a<W>String<W>or<W>DOM<W>Document.<W>The<W>output<W>of<EOL>
+| Transform<W>can<W>be<W>used<W>as<W>input<W>to<W>comparisons,<W>validations,<W>XPath<W>tests<W>and<W>so<W>on.<W>There<W>is<W>no<W>detailed<W>sections<W>on<EOL>
+| transformations<W>since<W>they<W>are<W>really<W>only<W>a<W>different<W>way<W>to<W>create<W>input<W>for<W>the<W>rest<W>of<W>XMLUnit<W><<W>[2]<W>machinery.<EOL>
+| Examples<W>can<W>be<W>found<W>in<W>Section<W>1.6.<W>It<W>is<W>possible<W>to<W>provide<W>a<W>custom<W><<W>[3]<W>javax.xml.transform.URIResolver<W>via<EOL>
+| the<W>XMLUnit.setURIResolver<W>method.<W>You<W>can<W>access<W>the<W>underlying<W>XSLT<W>transformer<W>via<W>XMLUnit.getTransformer-<EOL>
+| Factory.<W>The<W>central<W>piece<W>of<W>XMLUnit’s<W>XPath<W>support<W>is<W>the<W>XpathEngine<W>interface.<W>Currently<W>two<W>implementations<EOL>
+| of<W>the<W>interface<W>exist,<W>SimpleXpathEngine<W>and<W>org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine.<W>SimpleXpa-<EOL>
+| thEngine<W>is<W>a<W>very<W>basic<W>implementation<W>that<W>uses<W>your<W>XSLT<W>transformer<W>under<W>the<W>covers.<W>This<W>also<W>means<W>it<W>will<EOL>
+| expose<W>you<W>to<W>the<W>bugs<W>found<W>in<W>your<W>transformer<W>like<W>the<W>transformer<W>claiming<W>a<W>stylesheet<W>couldn’t<W>be<W>compiled<W>for<EOL>
+| very<W>basic<W>XPath<W>expressions.<W>This<W>has<W>been<W>reported<W>to<W>be<W>the<W>case<W>for<W>JDK<W>1.5.<EOL>
+| org.custommonkey.xmlunit.jaxp13.Jaxp13XpathEngine<W>uses<W>JAXP<W>1.3’s<W>javax.xml.xpath<W>package<W>and<W>seems<W>to<W>work<EOL>
+| more<W>reliable,<W>stable<W>and<W>performant<W>than<W>SimpleXpathEngine.<W>You<W>use<W>the<W>XMLUnit.newXpathEngine<W>method<W>to<EOL>
+| obtain<W>an<W>instance<W>of<W>the<W>XpathEngine.<W>As<W>of<W>XMLUnit<W>1.1<W>this<W>will<W>try<W>to<W>use<W>JAXP<W>1.3<W>if<W>it<W>is<W>available<W>and<W>fall<W>back<EOL>
+| to<W>SimpleXpathEngine.<W>Instances<W>of<W>XpathEngine<W>can<W>return<W>the<W>results<W>of<W>XPath<W>queries<W>either<W>as<W>DOM<W>NodeList<W>or</P></A></PAGE>
+| <PAGE><A><P>plain<W>Strings.<W>More<W>information<W>is<W>available<W>in<W>Section<W>5.<W>To<W>test<W>pieces<W>of<W>XML<W>by<W>traversing<W>the<W>DOM<W>tree<W>you<W>use<EOL>
+| the<W>NodeTester<W>class.<W>Each<W>DOM<W>Node<W>will<W>be<W>passed<W>to<W>a<W>NodeTester<W>implementation<W>you<W>provide.<W>The<EOL>
+| AbstractNodeTester<W>class<W>is<W>provided<W>as<W>a<W>NullObject<W>Pattern<W>base<W>class<W>for<W>implementations<W>of<W>your<W>own.<W>More<EOL>
+| information<W>is<W>available<W>in<W>Section<W>6.<W>Initially<W>XMLUnit<W>was<W>tightly<W>coupled<W>to<W>JUnit<W>and<W>the<W>recommended<W>approach<EOL>
+| was<W>to<W>write<W>unit<W>tests<W>by<W>inheriting<W>from<W>the<W>XMLTestCase<W>class.<W>XMLTestCase<W>provides<W>a<W>pretty<W>long<W>list<W>of<W>assert...<EOL>
+| methods<W>that<W>may<W>simplify<W>your<W>interaction<W>with<W>XMLUnit’s<W>internals<W>in<W>many<W>common<W>cases.<W>The<W>XMLAssert<W>class<EOL>
+| provides<W>the<W>same<W>set<W>of<W>assert...s<W>as<W>static<W>methods.<W>Use<W>XMLAssert<W>instead<W>of<W>XMLTestCase<W>for<W>your<W>unit<W>tests<W>if<W>you<EOL>
+| can’t<W>or<W>don’t<W>want<W>to<W>inherit<W>from<W>XMLTestCase.<W>All<W>power<W>of<W>XMLUnit<W>is<W>available<W>whether<W>you<W>use<W>XMLTestCase<EOL>
+| and/or<W>XMLAssert<W>or<W>the<W>underlying<W>API<W>directly.<W>If<W>you<W>are<W>using<W>JUnit<W>3.x<W>then<W>using<W>the<W>specific<W>classes<W>may<W>prove<EOL>
+| to<W>be<W>more<W>convenient.<EOL>
+| </P><P>If<W>you<W>are<W>using<W>a<W>JDK<W>1.4<W>or<W>later,<W>your<W>Java<W>class<W>library<W>already<W>contains<W>the<W>required<W>XML<W>parsers<W>and<W>XSLT<EOL>
+| transformers.<W>Still<W>you<W>may<W>want<W>to<W>use<W>a<W>different<W>parser/transformer<W>than<W>the<W>one<W>of<W>your<W>JDK<W>-<W>in<W>particular<W>since<EOL>
+| the<W>versions<W>shipping<W>with<W>some<W>JDKs<W>are<W>known<W>to<W>contain<W>serious<W>bugs.<W>As<W>described<W>in<W>Section<W>1.4<W>there<W>are<W>two<EOL>
+| main<W>approaches<W>to<W>choose<W>the<W>XML<W>parser<W>of<W>XSLT<W>transformer:<W>System<W>properties<W>and<W>setters<W>in<W>the<W>XMLUnit<EOL>
+| class.<W>If<W>you<W>use<W>system<W>properties<W>you<W>have<W>the<W>advantage<W>that<W>your<W>choice<W>affects<W>the<W>whole<W>JAXP<W>system,<W>whether<EOL>
+| it<W>is<W>used<W>inside<W>of<W>XMLUnit<W>or<W>not.<W>If<W>you<W>are<W>using<W>JDK<W>1.4<W>or<W>later<W>you<W>may<W>also<W>want<W>to<W>review<W>the<W>Endorsed<EOL>
+| Standards<W>Override<W>Mechanism<W>to<W>use<W>a<W>different<W>parser/transformer<W>than<W>the<W>one<W>shipping<W>with<W>your<W>JDK.<W>The<W>sec-<EOL>
+| ond<W>option<W>-<W>using<W>the<W>XMLUnit<W>class<W>-<W>allows<W>you<W>to<W>use<W>different<W>parsers<W>for<W>control<W>and<W>test<W>documents,<W>it<W>even<EOL>
+| allows<W>you<W>to<W>use<W>different<W>parsers<W>for<W>different<W>test<W>cases,<W>if<W>you<W>really<W>want<W>to<W>stretch<W>it<W>that<W>far.<W>It<W>may<W>also<W>work<EOL>
+| for<W>JDK<W>1.4<W>and<W>above,<W>even<W>if<W>you<W>don’t<W>override<W>the<W>endorsed<W>standards<W>libraries.<W>You<W>can<W>access<W>the<W>underlying<EOL>
+| JAXP<W>parser<W>by<W>XMLUnit.newControlParser,<W>XMLUnit.newTestParser,<W>XMLUnit.<W>getControlDocumentBuilderFac-<EOL>
+| tory,<W>XMLUnit.getTestDocumentBuilderFactory<W>and<W>XMLUnit.getSAXParserFactory<W>(used<W>by<W>Validator).<W>Note<W>that<EOL>
+| all<W>these<W>methods<W>return<W>factories<W>or<W>parsers<W>that<W>are<W>namespace<W>aware.<W>The<W>various<W>build...<W>methods<W>in<W>XMLUnit<EOL>
+| provide<W>convenience<W>layers<W>for<W>building<W>DOM<W>Documents<W>using<W>the<W>configured<W>parsers.<W>You<W>can<W>also<W>set<W>the<W>class<EOL>
+| name<W>for<W>the<W>XPathFactory<W>to<W>use<W>when<W>using<W>JAXP<W>1.3<W>by<W>passing<W>the<W>class<W>name<W>to<W>XMLUnit-<W>.setXPathFactory.<EOL>
+| </P><P>At<W>the<W>center<W>of<W>XMLUnit’s<W>support<W>for<W>comparisons<W>is<W>the<W>DifferenceEngine<W>class.<W>In<W>practice<W>you<W>rarely<W>deal<W>with<EOL>
+| it<W>directly<W>but<W>rather<W>use<W>it<W>via<W>instances<W>of<W>Diff<W>or<W>DetailedDiff<W>classes<W>(see<W>Section<W>3.5).<W>The<W>DifferenceEngine<EOL>
+| walks<W>two<W>trees<W>of<W>DOM<W>Nodes,<W>the<W>control<W>and<W>the<W>test<W>tree,<W>and<W>compares<W>the<W>nodes.<W>Whenever<W>it<W>detects<W>a<W>differ-<EOL>
+| ence,<W>it<W>sends<W>a<W>message<W>to<W>a<W>configured<W>DifferenceListener<W>(see<W>Section<W>3.3)<W>and<W>asks<W>a<W>Comparison-<W>Controller<EOL>
+| (see<W>Section<W>3.2)<W>whether<W>the<W>current<W>comparison<W>should<W>be<W>halted.<W>In<W>some<W>cases<W>the<W>order<W>of<W>elements<W>in<W>two<EOL>
+| pieces<W>of<W>XML<W>may<W>not<W>be<W>significant.<W>If<W>this<W>is<W>true,<W>the<W>DifferenceEngine<W>needs<W>help<W>to<W>determine<W>which<W>Elements<EOL>
+| to<W>compare.<W>This<W>is<W>the<W>job<W>of<W>an<W>ElementQualifier<W>(see<W>Section<W>3.4).<W>The<W>types<W>of<W>differences<W>DifferenceEngine<W>can<EOL>
+| detect<W>are<W>enumerated<W>in<W>the<W>DifferenceConstants<W>interface<W>and<W>represented<W>by<W>instances<W>of<W>the<W>Difference<W>class.<W>A<EOL>
+| Difference<W>can<W>be<W>recoverable;<W>recoverable<W>Differences<W>make<W>the<W>Diff<W>class<W>consider<W>two<W>pieces<W>of<W>XML<W>similar<EOL>
+| while<W>non-recoverable<W>Differences<W>render<W>the<W>two<W>pieces<W>different.<W>The<W>types<W>of<W>Differences<W>that<W>are<W>currently<W>de-<EOL>
+| tected<W>are<W>listed<W>in<W>Table<W>1<W>to<W>Table<W>4<W>(the<W>first<W>two<W>columns<W>refer<W>to<W>the<W>DifferenceConstants<W>class).<W>Note<W>that<W>some<EOL>
+| of<W>the<W>differences<W>listed<W>may<W>be<W>ignored<W>by<W>the<W>DifferenceEngine<W>if<W>certain<W>configuration<W>options<W>have<W>been<W>speci-<EOL>
+| fied.<W>See<W>Section<W>3.8<W>for<W>details.<W>DifferenceEngine<W>passes<W>differences<W>found<W>around<W>as<W>instances<W>of<W>the<W>Difference<EOL>
+| class.<W>In<W>addition<W>to<W>the<W>type<W>of<W>of<W>difference<W>this<W>class<W>also<W>holds<W>information<W>on<W>the<W>nodes<W>that<W>have<W>been<W>found<W>to<EOL>
+| be<W>different.<W>The<W>nodes<W>are<W>described<W>by<W>NodeDetail<W>instances<W>that<W>encapsulate<W>the<W>DOM<W>Node<W>instance<W>as<W>well<W>as<EOL>
+| the<W>XPath<W>expression<W>that<W>locates<W>the<W>Node<W>inside<W>the<W>given<W>piece<W>of<W>XML.<W>NodeDetail<W>also<W>contains<W>a<W>″value″<W>that<EOL>
+| provides<W>more<W>information<W>on<W>the<W>actual<W>values<W>that<W>have<W>been<W>found<W>to<W>be<W>different,<W>the<W>concrete<W>interpretation<W>de-<EOL>
+| pends<W>on<W>the<W>type<W>of<W>difference<W>as<W>can<W>be<W>seen<W>in<W>Table<W>5.<W>As<W>said<W>in<W>the<W>first<W>paragraph<W>you<W>won’t<W>deal<W>with<W>Differ-<EOL>
+| enceEngine<W>directly<W>in<W>most<W>cases.<W>In<W>cases<W>where<W>Diff<W>or<W>DetailedDiff<W>don’t<W>provide<W>what<W>you<W>need<W>you’d<W>create<W>an<EOL>
+| instance<W>of<W>DifferenceEngine<W>passing<W>a<W>ComparisonController<W>in<W>the<W>constructor<W>and<W>invoke<W>compare<W>with<W>your<EOL>
+| DOM<W>trees<W>to<W>compare<W>as<W>well<W>as<W>a<W>DifferenceListener<W>and<W>ElementQualifier.<W>The<W>listener<W>will<W>be<W>called<W>on<W>any<W>dif-<EOL>
+| ferences<W>while<W>the<W>control<W>method<W>is<W>executing.<EOL>
+| </P><P>IgnoreTextAndAttributeValuesDifferenceListener<W>doesn’t<W>do<W>anything<W>in<W>skippedComparison.<W>It<W>″downgrades″<W>Dif-<EOL>
+| ferences<W>of<W>type<W>ATTR_VALUE,<W>ATTR_VALUE_EXPLICITLY_SPECIFIED<W>and<W>TEXT_VALUE<W>to<W>recoverable<EOL>
+| differences.<W>This<W>means<W>if<W>instances<W>of<W>IgnoreTextAndAttributeValuesDifferenceListener<W>are<W>used<W>together<W>with<W>Diff<EOL>
+| then<W>two<W>pieces<W>of<W>XML<W>will<W>be<W>considered<W>similar<W>if<W>they<W>have<W>the<W>same<W>basic<W>structure.<W>They<W>are<W>not<W>considered<EOL>
+| identical,<W>though.<W>Note<W>that<W>the<W>list<W>of<W>ignored<W>differences<W>doesn’t<W>cover<W>all<W>textual<W>differences.<W>You<W>should<W>configure<EOL>
+| XMLUnit<W>to<W>ignore<W>comments<W>and<W>whitespace<W>and<W>to<W>consider<W>CDATA<W>sections<W>and<W>text<W>nodes<W>to<W>be<W>the<W>same<W>(see<EOL>
+| Section<W>3.8)<W>in<W>order<W>to<W>cover<W>COMMENT_-<W>VALUE<W>and<W>CDATA_VALUE<W>as<W>well.<EOL>
+| </P><P>Only<W>Elements<W>with<W>the<W>same<W>name<W>-<W>and<W>Namespace<W>URI<W>if<W>present<W>-<W>qualify.<W>In<W>Example<W>3.4<W>this<W>means<W>control<EOL>
+| node<W>1<W>will<W>be<W>compared<W>to<W>test<W>node<W>2.<W>Then<W>control<W>node<W>2<W>will<W>be<W>compared<W>to<W>test<W>node<W>3<W>because<W>DifferenceEn-<EOL>
+| </P><P>Page<W>2<W>of<W>3</P></A></PAGE>

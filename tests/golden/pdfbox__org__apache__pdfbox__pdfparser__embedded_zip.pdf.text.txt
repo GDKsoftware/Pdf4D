@@ -1,0 +1,607 @@
+text: default page 1
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+|
+text: sorted page 1
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+|
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| pdf_haystack
+|
+| </P></A></PAGE>

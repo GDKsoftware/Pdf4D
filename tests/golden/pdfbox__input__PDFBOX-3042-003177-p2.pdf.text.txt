@@ -1,0 +1,76 @@
+text: default page 1
+| 1 Because SamuelCleveland has passed away, his wife, Bobbie Jean Cleveland, brought
+| suit on his behalf. For clarity, we will refer to the Appellant as “Cleveland” and the decedent as
+| “Samuel.” \x20
+| -2-
+| brought under the FederalTort Claims Act (“FTCA”), 28 U.S.C. § 1346 et seq.1 Cleveland challenges
+| certain evidentiary rulings and the district court’s final determination that she failed to prove that the
+| defendant’s conduct fell below the requisite standard of care. \x20
+| I
+| Samuel sought admission to the emergency room at the Bayne Jones Army Community
+| Hospital (“BJACH”), presenting with flu-like symptoms, a slightly elevated respiration rate, and a
+| medical history of diabetes. Samuel was first seen by a triage nurse, who took his medical history and
+| classified him as a “category four,” a low priority patient. Samuel did not indicate that he had a prior
+| history of serious medical conditions, including congestive heart failure, hypertension, and other
+| chronic conditions, nor did he state that he was currently taking medications.  Physician assistant
+| George Eubanks (“Eubanks”) then examined Samueland concluded that he did not need a chest x-ray
+| or other further tests. Eubanks diagnosed Samuel with an upper respiratory infection, bronchitis, and
+| sinusitis, and prescribed a variety of medications: Entex, Proventil, and Zithromax. He then
+| discharged him. \x20
+| During the time Samuel was in the emergency room, Eubanks did not consult with an
+| attending physician.  Furthermore, Eubanks did not review Samuel’s medical file, which contained
+| his full medical history, including his prior congestive heart failure, until one hour after his discharge.
+| After receiving and reviewing the file, Eubanks did not believe that the file indicated any reason to
+| call Samuel back into the ER. \x20
+| Two days later, Samuel returned to the ER. He was diagnosed with pneumonia resulting from
+text: sorted page 1
+| brought under the FederalTort Claims Act (“FTCA”), 28 U.S.C. § 1346 et seq.1 Cleveland challenges
+| certain evidentiary rulings and the district court’s final determination that she failed to prove that the
+| defendant’s conduct fell below the requisite standard of care. \x20
+| I
+| Samuel sought admission to the emergency room at the Bayne Jones Army Community
+| Hospital (“BJACH”), presenting with flu-like symptoms, a slightly elevated respiration rate, and a
+| medical history of diabetes. Samuel was first seen by a triage nurse, who took his medical history and
+| classified him as a “category four,” a low priority patient. Samuel did not indicate that he had a prior
+| history of serious medical conditions, including congestive heart failure, hypertension, and other
+| chronic conditions, nor did he state that he was currently taking medications.  Physician assistant
+| George Eubanks (“Eubanks”) then examined Samueland concluded that he did not need a chest x-ray
+| or other further tests. Eubanks diagnosed Samuel with an upper respiratory infection, bronchitis, and
+| sinusitis, and prescribed a variety of medications: Entex, Proventil, and Zithromax. He then
+| discharged him. \x20
+| During the time Samuel was in the emergency room, Eubanks did not consult with an
+| attending physician.  Furthermore, Eubanks did not review Samuel’s medical file, which contained
+| his full medical history, including his prior congestive heart failure, until one hour after his discharge.
+| After receiving and reviewing the file, Eubanks did not believe that the file indicated any reason to
+| call Samuel back into the ER. \x20
+| Two days later, Samuel returned to the ER. He was diagnosed with pneumonia resulting from
+| 1 Because SamuelCleveland has passed away, his wife, Bobbie Jean Cleveland, brought
+| suit on his behalf. For clarity, we will refer to the Appellant as “Cleveland” and the decedent as
+| “Samuel.” \x20
+| -2-
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>1<W>Because<W>SamuelCleveland<W>has<W>passed<W>away,<W>his<W>wife,<W>Bobbie<W>Jean<W>Cleveland,<W>brought<EOL>
+| suit<W>on<W>his<W>behalf.<W>For clarity, we will refer to the Appellant as “Cleveland” and the decedent as<EOL>
+| “Samuel.”  <EOL>
+| </P><P>-2-<EOL>
+| </P><P>brought<W>under<W>the<W>FederalTort<W>Claims<W>Act<W>(“FTCA”),<W>28<W>U.S.C.<W>§<W>1346<W>et<W>seq.1<W>Cleveland<W>challenges<EOL>
+| </P><P>certain<W>evidentiary<W>rulings<W>and<W>the<W>district<W>court’s<W>final<W>determination<W>that<W>she<W>failed<W>to<W>prove<W>that<W>the<EOL>
+| </P><P>defendant’s conduct fell below the requisite standard of care.  <EOL>
+| </P><P>I<EOL>
+| </P><P>Samuel<W>sought<W>admission <W>to <W>the emergency <W>room at <W>the Bayne Jones Army Community<EOL>
+| </P><P>Hospital<W>(“BJACH”),<W>presenting<W>with<W>flu-like<W>symptoms,<W>a<W>slightly elevated respiration rate, and a<EOL>
+| </P><P>medical<W>history<W>of<W>diabetes.<W>Samuel was first seen by a triage nurse, who took his medical history and<EOL>
+| </P><P>classified<W>him<W>as<W>a<W>“category<W>four,”<W>a<W>low<W>priority<W>patient.<W>Samuel did not indicate that he had a prior<EOL>
+| </P><P>history<W>of<W>serious<W>medical conditions, <W>including congestive heart failure, hypertension, and other<EOL>
+| </P><P>chronic<W>conditions,<W>nor<W>did he state that he was currently taking medications.  Physician assistant<EOL>
+| </P><P>George<W>Eubanks<W>(“Eubanks”)<W>then<W>examined<W>Samueland<W>concluded<W>that<W>he<W>did<W>not<W>need<W>a<W>chest<W>x-ray<EOL>
+| </P><P>or<W>other<W>further<W>tests.<W>Eubanks diagnosed Samuel with an upper respiratory infection, bronchitis, and<EOL>
+| </P><P>sinusitis,<W>and<W>prescribed <W>a <W>variety<W>of<W>medications: <W>Entex,<W>Proventil,<W>and<W>Zithromax.<W>He <W>then<EOL>
+| </P><P>discharged him.  <EOL>
+| </P><P>During<W>the<W>time<W>Samuel<W>was<W>in<W>the <W>emergency<W>room, <W>Eubanks <W>did <W>not <W>consult <W>with <W>an<EOL>
+| </P><P>attending physician.  Furthermore, Eubanks did<W>not<W>review<W>Samuel’s<W>medical<W>file, which contained<EOL>
+| </P><P>his<W>full<W>medical<W>history,<W>including<W>his<W>prior<W>congestive<W>heart<W>failure,<W>until<W>one<W>hour<W>after<W>his<W>discharge.<EOL>
+| </P><P>After<W>receiving<W>and<W>reviewing the file, Eubanks did not believe that the file indicated<W>any<W>reason<W>to<EOL>
+| </P><P>call Samuel back into the ER.  <EOL>
+| </P><P>Two<W>days<W>later,<W>Samuel<W>returned<W>to<W>the<W>ER.<W>He was diagnosed with pneumonia resulting from</P></A></PAGE>

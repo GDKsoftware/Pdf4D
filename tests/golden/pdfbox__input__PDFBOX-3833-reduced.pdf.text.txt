@@ -1,0 +1,7 @@
+text: default page 1
+| ターン
+text: sorted page 1
+| ターン
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>ターン</P></A></PAGE>

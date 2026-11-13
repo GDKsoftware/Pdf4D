@@ -1,0 +1,371 @@
+text: default page 1
+|  Projects language English \x20
+| your location : my projects • Bodies and agencies- Agriculture • ORP SURVEY- STATE BODIES\x20
+| AND AGENCIES
+| logged on as : BridFoley   |   my\x20
+| profile  •  exit
+| survey design   show all pages
+| ORP SURVEY- STATE BODIES AND AGENCIES\x20
+| preview \x20
+| Introduction\x20
+| \x20
+| In the following questionnaire Hudson, on behalf of the Organisational Review Team, would like to\x20
+| get your views and opinions on how your parent Department interacts and works with you in relation\x20
+| to areas such as strategy, managing delivery and evaluation.\x20
+|  \x20
+| We would encourage you to be as open and frank in your responses as you can.  Your responses\x20
+| will only be seen by Hudson and the Organisational Review Programme team.  They will not be seen\x20
+| by your parent Department.\x20
+| \x20
+| \x20
+| Name of your office, body or agency \x20
+| \x20
+| \x20
+| Name of your parent Department \x20
+| \x20
+| \x20
+| Level of interaction\x20
+|  \x20
+| Please describe briefly the substance of your organisation’s main interactions with your\x20
+| parent Department, in terms of (a) face to face meetings; (b) formal reporting; and state\x20
+| the frequency of both of these \x20
+| \x20
+| \x20
+| (a).         Face to Face Meetings (including frequency)\x20
+| \x20
+| (b).         Formal Reporting (including frequency)\x20
+| \x20
+| Page 1 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 2
+|  \x20
+| \x20
+| Strategy\x20
+| \x20
+| Please tell us about your level of satisfaction with regard to how your parent Department consults with\x20
+| you when its strategy is being developed and updated.\x20
+| \x20
+| \x20
+| Please describe the role, if any, your parent Department plays in the development and monitoring of\x20
+| your organisation’s (a) strategy/long term planning process; (b) output, outcome, performance\x20
+| indicators and targets; and (c) how effective is their level of involvement\x20
+| \x20
+| \x20
+| (a).         Strategy/long term planning process\x20
+| \x20
+| Page 2 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 3
+| \x20
+| (b).         Output, outcome, performance indicators and targets\x20
+| \x20
+| \x20
+| (c).        How effective is your parent Department's level of involvement? \x20
+| \x20
+| Please comment on the clarity of the division between the role of your parent Department and your\x20
+| Page 3 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 4
+| \x20
+| organisation; and the degree to which this is clearly understood and accepted by all.\x20
+| \x20
+| \x20
+| Please comment on how your parent Department leads the sector in which you operate.\x20
+| \x20
+| \x20
+| What is the greatest challenge facing your parent Department in its leadership of the sector in which you\x20
+| operate?\x20
+| \x20
+| Page 4 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 5
+| \x20
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department sets strategic direction for the sector in\x20
+| which you operate\x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| \x20
+| Managing Delivery\x20
+| \x20
+| What role, if any, does your parent Department play in relation to monitoring the satisfaction of your\x20
+| customers?  \x20
+| \x20
+| \x20
+| Please comment on the role you feel your parent Department should take in this regard.\x20
+| \x20
+| \x20
+| Please describe your level of satisfaction with the manner that your parent Department exercises its\x20
+| corporate governance oversight of your organisation.\x20
+| \x20
+| Page 5 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 6
+| \x20
+| Where appropriate, does your parent Department engage in meaningful discussions on resource\x20
+| allocation for your organisation?\x20
+| \x20
+| \x20
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department manages the relationship with your\x20
+| organisation.\x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| \x20
+| Evaluation\x20
+| \x20
+| Please describe the way in which your parent Department seeks feedback from your organisation.  \x20
+| \x20
+| Page 6 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 7
+| \x20
+| How effective is it in dealing with challenging feedback?\x20
+| \x20
+| \x20
+| Does your parent Department take account of your feedback in the development of its policies, strategies\x20
+| and practices?\x20
+| \x20
+| \x20
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department manages and responds to feedback.\x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| \x20
+| General comments\x20
+| What do you feel is your parent Department's main strength?\x20
+| Page 7 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 8
+|  \x20
+| \x20
+| What do you feel is your parent Department's main weakness?\x20
+| \x20
+| \x20
+| What do you feel is your parent Department's main challenge for the future?\x20
+| \x20
+| \x20
+| What would you change about your parent Department?\x20
+| \x20
+| Page 8 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: default page 9
+| \x20
+| \x20
+| Any other comments \x20
+| \x20
+| \x20
+| page view   show all pages
+| CONTACT US  \x20
+| Page 9 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: sorted page 1
+| Survey Manager Page 1 of 9
+|  Projects language English \x20
+| your location : my projects • Bodies and agencies- Agriculture • ORP SURVEY- STATE BODIES logged on as : BridFoley   |   my\x20
+| AND AGENCIES profile  •  exit
+| survey design   show all pages
+| ORP SURVEY- STATE BODIES AND AGENCIES\x20
+| preview \x20
+| \x20
+| Introduction\x20
+| In the following questionnaire Hudson, on behalf of the Organisational Review Team, would like to\x20
+| get your views and opinions on how your parent Department interacts and works with you in relation\x20
+| to areas such as strategy, managing delivery and evaluation.\x20
+|    \x20
+| We would encourage you to be as open and frank in your responses as you can.  Your responses\x20
+| will only be seen by Hudson and the Organisational Review Programme team.  They will not be seen\x20
+| by your parent Department.\x20
+| Name of your office, body or agency \x20
+|  \x20
+| Name of your parent Department \x20
+|  \x20
+| Level of interaction\x20
+|  \x20
+|  Please describe briefly the substance of your organisation’s main interactions with your \x20
+| parent Department, in terms of (a) face to face meetings; (b) formal reporting; and state\x20
+| the frequency of both of these \x20
+| (a).         Face to Face Meetings (including frequency)\x20
+|  \x20
+| (b).         Formal Reporting (including frequency)\x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 2
+| Survey Manager Page 2 of 9
+|  \x20
+| \x20
+| Strategy\x20
+| Please tell us about your level of satisfaction with regard to how your parent Department consults with\x20
+| you when its strategy is being developed and updated.\x20
+|  \x20
+| Please describe the role, if any, your parent Department plays in the development and monitoring of\x20
+|  your organisation’s (a) strategy/long term planning process; (b) output, outcome, performance \x20
+| indicators and targets; and (c) how effective is their level of involvement\x20
+| (a).         Strategy/long term planning process\x20
+|  \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 3
+| Survey Manager Page 3 of 9
+| (b).         Output, outcome, performance indicators and targets\x20
+|  \x20
+| (c).        How effective is your parent Department's level of involvement? \x20
+|  \x20
+| Please comment on the clarity of the division between the role of your parent Department and your\x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 4
+| Survey Manager Page 4 of 9
+| organisation; and the degree to which this is clearly understood and accepted by all.\x20
+|  \x20
+| Please comment on how your parent Department leads the sector in which you operate.\x20
+|  \x20
+| What is the greatest challenge facing your parent Department in its leadership of the sector in which you\x20
+| operate?\x20
+|  \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 5
+| Survey Manager Page 5 of 9
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department sets strategic direction for the sector in\x20
+|  which you operate \x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| Managing Delivery\x20
+| What role, if any, does your parent Department play in relation to monitoring the satisfaction of your\x20
+| customers?  \x20
+|  \x20
+| Please comment on the role you feel your parent Department should take in this regard.\x20
+|  \x20
+| Please describe your level of satisfaction with the manner that your parent Department exercises its\x20
+| corporate governance oversight of your organisation.\x20
+|  \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 6
+| Survey Manager Page 6 of 9
+| Where appropriate, does your parent Department engage in meaningful discussions on resource\x20
+| allocation for your organisation?\x20
+|  \x20
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department manages the relationship with your\x20
+|  organisation. \x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| Evaluation\x20
+| Please describe the way in which your parent Department seeks feedback from your organisation.  \x20
+|  \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 7
+| Survey Manager Page 7 of 9
+| How effective is it in dealing with challenging feedback?\x20
+|  \x20
+| Does your parent Department take account of your feedback in the development of its policies, strategies\x20
+| and practices?\x20
+|  \x20
+| Using the four point scale from highly satisfied to highly dissatisfied please identify your level of\x20
+| satisfaction with regard to how well your parent Department manages and responds to feedback.\x20
+|  \x20
+| nmlkj Highly satisfied nmlkj Satisfied nmlkj Dissatisfied nmlkj Highly dissatisfied
+| \x20
+| General comments\x20
+| What do you feel is your parent Department's main strength?\x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 8
+| Survey Manager Page 8 of 9
+|  \x20
+| What do you feel is your parent Department's main weakness?\x20
+|  \x20
+| What do you feel is your parent Department's main challenge for the future?\x20
+|  \x20
+| What would you change about your parent Department?\x20
+|  \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: sorted page 9
+| Survey Manager Page 9 of 9
+| Any other comments \x20
+|  \x20
+| \x20
+| page view   show all pages
+| CONTACT US  \x20
+| \x20
+| http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I... 27/06/08
+text: range 2-3
+|  \x20
+| \x20
+| Strategy\x20
+| \x20
+| Please tell us about your level of satisfaction with regard to how your parent Department consults with\x20
+| you when its strategy is being developed and updated.\x20
+| \x20
+| \x20
+| Please describe the role, if any, your parent Department plays in the development and monitoring of\x20
+| your organisation’s (a) strategy/long term planning process; (b) output, outcome, performance\x20
+| indicators and targets; and (c) how effective is their level of involvement\x20
+| \x20
+| \x20
+| (a).         Strategy/long term planning process\x20
+| \x20
+| Page 2 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+| \x20
+| (b).         Output, outcome, performance indicators and targets\x20
+| \x20
+| \x20
+| (c).        How effective is your parent Department's level of involvement? \x20
+| \x20
+| Please comment on the clarity of the division between the role of your parent Department and your\x20
+| Page 3 of 9Survey Manager
+| 27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...
+text: separators 1-2
+| <PAGE><A><P> <W>Projects<W>language<W>English<W> <EOL>
+| </P><P>your location : my projects • Bodies and agencies- Agriculture • ORP SURVEY- STATE BODIES <EOL>
+| </P><P>AND AGENCIES<EOL>
+| </P><P>logged on as : BridFoley   |   my <EOL>
+| </P><P>profile  •  exit<EOL>
+| </P><P>survey design   <W>show all pages<EOL>
+| </P><P>ORP SURVEY- STATE BODIES AND AGENCIES <EOL>
+| preview  <EOL>
+| </P><P>Introduction <EOL>
+| </P><P> <EOL>
+| </P><P>In the following questionnaire Hudson, on behalf of the Organisational Review Team, would like to <EOL>
+| get your views and opinions on how your parent Department interacts and works with you in relation <EOL>
+| to areas such as strategy, managing delivery and evaluation. <EOL>
+|   <EOL>
+| We would encourage you to be as open and frank in your responses as you can.  Your responses <EOL>
+| will only be seen by Hudson and the Organisational Review Programme team.  They will not be seen <EOL>
+| by your parent Department. <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>Name of your office, body or agency  <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>Name of your parent Department  <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>Level of interaction <EOL>
+| </P><P>  <EOL>
+| </P><P>Please describe briefly the substance of your organisation’s main interactions with your <EOL>
+| parent Department, in terms of (a) face to face meetings; (b) formal reporting; and state <EOL>
+| the frequency of both of these  <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>(a).         Face to Face Meetings (including frequency) <EOL>
+| </P><P> <EOL>
+| </P><P>(b).         Formal Reporting (including frequency) <EOL>
+| </P><P> <EOL>
+| </P><P>Page 1 of 9Survey Manager<EOL>
+| </P><P>27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...</P></A></PAGE>
+| <PAGE><A><P> <W> <EOL>
+| </P><P> <EOL>
+| </P><P>Strategy <EOL>
+| </P><P> <EOL>
+| </P><P>Please tell us about your level of satisfaction with regard to how your parent Department consults with <EOL>
+| you when its strategy is being developed and updated. <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>Please describe the role, if any, your parent Department plays in the development and monitoring of <EOL>
+| your <W>organisation’s <W>(a) <W>strategy/long <W>term <W>planning <W>process; <W>(b) <W>output, <W>outcome, <W>performance <EOL>
+| indicators and targets; and (c) how effective is their level of involvement <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>(a).         Strategy/long term planning process <EOL>
+| </P><P> <EOL>
+| </P><P>Page 2 of 9Survey Manager<EOL>
+| </P><P>27/06/08http://surveymanager.hudson.com/pages/Design/DesignMasterGeneric.aspx?lang=EN_I...</P></A></PAGE>

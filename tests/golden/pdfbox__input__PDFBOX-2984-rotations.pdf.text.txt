@@ -1,0 +1,46 @@
+text: default page 1
+| Apache PDFBox ®
+| 90° text matrix
+text: default page 2
+| Apache PDFBox ®
+| 90° ctm
+text: default page 3
+| Apache PDFBox ®
+| 180° text matrix
+text: default page 4
+| Apache PDFBox ®
+| 180° ctm
+text: default page 5
+| Apache PDFBox ®
+| 270° text matrix
+text: default page 6
+| Apache PDFBox ®
+| 270° ctm
+text: sorted page 1
+| Apache PDFBox ®
+| 90° text matrix
+text: sorted page 2
+| Apache PDFBox ®
+| 90° ctm
+text: sorted page 3
+| Apache PDFBox ®
+| 180° text matrix
+text: sorted page 4
+| Apache PDFBox ®
+| 180° ctm
+text: sorted page 5
+| Apache PDFBox ®
+| 270° text matrix
+text: sorted page 6
+| Apache PDFBox ®
+| 270° ctm
+text: range 2-3
+| Apache PDFBox ®
+| 90° ctm
+| Apache PDFBox ®
+| 180° text matrix
+text: separators 1-2
+| <PAGE><A><P>Apache PDFBox ®<EOL>
+| 90° text matrix</P></A></PAGE>
+| <PAGE><A><P>Apache PDFBox ®<EOL>
+| 90° ctm</P></A></PAGE>

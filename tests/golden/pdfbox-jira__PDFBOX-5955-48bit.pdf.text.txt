@@ -1,0 +1,31 @@
+text: default page 1
+| This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025\x20
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, &\x20
+| libraries that I tested.\x20
+| Technical details:
+| User password: "" (empty / default)
+| Owner password: "ownerpass"
+| Metadata encrypted: false
+| Key: 0x02988E82AFF8
+| If you have any questions, feel free to reach out: ross at goldfynch dot com.
+text: sorted page 1
+| This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025\x20
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, &\x20
+| libraries that I tested.\x20
+| Technical details:
+| User password: "" (empty / default)
+| Owner password: "ownerpass"
+| Metadata encrypted: false
+| Key: 0x02988E82AFF8
+| If you have any questions, feel free to reach out: ross at goldfynch dot com.
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>This PDF demonstrates an unusual & under-documented encryption scheme. As of February, 2025 <EOL>
+| (when this file was created), only Acrobat Pro & Reader can open it - of the many PDF viewers, tools, & <EOL>
+| libraries that I tested. <EOL>
+| </P><P>Technical details:<EOL>
+| </P><P>User password: "" (empty / default)<EOL>
+| Owner password: "ownerpass"<EOL>
+| Metadata encrypted: false<EOL>
+| Key: 0x02988E82AFF8<EOL>
+| </P><P>If you have any questions, feel free to reach out: ross at goldfynch dot com.</P></A></PAGE>

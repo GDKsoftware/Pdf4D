@@ -1,0 +1,7 @@
+text: default page 1
+| Page rotation: 270
+text: sorted page 1
+| Page rotation: 270
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Page rotation: 270</P></A></PAGE>

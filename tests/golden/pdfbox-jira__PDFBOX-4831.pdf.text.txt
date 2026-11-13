@@ -1,0 +1,42 @@
+text: default page 1
+|
+text: default page 2
+|
+text: default page 3
+|
+text: default page 4
+|
+text: default page 5
+|
+text: default page 6
+|
+text: default page 7
+|
+text: default page 8
+|
+text: default page 9
+|
+text: sorted page 1
+|
+text: sorted page 2
+|
+text: sorted page 3
+|
+text: sorted page 4
+|
+text: sorted page 5
+|
+text: sorted page 6
+|
+text: sorted page 7
+|
+text: sorted page 8
+|
+text: sorted page 9
+|
+text: range 2-3
+|
+|
+text: separators 1-2
+| <PAGE><A></A></PAGE>
+| <PAGE><A></A></PAGE>

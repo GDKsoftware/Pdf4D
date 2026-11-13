@@ -1,0 +1,46 @@
+text: default page 1
+| Please complete the following form.\x20
+| * = required \x20
+|  Date you are available:   ______________________________________\x20
+|      Use mm/dd/yyyy format.\x20
+| * First name:    _______________________________________________                              \x20
+| * Last Name:   ________________________________________________\x20
+| * Email address:    _____________________________________________\x20
+| Telephone:     _________________________________________________         \x20
+| * ZIP code:  _______________________\x20
+| Use 10+4 ZIP code format.\x20
+| You will be contacted within a week.   \x20
+|       JAWS user\x20
+| \x20
+| \x20
+text: sorted page 1
+| Please complete the following form.\x20
+| * = required \x20
+|  Date you are available:   ______________________________________\x20
+|      Use mm/dd/yyyy format.\x20
+| * First name:    _______________________________________________                              \x20
+| * Last Name:   ________________________________________________\x20
+| * Email address:    _____________________________________________\x20
+| Telephone:     _________________________________________________         \x20
+| * ZIP code:  _______________________\x20
+| Use 10+4 ZIP code format.\x20
+|       JAWS user\x20
+| \x20
+| You will be contacted within a week.   \x20
+| \x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Please complete the following form. <EOL>
+| </P><P>* = required  <EOL>
+| </P><P> Date you are available:   ______________________________________ <EOL>
+|  <W> <W> <W>  Use mm/dd/yyyy format. <EOL>
+| </P><P>* First name:    _______________________________________________                               <EOL>
+| </P><P>* Last Name:   ________________________________________________ <EOL>
+| </P><P>* Email address:    _____________________________________________ <EOL>
+| </P><P>Telephone:     _________________________________________________          <EOL>
+| </P><P>* ZIP code:  _______________________ <EOL>
+| Use 10+4 ZIP code format. <EOL>
+| </P><P>You will be contacted within a week.    <EOL>
+| </P><P>      JAWS user <EOL>
+|  <EOL>
+| </P><P> </P></A></PAGE>

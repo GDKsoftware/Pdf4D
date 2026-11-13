@@ -16,11 +16,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.lang.reflect.Method;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.fontbox.cff.CFFFont;
+import org.apache.fontbox.ttf.OTFParser;
+import org.apache.fontbox.ttf.OpenTypeFont;
+import org.apache.fontbox.ttf.TTFParser;
+import org.apache.fontbox.ttf.TrueTypeFont;
+import org.apache.fontbox.type1.Type1Font;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSBoolean;
@@ -52,6 +60,10 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.encryption.PDEncryption;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.encryption.StandardSecurityHandler;
+import org.apache.pdfbox.pdmodel.font.FontInfo;
+import org.apache.pdfbox.pdmodel.font.FontMapper;
+import org.apache.pdfbox.pdmodel.font.FontMappers;
+import org.apache.pdfbox.pdmodel.font.FontProvider;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -68,6 +80,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDPushButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDRadioButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
  * Pdf4D golden oracle. Writes the canonical dump format described in docs/golden-format.md.
@@ -76,7 +89,12 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java dump    file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --prepare out.pdf
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --encrypt in.pdf out.pdf user owner alg [--nometa]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
  *   (a bare "file.pdf [password]" is the same as "dump")
+ *
+ * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
+ * and the LiberationSans fallback of PDFBox.
  */
 public class Pdf4DOracle
 {
@@ -88,7 +106,16 @@ public class Pdf4DOracle
         PrintStream out = new PrintStream(System.out, false, "UTF-8");
         try
         {
-            if (args.length >= 2 && args[0].equals("--prepare"))
+            makeFontsHermetic();
+            if (args.length >= 2 && args[0].equals("--font-widths"))
+            {
+                out.print(fontWidths(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("text"))
+            {
+                out.print(text(new File(args[1]), args.length > 2 ? args[2] : ""));
+            }
+            else if (args.length >= 2 && args[0].equals("--prepare"))
             {
                 prepareBase(new File(args[1]));
             }
@@ -728,6 +755,200 @@ public class Pdf4DOracle
             return canonicalDictionary((COSDictionary) b);
         }
         throw new IOException("unsupported COS type " + b.getClass());
+    }
+
+    // ------------------------------------------------------- hermetic fonts
+
+    /**
+     * Gives the font mapper a provider without fonts, so that the machine's installed fonts never play
+     * a role: only embedded fonts, the standard 14 and the built-in LiberationSans fallback remain.
+     */
+    static void makeFontsHermetic() throws Exception
+    {
+        FontMapper mapper = FontMappers.instance();
+        FontProvider empty = new FontProvider()
+        {
+            @Override
+            public String toDebugString()
+            {
+                return "empty";
+            }
+
+            @Override
+            public List<? extends FontInfo> getFontInfo()
+            {
+                return new ArrayList<FontInfo>();
+            }
+        };
+        // FontMapperImpl is package private, so the method is reached by reflection
+        Method setProvider = mapper.getClass().getMethod("setProvider", FontProvider.class);
+        setProvider.setAccessible(true);
+        setProvider.invoke(mapper, empty);
+    }
+
+    // ------------------------------------------------------------------ text
+
+    static String text(File file, String password)
+    {
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        StringBuilder sb = new StringBuilder();
+        try (doc)
+        {
+            int pageCount = 0;
+            try
+            {
+                for (PDPage p : doc.getPages())
+                {
+                    pageCount++;
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count, like in the dump
+            }
+            int last = Math.min(pageCount, 50);
+            for (int n = 1; n <= last; n++)
+            {
+                textSection(doc, sb, "text: default page " + n, n, n, false, false);
+            }
+            for (int n = 1; n <= last; n++)
+            {
+                textSection(doc, sb, "text: sorted page " + n, n, n, true, false);
+            }
+            textSection(doc, sb, "text: range 2-3", 2, 3, false, false);
+            textSection(doc, sb, "text: separators 1-2", 1, 2, false, true);
+        }
+        catch (Throwable t)
+        {
+            // only a failing close ends here
+        }
+        return sb.toString();
+    }
+
+    static void textSection(PDDocument doc, StringBuilder sb, String heading, int start, int end,
+            boolean sorted, boolean separators)
+    {
+        sb.append(heading).append('\n');
+        String text;
+        try
+        {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setSortByPosition(sorted);
+            stripper.setStartPage(start);
+            stripper.setEndPage(end);
+            if (separators)
+            {
+                stripper.setLineSeparator("<EOL>\n");
+                stripper.setWordSeparator("<W>");
+                stripper.setParagraphStart("<P>");
+                stripper.setParagraphEnd("</P>");
+                stripper.setPageStart("<PAGE>");
+                stripper.setPageEnd("</PAGE>\n");
+                stripper.setArticleStart("<A>");
+                stripper.setArticleEnd("</A>");
+            }
+            else
+            {
+                stripper.setLineSeparator("\n");
+                stripper.setPageEnd("\n");
+            }
+            text = stripper.getText(doc);
+        }
+        catch (Throwable t)
+        {
+            sb.append("error\n");
+            return;
+        }
+        String[] lines = text.split("\n", -1);
+        int count = lines.length;
+        if (count > 0 && lines[count - 1].isEmpty())
+        {
+            count--;
+        }
+        for (int i = 0; i < count; i++)
+        {
+            String line = lines[i];
+            if (line.isEmpty())
+            {
+                sb.append("|\n");
+                continue;
+            }
+            String escaped = escapeText(line);
+            if (line.endsWith(" "))
+            {
+                escaped = escaped.substring(0, escaped.length() - 1) + "\\x20";
+            }
+            sb.append("| ").append(escaped).append('\n');
+        }
+    }
+
+    // ---------------------------------------------------------- font widths
+
+    static String fontWidths(File file) throws Exception
+    {
+        String name = file.getName().toLowerCase();
+        TreeMap<String, String> widths = new TreeMap<>();
+        if (name.endsWith(".pfb"))
+        {
+            Type1Font font = Type1Font.createWithPFB(java.nio.file.Files.readAllBytes(file.toPath()));
+            for (String glyph : font.getCharStringsDict().keySet())
+            {
+                widths.put(glyph, num(font.getWidth(glyph)));
+            }
+        }
+        else if (name.endsWith(".otf"))
+        {
+            try (OpenTypeFont font = new OTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                if (font.isPostScript())
+                {
+                    CFFFont cff = font.getCFF().getFont();
+                    int n = cff.getNumCharStrings();
+                    for (int gid = 0; gid < n; gid++)
+                    {
+                        widths.put("gid" + gid, Integer.toString(cff.getType2CharString(gid).getWidth()));
+                    }
+                }
+                else
+                {
+                    ttfWidths(font, widths);
+                }
+            }
+        }
+        else
+        {
+            try (TrueTypeFont font = new TTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                ttfWidths(font, widths);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> e : widths.entrySet())
+        {
+            sb.append(e.getKey()).append(' ').append(e.getValue()).append('\n');
+        }
+        return sb.toString();
+    }
+
+    static void ttfWidths(TrueTypeFont font, TreeMap<String, String> widths) throws IOException
+    {
+        int n = font.getNumberOfGlyphs();
+        for (int gid = 0; gid < n; gid++)
+        {
+            widths.put("gid" + gid, Integer.toString(font.getAdvanceWidth(gid)));
+        }
     }
 
     // ------------------------------------------------------------ helpers

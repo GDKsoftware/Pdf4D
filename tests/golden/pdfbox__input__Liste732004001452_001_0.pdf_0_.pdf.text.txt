@@ -1,0 +1,25 @@
+text: default page 1
+| Ich bin Marios test.
+| $Anhang=/home/im/tmp/AGB.pdf$
+| $Auftragsnummer=2004001452-001$
+| $Mandant=1$
+| $MailTo=mario@ops.co.at$
+| $User=mario$
+| Ende
+text: sorted page 1
+| Ich bin Marios test.
+| $Anhang=/home/im/tmp/AGB.pdf$
+| $Auftragsnummer=2004001452-001$
+| $Mandant=1$
+| $MailTo=mario@ops.co.at$
+| $User=mario$
+| Ende
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Ich bin Marios test.<EOL>
+| </P><P>$Anhang=/home/im/tmp/AGB.pdf$<EOL>
+| $Auftragsnummer=2004001452-001$<EOL>
+| $Mandant=1$<EOL>
+| $MailTo=mario@ops.co.at$<EOL>
+| $User=mario$<EOL>
+| </P><P>Ende</P></A></PAGE>

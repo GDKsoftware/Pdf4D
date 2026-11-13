@@ -1,0 +1,82 @@
+text: default page 1
+| Not To Be Published:\x20
+| IN THE UNITED STATES DISTRICT COURT
+| FOR THE NORTHERN DISTRICT OF IOWA
+| WESTERN DIVISION
+| DOCTOR JOHN’S, INC., an Iowa
+| Corporation,
+| Plaintiff, No. C 03-4121-MWB
+| vs. ORDER REGARDING SANCTIONS
+| FOR THE CITY’S DESTRUCTION
+| OF RELEVANT RECORDS
+| CITY OF SIOUX CITY, IOWA, and
+| PAUL ECKERT, in his official capacity
+| as City Manager,
+| Defendants.
+| ____________________
+| By order dated May 1, 2007 (docket no. 213), the court dismissed this case in its
+| entirety, with prejudice, upon the parties’ settlement and Stipulation Of Dismissal (docket
+| no. 211).  However, the court stated in the order dismissing the case that it would retain
+| jurisdiction over the question of whether or not sanctions should be imposed upon the City
+| for destruction, during the pendency of litigation, of relevant records, which consisted of
+| recordings of closed sessions of the City Council concerning the ordinances challenged in
+| this case.  See, e.g., Cooter & Gell v. Hartmarx Corp., 496 U.S. 384 (1990); Perkins v.
+| General Motors Corp., 965 F.2d 597 (8th Cir. 1992).  Thereafter, on May 2, 2007, the
+| court held a conference with counsel for the parties, with a court reporter present, to
+| discuss the remaining sanctions question.  On May 3, 2007, the court also received a letter
+| from counsel for the City clarifying changes made to the City’s policy regarding retention
+text: sorted page 1
+| Not To Be Published:\x20
+| IN THE UNITED STATES DISTRICT COURT
+| FOR THE NORTHERN DISTRICT OF IOWA
+| WESTERN DIVISION
+| DOCTOR JOHN’S, INC., an Iowa
+| Corporation,
+| Plaintiff, No. C 03-4121-MWB
+| vs. ORDER REGARDING SANCTIONS
+| FOR THE CITY’S DESTRUCTION
+| CITY OF SIOUX CITY, IOWA, and
+| OF RELEVANT RECORDS
+| PAUL ECKERT, in his official capacity
+| as City Manager,
+| Defendants.
+| ____________________
+| By order dated May 1, 2007 (docket no. 213), the court dismissed this case in its
+| entirety, with prejudice, upon the parties’ settlement and Stipulation Of Dismissal (docket
+| no. 211).  However, the court stated in the order dismissing the case that it would retain
+| jurisdiction over the question of whether or not sanctions should be imposed upon the City
+| for destruction, during the pendency of litigation, of relevant records, which consisted of
+| recordings of closed sessions of the City Council concerning the ordinances challenged in
+| this case.  See, e.g., Cooter & Gell v. Hartmarx Corp., 496 U.S. 384 (1990); Perkins v.
+| General Motors Corp., 965 F.2d 597 (8th Cir. 1992).  Thereafter, on May 2, 2007, the
+| court held a conference with counsel for the parties, with a court reporter present, to
+| discuss the remaining sanctions question.  On May 3, 2007, the court also received a letter
+| from counsel for the City clarifying changes made to the City’s policy regarding retention
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Not To Be Published: <EOL>
+| </P><P>IN THE UNITED STATES DISTRICT COURT<EOL>
+| FOR THE NORTHERN DISTRICT OF IOWA<EOL>
+| </P><P>WESTERN DIVISION<EOL>
+| </P><P>DOCTOR JOHN’S, INC., an Iowa<EOL>
+| Corporation,<EOL>
+| </P><P>Plaintiff,<W>No. C 03-4121-MWB<EOL>
+| </P><P>vs.<W>ORDER REGARDING SANCTIONS<EOL>
+| FOR THE CITY’S DESTRUCTION<EOL>
+| </P><P>OF RELEVANT RECORDS<EOL>
+| CITY OF SIOUX CITY, IOWA, and<EOL>
+| PAUL ECKERT, in his official capacity<EOL>
+| as City Manager,<EOL>
+| </P><P>Defendants.<EOL>
+| </P><P>____________________<EOL>
+| </P><P>By order dated May 1, 2007 (docket no. 213), the court dismissed this case in its<EOL>
+| </P><P>entirety, with prejudice, upon the parties’ settlement and Stipulation Of Dismissal (docket<EOL>
+| </P><P>no. 211).  However, the court stated in the order dismissing the case that it would retain<EOL>
+| </P><P>jurisdiction over the question of whether or not sanctions should be imposed upon the City<EOL>
+| </P><P>for destruction, during the pendency of litigation, of relevant records, which consisted of<EOL>
+| </P><P>recordings of closed sessions of the City Council concerning the ordinances challenged in<EOL>
+| </P><P>this case.  See, e.g., Cooter & Gell v. Hartmarx Corp., 496 U.S. 384 (1990); Perkins v.<EOL>
+| </P><P>General Motors Corp., 965 F.2d 597 (8th Cir. 1992).  Thereafter, on May 2, 2007, the<EOL>
+| </P><P>court held a conference with counsel for <W>the parties, with a court reporter present, to<EOL>
+| </P><P>discuss the remaining sanctions question.  On May 3, 2007, the court also received a letter<EOL>
+| </P><P>from counsel for the City clarifying changes made to the City’s policy regarding retention</P></A></PAGE>

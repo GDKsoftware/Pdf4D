@@ -1,0 +1,53 @@
+text: default page 1
+| First level 1
+| First level 2
+| Fist level 3
+| Some content
+text: default page 2
+| Some other content
+text: default page 3
+| Second at level 1
+| Second level 2
+| Content
+text: default page 4
+| Third level 1
+| Third level 2
+| Third level 3
+| Content
+text: default page 5
+| Fourth level 1
+| Content
+text: default page 6
+| Content
+text: sorted page 1
+| First level 1
+| First level 2
+| Fist level 3
+| Some content
+text: sorted page 2
+| Some other content
+text: sorted page 3
+| Second at level 1
+| Second level 2
+| Content
+text: sorted page 4
+| Third level 1
+| Third level 2
+| Third level 3
+| Content
+text: sorted page 5
+| Fourth level 1
+| Content
+text: sorted page 6
+| Content
+text: range 2-3
+| Some other content
+| Second at level 1
+| Second level 2
+| Content
+text: separators 1-2
+| <PAGE><A><P>First level 1<EOL>
+| </P><P>First level 2<EOL>
+| </P><P>Fist level 3<EOL>
+| </P><P>Some content</P></A></PAGE>
+| <PAGE><A><P>Some other content</P></A></PAGE>

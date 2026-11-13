@@ -1,0 +1,330 @@
+text: default page 1
+| Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM
+| Pagina 1\x20
+| MODULO DA FIRMARE DIGITALMENTE\x20
+| Dati Accesso\x20
+| Nome Utente:\x20
+| Dati Anagrafici *\x20
+| Nominativo:\x20
+| Codice Fiscale/Numero di Serie: **\x20
+| * I dati anagrafici devono essere presenti nel certificato di firma digitale (Non modificare)
+| ** Per gli utenti stranieri che non dispongono del Codice Fiscale inserire il Numero di Serie  (Non modificare)
+| Dati Recapito\x20
+| Email/CECPAC/PEC *\x20
+| *E’ consigliato utilizzare una casella di posta elettronica di tipo PEC, per evitare eventuali addebiti per le spese di
+| spedizione delle comunicazioni (Non modificare)
+| Dati Qualifica (Registrazione)
+| Qualifica Selezionata:
+| Informazioni Firma Digitale\x20
+| Cosa è la firma digitale http://www.agid.gov.it/firma-digitale\x20
+| Informazioni http://www.agid.gov.it/agenda-digitale/infrastrutture-architetture/firme-elettroniche\x20
+| MODULO DA FIRMARE DIGITALMENTE
+|  (Non modificare il contenuto)
+| Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si\x20
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali secondo\x20
+| il D.Lgs. 30/06/2003, n.196\x20
+|  (Non modificare il contenuto)
+| Ho preso visione dell'informativa sul trattamento dei dati personali ai sensi del GDPR\x20
+| (Regolamento UE 2016/679) e del Decreto Legislativo 30 giugno 2003, n. 196       \x20
+| "Codice in materia di protezione dei dati personali"
+| Modulo Ver. 3.1 Ministero delle Imprese e del Made in Italy \x20
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM\x20
+text: default page 2
+| Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM\x20
+| Pagina 2\x20
+| Tutela della privacy (D.Lgs. 30/06/2003 N° 196)\x20
+| I dati personali forniti in relazione all’uso del presente portale (di seguito il “Portale”) e dei relativi servizi (di seguito i “Servizi”) sono trattati in\x20
+| conformità al D.Lgs. n. 196/2003 recante il “Codice in materia di protezione dei dati personali”.\x20
+| Ai sensi dell’articolo 13 della citata normativa, comunichiamo le seguenti informazioni rispetto al trattamento dei dati personali precisando che la\x20
+| presente informativa è resa solo per il Portale e non anche per altri siti internet eventualmente consultati tramite link. \x20
+| 1. Tipologia dei dati Trattati
+| a) Dati di navigazione, I sistemi informatici e le procedure software preposte al funzionamento del Portale acquisiscono, nel normale\x20
+| esercizio, alcuni dati personali che vengono poi trasmessi implicitamente nell’uso dei protocolli di comunicazione Internet. Si tratta di\x20
+| informazioni che per loro natura potrebbero, mediante associazioni ed elaborazioni con dati detenuti da terzi, permettere di identificare\x20
+| gli utenti (ad es. indirizzo IP, nomi di domini dei computer utilizzati dagli utenti che si collegano al Portale, ecc.). Questi dati vengono\x20
+| utilizzati solo per informazioni di tipo statistico (quindi sono anonimi) e per controllare il corretto funzionamento del Portale e vengono\x20
+| 365 giorni dopo la raccolta. I dati sui contatti web vengono conservati per il tempo strettamente necessario a conseguire gli scopi per i\x20
+| quali i dati sono stati raccolti e, comunque, in conformità alle disposizioni normative vigenti in materia.
+| b) Dati forniti volontariamente dagli utenti, Qualora collegandovi al Portale invierete i vostri dati personali per accedere ai Servizi ovvero per\x20
+| effettuare richieste in posta elettronica, ciò comporterà l’acquisizione da parte dell’Ufficio Italiano Brevetti e Marchi dell’indirizzo di posta\x20
+| e/o di altri eventuali dati personali che verranno trattati esclusivamente per rispondere alla richiesta, per la fruizione dei Servizi e/o per le\x20
+| finalità sotto esplicitate.
+| c) Cookies, Non viene fatto uso di cookies per la trasmissione di informazioni di carattere personale, né vengono utilizzati c.d. cookies\x20
+| persistenti di alcun tipo, ovvero sistemi per il tracciamento degli utenti. L’uso di c.d. cookies di sessione (che non vengono memorizzati in\x20
+| modo persistente sul computer dell’utente e svaniscono con la chiusura del browser) è strettamente limitato alla trasmissione di\x20
+| identificativi di sessione (costituiti da numeri casuali generati dal server) necessari per consentire l’esplorazione sicura ed efficiente del\x20
+| Portale. I c.d. cookies di sessione utilizzati in questo Portale evitano il ricorso ad altre tecniche informatiche potenzialmente pregiudizievoli\x20
+| per la riservatezza della navigazione degli utenti e non consentono l’acquisizione di dati personali identificativi dell’utente.
+| 2. Finalità del trattamento
+| I dati personali forniti potranno essere trattati, direttamente e/o tramite terzi, unicamente per le seguenti finalità:\x20
+| a) Finalità funzionali all’attività svolta dall’Ufficio Italiano Brevetti e Marchi in relazione alla trattazione informatizzata dei titoli di proprietà\x20
+| industriale
+| b) Finalità strettamente connesse e necessarie alla fruizione del Portale e dei Servizi richiesti nonché allo svolgimento di tutte le attività\x20
+| conseguenti.
+| 3. Modalità del trattamento
+| Il trattamento dei dati, improntato alla massima riservatezza e sicurezza nel rispetto della normativa sopra richiamata, dei regolamenti e della\x20
+| normativa comunitaria, avverrà con strumenti manuali, elettronici o comunque automatizzati.\x20
+| 4. Natura del conferimento dei dati personali e conseguenze di un eventuale rifiuto a rispondere
+| Il conferimento dei dati personali è facoltativo. L’eventuale rifiuto di conferirli può comportare l’impossibilità di utilizzare il Portale e fruire dei relativi\x20
+| Servizi.\x20
+| 5. Comunicazioni e diffusione dei dati
+| I dati potranno essere comunicati, nel rispetto della normativa vigente, al personale del Ministero dello Sviluppo Economico, a società esterne, a\x20
+| collaboratori autonomi, a professionisti, a consulenti incaricati dal Ministero dello Sviluppo Economico di svolgere servizi di varia natura, quali a\x20
+| titolo esemplificativo, la manutenzione e l’assistenza del Portale e dei relativi Servizi. I dati personali non sono soggetti a diffusione.\x20
+| 6. Diritti dell’interessato
+| In qualità di soggetti cui si riferiscono i dati personali avete il diritto di ottenere la conferma dell’esistenza o meno dei medesimi dati e di conoscerne\x20
+| il contenuto e l’origine, verificarne l’esattezza o chiederne l’integrazione o l’aggiornamento, oppure la rettificazione (art. 7 del D.Lgs. n. 196/2003). \x20
+| Ai sensi del medesimo articolo avete il diritto di chiedere la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in\x20
+| violazione di legge, nonché di opporsi in ogni caso, per motivi legittimi, al loro trattamento. Le richieste vanno rivolte al seguente indirizzo: Ministero\x20
+| dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| 7. Titolari e responsabili del trattamento
+| Titolare del trattamento dei dati è il Ministero dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e\x20
+| Marchi, con sede in Roma, Via Molise 19. L’elenco aggiornato dei responsabili del trattamento e dei terzi ai quali i dati personali potranno essere\x20
+| comunicati è disponibile, in qualunque momento dietro espressa richiesta dell’interessato, al seguente indirizzo: Ministero dello Sviluppo Economico,\x20
+| Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| MODULO DA FIRMARE DIGITALMENTE\x20
+| Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si\x20
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali\x20
+| secondo il D.Lgs. 30/06/2003, n.196\x20
+|  (Non modificare il contenuto)
+| Modulo Ver. 3.1 Ministero delle Imprese e del Made in Italy \x20
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM\x20
+text: sorted page 1
+| Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM
+| MODULO DA FIRMARE DIGITALMENTE\x20
+|  (Non modificare il contenuto)
+| Dati Accesso\x20
+| Nome Utente:\x20
+| Dati Anagrafici *\x20
+| Nominativo:\x20
+| Codice Fiscale/Numero di Serie: **\x20
+| * I dati anagrafici devono essere presenti nel certificato di firma digitale (Non modificare)
+| ** Per gli utenti stranieri che non dispongono del Codice Fiscale inserire il Numero di Serie  (Non modificare)
+| Dati Recapito\x20
+| Email/CECPAC/PEC *\x20
+| *E’ consigliato utilizzare una casella di posta elettronica di tipo PEC, per evitare eventuali addebiti per le spese di
+| spedizione delle comunicazioni (Non modificare)
+| Dati Qualifica (Registrazione)
+| Qualifica Selezionata:
+| Ho preso visione dell'informativa sul trattamento dei dati personali ai sensi del GDPR\x20
+| (Regolamento UE 2016/679) e del Decreto Legislativo 30 giugno 2003, n. 196       \x20
+| "Codice in materia di protezione dei dati personali"
+| Informazioni Firma Digitale\x20
+| Cosa è la firma digitale http://www.agid.gov.it/firma-digitale\x20
+| Informazioni http://www.agid.gov.it/agenda-digitale/infrastrutture-architetture/firme-elettroniche\x20
+| MODULO DA FIRMARE DIGITALMENTE
+|  (Non modificare il contenuto)
+| Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si\x20
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali secondo\x20
+| il D.Lgs. 30/06/2003, n.196\x20
+| Modulo Ver. 3.1 Ministero delle Imprese e del Made in Italy  Pagina 1\x20
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM\x20
+text: sorted page 2
+| Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM\x20
+| Tutela della privacy (D.Lgs. 30/06/2003 N° 196)\x20
+| I dati personali forniti in relazione all’uso del presente portale (di seguito il “Portale”) e dei relativi servizi (di seguito i “Servizi”) sono trattati in\x20
+| conformità al D.Lgs. n. 196/2003 recante il “Codice in materia di protezione dei dati personali”.\x20
+| Ai sensi dell’articolo 13 della citata normativa, comunichiamo le seguenti informazioni rispetto al trattamento dei dati personali precisando che la\x20
+| presente informativa è resa solo per il Portale e non anche per altri siti internet eventualmente consultati tramite link. \x20
+| 1. Tipologia dei dati Trattati
+| a) Dati di navigazione, I sistemi informatici e le procedure software preposte al funzionamento del Portale acquisiscono, nel normale\x20
+| esercizio, alcuni dati personali che vengono poi trasmessi implicitamente nell’uso dei protocolli di comunicazione Internet. Si tratta di\x20
+| informazioni che per loro natura potrebbero, mediante associazioni ed elaborazioni con dati detenuti da terzi, permettere di identificare\x20
+| gli utenti (ad es. indirizzo IP, nomi di domini dei computer utilizzati dagli utenti che si collegano al Portale, ecc.). Questi dati vengono\x20
+| utilizzati solo per informazioni di tipo statistico (quindi sono anonimi) e per controllare il corretto funzionamento del Portale e vengono\x20
+| 365 giorni dopo la raccolta. I dati sui contatti web vengono conservati per il tempo strettamente necessario a conseguire gli scopi per i\x20
+| quali i dati sono stati raccolti e, comunque, in conformità alle disposizioni normative vigenti in materia.
+| b) Dati forniti volontariamente dagli utenti, Qualora collegandovi al Portale invierete i vostri dati personali per accedere ai Servizi ovvero per\x20
+| effettuare richieste in posta elettronica, ciò comporterà l’acquisizione da parte dell’Ufficio Italiano Brevetti e Marchi dell’indirizzo di posta\x20
+| e/o di altri eventuali dati personali che verranno trattati esclusivamente per rispondere alla richiesta, per la fruizione dei Servizi e/o per le\x20
+| finalità sotto esplicitate.
+| c) Cookies, Non viene fatto uso di cookies per la trasmissione di informazioni di carattere personale, né vengono utilizzati c.d. cookies\x20
+| persistenti di alcun tipo, ovvero sistemi per il tracciamento degli utenti. L’uso di c.d. cookies di sessione (che non vengono memorizzati in\x20
+| modo persistente sul computer dell’utente e svaniscono con la chiusura del browser) è strettamente limitato alla trasmissione di\x20
+| identificativi di sessione (costituiti da numeri casuali generati dal server) necessari per consentire l’esplorazione sicura ed efficiente del\x20
+| Portale. I c.d. cookies di sessione utilizzati in questo Portale evitano il ricorso ad altre tecniche informatiche potenzialmente pregiudizievoli\x20
+| per la riservatezza della navigazione degli utenti e non consentono l’acquisizione di dati personali identificativi dell’utente.
+| 2. Finalità del trattamento
+| I dati personali forniti potranno essere trattati, direttamente e/o tramite terzi, unicamente per le seguenti finalità:\x20
+| a) Finalità funzionali all’attività svolta dall’Ufficio Italiano Brevetti e Marchi in relazione alla trattazione informatizzata dei titoli di proprietà\x20
+| industriale
+| b) Finalità strettamente connesse e necessarie alla fruizione del Portale e dei Servizi richiesti nonché allo svolgimento di tutte le attività\x20
+| conseguenti.
+| 3. Modalità del trattamento
+| Il trattamento dei dati, improntato alla massima riservatezza e sicurezza nel rispetto della normativa sopra richiamata, dei regolamenti e della\x20
+| normativa comunitaria, avverrà con strumenti manuali, elettronici o comunque automatizzati.\x20
+| 4. Natura del conferimento dei dati personali e conseguenze di un eventuale rifiuto a rispondere
+| Il conferimento dei dati personali è facoltativo. L’eventuale rifiuto di conferirli può comportare l’impossibilità di utilizzare il Portale e fruire dei relativi\x20
+| Servizi.\x20
+| 5. Comunicazioni e diffusione dei dati
+| I dati potranno essere comunicati, nel rispetto della normativa vigente, al personale del Ministero dello Sviluppo Economico, a società esterne, a\x20
+| collaboratori autonomi, a professionisti, a consulenti incaricati dal Ministero dello Sviluppo Economico di svolgere servizi di varia natura, quali a\x20
+| titolo esemplificativo, la manutenzione e l’assistenza del Portale e dei relativi Servizi. I dati personali non sono soggetti a diffusione.\x20
+| 6. Diritti dell’interessato
+| In qualità di soggetti cui si riferiscono i dati personali avete il diritto di ottenere la conferma dell’esistenza o meno dei medesimi dati e di conoscerne\x20
+| il contenuto e l’origine, verificarne l’esattezza o chiederne l’integrazione o l’aggiornamento, oppure la rettificazione (art. 7 del D.Lgs. n. 196/2003). \x20
+| Ai sensi del medesimo articolo avete il diritto di chiedere la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in\x20
+| violazione di legge, nonché di opporsi in ogni caso, per motivi legittimi, al loro trattamento. Le richieste vanno rivolte al seguente indirizzo: Ministero\x20
+| dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| 7. Titolari e responsabili del trattamento
+| Titolare del trattamento dei dati è il Ministero dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e\x20
+| Marchi, con sede in Roma, Via Molise 19. L’elenco aggiornato dei responsabili del trattamento e dei terzi ai quali i dati personali potranno essere\x20
+| comunicati è disponibile, in qualunque momento dietro espressa richiesta dell’interessato, al seguente indirizzo: Ministero dello Sviluppo Economico,\x20
+| Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| MODULO DA FIRMARE DIGITALMENTE\x20
+|  (Non modificare il contenuto)
+| Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si\x20
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali\x20
+| secondo il D.Lgs. 30/06/2003, n.196\x20
+| Modulo Ver. 3.1 Ministero delle Imprese e del Made in Italy  Pagina 2\x20
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM\x20
+text: range 2-3
+| Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM\x20
+| Pagina 2\x20
+| Tutela della privacy (D.Lgs. 30/06/2003 N° 196)\x20
+| I dati personali forniti in relazione all’uso del presente portale (di seguito il “Portale”) e dei relativi servizi (di seguito i “Servizi”) sono trattati in\x20
+| conformità al D.Lgs. n. 196/2003 recante il “Codice in materia di protezione dei dati personali”.\x20
+| Ai sensi dell’articolo 13 della citata normativa, comunichiamo le seguenti informazioni rispetto al trattamento dei dati personali precisando che la\x20
+| presente informativa è resa solo per il Portale e non anche per altri siti internet eventualmente consultati tramite link. \x20
+| 1. Tipologia dei dati Trattati
+| a) Dati di navigazione, I sistemi informatici e le procedure software preposte al funzionamento del Portale acquisiscono, nel normale\x20
+| esercizio, alcuni dati personali che vengono poi trasmessi implicitamente nell’uso dei protocolli di comunicazione Internet. Si tratta di\x20
+| informazioni che per loro natura potrebbero, mediante associazioni ed elaborazioni con dati detenuti da terzi, permettere di identificare\x20
+| gli utenti (ad es. indirizzo IP, nomi di domini dei computer utilizzati dagli utenti che si collegano al Portale, ecc.). Questi dati vengono\x20
+| utilizzati solo per informazioni di tipo statistico (quindi sono anonimi) e per controllare il corretto funzionamento del Portale e vengono\x20
+| 365 giorni dopo la raccolta. I dati sui contatti web vengono conservati per il tempo strettamente necessario a conseguire gli scopi per i\x20
+| quali i dati sono stati raccolti e, comunque, in conformità alle disposizioni normative vigenti in materia.
+| b) Dati forniti volontariamente dagli utenti, Qualora collegandovi al Portale invierete i vostri dati personali per accedere ai Servizi ovvero per\x20
+| effettuare richieste in posta elettronica, ciò comporterà l’acquisizione da parte dell’Ufficio Italiano Brevetti e Marchi dell’indirizzo di posta\x20
+| e/o di altri eventuali dati personali che verranno trattati esclusivamente per rispondere alla richiesta, per la fruizione dei Servizi e/o per le\x20
+| finalità sotto esplicitate.
+| c) Cookies, Non viene fatto uso di cookies per la trasmissione di informazioni di carattere personale, né vengono utilizzati c.d. cookies\x20
+| persistenti di alcun tipo, ovvero sistemi per il tracciamento degli utenti. L’uso di c.d. cookies di sessione (che non vengono memorizzati in\x20
+| modo persistente sul computer dell’utente e svaniscono con la chiusura del browser) è strettamente limitato alla trasmissione di\x20
+| identificativi di sessione (costituiti da numeri casuali generati dal server) necessari per consentire l’esplorazione sicura ed efficiente del\x20
+| Portale. I c.d. cookies di sessione utilizzati in questo Portale evitano il ricorso ad altre tecniche informatiche potenzialmente pregiudizievoli\x20
+| per la riservatezza della navigazione degli utenti e non consentono l’acquisizione di dati personali identificativi dell’utente.
+| 2. Finalità del trattamento
+| I dati personali forniti potranno essere trattati, direttamente e/o tramite terzi, unicamente per le seguenti finalità:\x20
+| a) Finalità funzionali all’attività svolta dall’Ufficio Italiano Brevetti e Marchi in relazione alla trattazione informatizzata dei titoli di proprietà\x20
+| industriale
+| b) Finalità strettamente connesse e necessarie alla fruizione del Portale e dei Servizi richiesti nonché allo svolgimento di tutte le attività\x20
+| conseguenti.
+| 3. Modalità del trattamento
+| Il trattamento dei dati, improntato alla massima riservatezza e sicurezza nel rispetto della normativa sopra richiamata, dei regolamenti e della\x20
+| normativa comunitaria, avverrà con strumenti manuali, elettronici o comunque automatizzati.\x20
+| 4. Natura del conferimento dei dati personali e conseguenze di un eventuale rifiuto a rispondere
+| Il conferimento dei dati personali è facoltativo. L’eventuale rifiuto di conferirli può comportare l’impossibilità di utilizzare il Portale e fruire dei relativi\x20
+| Servizi.\x20
+| 5. Comunicazioni e diffusione dei dati
+| I dati potranno essere comunicati, nel rispetto della normativa vigente, al personale del Ministero dello Sviluppo Economico, a società esterne, a\x20
+| collaboratori autonomi, a professionisti, a consulenti incaricati dal Ministero dello Sviluppo Economico di svolgere servizi di varia natura, quali a\x20
+| titolo esemplificativo, la manutenzione e l’assistenza del Portale e dei relativi Servizi. I dati personali non sono soggetti a diffusione.\x20
+| 6. Diritti dell’interessato
+| In qualità di soggetti cui si riferiscono i dati personali avete il diritto di ottenere la conferma dell’esistenza o meno dei medesimi dati e di conoscerne\x20
+| il contenuto e l’origine, verificarne l’esattezza o chiederne l’integrazione o l’aggiornamento, oppure la rettificazione (art. 7 del D.Lgs. n. 196/2003). \x20
+| Ai sensi del medesimo articolo avete il diritto di chiedere la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in\x20
+| violazione di legge, nonché di opporsi in ogni caso, per motivi legittimi, al loro trattamento. Le richieste vanno rivolte al seguente indirizzo: Ministero\x20
+| dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| 7. Titolari e responsabili del trattamento
+| Titolare del trattamento dei dati è il Ministero dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e\x20
+| Marchi, con sede in Roma, Via Molise 19. L’elenco aggiornato dei responsabili del trattamento e dei terzi ai quali i dati personali potranno essere\x20
+| comunicati è disponibile, in qualunque momento dietro espressa richiesta dell’interessato, al seguente indirizzo: Ministero dello Sviluppo Economico,\x20
+| Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma.\x20
+| MODULO DA FIRMARE DIGITALMENTE\x20
+| Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si\x20
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali\x20
+| secondo il D.Lgs. 30/06/2003, n.196\x20
+|  (Non modificare il contenuto)
+| Modulo Ver. 3.1 Ministero delle Imprese e del Made in Italy \x20
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM\x20
+text: separators 1-2
+| <PAGE><A><P>Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM<EOL>
+| </P><P>Pagina 1 <EOL>
+| </P><P>MODULO DA FIRMARE DIGITALMENTE <EOL>
+| </P><P>Dati Accesso <EOL>
+| Nome Utente: <EOL>
+| </P><P>Dati Anagrafici * <EOL>
+| Nominativo: <EOL>
+| Codice Fiscale/Numero di Serie: ** <EOL>
+| </P><P>*<W>I dati anagrafici devono essere presenti nel certificato di firma digitale (Non modificare)<EOL>
+| ** Per gli utenti stranieri che non dispongono del Codice Fiscale inserire il Numero di Serie  (Non modificare)<EOL>
+| </P><P>Dati Recapito <EOL>
+| Email/CECPAC/PEC * <EOL>
+| *E’ consigliato utilizzare una casella di posta elettronica di tipo PEC, per evitare eventuali addebiti per le spese di<EOL>
+| spedizione delle comunicazioni (Non modificare)<EOL>
+| </P><P>Dati Qualifica (Registrazione)<EOL>
+| Qualifica Selezionata:<EOL>
+| </P><P>Informazioni Firma Digitale <EOL>
+| Cosa è la firma digitale <W>http://www.agid.gov.it/firma-digitale <EOL>
+| Informazioni <W>http://www.agid.gov.it/agenda-digitale/infrastrutture-architetture/firme-elettroniche <EOL>
+| </P><P>MODULO DA FIRMARE DIGITALMENTE<EOL>
+|  (Non modificare il contenuto)<EOL>
+| </P><P>Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si <EOL>
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali secondo <EOL>
+| il D.Lgs. 30/06/2003, n.196 <EOL>
+| </P><P> (Non modificare il contenuto)<EOL>
+| </P><P>Ho preso visione dell'informativa sul trattamento dei dati personali ai sensi del GDPR <EOL>
+| (Regolamento UE 2016/679) e del Decreto Legislativo 30 giugno 2003, n. 196  <W> <W> <W> <W> <W> <W> <EOL>
+| "Codice in materia di protezione dei dati personali"<EOL>
+| </P><P>Modulo Ver. 3.1 <W>Ministero delle Imprese e del Made in Italy  <EOL>
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM </P></A></PAGE>
+| <PAGE><A><P>Modulo di Aggiunta di Ruolo ai Servizi On-Line DGLC-UIBM <EOL>
+| </P><P>Pagina 2 <EOL>
+| </P><P>Tutela della privacy (D.Lgs. 30/06/2003 N° 196) <EOL>
+| I dati personali forniti in relazione all’uso del presente portale (di seguito il “Portale”) e dei relativi servizi (di seguito i “Servizi”) sono trattati in <EOL>
+| </P><P>conformità al D.Lgs. n. 196/2003 recante il “Codice in materia di protezione dei dati personali”. <EOL>
+| </P><P>Ai sensi dell’articolo 13 della citata normativa, comunichiamo le seguenti informazioni rispetto al trattamento dei dati personali precisando che la <EOL>
+| </P><P>presente informativa è resa solo per il Portale e non anche per altri siti internet eventualmente consultati tramite link.  <EOL>
+| </P><P>1.<W>Tipologia dei dati Trattati<EOL>
+| a)<W>Dati di navigazione, I sistemi informatici e le procedure software preposte al funzionamento del Portale acquisiscono, nel normale <EOL>
+| </P><P>esercizio, alcuni dati personali che vengono poi trasmessi implicitamente nell’uso dei protocolli di comunicazione Internet. Si tratta di <EOL>
+| informazioni che per loro natura potrebbero, mediante associazioni ed elaborazioni con dati detenuti da terzi, permettere di identificare <EOL>
+| gli utenti (ad es. indirizzo IP, nomi di domini dei computer utilizzati dagli utenti che si collegano al Portale, ecc.). Questi dati vengono <EOL>
+| utilizzati solo per informazioni di tipo statistico (quindi sono anonimi) e per controllare il corretto funzionamento del Portale e vengono <EOL>
+| 365 giorni dopo la raccolta. I dati sui contatti web vengono conservati per il tempo strettamente necessario a conseguire gli scopi per i <EOL>
+| quali i dati sono stati raccolti e, comunque, in conformità alle disposizioni normative vigenti in materia.<EOL>
+| </P><P>b)<W>Dati forniti volontariamente dagli utenti, Qualora collegandovi al Portale invierete i vostri dati personali per accedere ai Servizi ovvero per <EOL>
+| effettuare richieste in posta elettronica, ciò comporterà l’acquisizione da parte dell’Ufficio Italiano Brevetti e Marchi dell’indirizzo di posta <EOL>
+| e/o di altri eventuali dati personali che verranno trattati esclusivamente per rispondere alla richiesta, per la fruizione dei Servizi e/o per le <EOL>
+| finalità sotto esplicitate.<EOL>
+| </P><P>c)<W>Cookies, Non viene fatto uso di cookies per la trasmissione di informazioni di carattere personale, né vengono utilizzati c.d. cookies <EOL>
+| persistenti di alcun tipo, ovvero sistemi per il tracciamento degli utenti. L’uso di c.d. cookies di sessione (che non vengono memorizzati in <EOL>
+| modo persistente sul computer dell’utente e svaniscono con la chiusura del browser) è strettamente limitato alla trasmissione di <EOL>
+| identificativi di sessione (costituiti da numeri casuali generati dal server) necessari per consentire l’esplorazione sicura ed efficiente del <EOL>
+| Portale. I c.d. cookies di sessione utilizzati in questo Portale evitano il ricorso ad altre tecniche informatiche potenzialmente pregiudizievoli <EOL>
+| per la riservatezza della navigazione degli utenti e non consentono l’acquisizione di dati personali identificativi dell’utente.<EOL>
+| </P><P>2.<W>Finalità del trattamento<EOL>
+| I dati personali forniti potranno essere trattati, direttamente e/o tramite terzi, unicamente per le seguenti finalità: <EOL>
+| </P><P>a)<W>Finalità funzionali all’attività svolta dall’Ufficio Italiano Brevetti e Marchi in relazione alla trattazione informatizzata dei titoli di proprietà <EOL>
+| industriale<EOL>
+| </P><P>b)<W>Finalità strettamente connesse e necessarie alla fruizione del Portale e dei Servizi richiesti nonché allo svolgimento di tutte le attività <EOL>
+| conseguenti.<EOL>
+| </P><P>3.<W>Modalità del trattamento<EOL>
+| Il trattamento dei dati, improntato alla massima riservatezza e sicurezza nel rispetto della normativa sopra richiamata, dei regolamenti e della <EOL>
+| normativa comunitaria, avverrà con strumenti manuali, elettronici o comunque automatizzati. <EOL>
+| 4.<W>Natura del conferimento dei dati personali e conseguenze di un eventuale rifiuto a rispondere<EOL>
+| Il conferimento dei dati personali è facoltativo. L’eventuale rifiuto di conferirli può comportare l’impossibilità di utilizzare il Portale e fruire dei relativi <EOL>
+| Servizi. <EOL>
+| 5.<W>Comunicazioni e diffusione dei dati<EOL>
+| I dati potranno essere comunicati, nel rispetto della normativa vigente, al personale del Ministero dello Sviluppo Economico, a società esterne, a <EOL>
+| collaboratori autonomi, a professionisti, a consulenti incaricati dal Ministero dello Sviluppo Economico di svolgere servizi di varia natura, quali a <EOL>
+| titolo esemplificativo, la manutenzione e l’assistenza del Portale e dei relativi Servizi. I dati personali non sono soggetti a diffusione. <EOL>
+| 6.<W>Diritti dell’interessato<EOL>
+| In qualità di soggetti cui si riferiscono i dati personali avete il diritto di ottenere la conferma dell’esistenza o meno dei medesimi dati e di conoscerne <EOL>
+| il contenuto e l’origine, verificarne l’esattezza o chiederne l’integrazione o l’aggiornamento, oppure la rettificazione (art. 7 del D.Lgs. n. 196/2003).  <EOL>
+| Ai sensi del medesimo articolo avete il diritto di chiedere la cancellazione, la trasformazione in forma anonima o il blocco dei dati trattati in <EOL>
+| violazione di legge, nonché di opporsi in ogni caso, per motivi legittimi, al loro trattamento. Le richieste vanno rivolte al seguente indirizzo: Ministero <EOL>
+| dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma. <EOL>
+| 7.<W>Titolari e responsabili del trattamento<EOL>
+| Titolare del trattamento dei dati è il Ministero dello Sviluppo Economico, Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e <EOL>
+| Marchi, con sede in Roma, Via Molise 19. L’elenco aggiornato dei responsabili del trattamento e dei terzi ai quali i dati personali potranno essere <EOL>
+| comunicati è disponibile, in qualunque momento dietro espressa richiesta dell’interessato, al seguente indirizzo: Ministero dello Sviluppo Economico, <EOL>
+| Direzione Generale Lotta alla contraffazione – Ufficio Italiano Brevetti e Marchi, via Molise 19, Roma. <EOL>
+| </P><P>MODULO DA FIRMARE DIGITALMENTE <EOL>
+| </P><P>Firmando digitalmente il presente documento e caricandolo nel sito DGLC-UIBM di deposito si <EOL>
+| dichiara di aver preso visione dell'informativa sul trattamento dei dati personali <EOL>
+| secondo il D.Lgs. 30/06/2003, n.196 <EOL>
+| </P><P> (Non modificare il contenuto)<EOL>
+| </P><P>Modulo Ver. 3.1 <W>Ministero delle Imprese e del Made in Italy  <EOL>
+| DIREZIONE GENERALE PER LA TUTELA DELLA PROPRIETÀ INDUSTRIALE - UIBM </P></A></PAGE>

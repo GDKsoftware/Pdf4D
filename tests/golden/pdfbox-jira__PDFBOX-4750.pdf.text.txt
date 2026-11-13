@@ -1,0 +1,280 @@
+text: default page 1
+| In der von uns untersuchten Firmware werden diese Kurven verwendet, um das genaue Zeit/Distanz-Profil bekannter\x20
+| Abgasprüfungen festzulegen. Im Allgemeinen stellen wir fest, dass die Anzahl der Profile mit der Zeit zugenommen hat. Wie in\x20
+| Tabelle II dargestellt, ist die Anzahl der untersuchten Kurven von 0 in EDC17CP04 P 531 auf 7 in EDC17CP44 P 859 gestiegen.\x20
+| Abbildung 3 zeigt mehrere Kurvenpaare, die in der Firmware eines EDC17C54 ECU (Software-Teilenummer 03L906012,\x20
+| Revision 7444; restliche festgestellte Kurven in Abbildung 14 im Anhang) gefunden wurden. Der Bereich außerhalb der von den\x20
+| Kurven definierten oberen und unteren Grenzen dlower und dupper ist abschattiert. Wenn der berechnete Zeit- und Distanzwert (t, d) in\x20
+| diesen Graubereich fällt, gilt die Prüfung als ausgeschlossen, und das entsprechende Flipflop wird gesetzt. Zusätzlich zu den\x20
+| Grenzwerten haben wir die in Tabelle IV enthaltenen Prüfzyklen bekannter Abgasprüfungen eingetragen. Die Prüfzyklen, die dem\x20
+| Profil entsprechen, sind mit dicken Linien dargestellt; alle anderen mit dünnen Linien. Wie unsere Ergebnisse zeigen, kommen viele\x20
+| der konfigurierten Grenzen einem bekannten Prüfzyklus recht nahe. Vor allem Profil 1 entspricht bis km 4,2 dem Prüfzyklus nach\x20
+| FTP-75, und Profil 5 bis km 16,1 dem Prüfzyklus nach HWFET (in der Abbildung nicht ganz dargestellt).\x20
+| \x20
+| \x20
+| \x20
+| Abb. 3: Auswahl von Kurvenkontrolluntersuchungen anhand verschiedener Abgasprüfzyklen in der Firmware für einen VW Passat, Freigabe 12/2014 (EDC17C54,\x20
+| Software-Teilenummer 03L906012, Revision 7444). Der Bereich, in dem die Software meldet, dass das Fahrprofil entsprechend übereinstimmt, ist weiß markiert.\x20
+| Wie aus den Graphen hervorgeht, folgt dieser Bereich dem Prüfzyklus tendenziell genau. In der Legende sind die bekannten übereinstimmenden Prüfzyklen\x20
+| aufgeführt.  markiert eine zusätzliche Lenkradkontrolle. Abbildung 14 im Anhang enthält die restlichen Kurven.\x20
+| \x20
+| Lenkradkontrollen. Ab 2009 wurde die Anzahl der Profilkontrollen in der in Volkswagen-Fahrzeugen eingesetzten EDC-Firmware\x20
+| von 7 auf 10 erhöht. Wie bereits angemerkt, wurden die in Abbildung 3 dargestellten Profile aus einem EDC17C54-Firmwareimage,\x20
+| VW-Teilenummer 03L906012 extrahiert, das 10 Profile umfasst, von denen vier in der Abbildung dargestellt sind (die in Abbildung 2\x20
+| dargestellte Akustikbedingung, die aus einem älteren EDC17C54-Funktionsrahmen stammt, zeigt nur 7 Profile). \x20
+| \x20
+| Beachten Sie bitte, dass die Profile 8 und 9 deutlich ungenauer sind, als die Profile 1 und 7. Tatsächlich stimmt Profil 9 mit\x20
+| insgesamt 10 bekannten Abgasprüfzyklen überein. Neben der Überprüfung der in Abbildung 3 dargestellten Zeit/Distanz-Relation\x20
+| wurde in den Profilen 8, 9 und 10 zusätzlich eine Lenkradwinkelkontrolle berücksichtigt: neben der Abweichung von einem\x20
+| vorgeschriebenen Zeit/Distanz-Profil würde das den Profilen 8, 9 und 10 entsprechende Flipflop zurückgesetzt werden, wenn der\x20
+| Lenkradwinkel um mehr als 20° von der Neutralstellung abweicht. Leider konnten wir keinen Funktionsrahmen beschaffen, der diese\x20
+| erweiterte Akustikbedingung enthält. Der folgende Code stellt unsere Rekonstruktion der Logik dar, anhand derer bestimmt wird, ob\x20
+| die Akustikbedingung bei einer Lenkradwinkelabweichung gelöscht werden soll.\x20
+text: default page 2
+| PTrading
+| 210100001Our Reference :
+| Buyer:
+| Merz Energy Trading Ltd.Seller:
+| 2013-09-11Trade Date:
+| Delivery Point:
+| Commodity: Power
+| Tot. Contr. Value (EUR):
+| Tot. Contr. Volume (MWh):
+| EURCurrency:
+| Market: DE
+| 100,45
+| 51.010.389,00
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22447 Hamburg
+| Germany
+| To:
+| Deal ID: null_null
+| null
+| CONFIRMATION OF INDIVIDUAL CONTRACT
+| Delivery Schedule
+| First Date Last Date From
+| CET
+| To
+| CET
+| Total Amount
+| EUR
+| Total Volume
+| (MWh)
+| Contract
+| Capacity
+| (MW)
+| Contract
+| Price
+| (EUR/MWh)
+| 09:00 18:00 10.002000-Jan-01 2000-Dec-31 10,834,976.4087,690.00123.56
+| This Confirmation confirms the Individual Contract entered into pursuant to the General Agreement Concerning the De-
+| livery and Acceptance of Natural Gas between the Parties (General Agreement) and supplements and forms part of that
+| General Agreement.  In case of any inconsistencies between the terms of this Confirmation and the Individual Contract,
+| please contact us immediately.
+| Date:
+| Date:11/09/2013
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22301 Hamburg
+| Germany
+| Edited with the trial version of\x20
+| Foxit Advanced PDF Editor
+| To remove this notice, visit:
+| www.foxitsoftware.com/shopping
+text: sorted page 1
+| In der von uns untersuchten Firmware werden diese Kurven verwendet, um das genaue Zeit/Distanz-Profil bekannter\x20
+| Abgasprüfungen festzulegen. Im Allgemeinen stellen wir fest, dass die Anzahl der Profile mit der Zeit zugenommen hat. Wie in\x20
+| Tabelle II dargestellt, ist die Anzahl der untersuchten Kurven von 0 in EDC17CP04 P 531 auf 7 in EDC17CP44 P 859 gestiegen.\x20
+| Abbildung 3 zeigt mehrere Kurvenpaare, die in der Firmware eines EDC17C54 ECU (Software-Teilenummer 03L906012,\x20
+| Revision 7444; restliche festgestellte Kurven in Abbildung 14 im Anhang) gefunden wurden. Der Bereich außerhalb der von den\x20
+| Kurven definierten oberen und unteren Grenzen dlower und dupper ist abschattiert. Wenn der berechnete Zeit- und Distanzwert (t, d) in\x20
+| diesen Graubereich fällt, gilt die Prüfung als ausgeschlossen, und das entsprechende Flipflop wird gesetzt. Zusätzlich zu den\x20
+| Grenzwerten haben wir die in Tabelle IV enthaltenen Prüfzyklen bekannter Abgasprüfungen eingetragen. Die Prüfzyklen, die dem\x20
+| Profil entsprechen, sind mit dicken Linien dargestellt; alle anderen mit dünnen Linien. Wie unsere Ergebnisse zeigen, kommen viele\x20
+| der konfigurierten Grenzen einem bekannten Prüfzyklus recht nahe. Vor allem Profil 1 entspricht bis km 4,2 dem Prüfzyklus nach\x20
+| FTP-75, und Profil 5 bis km 16,1 dem Prüfzyklus nach HWFET (in der Abbildung nicht ganz dargestellt).\x20
+| \x20
+| \x20
+| \x20
+| Abb. 3: Auswahl von Kurvenkontrolluntersuchungen anhand verschiedener Abgasprüfzyklen in der Firmware für einen VW Passat, Freigabe 12/2014 (EDC17C54,\x20
+| Software-Teilenummer 03L906012, Revision 7444). Der Bereich, in dem die Software meldet, dass das Fahrprofil entsprechend übereinstimmt, ist weiß markiert.\x20
+| Wie aus den Graphen hervorgeht, folgt dieser Bereich dem Prüfzyklus tendenziell genau. In der Legende sind die bekannten übereinstimmenden Prüfzyklen\x20
+| aufgeführt.  markiert eine zusätzliche Lenkradkontrolle. Abbildung 14 im Anhang enthält die restlichen Kurven.\x20
+| \x20
+| Lenkradkontrollen. Ab 2009 wurde die Anzahl der Profilkontrollen in der in Volkswagen-Fahrzeugen eingesetzten EDC-Firmware\x20
+| von 7 auf 10 erhöht. Wie bereits angemerkt, wurden die in Abbildung 3 dargestellten Profile aus einem EDC17C54-Firmwareimage,\x20
+| VW-Teilenummer 03L906012 extrahiert, das 10 Profile umfasst, von denen vier in der Abbildung dargestellt sind (die in Abbildung 2\x20
+| dargestellte Akustikbedingung, die aus einem älteren EDC17C54-Funktionsrahmen stammt, zeigt nur 7 Profile). \x20
+| \x20
+| Beachten Sie bitte, dass die Profile 8 und 9 deutlich ungenauer sind, als die Profile 1 und 7. Tatsächlich stimmt Profil 9 mit\x20
+| insgesamt 10 bekannten Abgasprüfzyklen überein. Neben der Überprüfung der in Abbildung 3 dargestellten Zeit/Distanz-Relation\x20
+| wurde in den Profilen 8, 9 und 10 zusätzlich eine Lenkradwinkelkontrolle berücksichtigt: neben der Abweichung von einem\x20
+| vorgeschriebenen Zeit/Distanz-Profil würde das den Profilen 8, 9 und 10 entsprechende Flipflop zurückgesetzt werden, wenn der\x20
+| Lenkradwinkel um mehr als 20° von der Neutralstellung abweicht. Leider konnten wir keinen Funktionsrahmen beschaffen, der diese\x20
+| erweiterte Akustikbedingung enthält. Der folgende Code stellt unsere Rekonstruktion der Logik dar, anhand derer bestimmt wird, ob\x20
+| die Akustikbedingung bei einer Lenkradwinkelabweichung gelöscht werden soll.\x20
+text: sorted page 2
+| Edited with the trial version of\x20
+| Foxit Advanced PDF Editor
+| To remove this notice, visit:
+| www.foxitsoftware.com/shopping
+| To:
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22447 Hamburg
+| Germany
+| CONFIRMATION OF INDIVIDUAL CONTRACT
+| Deal ID: null_null
+| Seller: Merz Energy Trading Ltd.
+| Buyer: PTrading
+| Our Reference : 210100001
+| Trade Date: 2013-09-11
+| Delivery Point: null
+| Commodity: Power
+| Market: DE
+| Currency: EUR
+| Tot. Contr. Value (EUR): 100,45
+| Tot. Contr. Volume (MWh): 51.010.389,00
+| Delivery Schedule
+| First Date Last Date From To Contract Contract Total Volume Total Amount
+| CET CET Capacity Price (MWh) EUR
+| (MW) (EUR/MWh)
+| 2000-Jan-01 2000-Dec-31 09:00 18:00 10.00 123.56 87,690.00 10,834,976.40
+| This Confirmation confirms the Individual Contract entered into pursuant to the General Agreement Concerning the De-
+| livery and Acceptance of Natural Gas between the Parties (General Agreement) and supplements and forms part of that
+| General Agreement.  In case of any inconsistencies between the terms of this Confirmation and the Individual Contract,
+| please contact us immediately.
+| Date:
+| 11/09/2013 Date:
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22301 Hamburg
+| Germany
+text: range 2-3
+| PTrading
+| 210100001Our Reference :
+| Buyer:
+| Merz Energy Trading Ltd.Seller:
+| 2013-09-11Trade Date:
+| Delivery Point:
+| Commodity: Power
+| Tot. Contr. Value (EUR):
+| Tot. Contr. Volume (MWh):
+| EURCurrency:
+| Market: DE
+| 100,45
+| 51.010.389,00
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22447 Hamburg
+| Germany
+| To:
+| Deal ID: null_null
+| null
+| CONFIRMATION OF INDIVIDUAL CONTRACT
+| Delivery Schedule
+| First Date Last Date From
+| CET
+| To
+| CET
+| Total Amount
+| EUR
+| Total Volume
+| (MWh)
+| Contract
+| Capacity
+| (MW)
+| Contract
+| Price
+| (EUR/MWh)
+| 09:00 18:00 10.002000-Jan-01 2000-Dec-31 10,834,976.4087,690.00123.56
+| This Confirmation confirms the Individual Contract entered into pursuant to the General Agreement Concerning the De-
+| livery and Acceptance of Natural Gas between the Parties (General Agreement) and supplements and forms part of that
+| General Agreement.  In case of any inconsistencies between the terms of this Confirmation and the Individual Contract,
+| please contact us immediately.
+| Date:
+| Date:11/09/2013
+| Merz Energy Trading Ltd.
+| Dorotheenstrasse, 22301 Hamburg
+| Germany
+| Edited with the trial version of\x20
+| Foxit Advanced PDF Editor
+| To remove this notice, visit:
+| www.foxitsoftware.com/shopping
+text: separators 1-2
+| <PAGE><A><P>In <W>der <W>von <W>uns <W>untersuchten <W>Firmware <W>werden <W>diese <W>Kurven <W>verwendet, <W>um <W>das <W>genaue <W>Zeit/Distanz-Profil <W>bekannter <EOL>
+| Abgasprüfungen <W>festzulegen. <W>Im <W>Allgemeinen <W>stellen <W>wir <W>fest, <W>dass <W>die <W>Anzahl <W>der <W>Profile <W>mit <W>der <W>Zeit <W>zugenommen <W>hat. <W>Wie <W>in <EOL>
+| Tabelle II dargestellt, ist die Anzahl der untersuchten Kurven von 0 in EDC17CP04 P 531 auf 7 in EDC17CP44 P 859 gestiegen. <EOL>
+| </P><P>Abbildung <W>3 <W>zeigt <W>mehrere <W>Kurvenpaare, <W>die <W>in <W>der <W>Firmware <W>eines <W>EDC17C54 <W>ECU <W>(Software-Teilenummer <W>03L906012, <EOL>
+| Revision <W>7444; <W>restliche <W>festgestellte <W>Kurven <W>in <W>Abbildung <W>14 <W>im <W>Anhang) <W>gefunden <W>wurden. <W>Der <W>Bereich <W>außerhalb <W>der <W>von <W>den <EOL>
+| Kurven definierten oberen und unteren Grenzen dlower und dupper ist abschattiert. Wenn der berechnete Zeit- und Distanzwert (t, d) in <EOL>
+| diesen <W>Graubereich <W>fällt, <W>gilt <W>die <W>Prüfung <W>als <W>ausgeschlossen, <W>und <W>das <W>entsprechende <W>Flipflop <W>wird <W>gesetzt. <W>Zusätzlich <W>zu <W>den <EOL>
+| Grenzwerten haben wir die <W>in <W>Tabelle <W>IV enthaltenen Prüfzyklen bekannter Abgasprüfungen <W>eingetragen. Die Prüfzyklen, die dem <EOL>
+| Profil entsprechen, sind mit dicken Linien dargestellt; alle anderen mit dünnen Linien. Wie unsere Ergebnisse zeigen, kommen viele <EOL>
+| der <W>konfigurierten Grenzen einem bekannten Prüfzyklus <W>recht nahe. Vor allem Profil <W>1 entspricht bis <W>km 4,2 dem Prüfzyklus nach <EOL>
+| FTP-75, und Profil 5 bis km 16,1 dem Prüfzyklus nach HWFET (in der Abbildung nicht ganz dargestellt). <EOL>
+| </P><P> <EOL>
+|  <EOL>
+| </P><P> <EOL>
+| Abb. 3: Auswahl von Kurvenkontrolluntersuchungen anhand verschiedener Abgasprüfzyklen in der Firmware für einen VW Passat, Freigabe 12/2014 (EDC17C54, <EOL>
+| Software-Teilenummer 03L906012, Revision 7444). Der Bereich, in dem die Software meldet, dass das Fahrprofil entsprechend übereinstimmt, ist weiß markiert. <EOL>
+| Wie <W>aus <W>den <W>Graphen <W>hervorgeht, <W>folgt <W>dieser <W>Bereich <W>dem <W>Prüfzyklus <W>tendenziell <W>genau. <W>In <W>der <W>Legende <W>sind <W>die <W>bekannten <W>übereinstimmenden <W>Prüfzyklen <EOL>
+| aufgeführt. <W> markiert eine zusätzliche Lenkradkontrolle. Abbildung 14 im Anhang enthält die restlichen Kurven. <EOL>
+|  <EOL>
+| Lenkradkontrollen. Ab 2009 wurde die Anzahl der Profilkontrollen <W>in der <W>in Volkswagen-Fahrzeugen eingesetzten EDC-Firmware <EOL>
+| von 7 auf 10 erhöht. Wie bereits angemerkt, wurden die in Abbildung 3 dargestellten Profile aus einem EDC17C54-Firmwareimage, <EOL>
+| VW-Teilenummer 03L906012 extrahiert, das 10 Profile umfasst, von denen vier in der Abbildung dargestellt sind (die in Abbildung 2 <EOL>
+| dargestellte Akustikbedingung, die aus einem älteren EDC17C54-Funktionsrahmen stammt, zeigt nur 7 Profile).  <EOL>
+| </P><P> <EOL>
+| Beachten <W>Sie <W>bitte, <W>dass <W>die <W>Profile <W>8 <W>und <W>9 <W>deutlich <W>ungenauer <W>sind, <W>als <W>die <W>Profile <W>1 <W>und <W>7. <W>Tatsächlich <W>stimmt <W>Profil <W>9 <W>mit <EOL>
+| </P><P>insgesamt <W>10 <W>bekannten <W>Abgasprüfzyklen <W>überein. <W>Neben <W>der <W>Überprüfung <W>der <W>in <W>Abbildung <W>3 <W>dargestellten <W>Zeit/Distanz-Relation <EOL>
+| wurde <W>in <W>den <W>Profilen <W>8, <W>9 <W>und <W>10 <W>zusätzlich <W>eine <W>Lenkradwinkelkontrolle <W>berücksichtigt: <W>neben <W>der <W>Abweichung <W>von <W>einem <EOL>
+| vorgeschriebenen <W>Zeit/Distanz-Profil <W>würde <W>das <W>den <W>Profilen <W>8, <W>9 <W>und <W>10 <W>entsprechende <W>Flipflop <W>zurückgesetzt <W>werden, <W>wenn <W>der <EOL>
+| Lenkradwinkel um mehr als 20° von der Neutralstellung abweicht. Leider konnten wir keinen Funktionsrahmen beschaffen, der diese <EOL>
+| erweiterte Akustikbedingung enthält. Der folgende Code stellt unsere Rekonstruktion der Logik dar, anhand derer bestimmt wird, ob <EOL>
+| die Akustikbedingung bei einer Lenkradwinkelabweichung gelöscht werden soll. </P></A></PAGE>
+| <PAGE><A><P>PTrading<EOL>
+| </P><P>210100001Our Reference :<EOL>
+| </P><P>Buyer:<EOL>
+| </P><P>Merz Energy Trading Ltd.Seller:<EOL>
+| </P><P>2013-09-11Trade Date:<EOL>
+| </P><P>Delivery Point:<EOL>
+| </P><P>Commodity:<W>Power<EOL>
+| </P><P>Tot. Contr. Value (EUR):<EOL>
+| </P><P>Tot. Contr. Volume (MWh):<EOL>
+| </P><P>EURCurrency:<EOL>
+| </P><P>Market:<W>DE<EOL>
+| </P><P>100,45<EOL>
+| </P><P>51.010.389,00<EOL>
+| </P><P>Merz Energy Trading Ltd.<EOL>
+| </P><P>Dorotheenstrasse, 22447 Hamburg<EOL>
+| </P><P>Germany<EOL>
+| </P><P>To:<EOL>
+| </P><P>Deal ID: null_null<EOL>
+| </P><P>null<EOL>
+| </P><P>CONFIRMATION OF INDIVIDUAL CONTRACT<EOL>
+| </P><P>Delivery Schedule<EOL>
+| </P><P>First Date<W>Last Date<W>From<EOL>
+| CET<EOL>
+| </P><P>To<EOL>
+| CET<EOL>
+| </P><P>Total Amount<EOL>
+| EUR<EOL>
+| </P><P>Total Volume<EOL>
+| (MWh)<EOL>
+| </P><P>Contract<EOL>
+| Capacity<EOL>
+| </P><P>(MW)<EOL>
+| </P><P>Contract<EOL>
+| Price<EOL>
+| </P><P>(EUR/MWh)<EOL>
+| </P><P>09:00<W>18:00<W>10.002000-Jan-01<W>2000-Dec-31<W>10,834,976.4087,690.00123.56<EOL>
+| </P><P>This Confirmation confirms the Individual Contract entered into pursuant to the General Agreement Concerning the<W>De-<EOL>
+| livery and Acceptance of Natural Gas between the Parties (General Agreement) and supplements and forms part of that<EOL>
+| General Agreement.  In case of any inconsistencies between the terms of this Confirmation and the Individual Contract,<EOL>
+| please contact us immediately.<EOL>
+| </P><P>Date:<EOL>
+| Date:11/09/2013<EOL>
+| </P><P>Merz Energy Trading Ltd.<EOL>
+| </P><P>Dorotheenstrasse, 22301 Hamburg<EOL>
+| </P><P>Germany<EOL>
+| </P><P>Edited with the trial version of <EOL>
+| Foxit Advanced PDF Editor<EOL>
+| </P><P>To remove this notice, visit:<EOL>
+| www.foxitsoftware.com/shopping</P></A></PAGE>

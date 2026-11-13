@@ -1,0 +1,20 @@
+text: default page 1
+| Dies ist ein Test für Attachments!\x20
+|  \x20
+text: default page 2
+| Attachment auf Seite 2\x20
+| \x20
+text: sorted page 1
+| Dies ist ein Test für Attachments!\x20
+|  \x20
+text: sorted page 2
+| Attachment auf Seite 2\x20
+| \x20
+text: range 2-3
+| Attachment auf Seite 2\x20
+| \x20
+text: separators 1-2
+| <PAGE><A><P>Dies ist ein Test für Attachments! <EOL>
+| </P><P> <W> </P></A></PAGE>
+| <PAGE><A><P>Attachment auf Seite 2 <EOL>
+| </P><P> </P></A></PAGE>

@@ -1,0 +1,28 @@
+text: default page 1
+| العربية
+| العربية
+| test الختبار
+| 14 april 1434 ١٤  إبريل ١٤٣٤
+| 14-april-1434 ١٤-إبريل-١٤٣٤
+| (january) (يناير)
+| «self test» «إختبار ذاتي»
+| A line with an Arabic العربية word embedded.
+text: sorted page 1
+| العربية
+| العربية
+| test الختبار
+| 14 april 1434 ١٤  إبريل ١٤٣٤
+| 14-april-1434 ١٤-إبريل-١٤٣٤
+| (january) (يناير)
+| «self test» «إختبار ذاتي»
+| A line with an Arabic العربية word embedded.
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>العربية<EOL>
+| العربية<EOL>
+| </P><P>test <W>الختبار<EOL>
+| 14 april 1434<W>١٤  إبريل ١٤٣٤<EOL>
+| 14-april-1434<W>١٤-إبريل-١٤٣٤<EOL>
+| (january)<W>(يناير)<EOL>
+| «self test»<W>«إختبار ذاتي»<EOL>
+| </P><P>A line with an Arabic العربية word embedded.</P></A></PAGE>

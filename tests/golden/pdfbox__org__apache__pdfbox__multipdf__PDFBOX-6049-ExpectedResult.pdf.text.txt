@@ -1,0 +1,112 @@
+text: default page 1
+| rotation 0
+| O
+| ve
+| rla
+| y
+text: default page 2
+| ro
+| tatio
+| n
+|  90O
+| ve
+| rla
+| y
+text: default page 3
+| rotation 180
+| O
+| ve
+| rla
+| y
+text: default page 4
+| ro
+| ta
+| ti
+| o
+| n
+|  2
+| 70
+| O
+| ve
+| rla
+| y
+text: default page 5
+| rotation 0
+| O
+| ve
+| rla
+| y
+text: default page 6
+| ro
+| tatio
+| n
+|  90O
+| ve
+| rla
+| y
+text: default page 7
+| rotation 180
+| O
+| ve
+| rla
+| y
+text: default page 8
+| ro
+| ta
+| ti
+| o
+| n
+|  2
+| 70
+| O
+| ve
+| rla
+| y
+text: sorted page 1
+| rotation 0
+| Overlay
+text: sorted page 2
+| rotation 90Overlay
+text: sorted page 3
+| rotation 180
+| Overlay
+text: sorted page 4
+| Orvotation 270
+| erlay
+text: sorted page 5
+| rotation 0
+| Overlay
+text: sorted page 6
+| rotation 90Overlay
+text: sorted page 7
+| rotation 180
+| Overlay
+text: sorted page 8
+| Orvotation 270
+| erlay
+text: range 2-3
+| ro
+| tatio
+| n
+|  90O
+| ve
+| rla
+| y
+| rotation 180
+| O
+| ve
+| rla
+| y
+text: separators 1-2
+| <PAGE><A><P>rotation 0<EOL>
+| </P><P>O<EOL>
+| ve<EOL>
+| </P><P>rla<EOL>
+| y</P></A></PAGE>
+| <PAGE><A><P>ro<EOL>
+| tatio<EOL>
+| </P><P>n<EOL>
+|  90O<EOL>
+| </P><P>ve<EOL>
+| rla<EOL>
+| </P><P>y</P></A></PAGE>

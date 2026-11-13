@@ -1,0 +1,185 @@
+text: default page 1
+| Testing object
+| Rounded shape - text
+| box Testing object
+| Circle converted to
+| text box
+| Table with rounded corners
+| Table with double lines
+| Další nehoda kamionu uzavřela na větší část odpoledne úsek dálnice D1 z Brna na
+| Kroměříž.
+| Ruská expedice Arktika 2007 dosáhla dna Severního ledového oceánu pod
+| severním pólem. Podle agentury Itar-tass.
+| Testovací Dokument Tabulky and Frames
+| Z a t í m c o
+| ně které banky
+| český bankovní
+| trh definitivně
+| opouště jí, jiné
+| s e n a n ě j
+| naopak hrnou.
+| V Česku se
+| hodlá prosadit
+| nová banka.
+| P ři c h á z í z
+| Polska a měla
+| by být zajímavá
+| p ře d e v š í m
+| c e n o v ě . S
+| k l i e n t y
+| k o m u n i k u j e
+| převážně na
+| dálku. Jmenuje
+| se mBank.
+| I n t e r n e t o v á
+| mBank (retailová
+| součást BRE Bank)
+| funguje v Polsku
+| sedm let. Na
+| tamním trhu si
+| své klienty našla
+| poměrně rychle a
+| v s ou ča sn os t i
+| sp ravu je 1,85
+| m i l i o n u ú č t ů
+| (Polsko má kolem
+| 3 8 , 5 m i l i o n u
+| obyvatel). To je v
+| Čechách velmi
+| d o b ře z n á m ý
+| scénář. Podobně
+| rychlý nástup zde
+| totiž měla v roce
+| 1997 tehde jš í
+| novinka – čistě
+| i n t e r n e t o v á
+| eBanka.
+| mBank nenabízí
+| všechno, ale zato
+| za atraktivní ceny
+| Zákazníci budou
+| moci využívat jak
+| depozitních, tak
+| úvěr ových služeb
+| banky. Chybět by
+| v nabídce neměly
+| s po t řeb i t e l s k é
+| úvě ry, kreditní
+| karty, hypoteční
+| úvěry, osobní účty
+| č i m o ž n o s t
+| i nves tovat do
+| cenných papírů.
+text: sorted page 1
+| Další nehoda kamionu uzavřela na větší část odpoledne úsek dálnice D1 z Brna na
+| Kroměříž.
+| Ruská expedice Arktika 2007 dosáhla dna Severního ledového oceánu pod
+| severním pólem. Podle agentury Itar-tass.
+| Testovací Dokument Tabulky and Frames
+| Z a t í m c o I n t e r n e t o v á mBank nenabízí
+| ně které banky
+| český bankovní mBank (retailová všechno, ale zato
+| trh definitivně součást BRE Bank) za atraktivní ceny
+| opouště jí, jiné funguje v Polsku Zákazníci budou
+| s e n a n ě j sedm let. Na moci využívat jak
+| naopak hrnou.
+| V Česku se tamním trhu si depozitních, tak
+| hodlá prosadit své klienty našla úvěr ových služeb
+| nová banka. poměrně rychle a banky. Chybět by
+| P ři c h á z í z v s ou ča sn os t i v nabídce neměly
+| Polska a měla
+| by být zajímavá spravu je 1,85 s po t řeb i t e l s k é
+| p ře d e v š í m m i l i o n u ú č t ů úvě ry, kreditní
+| c e n o v ě . S (Polsko má kolem karty, hypoteční
+| k l i e n t y
+| k o m u n i k u j e 3 8 , 5 m i l i o n u úvěry, osobní účty
+| převážně na obyvatel). To je v č i m o ž n o s t
+| dálku. Jmenuje Čechách velmi i nves tovat do
+| se mBank. d o b ře z n á m ý cenných papírů.
+| scénář. Podobně
+| rychlý nástup zde
+| totiž měla v roce
+| 1997 tehde jš í
+| novinka – čistě
+| i n t e r n e t o v á
+| eBanka.
+| Testing object
+| Rounded shape - text
+| box Testing object
+| Circle converted to
+| text box
+| Table with rounded corners
+| Table with double lines
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Testing object<EOL>
+| </P><P>Rounded shape - text<EOL>
+| box<W>Testing object<EOL>
+| </P><P>Circle converted to<EOL>
+| text box<EOL>
+| </P><P>Table with rounded corners<EOL>
+| </P><P>Table with double lines<EOL>
+| </P><P>Další nehoda kamionu uzavřela na větší část odpoledne úsek dálnice D1 z Brna na<EOL>
+| Kroměříž.<EOL>
+| </P><P>Ruská expedice Arktika 2007 dosáhla dna Severního ledového oceánu pod<EOL>
+| severním pólem. Podle agentury Itar-tass.<EOL>
+| </P><P>Testovací<W>Dokument<W>Tabulky and<W>Frames<EOL>
+| </P><P>Z<W>a<W>t<W>í<W>m<W>c<W>o<EOL>
+| ně<W>které<W>banky<EOL>
+| český<W>bankovní<EOL>
+| trh<W>definitivně<EOL>
+| opouště<W>jí,<W>jiné<EOL>
+| s<W>e<W>n<W>a<W>n<W>ě<W>j<EOL>
+| naopak<W>hrnou.<EOL>
+| V<W>Česku<W>se<EOL>
+| hodlá<W>prosadit<EOL>
+| nová<W>banka.<EOL>
+| P<W>ři<W>c<W>h<W>á<W>z<W>í<W>z<EOL>
+| Polska<W>a<W>měla<EOL>
+| by<W>být<W>zajímavá<EOL>
+| p<W>ře<W>d<W>e<W>v<W>š<W>í<W>m<EOL>
+| c<W>e<W>n<W>o<W>v<W>ě<W>.<W>S<EOL>
+| k<W>l<W>i<W>e<W>n<W>t<W>y<EOL>
+| k<W>o<W>m<W>u<W>n<W>i<W>k<W>u<W>j<W>e<EOL>
+| převážně<W>na<EOL>
+| dálku.<W>Jmenuje<EOL>
+| se mBank.<EOL>
+| </P><P>I<W>n<W>t<W>e<W>r<W>n<W>e<W>t<W>o<W>v<W>á<EOL>
+| mBank<W>(retailová<EOL>
+| součást<W>BRE<W>Bank)<EOL>
+| funguje<W>v<W>Polsku<EOL>
+| sedm<W>let.<W>Na<EOL>
+| tamním<W>trhu<W>si<EOL>
+| své<W>klienty<W>našla<EOL>
+| poměrně<W>rychle<W>a<EOL>
+| v<W>s<W>ou<W>ča<W>sn<W>os<W>t<W>i<EOL>
+| sp<W>ravu<W>je<W>1,85<EOL>
+| m<W>i<W>l<W>i<W>o<W>n<W>u<W>ú<W>č<W>t<W>ů<EOL>
+| (Polsko<W>má<W>kolem<EOL>
+| 3<W>8<W>,<W>5<W>m<W>i<W>l<W>i<W>o<W>n<W>u<EOL>
+| obyvatel).<W>To<W>je<W>v<EOL>
+| Čechách<W>velmi<EOL>
+| d<W>o<W>b<W>ře<W>z<W>n<W>á<W>m<W>ý<EOL>
+| scénář.<W>Podobně<EOL>
+| rychlý<W>nástup<W>zde<EOL>
+| totiž<W>měla<W>v<W>roce<EOL>
+| 1997<W>tehde<W>jš<W>í<EOL>
+| novinka<W>–<W>čistě<EOL>
+| i<W>n<W>t<W>e<W>r<W>n<W>e<W>t<W>o<W>v<W>á<EOL>
+| eBanka.<EOL>
+| </P><P>mBank<W>nenabízí<EOL>
+| všechno,<W>ale<W>zato<EOL>
+| za atraktivní ceny<EOL>
+| Zákazníci<W>budou<EOL>
+| moci<W>využívat<W>jak<EOL>
+| depozitních,<W>tak<EOL>
+| úvěr<W>ových<W>služeb<EOL>
+| banky.<W>Chybět<W>by<EOL>
+| v<W>nabídce<W>neměly<EOL>
+| s<W>po<W>t<W>řeb<W>i<W>t<W>e<W>l<W>s<W>k<W>é<EOL>
+| úvě<W>ry,<W>kreditní<EOL>
+| karty,<W>hypoteční<EOL>
+| úvěry,<W>osobní<W>účty<EOL>
+| č<W>i<W>m<W>o<W>ž<W>n<W>o<W>s<W>t<EOL>
+| i<W>nves<W>tovat<W>do<EOL>
+| cenných papírů.</P></A></PAGE>

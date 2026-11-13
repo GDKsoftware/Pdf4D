@@ -1,0 +1,10 @@
+text: default page 1
+| بآُتَّا \x20
+| \x20
+text: sorted page 1
+|  آَُّتاب
+| \x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>بآُتَّا<W> <EOL>
+|  </P></A></PAGE>

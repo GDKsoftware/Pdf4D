@@ -1,0 +1,10 @@
+text: default page 1
+| Fraternity Members 480 Male Undergraduates 3495
+| Sorority Members 484 Female Undergraduates 4880
+text: sorted page 1
+| Fraternity Members 480 Male Undergraduates 3495
+| Sorority Members 484 Female Undergraduates 4880
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Fraternity Members<W>480<W>Male Undergraduates<W>3495<EOL>
+| Sorority Members<W>484<W>Female Undergraduates<W>4880</P></A></PAGE>

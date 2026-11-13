@@ -1,0 +1,514 @@
+text: default page 1
+| Aquarium Fishes
+|   Aquarium Fishes
+| General Topics\x20
+| Ornamentals & Web Resources\x20
+| Dealers and Pet Shops & Web Resources\x20
+|  \x20
+| General Topics
+| Deutsche Veterinarmedizinische Gesellschaft (1994) Tagung der Fachgruppen\x20
+| “Tierschutzrecht und gerichtliche Veterinarmedizin” und “Fischkrankheiten”, Stuttgart-
+| Hohenheim, 10.-11. Marz 1994. [Proceedings of a meeting of the Expert Groups on animal\x20
+| protection law, veterinary jurisprudence and fish diseases, German Veterinary Medical\x20
+| Society, Stuttgart-Hohenheim, 10-11 March 1994]. Frankfurter Strasse 89, D-6300\x20
+| Giessen, Germany.  111 pp. (In German with English Subtitles) \x20
+| NAL Call No.  SF605 T33 1994
+| The meeting discussed the welfare of fish kept in aquaria and of aviary birds.\x20
+| Descriptors: animal welfare, aquarium fishes, aviary birds\x20
+| Copyright © 2003, CAB International.
+| Manz D (1988)  Tierschutzrelevante Gesichtspunkte bei der Haltung von\x20
+| Aquarienfischen. [Animal welfare aspects of the keeping of aquarium fish.] Tagung\x20
+| der Fachgruppe “Fischkrankheiten” und der Fachgruppe “Zootierkrankheiten” im\x20
+| Tierpark “Hellabrunn”, Munchen, 22./ 23. November 1988.  Deutsche\x20
+| Veterinarmedizinische Gesellschaft Giessen, German Federal Republic.  p.20-26  (In\x20
+| German)\x20
+| NAL Call No.  SF458.5 T3
+| Descriptors: animal welfare, aquarium fishes, fishes, aquatic animals\x20
+| Weins J (1997) Untersuchungen uber die Susswasserzierfischhaltung im Zoofachhandel\x20
+| unter tierhygienischen und tierschutzrechtlichen Aspekten mit Vorschlagen fur die Tatigkeit\x20
+| der berwachungsbehorden [Welfare aspects of the trade in freshwater aquarium fishes.] \x20
+| Fachbereich Veterinarmedizin, Justus-Liebig-Universitat, Giessen Germany.  173 pp. (In\x20
+| German with English summary)             \x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (1 of 6)9/16/2003 9:05:30 AM
+text: default page 2
+| Aquarium Fishes
+| Descriptors: animal welfare, pets, aquarium fishes\x20
+| Wildgoose W (2001) Taking the plunge: treating pet fish. In Practice. 23 (4):220-227\x20
+| NAL Call No.  SF601.I4
+| Descriptors: animal welfare, aquarium fishes, aquatic animals, fish diseases, nitrogen\x20
+| cycle, ornamental fishes, veterinarians, water filters, water quality, goldfish\x20
+| Wilhelm W (1991) The art of keeping aquarium fishes. Tijdschrift voor Diergeneeskunde\x20
+| (Netherlands).  116 Suppl 1 p. 57S-63S.
+| NAL Call No.  41.8 T431 \x20
+| Descriptors: animal welfare, fishes, physiology, animal feed, animal nutrition, housing,\x20
+| standard, water
+| Return to: Top of Document
+| Ornamentals
+| Biffar M (2002) Recent developments in ornamental fish: market, health management\x20
+| and general trends. Bulletin of the European Association of Fish Pathologists. 22 (2):66-
+| 71 ISSN: 0108-0288\x20
+| Descriptors: animal health, animal welfare, aquarium fishes, hobbies, import controls,\x20
+| international trade, ornamental fishes, regulations\x20
+| Ferraz E, Araujo MGL (1999) Ornamental fish from the Rio Negro Basin: Overcoming\x20
+| disease related mortalities. (Eds:) Nelson J, MacKinley D.  Special Adaptations of\x20
+| Tropical Fish.  pp. 11-16
+| Brazil is a major exporter of aquarium fish. The main source for ornamental fish for export\x20
+| is the Rio Negro basin. The techniques for fish capture and transportation are, basically, the\x20
+| same as those used at the beginning of exploitation. Though some improvements have been\x20
+| made in fish husbandry management post-capture, diseases and mortalities are still a\x20
+| problem. A variety of approaches were used to assess the health problems: 1) interviews\x20
+| with fishermen, middlemen and exporters; 2) recording the condition of the fish on their\x20
+| arrival at the exporters' holding facilities; and 3) routine disease screening of 7 species of\x20
+| fish. Results indicate: 1) that the seasonal fluctuations of the water level play an important\x20
+| role in determining fish health; fish captured from areas with low water levels during the\x20
+| long dry season are often found to be in a debilitated condition; 2) in the chain of events\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (2 of 6)9/16/2003 9:05:30 AM
+text: default page 3
+| Aquarium Fishes
+| linking capture to export the most critical phases influencing the health and survival of the\x20
+| fish are the storage of fish by fishermen and the transport to the local reception areas of the\x20
+| exporters in Barcelos. The transport from Barcelos to the principal fish holding facilities in\x20
+| Manaus was previously considered a critical phase, but the recent provision of new boats\x20
+| for fish transport, and improvements in fish husbandry prior to transport, have contributed\x20
+| to reduced mortalities during this period; 3) the most common diseases diagnosed are\x20
+| related to the series of handling stressors and sub-optimal conditions which fish are\x20
+| exposed to prior to delivery at the exporters' holding facilities. The negative effects of\x20
+| handling stress on the condition of the fish can be reduced if more attention is paid to the\x20
+| welfare of the fish following the arrival of the consignments at the reception areas in\x20
+| Barcelos. Another problem concerning the Brazilian ornamental fish industry concerns the\x20
+| legislation controlling the export of ornamental species. Problems related to the export of\x20
+| non-permissible species possessing similar external characteristics to and recorded under\x20
+| the same Latin or common name as a permissible species, are still present.\x20
+| Descriptors:  ornamental fish, tropical fish, diseases, mortality, trade, fish handling,\x20
+| transportation, live storage, river basins, Paracheirodon axelrodi, Hyphessobrycon\x20
+| erythrostigma, Symphysodon discus, Ancistrus, Corydoras robinae, Corydoras adolfoi,\x20
+| Corydoras burguessi, Brazil
+| ASFA; Copyright © 2003, FAO
+| Ford, DM (1991) Ornamental fish. Eds: Anderson RS, Edney ATB. Practical Animal\x20
+| Handling. Pergamon Press plc   Oxford, UK.  p.171-176\x20
+| NAL Call No.  SF61 P73 1991
+| Topics discussed are the inspection tank, the fresh water tank, salt water tank, maintenance,\x20
+| examination, the home aquarium, the pond fish and capture and transporting of fish.  \x20
+| Descriptors: fish diseases, transport of animals, restraint of animals, animal welfare\x20
+| Copyright © 2003, CAB International.
+| Hignette M (1984) The use of cyanide to catch tropical marine fish for aquariums and\x20
+| its diagnosis. Comptes Rendus des Journees Aquariologiques de l'Institut\x20
+| Oceanographique, 16 Dec 198 (Proceedings of Marine Aquariology of the\x20
+| Oceanographical Institute, 16 Dec 1983.). Oceanis. Serie de documents oceanographiques.\x20
+| Paris. 10(5):585-591 ISSN: 0182-0745
+| Marine tropical fish for the pet industry are nowadays very often caught with cyanide\x20
+| sodium, which is used for its “anaesthetic” effect. This method however can be responsible\x20
+| for fish dying as much as several weeks after transport, and must be avoided. In order to\x20
+| stop exporters having recourse to this practice, fish importers and aquariologists must know\x20
+| how to measure cyanide themselves in fish or obtain analyses from reliable laboratories.
+| Descriptors:  cyanides, aquaria, tropical fish, catching methods, fish poisoning, stupefying\x20
+| methods, mortality causes
+| ASFA; Copyright © 2003, FAO
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (3 of 6)9/16/2003 9:05:30 AM
+text: default page 4
+| Aquarium Fishes
+| Wyllie S (1994) The international ornamental fish trade. State Veterinary Journal. 4
+| (1):11-13\x20
+| NAL Call No.  SF601 S8
+| Descriptors:  ornamental fishes, transport of animals, animal welfare, regulations, aquaria, trade,\x20
+| collections, transport\x20
+| Web Resources:\x20
+| Marine Aquarium Council
+| http://www.aquariumcouncil.org/default.asp      \x20
+| Ornamental Fish
+| http://www.ornamentalfish.org/association/code/conduct/conduct.php
+|             Provides code of conduct that addresses all aspects of ornamentals. \x20
+| Return to: Top of Document
+| Dealers and Pet Shops
+| Chan TTC, Sadovy Y (1998) Profile of the marine aquarium fish trade in Hong Kong. \x20
+| Aquarium Sciences and Conservation. 2(4):197-213
+| A market survey and review of government statistics were carried out to establish imports and\x20
+| exports of marine ornamental fishes into and out of Hong Kong, and to examine the local trade\x20
+| in terms of volume, value and species composition. Official government import figures for\x20
+| marine aquarium fishes were available from 1984 to 1991 and from 1997 and 1998. When\x20
+| compared with net imports, export and re export volumes over the 15 year period were\x20
+| small, indicating that most imports entered the local market, or were exported unrecorded.\x20
+| The market survey of marine aquarium shops in Hong Kong was carried out between\x20
+| August 1996 and January 1997. From this survey, an annual estimate of 957,563 coral reef\x20
+| fish was calculated for the local trade, valued at HK$57,453,780, with a mean retail price of\x20
+| HK$60 per fish. These figures account for an estimated 2 3% of the global value and\x20
+| volume of marine aquarium fish trade, according to 1992 figures and, compared with\x20
+| government figures, indicate that official declarations of imports are underreported by at\x20
+| least 2 3 fold. A total of 342 marine aquarium fish species, from 49 families, were recorded\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (4 of 6)9/16/2003 9:05:30 AM
+text: default page 5
+| Aquarium Fishes
+| with about 60% belonging to the families Labridae, Chaetodontidae, Pomacanthidae and\x20
+| Pomacentridae. It was estimated that a large proportion of the trade was in juvenile fishes\x20
+| and almost all fish were less than 10 cm in standard length. It was common to see fishes in\x20
+| poor condition, species hard to maintain in captivity, or those listed for conservation\x20
+| concern, on sale. There are no regulations for local traders of live marine fishes other than\x20
+| those relating to either protected species or animal welfare. Licensing of traders in marine\x20
+| fishes could be introduced under existing Hong Kong legislation if fishes were to be re\x20
+| classified as animals. This is strongly recommended as a step towards regulating and\x20
+| managing the trade in Hong Kong.\x20
+| Descriptors:  aquarium culture, ornamental fish, aquaculture economics, marine fish,\x20
+| resource conservation, ISEW, Hong Kong\x20
+| ASFA; Copyright © 2003, FAO
+| Etscheidt J (1995) Kriterien zur beurteilung der haltung von\x20
+| suesswasseraquarienfischen im zoohandel [Critical aspects of the welfare of\x20
+| freshwater fish in pet shops].  Tieraerztliche Umschau. 50(3):196-199 (In German)
+| NAL Call No.  41.8 T445
+| It is possible with the aid of key parameters to assess the welfare of freshwater fish kept in\x20
+| petshops. The most important factors are water quality, stocking density, social behaviour, inter-
+| species interactions, the decoration and structure of the fish tanks, the technical devices and the\x20
+| expertise of the owner in terms of feeding and the management of water changes and filtering.\x20
+| Descriptors: freshwater fish, ornamental fish, stocking density, water quality control,\x20
+| aquariology, fish, animal welfare \x20
+| ASFA; Copyright © 2003, FAO
+| Nowak, D. (1993) Tierschutzrelevante Probleme bei der Kontrolle von\x20
+| Zoofachgeschaften aus amtstierarztlicher Sicht [Problems of animal welfare during\x20
+| official veterinary surveillance of pet shops].  Deutsche Tierarztliche Wochenschrift  100
+| (2):76-78 (In German with English Summary)
+| NAL Call No.  41.8 D482\x20
+| From a survey of all official veterinarians in Berlin. Typical problems of keeping fishes, birds,\x20
+| rodents and reptiles are listed. Many of the vets reported the lack of practical guidance,\x20
+| manuals or expert opinions.\x20
+| Descriptors: pets, aviary birds, animal welfare, veterinary services \x20
+| Copyright © 2003, CAB International.
+| Winter M (1993) Tierschutzgerechte Haltung von Zierfischen im Zoohandel - eine Studie.\x20
+| [Humane handling of aquarium fish by animal dealers.] Tierarztliche Fakultat, Ludwig-
+| Maximilians-Universitat, Munchen.  190 pp.  (In German with English summary). Thesis.
+| Descriptors: zootechny, animal welfare, aquarium fishes, fishes
+| Copyright © 2003, CAB International.
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (5 of 6)9/16/2003 9:05:30 AM
+text: default page 6
+| Aquarium Fishes
+| Web Resources:
+| APHIS Animal Care
+| Publications
+| http://www.aphis.usda.gov/ac/publications.html\x20
+|             Links to the Animal Welfare Act, Regulations, and Standards and other related publications.
+| Return to: Contents    OR    Top of Document\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (6 of 6)9/16/2003 9:05:30 AM
+text: sorted page 1
+| Aquarium Fishes
+|   Aquarium Fishes
+| General Topics\x20
+| Ornamentals & Web Resources\x20
+| Dealers and Pet Shops & Web Resources\x20
+|  \x20
+| General Topics
+| Deutsche Veterinarmedizinische Gesellschaft (1994) Tagung der Fachgruppen\x20
+| “Tierschutzrecht und gerichtliche Veterinarmedizin” und “Fischkrankheiten”, Stuttgart-
+| Hohenheim, 10.-11. Marz 1994. [Proceedings of a meeting of the Expert Groups on animal\x20
+| protection law, veterinary jurisprudence and fish diseases, German Veterinary Medical\x20
+| Society, Stuttgart-Hohenheim, 10-11 March 1994]. Frankfurter Strasse 89, D-6300\x20
+| Giessen, Germany.  111 pp. (In German with English Subtitles) \x20
+| NAL Call No.  SF605 T33 1994
+| The meeting discussed the welfare of fish kept in aquaria and of aviary birds.\x20
+| Descriptors: animal welfare, aquarium fishes, aviary birds\x20
+| Copyright © 2003, CAB International.
+| Manz D (1988)  Tierschutzrelevante Gesichtspunkte bei der Haltung von\x20
+| Aquarienfischen. [Animal welfare aspects of the keeping of aquarium fish.] Tagung\x20
+| der Fachgruppe “Fischkrankheiten” und der Fachgruppe “Zootierkrankheiten” im\x20
+| Tierpark “Hellabrunn”, Munchen, 22./ 23. November 1988.  Deutsche\x20
+| Veterinarmedizinische Gesellschaft Giessen, German Federal Republic.  p.20-26  (In\x20
+| German)\x20
+| NAL Call No.  SF458.5 T3
+| Descriptors: animal welfare, aquarium fishes, fishes, aquatic animals\x20
+| Weins J (1997) Untersuchungen uber die Susswasserzierfischhaltung im Zoofachhandel\x20
+| unter tierhygienischen und tierschutzrechtlichen Aspekten mit Vorschlagen fur die Tatigkeit\x20
+| der berwachungsbehorden [Welfare aspects of the trade in freshwater aquarium fishes.] \x20
+| Fachbereich Veterinarmedizin, Justus-Liebig-Universitat, Giessen Germany.  173 pp. (In\x20
+| German with English summary)             \x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (1 of 6)9/16/2003 9:05:30 AM
+text: sorted page 2
+| Aquarium Fishes
+| Descriptors: animal welfare, pets, aquarium fishes\x20
+| Wildgoose W (2001) Taking the plunge: treating pet fish. In Practice. 23 (4):220-227\x20
+| NAL Call No.  SF601.I4
+| Descriptors: animal welfare, aquarium fishes, aquatic animals, fish diseases, nitrogen\x20
+| cycle, ornamental fishes, veterinarians, water filters, water quality, goldfish\x20
+| Wilhelm W (1991) The art of keeping aquarium fishes. Tijdschrift voor Diergeneeskunde\x20
+| (Netherlands).  116 Suppl 1 p. 57S-63S.
+| NAL Call No.  41.8 T431 \x20
+| Descriptors: animal welfare, fishes, physiology, animal feed, animal nutrition, housing,\x20
+| standard, water
+| Return to: Top of Document
+| Ornamentals
+| Biffar M (2002) Recent developments in ornamental fish: market, health management\x20
+| and general trends. Bulletin of the European Association of Fish Pathologists. 22 (2):66-
+| 71 ISSN: 0108-0288\x20
+| Descriptors: animal health, animal welfare, aquarium fishes, hobbies, import controls,\x20
+| international trade, ornamental fishes, regulations\x20
+| Ferraz E, Araujo MGL (1999) Ornamental fish from the Rio Negro Basin: Overcoming\x20
+| disease related mortalities. (Eds:) Nelson J, MacKinley D.  Special Adaptations of\x20
+| Tropical Fish.  pp. 11-16
+| Brazil is a major exporter of aquarium fish. The main source for ornamental fish for export\x20
+| is the Rio Negro basin. The techniques for fish capture and transportation are, basically, the\x20
+| same as those used at the beginning of exploitation. Though some improvements have been\x20
+| made in fish husbandry management post-capture, diseases and mortalities are still a\x20
+| problem. A variety of approaches were used to assess the health problems: 1) interviews\x20
+| with fishermen, middlemen and exporters; 2) recording the condition of the fish on their\x20
+| arrival at the exporters' holding facilities; and 3) routine disease screening of 7 species of\x20
+| fish. Results indicate: 1) that the seasonal fluctuations of the water level play an important\x20
+| role in determining fish health; fish captured from areas with low water levels during the\x20
+| long dry season are often found to be in a debilitated condition; 2) in the chain of events\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (2 of 6)9/16/2003 9:05:30 AM
+text: sorted page 3
+| Aquarium Fishes
+| linking capture to export the most critical phases influencing the health and survival of the\x20
+| fish are the storage of fish by fishermen and the transport to the local reception areas of the\x20
+| exporters in Barcelos. The transport from Barcelos to the principal fish holding facilities in\x20
+| Manaus was previously considered a critical phase, but the recent provision of new boats\x20
+| for fish transport, and improvements in fish husbandry prior to transport, have contributed\x20
+| to reduced mortalities during this period; 3) the most common diseases diagnosed are\x20
+| related to the series of handling stressors and sub-optimal conditions which fish are\x20
+| exposed to prior to delivery at the exporters' holding facilities. The negative effects of\x20
+| handling stress on the condition of the fish can be reduced if more attention is paid to the\x20
+| welfare of the fish following the arrival of the consignments at the reception areas in\x20
+| Barcelos. Another problem concerning the Brazilian ornamental fish industry concerns the\x20
+| legislation controlling the export of ornamental species. Problems related to the export of\x20
+| non-permissible species possessing similar external characteristics to and recorded under\x20
+| the same Latin or common name as a permissible species, are still present.\x20
+| Descriptors:  ornamental fish, tropical fish, diseases, mortality, trade, fish handling,\x20
+| transportation, live storage, river basins, Paracheirodon axelrodi, Hyphessobrycon\x20
+| erythrostigma, Symphysodon discus, Ancistrus, Corydoras robinae, Corydoras adolfoi,\x20
+| Corydoras burguessi, Brazil
+| ASFA; Copyright © 2003, FAO
+| Ford, DM (1991) Ornamental fish. Eds: Anderson RS, Edney ATB. Practical Animal\x20
+| Handling. Pergamon Press plc   Oxford, UK.  p.171-176\x20
+| NAL Call No.  SF61 P73 1991
+| Topics discussed are the inspection tank, the fresh water tank, salt water tank, maintenance,\x20
+| examination, the home aquarium, the pond fish and capture and transporting of fish.  \x20
+| Descriptors: fish diseases, transport of animals, restraint of animals, animal welfare\x20
+| Copyright © 2003, CAB International.
+| Hignette M (1984) The use of cyanide to catch tropical marine fish for aquariums and\x20
+| its diagnosis. Comptes Rendus des Journees Aquariologiques de l'Institut\x20
+| Oceanographique, 16 Dec 198 (Proceedings of Marine Aquariology of the\x20
+| Oceanographical Institute, 16 Dec 1983.). Oceanis. Serie de documents oceanographiques.\x20
+| Paris. 10(5):585-591 ISSN: 0182-0745
+| Marine tropical fish for the pet industry are nowadays very often caught with cyanide\x20
+| sodium, which is used for its “anaesthetic” effect. This method however can be responsible\x20
+| for fish dying as much as several weeks after transport, and must be avoided. In order to\x20
+| stop exporters having recourse to this practice, fish importers and aquariologists must know\x20
+| how to measure cyanide themselves in fish or obtain analyses from reliable laboratories.
+| Descriptors:  cyanides, aquaria, tropical fish, catching methods, fish poisoning, stupefying\x20
+| methods, mortality causes
+| ASFA; Copyright © 2003, FAO
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (3 of 6)9/16/2003 9:05:30 AM
+text: sorted page 4
+| Aquarium Fishes
+| Wyllie S (1994) The international ornamental fish trade. State Veterinary Journal. 4
+| (1):11-13\x20
+| NAL Call No.  SF601 S8
+| Descriptors:  ornamental fishes, transport of animals, animal welfare, regulations, aquaria, trade,\x20
+| collections, transport\x20
+| Web Resources:\x20
+| Marine Aquarium Council
+| http://www.aquariumcouncil.org/default.asp      \x20
+| Ornamental Fish
+| http://www.ornamentalfish.org/association/code/conduct/conduct.php
+|             Provides code of conduct that addresses all aspects of ornamentals. \x20
+| Return to: Top of Document
+| Dealers and Pet Shops
+| Chan TTC, Sadovy Y (1998) Profile of the marine aquarium fish trade in Hong Kong. \x20
+| Aquarium Sciences and Conservation. 2(4):197-213
+| A market survey and review of government statistics were carried out to establish imports and\x20
+| exports of marine ornamental fishes into and out of Hong Kong, and to examine the local trade\x20
+| in terms of volume, value and species composition. Official government import figures for\x20
+| marine aquarium fishes were available from 1984 to 1991 and from 1997 and 1998. When\x20
+| compared with net imports, export and re export volumes over the 15 year period were\x20
+| small, indicating that most imports entered the local market, or were exported unrecorded.\x20
+| The market survey of marine aquarium shops in Hong Kong was carried out between\x20
+| August 1996 and January 1997. From this survey, an annual estimate of 957,563 coral reef\x20
+| fish was calculated for the local trade, valued at HK$57,453,780, with a mean retail price of\x20
+| HK$60 per fish. These figures account for an estimated 2 3% of the global value and\x20
+| volume of marine aquarium fish trade, according to 1992 figures and, compared with\x20
+| government figures, indicate that official declarations of imports are underreported by at\x20
+| least 2 3 fold. A total of 342 marine aquarium fish species, from 49 families, were recorded\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (4 of 6)9/16/2003 9:05:30 AM
+text: sorted page 5
+| Aquarium Fishes
+| with about 60% belonging to the families Labridae, Chaetodontidae, Pomacanthidae and\x20
+| Pomacentridae. It was estimated that a large proportion of the trade was in juvenile fishes\x20
+| and almost all fish were less than 10 cm in standard length. It was common to see fishes in\x20
+| poor condition, species hard to maintain in captivity, or those listed for conservation\x20
+| concern, on sale. There are no regulations for local traders of live marine fishes other than\x20
+| those relating to either protected species or animal welfare. Licensing of traders in marine\x20
+| fishes could be introduced under existing Hong Kong legislation if fishes were to be re\x20
+| classified as animals. This is strongly recommended as a step towards regulating and\x20
+| managing the trade in Hong Kong.\x20
+| Descriptors:  aquarium culture, ornamental fish, aquaculture economics, marine fish,\x20
+| resource conservation, ISEW, Hong Kong\x20
+| ASFA; Copyright © 2003, FAO
+| Etscheidt J (1995) Kriterien zur beurteilung der haltung von\x20
+| suesswasseraquarienfischen im zoohandel [Critical aspects of the welfare of\x20
+| freshwater fish in pet shops].  Tieraerztliche Umschau. 50(3):196-199 (In German)
+| NAL Call No.  41.8 T445
+| It is possible with the aid of key parameters to assess the welfare of freshwater fish kept in\x20
+| petshops. The most important factors are water quality, stocking density, social behaviour, inter-
+| species interactions, the decoration and structure of the fish tanks, the technical devices and the\x20
+| expertise of the owner in terms of feeding and the management of water changes and filtering.\x20
+| Descriptors: freshwater fish, ornamental fish, stocking density, water quality control,\x20
+| aquariology, fish, animal welfare \x20
+| ASFA; Copyright © 2003, FAO
+| Nowak, D. (1993) Tierschutzrelevante Probleme bei der Kontrolle von\x20
+| Zoofachgeschaften aus amtstierarztlicher Sicht [Problems of animal welfare during\x20
+| official veterinary surveillance of pet shops].  Deutsche Tierarztliche Wochenschrift  100
+| (2):76-78 (In German with English Summary)
+| NAL Call No.  41.8 D482\x20
+| From a survey of all official veterinarians in Berlin. Typical problems of keeping fishes, birds,\x20
+| rodents and reptiles are listed. Many of the vets reported the lack of practical guidance,\x20
+| manuals or expert opinions.\x20
+| Descriptors: pets, aviary birds, animal welfare, veterinary services \x20
+| Copyright © 2003, CAB International.
+| Winter M (1993) Tierschutzgerechte Haltung von Zierfischen im Zoohandel - eine Studie.\x20
+| [Humane handling of aquarium fish by animal dealers.] Tierarztliche Fakultat, Ludwig-
+| Maximilians-Universitat, Munchen.  190 pp.  (In German with English summary). Thesis.
+| Descriptors: zootechny, animal welfare, aquarium fishes, fishes
+| Copyright © 2003, CAB International.
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (5 of 6)9/16/2003 9:05:30 AM
+text: sorted page 6
+| Aquarium Fishes
+| Web Resources:
+| APHIS Animal Care
+| Publications
+| http://www.aphis.usda.gov/ac/publications.html\x20
+|             Links to the Animal Welfare Act, Regulations, and Standards and other related publications.
+| Return to: Contents    OR    Top of Document\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (6 of 6)9/16/2003 9:05:30 AM
+text: range 2-3
+| Aquarium Fishes
+| Descriptors: animal welfare, pets, aquarium fishes\x20
+| Wildgoose W (2001) Taking the plunge: treating pet fish. In Practice. 23 (4):220-227\x20
+| NAL Call No.  SF601.I4
+| Descriptors: animal welfare, aquarium fishes, aquatic animals, fish diseases, nitrogen\x20
+| cycle, ornamental fishes, veterinarians, water filters, water quality, goldfish\x20
+| Wilhelm W (1991) The art of keeping aquarium fishes. Tijdschrift voor Diergeneeskunde\x20
+| (Netherlands).  116 Suppl 1 p. 57S-63S.
+| NAL Call No.  41.8 T431 \x20
+| Descriptors: animal welfare, fishes, physiology, animal feed, animal nutrition, housing,\x20
+| standard, water
+| Return to: Top of Document
+| Ornamentals
+| Biffar M (2002) Recent developments in ornamental fish: market, health management\x20
+| and general trends. Bulletin of the European Association of Fish Pathologists. 22 (2):66-
+| 71 ISSN: 0108-0288\x20
+| Descriptors: animal health, animal welfare, aquarium fishes, hobbies, import controls,\x20
+| international trade, ornamental fishes, regulations\x20
+| Ferraz E, Araujo MGL (1999) Ornamental fish from the Rio Negro Basin: Overcoming\x20
+| disease related mortalities. (Eds:) Nelson J, MacKinley D.  Special Adaptations of\x20
+| Tropical Fish.  pp. 11-16
+| Brazil is a major exporter of aquarium fish. The main source for ornamental fish for export\x20
+| is the Rio Negro basin. The techniques for fish capture and transportation are, basically, the\x20
+| same as those used at the beginning of exploitation. Though some improvements have been\x20
+| made in fish husbandry management post-capture, diseases and mortalities are still a\x20
+| problem. A variety of approaches were used to assess the health problems: 1) interviews\x20
+| with fishermen, middlemen and exporters; 2) recording the condition of the fish on their\x20
+| arrival at the exporters' holding facilities; and 3) routine disease screening of 7 species of\x20
+| fish. Results indicate: 1) that the seasonal fluctuations of the water level play an important\x20
+| role in determining fish health; fish captured from areas with low water levels during the\x20
+| long dry season are often found to be in a debilitated condition; 2) in the chain of events\x20
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (2 of 6)9/16/2003 9:05:30 AM
+| Aquarium Fishes
+| linking capture to export the most critical phases influencing the health and survival of the\x20
+| fish are the storage of fish by fishermen and the transport to the local reception areas of the\x20
+| exporters in Barcelos. The transport from Barcelos to the principal fish holding facilities in\x20
+| Manaus was previously considered a critical phase, but the recent provision of new boats\x20
+| for fish transport, and improvements in fish husbandry prior to transport, have contributed\x20
+| to reduced mortalities during this period; 3) the most common diseases diagnosed are\x20
+| related to the series of handling stressors and sub-optimal conditions which fish are\x20
+| exposed to prior to delivery at the exporters' holding facilities. The negative effects of\x20
+| handling stress on the condition of the fish can be reduced if more attention is paid to the\x20
+| welfare of the fish following the arrival of the consignments at the reception areas in\x20
+| Barcelos. Another problem concerning the Brazilian ornamental fish industry concerns the\x20
+| legislation controlling the export of ornamental species. Problems related to the export of\x20
+| non-permissible species possessing similar external characteristics to and recorded under\x20
+| the same Latin or common name as a permissible species, are still present.\x20
+| Descriptors:  ornamental fish, tropical fish, diseases, mortality, trade, fish handling,\x20
+| transportation, live storage, river basins, Paracheirodon axelrodi, Hyphessobrycon\x20
+| erythrostigma, Symphysodon discus, Ancistrus, Corydoras robinae, Corydoras adolfoi,\x20
+| Corydoras burguessi, Brazil
+| ASFA; Copyright © 2003, FAO
+| Ford, DM (1991) Ornamental fish. Eds: Anderson RS, Edney ATB. Practical Animal\x20
+| Handling. Pergamon Press plc   Oxford, UK.  p.171-176\x20
+| NAL Call No.  SF61 P73 1991
+| Topics discussed are the inspection tank, the fresh water tank, salt water tank, maintenance,\x20
+| examination, the home aquarium, the pond fish and capture and transporting of fish.  \x20
+| Descriptors: fish diseases, transport of animals, restraint of animals, animal welfare\x20
+| Copyright © 2003, CAB International.
+| Hignette M (1984) The use of cyanide to catch tropical marine fish for aquariums and\x20
+| its diagnosis. Comptes Rendus des Journees Aquariologiques de l'Institut\x20
+| Oceanographique, 16 Dec 198 (Proceedings of Marine Aquariology of the\x20
+| Oceanographical Institute, 16 Dec 1983.). Oceanis. Serie de documents oceanographiques.\x20
+| Paris. 10(5):585-591 ISSN: 0182-0745
+| Marine tropical fish for the pet industry are nowadays very often caught with cyanide\x20
+| sodium, which is used for its “anaesthetic” effect. This method however can be responsible\x20
+| for fish dying as much as several weeks after transport, and must be avoided. In order to\x20
+| stop exporters having recourse to this practice, fish importers and aquariologists must know\x20
+| how to measure cyanide themselves in fish or obtain analyses from reliable laboratories.
+| Descriptors:  cyanides, aquaria, tropical fish, catching methods, fish poisoning, stupefying\x20
+| methods, mortality causes
+| ASFA; Copyright © 2003, FAO
+| http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (3 of 6)9/16/2003 9:05:30 AM
+text: separators 1-2
+| <PAGE><A><P>Aquarium Fishes<EOL>
+| </P><P>  Aquarium Fishes<EOL>
+| General Topics <EOL>
+| </P><P>Ornamentals & Web Resources <EOL>
+| </P><P>Dealers and Pet Shops & Web Resources <EOL>
+| </P><P>  <EOL>
+| </P><P>General Topics<EOL>
+| </P><P>Deutsche Veterinarmedizinische Gesellschaft (1994) Tagung der Fachgruppen <EOL>
+| “Tierschutzrecht und gerichtliche Veterinarmedizin” und “Fischkrankheiten”, Stuttgart-<EOL>
+| Hohenheim, 10.-11. Marz 1994. [Proceedings of a meeting of the Expert Groups on animal <EOL>
+| protection law, veterinary jurisprudence and fish diseases, German Veterinary Medical <EOL>
+| Society, Stuttgart-Hohenheim, 10-11 March 1994]. Frankfurter Strasse 89, D-6300 <EOL>
+| Giessen, Germany.  111 pp. (In German with English Subtitles)  <EOL>
+| NAL Call No.  SF605 T33 1994<EOL>
+| The meeting discussed the welfare of fish kept in aquaria and of aviary birds. <EOL>
+| Descriptors: animal welfare, aquarium fishes, aviary birds <EOL>
+| Copyright © 2003, CAB International.<EOL>
+| </P><P>Manz D (1988)  Tierschutzrelevante Gesichtspunkte bei der Haltung von <EOL>
+| Aquarienfischen. [Animal welfare aspects of the keeping of aquarium fish.] Tagung <EOL>
+| der Fachgruppe “Fischkrankheiten” und der Fachgruppe “Zootierkrankheiten” im <EOL>
+| Tierpark “Hellabrunn”, Munchen, 22./ 23. November 1988.  Deutsche <EOL>
+| Veterinarmedizinische Gesellschaft Giessen, German Federal Republic.  p.20-26  (In <EOL>
+| German) <EOL>
+| NAL Call No.  SF458.5 T3<EOL>
+| Descriptors: animal welfare, aquarium fishes, fishes, aquatic animals <EOL>
+| </P><P>Weins J (1997) Untersuchungen uber die Susswasserzierfischhaltung im Zoofachhandel <EOL>
+| unter tierhygienischen und tierschutzrechtlichen Aspekten mit Vorschlagen fur die Tatigkeit <EOL>
+| der berwachungsbehorden [Welfare aspects of the trade in freshwater aquarium fishes.]  <EOL>
+| Fachbereich Veterinarmedizin, Justus-Liebig-Universitat, Giessen Germany.  173 pp. (In <EOL>
+| German with English summary)              <EOL>
+| </P><P>http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (1 of 6)9/16/2003 9:05:30 AM</P></A></PAGE>
+| <PAGE><A><P>Aquarium Fishes<EOL>
+| </P><P>Descriptors: animal welfare, pets, aquarium fishes <EOL>
+| </P><P>Wildgoose W (2001) Taking the plunge: treating pet fish. In Practice. 23 (4):220-227 <EOL>
+| NAL Call No.  SF601.I4<EOL>
+| Descriptors: animal welfare, aquarium fishes, aquatic animals, fish diseases, nitrogen <EOL>
+| cycle, ornamental fishes, veterinarians, water filters, water quality, goldfish <EOL>
+| </P><P>Wilhelm W (1991) The art of keeping aquarium fishes. Tijdschrift voor Diergeneeskunde <EOL>
+| (Netherlands).  116 Suppl 1 p. 57S-63S.<EOL>
+| NAL Call No.  41.8 T431  <EOL>
+| Descriptors: animal welfare, fishes, physiology, animal feed, animal nutrition, housing, <EOL>
+| standard, water<EOL>
+| </P><P>Return to: Top of Document<EOL>
+| </P><P>Ornamentals<EOL>
+| </P><P>Biffar M (2002) Recent developments in ornamental fish: market, health management <EOL>
+| and general trends. Bulletin of the European Association of Fish Pathologists. 22 (2):66-<EOL>
+| 71 ISSN: 0108-0288 <EOL>
+| Descriptors: animal health, animal welfare, aquarium fishes, hobbies, import controls, <EOL>
+| international trade, ornamental fishes, regulations <EOL>
+| </P><P>Ferraz E, Araujo MGL (1999) Ornamental fish from the Rio Negro Basin: Overcoming <EOL>
+| disease related mortalities. (Eds:) Nelson J, MacKinley D.  Special Adaptations of <EOL>
+| Tropical Fish.  pp. 11-16<EOL>
+| Brazil is a major exporter of aquarium fish. The main source for ornamental fish for export <EOL>
+| is the Rio Negro basin. The techniques for fish capture and transportation are, basically, the <EOL>
+| same as those used at the beginning of exploitation. Though some improvements have been <EOL>
+| made in fish husbandry management post-capture, diseases and mortalities are still a <EOL>
+| problem. A variety of approaches were used to assess the health problems: 1) interviews <EOL>
+| with fishermen, middlemen and exporters; 2) recording the condition of the fish on their <EOL>
+| arrival at the exporters' holding facilities; and 3) routine disease screening of 7 species of <EOL>
+| fish. Results indicate: 1) that the seasonal fluctuations of the water level play an important <EOL>
+| role in determining fish health; fish captured from areas with low water levels during the <EOL>
+| long dry season are often found to be in a debilitated condition; 2) in the chain of events <EOL>
+| </P><P>http://www.nal.usda.gov/awic/pubs/Fishwelfare/aquar.htm (2 of 6)9/16/2003 9:05:30 AM</P></A></PAGE>

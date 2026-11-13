@@ -1,0 +1,163 @@
+text: default page 1
+| 30
+| N o te s  o n \x20
+| C o n tr ib u to r s
+| JO H N  M ARTIN, M .D ., th e  d o n o r of a large collection of\x20
+| h istoric  books o n  th e  d ev e lo p m en t of m edicine h o u se d  in  the\x20
+| John  M artin  Rare Book R oom  of the  H ard in  L ibrary for the\x20
+| H ealth  Sciences, is a re tired  n eu ro su rg e o n  w h o  lives in  Iow a\x20
+| City.
+| KAREN M . M A SO N  is C u ra to r of th e  Iow a W om en 's  A r­
+| chives.
+| ROBERT A. M cC O W N  is H ead  of the  Special Collections\x20
+| D ep artm en t.
+text: default page 2
+| A d v is o r y  B oard  o f  th e \x20
+| F rien d s  o f  th e  U n iv e r s i ty  o f  Io w a  L ib ra ries
+| Connie Brothers Carl Klaus
+| Lacy Daniels Sarah Lande
+| Diane Dillon-Ridgley Henrietta Logan, Chair
+| Annette Fitz Mary Lyman
+| Peg McElroy Fraser Della McGrath
+| Joanne Fritz Mary Anne Madden
+| Webster Gelman Casey Mahon
+| John Gerber Julie K. Scott
+| Bruce E. Gronbeck Virginia R. Stafford
+| William Hamilton W. Richard Summerwill
+| Betsy Hawtrey Rhoda Vernon
+| Margery Hoppin Nancy Baker Wiese
+| W. Bruce Johnson Thomas Yoseloff
+| Jae-On Kim
+| Honorary
+| Dale M. Bentz Alfred S. Martin
+| Homer L. Calkin John Martin
+| Leslie W. Dunlap
+| Ex Officio\x20
+| Sheila D. Creth
+| Annual memberships in the Friends are solicited as follows: Sponsor,\x20
+| $1000; Fellow, $500; Sustaining, $100; Contributing, $50; Friend, $25; and\x20
+| Student, $10. Corporate categories are Corporate Sponsor, $1000; and Cor­
+| porate Fellow, $500. Honor categories include University Librarians Club,\x20
+| $20,000 or more; Benefactor, $10,000 or more; and Patron, $5000. Correspon­
+| dence concerning membership in the Friends should be sent to Barbara I.\x20
+| Dewey, University Libraries, Iowa City, Iowa 52242-1420.
+text: default page 3
+|
+text: sorted page 1
+| N o te s  o n \x20
+| C o n tr ib u to r s
+| JO H N  M ARTIN, M .D ., th e  d o n o r of a large collection of\x20
+| h istoric  books o n  th e  d ev e lo p m en t of m edicine h o u se d  in  the\x20
+| John  M artin  Rare Book R oom  of the  H ard in  L ibrary for the\x20
+| H ealth  Sciences, is a re tired  n eu ro su rg e o n  w h o  lives in  Iow a\x20
+| City.
+| KAREN M . M A SO N  is C u ra to r of th e  Iow a W om en 's  A r­
+| chives.
+| ROBERT A. M cC O W N  is H ead  of the  Special Collections\x20
+| D ep artm en t.
+| 30
+text: sorted page 2
+| A d v is o r y  B oard  o f  th e \x20
+| F rien d s  o f  th e  U n iv e r s i ty  o f  Io w a  L ib ra ries
+| Connie Brothers Carl Klaus
+| Lacy Daniels Sarah Lande
+| Diane Dillon-Ridgley Henrietta Logan, Chair
+| Annette Fitz Mary Lyman
+| Peg McElroy Fraser Della McGrath
+| Joanne Fritz Mary Anne Madden
+| Webster Gelman Casey Mahon
+| John Gerber Julie K. Scott
+| Bruce E. Gronbeck Virginia R. Stafford
+| William Hamilton W. Richard Summerwill
+| Betsy Hawtrey Rhoda Vernon
+| Margery Hoppin Nancy Baker Wiese
+| W. Bruce Johnson Thomas Yoseloff
+| Jae-On Kim
+| Honorary
+| Dale M. Bentz Alfred S. Martin
+| Homer L. Calkin John Martin
+| Leslie W. Dunlap
+| Ex Officio\x20
+| Sheila D. Creth
+| Annual memberships in the Friends are solicited as follows: Sponsor,\x20
+| $1000; Fellow, $500; Sustaining, $100; Contributing, $50; Friend, $25; and\x20
+| Student, $10. Corporate categories are Corporate Sponsor, $1000; and Cor­
+| porate Fellow, $500. Honor categories include University Librarians Club,\x20
+| $20,000 or more; Benefactor, $10,000 or more; and Patron, $5000. Correspon­
+| dence concerning membership in the Friends should be sent to Barbara I.\x20
+| Dewey, University Libraries, Iowa City, Iowa 52242-1420.
+text: sorted page 3
+|
+text: range 2-3
+| A d v is o r y  B oard  o f  th e \x20
+| F rien d s  o f  th e  U n iv e r s i ty  o f  Io w a  L ib ra ries
+| Connie Brothers Carl Klaus
+| Lacy Daniels Sarah Lande
+| Diane Dillon-Ridgley Henrietta Logan, Chair
+| Annette Fitz Mary Lyman
+| Peg McElroy Fraser Della McGrath
+| Joanne Fritz Mary Anne Madden
+| Webster Gelman Casey Mahon
+| John Gerber Julie K. Scott
+| Bruce E. Gronbeck Virginia R. Stafford
+| William Hamilton W. Richard Summerwill
+| Betsy Hawtrey Rhoda Vernon
+| Margery Hoppin Nancy Baker Wiese
+| W. Bruce Johnson Thomas Yoseloff
+| Jae-On Kim
+| Honorary
+| Dale M. Bentz Alfred S. Martin
+| Homer L. Calkin John Martin
+| Leslie W. Dunlap
+| Ex Officio\x20
+| Sheila D. Creth
+| Annual memberships in the Friends are solicited as follows: Sponsor,\x20
+| $1000; Fellow, $500; Sustaining, $100; Contributing, $50; Friend, $25; and\x20
+| Student, $10. Corporate categories are Corporate Sponsor, $1000; and Cor­
+| porate Fellow, $500. Honor categories include University Librarians Club,\x20
+| $20,000 or more; Benefactor, $10,000 or more; and Patron, $5000. Correspon­
+| dence concerning membership in the Friends should be sent to Barbara I.\x20
+| Dewey, University Libraries, Iowa City, Iowa 52242-1420.
+|
+text: separators 1-2
+| <PAGE><A><P>30<EOL>
+| </P><P>N<W>o<W>te<W>s<W> <W>o<W>n<W> <EOL>
+| C<W>o<W>n<W>tr<W>ib<W>u<W>to<W>r<W>s<EOL>
+| </P><P>JO<W>H<W>N<W> <W>M<W>ARTIN, <W>M<W>.D<W>., <W>th<W>e<W> <W>d<W>o<W>n<W>o<W>r <W>of <W>a <W>large <W>collection <W>of <EOL>
+| h<W>istoric<W> <W>books <W>o<W>n<W> <W>th<W>e<W> <W>d<W>ev<W>e<W>lo<W>p<W>m<W>en<W>t <W>of m<W>edicine <W>h<W>o<W>u<W>se<W>d<W> <W>in<W> <W>the <EOL>
+| John<W> <W>M<W>artin<W> <W>Rare <W>Book <W>R<W>oom<W> <W>of <W>the<W> <W>H<W>ard<W>in<W> <W>L<W>ibrary <W>for <W>the <EOL>
+| H<W>ealth<W> <W>Sciences, <W>is <W>a <W>re<W>tired<W> <W>n<W>eu<W>ro<W>su<W>rg<W>e<W>o<W>n<W> <W>w<W>h<W>o<W> <W>lives <W>in<W> <W>Iow<W>a <EOL>
+| City.<EOL>
+| </P><P>KAREN <W>M<W>. <W>M<W>A<W>SO<W>N<W> <W>is <W>C<W>u<W>ra<W>to<W>r <W>of <W>th<W>e<W> <W>Iow<W>a <W>W<W>om<W>en<W>'s<W> <W>A<W>r­<EOL>
+| chives.<EOL>
+| </P><P>ROBERT <W>A. <W>M<W>cC<W>O<W>W<W>N<W> <W>is <W>H<W>ead<W> <W>of <W>the<W> <W>Special <W>Collections <EOL>
+| D<W>ep<W>artm<W>en<W>t.</P></A></PAGE>
+| <PAGE><A><P>A<W>d<W>v<W>is<W>o<W>r<W>y<W> <W>B<W>oard<W> <W>o<W>f<W> <W>th<W>e<W> <EOL>
+| F<W>rien<W>d<W>s<W> <W>o<W>f<W> <W>th<W>e<W> <W>U<W>n<W>iv<W>e<W>r<W>s<W>i<W>ty<W> <W>o<W>f<W> Io<W>w<W>a<W> <W>L<W>ib<W>ra<W>ries<EOL>
+| </P><P>Connie Brothers <W>Carl Klaus<EOL>
+| Lacy Daniels <W>Sarah Lande<EOL>
+| Diane Dillon-Ridgley <W>Henrietta Logan, <W>Chair<EOL>
+| Annette Fitz <W>Mary Lyman<EOL>
+| Peg McElroy Fraser <W>Della McGrath<EOL>
+| Joanne Fritz <W>Mary Anne Madden<EOL>
+| Webster Gelman <W>Casey Mahon<EOL>
+| John Gerber <W>Julie K. <W>Scott<EOL>
+| Bruce E. <W>Gronbeck <W>Virginia R. <W>Stafford<EOL>
+| William Hamilton <W>W. <W>Richard Summerwill<EOL>
+| Betsy Hawtrey <W>Rhoda Vernon<EOL>
+| Margery Hoppin <W>Nancy Baker Wiese<EOL>
+| W. <W>Bruce Johnson <W>Thomas Yoseloff<EOL>
+| Jae-On Kim<EOL>
+| </P><P>Honorary<EOL>
+| Dale M. <W>Bentz <W>Alfred S. <W>Martin<EOL>
+| Homer L. <W>Calkin <W>John Martin<EOL>
+| Leslie W. <W>Dunlap<EOL>
+| </P><P>Ex Officio <EOL>
+| Sheila D. <W>Creth<EOL>
+| </P><P>Annual <W>memberships <W>in <W>the <W>Friends <W>are <W>solicited <W>as <W>follows: <W>Sponsor, <EOL>
+| $1000; <W>Fellow, <W>$500; <W>Sustaining, <W>$100; <W>Contributing, <W>$50; <W>Friend, <W>$25; <W>and <EOL>
+| Student, <W>$10. <W>Corporate <W>categories <W>are <W>Corporate <W>Sponsor, <W>$1000; <W>and Cor­<EOL>
+| porate <W>Fellow, <W>$500. <W>Honor <W>categories <W>include <W>University <W>Librarians <W>Club, <EOL>
+| $20,000 or more; Benefactor, $10,000 or more; and Patron, $5000. <W>Correspon­<EOL>
+| dence <W>concerning <W>membership <W>in <W>the <W>Friends <W>should be <W>sent <W>to <W>Barbara <W>I. <EOL>
+| Dewey, <W>University Libraries, <W>Iowa City, <W>Iowa 52242-1420.</P></A></PAGE>

@@ -1,0 +1,7 @@
+file;source_url;license;notes
+DejaVuSerifCondensed.pfb;https://issues.apache.org/jira/secure/attachment/13064282/DejaVuSerifCondensed.pfb;Bitstream Vera and DejaVu licence;DejaVu Serif Condensed, Type 1 conversion
+FoglihtenNo07.otf;https://archive.apache.org/dist/pdfbox/3.0.8/pdfbox-3.0.8-src.zip#fontbox/src/test/resources/otf/FoglihtenNo07.otf;SIL OFL 1.1;FoglihtenNo07 by Grzegorz Luk, CFF, copy from the PDFBox 3.0.8 source
+JosefinSans-Italic.ttf;https://archive.apache.org/dist/pdfbox/3.0.8/pdfbox-3.0.8-src.zip#fontbox/src/test/resources/ttf/JosefinSans-Italic.ttf;SIL OFL 1.1;Josefin Sans, copy from the PDFBox 3.0.8 source
+LiberationSans-Regular.ttf;https://archive.apache.org/dist/pdfbox/3.0.8/pdfbox-3.0.8-src.zip#fontbox/src/test/resources/ttf/LiberationSans-Regular.ttf;SIL OFL 1.1;Liberation Fonts, copy from the PDFBox 3.0.8 source
+OpenSans-Regular.pfb;https://mirror.math.princeton.edu/pub/CTAN/fonts/opensans/type1/OpenSans-Regular.pfb;Apache-2.0;Open Sans, Type 1 conversion
+SourceSansProBold.otf;https://issues.apache.org/jira/secure/attachment/12684264/SourceSansProBold.otf;SIL OFL 1.1;Source Sans Pro Bold by Adobe, CFF

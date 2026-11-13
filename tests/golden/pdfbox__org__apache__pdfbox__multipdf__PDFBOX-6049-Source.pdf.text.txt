@@ -1,0 +1,62 @@
+text: default page 1
+| rotation 0
+text: default page 2
+| ro
+| tatio
+| n
+|  90
+text: default page 3
+| rotation 180
+text: default page 4
+| ro
+| ta
+| ti
+| o
+| n
+|  2
+| 70
+text: default page 5
+| rotation 0
+text: default page 6
+| ro
+| tatio
+| n
+|  90
+text: default page 7
+| rotation 180
+text: default page 8
+| ro
+| ta
+| ti
+| o
+| n
+|  2
+| 70
+text: sorted page 1
+| rotation 0
+text: sorted page 2
+| rotation 90
+text: sorted page 3
+| rotation 180
+text: sorted page 4
+| rotation 270
+text: sorted page 5
+| rotation 0
+text: sorted page 6
+| rotation 90
+text: sorted page 7
+| rotation 180
+text: sorted page 8
+| rotation 270
+text: range 2-3
+| ro
+| tatio
+| n
+|  90
+| rotation 180
+text: separators 1-2
+| <PAGE><A><P>rotation 0</P></A></PAGE>
+| <PAGE><A><P>ro<EOL>
+| tatio<EOL>
+| </P><P>n<EOL>
+|  90</P></A></PAGE>

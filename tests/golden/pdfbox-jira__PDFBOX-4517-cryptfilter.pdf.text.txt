@@ -1,0 +1,7 @@
+text: default page 1
+|  !"#$%'()*+,-./ 0123456789 Hello World
+text: sorted page 1
+|  !"#$%'()*+,-./ 0123456789 Hello World
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P> !"#$%'()*+,-./ 0123456789 Hello World</P></A></PAGE>

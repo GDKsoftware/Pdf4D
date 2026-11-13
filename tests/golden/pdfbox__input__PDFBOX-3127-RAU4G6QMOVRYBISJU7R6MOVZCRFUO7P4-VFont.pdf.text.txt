@@ -1,0 +1,48 @@
+text: default page 1
+| NOTICE OF PUBLIC HEARING\x20
+| \x20
+| The South Carolina Department of Insurance will hold a public\x20
+| hearing in accordance with the requirements of Section 38-3-
+| 110 ︵5 ︶ Thursday, April 29, 2010 at The Conference and Business\x20
+| Center at the Grand Strand Campus of the Horry-Georgetown\x20
+| Technical College, 950 Crabtree Lane, Myrtle Beach, S.C., 29577\x20
+| from 5:30 p.m.-7:00 p.m.    The purpose of this hearing is to provide\x20
+| an opportunity to discuss and offer input concerning the status of the\x20
+| coastal property insurance market.  The Conference Center is located\x20
+| one mile south of the Myrtle Beach International Airport between\x20
+| Highway 17 Business and Highway 17 Bypass.  The telephone\x20
+| number for the Conference and Business Center is 843-477-2042.\x20
+| \x20
+text: sorted page 1
+| NOTICE OF PUBLIC HEARING\x20
+| \x20
+| The South Carolina Department of Insurance will hold a public\x20
+| hearing in accordance with the requirements of Section 38-3-
+| 110 5  Thursday, April 29, 2010 at The Conference and Business\x20
+| Center at the Grand Strand Campus of the Horry-Georgetown\x20
+| Technical College, 950 Crabtree Lane, Myrtle Beach, S.C., 29577\x20
+| from 5:30 p.m.-7:00 p.m.    The purpose of this hearing is to provide\x20
+| an opportunity to discuss and offer input concerning the status of the\x20
+| coastal property insurance market.  The Conference Center is located\x20
+| one mile south of the Myrtle Beach International Airport between\x20
+| Highway 17 Business and Highway 17 Bypass.  The telephone\x20
+| number for the Conference and Business Center is 843-477-2042.\x20
+| \x20
+| ︵
+| ︶
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>NOTICE OF PUBLIC HEARING <EOL>
+|  <EOL>
+| </P><P>The <W>South <W>Carolina <W>Department <W>of <W>Insurance <W>will <W>hold <W>a <W>public <EOL>
+| hearing <W>in <W>accordance <W>with <W>the <W>requirements <W>of <W>Section <W>38-3-<EOL>
+| 110<W>︵5<W>︶ Thursday, April 29, 2010 at The Conference and Business <EOL>
+| Center <W>at <W>the <W>Grand <W>Strand <W>Campus <W>of <W>the <W>Horry-Georgetown <EOL>
+| Technical <W>College, <W>950 <W>Crabtree <W>Lane, <W>Myrtle <W>Beach, <W>S.C., <W>29577 <EOL>
+| from 5:30 p.m.-7:00 p.m.    The purpose of this hearing is to provide <EOL>
+| an opportunity to discuss and offer input concerning the status of the <EOL>
+| coastal property insurance market.  The Conference Center is located <EOL>
+| one <W>mile <W>south <W>of <W>the <W>Myrtle <W>Beach <W>International <W>Airport <W>between <EOL>
+| Highway <W>17 <W>Business and <W>Highway <W>17 <W>Bypass. <W> <W>The <W>telephone <EOL>
+| number for the Conference and Business Center is 843-477-2042. <EOL>
+|  </P></A></PAGE>

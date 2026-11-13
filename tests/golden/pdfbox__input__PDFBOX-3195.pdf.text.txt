@@ -1,0 +1,10 @@
+text: default page 1
+| A
+| 123
+text: sorted page 1
+| A
+| 123
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>A<EOL>
+| </P><P>123</P></A></PAGE>

@@ -1,0 +1,7 @@
+text: default page 1
+| 𝑋̂
+text: sorted page 1
+| 𝑋̂
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>𝑋̂</P></A></PAGE>

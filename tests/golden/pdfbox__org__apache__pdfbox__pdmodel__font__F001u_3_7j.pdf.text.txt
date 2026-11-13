@@ -1,0 +1,7 @@
+text: default page 1
+| Finished Product พลังรัก\x20
+text: sorted page 1
+| Finished Product พลังรัก\x20
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Finished Product<W>พลังรัก </P></A></PAGE>

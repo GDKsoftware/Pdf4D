@@ -1,0 +1,513 @@
+text: default page 1
+| Improving Generic Drug Review Performance\x20
+| Generic Drug Budget Authority:  +5,561,000; 13 FTE\x20
+| Generic Drug User Fees:  +$15,701,000; 34 FTE (First Year)\x20
+| \x20
+| 1.  Why is this initiative necessary?\x20
+| \x20
+| The number of generic drug applications submitted to FDA has been rising exponentially. \x20
+| During the past six years, applications increased by 158 percent, rising from 307\x20
+| applications in FY 2002 to 793 applications in FY 2006.  FDA estimates it will receive\x20
+| 857 applications in FY 2008.  These statistics demonstrate the urgent need for increased\x20
+| resources for the Generic Drug Review Program.  The additional budget authority and\x20
+| proposed user fees in the Improving Generic Drug Review Initiative allow FDA to\x20
+| respond to the growing number applications.  \x20
+| \x20
+| Generic drugs often cost 20 to 70 percent less than their brand-name counterparts.  The\x20
+| promise of significant savings makes timely review of generic drug applications a vital\x20
+| part of the Administration’s strategy to reduce healthcare costs associated with\x20
+| prescription drugs.  \x20
+| \x20
+| The following table identifies the funding history for the Generic Drug Review Program\x20
+| and the FY 2008 levels, including the increased generic drug budget authority and\x20
+| proposed user fees:\x20
+| \x20
+| Funding History for the Generic Drug Review Program\x20
+| \x20
+| Program FY 2006\x20
+| Actuals\x20
+| FY 2007\x20
+| President\x20
+| Budget\x20
+| FY 2008\x20
+| Initiative\x20
+| FY 2008\x20
+| Total1
+| +/- 07 President\x20
+| Budget\x20
+| Budget Authority\x20
+| Human Drugs $62,567,000 $64,600,000 $70,161,000 $5,561,000\x20
+| Center $55,437,000 $58,000,000 $63,561,000 $5,561,000\x20
+| Field $7,130,000 $6,600,000 $6,600,000 -\x20
+| User Fees\x20
+| Generic Drug User Fee 0 0 $15,701,000 $15,701,000\x20
+| Program Total $62,567,000 $64,600,000 $85,862,000 $21,262,000\x20
+|            1 The FY 2008 Generic Drug total is $87,102,000.  This includes generic drug funds and pay increase.   \x20
+| \x20
+| 2.  How does this initiative support important public health priorities?\x20
+| \x20
+| This initiative supports the public health priorities of the HHS 500-day plan for\x20
+| Transforming Healthcare.  Specifically, the initiative supports the Secretary’s objective\x20
+| for rapidly approving safe new drugs, continually monitoring drug safety after approval,\x20
+| and proactively communicating new information to providers and patients.  Improving\x20
+| generic drug review performance also supports other public health priorities:\x20
+| \x20
+| • The initiative advances Medicare Rx objectives by promoting the availability of\x20
+| lower cost generic alternatives.\x20
+text: default page 2
+| • The initiative advances Medicaid Modernization by enabling FDA to approve\x20
+| lower-cost generic drugs that generate savings to support a modernized Medicaid\x20
+| program.\x20
+| • The initiative supports Pandemic Preparedness by allowing prompt review of\x20
+| generic drugs that support the HHS pandemic influenza response.\x20
+| Furthermore, enhanced generic drug review ensures that American consumers have\x20
+| additional choices when buying drugs, which will produce a dramatic return on\x20
+| investment for the resources that FDA spends on generic drug review.  The\x20
+| Congressional Budget Office estimates that generic drug use results in U.S. savings of\x20
+| $10 billion per year.  One of the nation’s largest pharmacy benefit management\x20
+| companies estimates that more extensive generic drug use could save an additional $20\x20
+| billion per year.  As $60-70 billion in brand name drugs lose patent protection in the next\x20
+| few years, Americans could substitute generic drugs for brand name drugs at a rate of 50\x20
+| to 75 percent.  \x20
+| \x20
+| Enhanced generic drug review also directly supports the Secretary’s vision for improving\x20
+| the human condition around the world.  The FDA Generic Drug Review Program plays a\x20
+| significant role in the President’s Emergency Plan for AIDS Relief (PEPFAR), by\x20
+| approving new generic treatments for HIV and AIDS.  If FDA deems a generic drug safe\x20
+| and effective – but the brand name equivalent is still under patent in the United States –\x20
+| FDA can grant a tentative approval for the drug.  The tentative approval allows the drug\x20
+| to be sold outside of the United States for HIV and AIDS treatment.\x20
+| \x20
+| 3.  What are the risks of not funding this initiative?\x20
+| \x20
+| Not proceeding with the Improving Generic Drug Review Initiative will result in the\x20
+| inability to capture significant savings from generic drug use.  Generic drugs reduce the\x20
+| cost of pharmaceutical care and allow increased access to health care for many\x20
+| Americans.  Generic drugs have the same quality, strength, purity, and stability as brand-
+| name drugs.  \x20
+| \x20
+| Government programs rely on the availability of generic drugs to hold down costs. \x20
+| According to data from the National Association of Chain Drug Stores, in 2004 the\x20
+| average price of a brand prescription was approximately $96.01, while the average price\x20
+| of an available generic prescription was approximately $28.74.  That is a difference of\x20
+| $67.27 per prescription.  \x20
+| \x20
+| Not funding this initiative limits the generic drugs available to treat diseases that are of\x20
+| major concern in the United States and abroad.  The initiative also supports the\x20
+| availability of specialized drugs for foreign countries (under PEPFAR), and to assure\x20
+| availability of medical countermeasures to bioterrorism and natural disasters.\x20
+text: default page 3
+| 4. What activities will these funds support?\x20
+| \x20
+| Budget Authority:  The budget authority increase in the Improving Generic Drug\x20
+| Review Initiative directly supports core review functions in the Generic Drugs Program\x20
+| and allows CDER to sustain performance in a number of important areas:\x20
+| • managing the existing generic drug application backlog as quickly and efficiently\x20
+| as possible\x20
+| • increasing efficiency and improving generic drug review times by evaluating\x20
+| ways to improve communication with industry and improve the quality of\x20
+| applications\x20
+| • assuring that generic drugs conform to manufacturing standards equal to the\x20
+| standard for brand name drugs\x20
+| • providing medical and scientific expertise necessary to fulfill the President’s\x20
+| commitment to ensuring the quality of HIV/AIDS drugs purchased by the United\x20
+| States for developing countries.\x20
+| \x20
+| User Fees:  The addition of fee resources under the Improving Generic Drug Review\x20
+| Initiative will allow FDA’s Center for Drug Evaluation and Research (CDER) to ramp-up\x20
+| the Generic Drug program in FY 2008 and thereby begin to minimize the application\x20
+| backlog.  CDER will hire staff to respond to the backlog.  CDER will also enhance a\x20
+| range of operations, from establishing criteria for determining the bioequivalence of\x20
+| complex drugs and drugs with non-traditional dosage forms, to improving the\x20
+| information technology infrastructure that the generic drug program relies on to conduct\x20
+| application review.  \x20
+| \x20
+| Following the first full year of implementing this initiative, FDA will achieve a 50\x20
+| percent increase in approvals.  FDA currently performs an average of 40 approvals or\x20
+| tentative approvals per month.  FDA will achieve the 50 percent increase after one full\x20
+| year because FDA must first hire and train the new generic drug review staff before it can\x20
+| achieve the additional approvals.  During the next five years, the goal is to meet the\x20
+| statutory requirement for generic drug review by acting on 90 percent of original generic\x20
+| drug applications and amendments to unapproved applications within 180 days.  \x20
+| \x20
+| The funds in this initiative will support all activities associated with the review of generic\x20
+| drugs.  FDA will achieve increased outputs from FY 2007 to FY 2008 in four measures:\x20
+| • First cycle approvals will increase from two percent of applications approved or\x20
+| tentatively approved to five percent of applications approved or tentatively\x20
+| approved.\x20
+| • FDA will reduce the time it takes to approve 40 percent of first generic\x20
+| applications without patent or exclusivity protection from 12 months to four\x20
+| months.  FDA will also reduce the time it takes to approve 80 percent of first\x20
+| generic applications without patent protection from 14 months to six months. \x20
+text: default page 4
+| This improvement depends on receiving the authority to formally expedite these\x20
+| applications.\x20
+| • The number of domestic pre-approval generic drug inspections will increase from\x20
+| 110 to 155.\x20
+| • The number of foreign pre-approval generic drug inspections will increase from\x20
+| 42 to 87.\x20
+| 5.  What results will FDA achieve?\x20
+|  \x20
+| Budget Authority:  With additional base resources for the Generics Drug Program,\x20
+| CDER will be able to approve or tentatively approve as many as 550 generic drugs per\x20
+| year.  The American public will enjoy more cost saving from generic drugs.\x20
+| \x20
+| User Fees:  With the additional resources generated by the proposed Generic Drug User\x20
+| Fee, FDA will come closer to achieving generic drug review requirements.  The statutory\x20
+| requirement for generic drug review is to act on original generic drug applications within\x20
+| 180 days.  Currently, FDA estimates that performance toward this requirement with\x20
+| existing resources in FY 2006 and FY 2007 is near 55-60 percent percent.  Although the\x20
+| number of generic drug applications that FDA receives will continue to rise, FDA expects\x20
+| that it can achieve the following performance toward meeting the statutory requirement: \x20
+| \x20
+| • 70 percent by the end of FY 2008\x20
+| • 72 percent by the end of FY 2009\x20
+| • 73 percent by the end of FY 2010\x20
+| • 75 percent by the end of FY 2011\x20
+| • 80 percent by the end of FY 2012\x20
+| • 85 percent by the end of FY 2013\x20
+| • 90 percent by the end of FY 2014.\x20
+text: sorted page 1
+| Improving Generic Drug Review Performance\x20
+| Generic Drug Budget Authority:  +5,561,000; 13 FTE\x20
+| Generic Drug User Fees:  +$15,701,000; 34 FTE (First Year)\x20
+| \x20
+| 1.  Why is this initiative necessary?\x20
+| \x20
+| The number of generic drug applications submitted to FDA has been rising exponentially. \x20
+| During the past six years, applications increased by 158 percent, rising from 307\x20
+| applications in FY 2002 to 793 applications in FY 2006.  FDA estimates it will receive\x20
+| 857 applications in FY 2008.  These statistics demonstrate the urgent need for increased\x20
+| resources for the Generic Drug Review Program.  The additional budget authority and\x20
+| proposed user fees in the Improving Generic Drug Review Initiative allow FDA to\x20
+| respond to the growing number applications.  \x20
+| \x20
+| Generic drugs often cost 20 to 70 percent less than their brand-name counterparts.  The\x20
+| promise of significant savings makes timely review of generic drug applications a vital\x20
+| part of the Administration’s strategy to reduce healthcare costs associated with\x20
+| prescription drugs.  \x20
+| \x20
+| The following table identifies the funding history for the Generic Drug Review Program\x20
+| and the FY 2008 levels, including the increased generic drug budget authority and\x20
+| proposed user fees:\x20
+| \x20
+| Funding History for the Generic Drug Review Program\x20
+| \x20
+| FY 2007 FY 2008\x20
+| Program FY 2006\x20
+| Actuals President Initiative\x20
+| Budget FY 2008 +/- 07 President\x20
+| Total1 Budget\x20
+| Budget Authority\x20
+| Human Drugs $62,567,000 $64,600,000 $70,161,000 $5,561,000\x20
+| Center $55,437,000 $58,000,000 $63,561,000 $5,561,000\x20
+| Field $7,130,000 $6,600,000 $6,600,000 -\x20
+| User Fees\x20
+| Generic Drug User Fee 0 0 $15,701,000 $15,701,000\x20
+| Program Total $62,567,000 $64,600,000 $85,862,000 $21,262,000\x20
+|            1 The FY 2008 Generic Drug total is $87,102,000.  This includes generic drug funds and pay increase.   \x20
+| \x20
+| 2.  How does this initiative support important public health priorities?\x20
+| \x20
+| This initiative supports the public health priorities of the HHS 500-day plan for\x20
+| Transforming Healthcare.  Specifically, the initiative supports the Secretary’s objective\x20
+| for rapidly approving safe new drugs, continually monitoring drug safety after approval,\x20
+| and proactively communicating new information to providers and patients.  Improving\x20
+| generic drug review performance also supports other public health priorities:\x20
+| \x20
+| • The initiative advances Medicare Rx objectives by promoting the availability of\x20
+| lower cost generic alternatives.\x20
+text: sorted page 2
+| • The initiative advances Medicaid Modernization by enabling FDA to approve\x20
+| lower-cost generic drugs that generate savings to support a modernized Medicaid\x20
+| program.\x20
+| • The initiative supports Pandemic Preparedness by allowing prompt review of\x20
+| generic drugs that support the HHS pandemic influenza response.\x20
+| Furthermore, enhanced generic drug review ensures that American consumers have\x20
+| additional choices when buying drugs, which will produce a dramatic return on\x20
+| investment for the resources that FDA spends on generic drug review.  The\x20
+| Congressional Budget Office estimates that generic drug use results in U.S. savings of\x20
+| $10 billion per year.  One of the nation’s largest pharmacy benefit management\x20
+| companies estimates that more extensive generic drug use could save an additional $20\x20
+| billion per year.  As $60-70 billion in brand name drugs lose patent protection in the next\x20
+| few years, Americans could substitute generic drugs for brand name drugs at a rate of 50\x20
+| to 75 percent.  \x20
+| \x20
+| Enhanced generic drug review also directly supports the Secretary’s vision for improving\x20
+| the human condition around the world.  The FDA Generic Drug Review Program plays a\x20
+| significant role in the President’s Emergency Plan for AIDS Relief (PEPFAR), by\x20
+| approving new generic treatments for HIV and AIDS.  If FDA deems a generic drug safe\x20
+| and effective – but the brand name equivalent is still under patent in the United States –\x20
+| FDA can grant a tentative approval for the drug.  The tentative approval allows the drug\x20
+| to be sold outside of the United States for HIV and AIDS treatment.\x20
+| \x20
+| 3.  What are the risks of not funding this initiative?\x20
+| \x20
+| Not proceeding with the Improving Generic Drug Review Initiative will result in the\x20
+| inability to capture significant savings from generic drug use.  Generic drugs reduce the\x20
+| cost of pharmaceutical care and allow increased access to health care for many\x20
+| Americans.  Generic drugs have the same quality, strength, purity, and stability as brand-
+| name drugs.  \x20
+| \x20
+| Government programs rely on the availability of generic drugs to hold down costs. \x20
+| According to data from the National Association of Chain Drug Stores, in 2004 the\x20
+| average price of a brand prescription was approximately $96.01, while the average price\x20
+| of an available generic prescription was approximately $28.74.  That is a difference of\x20
+| $67.27 per prescription.  \x20
+| \x20
+| Not funding this initiative limits the generic drugs available to treat diseases that are of\x20
+| major concern in the United States and abroad.  The initiative also supports the\x20
+| availability of specialized drugs for foreign countries (under PEPFAR), and to assure\x20
+| availability of medical countermeasures to bioterrorism and natural disasters.\x20
+text: sorted page 3
+| 4. What activities will these funds support?\x20
+| \x20
+| Budget Authority:  The budget authority increase in the Improving Generic Drug\x20
+| Review Initiative directly supports core review functions in the Generic Drugs Program\x20
+| and allows CDER to sustain performance in a number of important areas:\x20
+| • managing the existing generic drug application backlog as quickly and efficiently\x20
+| as possible\x20
+| • increasing efficiency and improving generic drug review times by evaluating\x20
+| ways to improve communication with industry and improve the quality of\x20
+| applications\x20
+| • assuring that generic drugs conform to manufacturing standards equal to the\x20
+| standard for brand name drugs\x20
+| • providing medical and scientific expertise necessary to fulfill the President’s\x20
+| commitment to ensuring the quality of HIV/AIDS drugs purchased by the United\x20
+| States for developing countries.\x20
+| \x20
+| User Fees:  The addition of fee resources under the Improving Generic Drug Review\x20
+| Initiative will allow FDA’s Center for Drug Evaluation and Research (CDER) to ramp-up\x20
+| the Generic Drug program in FY 2008 and thereby begin to minimize the application\x20
+| backlog.  CDER will hire staff to respond to the backlog.  CDER will also enhance a\x20
+| range of operations, from establishing criteria for determining the bioequivalence of\x20
+| complex drugs and drugs with non-traditional dosage forms, to improving the\x20
+| information technology infrastructure that the generic drug program relies on to conduct\x20
+| application review.  \x20
+| \x20
+| Following the first full year of implementing this initiative, FDA will achieve a 50\x20
+| percent increase in approvals.  FDA currently performs an average of 40 approvals or\x20
+| tentative approvals per month.  FDA will achieve the 50 percent increase after one full\x20
+| year because FDA must first hire and train the new generic drug review staff before it can\x20
+| achieve the additional approvals.  During the next five years, the goal is to meet the\x20
+| statutory requirement for generic drug review by acting on 90 percent of original generic\x20
+| drug applications and amendments to unapproved applications within 180 days.  \x20
+| \x20
+| The funds in this initiative will support all activities associated with the review of generic\x20
+| drugs.  FDA will achieve increased outputs from FY 2007 to FY 2008 in four measures:\x20
+| • First cycle approvals will increase from two percent of applications approved or\x20
+| tentatively approved to five percent of applications approved or tentatively\x20
+| approved.\x20
+| • FDA will reduce the time it takes to approve 40 percent of first generic\x20
+| applications without patent or exclusivity protection from 12 months to four\x20
+| months.  FDA will also reduce the time it takes to approve 80 percent of first\x20
+| generic applications without patent protection from 14 months to six months. \x20
+text: sorted page 4
+| This improvement depends on receiving the authority to formally expedite these\x20
+| applications.\x20
+| • The number of domestic pre-approval generic drug inspections will increase from\x20
+| 110 to 155.\x20
+| • The number of foreign pre-approval generic drug inspections will increase from\x20
+| 42 to 87.\x20
+| 5.  What results will FDA achieve?\x20
+|  \x20
+| Budget Authority:  With additional base resources for the Generics Drug Program,\x20
+| CDER will be able to approve or tentatively approve as many as 550 generic drugs per\x20
+| year.  The American public will enjoy more cost saving from generic drugs.\x20
+| \x20
+| User Fees:  With the additional resources generated by the proposed Generic Drug User\x20
+| Fee, FDA will come closer to achieving generic drug review requirements.  The statutory\x20
+| requirement for generic drug review is to act on original generic drug applications within\x20
+| 180 days.  Currently, FDA estimates that performance toward this requirement with\x20
+| existing resources in FY 2006 and FY 2007 is near 55-60 percent percent.  Although the\x20
+| number of generic drug applications that FDA receives will continue to rise, FDA expects\x20
+| that it can achieve the following performance toward meeting the statutory requirement: \x20
+| \x20
+| • 70 percent by the end of FY 2008\x20
+| • 72 percent by the end of FY 2009\x20
+| • 73 percent by the end of FY 2010\x20
+| • 75 percent by the end of FY 2011\x20
+| • 80 percent by the end of FY 2012\x20
+| • 85 percent by the end of FY 2013\x20
+| • 90 percent by the end of FY 2014.\x20
+text: range 2-3
+| • The initiative advances Medicaid Modernization by enabling FDA to approve\x20
+| lower-cost generic drugs that generate savings to support a modernized Medicaid\x20
+| program.\x20
+| • The initiative supports Pandemic Preparedness by allowing prompt review of\x20
+| generic drugs that support the HHS pandemic influenza response.\x20
+| Furthermore, enhanced generic drug review ensures that American consumers have\x20
+| additional choices when buying drugs, which will produce a dramatic return on\x20
+| investment for the resources that FDA spends on generic drug review.  The\x20
+| Congressional Budget Office estimates that generic drug use results in U.S. savings of\x20
+| $10 billion per year.  One of the nation’s largest pharmacy benefit management\x20
+| companies estimates that more extensive generic drug use could save an additional $20\x20
+| billion per year.  As $60-70 billion in brand name drugs lose patent protection in the next\x20
+| few years, Americans could substitute generic drugs for brand name drugs at a rate of 50\x20
+| to 75 percent.  \x20
+| \x20
+| Enhanced generic drug review also directly supports the Secretary’s vision for improving\x20
+| the human condition around the world.  The FDA Generic Drug Review Program plays a\x20
+| significant role in the President’s Emergency Plan for AIDS Relief (PEPFAR), by\x20
+| approving new generic treatments for HIV and AIDS.  If FDA deems a generic drug safe\x20
+| and effective – but the brand name equivalent is still under patent in the United States –\x20
+| FDA can grant a tentative approval for the drug.  The tentative approval allows the drug\x20
+| to be sold outside of the United States for HIV and AIDS treatment.\x20
+| \x20
+| 3.  What are the risks of not funding this initiative?\x20
+| \x20
+| Not proceeding with the Improving Generic Drug Review Initiative will result in the\x20
+| inability to capture significant savings from generic drug use.  Generic drugs reduce the\x20
+| cost of pharmaceutical care and allow increased access to health care for many\x20
+| Americans.  Generic drugs have the same quality, strength, purity, and stability as brand-
+| name drugs.  \x20
+| \x20
+| Government programs rely on the availability of generic drugs to hold down costs. \x20
+| According to data from the National Association of Chain Drug Stores, in 2004 the\x20
+| average price of a brand prescription was approximately $96.01, while the average price\x20
+| of an available generic prescription was approximately $28.74.  That is a difference of\x20
+| $67.27 per prescription.  \x20
+| \x20
+| Not funding this initiative limits the generic drugs available to treat diseases that are of\x20
+| major concern in the United States and abroad.  The initiative also supports the\x20
+| availability of specialized drugs for foreign countries (under PEPFAR), and to assure\x20
+| availability of medical countermeasures to bioterrorism and natural disasters.\x20
+| 4. What activities will these funds support?\x20
+| \x20
+| Budget Authority:  The budget authority increase in the Improving Generic Drug\x20
+| Review Initiative directly supports core review functions in the Generic Drugs Program\x20
+| and allows CDER to sustain performance in a number of important areas:\x20
+| • managing the existing generic drug application backlog as quickly and efficiently\x20
+| as possible\x20
+| • increasing efficiency and improving generic drug review times by evaluating\x20
+| ways to improve communication with industry and improve the quality of\x20
+| applications\x20
+| • assuring that generic drugs conform to manufacturing standards equal to the\x20
+| standard for brand name drugs\x20
+| • providing medical and scientific expertise necessary to fulfill the President’s\x20
+| commitment to ensuring the quality of HIV/AIDS drugs purchased by the United\x20
+| States for developing countries.\x20
+| \x20
+| User Fees:  The addition of fee resources under the Improving Generic Drug Review\x20
+| Initiative will allow FDA’s Center for Drug Evaluation and Research (CDER) to ramp-up\x20
+| the Generic Drug program in FY 2008 and thereby begin to minimize the application\x20
+| backlog.  CDER will hire staff to respond to the backlog.  CDER will also enhance a\x20
+| range of operations, from establishing criteria for determining the bioequivalence of\x20
+| complex drugs and drugs with non-traditional dosage forms, to improving the\x20
+| information technology infrastructure that the generic drug program relies on to conduct\x20
+| application review.  \x20
+| \x20
+| Following the first full year of implementing this initiative, FDA will achieve a 50\x20
+| percent increase in approvals.  FDA currently performs an average of 40 approvals or\x20
+| tentative approvals per month.  FDA will achieve the 50 percent increase after one full\x20
+| year because FDA must first hire and train the new generic drug review staff before it can\x20
+| achieve the additional approvals.  During the next five years, the goal is to meet the\x20
+| statutory requirement for generic drug review by acting on 90 percent of original generic\x20
+| drug applications and amendments to unapproved applications within 180 days.  \x20
+| \x20
+| The funds in this initiative will support all activities associated with the review of generic\x20
+| drugs.  FDA will achieve increased outputs from FY 2007 to FY 2008 in four measures:\x20
+| • First cycle approvals will increase from two percent of applications approved or\x20
+| tentatively approved to five percent of applications approved or tentatively\x20
+| approved.\x20
+| • FDA will reduce the time it takes to approve 40 percent of first generic\x20
+| applications without patent or exclusivity protection from 12 months to four\x20
+| months.  FDA will also reduce the time it takes to approve 80 percent of first\x20
+| generic applications without patent protection from 14 months to six months. \x20
+text: separators 1-2
+| <PAGE><A><P>Improving Generic Drug Review Performance <EOL>
+| Generic Drug Budget Authority:  +5,561,000; 13 FTE <EOL>
+| </P><P>Generic Drug User Fees:  +$15,701,000; 34 FTE (First Year) <EOL>
+|  <EOL>
+| 1.  Why is this initiative necessary? <EOL>
+|  <EOL>
+| The number of generic drug applications submitted to FDA has been rising exponentially.  <EOL>
+| During the past six years, applications increased by 158 percent, rising from 307 <EOL>
+| applications in FY 2002 to 793 applications in FY 2006.  FDA estimates it will receive <EOL>
+| 857 applications in FY 2008.  These statistics demonstrate the urgent need for increased <EOL>
+| resources for the Generic Drug Review Program.  The additional budget authority and <EOL>
+| proposed user fees in the Improving Generic Drug Review Initiative allow FDA to <EOL>
+| respond to the growing number applications.   <EOL>
+|  <EOL>
+| Generic drugs often cost 20 to 70 percent less than their brand-name counterparts.  The <EOL>
+| promise of significant savings makes timely review of generic drug applications a vital <EOL>
+| part of the Administration’s strategy to reduce healthcare costs associated with <EOL>
+| prescription drugs.   <EOL>
+|  <EOL>
+| The following table identifies the funding history for the Generic Drug Review Program <EOL>
+| and the FY 2008 levels, including the increased generic drug budget authority and <EOL>
+| proposed user fees: <EOL>
+|  <EOL>
+| </P><P>Funding History for the Generic Drug Review Program <EOL>
+|  <EOL>
+| </P><P>Program <W>FY 2006 <EOL>
+| Actuals <EOL>
+| </P><P>FY 2007 <EOL>
+| President <EOL>
+| Budget <EOL>
+| </P><P>FY 2008 <EOL>
+| Initiative <EOL>
+| </P><P>FY 2008 <EOL>
+| Total1<EOL>
+| </P><P>+/- 07 President <EOL>
+| Budget <EOL>
+| </P><P>Budget Authority <EOL>
+| Human Drugs <W>$62,567,000 <W>$64,600,000 <W>$70,161,000 <W>$5,561,000 <EOL>
+| Center <W>$55,437,000 <W>$58,000,000 <W>$63,561,000 <W>$5,561,000 <EOL>
+| Field <W>$7,130,000 <W>$6,600,000 <W>$6,600,000 <W>- <EOL>
+| </P><P>User Fees <EOL>
+| Generic Drug User Fee <W>0 <W>0 <W>$15,701,000 <W>$15,701,000 <EOL>
+| Program Total <W>$62,567,000 <W>$64,600,000 <W>$85,862,000 <W>$21,262,000 <EOL>
+| </P><P>           1 The FY 2008 Generic Drug total is $87,102,000.  This includes generic drug funds and pay increase.    <EOL>
+|  <EOL>
+| 2.  How does this initiative support important public health priorities? <EOL>
+|  <EOL>
+| This initiative supports the public health priorities of the HHS 500-day plan for <EOL>
+| Transforming Healthcare.  Specifically, the initiative supports the Secretary’s objective <EOL>
+| for rapidly approving safe new drugs, continually monitoring drug safety after approval, <EOL>
+| and proactively communicating new information to providers and patients.  Improving <EOL>
+| generic drug review performance also supports other public health priorities: <EOL>
+|  <EOL>
+| </P><P>• <W>The initiative advances Medicare Rx objectives by promoting the availability of <EOL>
+| lower cost generic alternatives. </P></A></PAGE>
+| <PAGE><A><P>• <W>The initiative advances Medicaid Modernization by enabling FDA to approve <EOL>
+| lower-cost generic drugs that generate savings to support a modernized Medicaid <EOL>
+| program. <EOL>
+| </P><P>• <W>The initiative supports Pandemic Preparedness by allowing prompt review of <EOL>
+| generic drugs that support the HHS pandemic influenza response. <EOL>
+| </P><P>Furthermore, enhanced generic drug review ensures that American consumers have <EOL>
+| additional choices when buying drugs, which will produce a dramatic return on <EOL>
+| investment for the resources that FDA spends on generic drug review.  The <EOL>
+| Congressional Budget Office estimates that generic drug use results in U.S. savings of <EOL>
+| $10 billion per year.  One of the nation’s largest pharmacy benefit management <EOL>
+| companies estimates that more extensive generic drug use could save an additional $20 <EOL>
+| billion per year.  As $60-70 billion in brand name drugs lose patent protection in the next <EOL>
+| few years, Americans could substitute generic drugs for brand name drugs at a rate of 50 <EOL>
+| to 75 percent.   <EOL>
+|  <EOL>
+| Enhanced generic drug review also directly supports the Secretary’s vision for improving <EOL>
+| the human condition around the world.  The FDA Generic Drug Review Program plays a <EOL>
+| significant role in the President’s Emergency Plan for AIDS Relief (PEPFAR), by <EOL>
+| approving new generic treatments for HIV and AIDS.  If FDA deems a generic drug safe <EOL>
+| and effective – but the brand name equivalent is still under patent in the United States – <EOL>
+| FDA can grant a tentative approval for the drug.  The tentative approval allows the drug <EOL>
+| to be sold outside of the United States for HIV and AIDS treatment. <EOL>
+|  <EOL>
+| 3.  What are the risks of not funding this initiative? <EOL>
+|  <EOL>
+| Not proceeding with the Improving Generic Drug Review Initiative will result in the <EOL>
+| inability to capture significant savings from generic drug use.  Generic drugs reduce the <EOL>
+| cost of pharmaceutical care and allow increased access to health care for many <EOL>
+| Americans.  Generic drugs have the same quality, strength, purity, and stability as brand-<EOL>
+| name drugs.   <EOL>
+|  <EOL>
+| Government programs rely on the availability of generic drugs to hold down costs.  <EOL>
+| According to data from the National Association of Chain Drug Stores, in 2004 the <EOL>
+| average price of a brand prescription was approximately $96.01, while the average price <EOL>
+| of an available generic prescription was approximately $28.74.  That is a difference of <EOL>
+| $67.27 per prescription.   <EOL>
+|  <EOL>
+| Not funding this initiative limits the generic drugs available to treat diseases that are of <EOL>
+| major concern in the United States and abroad.  The initiative also supports the <EOL>
+| availability of specialized drugs for foreign countries (under PEPFAR), and to assure <EOL>
+| availability of medical countermeasures to bioterrorism and natural disasters. </P></A></PAGE>

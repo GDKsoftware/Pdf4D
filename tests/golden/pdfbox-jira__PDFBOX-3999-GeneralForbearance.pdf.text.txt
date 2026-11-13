@@ -1,0 +1,639 @@
+text: default page 1
+| GFB
+| GENERAL FORBEARANCE REQUEST\x20
+| William D. Ford Federal Direct Loan (Direct Loan) Program / Federal Family\x20
+| Education Loan (FFEL) Program / Federal Perkins Loan (Perkins Loan) Program
+| WARNING: Any person who knowingly makes a false statement or misrepresentation on this form or on\x20
+| any accompanying document is subject to penalties that may include fines, imprisonment, or both, under\x20
+| the U.S. Criminal Code and 20 U.S.C. 1097.
+| OMB No. 1845-0031\x20
+| Form Approved\x20
+| Exp. Date 2/28/2019
+| SECTION 1: BORROWER INFORMATION
+| Please enter or correct the following information.
+| Check this box if any of your information has changed.
+| SSN
+| Name
+| Address
+| City State Zip Code
+| Telephone - Primary
+| Telephone - Alternate
+| Email (Optional)
+| SECTION 2: FORBEARANCE REQUEST
+| Carefully read the entire form before completing it. Answer all questions in Section 2. Your loan holder has sole\x20
+| discretion in whether to grant your general forbearance request, and, if granted, for what period your forbearance\x20
+| will be applied. Instead of forbearance, you may want to consider requesting a deferment (which has an interest benefit\x20
+| for some loan types) or changing to a repayment plan that determines your monthly payment amount based on your\x20
+| income. Visit StudentAid.gov/IDR for more information.
+| 1. I am requesting a forbearance because I am\x20
+| experiencing a temporary hardship related to one of\x20
+| the following situations (check one):
+| Financial difficulties
+| Change in employment
+| Medical expenses
+| Other (explain the situation below)
+| 2. If approved for a forbearance, I would like to:
+| Temporarily stop making payments.
+| Temporarily make smaller payments of
+| per month.
+| 3. I would like my forbearance to begin with the\x20
+| monthly payment that is due in the month and year\x20
+| below:
+| 4. If approved for forbearance, I would like my\x20
+| forbearance to end in the month and year below,\x20
+| and begin making payments the following month:
+| Page 1 of 4\x20
+text: default page 2
+| Borrower SSNBorrower Name
+| SECTION 3: BORROWER/ENDORSER UNDERSTANDINGS, CERTIFICATIONS, AND AUTHORIZATION
+| I understand that:
+| • I am not required to make payments of loan principal or interest during my forbearance, but interest will continue to\x20
+| be charged on all my loans.
+| • My loan holder has sole discretion in whether to grant my general forbearance request and for what dates it will be\x20
+| granted.
+| • For Perkins Loans, there is a cumulative limit on general forbearance of 3 years. For Direct Loans and FFEL Program\x20
+| loans, my loan holder may set a limit on general forbearance.
+| • My forbearance will end on the earlier of the end date that I requested, 12 months from the date my forbearance\x20
+| begins, or when I exhaust any limit that my loan holder has on forbearance.
+| • I can request another forbearance after my forbearance ends if I am still experiencing financial hardship.
+| • Interest may capitalize on my loans during or at the expiration of my forbearance, but interest never capitalizes on\x20
+| Perkins Loans.
+| I certify that:
+| • The information I have provided on this form is true and correct.
+| • I will provide additional documentation to my loan holder, if requested, to support my general forbearance request.
+| • I will repay my loans according to the terms of my promissory note, even if my request is not granted.
+| I authorize the entity to which I submit this request and its agents to contact me regarding my request or my loans at any\x20
+| cellular telephone number that I provide now or in the future using automated telephone dialing equipment or artificial or\x20
+| prerecorded voice or text messages.
+| Date Borrower's/Endorser's Signature
+| Type or print using dark ink. Enter dates as month-day-year (mm-dd-yyyy) or (mm-yyyy) as appropriate. Example: March 14,\x20
+| 2016 = 03-14-2016. Include your name and account number on any documentation that you may be requested to submit\x20
+| with this form. If you want to apply for a forbearance on loans that are held by different loan holders, you must submit a\x20
+| separate forbearance request to each loan holder. Return the completed form and any requested documentation to the\x20
+| address shown in Section 6.\x20
+|  \x20
+| If you are an endorser, you may request forbearance only when you are required to repay the loan because the borrower is\x20
+| not making payments. If you have a loan made jointly with another borrower (as co-makers), you must both individually meet\x20
+| the requirements for a forbearance and each of you must request forbearance.
+| SECTION 4: INSTRUCTIONS FOR COMPLETING THE FORBEARANCE REQUEST
+| Page 2 of 4\x20
+text: default page 3
+| SECTION 5: DEFINITIONS
+| A forbearance is a period during which you are allowed\x20
+| to postpone making payments temporarily, allowed an\x20
+| extension of time for making payments, or temporarily\x20
+| allowed to make smaller payments than scheduled. A\x20
+| forbearance can be a mandatory forbearance, meaning that\x20
+| your loan holder must grant the forbearance if you qualify\x20
+| for the forbearance and supply all supporting\x20
+| documentation. A forbearance can also be a discretionary\x20
+| forbearance, meaning that your loan holder may grant the\x20
+| forbearance, but is not required to do so.\x20
+| The holder of your Direct Loans is the Department. The\x20
+| holder of your FFEL Program loans may be a lender,\x20
+| guaranty agency, secondary market, or the Department. The\x20
+| holder of your Perkins Loans is an institution of higher\x20
+| education or the Department. Your loan holder may use a\x20
+| servicer to handle billing and other communications related\x20
+| to your loans. References to “your loan holder” on this form\x20
+| mean either your loan holder or your servicer.\x20
+| A subsidized loan is a Direct Subsidized Loan, a Direct\x20
+| Subsidized Consolidation Loan, a Federal Subsidized\x20
+| Stafford Loan, portions of some Federal Consolidation\x20
+| Loans, Federal Perkins Loans, NDSL, and Defense Loans.\x20
+| An unsubsidized loan is a Direct Unsubsidized Loan, a\x20
+| Direct Unsubsidized Consolidation Loan, a Direct PLUS\x20
+| Loan, a Federal Unsubsidized Stafford Loan, a Federal PLUS\x20
+| Loan, a Federal SLS, and portions of some Federal\x20
+| Consolidation Loans.\x20
+| The William D. Ford Federal Direct Loan (Direct Loan)\x20
+| Program includes Federal Direct Stafford/Ford (Direct\x20
+| Subsidized) Loans, Federal Direct Unsubsidized Stafford/
+| Ford (Direct Unsubsidized) Loans, Federal Direct PLUS\x20
+| (Direct PLUS) Loans, and Federal Direct Consolidation\x20
+| (Direct Consolidation) Loans.
+| Capitalization is the addition of unpaid interest to the\x20
+| principal balance of your loan. Capitalization causes more\x20
+| interest to accrue over the life of your loan and may cause\x20
+| your monthly payment amount to increase. Interest never\x20
+| capitalizes on Perkins Loans. Table 1 (below) provides an\x20
+| example of the monthly payments and the total amount\x20
+| repaid for a $30,000 unsubsidized loan. The example loan\x20
+| has a 6% interest rate and the example deferment or\x20
+| forbearance lasts for 12 months and begins when the loan\x20
+| entered repayment. The example compares the effects of\x20
+| paying the interest as it accrues or allowing it to be\x20
+| capitalized.\x20
+| A co-maker is one of the two individuals who are joint\x20
+| borrowers on a Direct or Federal Consolidation Loan or a\x20
+| Federal PLUS Loan. Both co-makers are equally responsible\x20
+| for repaying the full amount of the loan.\x20
+| A deferment is a period during which you are entitled\x20
+| to postpone repayment of your loans. Interest is not\x20
+| generally charged to you during a deferment on your\x20
+| subsidized loans. Interest is always charged to you during a\x20
+| deferment on your unsubsidized loans. On loans made\x20
+| under the Perkins Loan Program, all deferments are\x20
+| followed by a post-deferment grace period of 6 months,\x20
+| during which time you are not required to make payments.\x20
+| An endorser is an individual who signs a promissory\x20
+| note and agrees to pay the loan if the borrower does not.\x20
+| The Federal Family Education Loan (FFEL) Program\x20
+| includes Federal Stafford Loans, Federal PLUS Loans, Federal\x20
+| Consolidation Loans, and Federal Supplemental Loans for\x20
+| Students (SLS).\x20
+| The Federal Perkins Loan (Perkins Loan) Program\x20
+| includes Federal Perkins Loans, National Direct Student\x20
+| Loans (NDSL), and National Defense Student Loans (Defense\x20
+| Loans).
+| Table 1. Capitalization Chart
+| Treatment of Interest with\x20
+| Deferment/Forbearance
+| Loan Amt. Capitalized\x20
+| Interest\x20
+| Outstanding\x20
+| Principal
+| Monthly\x20
+| Payment
+| Number of\x20
+| Payments
+| Total Repaid
+| Interest is paid $30,000 $0 $30,000 $333 120 $41,767
+| Interest is capitalized at the\x20
+| end
+| $30,000 $1,800 $31,800 $353 120 $42,365
+| Interest is capitalized\x20
+| quarterly and at the end
+| $30,000 $1,841 $31,841 $354 120 $42,420
+| SECTION 6: WHERE TO SEND THE COMPLETED FORBEARANCE REQUEST
+| Return the completed form and any documentation to:\x20
+| (If no address is shown, return to your loan holder.)
+| If you need help completing this form, call:\x20
+| (If no telephone number is shown, call your loan holder.)
+| Page 3 of 4\x20
+text: default page 4
+| SECTION 7: IMPORTANT NOTICES
+| Privacy Act Notice. The Privacy Act of 1974 (5 U.S.C.\x20
+| 552a) requires that the following notice be provided to you:\x20
+| The authorities for collecting the requested information\x20
+| from and about you are §421 et seq., §451 et seq., or §461 of\x20
+| the Higher Education Act of 1965, as amended (20 U.S.C.\x20
+| 1071 et seq., 20 U.S.C. 1087a et seq., or 20 U.S.C. 1087aa et\x20
+| seq.) and the authorities for collecting and using your Social\x20
+| Security Number (SSN) are §§428B(f) and 484(a)(4) of the\x20
+| HEA (20 U.S.C. 1078-2(f) and 1091(a)(4)) and 31 U.S.C.\x20
+| 7701(b). Participating in the William D. Ford Federal Direct\x20
+| Loan (Direct Loan) Program, Federal Family Education Loan\x20
+| (FFEL) Program, or Federal Perkins Loan (Perkins Loan)\x20
+| Program and giving us your SSN are voluntary, but you must\x20
+| provide the requested information, including your SSN, to\x20
+| participate. \x20
+| The principal purposes for collecting the information on\x20
+| this form, including your SSN, are to verify your identity, to\x20
+| determine your eligibility to receive a loan or a benefit on a\x20
+| loan (such as a deferment, forbearance, discharge, or\x20
+| forgiveness) under the Direct Loan, FFEL, or Federal Perkins\x20
+| Loan Programs, to permit the servicing of your loans, and, if\x20
+| it becomes necessary, to locate you and to collect and\x20
+| report on your loans if your loans become delinquent or\x20
+| default. We also use your SSN as an account identifier and to\x20
+| permit you to access your account information\x20
+| electronically. \x20
+|  The information in your file may be disclosed, on a\x20
+| case-by-case basis or under a computer matching program,\x20
+| to third parties as authorized under routine uses in the\x20
+| appropriate systems of records notices. The routine uses of\x20
+| this information include, but are not limited to, its disclosure\x20
+| to federal, state, or local agencies, to private parties such as\x20
+| relatives, present and former employers, business and\x20
+| personal associates, to consumer reporting agencies, to\x20
+| financial and educational institutions, and to guaranty\x20
+| agencies in order to verify your identity, to determine your\x20
+| eligibility to receive a loan or a benefit on a loan, to permit\x20
+| the servicing or collection of your loans, to enforce the\x20
+| terms of the loans, to investigate possible fraud and to verify\x20
+| compliance with federal student financial aid program\x20
+| regulations, or to locate you if you become delinquent in\x20
+| your loan payments or if you default. To provide default rate\x20
+| calculations, disclosures may be made to guaranty agencies,\x20
+| to financial and educational institutions, or to state\x20
+| agencies. To provide financial aid history information,\x20
+| disclosures may be made to educational institutions.\x20
+| To assist program administrators with tracking refunds\x20
+| and cancellations, disclosures may be made to guaranty\x20
+| agencies, to financial and educational institutions, or to\x20
+| federal or state agencies. To provide a standardized method\x20
+| for educational institutions to efficiently submit student\x20
+| enrollment statuses, disclosures may be made to guaranty\x20
+| agencies or to financial and educational institutions. To\x20
+| counsel you in repayment efforts, disclosures may be made\x20
+| to guaranty agencies, to financial and educational\x20
+| institutions, or to federal, state, or local agencies. \x20
+| In the event of litigation, we may send records to the\x20
+| Department of Justice, a court, adjudicative body, counsel,\x20
+| party, or witness if the disclosure is relevant and necessary\x20
+| to the litigation. If this information, either alone or with\x20
+| other information, indicates a potential violation of law, we\x20
+| may send it to the appropriate authority for action. We may\x20
+| send information to members of Congress if you ask them\x20
+| to help you with federal student aid questions. In\x20
+| circumstances involving employment complaints,\x20
+| grievances, or disciplinary actions, we may disclose relevant\x20
+| records to adjudicate or investigate the issues. If provided\x20
+| for by a collective bargaining agreement, we may disclose\x20
+| records to a labor organization recognized under 5 U.S.C.\x20
+| Chapter 71. Disclosures may be made to our contractors for\x20
+| the purpose of performing any programmatic function that\x20
+| requires disclosure of records. Before making any such\x20
+| disclosure, we will require the contractor to maintain Privacy\x20
+| Act safeguards. Disclosures may also be made to qualified\x20
+| researchers under Privacy Act safeguards. \x20
+| Paperwork Reduction Notice. According to the\x20
+| Paperwork Reduction Act of 1995, no persons are required\x20
+| to respond to a collection of information unless such\x20
+| collection displays a valid OMB control number. The valid\x20
+| OMB control number for this information collection is\x20
+| 1845-0031. Public reporting burden for this collection of\x20
+| information is estimated to average 5 minutes per response,\x20
+| including time for reviewing instructions, searching existing\x20
+| data sources, gathering and maintaining the data needed,\x20
+| and completing and reviewing the collection of information.\x20
+| The obligation to respond to this collection is required to\x20
+| obtain a benefit in accordance with 34 CFR 674.33, 682.211,\x20
+| and 685.205. If you have comments or concerns regarding\x20
+| the status of your individual submission of this form, please\x20
+| contact your loan holder directly (see Section 6).\x20
+| Page 4 of 4\x20
+text: sorted page 1
+| GENERAL FORBEARANCE REQUEST OMB No. 1845-0031\x20
+| William D. Ford Federal Direct Loan (Direct Loan) Program / Federal Family Form Approved\x20
+| Education Loan (FFEL) Program / Federal Perkins Loan (Perkins Loan) Program Exp. Date 2/28/2019
+| WARNING: Any person who knowingly makes a false statement or misrepresentation on this form or on\x20
+| GFB any accompanying document is subject to penalties that may include fines, imprisonment, or both, under\x20
+| the U.S. Criminal Code and 20 U.S.C. 1097.
+| SECTION 1: BORROWER INFORMATION
+| Please enter or correct the following information.
+| Check this box if any of your information has changed.
+| SSN
+| Name
+| Address
+| City State Zip Code
+| Telephone - Primary
+| Telephone - Alternate
+| Email (Optional)
+| SECTION 2: FORBEARANCE REQUEST
+| Carefully read the entire form before completing it. Answer all questions in Section 2. Your loan holder has sole\x20
+| discretion in whether to grant your general forbearance request, and, if granted, for what period your forbearance\x20
+| will be applied. Instead of forbearance, you may want to consider requesting a deferment (which has an interest benefit\x20
+| for some loan types) or changing to a repayment plan that determines your monthly payment amount based on your\x20
+| income. Visit StudentAid.gov/IDR for more information.
+| 1. I am requesting a forbearance because I am 2. If approved for a forbearance, I would like to:
+| experiencing a temporary hardship related to one of Temporarily stop making payments.
+| the following situations (check one):
+| Temporarily make smaller payments of
+| Financial difficulties per month.
+| Change in employment
+| Medical expenses 3. I would like my forbearance to begin with the\x20
+| Other (explain the situation below) monthly payment that is due in the month and year\x20
+| below:
+| 4. If approved for forbearance, I would like my\x20
+| forbearance to end in the month and year below,\x20
+| and begin making payments the following month:
+| Page 1 of 4\x20
+text: sorted page 2
+| Borrower Name Borrower SSN
+| SECTION 3: BORROWER/ENDORSER UNDERSTANDINGS, CERTIFICATIONS, AND AUTHORIZATION
+| I understand that:
+| • I am not required to make payments of loan principal or interest during my forbearance, but interest will continue to\x20
+| be charged on all my loans.
+| • My loan holder has sole discretion in whether to grant my general forbearance request and for what dates it will be\x20
+| granted.
+| • For Perkins Loans, there is a cumulative limit on general forbearance of 3 years. For Direct Loans and FFEL Program\x20
+| loans, my loan holder may set a limit on general forbearance.
+| • My forbearance will end on the earlier of the end date that I requested, 12 months from the date my forbearance\x20
+| begins, or when I exhaust any limit that my loan holder has on forbearance.
+| • I can request another forbearance after my forbearance ends if I am still experiencing financial hardship.
+| • Interest may capitalize on my loans during or at the expiration of my forbearance, but interest never capitalizes on\x20
+| Perkins Loans.
+| I certify that:
+| • The information I have provided on this form is true and correct.
+| • I will provide additional documentation to my loan holder, if requested, to support my general forbearance request.
+| • I will repay my loans according to the terms of my promissory note, even if my request is not granted.
+| I authorize the entity to which I submit this request and its agents to contact me regarding my request or my loans at any\x20
+| cellular telephone number that I provide now or in the future using automated telephone dialing equipment or artificial or\x20
+| prerecorded voice or text messages.
+| Borrower's/Endorser's Signature Date\x20
+| SECTION 4: INSTRUCTIONS FOR COMPLETING THE FORBEARANCE REQUEST
+| Type or print using dark ink. Enter dates as month-day-year (mm-dd-yyyy) or (mm-yyyy) as appropriate. Example: March 14,\x20
+| 2016 = 03-14-2016. Include your name and account number on any documentation that you may be requested to submit\x20
+| with this form. If you want to apply for a forbearance on loans that are held by different loan holders, you must submit a\x20
+| separate forbearance request to each loan holder. Return the completed form and any requested documentation to the\x20
+| address shown in Section 6.\x20
+|  \x20
+| If you are an endorser, you may request forbearance only when you are required to repay the loan because the borrower is\x20
+| not making payments. If you have a loan made jointly with another borrower (as co-makers), you must both individually meet\x20
+| the requirements for a forbearance and each of you must request forbearance.
+| Page 2 of 4\x20
+text: sorted page 3
+| SECTION 5: DEFINITIONS
+| Capitalization is the addition of unpaid interest to the A forbearance is a period during which you are allowed\x20
+| principal balance of your loan. Capitalization causes more to postpone making payments temporarily, allowed an\x20
+| interest to accrue over the life of your loan and may cause extension of time for making payments, or temporarily\x20
+| your monthly payment amount to increase. Interest never allowed to make smaller payments than scheduled. A\x20
+| capitalizes on Perkins Loans. Table 1 (below) provides an forbearance can be a mandatory forbearance, meaning that\x20
+| example of the monthly payments and the total amount your loan holder must grant the forbearance if you qualify\x20
+| repaid for a $30,000 unsubsidized loan. The example loan for the forbearance and supply all supporting\x20
+| has a 6% interest rate and the example deferment or documentation. A forbearance can also be a discretionary\x20
+| forbearance lasts for 12 months and begins when the loan forbearance, meaning that your loan holder may grant the\x20
+| entered repayment. The example compares the effects of forbearance, but is not required to do so.\x20
+| paying the interest as it accrues or allowing it to be The holder of your Direct Loans is the Department. The\x20
+| capitalized. holder of your FFEL Program loans may be a lender,\x20
+| A co-maker is one of the two individuals who are joint guaranty agency, secondary market, or the Department. The\x20
+| borrowers on a Direct or Federal Consolidation Loan or a holder of your Perkins Loans is an institution of higher\x20
+| Federal PLUS Loan. Both co-makers are equally responsible education or the Department. Your loan holder may use a\x20
+| for repaying the full amount of the loan. servicer to handle billing and other communications related\x20
+| A deferment is a period during which you are entitled to your loans. References to “your loan holder” on this form\x20
+| to postpone repayment of your loans. Interest is not mean either your loan holder or your servicer.\x20
+| generally charged to you during a deferment on your A subsidized loan is a Direct Subsidized Loan, a Direct\x20
+| subsidized loans. Interest is always charged to you during a Subsidized Consolidation Loan, a Federal Subsidized\x20
+| deferment on your unsubsidized loans. On loans made Stafford Loan, portions of some Federal Consolidation\x20
+| under the Perkins Loan Program, all deferments are Loans, Federal Perkins Loans, NDSL, and Defense Loans.\x20
+| followed by a post-deferment grace period of 6 months, An unsubsidized loan is a Direct Unsubsidized Loan, a\x20
+| during which time you are not required to make payments. Direct Unsubsidized Consolidation Loan, a Direct PLUS\x20
+| An endorser is an individual who signs a promissory Loan, a Federal Unsubsidized Stafford Loan, a Federal PLUS\x20
+| note and agrees to pay the loan if the borrower does not. Loan, a Federal SLS, and portions of some Federal\x20
+| The Federal Family Education Loan (FFEL) Program Consolidation Loans.\x20
+| includes Federal Stafford Loans, Federal PLUS Loans, Federal The William D. Ford Federal Direct Loan (Direct Loan)\x20
+| Consolidation Loans, and Federal Supplemental Loans for Program includes Federal Direct Stafford/Ford (Direct\x20
+| Students (SLS). Subsidized) Loans, Federal Direct Unsubsidized Stafford/
+| The Federal Perkins Loan (Perkins Loan) Program Ford (Direct Unsubsidized) Loans, Federal Direct PLUS\x20
+| includes Federal Perkins Loans, National Direct Student (Direct PLUS) Loans, and Federal Direct Consolidation\x20
+| Loans (NDSL), and National Defense Student Loans (Defense (Direct Consolidation) Loans.
+| Loans).
+| Table 1. Capitalization Chart
+| Treatment of Interest with Loan Amt. Capitalized Outstanding Monthly Number of Total Repaid
+| Deferment/Forbearance Interest Principal Payment Payments
+| Interest is paid $30,000 $0 $30,000 $333 120 $41,767
+| Interest is capitalized at the $30,000 $1,800 $31,800 $353 120 $42,365
+| end
+| Interest is capitalized $30,000 $1,841 $31,841 $354 120 $42,420
+| quarterly and at the end
+| SECTION 6: WHERE TO SEND THE COMPLETED FORBEARANCE REQUEST
+| Return the completed form and any documentation to: If you need help completing this form, call:\x20
+| (If no address is shown, return to your loan holder.) (If no telephone number is shown, call your loan holder.)
+| Page 3 of 4\x20
+text: sorted page 4
+| SECTION 7: IMPORTANT NOTICES
+| Privacy Act Notice. The Privacy Act of 1974 (5 U.S.C. To assist program administrators with tracking refunds\x20
+| 552a) requires that the following notice be provided to you: and cancellations, disclosures may be made to guaranty\x20
+| The authorities for collecting the requested information agencies, to financial and educational institutions, or to\x20
+| from and about you are §421 et seq., §451 et seq., or §461 of federal or state agencies. To provide a standardized method\x20
+| the Higher Education Act of 1965, as amended (20 U.S.C. for educational institutions to efficiently submit student\x20
+| 1071 et seq., 20 U.S.C. 1087a et seq., or 20 U.S.C. 1087aa et enrollment statuses, disclosures may be made to guaranty\x20
+| seq.) and the authorities for collecting and using your Social agencies or to financial and educational institutions. To\x20
+| Security Number (SSN) are §§428B(f) and 484(a)(4) of the counsel you in repayment efforts, disclosures may be made\x20
+| HEA (20 U.S.C. 1078-2(f) and 1091(a)(4)) and 31 U.S.C. to guaranty agencies, to financial and educational\x20
+| 7701(b). Participating in the William D. Ford Federal Direct institutions, or to federal, state, or local agencies. \x20
+| Loan (Direct Loan) Program, Federal Family Education Loan In the event of litigation, we may send records to the\x20
+| (FFEL) Program, or Federal Perkins Loan (Perkins Loan) Department of Justice, a court, adjudicative body, counsel,\x20
+| Program and giving us your SSN are voluntary, but you must party, or witness if the disclosure is relevant and necessary\x20
+| provide the requested information, including your SSN, to to the litigation. If this information, either alone or with\x20
+| participate.  other information, indicates a potential violation of law, we\x20
+| The principal purposes for collecting the information on may send it to the appropriate authority for action. We may\x20
+| this form, including your SSN, are to verify your identity, to send information to members of Congress if you ask them\x20
+| determine your eligibility to receive a loan or a benefit on a to help you with federal student aid questions. In\x20
+| loan (such as a deferment, forbearance, discharge, or circumstances involving employment complaints,\x20
+| forgiveness) under the Direct Loan, FFEL, or Federal Perkins grievances, or disciplinary actions, we may disclose relevant\x20
+| Loan Programs, to permit the servicing of your loans, and, if records to adjudicate or investigate the issues. If provided\x20
+| it becomes necessary, to locate you and to collect and for by a collective bargaining agreement, we may disclose\x20
+| report on your loans if your loans become delinquent or records to a labor organization recognized under 5 U.S.C.\x20
+| default. We also use your SSN as an account identifier and to Chapter 71. Disclosures may be made to our contractors for\x20
+| permit you to access your account information the purpose of performing any programmatic function that\x20
+| electronically.  requires disclosure of records. Before making any such\x20
+| disclosure, we will require the contractor to maintain Privacy\x20
+|  The information in your file may be disclosed, on a Act safeguards. Disclosures may also be made to qualified\x20
+| case-by-case basis or under a computer matching program, researchers under Privacy Act safeguards. \x20
+| to third parties as authorized under routine uses in the Paperwork Reduction Notice. According to the\x20
+| appropriate systems of records notices. The routine uses of Paperwork Reduction Act of 1995, no persons are required\x20
+| this information include, but are not limited to, its disclosure to respond to a collection of information unless such\x20
+| to federal, state, or local agencies, to private parties such as collection displays a valid OMB control number. The valid\x20
+| relatives, present and former employers, business and OMB control number for this information collection is\x20
+| personal associates, to consumer reporting agencies, to 1845-0031. Public reporting burden for this collection of\x20
+| financial and educational institutions, and to guaranty information is estimated to average 5 minutes per response,\x20
+| agencies in order to verify your identity, to determine your including time for reviewing instructions, searching existing\x20
+| eligibility to receive a loan or a benefit on a loan, to permit data sources, gathering and maintaining the data needed,\x20
+| the servicing or collection of your loans, to enforce the and completing and reviewing the collection of information.\x20
+| terms of the loans, to investigate possible fraud and to verify The obligation to respond to this collection is required to\x20
+| compliance with federal student financial aid program obtain a benefit in accordance with 34 CFR 674.33, 682.211,\x20
+| regulations, or to locate you if you become delinquent in and 685.205. If you have comments or concerns regarding\x20
+| your loan payments or if you default. To provide default rate the status of your individual submission of this form, please\x20
+| calculations, disclosures may be made to guaranty agencies, contact your loan holder directly (see Section 6).\x20
+| to financial and educational institutions, or to state\x20
+| agencies. To provide financial aid history information,\x20
+| disclosures may be made to educational institutions.\x20
+| Page 4 of 4\x20
+text: range 2-3
+| Borrower SSNBorrower Name
+| SECTION 3: BORROWER/ENDORSER UNDERSTANDINGS, CERTIFICATIONS, AND AUTHORIZATION
+| I understand that:
+| • I am not required to make payments of loan principal or interest during my forbearance, but interest will continue to\x20
+| be charged on all my loans.
+| • My loan holder has sole discretion in whether to grant my general forbearance request and for what dates it will be\x20
+| granted.
+| • For Perkins Loans, there is a cumulative limit on general forbearance of 3 years. For Direct Loans and FFEL Program\x20
+| loans, my loan holder may set a limit on general forbearance.
+| • My forbearance will end on the earlier of the end date that I requested, 12 months from the date my forbearance\x20
+| begins, or when I exhaust any limit that my loan holder has on forbearance.
+| • I can request another forbearance after my forbearance ends if I am still experiencing financial hardship.
+| • Interest may capitalize on my loans during or at the expiration of my forbearance, but interest never capitalizes on\x20
+| Perkins Loans.
+| I certify that:
+| • The information I have provided on this form is true and correct.
+| • I will provide additional documentation to my loan holder, if requested, to support my general forbearance request.
+| • I will repay my loans according to the terms of my promissory note, even if my request is not granted.
+| I authorize the entity to which I submit this request and its agents to contact me regarding my request or my loans at any\x20
+| cellular telephone number that I provide now or in the future using automated telephone dialing equipment or artificial or\x20
+| prerecorded voice or text messages.
+| Date Borrower's/Endorser's Signature
+| Type or print using dark ink. Enter dates as month-day-year (mm-dd-yyyy) or (mm-yyyy) as appropriate. Example: March 14,\x20
+| 2016 = 03-14-2016. Include your name and account number on any documentation that you may be requested to submit\x20
+| with this form. If you want to apply for a forbearance on loans that are held by different loan holders, you must submit a\x20
+| separate forbearance request to each loan holder. Return the completed form and any requested documentation to the\x20
+| address shown in Section 6.\x20
+|  \x20
+| If you are an endorser, you may request forbearance only when you are required to repay the loan because the borrower is\x20
+| not making payments. If you have a loan made jointly with another borrower (as co-makers), you must both individually meet\x20
+| the requirements for a forbearance and each of you must request forbearance.
+| SECTION 4: INSTRUCTIONS FOR COMPLETING THE FORBEARANCE REQUEST
+| Page 2 of 4\x20
+| SECTION 5: DEFINITIONS
+| A forbearance is a period during which you are allowed\x20
+| to postpone making payments temporarily, allowed an\x20
+| extension of time for making payments, or temporarily\x20
+| allowed to make smaller payments than scheduled. A\x20
+| forbearance can be a mandatory forbearance, meaning that\x20
+| your loan holder must grant the forbearance if you qualify\x20
+| for the forbearance and supply all supporting\x20
+| documentation. A forbearance can also be a discretionary\x20
+| forbearance, meaning that your loan holder may grant the\x20
+| forbearance, but is not required to do so.\x20
+| The holder of your Direct Loans is the Department. The\x20
+| holder of your FFEL Program loans may be a lender,\x20
+| guaranty agency, secondary market, or the Department. The\x20
+| holder of your Perkins Loans is an institution of higher\x20
+| education or the Department. Your loan holder may use a\x20
+| servicer to handle billing and other communications related\x20
+| to your loans. References to “your loan holder” on this form\x20
+| mean either your loan holder or your servicer.\x20
+| A subsidized loan is a Direct Subsidized Loan, a Direct\x20
+| Subsidized Consolidation Loan, a Federal Subsidized\x20
+| Stafford Loan, portions of some Federal Consolidation\x20
+| Loans, Federal Perkins Loans, NDSL, and Defense Loans.\x20
+| An unsubsidized loan is a Direct Unsubsidized Loan, a\x20
+| Direct Unsubsidized Consolidation Loan, a Direct PLUS\x20
+| Loan, a Federal Unsubsidized Stafford Loan, a Federal PLUS\x20
+| Loan, a Federal SLS, and portions of some Federal\x20
+| Consolidation Loans.\x20
+| The William D. Ford Federal Direct Loan (Direct Loan)\x20
+| Program includes Federal Direct Stafford/Ford (Direct\x20
+| Subsidized) Loans, Federal Direct Unsubsidized Stafford/
+| Ford (Direct Unsubsidized) Loans, Federal Direct PLUS\x20
+| (Direct PLUS) Loans, and Federal Direct Consolidation\x20
+| (Direct Consolidation) Loans.
+| Capitalization is the addition of unpaid interest to the\x20
+| principal balance of your loan. Capitalization causes more\x20
+| interest to accrue over the life of your loan and may cause\x20
+| your monthly payment amount to increase. Interest never\x20
+| capitalizes on Perkins Loans. Table 1 (below) provides an\x20
+| example of the monthly payments and the total amount\x20
+| repaid for a $30,000 unsubsidized loan. The example loan\x20
+| has a 6% interest rate and the example deferment or\x20
+| forbearance lasts for 12 months and begins when the loan\x20
+| entered repayment. The example compares the effects of\x20
+| paying the interest as it accrues or allowing it to be\x20
+| capitalized.\x20
+| A co-maker is one of the two individuals who are joint\x20
+| borrowers on a Direct or Federal Consolidation Loan or a\x20
+| Federal PLUS Loan. Both co-makers are equally responsible\x20
+| for repaying the full amount of the loan.\x20
+| A deferment is a period during which you are entitled\x20
+| to postpone repayment of your loans. Interest is not\x20
+| generally charged to you during a deferment on your\x20
+| subsidized loans. Interest is always charged to you during a\x20
+| deferment on your unsubsidized loans. On loans made\x20
+| under the Perkins Loan Program, all deferments are\x20
+| followed by a post-deferment grace period of 6 months,\x20
+| during which time you are not required to make payments.\x20
+| An endorser is an individual who signs a promissory\x20
+| note and agrees to pay the loan if the borrower does not.\x20
+| The Federal Family Education Loan (FFEL) Program\x20
+| includes Federal Stafford Loans, Federal PLUS Loans, Federal\x20
+| Consolidation Loans, and Federal Supplemental Loans for\x20
+| Students (SLS).\x20
+| The Federal Perkins Loan (Perkins Loan) Program\x20
+| includes Federal Perkins Loans, National Direct Student\x20
+| Loans (NDSL), and National Defense Student Loans (Defense\x20
+| Loans).
+| Table 1. Capitalization Chart
+| Treatment of Interest with\x20
+| Deferment/Forbearance
+| Loan Amt. Capitalized\x20
+| Interest\x20
+| Outstanding\x20
+| Principal
+| Monthly\x20
+| Payment
+| Number of\x20
+| Payments
+| Total Repaid
+| Interest is paid $30,000 $0 $30,000 $333 120 $41,767
+| Interest is capitalized at the\x20
+| end
+| $30,000 $1,800 $31,800 $353 120 $42,365
+| Interest is capitalized\x20
+| quarterly and at the end
+| $30,000 $1,841 $31,841 $354 120 $42,420
+| SECTION 6: WHERE TO SEND THE COMPLETED FORBEARANCE REQUEST
+| Return the completed form and any documentation to:\x20
+| (If no address is shown, return to your loan holder.)
+| If you need help completing this form, call:\x20
+| (If no telephone number is shown, call your loan holder.)
+| Page 3 of 4\x20
+text: separators 1-2
+| <PAGE><A><P>GFB<EOL>
+| </P><P>GENERAL FORBEARANCE REQUEST <EOL>
+| William D. Ford Federal Direct Loan (Direct Loan) Program / Federal Family <EOL>
+| Education Loan (FFEL) Program / Federal Perkins Loan (Perkins Loan) Program<EOL>
+| </P><P>WARNING: Any person who knowingly makes a false statement or misrepresentation on this form or on <EOL>
+| any accompanying document is subject to penalties that may include fines, imprisonment, or both, under <EOL>
+| the U.S. Criminal Code and 20 U.S.C. 1097.<EOL>
+| </P><P>OMB No. 1845-0031 <EOL>
+| Form Approved <EOL>
+| Exp. Date 2/28/2019<EOL>
+| </P><P>SECTION 1: BORROWER INFORMATION<EOL>
+| </P><P>Please enter or correct the following information.<EOL>
+| </P><P>Check this box if any of your information has changed.<EOL>
+| </P><P>SSN<EOL>
+| </P><P>Name<EOL>
+| </P><P>Address<EOL>
+| </P><P>City<W>State<W>Zip Code<EOL>
+| </P><P>Telephone - Primary<EOL>
+| </P><P>Telephone - Alternate<EOL>
+| </P><P>Email (Optional)<EOL>
+| </P><P>SECTION 2: FORBEARANCE REQUEST<EOL>
+| </P><P>Carefully read the entire form before completing it. Answer all questions in Section 2. Your loan holder has sole <EOL>
+| discretion in whether to grant your general forbearance request, and, if granted, for what period your forbearance <EOL>
+| will be applied. Instead of forbearance, you may want to consider requesting a deferment (which has an interest benefit <EOL>
+| for some loan types) or changing to a repayment plan that determines your monthly payment amount based on your <EOL>
+| income. Visit StudentAid.gov/IDR for more information.<EOL>
+| </P><P>1.<W>I am requesting a forbearance because I am <EOL>
+| experiencing a temporary hardship related to one of <EOL>
+| the following situations (check one):<EOL>
+| </P><P>Financial difficulties<EOL>
+| </P><P>Change in employment<EOL>
+| </P><P>Medical expenses<EOL>
+| </P><P>Other (explain the situation below)<EOL>
+| </P><P>2.<W>If approved for a forbearance, I would like to:<EOL>
+| </P><P>Temporarily stop making payments.<EOL>
+| </P><P>Temporarily make smaller payments of<EOL>
+| </P><P>per month.<EOL>
+| </P><P>3.<W>I would like my forbearance to begin with the <EOL>
+| monthly payment that is due in the month and year <EOL>
+| below:<EOL>
+| </P><P>4.<W>If approved for forbearance, I would like my <EOL>
+| forbearance to end in the month and year below, <EOL>
+| and begin making payments the following month:<EOL>
+| </P><P>Page 1 of 4 </P></A></PAGE>
+| <PAGE><A><P>Borrower SSNBorrower Name<EOL>
+| </P><P>SECTION 3: BORROWER/ENDORSER UNDERSTANDINGS, CERTIFICATIONS, AND AUTHORIZATION<EOL>
+| </P><P>I understand that:<EOL>
+| </P><P>•<W>I am not required to make payments of loan principal or interest during my forbearance, but interest will continue to <EOL>
+| be charged on all my loans.<EOL>
+| </P><P>•<W>My loan holder has sole discretion in whether to grant my general forbearance request and for what dates it will be <EOL>
+| granted.<EOL>
+| </P><P>•<W>For Perkins Loans, there is a cumulative limit on general forbearance of 3 years. For Direct Loans and FFEL Program <EOL>
+| loans, my loan holder may set a limit on general forbearance.<EOL>
+| </P><P>•<W>My forbearance will end on the earlier of the end date that I requested, 12 months from the date my forbearance <EOL>
+| begins, or when I exhaust any limit that my loan holder has on forbearance.<EOL>
+| </P><P>•<W>I can request another forbearance after my forbearance ends if I am still experiencing financial hardship.<EOL>
+| </P><P>•<W>Interest may capitalize on my loans during or at the expiration of my forbearance, but interest never capitalizes on <EOL>
+| Perkins Loans.<EOL>
+| </P><P>I certify that:<EOL>
+| </P><P>•<W>The information I have provided on this form is true and correct.<EOL>
+| </P><P>•<W>I will provide additional documentation to my loan holder, if requested, to support my general forbearance request.<EOL>
+| </P><P>•<W>I will repay my loans according to the terms of my promissory note, even if my request is not granted.<EOL>
+| </P><P>I authorize the entity to which I submit this request and its agents to contact me regarding my request or my loans at any <EOL>
+| cellular telephone number that I provide now or in the future using automated telephone dialing equipment or artificial or <EOL>
+| prerecorded voice or text messages.<EOL>
+| </P><P>Date Borrower's/Endorser's Signature<EOL>
+| </P><P>Type or print using dark ink. Enter dates as month-day-year (mm-dd-yyyy) or (mm-yyyy) as appropriate. Example: March 14, <EOL>
+| 2016 = 03-14-2016. Include your name and account number on any documentation that you may be requested to submit <EOL>
+| with this form. If you want to apply for a forbearance on loans that are held by different loan holders, you must submit a <EOL>
+| separate forbearance request to each loan holder. Return the completed form and any requested documentation to the <EOL>
+| address shown in Section 6. <EOL>
+|   <EOL>
+| If you are an endorser, you may request forbearance only when you are required to repay the loan because the borrower is <EOL>
+| not making payments. If you have a loan made jointly with another borrower (as co-makers), you must both individually meet <EOL>
+| the requirements for a forbearance and each of you must request forbearance.<EOL>
+| </P><P>SECTION 4: INSTRUCTIONS FOR COMPLETING THE FORBEARANCE REQUEST<EOL>
+| </P><P>Page 2 of 4 </P></A></PAGE>

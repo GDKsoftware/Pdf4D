@@ -1,0 +1,828 @@
+text: default page 1
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 1\x20
+| \x20
+|  \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  百度号码归属地查询\x20
+| API 接口文档\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| 版本 6.0\x20
+| 作者 百度移动安全部\x20
+| 发布日期 -/-/-\x20
+| \x20
+| \x20
+| \x20
+text: default page 2
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 2\x20
+| \x20
+|                                               修订记录\x20
+| 版本 修订内容 修订人 修改日期\x20
+| 6.0 接口文档排版 傅正(fuzheng@baidu.com) 2016. .21\x20
+|    \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+text: default page 3
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 3\x20
+| \x20
+|                                                   目录\x20
+| 1.1  API 背景 .................................................................................................................... 4\x20
+| 2.1  API 使用说明 ............................................................................................................ 4\x20
+| 2.1.1  服务请求域名 .............................................................................................................. 4\x20
+| 2.1.2  请求格式及参数说明 .................................................................................................. 5\x20
+| 2.1.3  返回格式及参数说明 .................................................................................................. 6\x20
+| 3.1  数据传输安全 ........................................................................................................... 7\x20
+| 3.1.1   传输安全加密流程图 ................................................................................................. 7\x20
+| 3.1.2   URL 参数签名（即 URL 中参数 s） ........................................................................... 7\x20
+| 3.1.3   数据加密 ..................................................................................................................... 8\x20
+| 3.1.4   加密后的请求体签名（即 URL 中 checkStr 参数） ................................................. 9\x20
+| 3.1.5   POST 请求示例 .......................................................................................................... 10\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+text: default page 4
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 4\x20
+| \x20
+| 1.1 API 背景\x20
+| 本接口提供号码归属地信息查询服务。查询方通过提供相应参数
+| 信息（具体参数信息及示例见下）以 POST 方式查询号码相关信息,
+| 系统对请求处理后返回结果（具体信息格式及示例见下）。\x20
+| \x20
+| \x20
+| \x20
+| 2.1 API 使用说明\x20
+| \x20
+| 2.1.1 服务请求域名\x20
+| \x20
+| 环境 域名\x20
+| 生产环境 http://mobsec-dianhua.baidu.com\x20
+| 沙盒环境 http://sandbox.sjws.baidu.com:8080\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| 其中使用云端提供的沙盒环境，将使用到的相关参数如下所示：\x20
+| \x20
+| appkey: 50b13132bb394901f151bc12  \x20
+| \x20
+| appsecret: 50b13132bb394901f151bc12\x20
+| \x20
+|  \x20
+text: default page 5
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 5\x20
+| \x20
+| \x20
+| 2.1.2 请求格式及参数说明\x20
+| \x20
+| 格式 说明\x20
+| 方法 POST\x20
+| URL 格式 http://域名/dianhua_api/location/query/1.0\x20
+| URL 必填参数名 appkey，tk(设备标识)，nonce（当前时间，UTC 时
+| 间），auth_ver(签名版本，默认写 2),  checkStr（加密后
+| 的请求体签名），s（url 参数签名）\x20
+| \x20
+| 注意：顾名思义以上 URL 必填参数名为必填项，否则会被拦截。\x20
+| \x20
+| \x20
+| \x20
+| POST 参数：\x20
+| 采用 JSON 对象，具体格式（样式）如下：\x20
+|   {\x20
+| "createTime" : "utc 时间，long 型",    //毫秒\x20
+| "msg": "加密后的 base64 字符串"\x20
+|              \x20
+| }\x20
+| \x20
+| \x20
+| \x20
+|  \x20
+text: default page 6
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 6\x20
+| \x20
+| 2.1.3 返回格式及参数说明\x20
+| 返回的 HTTP 头中状态码及含义\x20
+| 状态码 含义\x20
+| 200 OK\x20
+| 304 支持\x20
+| 400 请求的参数有误\x20
+| 401 未认证\x20
+|   返回 Body 体样式\x20
+| 返回的 Body 体样式如下所示\x20
+| { \x20
+|       "response" : { \x20
+|             "datas" : { \x20
+|                   "13838383838" : { \x20
+|                         "operation" : "移动",  \x20
+|                         "province" : "河南",  \x20
+|                         "city" : "郑州"\x20
+|                   } ,  \x20
+|                   "18610328820" : { \x20
+|                         "operation" : "联通",  \x20
+|                         "province" : "北京",  \x20
+|                         "city" : "北京"\x20
+|                   } \x20
+|             } \x20
+|       } ,  \x20
+|       "responseHeader" : { \x20
+|             "status" : 200,  \x20
+|             "time" : 1441780364613,  \x20
+|             "version" : "1.1.0"\x20
+|       } \x20
+| } \x20
+| \x20
+| \x20
+|  \x20
+text: default page 7
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 7\x20
+| \x20
+| 3.1 数据传输安全\x20
+|  3.1.1 传输安全加密流程图\x20
+|                                   \x20
+|        \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| 3.1.2 URL 参数签名（即 URL 中参数 s）\x20
+| \x20
+| 为了防止 URL 被恶意篡改和验证请求，需要对 URL 的参数做签名校验，
+| 流程是对请求参数排序，拼接成字符串，然后计算 MD5。（URL 参数签名是对
+| 除了 s 参数外的其他参数计算 MD5(appkey+参数值+auth_ver+其数值+.....) ）\x20
+| Map<String, String>signParams =new TreeMap<String,String>()   \x20
+| for (Map.Entry<String, String> entry : valueMap.entrySet()) {\x20
+| signParams.put(entry.getKey(), entry.getValue());\x20
+| }\x20
+| StringBuilder paramsStr = new StringBuilder();\x20
+| Set<Map.Entry<String, String>>  paramsEntry = signParams.entrySet();      \x20
+| for (Map.Entry<String, String> entry : paramsEntry) {\x20
+|         paramsStr.append(entry.getKey()).append(entry.getValue()                     \x20
+|              == null ? "-" : entry.getValue());\x20
+| }\x20
+| paramsStr.append(app.getAppSecret());\x20
+| String sign = DigestUtils.md5Hex(paramsStr.toString().getBytes("UTF-8"));\x20
+| \x20
+| 对 URL 请求中除了参数 s 之外的其他参
+| 数进行生成签名操作，结果置于 s\x20
+| 将 checkStr 参数放入 URL 请求中\x20
+| \x20
+| 由加密后的数据体生成请求体签名
+| （checkStr）\x20
+| \x20
+| 数据体加密(TrippleDES)\x20
+| \x20
+text: default page 8
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 8\x20
+| \x20
+| \x20
+| 3.1.3 数据加密\x20
+| 一、加密代码（可参考以下代码）    \x20
+| String data="{"location": "可缺省，例如：北京","iccid": "","cell" : { "mcc" :\x20
+| "","mnc" : "","lac" : "","id": ""},"phones": ["123","345"]}";\x20
+| String DEFAULT_CHARASET = "utf-8";\x20
+| Long time = System.currentTimeMillis();\x20
+| JsonObject content = new JsonObject();\x20
+| content.addProperty("createTime",time);\x20
+| content.addProperty("msg", encryptWithBase64 (appsecret 的前 24 位, time, data));\x20
+| public static byte[] longToBytes(long v) {\x20
+|    ByteBuffer byteBuffer = ByteBuffer.allocate(8);\x20
+|    byteBuffer.order(ByteOrder.BIG_ENDIAN);\x20
+|    byteBuffer.putLong(v);\x20
+|    return byteBuffer.array();\x20
+|     }\x20
+| public static String encryptWithBase64(String key, long iv, String message) {\x20
+| try {\x20
+|    byte[] cipherText = encrypt(\x20
+|             key.getBytes(DEFAULT_CHARASET), \x20
+|             longToBytes(iv),     \x20
+|             message.getBytes(DEFAULT_CHARASET));\x20
+|    return Base64.encodeBase64String(cipherText);\x20
+| } catch (UnsupportedEncodingException e) {\x20
+|           throw new SecurityException(e);\x20
+|         }\x20
+| }\x20
+| public static byte[] encrypt(byte[] key, byte[] iv, byte[] message) {\x20
+|         byte[] result = null;\x20
+| try {\x20
+|        Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");\x20
+|        SecretKeyFactory skf = SecretKeyFactory.getInstance("DESede");\x20
+|        SecretKey secretKey = skf.generateSecret(new DESedeKeySpec(key));\x20
+|        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);\x20
+|        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);\x20
+|        result = cipher.doFinal(message);\x20
+|  } catch (Exception e) {\x20
+text: default page 9
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 9\x20
+| \x20
+|             throw new SecurityException(e);\x20
+|         }\x20
+|  return result;\x20
+| }\x20
+| \x20
+|   二、加密样例\x20
+|         （1） 加密前数据：\x20
+| { \x20
+|       "phones" : [ "123" ] // 电话号码，多号码查询是采用英文逗号分隔\x20
+| } \x20
+| \x20
+| （2）加密后数据：\x20
+| { \x20
+|       "createTime" : 123456789,         //请求体创建时间（毫秒）\x20
+|       "msg": "加密后的 base64 字符串"\x20
+| } \x20
+| \x20
+| 3.1.4 加密后的请求体签名（即 URL 中 checkStr 参数）\x20
+| String dx_key = "AYUEJ1AWWHKTYENYUG1RP1B52SY5R1OJ"\x20
+| String body = content.toString();       //JsonObject content = new JsonObject();\x20
+| int len = body.length();\x20
+| len = (len < 50 ? len : 50);\x20
+| String str = body.substring(0, len) + dx_key;\x20
+| MessageDigest messageDigest = MessageDigest.getInstance("MD5");\x20
+| messageDigest.reset();\x20
+| messageDigest.update(str.getBytes("UTF-8"));\x20
+| String checkStr =String.valueOf(Hex.encodeHexString(messageDigest.digest()));\x20
+| \x20
+| 注意：签名得到的结果作为 URL 请求参数 checkStr，这个参数在提交 URL
+| 时是必填项并且会用来校验请求体的的完整性。\x20
+| \x20
+| \x20
+| \x20
+text: default page 10
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 10\x20
+| \x20
+| 3.1.5 POST 请求示例\x20
+| 请求：\x20
+| \x20
+|  curl - XPOST 'http://api.dianhua.dianxin.net/dianhua_api/location/query/1.
+| 0?appkey=7010470d62f39cbbfc0b77c0&auth_ver=2& tk=dj2EoWq6eITWudAkkL9NHA%3D%3D&nonce=
+| 1463389860123&s=6e847577295f31779ffcb594a30566e0&checkStr=ee4f44af7a9387c6da27a7cb7
+| 7fedd25&location=true' \x20
+|          - d '{"createTime":1463389860123,"msg":"2QctkhpsmOKiBQcomEFs1Db0OwI/4heMfoO
+| 9r6B5yhQnzmQjM93fi6KpowoETMPr"}' \x20
+| \x20
+| \x20
+| 应答：\x20
+| \x20
+| { \x20
+|       "response" : { \x20
+|             "datas" : { \x20
+|                   "13838383838" : { \x20
+|                         "operation" : "移动",  \x20
+|                         "province" : "河南",  \x20
+|                         "city" : "郑州"\x20
+|                   } ,  \x20
+|                   "18610328820" : { \x20
+|                         "operation" : "联通",  \x20
+|                         "province" : "北京",  \x20
+|                         "city" : "北京"\x20
+|                   } \x20
+|             } \x20
+|       } ,  \x20
+|       "responseHeader" : { \x20
+|             "status" : 200,  \x20
+|             "time " : 1466411072443,  \x20
+|             "version" : "1.1.0"\x20
+|       } \x20
+| } \x20
+| \x20
+| 注意：上述两个样例中 URL 中参数信息是由程序加密生成，此处取出只是
+| 为了更清晰地呈现示例。\x20
+text: sorted page 1
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+|  \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  百度号码归属地查询\x20
+| API 接口文档\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| 版本 6.0
+| 作者 百度移动安全部\x20
+| 发布日期 -/-/-
+| \x20
+| \x20
+| \x20
+| 1\x20
+| \x20
+text: sorted page 2
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+|                                               修订记录\x20
+| 版本 修订内容 修订人 修改日期\x20
+| 6.0 接口文档排版 傅正(fuzheng@b)aid2u0.1.c6o.m21
+|    \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+| 2\x20
+| \x20
+text: sorted page 3
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+|                                                   目录\x20
+| 1.1  API 背景 .................................................................................................................... 4\x20
+| 2.1  API 使用说明 ............................................................................................................ 4\x20
+| 2.1.1  服务请求域名 .............................................................................................................. 4\x20
+| 2.1.2  请求格式及参数说明 .................................................................................................. 5\x20
+| 2.1.3  返回格式及参数说明 .................................................................................................. 6\x20
+| 3.1  数据传输安全 ........................................................................................................... 7\x20
+| 3.1.1   传输安全加密流程图 ................................................................................................. 7\x20
+| 3.1.2   URL 参数签名（即 URL 中参数 s） ........................................................................... 7\x20
+| 3.1.3   数据加密 ..................................................................................................................... 8\x20
+| 3.1.4   加密后的请求体签名（即 URL 中 checkStr 参数） ................................................. 9\x20
+| 3.1.5   POST 请求示例 .......................................................................................................... 10\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+| 3\x20
+| \x20
+text: sorted page 4
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 1.1 API 背景\x20
+| 本接口提供号码归属地信息查询服务。查询方通过提供相应参数
+| 信息（具体参数信息及示例见下）以 POST 方式查询号码相关信息,
+| 系统对请求处理后返回结果（具体信息格式及示例见下）。\x20
+| \x20
+| \x20
+| \x20
+| 2.1 API 使用说明\x20
+| \x20
+| 2.1.1 服务请求域名\x20
+| \x20
+| 环境 域名\x20
+| 生产环境 http://mobsec-dianhua.baidu.com\x20
+| 沙盒环境 http://sandbox.sjws.baidu.com:8080\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| 其中使用云端提供的沙盒环境，将使用到的相关参数如下所示：\x20
+| \x20
+| appkey: 50b13132bb394901f151bc12  \x20
+| \x20
+| appsecret: 50b13132bb394901f151bc12\x20
+| \x20
+|  \x20
+| 4\x20
+| \x20
+text: sorted page 5
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| \x20
+| 2.1.2 请求格式及参数说明\x20
+| \x20
+| 格式 说明\x20
+| 方法 POST\x20
+| URL 格式 http://域名/dianhua_api/location/query/1.0\x20
+| URL 必填参数名 appkey，tk(设备标识)，nonce（当前时间，UTC 时
+| 间），auth_ver(签名版本，默认写 2),  checkStr（加密后
+| 的请求体签名），s（url 参数签名）\x20
+| \x20
+| 注意：顾名思义以上 URL 必填参数名为必填项，否则会被拦截。\x20
+| \x20
+| \x20
+| \x20
+| POST 参数：\x20
+| 采用 JSON 对象，具体格式（样式）如下：\x20
+|   {\x20
+| "createTime" : "utc 时间，long 型",    //毫秒\x20
+| "msg": "加密后的 base64 字符串"\x20
+|              \x20
+| }\x20
+| \x20
+| \x20
+| \x20
+|  \x20
+| 5\x20
+| \x20
+text: sorted page 6
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 2.1.3 返回格式及参数说明\x20
+| 返回的 HTTP 头中状态码及含义\x20
+| 状态码 含义\x20
+| 200 OK\x20
+| 304 支持\x20
+| 400 请求的参数有误\x20
+| 401 未认证\x20
+|   返回 Body 体样式\x20
+| 返回的 Body 体样式如下所示\x20
+| { \x20
+|       "response" : { \x20
+|             "datas" : { \x20
+|                   "13838383838" : { \x20
+|                         "operation" : "移动",  \x20
+|                         "province" : "河南",  \x20
+|                         "city" : "郑州"\x20
+|                   } ,  \x20
+|                   "18610328820" : { \x20
+|                         "operation" : "联通",  \x20
+|                         "province" : "北京",  \x20
+|                         "city" : "北京"\x20
+|                   } \x20
+|             } \x20
+|       } ,  \x20
+|       "responseHeader" : { \x20
+|             "status" : 200,  \x20
+|             "time" : 1441780364613,  \x20
+|             "version" : "1.1.0"\x20
+|       } \x20
+| } \x20
+| \x20
+| \x20
+|  \x20
+| 6\x20
+| \x20
+text: sorted page 7
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 3.1 数据传输安全\x20
+|  3.1.1 传输安全加密流程图\x20
+|                                   \x20
+| 数据体加密(TrippleDES)\x20
+|         \x20
+| \x20
+| 由加密后的数据体生成请求体签名
+|  （checkStr）\x20
+| \x20
+| \x20
+| 将 checkStr 参数放入 URL 请求中\x20
+| \x20
+| \x20
+| \x20
+| 对 URL 请求中除了参数 s 之外的其他参
+| \x20
+| 数进行生成签名操作，结果置于 s\x20
+| \x20
+| 3.1.2 URL 参数签名（即 URL 中参数 s）\x20
+| \x20
+| 为了防止 URL 被恶意篡改和验证请求，需要对 URL 的参数做签名校验，
+| 流程是对请求参数排序，拼接成字符串，然后计算 MD5。（URL 参数签名是对
+| 除了 s 参数外的其他参数计算 MD5(appkey+参数值+auth_ver+其数值+.....) ）\x20
+| Map<String, String>signParams =new TreeMap<String,String>()   \x20
+| for (Map.Entry<String, String> entry : valueMap.entrySet()) {\x20
+| signParams.put(entry.getKey(), entry.getValue());\x20
+| }\x20
+| StringBuilder paramsStr = new StringBuilder();\x20
+| Set<Map.Entry<String, String>>  paramsEntry = signParams.entrySet();      \x20
+| for (Map.Entry<String, String> entry : paramsEntry) {\x20
+|         paramsStr.append(entry.getKey()).append(entry.getValue()                     \x20
+|              == null ? "-" : entry.getValue());\x20
+| }\x20
+| paramsStr.append(app.getAppSecret());\x20
+| String sign = DigestUtils.md5Hex(paramsStr.toString().getBytes("UTF-8"));\x20
+| \x20
+| 7\x20
+| \x20
+text: sorted page 8
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| \x20
+| 3.1.3 数据加密\x20
+| 一、加密代码（可参考以下代码）    \x20
+| String data="{"location": "可缺省，例如：北京","iccid": "","cell" : { "mcc" :\x20
+| "","mnc" : "","lac" : "","id": ""},"phones": ["123","345"]}";\x20
+| String DEFAULT_CHARASET = "utf-8";\x20
+| Long time = System.currentTimeMillis();\x20
+| JsonObject content = new JsonObject();\x20
+| content.addProperty("createTime",time);\x20
+| content.addProperty("msg", encryptWithBase64 (appsecret 的前 24 位, time, data));\x20
+| public static byte[] longToBytes(long v) {\x20
+|    ByteBuffer byteBuffer = ByteBuffer.allocate(8);\x20
+|    byteBuffer.order(ByteOrder.BIG_ENDIAN);\x20
+|    byteBuffer.putLong(v);\x20
+|    return byteBuffer.array();\x20
+|     }\x20
+| public static String encryptWithBase64(String key, long iv, String message) {\x20
+| try {\x20
+|    byte[] cipherText = encrypt(\x20
+|             key.getBytes(DEFAULT_CHARASET), \x20
+|             longToBytes(iv),     \x20
+|             message.getBytes(DEFAULT_CHARASET));\x20
+|    return Base64.encodeBase64String(cipherText);\x20
+| } catch (UnsupportedEncodingException e) {\x20
+|           throw new SecurityException(e);\x20
+|         }\x20
+| }\x20
+| public static byte[] encrypt(byte[] key, byte[] iv, byte[] message) {\x20
+|         byte[] result = null;\x20
+| try {\x20
+|        Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");\x20
+|        SecretKeyFactory skf = SecretKeyFactory.getInstance("DESede");\x20
+|        SecretKey secretKey = skf.generateSecret(new DESedeKeySpec(key));\x20
+|        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);\x20
+|        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);\x20
+|        result = cipher.doFinal(message);\x20
+|  } catch (Exception e) {\x20
+| 8\x20
+| \x20
+text: sorted page 9
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+|             throw new SecurityException(e);\x20
+|         }\x20
+|  return result;\x20
+| }\x20
+| \x20
+|   二、加密样例\x20
+|         （1） 加密前数据：\x20
+| { \x20
+|       "phones" : [ "123" ] // 电话号码，多号码查询是采用英文逗号分隔\x20
+| } \x20
+| \x20
+| （2）加密后数据：\x20
+| { \x20
+|       "createTime" : 123456789,         //请求体创建时间（毫秒）\x20
+|       "msg": "加密后的 base64 字符串"\x20
+| } \x20
+| \x20
+| 3.1.4 加密后的请求体签名（即 URL 中 checkStr 参数）\x20
+| String dx_key = "AYUEJ1AWWHKTYENYUG1RP1B52SY5R1OJ"\x20
+| String body = content.toString();       //JsonObject content = new JsonObject();\x20
+| int len = body.length();\x20
+| len = (len < 50 ? len : 50);\x20
+| String str = body.substring(0, len) + dx_key;\x20
+| MessageDigest messageDigest = MessageDigest.getInstance("MD5");\x20
+| messageDigest.reset();\x20
+| messageDigest.update(str.getBytes("UTF-8"));\x20
+| String checkStr =String.valueOf(Hex.encodeHexString(messageDigest.digest()));\x20
+| \x20
+| 注意：签名得到的结果作为 URL 请求参数 checkStr，这个参数在提交 URL
+| 时是必填项并且会用来校验请求体的的完整性。\x20
+| \x20
+| \x20
+| \x20
+| 9\x20
+| \x20
+text: sorted page 10
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 3.1.5 POST 请求示例\x20
+| 请求：\x20
+| \x20
+|  curl - XPOST 'http://api.dianhua.dianxin.net/dianhua_api/location/query/1.
+| 0?appkey=7010470d62f39cbbfc0b77c0&auth_ver=2& tk=dj2EoWq6eITWudAkkL9NHA%3D%3D&nonce=
+| 1463389860123&s=6e847577295f31779ffcb594a30566e0&checkStr=ee4f44af7a9387c6da27a7cb7
+| 7fedd25&location=true' \x20
+|          - d '{"createTime":1463389860123,"msg":"2QctkhpsmOKiBQcomEFs1Db0OwI/4heMfoO
+| 9r6B5yhQnzmQjM93fi6KpowoETMP"r}' \x20
+| \x20
+| \x20
+| 应答：\x20
+| \x20
+| { \x20
+|       "response" : { \x20
+|             "datas" : { \x20
+|                   "13838383838" : { \x20
+|                         "operation" : "移动",  \x20
+|                         "province" : "河南",  \x20
+|                         "city" : "郑州"\x20
+|                   } ,  \x20
+|                   "18610328820" : { \x20
+|                         "operation" : "联通",  \x20
+|                         "province" : "北京",  \x20
+|                         "city" : "北京"\x20
+|                   } \x20
+|             } \x20
+|       } ,  \x20
+|       "responseHeader" : { \x20
+|             "status" : 200,  \x20
+|             "time " : 1466411072443,  \x20
+|             "version" : "1.1.0"\x20
+|       } \x20
+| } \x20
+| \x20
+| 注意：上述两个样例中 URL 中参数信息是由程序加密生成，此处取出只是
+| 为了更清晰地呈现示例。\x20
+| 10\x20
+| \x20
+text: range 2-3
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 2\x20
+| \x20
+|                                               修订记录\x20
+| 版本 修订内容 修订人 修改日期\x20
+| 6.0 接口文档排版 傅正(fuzheng@baidu.com) 2016. .21\x20
+|    \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+| \x20
+|          百度号码归属地查询 API          \x20
+| \x20
+| 3\x20
+| \x20
+|                                                   目录\x20
+| 1.1  API 背景 .................................................................................................................... 4\x20
+| 2.1  API 使用说明 ............................................................................................................ 4\x20
+| 2.1.1  服务请求域名 .............................................................................................................. 4\x20
+| 2.1.2  请求格式及参数说明 .................................................................................................. 5\x20
+| 2.1.3  返回格式及参数说明 .................................................................................................. 6\x20
+| 3.1  数据传输安全 ........................................................................................................... 7\x20
+| 3.1.1   传输安全加密流程图 ................................................................................................. 7\x20
+| 3.1.2   URL 参数签名（即 URL 中参数 s） ........................................................................... 7\x20
+| 3.1.3   数据加密 ..................................................................................................................... 8\x20
+| 3.1.4   加密后的请求体签名（即 URL 中 checkStr 参数） ................................................. 9\x20
+| 3.1.5   POST 请求示例 .......................................................................................................... 10\x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+| \x20
+|  \x20
+text: separators 1-2
+| <PAGE><A><P> <EOL>
+| </P><P>         百度号码归属地查询<W>API          <W> <EOL>
+| </P><P> <EOL>
+| </P><P>1 <EOL>
+| </P><P> <EOL>
+| </P><P>  <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> 百度号码归属地查询 <EOL>
+| </P><P>API<W>接口文档 <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P>版本 <W>6.0 <EOL>
+| </P><P>作者 <W>百度移动安全部 <EOL>
+| </P><P>发布日期 <W>-/-/- <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> </P></A></PAGE>
+| <PAGE><A><P> <EOL>
+| </P><P>         百度号码归属地查询<W>API          <W> <EOL>
+| </P><P> <EOL>
+| </P><P>2 <EOL>
+| </P><P> <EOL>
+| </P><P>                                              修订记录 <EOL>
+| </P><P>版本 <W>修订内容 <W>修订人 <W>修改日期 <EOL>
+| </P><P>6.0 <W>接口文档排版 <W>傅正(fuzheng@baidu.com) <W>2016.<W>.21 <EOL>
+| </P><P> <W> <W> <W> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <EOL>
+| </P><P> <W> </P></A></PAGE>
