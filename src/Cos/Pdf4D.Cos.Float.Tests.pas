@@ -38,6 +38,9 @@ type
     procedure TestParseValueBeyondDoubleRange;
 
     [Test]
+    procedure TestParseVeryLongTokenIsFast;
+
+    [Test]
     procedure TestParseWhitespaceAndSuffix;
 
     [Test]
@@ -57,6 +60,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Diagnostics,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Float,
   Pdf4D.Cos.Integer;
@@ -148,6 +152,21 @@ begin
   AssertParses('-3.4028234663852886E39', -3.4028234663852886E38);
   AssertParses('340282346638528860000000000000000000000000', 3.4028234663852886E38);
   AssertParses('-340282346638528860000000000000000000000000', -3.4028234663852886E38);
+end;
+
+procedure TCosFloatTests.TestParseVeryLongTokenIsFast;
+begin
+  const Watch = TStopwatch.StartNew;
+  const Number = TCosFloat.Parse('1.' + StringOfChar('5', 2 * 1024 * 1024));
+  try
+    Assert.AreEqual<Single>(1.5555556, Number.FloatValue);
+  finally
+    Number.Free;
+  end;
+  AssertParses('1' + StringOfChar('0', 2 * 1024 * 1024), 3.4028234663852886E38);
+  AssertParses('0.' + StringOfChar('0', 2 * 1024 * 1024) + '1', 0);
+  AssertParses('1.' + StringOfChar('0', 350), 1);
+  Assert.IsTrue(Watch.ElapsedMilliseconds < 3000, 'a long number token must be parsed in linear time');
 end;
 
 procedure TCosFloatTests.TestParseValueBeyondDoubleRange;

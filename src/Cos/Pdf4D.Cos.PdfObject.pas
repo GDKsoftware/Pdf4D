@@ -74,7 +74,16 @@ begin
 
   FLoading := True;
   try
-    FObject := LoadFromResolver;
+    const Loaded = LoadFromResolver;
+    if not Assigned(FObject) then
+    begin
+      FObject := Loaded;
+    end
+    else if Loaded <> FObject then
+    begin
+      // The resolver handed the content over with SetObject while loading: that content stays
+      Loaded.Free;
+    end;
   finally
     FLoading := False;
   end;

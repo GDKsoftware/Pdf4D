@@ -61,6 +61,9 @@ type
     procedure TestSharedIndirectFreedOnce;
 
     [Test]
+    procedure TestSetObjectDuringLoadKeepsFirstContentAndFreesTheOther;
+
+    [Test]
     procedure TestReplacingItemFreesOldDirectValue;
 
     [Test]
@@ -309,6 +312,36 @@ begin
       Shared.Free;
     end;
     Assert.AreEqual(1, TTrackedValue.FreedCount, 'the reference frees its content once');
+  finally
+    Resolver.Free;
+  end;
+end;
+
+procedure TCosDictionaryTests.TestSetObjectDuringLoadKeepsFirstContentAndFreesTheOther;
+begin
+  TTrackedValue.FreedCount := 0;
+  const Resolver = TFakeResolver.Create;
+  try
+    var Proxy: TCosObject := nil;
+    var HandedOver: TCosBase := nil;
+    Resolver.Define(1,
+      function: TCosBase
+      begin
+        HandedOver := TTrackedValue.Create;
+        Proxy.SetObject(HandedOver);
+        Result := TTrackedValue.Create;
+      end);
+
+    Proxy := TCosObject.Create(TCosObjectKey.Make(1, 0), Resolver);
+    try
+      const Loaded = Proxy.GetObject;
+
+      Assert.AreSame(HandedOver, Loaded, 'the content set while loading stays');
+      Assert.AreEqual(1, TTrackedValue.FreedCount, 'the returned duplicate is freed, not leaked');
+    finally
+      Proxy.Free;
+    end;
+    Assert.AreEqual(2, TTrackedValue.FreedCount);
   finally
     Resolver.Free;
   end;

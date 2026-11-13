@@ -143,6 +143,9 @@ type
     procedure TestNestingCounterIsReleasedAfterParse;
 
     [Test]
+    procedure TestNestingLimitIsClamped;
+
+    [Test]
     procedure TestReadLongAndInt;
 
     [Test]
@@ -794,6 +797,33 @@ begin
     FParser.ParseDirObject.Free;
   end;
   Assert.Pass;
+end;
+
+procedure TBaseParserTests.TestNestingLimitIsClamped;
+begin
+  Start(StringOfChar('[', 900) + StringOfChar(']', 900), High(Integer));
+  FParser.ParseDirObject.Free;
+
+  Start(StringOfChar('[', 100000), High(Integer));
+  Assert.WillRaise(
+    procedure
+    begin
+      FParser.ParseDirObject.Free;
+    end,
+    EPdfParseException);
+
+  var Text := '';
+  for var Index := 1 to 100000 do
+  begin
+    Text := Text + '<</A ';
+  end;
+  Start(Text, High(Integer));
+  Assert.WillRaise(
+    procedure
+    begin
+      FParser.ParseDirObject.Free;
+    end,
+    EPdfParseException);
 end;
 
 procedure TBaseParserTests.TestReadLongAndInt;

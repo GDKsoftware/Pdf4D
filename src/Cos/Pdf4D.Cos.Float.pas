@@ -12,6 +12,9 @@ type
   private
     const MinNormalSingle = 1.17549435E-38;
     const MaxSingleValue = 3.4028234663852886E38;
+    const MaxFractionDigits = 100;
+    // Beyond this power of ten a value is far outside the range of a Single, so it is clamped or becomes 0 without parsing
+    const MaxParsedExponent = 50;
 
   private
     FValue: Single;
@@ -132,7 +135,8 @@ begin
   end;
 
   var Parsed: Double;
-  if TryStrToFloat(Normalized, Parsed, TFormatSettings.Invariant) then
+  const OutOfSingleRange = (ApproximateExponent > MaxParsedExponent) or (ApproximateExponent < -MaxParsedExponent);
+  if (not OutOfSingleRange) and TryStrToFloat(Normalized, Parsed, TFormatSettings.Invariant) then
   begin
     Value := CoerceDouble(Parsed);
   end
@@ -185,22 +189,25 @@ begin
     Inc(Index);
   end;
 
-  var IntegerDigits := '';
+  // Scan with indices and copy once: appending a character at a time is quadratic for a hostile long token
+  const IntegerStart = Index;
   while (Index <= Last) and CharInSet(Text[Index], ['0'..'9']) do
   begin
-    IntegerDigits := IntegerDigits + Text[Index];
     Inc(Index);
   end;
+  var IntegerDigits := Copy(Text, IntegerStart, Index - IntegerStart);
 
   var FractionDigits := '';
   if (Index <= Last) and (Text[Index] = '.') then
   begin
     Inc(Index);
+    const FractionStart = Index;
     while (Index <= Last) and CharInSet(Text[Index], ['0'..'9']) do
     begin
-      FractionDigits := FractionDigits + Text[Index];
       Inc(Index);
     end;
+    // Digits beyond this cannot change a Single, and TryStrToFloat misparses digit strings of a few hundred characters
+    FractionDigits := Copy(Text, FractionStart, Min(Index - FractionStart, MaxFractionDigits));
   end;
 
   if (IntegerDigits = '') and (FractionDigits = '') then
@@ -263,8 +270,13 @@ begin
   end
   else
   begin
-    const LeadingFractionZeros = System.Length(FractionDigits) - System.Length(FractionDigits.TrimLeft(['0']));
-    ApproximateExponent := ExponentValue - LeadingFractionZeros;
+    const SignificantFraction = FractionDigits.TrimLeft(['0']);
+    const LeadingFractionZeros = System.Length(FractionDigits) - System.Length(SignificantFraction);
+    // A value of zero stays zero whatever its exponent
+    if SignificantFraction <> '' then
+    begin
+      ApproximateExponent := ExponentValue - LeadingFractionZeros;
+    end;
   end;
   Result := True;
 end;

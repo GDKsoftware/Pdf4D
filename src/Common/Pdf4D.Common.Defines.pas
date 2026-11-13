@@ -31,6 +31,8 @@ const
   DefaultMaxDecodedStreamSize: Int64 = 256 * 1024 * 1024;
   // Same limit as BaseParser.MAX_RECURSION_DEPTH in PDFBox
   DefaultMaxNestingDepth = 500;
+  // A caller's MaxNestingDepth is clamped to this: the parser recurses, and deeper nesting could overflow the stack
+  MaximumNestingDepth = 2000;
 
 implementation
 

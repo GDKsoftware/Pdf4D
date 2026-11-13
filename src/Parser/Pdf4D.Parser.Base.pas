@@ -120,6 +120,7 @@ type
 implementation
 
 uses
+  System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Float,
@@ -326,7 +327,7 @@ function TBaseParser.MaxNestingDepth: Integer;
 begin
   if Assigned(FDocument) then
   begin
-    Result := FDocument.Options.MaxNestingDepth;
+    Result := Min(FDocument.Options.MaxNestingDepth, MaximumNestingDepth);
   end
   else
   begin
