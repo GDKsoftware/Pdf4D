@@ -7,18 +7,23 @@ uses
   System.SysUtils,
   Pdf4D.Common.Log,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.DestinationResolver,
+  Pdf4D.Model.Outline,
   Pdf4D.Model.PageTree;
 
 type
   // The catalog (/Root). It holds the dictionary and does not own it. The sub dictionaries are given as they are,
-  // the classes for outlines, forms and so on come with the tasks that need them.
+  // except the outline, the classes for forms and so on come with the tasks that need them.
   TPDDocumentCatalog = class
   private
     FRoot: TCosDictionary;
     FLog: TPdfLog;
     FPages: TPDPageTree;
+    FResolver: TPDDestinationResolver;
+    FOutline: TPDDocumentOutline;
 
     function GetPages: TPDPageTree;
+    function GetDestinationResolver: TPDDestinationResolver;
 
   public
     // Log may be nil
@@ -28,7 +33,8 @@ type
     // The page tree, which the catalog owns. Raises EPdfParseException when /Pages is no dictionary.
     property Pages: TPDPageTree read GetPages;
 
-    function TryGetOutline(out Outline: TCosDictionary): Boolean;
+    // Port of getDocumentOutline. The outline belongs to the catalog. False when /Outlines is no dictionary.
+    function TryGetOutline(out Outline: TPDDocumentOutline): Boolean;
     function TryGetPageLabels(out PageLabels: TCosDictionary): Boolean;
     function TryGetAcroForm(out AcroForm: TCosDictionary): Boolean;
     function TryGetNames(out Names: TCosDictionary): Boolean;
@@ -37,6 +43,9 @@ type
 
     // The /Version name of the catalog, empty when there is none
     function Version: string;
+
+    // Finds the pages of destinations and the named destinations of the document, which the catalog owns
+    property DestinationResolver: TPDDestinationResolver read GetDestinationResolver;
 
     property CosObject: TCosDictionary read FRoot;
   end;
@@ -58,6 +67,8 @@ end;
 
 destructor TPDDocumentCatalog.Destroy;
 begin
+  FOutline.Free;
+  FResolver.Free;
   FPages.Free;
   inherited;
 end;
@@ -76,9 +87,31 @@ begin
   Result := FPages;
 end;
 
-function TPDDocumentCatalog.TryGetOutline(out Outline: TCosDictionary): Boolean;
+function TPDDocumentCatalog.GetDestinationResolver: TPDDestinationResolver;
 begin
-  Result := FRoot.TryGetCosDictionary(TCosNames.Outlines, Outline);
+  if not Assigned(FResolver) then
+  begin
+    FResolver := TPDDestinationResolver.Create(FRoot,
+      function: TPDPageTree
+      begin
+        Result := Pages;
+      end, FLog);
+  end;
+  Result := FResolver;
+end;
+
+function TPDDocumentCatalog.TryGetOutline(out Outline: TPDDocumentOutline): Boolean;
+begin
+  if not Assigned(FOutline) then
+  begin
+    var Root: TCosDictionary;
+    if FRoot.TryGetCosDictionary(TCosNames.Outlines, Root) then
+    begin
+      FOutline := TPDDocumentOutline.Create(Root, DestinationResolver);
+    end;
+  end;
+  Outline := FOutline;
+  Result := Assigned(FOutline);
 end;
 
 function TPDDocumentCatalog.TryGetPageLabels(out PageLabels: TCosDictionary): Boolean;

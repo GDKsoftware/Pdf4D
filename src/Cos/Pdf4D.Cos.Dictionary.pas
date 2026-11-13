@@ -59,6 +59,8 @@ type
     function GetBoolean(const Key: string; const Default: Boolean): Boolean;
     function GetNameAsString(const Key: string; const Default: string): string;
     function GetString(const Key: string; const Default: string): string;
+    // False when the entry is missing or no string, which is where COSDictionary.getString gives null
+    function TryGetString(const Key: string; out Value: string): Boolean;
 
     function TryGetCosArray(const Key: string; out Value: TCosArray): Boolean;
     // A stream is a dictionary too, like COSStream extends COSDictionary
@@ -297,6 +299,20 @@ begin
   else
   begin
     Result := Default;
+  end;
+end;
+
+function TCosDictionary.TryGetString(const Key: string; out Value: string): Boolean;
+begin
+  var Item: TCosBase;
+  Result := (TryGetDictionaryObject(Key, Item) and (Item is TCosString));
+  if Result then
+  begin
+    Value := TCosString(Item).GetString;
+  end
+  else
+  begin
+    Value := '';
   end;
 end;
 

@@ -13,6 +13,7 @@ uses
   Pdf4D.Encryption.AccessPermission,
   Pdf4D.Model.DocumentCatalog,
   Pdf4D.Model.DocumentInformation,
+  Pdf4D.Model.EmbeddedFile,
   Pdf4D.Model.PageTree;
 
 type
@@ -25,6 +26,7 @@ type
     FInformation: TPDDocumentInformation;
     // Stand ins for a trailer without /Root or /Info, as PDFBox creates them
     FSubstitutes: TObjectList<TCosDictionary>;
+    FEmbeddedFiles: TObjectList<TPDEmbeddedFile>;
 
     constructor Create(const CosDocument: TCosDocument);
 
@@ -44,6 +46,11 @@ type
     // that cannot be loaded raises an EPdfException descendant.
     class function Load(const Source: TStream; const OwnsSource: Boolean; const Options: TPdfLoadOptions): TPDDocument; static;
 
+    // Port of the read side of PDDocumentNameDictionary.getEmbeddedFiles: the entries of the name tree /Names
+    // /EmbeddedFiles in the order of the walk through the tree (see TPDNameTreeNode.GetAll), also those without a
+    // stream. The document owns them. Raises EPdfParseException when the tree has a bad key or value.
+    function GetEmbeddedFiles: TArray<TPDEmbeddedFile>;
+
     property CosDocument: TCosDocument read FCosDocument;
     property Catalog: TPDDocumentCatalog read GetCatalog;
     property DocumentInformation: TPDDocumentInformation read GetInformation;
@@ -60,6 +67,7 @@ implementation
 uses
   System.Math,
   Pdf4D.Cos.Names,
+  Pdf4D.Model.NameTree,
   Pdf4D.Parser.Pdf;
 
 const
@@ -76,6 +84,7 @@ end;
 
 destructor TPDDocument.Destroy;
 begin
+  FEmbeddedFiles.Free;
   FInformation.Free;
   FCatalog.Free;
   FCosDocument.Free;
@@ -125,6 +134,40 @@ end;
 function TPDDocument.GetPages: TPDPageTree;
 begin
   Result := Catalog.Pages;
+end;
+
+function TPDDocument.GetEmbeddedFiles: TArray<TPDEmbeddedFile>;
+begin
+  if not Assigned(FEmbeddedFiles) then
+  begin
+    const Found = TObjectList<TPDEmbeddedFile>.Create(True);
+    try
+      var Names: TCosDictionary;
+      var Root: TCosDictionary;
+      if Catalog.TryGetNames(Names) and Names.TryGetCosDictionary(TCosNames.EmbeddedFiles, Root) then
+      begin
+        const Tree = TPDNameTreeNode.Create(Root, TPDEmbeddedFile.ConvertTreeValue, FCosDocument.Log);
+        try
+          for var Pair in Tree.GetAll do
+          begin
+            Found.Add(TPDEmbeddedFile.Create(Pair.Key, TCosDictionary(Pair.Value)));
+          end;
+        finally
+          Tree.Free;
+        end;
+      end;
+    except
+      Found.Free;
+      raise;
+    end;
+    FEmbeddedFiles := Found;
+  end;
+
+  SetLength(Result, FEmbeddedFiles.Count);
+  for var Index := 0 to FEmbeddedFiles.Count - 1 do
+  begin
+    Result[Index] := FEmbeddedFiles[Index];
+  end;
 end;
 
 function TPDDocument.GetIsEncrypted: Boolean;

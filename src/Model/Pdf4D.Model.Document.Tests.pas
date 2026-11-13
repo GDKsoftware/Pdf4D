@@ -58,7 +58,8 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
-  Pdf4D.Model.Document;
+  Pdf4D.Model.Document,
+  Pdf4D.Model.Outline;
 
 { TDocumentTests }
 
@@ -223,7 +224,8 @@ begin
 
     var Dictionary: TCosDictionary;
     var Metadata: TCosStream;
-    Assert.IsTrue(Catalog.TryGetOutline(Dictionary));
+    var Outline: TPDDocumentOutline;
+    Assert.IsTrue(Catalog.TryGetOutline(Outline));
     Assert.IsTrue(Catalog.TryGetPageLabels(Dictionary));
     Assert.IsTrue(Catalog.TryGetAcroForm(Dictionary));
     Assert.IsTrue(Catalog.TryGetNames(Dictionary));
@@ -238,9 +240,9 @@ begin
   try
     const PlainCatalog = FDocuments.Open(Plain).Catalog;
 
-    var Dictionary: TCosDictionary;
     var Metadata: TCosStream;
-    Assert.IsFalse(PlainCatalog.TryGetOutline(Dictionary));
+    var Outline: TPDDocumentOutline;
+    Assert.IsFalse(PlainCatalog.TryGetOutline(Outline));
     Assert.IsFalse(PlainCatalog.TryGetMetadata(Metadata));
     Assert.AreEqual('', PlainCatalog.Version);
   finally

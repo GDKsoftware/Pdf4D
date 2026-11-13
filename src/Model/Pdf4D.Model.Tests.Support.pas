@@ -16,6 +16,7 @@ type
   private
     FLogLines: TList<string>;
     FDocument: TPDDocument;
+    FMaxDecodedStreamSize: Int64;
 
   public
     constructor Create;
@@ -24,11 +25,17 @@ type
     // The builder holds a catalog as object 1, /Pages 2 0 R is the page tree root. The caller owns the builder.
     class function NewBuilder(const PagesBody: string): TTestPdfBuilder; static;
 
+    // A builder with PageCount pages, the objects 10 and up, and a catalog that has CatalogExtra behind /Pages. The objects
+    // 3 to 9 are free for the test. The caller owns the builder.
+    class function NewBuilderWithPages(const PageCount: Integer; const CatalogExtra: string): TTestPdfBuilder; static;
+
     // Loads the file that the builder makes. HeaderMinor is the digit after "1." in the header.
     function Open(const Builder: TTestPdfBuilder; const HeaderMinor: Char = '7'): TPDDocument;
 
     function HasLogLine(const Fragment: string): Boolean;
 
+    // Zero keeps the default limit on the size of decoded streams
+    property MaxDecodedStreamSize: Int64 read FMaxDecodedStreamSize write FMaxDecodedStreamSize;
     property Document: TPDDocument read FDocument;
     property LogLines: TList<string> read FLogLines;
   end;
@@ -63,6 +70,29 @@ begin
   end;
 end;
 
+class function TModelTestDocuments.NewBuilderWithPages(const PageCount: Integer; const CatalogExtra: string): TTestPdfBuilder;
+begin
+  Result := TTestPdfBuilder.Create;
+  try
+    const Kids = TStringBuilder.Create;
+    try
+      for var Index := 0 to PageCount - 1 do
+      begin
+        Kids.Append(10 + Index).Append(' 0 R ');
+        Result.AddObject(10 + Index, '<< /Type /Page /Parent 2 0 R >>');
+      end;
+      Result.AddObject(2, Format('<< /Type /Pages /Kids [%s] /Count %d >>', [Kids.ToString, PageCount]));
+    finally
+      Kids.Free;
+    end;
+    Result.AddObject(1, Format('<< /Type /Catalog /Pages 2 0 R %s >>', [CatalogExtra]));
+    Result.SetRoot(1);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
 function TModelTestDocuments.Open(const Builder: TTestPdfBuilder; const HeaderMinor: Char): TPDDocument;
 begin
   var Data := Builder.Build(TXrefStyle.Table);
@@ -70,6 +100,10 @@ begin
   Data[7] := Ord(HeaderMinor);
 
   var Options := TPdfLoadOptions.Default;
+  if FMaxDecodedStreamSize > 0 then
+  begin
+    Options.MaxDecodedStreamSize := FMaxDecodedStreamSize;
+  end;
   Options.OnLog :=
     procedure(const Level: TPdfLogLevel; const Message: string)
     begin

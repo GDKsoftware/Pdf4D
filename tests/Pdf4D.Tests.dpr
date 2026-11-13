@@ -50,7 +50,21 @@ uses
   Pdf4D.Model.Tests.Support in '..\src\Model\Pdf4D.Model.Tests.Support.pas',
   Pdf4D.Model.PageTree.Tests in '..\src\Model\Pdf4D.Model.PageTree.Tests.pas',
   Pdf4D.Model.Page.Tests in '..\src\Model\Pdf4D.Model.Page.Tests.pas',
-  Pdf4D.Model.Document.Tests in '..\src\Model\Pdf4D.Model.Document.Tests.pas';
+  Pdf4D.Model.Document.Tests in '..\src\Model\Pdf4D.Model.Document.Tests.pas',
+  Pdf4D.Model.TreeWalker in '..\src\Model\Pdf4D.Model.TreeWalker.pas',
+  Pdf4D.Model.NameTree in '..\src\Model\Pdf4D.Model.NameTree.pas',
+  Pdf4D.Model.NumberTree in '..\src\Model\Pdf4D.Model.NumberTree.pas',
+  Pdf4D.Model.DestinationResolver in '..\src\Model\Pdf4D.Model.DestinationResolver.pas',
+  Pdf4D.Model.Destination in '..\src\Model\Pdf4D.Model.Destination.pas',
+  Pdf4D.Model.OutlineItem in '..\src\Model\Pdf4D.Model.OutlineItem.pas',
+  Pdf4D.Model.Outline in '..\src\Model\Pdf4D.Model.Outline.pas',
+  Pdf4D.Model.PageLabels in '..\src\Model\Pdf4D.Model.PageLabels.pas',
+  Pdf4D.Model.EmbeddedFile in '..\src\Model\Pdf4D.Model.EmbeddedFile.pas',
+  Pdf4D.Model.NameTree.Tests in '..\src\Model\Pdf4D.Model.NameTree.Tests.pas',
+  Pdf4D.Model.PageLabels.Tests in '..\src\Model\Pdf4D.Model.PageLabels.Tests.pas',
+  Pdf4D.Model.Outline.Tests in '..\src\Model\Pdf4D.Model.Outline.Tests.pas',
+  Pdf4D.Model.EmbeddedFile.Tests in '..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas',
+  Pdf4D.Model.Navigation.Golden.Tests in '..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

@@ -229,6 +229,13 @@ type
     const Filter = 'Filter';
     const First = 'First';
     const FirstChar = 'FirstChar';
+    const Fit = 'Fit';
+    const FitB = 'FitB';
+    const FitBH = 'FitBH';
+    const FitBV = 'FitBV';
+    const FitH = 'FitH';
+    const FitR = 'FitR';
+    const FitV = 'FitV';
     const FitWindow = 'FitWindow';
     const FL = 'FL';
     const Flags = 'Flags';
@@ -257,6 +264,7 @@ type
     const FunctionType = 'FunctionType';
     const G = 'G';
     const Gamma = 'Gamma';
+    const GoTo_ = 'GoTo';
     const Group = 'Group';
     const GTS_PDFA1 = 'GTS_PDFA1';
     const H = 'H';
@@ -593,6 +601,7 @@ type
     const XRef = 'XRef';
     const XRefStm = 'XRefStm';
     const XStep = 'XStep';
+    const XYZ = 'XYZ';
     const Y = 'Y';
     const Yes = 'Yes';
     const YStep = 'YStep';

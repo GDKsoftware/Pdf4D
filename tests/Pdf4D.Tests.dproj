@@ -122,6 +122,20 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Document.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.TreeWalker.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.NumberTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DestinationResolver.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Destination.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.OutlineItem.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Navigation.Golden.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
