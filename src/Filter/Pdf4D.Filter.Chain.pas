@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: the decode loop of pdfbox/src/main/java/org/apache/pdfbox/filter/Filter.java and
 // PDStream.createInputStream(List) (3.0.8)
 unit Pdf4D.Filter.Chain;

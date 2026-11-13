@@ -112,7 +112,10 @@ function Format-Constant([string]$name, $items, [string]$comment) {
     return "  // $comment`n  $name =`n" + ($lines -join " +`n") + ";`n`n"
 }
 
-$unit = "// Data of the Unicode normalization forms, generated from the Unicode $UnicodeVersion character database (UnicodeData.txt and`n"
+$unit = "// Licensed under the Apache License, Version 2.0; see the LICENSE file.`n"
+$unit += "// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.`n"
+$unit += "// Contains data of the Unicode Character Database, Copyright (c) 1991-2024 Unicode, Inc., under the Unicode License v3 (see NOTICE).`n"
+$unit += "// Data of the Unicode normalization forms, generated from the Unicode $UnicodeVersion character database (UnicodeData.txt and`n"
 $unit += "// CompositionExclusions.txt) by tools/unicode/generate-unicode-data.ps1. Do not edit by hand.`n"
 $unit += "// Composition exclusions: the entries of CompositionExclusions.txt, the singleton decompositions and the decompositions that`n"
 $unit += "// start with a non-starter (UAX 15, full composition exclusion).`n"

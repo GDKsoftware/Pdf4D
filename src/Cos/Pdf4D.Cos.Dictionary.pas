@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/cos/COSDictionary.java and COSStream.java (3.0.8)
 // TCosStream lives in this unit because TCosDictionary.TryGetCosStream needs the type and Delphi cannot
 // forward declare a class across units.

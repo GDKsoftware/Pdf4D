@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/StandardSecurityHandler.java (3.0.8), the decrypting side
 // Algorithms 1.A, 2, 2.A, 2.B, 3 to 7 and 11 to 13 of ISO 32000-2 7.6.4 and 7.6.5
 unit Pdf4D.Encryption.StandardSecurityHandler;

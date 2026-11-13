@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/SecurityHandler.java (3.0.8), the decrypting side
 // Differences with PDFBox: the data of a stream is decrypted when it is read (TCosStream.Decryptor) and not when the stream
 // is parsed, and a stream with its own Identity crypt filter is left alone as ISO 32000-1 7.6.5 says.

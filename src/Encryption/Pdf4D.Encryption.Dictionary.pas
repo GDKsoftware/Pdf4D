@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/PDEncryption.java and PDCryptFilterDictionary.java (3.0.8)
 // Only the read side is ported: the library does not write encrypted files.
 unit Pdf4D.Encryption.Dictionary;

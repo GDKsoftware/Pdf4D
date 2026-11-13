@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 unit Pdf4D.Encryption.Exemptions.Tests;
 
 // Files that these tests encrypt themselves with the simplest handler (revision 2, RC4 with a 40 bit key, empty user

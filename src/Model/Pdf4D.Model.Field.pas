@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/interactive/form/PDFieldFactory.java,
 // PDField.java, PDTerminalField.java, PDNonTerminalField.java, PDVariableText.java, PDTextField.java, PDButton.java,
 // PDCheckBox.java, PDRadioButton.java, PDPushButton.java, PDChoice.java, PDComboBox.java, PDListBox.java and

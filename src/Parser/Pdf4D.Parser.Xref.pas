@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdfparser/COSParser.java (3.0.8): parseXref, parseXrefTable,
 // parseXrefObjStream, parseTrailer, parseStartXref, getStartxrefOffset, checkXRefOffset, checkXRefStreamOffset and
 // calculateXRefFixedOffset. PDFBox 3.0.8 has no class XrefParser: this one holds those methods of COSParser.

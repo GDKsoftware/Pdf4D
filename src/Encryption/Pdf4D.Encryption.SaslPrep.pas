@@ -1,3 +1,5 @@
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+// Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/SaslPrep.java (3.0.8)
 // SASLprep of RFC 4013 for the passwords of revision 6. Differences with PDFBox: the normalization is a port of the algorithm
 // (the RTL has none), and Java knows the bidirectional class of a character and Delphi does not, so the check of RFC 3454 section 6 uses the Hebrew and Arabic blocks for RandALCat and
