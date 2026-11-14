@@ -5,10 +5,12 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
   Pdf4D.Api.Attachment.Interfaces,
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextOptions,
   Pdf4D.Cos.Document;
 
 type
@@ -78,6 +80,13 @@ type
     // The fields of the form itself, empty when there is no form
     function Fields: TArray<IPdfField>;
     function Attachments: TArray<IPdfAttachment>;
+
+    // The text of all pages with the default options, as PDFBox's PDFTextStripper writes it. Only EPdfException
+    // descendants are raised.
+    function ExtractText: string; overload;
+    function ExtractText(const Options: TPdfTextOptions): string; overload;
+    // Writes the text to Writer instead of returning it
+    procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
 
     // The document of the inner layer. It stays valid only as long as this interface (or any other interface of the
     // same document) is alive. The same holds for every object that you get from it.

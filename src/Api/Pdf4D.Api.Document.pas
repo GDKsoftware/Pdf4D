@@ -12,6 +12,7 @@ uses
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextOptions,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Document,
   Pdf4D.Cos.Dictionary,
@@ -48,6 +49,9 @@ type
     function Fields: TArray<IPdfField>;
     function Attachments: TArray<IPdfAttachment>;
     function CosDocument: TCosDocument;
+    function ExtractText: string; overload;
+    function ExtractText(const Options: TPdfTextOptions): string; overload;
+    procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
 
     // The document of the model layer, for code that needs more than the interfaces give (the acceptance test that
     // compares with PDFBox reads the same objects PDFBox reads). Like CosDocument, it is valid as long as this document is.
@@ -436,6 +440,27 @@ end;
 function TPdfDocument.CosDocument: TCosDocument;
 begin
   Result := FHandle.Document.CosDocument;
+end;
+
+function TPdfDocument.ExtractText: string;
+begin
+  Result := ExtractText(TPdfTextOptions.Default);
+end;
+
+function TPdfDocument.ExtractText(const Options: TPdfTextOptions): string;
+begin
+  const Writer = TStringWriter.Create;
+  try
+    WriteText(Writer, Options);
+    Result := Writer.ToString;
+  finally
+    Writer.Free;
+  end;
+end;
+
+procedure TPdfDocument.WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+begin
+  FHandle.WriteText(Writer, Options);
 end;
 
 function TPdfDocument.ModelDocument: TPDDocument;

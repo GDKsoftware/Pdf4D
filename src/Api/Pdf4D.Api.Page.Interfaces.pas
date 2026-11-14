@@ -24,6 +24,9 @@ type
     function ArtBox: TPdfRectangle;
     function Rotation: Integer;
 
+    // The text of this page only, with the default options
+    function ExtractText: string;
+
     // The page dictionary of the inner layer. It stays valid only as long as this interface (or any other interface
     // of the same document) is alive.
     function CosObject: TCosDictionary;

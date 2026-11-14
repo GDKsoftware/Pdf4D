@@ -23,6 +23,9 @@ type
     function Title: string;
     function TryGetPageIndex(out Index: Integer): Boolean;
     function Children: TArray<IPdfOutlineItem>;
+
+    // The item of the model, valid as long as the document is
+    function ModelItem: TPDOutlineItem;
   end;
 
 implementation
@@ -58,6 +61,11 @@ end;
 function TPdfOutlineItem.Children: TArray<IPdfOutlineItem>;
 begin
   Result := Wrap(FHandle, FItem.Children);
+end;
+
+function TPdfOutlineItem.ModelItem: TPDOutlineItem;
+begin
+  Result := FItem;
 end;
 
 end.

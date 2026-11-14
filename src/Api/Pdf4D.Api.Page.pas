@@ -28,10 +28,16 @@ type
     function TrimBox: TPdfRectangle;
     function ArtBox: TPdfRectangle;
     function Rotation: Integer;
+    function ExtractText: string;
     function CosObject: TCosDictionary;
   end;
 
 implementation
+
+uses
+  System.SysUtils,
+  System.Classes,
+  Pdf4D.Api.TextOptions;
 
 { TPdfPage }
 
@@ -81,6 +87,21 @@ end;
 function TPdfPage.Rotation: Integer;
 begin
   Result := FPage.Rotation;
+end;
+
+function TPdfPage.ExtractText: string;
+begin
+  var Options := TPdfTextOptions.Default;
+  Options.StartPage := FIndex + 1;
+  Options.EndPage := FIndex + 1;
+
+  const Writer = TStringWriter.Create;
+  try
+    FHandle.WriteText(Writer, Options);
+    Result := Writer.ToString;
+  finally
+    Writer.Free;
+  end;
 end;
 
 function TPdfPage.CosObject: TCosDictionary;

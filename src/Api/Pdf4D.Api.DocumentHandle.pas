@@ -6,8 +6,11 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  Pdf4D.Api.Outline.Interfaces,
+  Pdf4D.Api.TextOptions,
   Pdf4D.Common.Log,
-  Pdf4D.Model.Document;
+  Pdf4D.Model.Document,
+  Pdf4D.Model.OutlineItem;
 
 type
   // What every API object holds to keep the document alive. The handle never holds an API object, so there is no cycle.
@@ -17,6 +20,7 @@ type
     function Document: TPDDocument;
     function Log: TPdfLog;
     function PageLabel(const Index: Integer): string;
+    procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
   end;
 
   // Owns the document and, when the document was loaded from a file, the stream
@@ -29,6 +33,8 @@ type
 
     procedure BuildLabels;
     function ReadLabels: TArray<string>;
+    class function ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem; static;
+    procedure WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
 
   public
     // OwnedStream may be nil. Both are freed with the handle, the document first.
@@ -38,14 +44,17 @@ type
     function Document: TPDDocument;
     function Log: TPdfLog;
     function PageLabel(const Index: Integer): string;
+    procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
   end;
 
 implementation
 
 uses
+  Pdf4D.Api.OutlineItem,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Dictionary,
-  Pdf4D.Model.PageLabels;
+  Pdf4D.Model.PageLabels,
+  Pdf4D.Text.Stripper;
 
 { TPdfDocumentHandle }
 
@@ -121,6 +130,70 @@ begin
       Log.Error('The page labels cannot be made: %s', [Failure.Message]);
       Result := nil;
     end;
+  end;
+end;
+
+// A bookmark that is not one of this API is a mistake of the caller
+class function TPdfDocumentHandle.ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
+begin
+  if not Assigned(Bookmark) then
+  begin
+    Exit(nil);
+  end;
+
+  const Item = (TObject(Bookmark) as TPdfOutlineItem);
+  Result := Item.ModelItem;
+end;
+
+procedure TPdfDocumentHandle.WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+begin
+  try
+    WriteTextInStripper(Writer, Options);
+  except
+    on Failure: EPdfException do
+    begin
+      raise;
+    end;
+    on Failure: Exception do
+    begin
+      if not TPdfFailure.IsInputFailure(Failure) then
+      begin
+        raise;
+      end;
+      raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+    end;
+  end;
+end;
+
+procedure TPdfDocumentHandle.WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
+begin
+  const Stripper = TPdfTextStripper.Create;
+  try
+    Stripper.SortByPosition := Options.SortByPosition;
+    Stripper.StartPage := Options.StartPage;
+    Stripper.EndPage := Options.EndPage;
+    Stripper.StartBookmark := ModelItemOf(Options.StartBookmark);
+    Stripper.EndBookmark := ModelItemOf(Options.EndBookmark);
+    Stripper.SuppressDuplicateOverlappingText := Options.SuppressDuplicateOverlappingText;
+    Stripper.ShouldSeparateByBeads := Options.ShouldSeparateByBeads;
+    Stripper.AddMoreFormatting := Options.AddMoreFormatting;
+    Stripper.IgnoreContentStreamSpaceGlyphs := Options.IgnoreContentStreamSpaceGlyphs;
+    Stripper.LineSeparator := Options.LineSeparator;
+    Stripper.WordSeparator := Options.WordSeparator;
+    Stripper.ParagraphStart := Options.ParagraphStart;
+    Stripper.ParagraphEnd := Options.ParagraphEnd;
+    Stripper.PageStart := Options.PageStart;
+    Stripper.PageEnd := Options.PageEnd;
+    Stripper.ArticleStart := Options.ArticleStart;
+    Stripper.ArticleEnd := Options.ArticleEnd;
+    Stripper.SpacingTolerance := Options.SpacingTolerance;
+    Stripper.AverageCharTolerance := Options.AverageCharTolerance;
+    Stripper.IndentThreshold := Options.IndentThreshold;
+    Stripper.DropThreshold := Options.DropThreshold;
+
+    Stripper.WriteText(FDocument, Writer);
+  finally
+    Stripper.Free;
   end;
 end;
 

@@ -10,7 +10,7 @@ Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0
 
 ## Status
 
-Milestone M1 (document structure) is complete: loading, decryption, pages, document information, outlines, form fields, attachments and the public API. Text extraction, fonts and content streams follow in later milestones. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
+Milestone M1 (document structure) is complete: loading, decryption, pages, document information, outlines, form fields, attachments and the public API. Text extraction (milestone M2) is available through `ExtractText`. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
 
 ## Usage
 
@@ -40,6 +40,34 @@ The interfaces keep the document alive: a page, an outline item, a field or an a
 `IPdfDocument` reference is released, and the file is closed when the last reference is gone. A file that cannot be
 opened or parsed raises an `EPdfException` descendant. `CosDocument` and the `CosObject` functions give access to the
 inner layer; what they return is valid only while an interface of the document is alive.
+
+## Extracting text
+
+```delphi
+uses
+  Pdf4D.Api.Document,
+  Pdf4D.Api.Document.Interfaces,
+  Pdf4D.Api.TextOptions;
+
+begin
+  const Document = TPdfDocument.Load('invoice.pdf');
+  const Text = Document.ExtractText;
+  Writeln(Text);
+
+  // The options are those of PDFBox's PDFTextStripper, with the same defaults
+  var Options := TPdfTextOptions.Default;
+  Options.SortByPosition := True;
+  Options.StartPage := 2;
+  Options.EndPage := 3;
+  Writeln(Document.ExtractText(Options));
+
+  // One page only
+  Writeln(Document.Page(0).ExtractText);
+end;
+```
+
+A document is not thread-safe, but different documents can be used in different threads. Only `EPdfException`
+descendants are raised.
 
 ## Building and testing
 
