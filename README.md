@@ -4,7 +4,7 @@ Pdf4D is a native Delphi port of the reading side of [Apache PDFBox](https://pdf
 
 ## Platforms
 
-- Delphi 12 or later (developed and tested with Delphi 13; Delphi 12 is not tested)
+- Delphi 12 or newer. Built and tested on Delphi 13 (Studio 37.0); not yet verified on Delphi 12.
 - Win32, Win64 and Linux64
 - RTL only: no `Winapi.*`, `Vcl.*` or `FMX.*` units and no inline assembler
 

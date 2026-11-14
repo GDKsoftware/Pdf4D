@@ -171,7 +171,7 @@ The budgets for operators and glyphs are bounded but large. A hostile file that 
 
 ## Tested platforms
 
-Pdf4D is developed and tested with Delphi 13 on Win32, Win64 and Linux64. The code uses no Delphi 13-only syntax, but Delphi 12 has not been tested, and the project file (`tests/Pdf4D.Tests.dproj`) has only been built with Delphi 13.
+Pdf4D needs Delphi 12 or newer. It is built and tested on Delphi 13 (Studio 37.0) on Win32, Win64 and Linux64, and not yet verified on Delphi 12. The code uses no Delphi 13-only syntax, but Delphi 12 has not been tested, and the project file (`tests/Pdf4D.Tests.dproj`) has only been built with Delphi 13.
 
 ## Unicode normalization (SASLprep)
 

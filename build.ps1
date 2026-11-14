@@ -3,7 +3,10 @@ param(
     [string]$Platform = 'All',
 
     [ValidateSet('Debug', 'Release')]
-    [string]$Config = 'Debug'
+    [string]$Config = 'Debug',
+
+    # The Linux64 SDK folder; by default the one the IDE has registered as the default Linux64 SDK
+    [string]$LinuxSdkPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,6 +44,30 @@ function Test-NoInitializationSections {
     }
 }
 
+# System.ZLib links against the system zlib (-lz), which needs the libz.so development link in the SDK
+function Get-LinuxSdkPath {
+    if ($LinuxSdkPath) {
+        return $LinuxSdkPath
+    }
+
+    $sdkRegistryKey = 'HKCU:\Software\Embarcadero\BDS\37.0\PlatformSDKs'
+    $sdkName = (Get-ItemProperty -Path $sdkRegistryKey -ErrorAction SilentlyContinue).Default_Linux64
+    if (-not $sdkName) {
+        throw "No default Linux64 SDK is registered under $sdkRegistryKey. Register one in the IDE (Tools > Options > Deployment > SDK Manager) or pass -LinuxSdkPath."
+    }
+
+    $systemRoot = (Get-ItemProperty -Path (Join-Path $sdkRegistryKey $sdkName)).SystemRoot
+    $sdkFolder = if ($env:BDSPLATFORMSDKSDIR) { $env:BDSPLATFORMSDKSDIR } else { Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Embarcadero\Studio\SDKs' }
+    return $systemRoot.Replace('$(BDSPLATFORMSDKSDIR)', $sdkFolder)
+}
+
+function Test-LinuxSdkHasLibz {
+    $libzPath = Join-Path (Get-LinuxSdkPath) 'usr\lib\x86_64-linux-gnu\libz.so'
+    if (-not (Test-Path -LiteralPath $libzPath)) {
+        throw "The Linux64 SDK has no libz.so: $libzPath is missing. Copy or link libz.so.1 as libz.so in that folder, or install zlib1g-dev and update the SDK in the SDK Manager."
+    }
+}
+
 function Get-WslPath([string]$WindowsPath) {
     $linuxPath = (& wsl -d $WslDistro -- wslpath -a ($WindowsPath -replace '\\', '/') | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or -not $linuxPath) {
@@ -70,6 +97,10 @@ function Invoke-Tests([string]$TargetPlatform) {
 Test-NoInitializationSections
 
 $platforms = if ($Platform -eq 'All') { @('Win32', 'Win64', 'Linux64') } else { @($Platform) }
+
+if ($platforms -contains 'Linux64') {
+    Test-LinuxSdkHasLibz
+}
 
 foreach ($targetPlatform in $platforms) {
     Invoke-Build $targetPlatform
