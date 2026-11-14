@@ -149,6 +149,7 @@ begin
   Assert.AreEqual(16 * 1024 * 1024, Options.MaxInlineImageSize);
   Assert.AreEqual(4096, Options.MaxGraphicsStateDepth);
   Assert.AreEqual<Int64>(16777216, Options.MaxToUnicodeMappings);
+  Assert.AreEqual<Int64>(256 * 1024 * 1024, Options.MaxContentBytesPerPage);
   Assert.AreEqual('', Options.Password);
   Assert.IsFalse(Assigned(Options.OnLog));
 end;

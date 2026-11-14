@@ -14,6 +14,7 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Log,
+  Pdf4D.Font.Base,
   Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Page,
   Pdf4D.Model.Tests.Support,
@@ -35,6 +36,18 @@ type
     destructor Destroy; override;
 
     property Positions: TObjectList<TTextPosition> read FPositions;
+  end;
+
+  // Counts the height computations
+  TCountingEngine = class(TCollectingEngine)
+  private
+    FHeightCalls: Integer;
+
+  protected
+    function ComputeFontHeight(const Font: TPDFont): Single; override;
+
+  public
+    property HeightCalls: Integer read FHeightCalls;
   end;
 
   [TestFixture]
@@ -88,6 +101,9 @@ type
 
     [Test]
     procedure TestDiacriticMergeOfPositionsFromAPage;
+
+    [Test]
+    procedure TestVerticalFontWidthUsesUnitsPerEm;
   end;
 
 implementation
@@ -102,6 +118,7 @@ const
   PageStart = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 10 0 R >> >> ';
   Type0Body = '<< /Type /Font /Subtype /Type0 /BaseFont /Test /Encoding /Identity-H /DescendantFonts [11 0 R] >>';
   DescendantBody = '<< /Type /Font /Subtype /CIDFontType2 /BaseFont /Test /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /DW 500 >>';
+  VerticalBody = '<< /Type /Font /Subtype /Type0 /BaseFont /Test /Encoding /Identity-V /DescendantFonts [11 0 R] >>';
   Type3Body = '<< /Type /Font /Subtype /Type3 /FontBBox [0 0 100 100] /FontMatrix [0.001 0 0 0.001 0 0] /CharProcs << /A 30 0 R >> ' +
               '/Encoding << /Differences [65 /A] >> /FirstChar 65 /LastChar 200 /Widths [500]>>';
   EmbeddedFontBody = '<< /Type /Font /Subtype /TrueType /BaseFont /LiberationSans /Encoding /WinAnsiEncoding /FontDescriptor 20 0 R >>';
@@ -123,6 +140,14 @@ end;
 procedure TCollectingEngine.ProcessTextPosition(const Text: TTextPosition);
 begin
   FPositions.Add(Text);
+end;
+
+{ TCountingEngine }
+
+function TCountingEngine.ComputeFontHeight(const Font: TPDFont): Single;
+begin
+  Inc(FHeightCalls);
+  Result := inherited ComputeFontHeight(Font);
 end;
 
 { TLegacyStreamEngineTests }
@@ -304,6 +329,9 @@ end;
 
 procedure TLegacyStreamEngineTests.TestFontHeightIsComputedOncePerFont;
 begin
+  FreeAndNil(FEngine);
+  const Counting = TCountingEngine.Create;
+  FEngine := Counting;
   RunHelvetica('BT /F1 12 Tf 100 700 Td (HiH) Tj 0 -20 Td (i) Tj ET');
 
   Assert.AreEqual<Integer>(4, FEngine.Positions.Count);
@@ -311,6 +339,37 @@ begin
   begin
     AssertNear(6.936, Position(Index).Height);
   end;
+  Assert.AreEqual<Integer>(1, Counting.HeightCalls);
+
+  // The height belongs to the document: the same page again does not compute it again
+  FEngine.ProcessPage(FPage);
+  Assert.AreEqual<Integer>(1, Counting.HeightCalls);
+end;
+
+procedure TLegacyStreamEngineTests.TestVerticalFontWidthUsesUnitsPerEm;
+begin
+  // Confirmed with PDFBox 3.0.8 (PDFTextStripper subclass): the width of a vertical glyph is 500 / 1000 * (1000 / 2048) of
+  // the font size plus the position vector (3), which gives 5.9297
+  const FontFile = TTestFonts.Bytes('LiberationSans-Regular.ttf');
+  const Builder = NewBuilder('', 'BT /F1 12 Tf 100 700 Td <00410042> Tj ET', VerticalBody);
+  try
+    Builder.AddObject(11, '<< /Type /Font /Subtype /CIDFontType2 /BaseFont /LiberationSans /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) ' +
+                          '/Supplement 0 >> /DW 500 /CIDToGIDMap /Identity /FontDescriptor 20 0 R >>');
+    Builder.AddObject(20, '<< /Type /FontDescriptor /FontName /LiberationSans /Flags 4 /FontBBox [-203 -303 1050 910] /ItalicAngle 0 ' +
+                          '/Ascent 905 /Descent -212 /CapHeight 729 /StemV 80 /FontFile2 21 0 R >>');
+    TTextTestDocuments.AddFontFile(Builder, 21, Format('/Length1 %d', [Length(FontFile)]), FontFile);
+  except
+    Builder.Free;
+    raise;
+  end;
+  Run(Builder);
+
+  Assert.AreEqual<Integer>(2, FEngine.Positions.Count);
+  AssertNear(97, Position(0).XDirAdj);
+  AssertNear(102.56, Position(0).YDirAdj);
+  AssertNear(5.9297, Position(0).WidthDirAdj);
+  AssertNear(7.278, Position(0).Height);
+  AssertNear(114.56, Position(1).YDirAdj);
 end;
 
 procedure TLegacyStreamEngineTests.TestDiacriticMergeOfPositionsFromAPage;
