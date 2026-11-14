@@ -10,6 +10,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Diagnostics,
   DUnitX.TestFramework,
   Pdf4D.Model.Document,
   Pdf4D.Model.Tests.Support,
@@ -26,6 +27,10 @@ type
     function ToUnicodeBuilder(const Content, Mappings: string): TTestPdfBuilder;
     function Extract(const Builder: TTestPdfBuilder): string;
     function ExtractContent(const Content: string): string;
+    // The separators that tools/oracle gives PDFBox for its separator section, so that the oracle text can be used as it is
+    procedure UseOracleSeparators;
+    // A page with a letter at each of Count scattered positions, from a fixed random sequence
+    class function ScatteredContent(const Count, Seed, YSpan: Integer): string; static;
 
   public
     [Setup]
@@ -75,6 +80,42 @@ type
 
     [Test]
     procedure TestPageWithoutTextWritesOnlyPageEnd;
+
+    [Test]
+    procedure TestHangingIndentStaysInOneParagraph;
+
+    [Test]
+    procedure TestIndentAfterAHangingLineStartsAParagraph;
+
+    [Test]
+    procedure TestLeftOfThePreviousLineStartsAParagraph;
+
+    [Test]
+    procedure TestRepeatedListItemFormatStartsAParagraph;
+
+    [Test]
+    procedure TestDifferentListItemFormatsStayInOneParagraph;
+
+    [Test]
+    procedure TestLigatureAllahAfterAlefGetsLamLamHeh;
+
+    [Test]
+    procedure TestLigatureAllahAloneIsDecomposedAndReversed;
+
+    [Test]
+    procedure TestHebrewPresentationFormIsReversed;
+
+    [Test]
+    procedure TestArabicPresentationFormBIsReversed;
+
+    [Test]
+    procedure TestSortedModeMergesLikePdfBox;
+
+    [Test]
+    procedure TestInconsistentComparisonFallsBackToMergeSort;
+
+    [Test]
+    procedure TestManyScatteredGlyphsFinishInTime;
   end;
 
 implementation
@@ -84,6 +125,45 @@ uses
 
 const
   Content = 'BT /F1 12 Tf 100 700 Td (Hello) Tj ( World) Tj ET';
+  RandomMultiplier = 1103515245;
+  RandomIncrement = 12345;
+  RandomMask = $7FFFFFFF;
+  ScatteredLetterCount = 200;
+  HostileGlyphCount = 200000;
+  MaxSecondsForHostileInput = 30;
+  ScatteredSeed = 94;
+  ScatteredYSpan = 20;
+  HostileYSpan = 700;
+  ShowOneGlyph = 'BT /F1 12 Tf 1 0 0 1 100 700 Tm (A) Tj ET';
+  // Lines with one left edge, the second and third shifted to the right by the indent of 30
+  FirstLine = '1 0 0 1 100 700 Tm (First) Tj';
+  SecondLineIndented = '1 0 0 1 130 686 Tm (second) Tj';
+  ThirdLineIndented = '1 0 0 1 130 672 Tm (third) Tj';
+  // From the PDFBox 3.0.8 oracle for the text of ScatteredContent: the JDK reports the comparison as inconsistent, so PDFBox
+  // sorts the letters again with its own merge sort
+  ScatteredSortedText =
+  'zg t v'#10 +
+  'g wu krykegat o s a w h'#10 +
+  'bax slaf swyyzxy hi p nz ex omgj v k x'#10 +
+  'an h y f nrs io nr gu h d'#10 +
+  'z of'#10 +
+  'r p'#10 +
+  'n b'#10 +
+  'm cg e'#10 +
+  'p p y da crj g'#10 +
+  'm no v un'#10 +
+  't v'#10 +
+  'gd n j v e po mr x i z r'#10 +
+  'q e q'#10 +
+  'j'#10 +
+  'bzfa ev k r y c t w'#10 +
+  'z f'#10 +
+  'z n lgr b fq p l jp h r dk vb wxh dl v oz k'#10 +
+  's b s kv on b kf d fntzi'#10 +
+  'yp'#10 +
+  'ug r'#10 +
+  'w f h youzf v p'#10 +
+  'z x yv o u g x i q lei u mjpa'#10;
 
 { TStripperTextTests }
 
@@ -113,6 +193,40 @@ end;
 function TStripperTextTests.ExtractContent(const Content: string): string;
 begin
   Result := Extract(TTextTestDocuments.NewBuilder(TTextTestDocuments.HelveticaF1, Content));
+end;
+
+procedure TStripperTextTests.UseOracleSeparators;
+begin
+  FStripper.LineSeparator := '<EOL>'#10;
+  FStripper.WordSeparator := '<W>';
+  FStripper.ParagraphStart := '<P>';
+  FStripper.ParagraphEnd := '</P>';
+  FStripper.PageStart := '<PAGE>';
+  FStripper.PageEnd := '</PAGE>'#10;
+  FStripper.ArticleStart := '<A>';
+  FStripper.ArticleEnd := '</A>';
+end;
+
+class function TStripperTextTests.ScatteredContent(const Count, Seed, YSpan: Integer): string;
+begin
+  var State := Int64(Seed);
+  const Builder = TStringBuilder.Create('BT /F1 12 Tf');
+  try
+    for var Index := 1 to Count do
+    begin
+      State := (State * RandomMultiplier + RandomIncrement) and RandomMask;
+      const Letter = Char(Ord('a') + (State shr 8) mod 26);
+      State := (State * RandomMultiplier + RandomIncrement) and RandomMask;
+      const X = 30 + (State shr 8) mod 500;
+      State := (State * RandomMultiplier + RandomIncrement) and RandomMask;
+      const Y = 50 + (State shr 8) mod YSpan;
+      Builder.AppendFormat(' 1 0 0 1 %d %d Tm (%s) Tj', [X, Y, Letter]);
+    end;
+    Builder.Append(' ET');
+    Result := Builder.ToString;
+  finally
+    Builder.Free;
+  end;
 end;
 
 function TStripperTextTests.ToUnicodeBuilder(const Content, Mappings: string): TTestPdfBuilder;
@@ -237,5 +351,100 @@ begin
   Assert.AreEqual(#10, ExtractContent('q Q'));
 end;
 
+procedure TStripperTextTests.TestHangingIndentStaysInOneParagraph;
+begin
+  UseOracleSeparators;
+  // The text is the output of the PDFBox 3.0.8 oracle for the same lines
+  Assert.AreEqual('<PAGE><A><P>First<EOL>'#10'second<EOL>'#10'third</P></A></PAGE>'#10,
+                  ExtractContent('BT /F1 12 Tf ' + FirstLine + ' ' + SecondLineIndented + ' ' + ThirdLineIndented + ' ET'));
+end;
+
+procedure TStripperTextTests.TestIndentAfterAHangingLineStartsAParagraph;
+begin
+  UseOracleSeparators;
+  // The third line is indented again, and the second is not the start of a paragraph: a new paragraph
+  Assert.AreEqual('<PAGE><A><P>First<EOL>'#10'second<EOL>'#10'</P><P>third</P></A></PAGE>'#10,
+                  ExtractContent('BT /F1 12 Tf ' + FirstLine + ' ' + SecondLineIndented + ' 1 0 0 1 160 672 Tm (third) Tj ET'));
+end;
+
+procedure TStripperTextTests.TestLeftOfThePreviousLineStartsAParagraph;
+begin
+  UseOracleSeparators;
+  Assert.AreEqual('<PAGE><A><P>First<EOL>'#10'second<EOL>'#10'</P><P>third</P></A></PAGE>'#10,
+                  ExtractContent('BT /F1 12 Tf ' + FirstLine + ' ' + SecondLineIndented + ' 1 0 0 1 100 672 Tm (third) Tj ET'));
+end;
+
+procedure TStripperTextTests.TestRepeatedListItemFormatStartsAParagraph;
+begin
+  UseOracleSeparators;
+  // The glyph A shows "1.", so both lines start with a list item of the format number and a dot
+  const Builder = ToUnicodeBuilder('BT /F1 12 Tf 1 0 0 1 100 700 Tm (A) Tj (x) Tj 1 0 0 1 100 686 Tm (A) Tj (y) Tj ET',
+                                   '1 beginbfchar <41> <0031002E> endbfchar');
+  Assert.AreEqual('<PAGE><A><P>1.x<EOL>'#10'</P><P>1.y</P></A></PAGE>'#10, Extract(Builder));
+end;
+
+procedure TStripperTextTests.TestDifferentListItemFormatsStayInOneParagraph;
+begin
+  UseOracleSeparators;
+  // "1." and "a." are two formats
+  const Builder = ToUnicodeBuilder('BT /F1 12 Tf 1 0 0 1 100 700 Tm (A) Tj (x) Tj 1 0 0 1 100 686 Tm (B) Tj (y) Tj ET',
+                                   '2 beginbfchar <41> <0031002E> <42> <0061002E> endbfchar');
+  Assert.AreEqual('<PAGE><A><P>1.x<EOL>'#10'a.y</P></A></PAGE>'#10, Extract(Builder));
+end;
+
+procedure TStripperTextTests.TestLigatureAllahAfterAlefGetsLamLamHeh;
+begin
+  // The oracle gives U+0647 U+0644 U+0644 U+0627: PDFBox runs bidi over the word and reverses it, Pdf4D keeps the file order
+  Assert.AreEqual(#$0627#$0644#$0644#$0647#10,
+                  Extract(ToUnicodeBuilder('BT /F1 12 Tf 1 0 0 1 100 700 Tm (AB) Tj ET', '2 beginbfchar <41> <0627> <42> <FDF2> endbfchar')));
+end;
+
+procedure TStripperTextTests.TestLigatureAllahAloneIsDecomposedAndReversed;
+begin
+  // The oracle gives U+0627 U+0644 U+0644 U+0647. Pdf4D reverses the decomposed form as PDFBox does before its bidi pass,
+  // and has no bidi pass.
+  Assert.AreEqual(#$0647#$0644#$0644#$0627#10,
+                  Extract(ToUnicodeBuilder('BT /F1 12 Tf 1 0 0 1 100 700 Tm (B) Tj ET', '1 beginbfchar <42> <FDF2> endbfchar')));
+end;
+
+procedure TStripperTextTests.TestHebrewPresentationFormIsReversed;
+begin
+  // U+FB2A is U+05E9 U+05C1 in NFKC, and the oracle gives that order after its bidi pass
+  Assert.AreEqual(#$05C1#$05E9#10, Extract(ToUnicodeBuilder(ShowOneGlyph, '1 beginbfchar <41> <FB2A> endbfchar')));
+end;
+
+procedure TStripperTextTests.TestArabicPresentationFormBIsReversed;
+begin
+  // U+FEF5 is U+0644 U+0622 in NFKC, and the oracle gives that order after its bidi pass
+  Assert.AreEqual(#$0622#$0644#10, Extract(ToUnicodeBuilder(ShowOneGlyph, '1 beginbfchar <41> <FEF5> endbfchar')));
+end;
+
+procedure TStripperTextTests.TestSortedModeMergesLikePdfBox;
+begin
+  FStripper.SortByPosition := True;
+  // More than 32 glyphs, so the sort merges runs. The text is the sorted section of the oracle.
+  const Drawing = 'BT /F1 12 Tf 1 0 0 1 100 660 Tm (Third line of the text) Tj 1 0 0 1 100 700 Tm (First line of the text) Tj ' +
+                  '1 0 0 1 100 680 Tm (Second line of the text) Tj 1 0 0 1 250 700 Tm (and more) Tj ET';
+  Assert.AreEqual('First line of the text and more'#10'Second line of the text'#10'Third line of the text'#10, ExtractContent(Drawing));
+end;
+
+procedure TStripperTextTests.TestInconsistentComparisonFallsBackToMergeSort;
+begin
+  FStripper.SortByPosition := True;
+  // The JDK reports that the comparison of these 200 letters is inconsistent, and PDFBox sorts them again with its merge sort
+  Assert.AreEqual(ScatteredSortedText, ExtractContent(ScatteredContent(ScatteredLetterCount, ScatteredSeed, ScatteredYSpan)));
+end;
+
+procedure TStripperTextTests.TestManyScatteredGlyphsFinishInTime;
+begin
+  // The letters are shown at 200,000 places of one page, so the map of the shown characters fills up with entries
+  const Content = ScatteredContent(HostileGlyphCount, ScatteredSeed, HostileYSpan);
+  const Watch = TStopwatch.StartNew;
+
+  const Text = ExtractContent(Content);
+
+  Assert.IsTrue(Text.Length > HostileGlyphCount div 2, 'The text of the page is written');
+  Assert.IsTrue(Watch.Elapsed.TotalSeconds < MaxSecondsForHostileInput, Format('Took %.1f seconds', [Watch.Elapsed.TotalSeconds]));
+end;
 
 end.
