@@ -1,16 +1,20 @@
 # Pdf4D
 
-Pdf4D is a native Delphi port of [Apache PDFBox](https://pdfbox.apache.org/) 3.0.8 for reading PDF files: document structure, pages, outlines, form fields and attachments. It has no dependencies besides the Delphi RTL.
+Pdf4D is a native Delphi port of the reading side of [Apache PDFBox](https://pdfbox.apache.org/) 3.0.8: document structure, pages, outlines, form fields, attachments and text extraction. It does not render pages, decode images or write PDF files. It has no dependencies besides the Delphi RTL.
 
 ## Platforms
 
-- Delphi 12 or later (developed with Delphi 13)
+- Delphi 12 or later (developed and tested with Delphi 13; Delphi 12 is not tested)
 - Win32, Win64 and Linux64
 - RTL only: no `Winapi.*`, `Vcl.*` or `FMX.*` units and no inline assembler
 
 ## Status
 
-Milestone M1 (document structure) is complete: loading, decryption, pages, document information, outlines, form fields, attachments and the public API. Text extraction (milestone M2) is available through `ExtractText`. See `coding-rules.md`, `docs/porting.md` and `docs/building.md`.
+Milestone M1 (document structure) is complete: loading, decryption, pages, document information, outlines, form fields, attachments and the public API.
+
+Milestone M2 (text extraction) is complete: `ExtractText` on a document or a page, with the options of PDFBox's `PDFTextStripper`. All 188 files of the test corpus give the same text as PDFBox 3.0.8, except 6 with documented differences (five with right-to-left text, one where Pdf4D is more lenient than PDFBox). Limits on hostile input and the other deviations are in `docs/porting.md`.
+
+See also `coding-rules.md` and `docs/building.md`.
 
 ## Usage
 
@@ -68,6 +72,14 @@ end;
 
 The text is what PDFBox's `PDFTextStripper` writes, with one deviation: right-to-left text (Hebrew, Arabic) comes in the
 order of the file, because there is no bidi pass. See `docs/porting.md`.
+
+Fonts that are not embedded are looked up among the standard 14 fonts (their metrics are part of the library), then among the fonts installed on the system (the font folders are scanned once, headers only, and nothing is written to disk). When no font matches, Pdf4D falls back to LiberationSans, which is part of the library, as PDFBox does.
+
+One page has a budget of operators and glyphs, so that a hostile file ends in bounded time. The defaults are large (10 million operators and 2 million glyphs); a caller who wants a shorter worst case lowers `MaxOperatorsPerPage` and `MaxGlyphsPerPage` in `TPdfLoadOptions` and passes it to `TPdfDocument.Load`. See `docs/porting.md` for all limits.
+
+## What the resources add
+
+The glyph lists, the AFM metrics of the standard 14 fonts, the predefined CMaps and LiberationSans-Regular are linked into the binary as compressed resources, so nothing has to be installed next to the program. Together they add about 1.6 MB (compressed) to an executable. Licences and sources are in `NOTICE`, `licenses/` and `src/Resources/resources.csv`.
 
 A document is not thread-safe, but different documents can be used in different threads. Input problems (the file or its
 content) raise `EPdfException` descendants; invalid arguments raise `EArgument*` exceptions. A bookmark option
