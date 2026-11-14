@@ -70,6 +70,7 @@ type
 
   protected
     function ReturnsNilForUnexpectedToken: Boolean; override;
+    function MaxArrayItems: Integer; override;
 
   public
     // The parser owns its own reader of Data. The messages go to Log, which the caller keeps (nil: Options.OnLog).
@@ -248,6 +249,11 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+function TPdfStreamParser.MaxArrayItems: Integer;
+begin
+  Result := MaxContentOperands;
 end;
 
 function TPdfStreamParser.ReturnsNilForUnexpectedToken: Boolean;

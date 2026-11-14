@@ -32,6 +32,7 @@ type
     FSource: TRandomAccessRead;
     FDocument: TCosDocument;
     FNestingDepth: Integer;
+    FIsArrayLimitLogged: Boolean;
 
     class function IsHexDigit(const Value: Integer): Boolean; static;
     class function HexValue(const Value: Integer): Integer; static;
@@ -74,6 +75,7 @@ type
     procedure ReadArrayItems(const Items: TCosArray; const StartPosition: Int64);
     function ReadArrayItem(const Items: TCosArray; const StartPosition: Int64): Boolean;
     function ResolveArrayReference(const Items: TCosArray): TCosBase;
+    procedure AddArrayItem(const Items: TCosArray; const Item: TCosBase);
 
     function SkipLinebreakAfter(const First: Integer): Boolean;
     function ReadStringNumber: string;
@@ -84,6 +86,8 @@ type
     class function ParseNumber(const Text: string): TCosNumber; static;
     // PDFBox returns null for a skipped unexpected token in a content stream parser and COSNull otherwise
     function ReturnsNilForUnexpectedToken: Boolean; virtual;
+    // Items beyond this count are read and dropped, with one log line per parser. Unlimited by default.
+    function MaxArrayItems: Integer; virtual;
 
   public
     class function IsEOL(const Value: Integer): Boolean; static;
@@ -128,7 +132,8 @@ uses
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Float,
   Pdf4D.Cos.Integer,
-  Pdf4D.Cos.Null;
+  Pdf4D.Cos.Null,
+  Pdf4D.Cos.PdfObject;
 
 const
   ByteLinefeed = 10;
@@ -1100,7 +1105,7 @@ begin
 
   if Assigned(Item) then
   begin
-    Items.Add(Item);
+    AddArrayItem(Items, Item);
     Exit(True);
   end;
 
@@ -1116,6 +1121,31 @@ begin
   FSource.Rewind(NextToken.Length);
   // An "endobj" or "endstream" means that the array has ended
   Result := not ((NextToken = EndObjKeyword) or (NextToken = EndStreamKeyword));
+end;
+
+function TBaseParser.MaxArrayItems: Integer;
+begin
+  Result := High(Integer);
+end;
+
+procedure TBaseParser.AddArrayItem(const Items: TCosArray; const Item: TCosBase);
+begin
+  if Items.Count < MaxArrayItems then
+  begin
+    Items.Add(Item);
+    Exit;
+  end;
+
+  if not FIsArrayLimitLogged then
+  begin
+    FIsArrayLimitLogged := True;
+    LogWarning('An array has more than %d items, the rest is dropped', [MaxArrayItems]);
+  end;
+  // A TCosObject belongs to the document
+  if not (Item is TCosObject) then
+  begin
+    Item.Free;
+  end;
 end;
 
 function TBaseParser.ResolveArrayReference(const Items: TCosArray): TCosBase;

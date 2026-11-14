@@ -68,6 +68,7 @@ begin
   var Stream: TCosStream;
   if not Engine.Resources.TryGetXObject(XObjectName, Stream) then
   begin
+    Engine.LogError('Missing XObject: %s', [XObjectName]);
     Exit;
   end;
 

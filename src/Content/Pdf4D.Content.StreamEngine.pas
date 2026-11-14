@@ -21,7 +21,8 @@ uses
   Pdf4D.Font.Base,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
-  Pdf4D.Model.Resources;
+  Pdf4D.Model.Resources,
+  Pdf4D.Parser.ContentStream;
 
 type
   // What the engine needs to know of an operator processor. TOperatorProcessor in Pdf4D.Content.OperatorProcessor adds the
@@ -37,6 +38,9 @@ type
   // behaviour it enforces the limits of TPdfLoadOptions, because content streams can be hostile:
   // - a form that is already being drawn is skipped, and the form depth is limited;
   // - a page has a budget of operators and of glyphs; a page over budget stops, and keeps what was gathered;
+  // - a page has a budget of decoded content bytes, counted for the page content and for every run of a form; the decoded
+  //   data of a form is kept for the page, so that a form that is drawn again is not decoded again;
+  // - an operator has a limited number of operands, and an array a limited number of items; the rest is dropped;
   // - q beyond the depth limit is ignored, and so is the Q that belongs to it.
   // The engine is not thread safe. It does not own the page.
   TPdfStreamEngine = class
@@ -48,6 +52,12 @@ type
         CreatedResources: TPDResources;
         PreviousStack: TObjectList<TPDGraphicsState>;
         PreviousIgnoredSaves: Integer;
+      end;
+
+      // The decoded data of a stream that is drawn more than once on one page
+      TCachedContent = record
+        Data: TBytes;
+        IsReadable: Boolean;
       end;
 
   private
@@ -67,6 +77,9 @@ type
     FLevel: Integer;
     FOperatorCount: Int64;
     FGlyphCount: Integer;
+    FContentBytes: Int64;
+    FIsOperandLimitLogged: Boolean;
+    FFormCache: TDictionary<TCosStream, TCachedContent>;
 
     procedure InitPage(const Page: TPDPage);
     function GetDefaultFont: TPDFont;
@@ -74,24 +87,35 @@ type
 
     procedure ProcessPageContent;
     function ReadPageContent: TBytes;
+    procedure AppendContent(var Buffer: TBytes; var Used: Int64; const Data: TBytes);
     function TryReadStreamData(const Stream: TCosStream; out Data: TBytes): Boolean;
+    function TryGetFormContent(const Stream: TCosStream; out Data: TBytes): Boolean;
+    procedure ChargeContentBytes(const Count: Int64);
+    function TryChargeContentBytes(const Count: Int64): Boolean;
+    procedure RunPageContent;
     procedure ProcessForm(const Form: TPDFormXObject);
     procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const Matrix: TPdfMatrix);
     procedure ProcessStreamOperators(const Data: TBytes);
-    procedure ProcessOperators(const Parser: TObject);
-    function TryReadToken(const Parser: TObject; out Token: TObject): Boolean;
+    procedure ProcessOperators(const Parser: TPdfStreamParser);
+    function TryReadToken(const Parser: TPdfStreamParser; out Token: TObject): Boolean;
+    procedure LogOperandLimit;
+    procedure RunOperator(const Operator: TContentOperator; const Operands: TObjectList<TObject>);
+    function CreateFrameResources(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TPDResources;
 
     function BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
     procedure EndFrame(const Frame: TStreamFrame);
 
     procedure CountOperator;
     procedure CountGlyph;
-    function TryHandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception): Boolean;
+    procedure HandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception);
 
     function IsVerticalFont(const Font: TPDFont): Boolean;
     function GetTextMatrixOrRaise: TPdfMatrix;
 
   protected
+    // Called by ProcessPage after the page is set up, inside the floating point guard. A subclass prepares what it reads from
+    // the page here.
+    procedure PrepareEngineForPage(const Page: TPDPage); virtual;
     procedure ApplyTextAdjustment(const Tx, Ty: Single); virtual;
     procedure ShowText(const Bytes: TBytes); virtual;
     // Called for operators without a processor. Nothing by default.
@@ -170,8 +194,7 @@ uses
   Pdf4D.Content.OperatorProcessor,
   Pdf4D.Cos.Number,
   Pdf4D.Cos.PdfString,
-  Pdf4D.Font.Factory,
-  Pdf4D.Parser.ContentStream;
+  Pdf4D.Font.Factory;
 
 { TPdfStreamEngine }
 
@@ -181,10 +204,12 @@ begin
   FProcessors := TObjectDictionary<string, TOperatorProcessorBase>.Create([doOwnsValues]);
   FStack := TObjectList<TPDGraphicsState>.Create(True);
   FActiveStreams := TList<TCosStream>.Create;
+  FFormCache := TDictionary<TCosStream, TCachedContent>.Create;
 end;
 
 destructor TPdfStreamEngine.Destroy;
 begin
+  FFormCache.Free;
   FActiveStreams.Free;
   FStack.Free;
   FProcessors.Free;
@@ -246,6 +271,9 @@ begin
   FLevel := 0;
   FOperatorCount := 0;
   FGlyphCount := 0;
+  FContentBytes := 0;
+  FIsOperandLimitLogged := False;
+  FFormCache.Clear;
 end;
 
 function TPdfStreamEngine.GetDefaultFont: TPDFont;
@@ -272,19 +300,42 @@ begin
   const PreviousMask = TPdfFloatGuard.Enter;
   try
     InitPage(Page);
+    PrepareEngineForPage(Page);
     if Page.HasContents then
     begin
-      try
-        ProcessPageContent;
-      except
-        on Failure: EPdfLimitExceededException do
-        begin
-          LogError('Processing of the page stopped, the text so far is kept: %s', [Failure.Message]);
-        end;
-      end;
+      RunPageContent;
     end;
   finally
     TPdfFloatGuard.Leave(PreviousMask);
+  end;
+end;
+
+procedure TPdfStreamEngine.PrepareEngineForPage(const Page: TPDPage);
+begin
+end;
+
+procedure TPdfStreamEngine.RunPageContent;
+begin
+  try
+    ProcessPageContent;
+  except
+    on Failure: EPdfLimitExceededException do
+    begin
+      LogError('Processing of the page stopped, the text so far is kept: %s', [Failure.Message]);
+    end;
+    on Failure: EPdfException do
+    begin
+      raise;
+    end;
+    on Failure: EAccessViolation do
+    begin
+      // A mistake in the library, not in the file
+      raise;
+    end;
+    on Failure: Exception do
+    begin
+      raise EPdfParseException.CreateFmt('Processing of the page failed: %s: %s', [Failure.ClassName, Failure.Message]);
+    end;
   end;
 end;
 
@@ -294,17 +345,101 @@ begin
   ProcessContent(Data, nil, False, TPdfMatrix.Identity);
 end;
 
+procedure TPdfStreamEngine.ChargeContentBytes(const Count: Int64);
+begin
+  const Limit = Options.MaxContentBytesPerPage;
+  if (Count > Limit) or (FContentBytes > Limit - Count) then
+  begin
+    raise EPdfLimitExceededException.CreateFmt('The page has more than %d bytes of content', [Limit]);
+  end;
+  FContentBytes := FContentBytes + Count;
+end;
+
+function TPdfStreamEngine.TryChargeContentBytes(const Count: Int64): Boolean;
+begin
+  Result := True;
+  try
+    ChargeContentBytes(Count);
+  except
+    on Failure: EPdfLimitExceededException do
+    begin
+      LogError('The rest of the page content is skipped: %s', [Failure.Message]);
+      Result := False;
+    end;
+  end;
+end;
+
 function TPdfStreamEngine.ReadPageContent: TBytes;
 begin
-  Result := nil;
-  for var Stream in FCurrentPage.ContentStreams do
-  begin
-    var Data: TBytes;
-    if TryReadStreamData(Stream, Data) then
+  var Buffer: TBytes := nil;
+  var Used: Int64 := 0;
+  try
+    for var Stream in FCurrentPage.ContentStreams do
     begin
-      // PDFBox puts a line feed between the streams of /Contents: an operator may not run into the next stream
-      Result := Result + Data + [ContentSeparator];
+      var Data: TBytes;
+      if TryReadStreamData(Stream, Data) then
+      begin
+        if not TryChargeContentBytes(Length(Data) + 1) then
+        begin
+          // What was read so far is run, as for a form that goes over budget
+          Break;
+        end;
+        AppendContent(Buffer, Used, Data);
+      end;
     end;
+    SetLength(Buffer, Used);
+  except
+    on Failure: EOutOfMemory do
+    begin
+      raise EPdfLimitExceededException.Create('Not enough memory for the content of the page');
+    end;
+  end;
+  Result := Buffer;
+end;
+
+// The streams of /Contents are joined with a line feed, as PDFBox does: an operator may not run into the next stream. The
+// buffer doubles when it is full, so that joining takes linear time.
+procedure TPdfStreamEngine.AppendContent(var Buffer: TBytes; var Used: Int64; const Data: TBytes);
+begin
+  const Needed = Used + Length(Data) + 1;
+  if Needed > High(Integer) then
+  begin
+    raise EPdfLimitExceededException.Create('The content of the page is too large for one buffer');
+  end;
+
+  if Needed > Length(Buffer) then
+  begin
+    SetLength(Buffer, Min(Max(Needed, Int64(Length(Buffer)) * 2), Int64(High(Integer))));
+  end;
+  if Length(Data) > 0 then
+  begin
+    Move(Data[0], Buffer[Used], Length(Data));
+  end;
+  Buffer[Used + Length(Data)] := ContentSeparator;
+  Used := Needed;
+end;
+
+// Decodes a form once per page, and charges the page for its bytes every time it is run
+function TPdfStreamEngine.TryGetFormContent(const Stream: TCosStream; out Data: TBytes): Boolean;
+begin
+  var Cached: TCachedContent;
+  if not FFormCache.TryGetValue(Stream, Cached) then
+  begin
+    Cached.IsReadable := TryReadStreamData(Stream, Cached.Data);
+    if Cached.IsReadable then
+    begin
+      ChargeContentBytes(Length(Cached.Data) + 1);
+    end;
+    FFormCache.Add(Stream, Cached);
+    Data := Cached.Data;
+    Exit(Cached.IsReadable);
+  end;
+
+  Data := Cached.Data;
+  Result := Cached.IsReadable;
+  if Result then
+  begin
+    ChargeContentBytes(Length(Data) + 1);
   end;
 end;
 
@@ -364,7 +499,7 @@ begin
   end;
 
   var Data: TBytes;
-  if not TryReadStreamData(Form.Stream, Data) then
+  if not TryGetFormContent(Form.Stream, Data) then
   begin
     Exit;
   end;
@@ -383,33 +518,49 @@ begin
   end;
 end;
 
-function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+function TPdfStreamEngine.CreateFrameResources(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TPDResources;
 begin
-  Result := Default(TStreamFrame);
-  Result.PreviousResources := FResources;
-  // Resource lookup: the resources of the stream, else those of the parent stream (not in the PDF specification, but
-  // PDFBOX-1359 does it and Acrobat copes), else those of the page
+  Result := nil;
   if Assigned(StreamResources) then
   begin
-    Result.CreatedResources := TPDResources.Create(StreamResources, FCurrentPage.Context);
-    FResources := Result.CreatedResources;
+    Result := TPDResources.Create(StreamResources, FCurrentPage.Context);
   end
   else if HasEmptyResources then
   begin
-    Result.CreatedResources := TPDResources.Create(nil, FCurrentPage.Context);
+    Result := TPDResources.Create(nil, FCurrentPage.Context);
+  end;
+end;
+
+function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+begin
+  Result := Default(TStreamFrame);
+  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state. Everything that
+  // can fail is made first, so that a failure leaves the engine as it was.
+  const NewStack = TObjectList<TPDGraphicsState>.Create(True);
+  try
+    NewStack.Add(FStack.Last.Clone);
+    Result.CreatedResources := CreateFrameResources(StreamResources, HasEmptyResources);
+  except
+    NewStack.Free;
+    raise;
+  end;
+
+  Result.PreviousResources := FResources;
+  Result.PreviousStack := FStack;
+  Result.PreviousIgnoredSaves := FIgnoredSaves;
+  FStack := NewStack;
+  FIgnoredSaves := 0;
+
+  // Resource lookup: the resources of the stream, else those of the parent stream (not in the PDF specification, but
+  // PDFBOX-1359 does it and Acrobat copes), else those of the page
+  if Assigned(Result.CreatedResources) then
+  begin
     FResources := Result.CreatedResources;
   end
   else if not Assigned(FResources) then
   begin
     FResources := FCurrentPage.Resources;
   end;
-
-  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state
-  Result.PreviousStack := FStack;
-  Result.PreviousIgnoredSaves := FIgnoredSaves;
-  FStack := TObjectList<TPDGraphicsState>.Create(True);
-  FStack.Add(Result.PreviousStack.Last.Clone);
-  FIgnoredSaves := 0;
 end;
 
 procedure TPdfStreamEngine.EndFrame(const Frame: TStreamFrame);
@@ -445,12 +596,12 @@ begin
   end;
 end;
 
-function TPdfStreamEngine.TryReadToken(const Parser: TObject; out Token: TObject): Boolean;
+function TPdfStreamEngine.TryReadToken(const Parser: TPdfStreamParser; out Token: TObject): Boolean;
 begin
   Token := nil;
   Result := True;
   try
-    Token := TPdfStreamParser(Parser).ParseNextToken;
+    Token := Parser.ParseNextToken;
   except
     on Failure: Exception do
     begin
@@ -465,7 +616,7 @@ begin
   end;
 end;
 
-procedure TPdfStreamEngine.ProcessOperators(const Parser: TObject);
+procedure TPdfStreamEngine.ProcessOperators(const Parser: TPdfStreamParser);
 begin
   // The tokens are made one at a time: a large stream is never held in memory as a list of tokens
   const Operands = TObjectList<TObject>.Create(True);
@@ -476,30 +627,48 @@ begin
       if Token is TContentOperator then
       begin
         try
-          var Values: TArray<TCosBase>;
-          SetLength(Values, Operands.Count);
-          for var Index := 0 to Operands.Count - 1 do
-          begin
-            Values[Index] := TCosBase(Operands[Index]);
-          end;
-          ProcessOperator(TContentOperator(Token), Values);
+          RunOperator(TContentOperator(Token), Operands);
         finally
           Token.Free;
           Operands.Clear;
         end;
       end
-      else if Token is TCosBase then
+      else if (Token is TCosBase) and (Operands.Count < MaxContentOperands) then
       begin
         Operands.Add(Token);
       end
       else
       begin
+        if Token is TCosBase then
+        begin
+          LogOperandLimit;
+        end;
         Token.Free;
       end;
     end;
   finally
     Operands.Free;
   end;
+end;
+
+procedure TPdfStreamEngine.LogOperandLimit;
+begin
+  if not FIsOperandLimitLogged then
+  begin
+    FIsOperandLimitLogged := True;
+    LogWarning('An operator has more than %d operands, the rest is dropped', [MaxContentOperands]);
+  end;
+end;
+
+procedure TPdfStreamEngine.RunOperator(const Operator: TContentOperator; const Operands: TObjectList<TObject>);
+begin
+  var Values: TArray<TCosBase>;
+  SetLength(Values, Operands.Count);
+  for var Index := 0 to Operands.Count - 1 do
+  begin
+    Values[Index] := TCosBase(Operands[Index]);
+  end;
+  ProcessOperator(Operator, Values);
 end;
 
 procedure TPdfStreamEngine.CountOperator;
@@ -538,31 +707,29 @@ begin
     begin
       raise;
     end;
+    on Failure: EAccessViolation do
+    begin
+      // A mistake in the library, not in the file
+      raise;
+    end;
     on Failure: Exception do
     begin
-      if not TryHandleOperatorFailure(Operator, Operands, Failure) then
-      begin
-        // A mistake in the library, not in the file
-        raise;
-      end;
+      HandleOperatorFailure(Operator, Operands, Failure);
     end;
   end;
 end;
 
-function TPdfStreamEngine.TryHandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception): Boolean;
+// The stream goes on after a failing operator, whatever the failure: a hostile file can drive the font and CMap code into
+// exceptions that are no EPdfException
+procedure TPdfStreamEngine.HandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception);
 begin
-  Result := True;
   if Failure is EPdfException then
   begin
     OperatorException(Operator, Operands, EPdfException(Failure));
   end
-  else if TPdfFailure.IsInputFailure(Failure) then
-  begin
-    LogError('Operator %s failed: %s', [Operator.Name, Failure.Message]);
-  end
   else
   begin
-    Result := False;
+    LogError('Operator %s failed: %s: %s', [Operator.Name, Failure.ClassName, Failure.Message]);
   end;
 end;
 

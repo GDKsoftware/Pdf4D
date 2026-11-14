@@ -29,6 +29,15 @@ type
   // the text of a Type 3 glyph comes from the font encoding only.
   TLegacyPdfStreamEngine = class(TPdfStreamEngine)
   private
+    type
+      // A font height in the cache of the document context, which frees it with the document
+      TCachedFontHeight = class
+      public
+        Height: Single;
+        constructor Create(const Height: Single);
+      end;
+
+  private
     const Thousand: Single = 1000;
     const Hundred: Single = 100;
     const FallbackSpaceWidth: Single = 1.0;
@@ -41,8 +50,6 @@ type
     FPageSize: TPdfRectangle;
     FHasTranslateMatrix: Boolean;
     FTranslateMatrix: TPdfMatrix;
-    FFontHeights: TDictionary<TCosDictionary, Single>;
-    FFontHeightContext: TPDDocumentContext;
 
     function GetVerticalDisplacementX(const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector): Single;
     function TryGetTrueTypeFont(const Font: TPDFont; out TrueType: TTrueTypeFont): Boolean;
@@ -51,6 +58,7 @@ type
     function TryGetUnicode(const Font: TPDFont; const Code: Integer; out Unicode: string): Boolean;
 
   protected
+    procedure PrepareEngineForPage(const Page: TPDPage); override;
     // Computes the height of the font. Override this to use other calculations.
     function ComputeFontHeight(const Font: TPDFont): Single; virtual;
     // Called with every text position. The callee becomes the owner; this version frees it.
@@ -60,7 +68,6 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure ProcessPage(const Page: TPDPage); override;
     procedure ShowGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector); override;
   end;
 
@@ -81,12 +88,19 @@ uses
   Pdf4D.Font.Type3,
   Pdf4D.FontBox.BoundingBox;
 
+{ TLegacyPdfStreamEngine.TCachedFontHeight }
+
+constructor TLegacyPdfStreamEngine.TCachedFontHeight.Create(const Height: Single);
+begin
+  inherited Create;
+  Self.Height := Height;
+end;
+
 { TLegacyPdfStreamEngine }
 
 constructor TLegacyPdfStreamEngine.Create;
 begin
   inherited Create;
-  FFontHeights := TDictionary<TCosDictionary, Single>.Create;
   TTextOperators.Register(Self);
   TDrawObjectOperators.Register(Self);
   TStateOperators.Register(Self);
@@ -94,29 +108,20 @@ end;
 
 destructor TLegacyPdfStreamEngine.Destroy;
 begin
-  FFontHeights.Free;
   inherited;
 end;
 
-procedure TLegacyPdfStreamEngine.ProcessPage(const Page: TPDPage);
+// Runs inside the floating point guard of ProcessPage
+procedure TLegacyPdfStreamEngine.PrepareEngineForPage(const Page: TPDPage);
 begin
   FPageRotation := Page.Rotation;
   FPageSize := Page.CropBox;
-
-  // The font heights are cached per font dictionary, which belongs to one document
-  if Page.Context <> FFontHeightContext then
-  begin
-    FFontHeights.Clear;
-    FFontHeightContext := Page.Context;
-  end;
-
   FHasTranslateMatrix := not (TJavaFloat.IsSame(FPageSize.LowerLeftX, 0) and TJavaFloat.IsSame(FPageSize.LowerLeftY, 0));
   if FHasTranslateMatrix then
   begin
     // The translation for a crop box that does not start in the origin
     FTranslateMatrix := TPdfMatrix.GetTranslateInstance(-FPageSize.LowerLeftX, -FPageSize.LowerLeftY);
   end;
-  inherited ProcessPage(Page);
 end;
 
 function TLegacyPdfStreamEngine.TryGetTrueTypeFont(const Font: TPDFont; out TrueType: TTrueTypeFont): Boolean;
@@ -153,11 +158,16 @@ end;
 
 function TLegacyPdfStreamEngine.GetFontHeight(const Font: TPDFont): Single;
 begin
-  if not FFontHeights.TryGetValue(Font.CosObject, Result) then
+  // The cache belongs to the document, so a font of another document can never find a height of this one
+  const Context = CurrentPage.Context;
+  var Cached: TObject;
+  if Context.TryGetCachedObject(TPDCacheScope.FontHeight, Font, Cached) then
   begin
-    Result := ComputeFontHeight(Font);
-    FFontHeights.AddOrSetValue(Font.CosObject, Result);
+    Exit(TCachedFontHeight(Cached).Height);
   end;
+
+  Result := ComputeFontHeight(Font);
+  Context.AddCachedObject(TPDCacheScope.FontHeight, Font, TCachedFontHeight.Create(Result));
 end;
 
 function TLegacyPdfStreamEngine.GetSpaceWidthText(const Font: TPDFont): Single;
@@ -174,7 +184,11 @@ begin
     // PDFBOX-614: see what the space displacement should be without breaking on a font that cannot tell
     Result := Font.GetSpaceWidth * GlyphSpaceToTextSpace;
   except
-    on Failure: EPdfException do
+    on Failure: EAccessViolation do
+    begin
+      raise;
+    end;
+    on Failure: Exception do
     begin
       LogWarning('The width of the space could not be read: %s', [Failure.Message]);
     end;

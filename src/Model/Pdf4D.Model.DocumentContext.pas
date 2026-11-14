@@ -13,7 +13,7 @@ uses
 
 type
   // Separate caches, so that the same dictionary or stream can be the key in more than one of them
-  TPDCacheScope = (General, ToUnicode, GlyphPrefix);
+  TPDCacheScope = (General, ToUnicode, GlyphPrefix, FontHeight);
 
   // What the model objects of one document share: the log, the options and a cache of objects that are made from
   // dictionaries and streams of the document (fonts, for instance). The context is not thread safe, like the document.
