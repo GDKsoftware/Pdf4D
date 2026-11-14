@@ -225,7 +225,8 @@ uses
   Pdf4D.Tests.TextGolden in 'Support\Pdf4D.Tests.TextGolden.pas',
   Pdf4D.Tests.TextGolden.Comparer.Tests in 'Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas',
   Pdf4D.Tests.TextGolden.Tests in 'Acceptance\Pdf4D.Tests.TextGolden.Tests.pas',
-  Pdf4D.Tests.PdfBoxText.Tests in 'Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas';
+  Pdf4D.Tests.PdfBoxText.Tests in 'Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas',
+  Pdf4D.Tests.TextRobustness.Tests in 'Acceptance\Pdf4D.Tests.TextRobustness.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
@@ -276,6 +277,8 @@ begin
 
   ExitCode := 0;
   try
+    // Without arguments this changes nothing; -r:<fixture> runs one fixture, for the fuzz sweeps
+    TDUnitX.CheckCommandLine;
     // The first run initializes DUnitX's global registries and loggers; leaks are measured on the second run.
     const WarmupPassed = RunTests;
     const Baseline = TMemoryCheck.OutstandingBlocks;

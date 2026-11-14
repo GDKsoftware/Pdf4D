@@ -39,6 +39,25 @@ The AES tests compare against Delphi Encryption Compendium (DEC) 6.4.1. DEC is u
 
 Tests that read corpus files look for a `corpus` folder with a `manifest.csv`, starting at the folder of the test program and going up. From `tests\<Platform>\<Config>` that finds `tests\corpus`, also for the Linux64 binary that WSL runs from the Windows file system (`/mnt/c/...`). The environment variable `PDF4D_CORPUS` names the folder when the program runs somewhere else. The working directory plays no part.
 
+## Fuzz sweeps
+
+`Pdf4D.Tests.Robustness.Tests` and `Pdf4D.Tests.TextRobustness.Tests` mutate corpus files, generate content streams and mutate font programs; every run happens on a worker thread with a time limit and may only succeed or end in an `EPdfException`. The seeds and sizes in the code are fixed. For a larger sweep with other seeds, set these environment variables and run one fixture (the test program takes DUnitX options such as `-r:`):
+
+| Variable | Meaning |
+|---|---|
+| `PDF4D_FUZZ_SEED` | Added to every seed (default 0). The name of a failure holds the seed and the index of the case. |
+| `PDF4D_FUZZ_SCALE` | Multiplies the number of cases (default 1). |
+| `PDF4D_FUZZ_SECONDS` | The time limit of one run (default 10). |
+| `PDF4D_FUZZ_TRACE` | A file that gets the duration and the outcome of every run. |
+| `PDF4D_ROBUSTNESS_OUTPUT` | A folder that gets the bytes of every failing case. |
+
+```powershell
+$env:PDF4D_FUZZ_SEED = 100000; $env:PDF4D_FUZZ_SCALE = 4
+tests\Win64\Debug\Pdf4D.Tests.exe -r:Pdf4D.Tests.TextRobustness.Tests.TTextRobustnessTests
+```
+
+A run that hits the time limit keeps its thread, so the process can crash when it ends; the failure is reported before that.
+
 ## Resources (rebuilding)
 
 The glyph lists, the AFM files of the standard 14 fonts, the predefined CMaps and LiberationSans live in `src\Resources` as one `.res` file per group. Each source file is a zlib-compressed `RCDATA` resource, named by `TPdfResourceData.NameOf` (for example `PDF4D_CMAP_UNIGB_UCS2_H`), and one small unit per group (`Pdf4D.Resources.<Group>.pas`) links the `.res` with `{$R}`. The `.res` files, `resources.csv` (name, source, SHA-256 of the uncompressed bytes, licence) and `afm-MustRead.html` are committed; never edit them by hand.

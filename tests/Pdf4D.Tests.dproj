@@ -297,6 +297,7 @@
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.TextGolden.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.TextRobustness.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
