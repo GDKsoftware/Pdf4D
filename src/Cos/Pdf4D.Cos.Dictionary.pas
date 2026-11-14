@@ -122,6 +122,11 @@ type
     // EPdfLimitExceededException.
     function CreateDecodedStream: TStream;
 
+    // The first MaxCount bytes of the decoded data (fewer for a shorter stream). The last filter stops after them, so the
+    // cost does not depend on the size of the whole data; reaching MaxCount is no error. Raises like CreateDecodedStream
+    // for an unknown or image filter and for an earlier filter that gives more than the decoded size limit.
+    function DecodePrefix(const MaxCount: Integer): TBytes;
+
     // The data decoded up to the first image filter, with the names of the filters that are left. Without an
     // image filter nothing is left. Raises like CreateDecodedStream for an unknown filter.
     function DecodeUntilImageFilter: TPdfDecodedData;
@@ -553,6 +558,11 @@ begin
   var Remaining: TArray<string>;
   const Data = TFilterChain.Decode(GetRawBytes, GetFilterNames, Self, MaxDecodedSize, DocumentLog, False, Remaining);
   Result := TBytesStream.Create(Data);
+end;
+
+function TCosStream.DecodePrefix(const MaxCount: Integer): TBytes;
+begin
+  Result := TFilterChain.DecodePrefix(GetRawBytes, GetFilterNames, Self, MaxDecodedSize, MaxCount, DocumentLog);
 end;
 
 function TCosStream.DecodeUntilImageFilter: TPdfDecodedData;

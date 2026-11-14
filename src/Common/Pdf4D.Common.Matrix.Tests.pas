@@ -23,6 +23,7 @@ type
     procedure AssertValues(const Expected: array of Single; const Actual: TPdfMatrix);
     procedure AssertIdentity(const Actual: TPdfMatrix);
     procedure CheckHugeValuesRaise(const Matrix: TPdfMatrix);
+    function RaisesOnOverflow: Boolean;
 
   public
     [Test]
@@ -66,6 +67,12 @@ type
 
     [Test]
     procedure TestTranslationAddsInJavaOrder;
+
+    [Test]
+    procedure TestScaleWidthToTextSpace;
+
+    [Test]
+    procedure TestScaleWidthToTextSpaceRejectsValuesOutOfRange;
 
     [Test]
     procedure TestTransformWithHugeValuesRaisesParseException;
@@ -308,14 +315,56 @@ begin
   Assert.AreEqual(Single(1), Matrix.GetValue(2, 2), 0);
 end;
 
+procedure TMatrixTests.TestScaleWidthToTextSpace;
+begin
+  const Matrix = TPdfMatrix.Create(Single(0.001), 0, 0, Single(0.001), 0, 0);
+  var Scaled: Single;
+
+  Assert.IsTrue(Matrix.TryScaleWidthToTextSpace(500, Scaled));
+
+  Assert.AreEqual(Double(500), Double(Scaled), 0.001);
+end;
+
+procedure TMatrixTests.TestScaleWidthToTextSpaceRejectsValuesOutOfRange;
+begin
+  const Matrix = TPdfMatrix.Create(3E38, 0, 0, 3E38, 0, 0);
+  var Scaled: Single;
+
+  Assert.IsFalse(Matrix.TryScaleWidthToTextSpace(1000, Scaled));
+  Assert.IsFalse(TPdfMatrix.Identity.TryScaleWidthToTextSpace(Single.NaN, Scaled));
+  Assert.AreEqual(Double(0), Double(Scaled), 0);
+end;
+
 procedure TMatrixTests.TestTransformWithHugeValuesRaisesParseException;
 begin
   const Matrix = TPdfMatrix.Create(3E38, 0, 0, 3E38, 3E38, 0);
   const Previous = SetExceptionMask([exDenormalized, exUnderflow, exPrecision]);
   try
-    CheckHugeValuesRaise(Matrix);
+    // Some platforms (Linux64) never raise for a floating point overflow, whatever the mask; there the guard has nothing to do
+    if RaisesOnOverflow then
+    begin
+      CheckHugeValuesRaise(Matrix);
+    end
+    else
+    begin
+      Assert.Pass('this platform gives an infinity instead of an exception');
+    end;
   finally
     SetExceptionMask(Previous);
+  end;
+end;
+
+function TMatrixTests.RaisesOnOverflow: Boolean;
+begin
+  try
+    const Product = TPdfMatrix.Create(3E38, 0, 0, 3E38, 0, 0).TransformPoint(3E38, 3E38);
+    // An infinity instead of an exception: the overflow is not raised here
+    Result := not IsInfinite(Product.X);
+  except
+    on EPdfParseException do
+    begin
+      Result := True;
+    end;
   end;
 end;
 

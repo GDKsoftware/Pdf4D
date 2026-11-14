@@ -49,6 +49,9 @@ type
     procedure TestInlineImageWithEIInsideData;
 
     [Test]
+    procedure TestManyIgnoredEIAreLoggedOnlyTheFirstTimes;
+
+    [Test]
     procedure TestInlineImageWithoutEIEndsStream;
 
     [Test]
@@ -304,6 +307,37 @@ begin
 
   Assert.AreEqual('op Q', DescribeNextToken);
   Assert.IsTrue(FLogLines.Count > 0, 'the ignored EI is logged');
+end;
+
+procedure TPdfStreamParserTests.TestManyIgnoredEIAreLoggedOnlyTheFirstTimes;
+begin
+  const Fake = BytesOf('EI ') + TBytes.Create($01, $02, $FF, $FE);
+  var Data: TBytes;
+  for var Count := 1 to 50 do
+  begin
+    Data := Data + Fake;
+  end;
+  Start(InlineImageWithData(Data, 'EI Q'));
+
+  const Token = FParser.ParseNextToken;
+  try
+    Assert.AreEqual<Integer>(Length(Data), Length(TContentOperator(Token).ImageData), 'all fake EI stay in the data');
+  finally
+    Token.Free;
+  end;
+
+  var IgnoredLines := 0;
+  var HasCount := False;
+  for var Line in FLogLines do
+  begin
+    if Line.StartsWith('ignoring ''EI''') then
+    begin
+      Inc(IgnoredLines);
+    end;
+    HasCount := (HasCount or Line.Contains('without a log line'));
+  end;
+  Assert.AreEqual(5, IgnoredLines, 'only the first five are logged');
+  Assert.IsTrue(HasCount, 'the rest is reported once as a count');
 end;
 
 procedure TPdfStreamParserTests.TestInlineImageWithoutEIEndsStream;

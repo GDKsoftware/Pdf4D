@@ -17,7 +17,8 @@ type
   private
     class function CountDecodableFilters(const FilterNames: TArray<string>; const StopAtImageFilter: Boolean): Integer; static;
     class function RemoveDuplicates(const FilterNames: TArray<string>; const Count: Integer; const Log: TPdfLog): TArray<string>; static;
-    class function ApplyFilter(const Data: TBytes; const Name: string; const Dictionary: TCosDictionary; const Index: Integer; const Limit: Int64; const Log: TPdfLog): TBytes; static;
+    class function ApplyFilter(const Data: TBytes; const Name: string; const Dictionary: TCosDictionary; const Index: Integer; const Limit: Int64; const Log: TPdfLog; const StopAtLimit: Boolean): TBytes; static;
+    class function DecodeFilters(const Data: TBytes; const FilterNames: TArray<string>; const Dictionary: TCosDictionary; const Limit, PrefixLimit: Int64; const Log: TPdfLog): TBytes; static;
 
   public
     // Applies the filters in order to Data, the raw bytes of a stream whose dictionary is Dictionary. Every filter may
@@ -25,6 +26,11 @@ type
     // StopAtImageFilter is set, raise EPdfUnsupportedFeatureException. With StopAtImageFilter the filters from the
     // first image filter on are not applied and are returned in RemainingFilters.
     class function Decode(const Data: TBytes; const FilterNames: TArray<string>; const Dictionary: TCosDictionary; const Limit: Int64; const Log: TPdfLog; const StopAtImageFilter: Boolean; out RemainingFilters: TArray<string>): TBytes; static;
+
+    // The first MaxCount bytes of the decoded data (fewer when it is shorter), without decoding the rest: the last filter
+    // stops after the prefix, and reaching MaxCount is no error. The earlier filters may give at most Limit bytes each.
+    // Raises like Decode for an unknown or an image filter.
+    class function DecodePrefix(const Data: TBytes; const FilterNames: TArray<string>; const Dictionary: TCosDictionary; const Limit: Int64; const MaxCount: Integer; const Log: TPdfLog): TBytes; static;
   end;
 
 implementation
@@ -43,11 +49,39 @@ begin
   const Count = CountDecodableFilters(FilterNames, StopAtImageFilter);
   RemainingFilters := Copy(FilterNames, Count, Length(FilterNames) - Count);
 
-  const Names = RemoveDuplicates(FilterNames, Count, Log);
+  Result := DecodeFilters(Data, Copy(FilterNames, 0, Count), Dictionary, Limit, 0, Log);
+end;
+
+class function TFilterChain.DecodePrefix(const Data: TBytes; const FilterNames: TArray<string>; const Dictionary: TCosDictionary; const Limit: Int64; const MaxCount: Integer; const Log: TPdfLog): TBytes;
+begin
+  if MaxCount <= 0 then
+  begin
+    Exit(nil);
+  end;
+
+  const Count = CountDecodableFilters(FilterNames, False);
+  Result := DecodeFilters(Data, Copy(FilterNames, 0, Count), Dictionary, Limit, MaxCount, Log);
+  if Length(Result) > MaxCount then
+  begin
+    SetLength(Result, MaxCount);
+  end;
+end;
+
+class function TFilterChain.DecodeFilters(const Data: TBytes; const FilterNames: TArray<string>; const Dictionary: TCosDictionary; const Limit, PrefixLimit: Int64; const Log: TPdfLog): TBytes;
+begin
+  const Names = RemoveDuplicates(FilterNames, Length(FilterNames), Log);
   Result := Data;
   for var Index := 0 to High(Names) do
   begin
-    Result := ApplyFilter(Result, Names[Index], Dictionary, Index, Limit, Log);
+    const IsPrefixStage = ((PrefixLimit > 0) and (Index = High(Names)));
+    if IsPrefixStage then
+    begin
+      Result := ApplyFilter(Result, Names[Index], Dictionary, Index, PrefixLimit, Log, True);
+    end
+    else
+    begin
+      Result := ApplyFilter(Result, Names[Index], Dictionary, Index, Limit, Log, False);
+    end;
   end;
 end;
 
@@ -99,7 +133,7 @@ begin
   end;
 end;
 
-class function TFilterChain.ApplyFilter(const Data: TBytes; const Name: string; const Dictionary: TCosDictionary; const Index: Integer; const Limit: Int64; const Log: TPdfLog): TBytes;
+class function TFilterChain.ApplyFilter(const Data: TBytes; const Name: string; const Dictionary: TCosDictionary; const Index: Integer; const Limit: Int64; const Log: TPdfLog; const StopAtLimit: Boolean): TBytes;
 begin
   var Filter: TPdfFilter;
   if not TFilterFactory.TryGetFilter(Name, Filter) then
@@ -112,9 +146,16 @@ begin
     const Input = TBytesStream.Create(Data);
     const Output = TBytesStream.Create;
     try
-      const Limited = TLimitedStream.Create(Output, Limit);
+      const Limited = TLimitedStream.Create(Output, Limit, StopAtLimit);
       try
-        Filter.Decode(Input, Limited, Dictionary, Index);
+        try
+          Filter.Decode(Input, Limited, Dictionary, Index);
+        except
+          // The prefix is complete: what the output holds is the result
+          on EPdfOutputPrefixReached do
+          begin
+          end;
+        end;
       finally
         Limited.Free;
       end;

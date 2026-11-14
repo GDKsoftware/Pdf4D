@@ -60,6 +60,10 @@ type
     procedure Translate(const Tx, Ty: Single);
     procedure Scale(const Sx, Sy: Single);
 
+    // The width of a glyph in thousandths of text space: Width times the 1000 scale of this font matrix. Java calculates the
+    // AffineTransform in double. False when the result is not a finite Single (PDFBox goes on with an infinity or NaN).
+    function TryScaleWidthToTextSpace(const Width: Single; out Scaled: Single): Boolean;
+
     function TransformPoint(const X, Y: Single): TPointF;
     function Transform(const V: TPdfVector): TPdfVector;
 
@@ -283,6 +287,25 @@ begin
   end;
   Scaled.CheckValuesAreFinite;
   Self := Scaled;
+end;
+
+function TPdfMatrix.TryScaleWidthToTextSpace(const Width: Single; out Scaled: Single): Boolean;
+begin
+  Scaled := 0;
+  const Thousand: Double = 1000;
+  try
+    const Value: Double = Double(FValues[0]) * Thousand * Double(Width) + Double(FValues[6]);
+    Result := ((not IsNan(Value)) and (Abs(Value) <= MaxSingle));
+    if Result then
+    begin
+      Scaled := Single(Value);
+    end;
+  except
+    on EMathError do
+    begin
+      Result := False;
+    end;
+  end;
 end;
 
 function TPdfMatrix.TransformPoint(const X, Y: Single): TPointF;

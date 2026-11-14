@@ -23,6 +23,8 @@ type
   TPdfStreamParser = class(TBaseParser)
   private
     const BinaryCheckLength = 10;
+    // A hostile stream can hold an "EI" every few bytes: only the first ones go to the log, the rest as a count
+    const MaxIgnoredEIWarnings = 5;
 
   private
     FDocument: TCosDocument;
@@ -33,6 +35,7 @@ type
     FInlineImageDepth: Integer;
     FInlineOffset: Int64;
     FIsClosed: Boolean;
+    FIgnoredEICount: Integer;
 
     class function CreateDocument(const Data: TBytes; const Options: TPdfLoadOptions; const Log: TPdfLog): TCosDocument; static;
     class function IsNumberText(const Text: string): Boolean; static;
@@ -42,6 +45,7 @@ type
     class function ByteText(const Value: Integer): string; static;
 
     procedure Close;
+    procedure ReportSuppressedEIWarnings;
     function PositionText: string;
     function TokenText(const Token: TObject): string;
 
@@ -82,6 +86,7 @@ implementation
 
 uses
   System.Classes,
+  System.Math,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Null,
@@ -193,6 +198,16 @@ end;
 procedure TPdfStreamParser.Close;
 begin
   FIsClosed := True;
+end;
+
+procedure TPdfStreamParser.ReportSuppressedEIWarnings;
+begin
+  if FIgnoredEICount > MaxIgnoredEIWarnings then
+  begin
+    FLog.Warning('ignored %d ''EI'' in the middle of this inline image, %d of them without a log line',
+                 [FIgnoredEICount, FIgnoredEICount - MaxIgnoredEIWarnings]);
+  end;
+  FIgnoredEICount := 0;
 end;
 
 function TPdfStreamParser.PositionText: string;
@@ -507,6 +522,7 @@ end;
 function TPdfStreamParser.ReadInlineImageBytes(out ImageData: TBytes): Boolean;
 begin
   var Count := 0;
+  FIgnoredEICount := 0;
   var LastByte := Source.Read;
   var CurrentByte := Source.Read;
 
@@ -520,13 +536,15 @@ begin
       FLog.Error('Inline image data larger than %d bytes at stream offset %d: the content stream ends here',
                  [FMaxInlineImageSize, Source.GetPosition]);
       Close;
+      ReportSuppressedEIWarnings;
       ImageData := nil;
       Exit(False);
     end;
 
     if Count = Length(ImageData) then
     begin
-      SetLength(ImageData, Count + InlineImageGrowthStep + (Count div 2));
+      const NewLength = Min(Int64(Count) + InlineImageGrowthStep + (Count div 2), Int64(FMaxInlineImageSize));
+      SetLength(ImageData, Integer(NewLength));
     end;
     ImageData[Count] := Byte(LastByte);
     Inc(Count);
@@ -540,6 +558,7 @@ begin
   begin
     FLog.Warning('Inline image without ''EI'' at stream offset %d', [Source.GetPosition]);
   end;
+  ReportSuppressedEIWarnings;
   SetLength(ImageData, Count);
   Result := True;
 end;
@@ -619,8 +638,12 @@ begin
 
   if not HasNoBinData then
   begin
-    FLog.Warning('ignoring ''EI'' assumed to be in the middle of inline image at stream offset %d, s = ''%s''',
-                 [Source.GetPosition, OperatorText]);
+    Inc(FIgnoredEICount);
+    if FIgnoredEICount <= MaxIgnoredEIWarnings then
+    begin
+      FLog.Warning('ignoring ''EI'' assumed to be in the middle of inline image at stream offset %d, s = ''%s''',
+                   [Source.GetPosition, OperatorText]);
+    end;
   end;
   Result := HasNoBinData;
 end;

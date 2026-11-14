@@ -31,6 +31,15 @@ type
 
     [Test]
     procedure TestFlateLargeOutputIsComplete;
+
+    [Test]
+    procedure TestDecodePrefixOfABombStopsAtThePrefix;
+
+    [Test]
+    procedure TestDecodePrefixOfShortDataGivesAllOfIt;
+
+    [Test]
+    procedure TestDecodePrefixWithoutFilterCutsTheRawData;
   end;
 
 implementation
@@ -38,12 +47,17 @@ implementation
 uses
   System.Classes,
   System.ZLib,
+  System.Diagnostics,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Log,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Name,
+  Pdf4D.Filter.Chain,
   Pdf4D.Filter.Tests.Support;
+
+const
+  FlateFilter = 'FlateDecode';
 
 { TFlateFilterTests }
 
@@ -155,6 +169,53 @@ begin
   const Decoded = TFilterTestSupport.Decode('FlateDecode', TFilterTestSupport.Compress(Original));
 
   Assert.IsTrue((Length(Decoded) = Length(Original)) and CompareMem(@Decoded[0], @Original[0], Length(Decoded)));
+end;
+
+procedure TFlateFilterTests.TestDecodePrefixOfABombStopsAtThePrefix;
+begin
+  var Bomb: TBytes;
+  SetLength(Bomb, 64 * 1024 * 1024);
+  const Compressed = TFilterTestSupport.Compress(Bomb);
+  Bomb := nil;
+  const Dictionary = TCosDictionary.Create;
+  try
+    const Watch = TStopwatch.StartNew;
+
+    // The limit for earlier filters is far below the size of the whole data: the prefix must not count against it
+    const Prefix = TFilterChain.DecodePrefix(Compressed, [FlateFilter], Dictionary, 1024, 100, nil);
+
+    Assert.AreEqual<Integer>(100, Length(Prefix));
+    Assert.AreEqual<Integer>(0, Prefix[99]);
+    Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, 'only the prefix is decoded');
+  finally
+    Dictionary.Free;
+  end;
+end;
+
+procedure TFlateFilterTests.TestDecodePrefixOfShortDataGivesAllOfIt;
+begin
+  const Dictionary = TCosDictionary.Create;
+  try
+    const Compressed = TFilterTestSupport.Compress(TFilterTestSupport.AsciiBytes('Hello'));
+
+    const Prefix = TFilterChain.DecodePrefix(Compressed, [FlateFilter], Dictionary, 1024, 100, nil);
+
+    Assert.AreEqual('Hello', TFilterTestSupport.AsciiString(Prefix));
+  finally
+    Dictionary.Free;
+  end;
+end;
+
+procedure TFlateFilterTests.TestDecodePrefixWithoutFilterCutsTheRawData;
+begin
+  const Dictionary = TCosDictionary.Create;
+  try
+    const Prefix = TFilterChain.DecodePrefix(TFilterTestSupport.AsciiBytes('Hello world'), [], Dictionary, 1024, 5, nil);
+
+    Assert.AreEqual('Hello', TFilterTestSupport.AsciiString(Prefix));
+  finally
+    Dictionary.Free;
+  end;
 end;
 
 end.

@@ -12,6 +12,9 @@ uses
   Pdf4D.Cos.Document;
 
 type
+  // Separate caches, so that the same dictionary or stream can be the key in more than one of them
+  TPDCacheScope = (General, ToUnicode, GlyphPrefix);
+
   // What the model objects of one document share: the log, the options and a cache of objects that are made from
   // dictionaries and streams of the document (fonts, for instance). The context is not thread safe, like the document.
   TPDDocumentContext = class
@@ -19,7 +22,7 @@ type
     FCosDocument: TCosDocument;
     FLog: TPdfLog;
     FOptions: TPdfLoadOptions;
-    FObjects: TObjectDictionary<TObject, TObject>;
+    FScopes: array[TPDCacheScope] of TObjectDictionary<TObject, TObject>;
     FToUnicodeMappings: Int64;
     FIsToUnicodeBudgetExhausted: Boolean;
 
@@ -33,9 +36,11 @@ type
     destructor Destroy; override;
 
     // Key is the identity of a dictionary or stream. Value stays owned by the context.
-    function TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean;
+    function TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean; overload;
+    function TryGetCachedObject(const Scope: TPDCacheScope; const Key: TObject; out Value: TObject): Boolean; overload;
     // The context becomes the owner of Value. A second value for the same Key raises EArgumentException.
-    procedure AddCachedObject(const Key: TObject; const Value: TObject);
+    procedure AddCachedObject(const Key: TObject; const Value: TObject); overload;
+    procedure AddCachedObject(const Scope: TPDCacheScope; const Key: TObject; const Value: TObject); overload;
 
     // The budget for the mappings of all ToUnicode CMaps of this document (Options.MaxToUnicodeMappings). A font asks
     // IsToUnicodeBudgetExhausted before it parses a ToUnicode CMap, and charges the mappings of the parsed CMap
@@ -47,6 +52,8 @@ type
     property CosDocument: TCosDocument read FCosDocument;
     property Log: TPdfLog read FLog;
     property Options: TPdfLoadOptions read FOptions;
+    // The mappings charged so far
+    property ToUnicodeMappings: Int64 read FToUnicodeMappings;
   end;
 
 implementation
@@ -96,18 +103,29 @@ procedure TPDDocumentContext.Initialize(const Log: TPdfLog; const Options: TPdfL
 begin
   FLog := Log;
   FOptions := Options;
-  FObjects := TObjectDictionary<TObject, TObject>.Create([doOwnsValues], TIdentityComparer.Create);
+  for var Scope := Low(TPDCacheScope) to High(TPDCacheScope) do
+  begin
+    FScopes[Scope] := TObjectDictionary<TObject, TObject>.Create([doOwnsValues], TIdentityComparer.Create);
+  end;
 end;
 
 destructor TPDDocumentContext.Destroy;
 begin
-  FObjects.Free;
+  for var Scope := Low(TPDCacheScope) to High(TPDCacheScope) do
+  begin
+    FScopes[Scope].Free;
+  end;
   inherited;
 end;
 
 function TPDDocumentContext.TryGetCachedObject(const Key: TObject; out Value: TObject): Boolean;
 begin
-  Result := FObjects.TryGetValue(Key, Value);
+  Result := TryGetCachedObject(TPDCacheScope.General, Key, Value);
+end;
+
+function TPDDocumentContext.TryGetCachedObject(const Scope: TPDCacheScope; const Key: TObject; out Value: TObject): Boolean;
+begin
+  Result := FScopes[Scope].TryGetValue(Key, Value);
 end;
 
 function TPDDocumentContext.IsToUnicodeBudgetExhausted: Boolean;
@@ -138,8 +156,13 @@ end;
 
 procedure TPDDocumentContext.AddCachedObject(const Key: TObject; const Value: TObject);
 begin
+  AddCachedObject(TPDCacheScope.General, Key, Value);
+end;
+
+procedure TPDDocumentContext.AddCachedObject(const Scope: TPDCacheScope; const Key: TObject; const Value: TObject);
+begin
   var Existing: TObject;
-  if FObjects.TryGetValue(Key, Existing) then
+  if FScopes[Scope].TryGetValue(Key, Existing) then
   begin
     if Existing = Value then
     begin
@@ -147,7 +170,7 @@ begin
     end;
     raise EArgumentException.Create('The context already holds a different object for this key');
   end;
-  FObjects.Add(Key, Value);
+  FScopes[Scope].Add(Key, Value);
 end;
 
 end.
