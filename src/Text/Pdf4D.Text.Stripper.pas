@@ -577,10 +577,11 @@ end;
 procedure TPdfTextStripper.FillBeadRectangles(const Page: TPDPage);
 begin
   const BeadCount = Page.ThreadBeadCount;
+  const Log = Page.Context.Log;
   // The page is not the current page of the engine yet, so the engine cannot log for it
-  if (BeadCount > MaxBeadsPerPage) and Assigned(Page.Context.Log) then
+  if (BeadCount > MaxBeadsPerPage) and Assigned(Log) then
   begin
-    Page.Context.Log.Warning('The page has %d article beads, only the first %d are used', [BeadCount, MaxBeadsPerPage]);
+    Log.Warning('The page has %d article beads, only the first %d are used', [BeadCount, MaxBeadsPerPage]);
   end;
   FBeadRectangles := Page.ThreadBeads(MaxBeadsPerPage);
 

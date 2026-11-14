@@ -36,6 +36,7 @@ uses
 
 const
   LineFeed = #10;
+  ErrorSectionFormat = '%s'#10'error'#10;
 
 { TTextDump }
 
@@ -128,7 +129,7 @@ begin
   except
     on EPdfException do
     begin
-      Result := Heading + LineFeed + 'error' + LineFeed;
+      Result := Format(ErrorSectionFormat, [Heading]);
     end;
     on Exception do
     begin
@@ -136,7 +137,7 @@ begin
       begin
         raise;
       end;
-      Result := Heading + LineFeed + 'error' + LineFeed;
+      Result := Format(ErrorSectionFormat, [Heading]);
     end;
   end;
 end;

@@ -7,6 +7,9 @@ uses
   System.SysUtils;
 
 type
+  // How a section of the actual text relates to the expected one
+  TSectionOutcome = (Equal, EqualAfterWhitespaceRules, Different);
+
   TTextComparison = record
     // One text per difference, with the section heading and the line number
     Differences: TArray<string>;
@@ -27,8 +30,8 @@ type
     class function IsKnown(const Heading, Platform: string; const KnownDifferences: TArray<string>): Boolean; static;
     class function FirstDifference(const Heading: string; const Expected, Actual: TArray<string>): string; static;
     class function AreEqual(const Left, Right: TArray<string>): Boolean; static;
-    class procedure CompareSection(const Heading: string; const Expected, Actual: TArray<string>; var Result: TTextComparison); static;
-    class procedure CompareHeadings(const Expected, Actual: TArray<string>; var Result: TTextComparison); static;
+    class function CompareSection(const Expected, Actual: TArray<string>): TSectionOutcome; static;
+    class function CompareHeadings(const Expected, Actual: TArray<string>): TArray<string>; static;
 
   public
     // Both texts are lines separated by LF. Lines before the first "text: " heading form one section without a heading.
@@ -49,6 +52,9 @@ const
   LineFeed = #10;
   HeadingStart = 'text: ';
   CommentMarker = '#';
+  MissingSectionFormat = 'missing section: %s';
+  ExtraSectionFormat = 'extra section: %s';
+  SectionOrderDifference = 'the sections come in another order';
 
 { TTextGoldenComparer }
 
@@ -80,8 +86,13 @@ begin
         't': Builder.Append(#9);
         'x':
         begin
-          const Code = StrToIntDef('$' + Text.Substring(Position, 2), -1);
-          if (Code >= 0) and (Position + 2 <= Text.Length) then
+          const HasTwoDigits = (Position + 2 <= Text.Length);
+          var Code := -1;
+          if HasTwoDigits then
+          begin
+            Code := StrToIntDef('$' + Text.Substring(Position, 2), -1);
+          end;
+          if Code >= 0 then
           begin
             Builder.Append(Char(Code));
             Inc(Position, 2);
@@ -305,32 +316,32 @@ begin
   end;
 end;
 
-class procedure TTextGoldenComparer.CompareSection(const Heading: string; const Expected, Actual: TArray<string>; var Result: TTextComparison);
+class function TTextGoldenComparer.CompareSection(const Expected, Actual: TArray<string>): TSectionOutcome;
 begin
   if AreEqual(Expected, Actual) then
   begin
-    Exit;
+    Exit(TSectionOutcome.Equal);
   end;
 
   var Ignored: TArray<Integer>;
   if AreEqual(LenientLines(Expected, Ignored), LenientLines(Actual, Ignored)) then
   begin
-    Inc(Result.LenientSections);
-    Exit;
+    Exit(TSectionOutcome.EqualAfterWhitespaceRules);
   end;
 
-  Result.Differences := Result.Differences + [FirstDifference(Heading, Expected, Actual)];
+  Result := TSectionOutcome.Different;
 end;
 
-class procedure TTextGoldenComparer.CompareHeadings(const Expected, Actual: TArray<string>; var Result: TTextComparison);
+class function TTextGoldenComparer.CompareHeadings(const Expected, Actual: TArray<string>): TArray<string>;
 begin
+  Result := nil;
   var IsSameSet := True;
   for var Heading in Expected do
   begin
     if IndexOfHeading(Actual, Heading) < 0 then
     begin
       IsSameSet := False;
-      Result.Differences := Result.Differences + ['missing section: ' + Heading];
+      Result := Result + [Format(MissingSectionFormat, [Heading])];
     end;
   end;
   for var Heading in Actual do
@@ -338,27 +349,25 @@ begin
     if IndexOfHeading(Expected, Heading) < 0 then
     begin
       IsSameSet := False;
-      Result.Differences := Result.Differences + ['extra section: ' + Heading];
+      Result := Result + [Format(ExtraSectionFormat, [Heading])];
     end;
   end;
 
   if IsSameSet and not AreEqual(Expected, Actual) then
   begin
-    Result.Differences := Result.Differences + ['the sections come in another order'];
+    Result := Result + [SectionOrderDifference];
   end;
 end;
 
 class function TTextGoldenComparer.Compare(const Expected, Actual: string; const KnownDifferences: TArray<string>; const Platform: string): TTextComparison;
 begin
-  Result.Differences := nil;
-  Result.LenientSections := 0;
-
   var ExpectedHeadings: TArray<string>;
   var ActualHeadings: TArray<string>;
   const ExpectedSections = SplitSections(Expected, ExpectedHeadings);
   const ActualSections = SplitSections(Actual, ActualHeadings);
 
-  CompareHeadings(ExpectedHeadings, ActualHeadings, Result);
+  Result.Differences := CompareHeadings(ExpectedHeadings, ActualHeadings);
+  Result.LenientSections := 0;
 
   for var Position := 0 to High(ExpectedHeadings) do
   begin
@@ -368,7 +377,15 @@ begin
     begin
       Continue;
     end;
-    CompareSection(Heading, ExpectedSections[Position], ActualSections[ActualPosition], Result);
+
+    const Outcome = CompareSection(ExpectedSections[Position], ActualSections[ActualPosition]);
+    case Outcome of
+      TSectionOutcome.Equal                    : ;
+      TSectionOutcome.EqualAfterWhitespaceRules: Inc(Result.LenientSections);
+      TSectionOutcome.Different                : Result.Differences := Result.Differences + [FirstDifference(Heading, ExpectedSections[Position], ActualSections[ActualPosition])];
+    else
+      raise ENotSupportedException.CreateFmt('Unsupported section outcome: %d', [Ord(Outcome)]);
+    end;
   end;
 end;
 

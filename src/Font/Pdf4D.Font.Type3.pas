@@ -58,7 +58,7 @@ type
     function TryGetFirstOperator(out FirstOperator: TFirstOperator): Boolean;
     function TryReadFirstOperator(const Prefix: TBytes; out FirstOperator: TFirstOperator): Boolean;
     function TryReadOperands(const Parser: TPdfStreamParser; const Operands: TObjectList<TObject>; out FirstOperator: TFirstOperator): Boolean;
-    class procedure CopyNumbers(const Operands: TObjectList<TObject>; var FirstOperator: TFirstOperator); static;
+    class function MakeFirstOperator(const OperatorName: string; const Operands: TObjectList<TObject>): TFirstOperator; static;
     procedure WarnAboutOwnResources;
 
   public
@@ -100,8 +100,8 @@ type
     function TryReadFontMatrix(out Matrix: TPdfMatrix): Boolean;
     function ReadWidthFromCharProc(const Code: Integer): Single;
     function GenerateBoundingBox: TBoundingBox;
-    procedure ExtendByGlyphBounds(var Box: TPdfRectangle);
-    procedure ExtendByCharProc(const Stream: TCosStream; var Box: TPdfRectangle);
+    function ExtendByGlyphBounds(const Box: TPdfRectangle): TPdfRectangle;
+    function ExtendByCharProc(const Stream: TCosStream; const Box: TPdfRectangle): TPdfRectangle;
     procedure WarnAboutDisplacement;
 
   protected
@@ -248,9 +248,9 @@ begin
     begin
       if Token is TContentOperator then
       begin
-        FirstOperator.OperatorName := TContentOperator(Token).Name;
+        const OperatorName = TContentOperator(Token).Name;
         Token.Free;
-        CopyNumbers(Operands, FirstOperator);
+        FirstOperator := MakeFirstOperator(OperatorName, Operands);
         Exit(True);
       end;
       Operands.Add(Token);
@@ -265,16 +265,18 @@ begin
   end;
 end;
 
-class procedure TPDType3CharProc.CopyNumbers(const Operands: TObjectList<TObject>; var FirstOperator: TFirstOperator);
+class function TPDType3CharProc.MakeFirstOperator(const OperatorName: string; const Operands: TObjectList<TObject>): TFirstOperator;
 begin
-  FirstOperator.OperandCount := Operands.Count;
+  Result := Default(TFirstOperator);
+  Result.OperatorName := OperatorName;
+  Result.OperandCount := Operands.Count;
   for var Index := 0 to Min(Operands.Count, GlyphBoundsOperandCount) - 1 do
   begin
     const IsNumber = (Operands[Index] is TCosNumber);
-    FirstOperator.IsNumber[Index] := IsNumber;
+    Result.IsNumber[Index] := IsNumber;
     if IsNumber then
     begin
-      FirstOperator.Numbers[Index] := TCosNumber(Operands[Index]).FloatValue;
+      Result.Numbers[Index] := TCosNumber(Operands[Index]).FloatValue;
     end;
   end;
 end;
@@ -620,8 +622,9 @@ begin
   Result := FFontMatrix;
 end;
 
-procedure TPDType3Font.ExtendByCharProc(const Stream: TCosStream; var Box: TPdfRectangle);
+function TPDType3Font.ExtendByCharProc(const Stream: TCosStream; const Box: TPdfRectangle): TPdfRectangle;
 begin
+  Result := Box;
   const CharProc = TPDType3CharProc.Create(Self, Stream);
   try
     var GlyphBox: TPdfRectangle;
@@ -630,10 +633,10 @@ begin
       Exit;
     end;
 
-    Box.LowerLeftX := Min(Box.LowerLeftX, GlyphBox.LowerLeftX);
-    Box.LowerLeftY := Min(Box.LowerLeftY, GlyphBox.LowerLeftY);
-    Box.UpperRightX := Max(Box.UpperRightX, GlyphBox.UpperRightX);
-    Box.UpperRightY := Max(Box.UpperRightY, GlyphBox.UpperRightY);
+    Result.LowerLeftX := Min(Box.LowerLeftX, GlyphBox.LowerLeftX);
+    Result.LowerLeftY := Min(Box.LowerLeftY, GlyphBox.LowerLeftY);
+    Result.UpperRightX := Max(Box.UpperRightX, GlyphBox.UpperRightX);
+    Result.UpperRightY := Max(Box.UpperRightY, GlyphBox.UpperRightY);
   finally
     CharProc.Free;
   end;
@@ -641,8 +644,9 @@ end;
 
 // Plan B of PDFBox: the largest bounding box of the glyphs. A font can name any number of glyph procedures, so only the first
 // MaxGlyphBoundsScanned are looked at.
-procedure TPDType3Font.ExtendByGlyphBounds(var Box: TPdfRectangle);
+function TPDType3Font.ExtendByGlyphBounds(const Box: TPdfRectangle): TPdfRectangle;
 begin
+  Result := Box;
   var CharProcs: TCosDictionary;
   if not TryGetCharProcs(CharProcs) then
   begin
@@ -664,7 +668,7 @@ begin
       LogWarning('Type 3 font %s has more than %d glyph procedures; the others are left out of its bounding box', [Name, MaxGlyphBoundsScanned]);
       Break;
     end;
-    ExtendByCharProc(Stream, Box);
+    Result := ExtendByCharProc(Stream, Result);
   end;
 end;
 
@@ -679,7 +683,7 @@ begin
 
   if not IsNonZeroBoundingBox(Box) then
   begin
-    ExtendByGlyphBounds(Box);
+    Box := ExtendByGlyphBounds(Box);
   end;
   Result := TBoundingBox.Create(Box.LowerLeftX, Box.LowerLeftY, Box.UpperRightX, Box.UpperRightY);
 end;

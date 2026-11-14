@@ -163,6 +163,18 @@ const
   MaxDeepStructure = 9000;
   MaxArrayElements = 20000;
   HeadWindow = 4096;
+  UnknownProgramMessage = 'Unknown program';
+  NameOperandFormat = '/%s ';
+  OperatorFormat = '%s ';
+  FontSizeFormat = '/%s %s Tf [ ';
+  InlineImageFormat = 'BI %s ';
+  FormDrawFormat = '/%s Do ';
+  ShowCodesFormat = 'BT /F1 12 Tf 72 700 Td %s> Tj ET';
+  EmbeddedFormat = '%s embedded';
+  EmbeddedType0Format = '%s embedded in a Type 0 font';
+  FontClassesFormat = '%s font classes';
+  ParserFormat = '%s parser';
+  SurroundedFormat = '%s%s%s';
 
   Shapes: array[0..79] of TOperatorShape = (
     (Name: 'q'; Operands: ''), (Name: 'Q'; Operands: ''), (Name: 'BT'; Operands: ''), (Name: 'ET'; Operands: ''),
@@ -292,7 +304,7 @@ end;
 
 procedure TContentGenerator.PutName(const Pool: array of string);
 begin
-  FWriter.Put('/' + Pick(Pool) + ' ');
+  FWriter.Put(Format(NameOperandFormat, [Pick(Pool)]));
 end;
 
 // A literal string; one in twenty is not escaped, so that the parentheses and backslashes in it are what is being tried
@@ -420,7 +432,7 @@ begin
       PutOperand(Operands[Index], OperatorName);
     end;
   end;
-  FWriter.Put(OperatorName + ' ');
+  FWriter.Put(Format(OperatorFormat, [OperatorName]));
 end;
 
 procedure TContentGenerator.PutRandomOperator;
@@ -499,7 +511,7 @@ begin
   FWriter.Put('BT ');
   for var Round := 1 to 1 + Random(5) do
   begin
-    FWriter.Put('/' + Pick(['F1', 'F1', 'F2', 'F3']) + ' ' + Pick(['12', '12', '0', '-5', '1000', '0.0001']) + ' Tf [ ');
+    FWriter.Put(Format(FontSizeFormat, [Pick(['F1', 'F1', 'F2', 'F3']), Pick(['12', '12', '0', '-5', '1000', '0.0001'])]));
     for var Index := 1 to 100 + Random(MaxArrayElements) do
     begin
       if Random(3) = 0 then
@@ -527,7 +539,7 @@ begin
     end
     else
     begin
-      FWriter.Put('/' + Pick(FormNames) + ' Do ');
+      FWriter.Put(Format(FormDrawFormat, [Pick(FormNames)]));
     end;
   end;
   FWriter.Put('BT /F1 12 Tf (after) Tj ET ');
@@ -538,7 +550,7 @@ begin
   FWriter.Put('BT /F1 12 Tf (text) Tj ET ');
   for var Index := 1 to 1 + Random(4) do
   begin
-    FWriter.Put('BI ' + Pick(InlineImageDictionaries) + ' ');
+    FWriter.Put(Format(InlineImageFormat, [Pick(InlineImageDictionaries)]));
     case Random(4) of
       0: ;
       1: FWriter.Put('ID ');
@@ -562,7 +574,7 @@ begin
   begin
     if Random(3) = 0 then
     begin
-      FWriter.Put('/' + Pick(['F1', 'F2', 'F3']) + ' ');
+      FWriter.Put(Format(NameOperandFormat, [Pick(['F1', 'F2', 'F3'])]));
       PutNumber;
       FWriter.Put('Tf ');
       PutString;
@@ -630,11 +642,12 @@ class procedure TFuzzDocuments.AddForms(const Builder: TTestPdfBuilder; const Ch
 const
   FormStart = '/Type /XObject /Subtype /Form /BBox [0 0 100 100] /Resources ';
   Fonts = '/Font << /F1 10 0 R >> ';
+  FormResourcesFormat = '%s<< %s%s>>';
 begin
-  Builder.AddStreamObject(40, FormStart + '<< ' + Fonts + '/XObject << /Fm1 40 0 R >> >>', TEncoding.ASCII.GetBytes('BT /F1 12 Tf (self) Tj ET /Fm1 Do'));
-  Builder.AddStreamObject(41, FormStart + '<< ' + Fonts + '/XObject << /Fm3 42 0 R >> >>', TEncoding.ASCII.GetBytes('BT /F1 12 Tf (two) Tj ET /Fm3 Do /Fm3 Do'));
-  Builder.AddStreamObject(42, FormStart + '<< ' + Fonts + '/XObject << /Fm2 41 0 R >> >>', TEncoding.ASCII.GetBytes('BT /F1 12 Tf (three) Tj ET /Fm2 Do /Fm2 Do'));
-  Builder.AddStreamObject(43, FormStart + '<< ' + Fonts + '>>', TEncoding.ASCII.GetBytes('BT /F1 12 Tf (four) Tj ET'));
+  Builder.AddStreamObject(40, Format(FormResourcesFormat, [FormStart, Fonts, '/XObject << /Fm1 40 0 R >> ']), TEncoding.ASCII.GetBytes('BT /F1 12 Tf (self) Tj ET /Fm1 Do'));
+  Builder.AddStreamObject(41, Format(FormResourcesFormat, [FormStart, Fonts, '/XObject << /Fm3 42 0 R >> ']), TEncoding.ASCII.GetBytes('BT /F1 12 Tf (two) Tj ET /Fm3 Do /Fm3 Do'));
+  Builder.AddStreamObject(42, Format(FormResourcesFormat, [FormStart, Fonts, '/XObject << /Fm2 41 0 R >> ']), TEncoding.ASCII.GetBytes('BT /F1 12 Tf (three) Tj ET /Fm2 Do /Fm2 Do'));
+  Builder.AddStreamObject(43, Format(FormResourcesFormat, [FormStart, Fonts, '']), TEncoding.ASCII.GetBytes('BT /F1 12 Tf (four) Tj ET'));
   Builder.AddObject(44, '<< /Type /ExtGState /Font [ 10 0 R 12 ] /LW 2 >>');
   Builder.AddObject(45, '<< /Type /OCG /Name (layer) >>');
 
@@ -643,7 +656,7 @@ begin
     const Number = ChainFirstObject + Index;
     const NextName = Format('Chain%d', [Index + 1]);
     var Content := 'BT /F1 12 Tf (x) Tj ET';
-    var Resources := '<< ' + Fonts + '>>';
+    var Resources := Format('<< %s>>', [Fonts]);
     if Index < ChainLength - 1 then
     begin
       Content := Content + Format(' /%s Do /%s Do', [NextName, NextName]);
@@ -717,7 +730,7 @@ begin
         Codes.Append(IntToHex(Code, 2));
       end;
     end;
-    Result := 'BT /F1 12 Tf 72 700 Td ' + Codes.ToString + '> Tj ET';
+    Result := Format(ShowCodesFormat, [Codes.ToString]);
   finally
     Codes.Free;
   end;
@@ -735,7 +748,7 @@ begin
     TEmbeddedProgram.ToUnicode:
       Result := '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /ToUnicode 22 0 R >>';
   else
-    raise EArgumentOutOfRangeException.Create('Unknown program');
+    raise EArgumentOutOfRangeException.Create(UnknownProgramMessage);
   end;
 end;
 
@@ -780,7 +793,7 @@ begin
         Builder.AddStreamObject(22, '', Data);
       end;
     else
-      raise EArgumentOutOfRangeException.Create('Unknown program');
+      raise EArgumentOutOfRangeException.Create(UnknownProgramMessage);
     end;
     Result := Builder.Build(TXrefStyle.Table);
   finally
@@ -848,9 +861,9 @@ begin
     const IsComposite = Odd(Index);
     const Name = MutatedName(ProgramNames[Embedding], FullSeed, Index, Kind);
 
-    Campaign.Run(Name + ' embedded', TFontDocuments.Embed(Embedding, IsComposite, Mutated, Segment1Size), '', TFuzzWork.PageText);
-    Campaign.Run(Name + ' font classes', TFontDocuments.Embed(Embedding, IsComposite, Mutated, Segment1Size), '', TFuzzWork.FontClasses);
-    Campaign.Run(Name + ' parser', FontMutation(DirectSource, Index), '', DirectWork);
+    Campaign.Run(Format(EmbeddedFormat, [Name]), TFontDocuments.Embed(Embedding, IsComposite, Mutated, Segment1Size), '', TFuzzWork.PageText);
+    Campaign.Run(Format(FontClassesFormat, [Name]), TFontDocuments.Embed(Embedding, IsComposite, Mutated, Segment1Size), '', TFuzzWork.FontClasses);
+    Campaign.Run(Format(ParserFormat, [Name]), FontMutation(DirectSource, Index), '', DirectWork);
   end;
 end;
 
@@ -911,9 +924,9 @@ end;
 class procedure TTextRobustnessTests.RunHostileFont(const Campaign: TFuzzCampaign; const Name: string; const Embedding: TEmbeddedProgram;
                                                     const Data: TBytes; const Segment1Size: Integer);
 begin
-  Campaign.Run(Name + ' embedded', TFontDocuments.Embed(Embedding, False, Data, Segment1Size), '', TFuzzWork.PageText);
-  Campaign.Run(Name + ' embedded in a Type 0 font', TFontDocuments.Embed(Embedding, True, Data, Segment1Size), '', TFuzzWork.PageText);
-  Campaign.Run(Name + ' font classes', TFontDocuments.Embed(Embedding, False, Data, Segment1Size), '', TFuzzWork.FontClasses);
+  Campaign.Run(Format(EmbeddedFormat, [Name]), TFontDocuments.Embed(Embedding, False, Data, Segment1Size), '', TFuzzWork.PageText);
+  Campaign.Run(Format(EmbeddedType0Format, [Name]), TFontDocuments.Embed(Embedding, True, Data, Segment1Size), '', TFuzzWork.PageText);
+  Campaign.Run(Format(FontClassesFormat, [Name]), TFontDocuments.Embed(Embedding, False, Data, Segment1Size), '', TFuzzWork.FontClasses);
 end;
 
 // The offset of the first table is moved far beyond the end of the data
@@ -946,21 +959,21 @@ begin
     RunHostile(Campaign, 'form that draws itself', TextBlock + '/Fm1 Do ' + TextBlock);
     RunHostile(Campaign, 'forms that draw each other twice', TextBlock + '/Fm2 Do ' + TextBlock);
     RunHostile(Campaign, 'chain of forms that draw the next one twice', TextBlock + '/Chain0 Do ' + TextBlock);
-    RunHostile(Campaign, 'inline image without EI', TextBlock + 'BI /W 1 /H 1 /BPC 8 /CS /G ID ' + RepeatText('x', 1000000));
+    RunHostile(Campaign, 'inline image without EI', Format(SurroundedFormat, [TextBlock, 'BI /W 1 /H 1 /BPC 8 /CS /G ID ', RepeatText('x', 1000000)]));
     RunHostile(Campaign, 'inline image with a huge size and no data', TextBlock + 'BI /W 100000 /H 100000 /BPC 8 /CS /RGB ID ');
-    RunHostile(Campaign, 'BI without ID', TextBlock + 'BI /W 1 /H 1 ' + RepeatText('/Name ', 20000));
-    RunHostile(Campaign, 'q without Q', TextBlock + RepeatText('q ', 50000) + TextBlock);
-    RunHostile(Campaign, 'BMC without EMC', TextBlock + RepeatText('/Span BMC ', 30000) + TextBlock);
-    RunHostile(Campaign, 'BDC without EMC', TextBlock + RepeatText('/Span << /MCID 1 >> BDC ', 30000) + TextBlock);
-    RunHostile(Campaign, 'Q without q', RepeatText('Q ', 50000) + TextBlock + RepeatText('EMC ', 50000));
-    RunHostile(Campaign, 'arrays nested 200000 deep', TextBlock + RepeatText('[ ', 200000) + ' TJ ' + TextBlock);
-    RunHostile(Campaign, 'dictionaries nested 200000 deep', TextBlock + RepeatText('<< /A ', 200000) + ' BDC ' + TextBlock);
-    RunHostile(Campaign, 'TJ with three million glyphs', 'BT /F1 12 Tf [' + RepeatText('(AAAAAAAAAA) -1 ', 300000) + '] TJ ET');
-    RunHostile(Campaign, 'Tj with three million glyphs', 'BT /F1 12 Tf (' + RepeatText('A', 3000000) + ') Tj ET');
-    RunHostile(Campaign, 'Tj with two million glyphs in a Type 0 font', 'BT /F2 12 Tf <' + RepeatText('0024', 2100000) + '> Tj ET');
-    RunHostile(Campaign, 'a million operators without operands', RepeatText('q Q ', 500000) + TextBlock);
-    RunHostile(Campaign, 'a million operands', RepeatText('1 ', 1000000) + 'Tj ' + TextBlock);
-    RunHostile(Campaign, 'a million line moves', 'BT /F1 12 Tf ' + RepeatText('T* (a) Tj ', 100000) + 'ET');
+    RunHostile(Campaign, 'BI without ID', Format(SurroundedFormat, [TextBlock, 'BI /W 1 /H 1 ', RepeatText('/Name ', 20000)]));
+    RunHostile(Campaign, 'q without Q', Format(SurroundedFormat, [TextBlock, RepeatText('q ', 50000), TextBlock]));
+    RunHostile(Campaign, 'BMC without EMC', Format(SurroundedFormat, [TextBlock, RepeatText('/Span BMC ', 30000), TextBlock]));
+    RunHostile(Campaign, 'BDC without EMC', Format(SurroundedFormat, [TextBlock, RepeatText('/Span << /MCID 1 >> BDC ', 30000), TextBlock]));
+    RunHostile(Campaign, 'Q without q', Format(SurroundedFormat, [RepeatText('Q ', 50000), TextBlock, RepeatText('EMC ', 50000)]));
+    RunHostile(Campaign, 'arrays nested 200000 deep', Format('%s%s TJ %s', [TextBlock, RepeatText('[ ', 200000), TextBlock]));
+    RunHostile(Campaign, 'dictionaries nested 200000 deep', Format('%s%s BDC %s', [TextBlock, RepeatText('<< /A ', 200000), TextBlock]));
+    RunHostile(Campaign, 'TJ with three million glyphs', Format('BT /F1 12 Tf [%s] TJ ET', [RepeatText('(AAAAAAAAAA) -1 ', 300000)]));
+    RunHostile(Campaign, 'Tj with three million glyphs', Format('BT /F1 12 Tf (%s) Tj ET', [RepeatText('A', 3000000)]));
+    RunHostile(Campaign, 'Tj with two million glyphs in a Type 0 font', Format('BT /F2 12 Tf <%s> Tj ET', [RepeatText('0024', 2100000)]));
+    RunHostile(Campaign, 'a million operators without operands', Format('%s%s', [RepeatText('q Q ', 500000), TextBlock]));
+    RunHostile(Campaign, 'a million operands', Format('%sTj %s', [RepeatText('1 ', 1000000), TextBlock]));
+    RunHostile(Campaign, 'a million line moves', Format('BT /F1 12 Tf %sET', [RepeatText('T* (a) Tj ', 100000)]));
 
     // Review focus 3: damaged font programs, with the text of the page still to come
     const TrueType = TTestFonts.Bytes(LiberationSansFile);

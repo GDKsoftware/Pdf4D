@@ -83,7 +83,14 @@ end;
 procedure TOverlapYValues.Add(const Value: Single);
 begin
   const Cursor = FValues.FindLowerBound(Value);
-  if FValues.IsEnd(Cursor) or not TJavaFloat.IsSame(FValues.Item(Cursor), Value) then
+  if FValues.IsEnd(Cursor) then
+  begin
+    FValues.Insert(Cursor, Value);
+    Exit;
+  end;
+
+  const Stored = FValues.Item(Cursor);
+  if not TJavaFloat.IsSame(Stored, Value) then
   begin
     FValues.Insert(Cursor, Value);
   end;
@@ -92,7 +99,13 @@ end;
 function TOverlapYValues.HasValueIn(const From, Till: Single): Boolean;
 begin
   const Cursor = FValues.FindLowerBound(From);
-  Result := (not FValues.IsEnd(Cursor)) and (TJavaFloat.Compare(FValues.Item(Cursor), Till) < 0);
+  if FValues.IsEnd(Cursor) then
+  begin
+    Exit(False);
+  end;
+
+  const Stored = FValues.Item(Cursor);
+  Result := (TJavaFloat.Compare(Stored, Till) < 0);
 end;
 
 { TOverlapColumn }
@@ -108,7 +121,8 @@ begin
   var Cursor := FColumns.Start;
   while not FColumns.IsEnd(Cursor) do
   begin
-    FColumns.Item(Cursor).YValues.Free;
+    const Entry = FColumns.Item(Cursor);
+    Entry.YValues.Free;
     Cursor := FColumns.Next(Cursor);
   end;
   FColumns.Free;
@@ -126,9 +140,13 @@ begin
   Probe.X := X;
   Probe.YValues := nil;
   const Cursor = FColumns.FindLowerBound(Probe);
-  if (not FColumns.IsEnd(Cursor)) and TJavaFloat.IsSame(FColumns.Item(Cursor).X, X) then
+  if not FColumns.IsEnd(Cursor) then
   begin
-    Exit(FColumns.Item(Cursor).YValues);
+    const Entry = FColumns.Item(Cursor);
+    if TJavaFloat.IsSame(Entry.X, X) then
+    begin
+      Exit(Entry.YValues);
+    end;
   end;
 
   Probe.YValues := TOverlapYValues.Create;

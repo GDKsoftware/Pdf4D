@@ -19,13 +19,27 @@ uses
   Pdf4D.Text.Stripper;
 
 type
+  // The lines of a text, handed out one at a time with the blank lines skipped
+  TNonBlankLineReader = record
+  strict private
+    FLines: TArray<string>;
+    FPosition: Integer;
+
+  public
+    constructor Create(const Lines: TArray<string>);
+
+    // False when no line is left
+    function TryReadNonBlank(out Line: string): Boolean;
+    // The number of lines read so far, the blank ones included
+    property Position: Integer read FPosition;
+  end;
+
   // The comparison of TestTextStripper.compareResult and stringsEqual: blank lines are skipped, a line is trimmed, and a space
   // or a character above 256 in the one text may stand for a run of them in the other
   TPdfBoxTextComparer = record
   strict private
     class function SplitLines(const Text: string): TArray<string>; static;
     class function IsBlank(const Line: string): Boolean; static;
-    class function NextLine(const Lines: TArray<string>; var Position: Integer; out Line: string): Boolean; static;
     class function SkipWhitespace(const Chars: TCharArray; const Index: Integer): Integer; static;
     class function NullableEqual(const HasExpected: Boolean; const Expected: string; const HasActual: Boolean; const Actual: string): Boolean; static;
 
@@ -133,6 +147,9 @@ const
   SortedSuffix = '-sorted.txt';
   TabulaSuffix = '-tabula.txt';
   TextSuffix = '.txt';
+  SavedFileFormat = 'reference__%s';
+  KnownDifferenceFormat = 'Known difference: %s';
+  ReferenceTextPath = 'reference' + PathDelim + 'pdfbox-text';
   BidiSamplePrefix = 'BidiSample.pdf';
   InputFolder = 'pdfbox/input/';
   BidiSampleFolder = 'pdfbox/org/apache/pdfbox/text/';
@@ -145,6 +162,30 @@ const
   ShortRange = 65536;
   Thousand: Single = 1000;
   TimesRomanFont = '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman >>';
+
+{ TNonBlankLineReader }
+
+constructor TNonBlankLineReader.Create(const Lines: TArray<string>);
+begin
+  FLines := Lines;
+  FPosition := 0;
+end;
+
+function TNonBlankLineReader.TryReadNonBlank(out Line: string): Boolean;
+begin
+  Line := '';
+  while (FPosition < Length(FLines)) and (FLines[FPosition].Trim = '') do
+  begin
+    Inc(FPosition);
+  end;
+
+  Result := FPosition < Length(FLines);
+  if Result then
+  begin
+    Line := FLines[FPosition];
+    Inc(FPosition);
+  end;
+end;
 
 { TPdfBoxTextComparer }
 
@@ -182,21 +223,6 @@ class function TPdfBoxTextComparer.IsBlank(const Line: string): Boolean;
 begin
   // String.trim removes the characters up to the space, as Trim does
   Result := Line.Trim = '';
-end;
-
-class function TPdfBoxTextComparer.NextLine(const Lines: TArray<string>; var Position: Integer; out Line: string): Boolean;
-begin
-  Line := '';
-  while (Position < Length(Lines)) and IsBlank(Lines[Position]) do
-  begin
-    Inc(Position);
-  end;
-  Result := Position < Length(Lines);
-  if Result then
-  begin
-    Line := Lines[Position];
-    Inc(Position);
-  end;
 end;
 
 class function TPdfBoxTextComparer.SkipWhitespace(const Chars: TCharArray; const Index: Integer): Integer;
@@ -254,22 +280,20 @@ end;
 
 class function TPdfBoxTextComparer.Compare(const Expected, Actual: string): TArray<string>;
 begin
-  const ExpectedLines = SplitLines(Expected);
-  const ActualLines = SplitLines(Actual);
-  var ExpectedPosition := 0;
-  var ActualPosition := 0;
+  var ExpectedReader := TNonBlankLineReader.Create(SplitLines(Expected));
+  var ActualReader := TNonBlankLineReader.Create(SplitLines(Actual));
   var Differences := TList<string>.Create;
   try
     while True do
     begin
       var ExpectedLine: string;
       var ActualLine: string;
-      const HasExpected = NextLine(ExpectedLines, ExpectedPosition, ExpectedLine);
-      const HasActual = NextLine(ActualLines, ActualPosition, ActualLine);
+      const HasExpected = ExpectedReader.TryReadNonBlank(ExpectedLine);
+      const HasActual = ActualReader.TryReadNonBlank(ActualLine);
       if not NullableEqual(HasExpected, ExpectedLine, HasActual, ActualLine) then
       begin
         Differences.Add(Format('expected line %d, actual line %d:%s  expected: "%s"%s  actual:   "%s"',
-                               [ExpectedPosition, ActualPosition, sLineBreak, ExpectedLine, sLineBreak, ActualLine]));
+                               [ExpectedReader.Position, ActualReader.Position, sLineBreak, ExpectedLine, sLineBreak, ActualLine]));
       end;
       if (not HasExpected) or (not HasActual) then
       begin
@@ -293,7 +317,7 @@ begin
     Exit;
   end;
 
-  const ReferenceFolder = TPath.Combine(TPath.GetDirectoryName(Folder), 'reference' + PathDelim + 'pdfbox-text');
+  const ReferenceFolder = TPath.Combine(TPath.GetDirectoryName(Folder), ReferenceTextPath);
   if not TDirectory.Exists(ReferenceFolder) then
   begin
     Exit;
@@ -395,7 +419,7 @@ end;
 
 class function TPdfBoxTextTests.ReferenceFolder: string;
 begin
-  Result := TPath.Combine(TPath.GetDirectoryName(TCorpus.Folder), 'reference' + PathDelim + 'pdfbox-text');
+  Result := TPath.Combine(TPath.GetDirectoryName(TCorpus.Folder), ReferenceTextPath);
 end;
 
 // The name of the PDF that an expected text belongs to
@@ -482,7 +506,7 @@ begin
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TFile.WriteAllBytes(TPath.Combine(Folder, 'reference__' + File_), TEncoding.UTF8.GetBytes(Actual));
+    TFile.WriteAllBytes(TPath.Combine(Folder, Format(SavedFileFormat, [File_])), TEncoding.UTF8.GetBytes(Actual));
   end;
 end;
 
@@ -506,7 +530,7 @@ begin
   var Reason: string;
   if KnownDifference(File_, Reason) then
   begin
-    Assert.Pass('Known difference: ' + Reason);
+    Assert.Pass(Format(KnownDifferenceFormat, [Reason]));
     Exit;
   end;
 

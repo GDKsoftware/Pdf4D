@@ -39,6 +39,9 @@ type
     function FindChunk(const Value: T): Integer;
     function FindOffset(const Chunk: TChunk; const Value: T): Integer;
     procedure SplitChunk(const ChunkIndex: Integer);
+    procedure EnsureFirstChunk;
+    function NormalizeCursor(const Cursor: TChunkCursor): TChunkCursor;
+    function SplitFullChunk(const Place: TChunkCursor): TChunkCursor;
     class procedure InsertInChunk(const Chunk: TChunk; const Offset: Integer; const Value: T); static;
 
   public
@@ -79,10 +82,10 @@ end;
 function TChunkedSortedList<T>.FindChunk(const Value: T): Integer;
 begin
   Result := 0;
-  var High := FChunks.Count;
-  while Result < High do
+  var UpperBound := FChunks.Count;
+  while Result < UpperBound do
   begin
-    const Middle = Result + (High - Result) div 2;
+    const Middle = Result + (UpperBound - Result) div 2;
     const Chunk = FChunks[Middle];
     if FComparison(Chunk.Items[Chunk.Count - 1], Value) < 0 then
     begin
@@ -90,7 +93,7 @@ begin
     end
     else
     begin
-      High := Middle;
+      UpperBound := Middle;
     end;
   end;
 end;
@@ -98,17 +101,17 @@ end;
 function TChunkedSortedList<T>.FindOffset(const Chunk: TChunk; const Value: T): Integer;
 begin
   Result := 0;
-  var High := Chunk.Count;
-  while Result < High do
+  var UpperBound := Chunk.Count;
+  while Result < UpperBound do
   begin
-    const Middle = Result + (High - Result) div 2;
+    const Middle = Result + (UpperBound - Result) div 2;
     if FComparison(Chunk.Items[Middle], Value) < 0 then
     begin
       Result := Middle + 1;
     end
     else
     begin
-      High := Middle;
+      UpperBound := Middle;
     end;
   end;
 end;
@@ -180,36 +183,52 @@ begin
   Inc(Chunk.Count);
 end;
 
+procedure TChunkedSortedList<T>.EnsureFirstChunk;
+begin
+  if FChunks.Count > 0 then
+  begin
+    Exit;
+  end;
+
+  const First = TChunk.Create;
+  SetLength(First.Items, FirstChunkCapacity);
+  FChunks.Add(First);
+end;
+
+// The cursor of an empty list or of the end becomes the place after the last item of the last chunk
+function TChunkedSortedList<T>.NormalizeCursor(const Cursor: TChunkCursor): TChunkCursor;
+begin
+  EnsureFirstChunk;
+  if Cursor.Chunk < FChunks.Count then
+  begin
+    Exit(Cursor);
+  end;
+
+  Result.Chunk := FChunks.Count - 1;
+  Result.Offset := FChunks[Result.Chunk].Count;
+end;
+
+function TChunkedSortedList<T>.SplitFullChunk(const Place: TChunkCursor): TChunkCursor;
+begin
+  Result := Place;
+  if FChunks[Place.Chunk].Count < MaxChunkSize then
+  begin
+    Exit;
+  end;
+
+  SplitChunk(Place.Chunk);
+  const LowerCount = FChunks[Place.Chunk].Count;
+  if Place.Offset > LowerCount then
+  begin
+    Result.Offset := Place.Offset - LowerCount;
+    Result.Chunk := Place.Chunk + 1;
+  end;
+end;
+
 procedure TChunkedSortedList<T>.Insert(const Cursor: TChunkCursor; const Value: T);
 begin
-  var ChunkIndex := Cursor.Chunk;
-  var Offset := Cursor.Offset;
-  if FChunks.Count = 0 then
-  begin
-    const First = TChunk.Create;
-    SetLength(First.Items, FirstChunkCapacity);
-    FChunks.Add(First);
-    ChunkIndex := 0;
-    Offset := 0;
-  end
-  else if ChunkIndex >= FChunks.Count then
-  begin
-    // At the end: after the last item of the last chunk
-    ChunkIndex := FChunks.Count - 1;
-    Offset := FChunks[ChunkIndex].Count;
-  end;
-
-  if FChunks[ChunkIndex].Count >= MaxChunkSize then
-  begin
-    SplitChunk(ChunkIndex);
-    if Offset > FChunks[ChunkIndex].Count then
-    begin
-      Dec(Offset, FChunks[ChunkIndex].Count);
-      Inc(ChunkIndex);
-    end;
-  end;
-
-  InsertInChunk(FChunks[ChunkIndex], Offset, Value);
+  const Place = SplitFullChunk(NormalizeCursor(Cursor));
+  InsertInChunk(FChunks[Place.Chunk], Place.Offset, Value);
   Inc(FCount);
 end;
 
