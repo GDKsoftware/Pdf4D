@@ -30,6 +30,9 @@ type
     class function GoldenName(const RelativePath: string): string; static;
     class function GoldenPath(const RelativePath: string): string; static;
     class function KnownDifferencesPath(const RelativePath: string): string; static;
+    // The text golden of PDFBox and the known differences of the text
+    class function TextGoldenPath(const RelativePath: string): string; static;
+    class function TextKnownDifferencesPath(const RelativePath: string): string; static;
   end;
 
 implementation
@@ -161,6 +164,16 @@ end;
 class function TCorpus.KnownDifferencesPath(const RelativePath: string): string;
 begin
   Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.known-differences.txt');
+end;
+
+class function TCorpus.TextGoldenPath(const RelativePath: string): string;
+begin
+  Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.text.txt');
+end;
+
+class function TCorpus.TextKnownDifferencesPath(const RelativePath: string): string;
+begin
+  Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.text-known-differences.txt');
 end;
 
 end.

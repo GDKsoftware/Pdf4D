@@ -1,0 +1,3 @@
+text: default page 1 # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+text: sorted page 1 # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+text: separators 1-2 # right-to-left text stays in file order, there is no bidi reordering (spec section 3)

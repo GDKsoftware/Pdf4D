@@ -216,7 +216,11 @@ uses
   Pdf4D.Tests.Golden in 'Support\Pdf4D.Tests.Golden.pas',
   Pdf4D.Tests.Golden.Comparer.Tests in 'Support\Pdf4D.Tests.Golden.Comparer.Tests.pas',
   Pdf4D.Tests.Golden.Tests in 'Acceptance\Pdf4D.Tests.Golden.Tests.pas',
-  Pdf4D.Tests.Robustness.Tests in 'Acceptance\Pdf4D.Tests.Robustness.Tests.pas';
+  Pdf4D.Tests.Robustness.Tests in 'Acceptance\Pdf4D.Tests.Robustness.Tests.pas',
+  Pdf4D.Tests.TextDump in 'Support\Pdf4D.Tests.TextDump.pas',
+  Pdf4D.Tests.TextGolden in 'Support\Pdf4D.Tests.TextGolden.pas',
+  Pdf4D.Tests.TextGolden.Comparer.Tests in 'Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas',
+  Pdf4D.Tests.TextGolden.Tests in 'Acceptance\Pdf4D.Tests.TextGolden.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
