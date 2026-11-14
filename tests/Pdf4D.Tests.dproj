@@ -102,6 +102,9 @@
         <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.Tests.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.Collect.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TimSort.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TimSort.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.Tables.pas"/>

@@ -77,7 +77,9 @@ type
     // through the destination /D of an action /A with /S /GoTo. The destination is an explicit destination or a named
     // destination. False when there is no destination, no page, the page is not in the page tree or anything is
     // wrong (PDFBox throws then).
-    function TryGetPageIndex(out PageIndex: Integer): Boolean;
+    function TryGetPageIndex(out PageIndex: Integer): Boolean; overload;
+    // As above, but a page that is not in the page tree gives True with index -1, the result of PDPageTree.indexOf
+    function TryGetPageIndex(out PageIndex: Integer; const NotInTreeIsMinusOne: Boolean): Boolean; overload;
   end;
 
   // The items of one outline: one object for each dictionary, so an item that is met again is the same object. It owns
@@ -240,6 +242,11 @@ end;
 
 function TPDOutlineItem.TryGetPageIndex(out PageIndex: Integer): Boolean;
 begin
+  Result := TryGetPageIndex(PageIndex, False);
+end;
+
+function TPDOutlineItem.TryGetPageIndex(out PageIndex: Integer; const NotInTreeIsMinusOne: Boolean): Boolean;
+begin
   PageIndex := -1;
   var Destination: TCosBase;
   if not CosObject.TryGetDictionaryObject(TCosNames.Dest, Destination) then
@@ -253,7 +260,7 @@ begin
     end;
   end;
 
-  Result := FItems.Resolver.TryResolvePageIndex(Destination, PageIndex);
+  Result := FItems.Resolver.TryResolvePageIndex(Destination, NotInTreeIsMinusOne, PageIndex);
 end;
 
 { TPDOutlineItems }

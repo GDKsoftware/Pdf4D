@@ -74,6 +74,9 @@ type
     procedure TestBookmarkPointingNowhereTwiceGivesNoText;
 
     [Test]
+    procedure TestEndBookmarkToPageOutsideTheTreeGivesNoText;
+
+    [Test]
     procedure TestBeadsSplitArticles;
 
     [Test]
@@ -279,6 +282,29 @@ begin
     Assert.IsTrue(Outline.TryGetFirstChild(Item));
 
     FStripper.StartBookmark := Item;
+    FStripper.EndBookmark := Item;
+    FStripper.GetText(Document);
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual<Integer>(0, FStripper.Pages.Count);
+end;
+
+procedure TStripperCollectTests.TestEndBookmarkToPageOutsideTheTreeGivesNoText;
+begin
+  // PDPageTree.indexOf gives -1 for a page that is not in the tree, so the end page number is 0 and no page is selected
+  const Builder = NewThreePageBuilder('/Outlines 3 0 R');
+  try
+    Builder.AddObject(3, '<< /Type /Outlines /First 4 0 R /Last 4 0 R /Count 1 >>');
+    Builder.AddObject(4, '<< /Title (Elsewhere) /Parent 3 0 R /Dest [5 0 R /Fit] >>');
+    Builder.AddObject(5, '<< /Type /Page >>');
+    const Document = FModels.Open(Builder);
+    var Outline: TPDDocumentOutline;
+    var Item: TPDOutlineItem;
+    Assert.IsTrue(Document.Catalog.TryGetOutline(Outline));
+    Assert.IsTrue(Outline.TryGetFirstChild(Item));
+
     FStripper.EndBookmark := Item;
     FStripper.GetText(Document);
   finally

@@ -37,7 +37,8 @@ type
 
     function GetDestinationsTree: TPDNameTreeNode;
     function TryFindInDestsDictionary(const Name: string; out Destination: TCosArray): Boolean;
-    function TryGetPageIndexOfArray(const Destination: TCosArray; out PageIndex: Integer): Boolean;
+    function TryGetPageIndexOfArray(const Destination: TCosArray; const NotInTreeIsMinusOne: Boolean; out PageIndex: Integer): Boolean;
+    class function IndexInTree(const Tree: TPDPageTree; const Page: TCosDictionary; const NotInTreeIsMinusOne: Boolean): Integer; static;
     class function ConvertTreeValue(const Value: TCosBase): TCosBase; static;
 
   public
@@ -60,7 +61,9 @@ type
     // that it gives. The value is an explicit destination (an array, the page is a page dictionary or a page number
     // that counts from 0), a name or a string, which name a destination of the document. False when there is no
     // page, the page is not in the page tree or anything is wrong with the value (PDFBox throws then).
-    function TryResolvePageIndex(const Value: TCosBase; out PageIndex: Integer): Boolean;
+    function TryResolvePageIndex(const Value: TCosBase; out PageIndex: Integer): Boolean; overload;
+    // With NotInTreeIsMinusOne a page that is not in the page tree gives True and index -1, as PDPageTree.indexOf does
+    function TryResolvePageIndex(const Value: TCosBase; const NotInTreeIsMinusOne: Boolean; out PageIndex: Integer): Boolean; overload;
   end;
 
 implementation
@@ -218,8 +221,24 @@ begin
   Result := TryFindInDestsDictionary(Name, Destination);
 end;
 
+class function TPDDestinationResolver.IndexInTree(const Tree: TPDPageTree; const Page: TCosDictionary; const NotInTreeIsMinusOne: Boolean): Integer;
+begin
+  try
+    Result := Tree.IndexOf(Page);
+  except
+    on EPdfParseException do
+    begin
+      if not NotInTreeIsMinusOne then
+      begin
+        raise;
+      end;
+      Result := -1;
+    end;
+  end;
+end;
+
 // Port of PDPageDestination.getPage and getPageNumber, and the lookup of the page in the page tree
-function TPDDestinationResolver.TryGetPageIndexOfArray(const Destination: TCosArray; out PageIndex: Integer): Boolean;
+function TPDDestinationResolver.TryGetPageIndexOfArray(const Destination: TCosArray; const NotInTreeIsMinusOne: Boolean; out PageIndex: Integer): Boolean;
 begin
   PageIndex := -1;
   if Destination.Count = 0 then
@@ -231,7 +250,7 @@ begin
   const Page = Destination.GetObject(0);
   if Page is TCosDictionary then
   begin
-    PageIndex := Tree.IndexOf(TCosDictionary(Page));
+    PageIndex := IndexInTree(Tree, TCosDictionary(Page), NotInTreeIsMinusOne);
     Exit(True);
   end;
 
@@ -251,15 +270,20 @@ end;
 
 function TPDDestinationResolver.TryResolvePageIndex(const Value: TCosBase; out PageIndex: Integer): Boolean;
 begin
+  Result := TryResolvePageIndex(Value, False, PageIndex);
+end;
+
+function TPDDestinationResolver.TryResolvePageIndex(const Value: TCosBase; const NotInTreeIsMinusOne: Boolean; out PageIndex: Integer): Boolean;
+begin
   PageIndex := -1;
   try
     var PageArray: TCosArray;
     var Name: string;
     case Classify(Value, PageArray, Name) of
       TPDDestinationKind.Page:
-        Result := TryGetPageIndexOfArray(PageArray, PageIndex);
+        Result := TryGetPageIndexOfArray(PageArray, NotInTreeIsMinusOne, PageIndex);
       TPDDestinationKind.Named:
-        Result := (TryFindNamedDestination(Name, PageArray) and TryGetPageIndexOfArray(PageArray, PageIndex));
+        Result := (TryFindNamedDestination(Name, PageArray) and TryGetPageIndexOfArray(PageArray, NotInTreeIsMinusOne, PageIndex));
     else
       Result := False;
     end;

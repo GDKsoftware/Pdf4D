@@ -20,10 +20,12 @@ type
     class procedure MergeRuns(Order, Auxiliary: TArray<Integer>; const From, Middle, Till: Int64; const Comparison: TComparison<Integer>); static;
     // Sorts the indices 0..Count-1, which is what the bottom-up sort of PDFBox does on its array of items
     class function SortedOrder(const Count: Integer; const Comparison: TComparison<Integer>): TArray<Integer>; static;
-    class procedure ApplyOrder<T>(const List: TList<T>; const Order: TArray<Integer>); static;
 
   public
     class procedure Sort<T>(const List: TList<T>; const Comparison: TComparison<T>); static;
+    // Puts the items in the order of the indices (the item that ends at position N is the one that was at Order[N]). The list
+    // keeps its items, so a list that owns them frees none.
+    class procedure ApplyOrder<T>(const List: TList<T>; const Order: TArray<Integer>); static;
   end;
 
 implementation
