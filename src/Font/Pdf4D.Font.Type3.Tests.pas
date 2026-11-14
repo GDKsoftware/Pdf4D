@@ -97,6 +97,9 @@ type
     procedure TestHugeNumberOfCharProcsIsBounded;
 
     [Test]
+    procedure TestFlateBombGlyphProcedureSharedByAllCodesIsReadOnce;
+
+    [Test]
     [TestCase('HalfOfBoundingBox', '/FontBBox [0 0 10 80] /CapHeight 5,40')]
     [TestCase('CapHeight', '/CapHeight 5 /Ascent 9,5')]
     [TestCase('Ascent', '/Ascent 9 /XHeight 7,9')]
@@ -114,6 +117,8 @@ implementation
 
 uses
   System.Classes,
+  System.Diagnostics,
+  Pdf4D.Filter.Tests.Support,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Matrix,
   Pdf4D.Cos.Dictionary,
@@ -410,6 +415,48 @@ begin
   const Box = Font.GetBoundingBox;
   Assert.AreEqual(Double(30), Double(Box.UpperRightX), 0);
   Assert.IsTrue(FModels.HasLogLine('glyph procedures'));
+end;
+
+procedure TType3FontTests.TestFlateBombGlyphProcedureSharedByAllCodesIsReadOnce;
+begin
+  // A glyph procedure that starts with d0 and then expands to 64 MiB, used by 256 codes
+  var Bomb: TBytes;
+  SetLength(Bomb, 64 * 1024 * 1024);
+  const Start = Ascii('70 0 d0 ');
+  Move(Start[0], Bomb[0], Length(Start));
+  const Compressed = TFilterTestSupport.Compress(Bomb);
+  Bomb := nil;
+
+  const Names = TStringBuilder.Create;
+  const CharProcs = TStringBuilder.Create;
+  try
+    for var Index := 0 to 255 do
+    begin
+      Names.AppendFormat('/G%d ', [Index]);
+      CharProcs.AppendFormat('/G%d 30 0 R ', [Index]);
+    end;
+    const Builder = TTextTestDocuments.NewBuilder(Format('%s/Encoding << /Differences [0 %s] >> /CharProcs << %s >> >>',
+                                                         [FontStart, Names.ToString, CharProcs.ToString]), '');
+    try
+      Builder.AddStreamObject(30, '/Filter /FlateDecode', Compressed);
+      const Document = FModels.Open(Builder);
+      const Font = TPDFontFactory.CreateFont(TTextTestDocuments.FontDictionary(Document, 'F1'), Document.Context);
+      FFonts.Add(Font);
+
+      const Watch = TStopwatch.StartNew;
+      for var Code := 0 to 255 do
+      begin
+        Assert.AreEqual(Double(70), Double(Font.GetWidthFromFont(Code)), 0.0001);
+      end;
+
+      Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, 'the bomb is decoded as a prefix, and once');
+    finally
+      Builder.Free;
+    end;
+  finally
+    CharProcs.Free;
+    Names.Free;
+  end;
 end;
 
 procedure TType3FontTests.TestHeightFromDescriptor(const DescriptorEntries: string; const Expected: Integer);

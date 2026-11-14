@@ -313,6 +313,9 @@ end;
 
 procedure TType1FontTests.TestEmptyEmbeddedType1IsDamaged;
 begin
+  // PDFBox 3.0.8 does the same (checked with PDType1Font on an empty /FontFile): "Font data unavailable" is an IOException,
+  // which is logged as an error and makes the font damaged and not embedded. Only a stream with data and /Length1 and
+  // /Length2 of 0 is ignored without a warning.
   const Builder = TTextTestDocuments.NewBuilder('<< /Type /Font /Subtype /Type1 /BaseFont /Foo /FontDescriptor 20 0 R >>', '');
   Builder.AddObject(20, '<< /Type /FontDescriptor /FontName /Foo /Flags 32 /FontFile 21 0 R >>');
   TTextTestDocuments.AddFontFile(Builder, 21, '/Length1 0 /Length2 0', nil);

@@ -107,6 +107,8 @@ uses
   Pdf4D.Font.Type1.Tests in '..\src\Font\Pdf4D.Font.Type1.Tests.pas',
   Pdf4D.Font.Type1C.Tests in '..\src\Font\Pdf4D.Font.Type1C.Tests.pas',
   Pdf4D.Font.TrueType.Tests in '..\src\Font\Pdf4D.Font.TrueType.Tests.pas',
+  Pdf4D.Font.CIDFontType2.Tests in '..\src\Font\Pdf4D.Font.CIDFontType2.Tests.pas',
+  Pdf4D.Font.ToUnicodeCache.Tests in '..\src\Font\Pdf4D.Font.ToUnicodeCache.Tests.pas',
   Pdf4D.Font.Type0.Tests in '..\src\Font\Pdf4D.Font.Type0.Tests.pas',
   Pdf4D.Font.CIDFontType0.Tests in '..\src\Font\Pdf4D.Font.CIDFontType0.Tests.pas',
   Pdf4D.Font.Type3.Tests in '..\src\Font\Pdf4D.Font.Type3.Tests.pas',

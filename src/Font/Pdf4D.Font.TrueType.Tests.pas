@@ -24,6 +24,7 @@ type
     function OpenFont(const FontEntries: string; const FontFile: TBytes; const HasFontFile: Boolean; const Flags: Integer = 32): TPDTrueTypeFont;
     function OpenEmbedded(const FontEntries: string; const Flags: Integer = 32): TPDTrueTypeFont;
     function ReferenceGID(const Code: Integer): Integer;
+    function WinSymbolFontBytes: TBytes;
 
   public
     [Setup]
@@ -37,6 +38,12 @@ type
 
     [Test]
     procedure TestSymbolicTrueTypeWithoutEncoding;
+
+    [Test]
+    procedure TestSymbolicWinSymbolCmapUsesTheF000Range;
+
+    [Test]
+    procedure TestZeroUnitsPerEmGivesTheUnscaledAdvance;
 
     [Test]
     procedure TestNonSymbolicUsesUnicodeCmap;
@@ -64,6 +71,7 @@ uses
   Pdf4D.FontBox.TrueType.Cmap,
   Pdf4D.FontBox.TrueType.Parser,
   Pdf4D.Tests.TestFonts,
+  Pdf4D.Tests.TrueTypeBuilder,
   Pdf4D.Tests.TextDocuments;
 
 const
@@ -150,6 +158,65 @@ begin
   Assert.IsTrue(Font.TryToUnicode(65, Value));
   Assert.AreEqual('A', Value);
   Assert.AreEqual(CapitalAWidth, Double(Font.GetWidthFromFont(65)), 0.0001);
+end;
+
+// The font with a cmap table that has one (3, 0) subtable of format 6, which maps F041, F042 and F043 to the glyphs 36, 37 and 38
+function TTrueTypeFontTests.WinSymbolFontBytes: TBytes;
+begin
+  const FirstCode = $F041;
+  const Subtable = TTestByteWriter.Create;
+  try
+    Subtable.U16(6);
+    Subtable.U16(10 + (2 * 3));
+    Subtable.U16(0);
+    Subtable.U16(FirstCode);
+    Subtable.U16(3);
+    Subtable.U16(36);
+    Subtable.U16(37);
+    Subtable.U16(38);
+
+    const Table = TTestByteWriter.Create;
+    try
+      Table.U16(0);
+      Table.U16(1);
+      Table.U16(3);
+      Table.U16(0);
+      Table.U32(12);
+      Table.Append(Subtable.ToBytes);
+
+      Result := TTestFonts.Bytes(LiberationFile);
+      TTrueTypeTestData.ReplaceTable(Result, 'cmap', 'cmap', Table.ToBytes);
+    finally
+      Table.Free;
+    end;
+  finally
+    Subtable.Free;
+  end;
+end;
+
+procedure TTrueTypeFontTests.TestSymbolicWinSymbolCmapUsesTheF000Range;
+begin
+  // The expected glyphs are the ones PDFBox 3.0.8 gives for the same font file: 65 -> 36, 66 -> 37, 67 -> 38, 68 -> 0
+  const Font = OpenFont('/BaseFont /LiberationSans /FontDescriptor 20 0 R', WinSymbolFontBytes, True, 4);
+
+  Assert.IsTrue(Font.IsSymbolic);
+  Assert.IsFalse(Font.IsDamaged);
+  Assert.AreEqual(36, Font.CodeToGID(65));
+  Assert.AreEqual(37, Font.CodeToGID(66));
+  Assert.AreEqual(38, Font.CodeToGID(67));
+  Assert.AreEqual(0, Font.CodeToGID(68));
+end;
+
+procedure TTrueTypeFontTests.TestZeroUnitsPerEmGivesTheUnscaledAdvance;
+begin
+  var Bytes := TTestFonts.Bytes(LiberationFile);
+  // unitsPerEm is at offset 18 of the head table
+  TTrueTypeTestData.Write16(Bytes, TTrueTypeTestData.TableOffset(Bytes, 'head') + 18, 0);
+  const Font = OpenFont(WinAnsiEntries, Bytes, True);
+
+  Assert.IsTrue(Font.IsEmbedded);
+  // 666.9922 per thousand at 2048 units per em is 1366 units
+  Assert.AreEqual(Double(1366), Double(Font.GetWidthFromFont(65)), 0.0001);
 end;
 
 procedure TTrueTypeFontTests.TestNonSymbolicUsesUnicodeCmap;

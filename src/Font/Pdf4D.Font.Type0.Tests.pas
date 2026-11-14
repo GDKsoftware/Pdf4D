@@ -113,6 +113,9 @@ type
 
     [Test]
     procedure TestFactoryCachesPerDocument;
+
+    [Test]
+    procedure TestFailedFontIsNotParsedAgain;
   end;
 
 implementation
@@ -526,6 +529,32 @@ begin
       Font.ReadCode([$41], Position);
     end, EPdfParseException);
   Assert.AreEqual(0, Font.CodeToCID(65), 'no CMap, no CID');
+end;
+
+procedure TType0FontTests.TestFailedFontIsNotParsedAgain;
+begin
+  // The descendant is parsed before the encoding is found to be unknown; the second request must not do that again
+  const Builder = TTextTestDocuments.NewBuilder(Type0Entries('/Encoding /NoSuchCMap-H') + TTextTestDocuments.Separator + DescendantEntries(IdentityMap), '');
+  try
+    Builder.AddObject(20, '<< /Type /FontDescriptor /FontName /LiberationSans /Flags 4 /FontFile2 21 0 R >>');
+    TTextTestDocuments.AddFontFile(Builder, 21, '/Length1 1', TTestFonts.Bytes(LiberationFile));
+    const Document = FModels.Open(Builder);
+    const Dictionary = TTextTestDocuments.FontDictionary(Document, 'F1');
+    Assert.WillRaiseWithMessageRegex(
+      procedure
+      begin
+        TPDFontFactory.GetFont(Dictionary, Document.Context);
+      end, EPdfParseException, 'predefined CMap');
+    Assert.IsTrue(TPDFontFactory.HasFailed(Dictionary, Document.Context));
+
+    Assert.WillRaiseWithMessageRegex(
+      procedure
+      begin
+        TPDFontFactory.GetFont(Dictionary, Document.Context);
+      end, EPdfParseException, 'earlier');
+  finally
+    Builder.Free;
+  end;
 end;
 
 procedure TType0FontTests.TestFactoryCachesPerDocument;

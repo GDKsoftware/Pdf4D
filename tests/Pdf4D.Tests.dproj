@@ -178,6 +178,8 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.TrueType.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType2.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.ToUnicodeCache.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type0.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType0.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type3.Tests.pas"/>

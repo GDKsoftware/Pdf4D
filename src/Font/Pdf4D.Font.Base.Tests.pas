@@ -13,6 +13,7 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Log,
+  Pdf4D.Common.Matrix,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Base,
   Pdf4D.FontBox.BoundingBox,
@@ -28,6 +29,19 @@ type
     function GetBoundingBox: TBoundingBox; override;
     function IsEmbedded: Boolean; override;
     function IsDamaged: Boolean; override;
+  end;
+
+  // As TTestFont, with the widths of a standard 14 font from a hook of its own
+  TStandard14TestFont = class(TTestFont)
+  protected
+    function GetStandard14Width(const Code: Integer): Single; override;
+  end;
+
+  // As TTestFont, with a font matrix of its own and access to the scaling of a width
+  TMatrixTestFont = class(TTestFont)
+  public
+    function GetFontMatrix: TPdfMatrix; override;
+    function ScaledWidth(const Width: Single): Single;
   end;
 
   // As TTestFont, and it can encode, like a simple font does
@@ -139,6 +153,21 @@ type
     procedure TestEmbeddedFontIsNotStandard14;
 
     [Test]
+    procedure TestStandard14WidthComesFromTheHook;
+
+    [Test]
+    procedure TestEmbeddedStandard14NameDoesNotUseTheHook;
+
+    [Test]
+    procedure TestBaseStandard14WidthRaises;
+
+    [Test]
+    procedure TestAverageFontWidthOverflowGivesInfinity;
+
+    [Test]
+    procedure TestHugeFontMatrixGivesNoWidthAndOneWarning;
+
+    [Test]
     procedure TestNoToUnicodeBudgetAcrossFonts;
 
     [Test]
@@ -151,7 +180,9 @@ type
 implementation
 
 uses
+  System.Math,
   Pdf4D.Cos.Base,
+  Pdf4D.Cos.Float,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
@@ -190,6 +221,25 @@ end;
 function TTestFont.IsDamaged: Boolean;
 begin
   Result := False;
+end;
+
+{ TStandard14TestFont }
+
+function TStandard14TestFont.GetStandard14Width(const Code: Integer): Single;
+begin
+  Result := 278;
+end;
+
+{ TMatrixTestFont }
+
+function TMatrixTestFont.GetFontMatrix: TPdfMatrix;
+begin
+  Result := TPdfMatrix.Create(3E38, 0, 0, 3E38, 0, 0);
+end;
+
+function TMatrixTestFont.ScaledWidth(const Width: Single): Single;
+begin
+  Result := ScaleToTextSpace(Width);
 end;
 
 { TEncodingTestFont }
@@ -594,6 +644,65 @@ begin
   Assert.IsFalse(Font.IsStandard14);
   Assert.IsTrue(Font.TryGetStandardAFM(Metrics), 'the AFM is looked up by name, as in PDFBox');
   Assert.AreEqual(Single(500), Font.GetWidth(65));
+end;
+
+procedure TFontBaseTests.TestStandard14WidthComesFromTheHook;
+begin
+  const Font = TStandard14TestFont.Create(NewFontDictionary('Helvetica'), FContext);
+  FFonts.Add(Font);
+
+  Assert.IsTrue(Font.IsStandard14);
+  Assert.AreEqual(Single(278), Font.GetWidth(65));
+end;
+
+procedure TFontBaseTests.TestEmbeddedStandard14NameDoesNotUseTheHook;
+begin
+  const Dictionary = NewFontDictionary('Helvetica');
+  Dictionary.SetItem('FontFile', TCosDictionary.Create);
+  const Font = TStandard14TestFont.Create(Dictionary, FContext);
+  FFonts.Add(Font);
+
+  Assert.IsFalse(Font.IsStandard14);
+  Assert.AreEqual(Single(500), Font.GetWidth(65), 'an embedded font goes to the font program');
+end;
+
+procedure TFontBaseTests.TestBaseStandard14WidthRaises;
+begin
+  const Font = NewFont(NewFontDictionary('Helvetica'));
+
+  Assert.WillRaise(
+    procedure
+    begin
+      Font.GetWidth(65);
+    end, EPdfUnsupportedFeatureException);
+end;
+
+procedure TFontBaseTests.TestAverageFontWidthOverflowGivesInfinity;
+begin
+  const Dictionary = NewFontDictionary('Test');
+  const Values = TCosArray.Create;
+  Dictionary.SetItem(TCosNames.Widths, Values);
+  Values.Add(TCosFloat.Create(3E38));
+  Values.Add(TCosFloat.Create(3E38));
+  const Font = NewFont(Dictionary);
+
+  // With overflow unmasked the sum raises, with it masked it is an infinity: both give Java's result
+  const Previous = SetExceptionMask([exDenormalized, exUnderflow, exPrecision]);
+  try
+    Assert.IsTrue(IsInfinite(Font.GetAverageFontWidth));
+  finally
+    SetExceptionMask(Previous);
+  end;
+end;
+
+procedure TFontBaseTests.TestHugeFontMatrixGivesNoWidthAndOneWarning;
+begin
+  const Font = TMatrixTestFont.Create(NewFontDictionary('Test'), FContext);
+  FFonts.Add(Font);
+
+  Assert.AreEqual(Single(0), Font.ScaledWidth(1000));
+  Assert.AreEqual(Single(0), Font.ScaledWidth(1000));
+  Assert.AreEqual(1, CountMessages(IntToStr(Ord(TPdfLogLevel.Warning))));
 end;
 
 procedure TFontBaseTests.TestNoToUnicodeBudgetAcrossFonts;
