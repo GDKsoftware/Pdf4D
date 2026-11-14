@@ -100,8 +100,15 @@ end;
 
 function TPdfVector.Scale(const S: Single): TPdfVector;
 begin
-  Result.X := X * S;
-  Result.Y := Y * S;
+  try
+    Result.X := X * S;
+    Result.Y := Y * S;
+  except
+    on EMathError do
+    begin
+      raise EPdfParseException.Create(IllegalValuesMessage);
+    end;
+  end;
 end;
 
 { TPdfMatrix }
@@ -245,9 +252,9 @@ procedure TPdfMatrix.Translate(const Tx, Ty: Single);
 begin
   var Moved := Self;
   try
-    Moved.FValues[6] := Moved.FValues[6] + Tx * Moved.FValues[0] + Ty * Moved.FValues[3];
-    Moved.FValues[7] := Moved.FValues[7] + Tx * Moved.FValues[1] + Ty * Moved.FValues[4];
-    Moved.FValues[8] := Moved.FValues[8] + Tx * Moved.FValues[2] + Ty * Moved.FValues[5];
+    Moved.FValues[6] := Moved.FValues[6] + (Tx * Moved.FValues[0] + Ty * Moved.FValues[3]);
+    Moved.FValues[7] := Moved.FValues[7] + (Tx * Moved.FValues[1] + Ty * Moved.FValues[4]);
+    Moved.FValues[8] := Moved.FValues[8] + (Tx * Moved.FValues[2] + Ty * Moved.FValues[5]);
   except
     on EMathError do
     begin
@@ -280,14 +287,28 @@ end;
 
 function TPdfMatrix.TransformPoint(const X, Y: Single): TPointF;
 begin
-  Result.X := X * FValues[0] + Y * FValues[3] + FValues[6];
-  Result.Y := X * FValues[1] + Y * FValues[4] + FValues[7];
+  try
+    Result.X := X * FValues[0] + Y * FValues[3] + FValues[6];
+    Result.Y := X * FValues[1] + Y * FValues[4] + FValues[7];
+  except
+    on EMathError do
+    begin
+      raise EPdfParseException.Create(IllegalValuesMessage);
+    end;
+  end;
 end;
 
 function TPdfMatrix.Transform(const V: TPdfVector): TPdfVector;
 begin
-  Result.X := V.X * FValues[0] + V.Y * FValues[3] + FValues[6];
-  Result.Y := V.X * FValues[1] + V.Y * FValues[4] + FValues[7];
+  try
+    Result.X := V.X * FValues[0] + V.Y * FValues[3] + FValues[6];
+    Result.Y := V.X * FValues[1] + V.Y * FValues[4] + FValues[7];
+  except
+    on EMathError do
+    begin
+      raise EPdfParseException.Create(IllegalValuesMessage);
+    end;
+  end;
 end;
 
 function TPdfMatrix.ScaleX: Single;

@@ -87,6 +87,8 @@ uses
   Pdf4D.Font.DirFinder in '..\src\Font\Pdf4D.Font.DirFinder.pas',
   Pdf4D.Font.FileSystemProvider in '..\src\Font\Pdf4D.Font.FileSystemProvider.pas',
   Pdf4D.Font.FileSystemProvider.Tests in '..\src\Font\Pdf4D.Font.FileSystemProvider.Tests.pas',
+  Pdf4D.Common.FloatGuard in '..\src\Common\Pdf4D.Common.FloatGuard.pas',
+  Pdf4D.Common.FloatGuard.Tests in '..\src\Common\Pdf4D.Common.FloatGuard.Tests.pas',
   Pdf4D.Common.Matrix in '..\src\Common\Pdf4D.Common.Matrix.pas',
   Pdf4D.Common.Matrix.Tests in '..\src\Common\Pdf4D.Common.Matrix.Tests.pas',
   Pdf4D.Font.Base in '..\src\Font\Pdf4D.Font.Base.pas',

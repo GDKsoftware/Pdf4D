@@ -22,6 +22,7 @@ type
     function FilledMatrix(const Offset: Integer): TPdfMatrix;
     procedure AssertValues(const Expected: array of Single; const Actual: TPdfMatrix);
     procedure AssertIdentity(const Actual: TPdfMatrix);
+    procedure CheckHugeValuesRaise(const Matrix: TPdfMatrix);
 
   public
     [Test]
@@ -64,6 +65,15 @@ type
     procedure TestTranslation;
 
     [Test]
+    procedure TestTranslationAddsInJavaOrder;
+
+    [Test]
+    procedure TestTransformWithHugeValuesRaisesParseException;
+
+    [Test]
+    procedure TestTransformWithHugeValuesGivesInfinityInsideTheFloatGuard;
+
+    [Test]
     procedure TestTransformPointAndVector;
 
     [Test]
@@ -77,7 +87,9 @@ implementation
 
 uses
   System.Math,
+  System.Types,
   Pdf4D.Common.Defines,
+  Pdf4D.Common.FloatGuard,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Float,
@@ -282,6 +294,62 @@ begin
   Matrix.Translate(2, 3);
 
   AssertValues([2, 4, 0, 4, 2, 0, 31, 44, 1], Matrix);
+end;
+
+procedure TMatrixTests.TestTranslationAddsInJavaOrder;
+begin
+  // Expected values come from org.apache.pdfbox.util.Matrix (PDFBox 3.0.8): translate adds the offset as one sum
+  var Matrix := TPdfMatrix.Create(Single(0.1), Single(0.7), Single(0.3), Single(0.9), 1E7, -1E7);
+
+  Matrix.Translate(Single(0.7), Single(0.1));
+
+  Assert.AreEqual(Single(1E7), Matrix.TranslateX, 0);
+  Assert.AreEqual(Single(-9999999), Matrix.TranslateY, 0);
+  Assert.AreEqual(Single(1), Matrix.GetValue(2, 2), 0);
+end;
+
+procedure TMatrixTests.TestTransformWithHugeValuesRaisesParseException;
+begin
+  const Matrix = TPdfMatrix.Create(3E38, 0, 0, 3E38, 3E38, 0);
+  const Previous = SetExceptionMask([exDenormalized, exUnderflow, exPrecision]);
+  try
+    CheckHugeValuesRaise(Matrix);
+  finally
+    SetExceptionMask(Previous);
+  end;
+end;
+
+procedure TMatrixTests.CheckHugeValuesRaise(const Matrix: TPdfMatrix);
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      Matrix.TransformPoint(3E38, 3E38);
+    end, EPdfParseException);
+  Assert.WillRaise(
+    procedure
+    begin
+      Matrix.Transform(TPdfVector.Create(3E38, 3E38));
+    end, EPdfParseException);
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfVector.Create(3E38, 1).Scale(3E38);
+    end, EPdfParseException);
+end;
+
+procedure TMatrixTests.TestTransformWithHugeValuesGivesInfinityInsideTheFloatGuard;
+begin
+  const Matrix = TPdfMatrix.Create(3E38, 0, 0, 3E38, 3E38, 0);
+  var Point: TPointF;
+
+  TPdfFloatGuard.Run(
+    procedure
+    begin
+      Point := Matrix.TransformPoint(3E38, 3E38);
+    end);
+
+  Assert.IsTrue(IsInfinite(Point.X));
 end;
 
 procedure TMatrixTests.TestTransformPointAndVector;

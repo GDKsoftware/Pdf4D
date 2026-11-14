@@ -158,6 +158,8 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.DirFinder.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.FileSystemProvider.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.FileSystemProvider.Tests.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.FloatGuard.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.FloatGuard.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Matrix.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Matrix.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.pas"/>
