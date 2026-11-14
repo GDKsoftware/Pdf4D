@@ -13,6 +13,13 @@ uses
   Pdf4D.Model.Resources;
 
 type
+  // Port of PDThreadBead, the part that text extraction reads: the rectangle of the bead on its page. An entry of /B that is
+  // no dictionary, or a bead without a valid /R, has no rectangle.
+  TPDThreadBead = record
+    HasRectangle: Boolean;
+    Rectangle: TPdfRectangle;
+  end;
+
   // A page of the page tree, which owns it. It holds the page dictionary and does not own that.
   TPDPage = class
   private
@@ -50,6 +57,9 @@ type
     // The inherited resources, made on first use and owned by the page. A page without resources dictionary gives empty
     // resources (PDFBox gives null), so that a caller needs no nil check.
     function Resources: TPDResources;
+    // Port of PDPage.getThreadBeads: one entry for each entry of /B, in order. An entry that is not a dictionary stays an
+    // entry (without rectangle), like the null entry of PDFBox.
+    function ThreadBeads: TArray<TPDThreadBead>;
 
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
@@ -211,6 +221,27 @@ begin
     FResources := TPDResources.Create(Dictionary, FContext);
   end;
   Result := FResources;
+end;
+
+function TPDPage.ThreadBeads: TArray<TPDThreadBead>;
+begin
+  var Beads: TCosArray;
+  if not FDictionary.TryGetCosArray(TCosNames.B, Beads) then
+  begin
+    Exit(nil);
+  end;
+
+  SetLength(Result, Beads.Count);
+  for var Index := 0 to Beads.Count - 1 do
+  begin
+    var Rectangle: TCosArray;
+    const Bead = Beads.GetObject(Index);
+    Result[Index].HasRectangle := ((Bead is TCosDictionary) and TCosDictionary(Bead).TryGetCosArray(TCosNames.R, Rectangle));
+    if Result[Index].HasRectangle then
+    begin
+      Result[Index].Rectangle := TPdfRectangle.FromCosArray(Rectangle);
+    end;
+  end;
 end;
 
 function TPDPage.ContentStreams: TArray<TCosStream>;

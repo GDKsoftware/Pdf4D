@@ -100,6 +100,8 @@
         <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.TextPosition.Tests.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.Collect.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.Tables.pas"/>
@@ -225,6 +227,7 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.MarkedContent.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentInformation.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentCatalog.pas"/>
