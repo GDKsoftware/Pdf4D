@@ -136,9 +136,13 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - The Unicode tables of text extraction (the presentation forms U+FB00 to U+FDFF and U+FE70 to U+FEFF, and the diacritic characters) are generated from `java.text.Normalizer` (NFKC) and `Character.getType` of JDK 21 (Unicode 15.0), which is what PDFBox 3.0.8 calls. The Unicode 16.0 data of the SASLprep normalization (M1) is separate and only serves passwords.
 - `/ExtGState` copies only `/Font`. The other entries of `PDExtendedGraphicsState` (line style, blend mode, transfer functions and the rest) are ignored, because they cannot change text.
 - The glyph procedures of a Type 3 font are not run for text, as in PDFBox. Their width (the `d0` or `d1` operator) and, as a last resort, their bounding box are read, from at most 64 KiB of the decoded stream.
-- A failing operator is logged and the content stream goes on, for every exception except an access violation. PDFBox does this only for an `IOException`. The check `/Length > 0` of a form XObject is not ported.
+- A failing operator is logged and the content stream goes on, for every exception except the fatal ones (`TPdfFailure.IsFatal`: access violation and the other external exceptions, invalid pointer, abort). `EOutOfMemory` ends the page like a limit and keeps the text so far. PDFBox does this only for an `IOException`. The check `/Length > 0` of a form XObject is not ported.
 - Floating point: Java computes with Infinity and NaN, Delphi raises `EMathError` on Windows. Known divisions and scalings have guards, and `TPdfFloatGuard` masks the floating point exceptions of the thread around the stream engine and the text API (and restores the mask afterwards). During a call of the text API the mask of the caller is therefore different.
 - A ToUnicode stream that several fonts share is parsed and counted once.
+- A font that fails to load is remembered per document, whatever the exception was (a fatal one excepted), so its font program is parsed once; a failure that is no `EPdfException` reaches the caller as `EPdfParseException`.
+- Overlapping ranges in `/W2` of a CID font: the first range that covers a CID wins, where PDFBox lets the last one win.
+- `TPDType1CFont.GetNameInFont` looks the name up in the glyph list that belongs to the font. This differs from the Adobe glyph list only for ZapfDingbats.
+- The cache of system fonts is never evicted: a font that was picked stays in memory until the process ends (PDFBox keeps them in soft references). It is bounded by the installed fonts and the scan limits.
 - The extra limits of the next section.
 
 ## Limits that Pdf4D adds
