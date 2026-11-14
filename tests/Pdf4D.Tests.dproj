@@ -197,6 +197,7 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type0.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType0.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type3.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Factory.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.Tests.pas"/>
         <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.Tests.pas"/>

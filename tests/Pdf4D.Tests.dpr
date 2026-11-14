@@ -126,6 +126,7 @@ uses
   Pdf4D.Font.Type0.Tests in '..\src\Font\Pdf4D.Font.Type0.Tests.pas',
   Pdf4D.Font.CIDFontType0.Tests in '..\src\Font\Pdf4D.Font.CIDFontType0.Tests.pas',
   Pdf4D.Font.Type3.Tests in '..\src\Font\Pdf4D.Font.Type3.Tests.pas',
+  Pdf4D.Font.Factory.Tests in '..\src\Font\Pdf4D.Font.Factory.Tests.pas',
   Pdf4D.Common.ResourceData.Tests in '..\src\Common\Pdf4D.Common.ResourceData.Tests.pas',
   Pdf4D.Cos.Float.Tests in '..\src\Cos\Pdf4D.Cos.Float.Tests.pas',
   Pdf4D.Cos.Name.Tests in '..\src\Cos\Pdf4D.Cos.Name.Tests.pas',

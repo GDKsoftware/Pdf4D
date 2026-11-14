@@ -16,15 +16,21 @@ uses
   Pdf4D.Model.DocumentContext;
 
 type
+  // Stands in for CreateFont inside GetFont; tests use it to make a font fail in a chosen way
+  TPDFontCreator = reference to function(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont;
+
   // Makes the right font class for a font dictionary: Type 1 (with or without /FontFile3), MMType1, TrueType, Type 3 and Type0.
   TPDFontFactory = class
   private
+    class var FCreatorOverride: TPDFontCreator;
+
     class function HasFontFile3(const Dictionary: TCosDictionary): Boolean; static;
     class function CreateType1Font(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
     class procedure CheckFontType(const Dictionary: TCosDictionary; const Context: TPDDocumentContext); static;
     class procedure LogWarning(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
     class procedure LogError(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
     class function IsRecoverableFailure(const Failure: Exception): Boolean; static;
+    class function CreateNewFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
 
   public
     // PDFontFactory.createFont: a new font that the caller owns. Dictionary stays with the document and has to outlive the
@@ -34,7 +40,9 @@ type
     // must not use it after the document is freed. Without a Context this is CreateFont, and the caller owns the font;
     // that is why Context is required here.
     // A dictionary that failed once is remembered by the context: it is not parsed again (the font program of a Type 0
-    // font can be big), and GetFont raises EPdfParseException for it at once.
+    // font can be big), and GetFont raises EPdfParseException for it at once. That holds for every failure except a mistake
+    // in the library (access violation, invalid pointer): a hostile font program can drive the font code into exceptions
+    // that are no EPdfException, and those reach the caller as EPdfParseException.
     class function GetFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
     // True when an earlier GetFont for Dictionary failed
     class function HasFailed(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): Boolean; static;
@@ -44,6 +52,8 @@ type
     // nothing and has to outlive the font. Raises EPdfParseException for a dictionary that is not a font or has another
     // subtype than CIDFontType0 or CIDFontType2.
     class function CreateDescendantFont(const Dictionary: TCosDictionary; const Parent: TPDCIDFontParent): TPDCIDFont; static;
+    // For tests only: replaces the font creation in GetFont. Set before use, reset to nil afterwards.
+    class property CreatorOverride: TPDFontCreator read FCreatorOverride write FCreatorOverride;
   end;
 
 implementation
@@ -198,15 +208,23 @@ begin
   end;
 
   try
-    Result := CreateFont(Dictionary, Context);
+    Result := CreateNewFont(Dictionary, Context);
   except
     on Failure: Exception do
     begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        raise;
+      end;
+
+      Context.AddCachedObject(Dictionary, TPDFontFailure.Create);
       if IsRecoverableFailure(Failure) then
       begin
-        Context.AddCachedObject(Dictionary, TPDFontFailure.Create);
+        raise;
       end;
-      raise;
+
+      LogError(Context, 'The font could not be made: %s: %s', [Failure.ClassName, Failure.Message]);
+      raise EPdfParseException.CreateFmt('The font could not be made: %s: %s', [Failure.ClassName, Failure.Message]);
     end;
   end;
   try
@@ -215,6 +233,16 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+class function TPDFontFactory.CreateNewFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont;
+begin
+  if Assigned(FCreatorOverride) then
+  begin
+    Exit(FCreatorOverride(Dictionary, Context));
+  end;
+
+  Result := CreateFont(Dictionary, Context);
 end;
 
 class function TPDFontFactory.HasFailed(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): Boolean;
@@ -243,5 +271,6 @@ begin
   end;
   Result.OwnDictionary;
 end;
+
 
 end.

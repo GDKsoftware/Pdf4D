@@ -27,6 +27,9 @@ type
     // it into an EPdfParseException. PDFBox sees these as an IOException. EMathError is the floating point overflow or
     // invalid operation that Java would turn into Infinity or NaN (see TPdfFloatGuard).
     class function IsInputFailure(const Failure: Exception): Boolean; static;
+    // True for an exception that no code may swallow: a mistake in the library or the runtime (access violation, stack
+    // overflow and other external exceptions, invalid pointer) or an abort
+    class function IsFatal(const Failure: Exception): Boolean; static;
   end;
 
   TPdfLoadOptions = record
@@ -79,6 +82,11 @@ implementation
 class function TPdfFailure.IsInputFailure(const Failure: Exception): Boolean;
 begin
   Result := ((Failure is EOutOfMemory) or (Failure is ERangeError) or (Failure is EIntOverflow) or (Failure is EStreamError) or (Failure is EMathError));
+end;
+
+class function TPdfFailure.IsFatal(const Failure: Exception): Boolean;
+begin
+  Result := ((Failure is EExternal) or (Failure is EInvalidPointer) or (Failure is EAbort));
 end;
 
 { TPdfLoadOptions }
