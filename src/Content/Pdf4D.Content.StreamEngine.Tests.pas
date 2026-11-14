@@ -104,6 +104,7 @@ type
     function EventsText: string;
     function CountLogLines(const Fragment: string): Integer;
     procedure RunAccessViolationCase;
+    procedure RunAbortCase;
     procedure RunUnsupportedFailureCase;
     procedure RunFailureProcessor(const FailureClass: ExceptClass; const Content: string);
 
@@ -217,6 +218,12 @@ type
     procedure TestAccessViolationInAnOperatorIsRaised;
 
     [Test]
+    procedure TestAbortInAnOperatorIsRaised;
+
+    [Test]
+    procedure TestOutOfMemoryInAnOperatorEndsThePageAsALimit;
+
+    [Test]
     procedure TestNonPdfExceptionAtThePageBoundaryBecomesParseException;
 
     [Test]
@@ -282,6 +289,11 @@ end;
 
 procedure TFailingProcessor.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The runtime never frees an EOutOfMemory it did not make itself, so the test raises the one of the runtime
+  if FFailureClass.InheritsFrom(EOutOfMemory) then
+  begin
+    OutOfMemoryError;
+  end;
   raise FFailureClass.Create('Test failure');
 end;
 
@@ -676,6 +688,11 @@ begin
   RunFailureProcessor(EAccessViolation, 'BT /F1 12 Tf XX (A) Tj ET');
 end;
 
+procedure TStreamEngineTests.RunAbortCase;
+begin
+  RunFailureProcessor(EAbort, 'BT /F1 12 Tf XX (A) Tj ET');
+end;
+
 procedure TStreamEngineTests.RunUnsupportedFailureCase;
 begin
   RunContent('BT /F1 12 Tf XX (A) Tj ET');
@@ -895,6 +912,20 @@ end;
 procedure TStreamEngineTests.TestAccessViolationInAnOperatorIsRaised;
 begin
   Assert.WillRaise(RunAccessViolationCase, EAccessViolation);
+end;
+
+procedure TStreamEngineTests.TestAbortInAnOperatorIsRaised;
+begin
+  Assert.WillRaise(RunAbortCase, EAbort);
+end;
+
+procedure TStreamEngineTests.TestOutOfMemoryInAnOperatorEndsThePageAsALimit;
+begin
+  RunFailureProcessor(EOutOfMemory, 'BT /F1 12 Tf (A) Tj XX (B) Tj XX (C) Tj ET');
+
+  Assert.AreEqual<Integer>(1, FEngine.Glyphs.Count, 'the text before the failure is kept, the rest is dropped');
+  Assert.IsTrue(HasLogLine('stopped, the text so far is kept'));
+  Assert.AreEqual<Integer>(0, CountLogLines('Operator XX failed'), 'the failure is no longer logged for every operator');
 end;
 
 procedure TStreamEngineTests.TestNonPdfExceptionAtThePageBoundaryBecomesParseException;

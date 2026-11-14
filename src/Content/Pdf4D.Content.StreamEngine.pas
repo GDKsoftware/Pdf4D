@@ -60,6 +60,18 @@ type
         IsReadable: Boolean;
       end;
 
+      // The content streams of a page, joined with a line feed. The buffer doubles when it is full, so that joining takes
+      // linear time.
+      TContentBuffer = record
+      private
+        FBytes: TBytes;
+        FUsed: Int64;
+
+      public
+        procedure Append(const Data: TBytes);
+        function ToBytes: TBytes;
+      end;
+
   private
     const Hundred: Single = 100;
     const Thousand: Single = 1000;
@@ -80,14 +92,16 @@ type
     FContentBytes: Int64;
     FIsOperandLimitLogged: Boolean;
     FFormCache: TDictionary<TCosStream, TCachedContent>;
+    FMaxOperators: Int64;
+    FMaxGlyphs: Integer;
 
     procedure InitPage(const Page: TPDPage);
     function GetDefaultFont: TPDFont;
     function GetOptions: TPdfLoadOptions;
+    procedure CacheLimits;
 
     procedure ProcessPageContent;
     function ReadPageContent: TBytes;
-    procedure AppendContent(var Buffer: TBytes; var Used: Int64; const Data: TBytes);
     function TryReadStreamData(const Stream: TCosStream; out Data: TBytes): Boolean;
     function TryGetFormContent(const Stream: TCosStream; out Data: TBytes): Boolean;
     procedure ChargeContentBytes(const Count: Int64);
@@ -205,6 +219,7 @@ begin
   FStack := TObjectList<TPDGraphicsState>.Create(True);
   FActiveStreams := TList<TCosStream>.Create;
   FFormCache := TDictionary<TCosStream, TCachedContent>.Create;
+  CacheLimits;
 end;
 
 destructor TPdfStreamEngine.Destroy;
@@ -274,6 +289,15 @@ begin
   FContentBytes := 0;
   FIsOperandLimitLogged := False;
   FFormCache.Clear;
+  CacheLimits;
+end;
+
+// The limits are read once per page: Options hands out a copy of the whole record, which is too much work per operator and glyph
+procedure TPdfStreamEngine.CacheLimits;
+begin
+  const PageOptions = Options;
+  FMaxOperators := PageOptions.MaxOperatorsPerPage;
+  FMaxGlyphs := PageOptions.MaxGlyphsPerPage;
 end;
 
 function TPdfStreamEngine.GetDefaultFont: TPDFont;
@@ -327,13 +351,13 @@ begin
     begin
       raise;
     end;
-    on Failure: EAccessViolation do
-    begin
-      // A mistake in the library, not in the file
-      raise;
-    end;
     on Failure: Exception do
     begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        // A mistake in the library or the runtime, not in the file
+        raise;
+      end;
       raise EPdfParseException.CreateFmt('Processing of the page failed: %s: %s', [Failure.ClassName, Failure.Message]);
     end;
   end;
@@ -371,8 +395,7 @@ end;
 
 function TPdfStreamEngine.ReadPageContent: TBytes;
 begin
-  var Buffer: TBytes := nil;
-  var Used: Int64 := 0;
+  var Buffer := Default(TContentBuffer);
   try
     for var Stream in FCurrentPage.ContentStreams do
     begin
@@ -384,39 +407,43 @@ begin
           // What was read so far is run, as for a form that goes over budget
           Break;
         end;
-        AppendContent(Buffer, Used, Data);
+        Buffer.Append(Data);
       end;
     end;
-    SetLength(Buffer, Used);
+    Result := Buffer.ToBytes;
   except
     on Failure: EOutOfMemory do
     begin
       raise EPdfLimitExceededException.Create('Not enough memory for the content of the page');
     end;
   end;
-  Result := Buffer;
 end;
 
-// The streams of /Contents are joined with a line feed, as PDFBox does: an operator may not run into the next stream. The
-// buffer doubles when it is full, so that joining takes linear time.
-procedure TPdfStreamEngine.AppendContent(var Buffer: TBytes; var Used: Int64; const Data: TBytes);
+// An operator may not run into the next stream, so the streams of /Contents are joined with a line feed, as PDFBox does
+procedure TPdfStreamEngine.TContentBuffer.Append(const Data: TBytes);
 begin
-  const Needed = Used + Length(Data) + 1;
+  const Needed = FUsed + Length(Data) + 1;
   if Needed > High(Integer) then
   begin
     raise EPdfLimitExceededException.Create('The content of the page is too large for one buffer');
   end;
 
-  if Needed > Length(Buffer) then
+  if Needed > Length(FBytes) then
   begin
-    SetLength(Buffer, Min(Max(Needed, Int64(Length(Buffer)) * 2), Int64(High(Integer))));
+    SetLength(FBytes, Min(Max(Needed, Int64(Length(FBytes)) * 2), Int64(High(Integer))));
   end;
   if Length(Data) > 0 then
   begin
-    Move(Data[0], Buffer[Used], Length(Data));
+    Move(Data[0], FBytes[FUsed], Length(Data));
   end;
-  Buffer[Used + Length(Data)] := ContentSeparator;
-  Used := Needed;
+  FBytes[FUsed + Length(Data)] := ContentSeparator;
+  FUsed := Needed;
+end;
+
+function TPdfStreamEngine.TContentBuffer.ToBytes: TBytes;
+begin
+  SetLength(FBytes, FUsed);
+  Result := FBytes;
 end;
 
 // Decodes a form once per page, and charges the page for its bytes every time it is run
@@ -674,17 +701,17 @@ end;
 procedure TPdfStreamEngine.CountOperator;
 begin
   Inc(FOperatorCount);
-  if FOperatorCount > Options.MaxOperatorsPerPage then
+  if FOperatorCount > FMaxOperators then
   begin
-    raise EPdfLimitExceededException.CreateFmt('The page has more than %d operators', [Options.MaxOperatorsPerPage]);
+    raise EPdfLimitExceededException.CreateFmt('The page has more than %d operators', [FMaxOperators]);
   end;
 end;
 
 procedure TPdfStreamEngine.CountGlyph;
 begin
-  if FGlyphCount >= Options.MaxGlyphsPerPage then
+  if FGlyphCount >= FMaxGlyphs then
   begin
-    raise EPdfLimitExceededException.CreateFmt('The page has more than %d glyphs', [Options.MaxGlyphsPerPage]);
+    raise EPdfLimitExceededException.CreateFmt('The page has more than %d glyphs', [FMaxGlyphs]);
   end;
   Inc(FGlyphCount);
 end;
@@ -707,13 +734,18 @@ begin
     begin
       raise;
     end;
-    on Failure: EAccessViolation do
+    on Failure: EOutOfMemory do
     begin
-      // A mistake in the library, not in the file
-      raise;
+      // Every operator after this one would fail the same way: the page ends here and keeps its text, as for a limit
+      raise EPdfLimitExceededException.CreateFmt('The page ran out of memory at operator %s', [Operator.Name]);
     end;
     on Failure: Exception do
     begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        // A mistake in the library or the runtime, not in the file
+        raise;
+      end;
       HandleOperatorFailure(Operator, Operands, Failure);
     end;
   end;

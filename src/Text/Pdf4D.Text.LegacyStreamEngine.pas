@@ -184,12 +184,17 @@ begin
     // PDFBOX-614: see what the space displacement should be without breaking on a font that cannot tell
     Result := Font.GetSpaceWidth * GlyphSpaceToTextSpace;
   except
-    on Failure: EAccessViolation do
+    on Failure: EOutOfMemory do
     begin
+      // The operator catch of the engine ends the page
       raise;
     end;
     on Failure: Exception do
     begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        raise;
+      end;
       LogWarning('The width of the space could not be read: %s', [Failure.Message]);
     end;
   end;
