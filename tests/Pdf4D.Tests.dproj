@@ -94,6 +94,12 @@
         <DCCReference Include="..\src\Resources\Pdf4D.Resources.Unicode.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.UnicodeTables.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.UnicodeTables.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TextPosition.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TextPositionComparator.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.IterativeMergeSort.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TextPosition.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.Tests.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.Tables.pas"/>
