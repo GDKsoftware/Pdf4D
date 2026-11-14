@@ -109,6 +109,7 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Encoding,
   Pdf4D.Font.Factory,
+  Pdf4D.Font.Type3,
   Pdf4D.Font.GlyphList,
   Pdf4D.Font.Simple,
   Pdf4D.Font.Type1C,
@@ -418,25 +419,20 @@ begin
     Builder.Free;
   end;
 
-  const Unsupported = TTextTestDocuments.NewBuilder('<< /Type /Font /Subtype /Type3 >>', '');
+  const Type3Builder = TTextTestDocuments.NewBuilder('<< /Type /Font /Subtype /Type3 >>', '');
   try
-    const Document = FModels.Open(Unsupported);
+    const Document = FModels.Open(Type3Builder);
     const Dictionary = TTextTestDocuments.FontDictionary(Document, 'F1');
-    var Raised := False;
+    const Type3Font = TPDFontFactory.CreateFont(Dictionary, Document.Context);
     try
-      TPDFontFactory.CreateFont(Dictionary, Document.Context).Free;
-    except
-      on EPdfUnsupportedFeatureException do
-      begin
-        Raised := True;
-      end;
+      Assert.IsTrue(Type3Font is TPDType3Font, 'a Type 3 subtype gives a Type 3 font');
+    finally
+      Type3Font.Free;
     end;
-    Assert.IsTrue(Raised, 'a Type 3 font is not supported yet');
   finally
-    Unsupported.Free;
+    Type3Builder.Free;
   end;
 end;
-
 procedure TType1FontTests.TestFactoryCachesPerDocument;
 begin
   const Builder = TTextTestDocuments.NewBuilder(TTextTestDocuments.HelveticaF1, '');

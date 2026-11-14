@@ -16,8 +16,7 @@ uses
   Pdf4D.Model.DocumentContext;
 
 type
-  // Makes the right font class for a font dictionary. Type 1 (with or without /FontFile3), MMType1, TrueType and Type0 are known; the
-  // other subtypes raise EPdfUnsupportedFeatureException until their classes exist.
+  // Makes the right font class for a font dictionary: Type 1 (with or without /FontFile3), MMType1, TrueType, Type 3 and Type0.
   TPDFontFactory = class
   private
     class function HasFontFile3(const Dictionary: TCosDictionary): Boolean; static;
@@ -49,9 +48,11 @@ uses
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
+  Pdf4D.Font.CIDFontType0,
   Pdf4D.Font.CIDFontType2,
   Pdf4D.Font.Type0,
   Pdf4D.Font.Type1,
+  Pdf4D.Font.Type3,
   Pdf4D.Font.TrueType,
   Pdf4D.Font.Type1C;
 
@@ -126,7 +127,7 @@ begin
   end
   else if SubType = TCosNames.Type3 then
   begin
-    raise EPdfUnsupportedFeatureException.CreateFmt('Font subtype %s is not supported yet', [SubType]);
+    Result := TPDType3Font.Create(Dictionary, Context);
   end
   else if (SubType = TCosNames.CIDFontType0) or (SubType = TCosNames.CIDFontType2) then
   begin
@@ -161,7 +162,7 @@ begin
   end
   else if SubType = TCosNames.CIDFontType0 then
   begin
-    raise EPdfUnsupportedFeatureException.CreateFmt('Font subtype %s is not supported yet', [SubType]);
+    Result := TPDCIDFontType0.Create(Dictionary, Parent);
   end
   else
   begin

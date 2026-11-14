@@ -140,7 +140,7 @@ type
     // widths in the font program (PDFBOX-563).
     function GetWidth(const Code: Integer): Single;
     function HasExplicitWidth(const Code: Integer): Boolean;
-    function GetAverageFontWidth: Single;
+    function GetAverageFontWidth: Single; virtual;
     // The position vector of the CID: /W2, else the default of /DW2 (half the width, /DW2 first value)
     function GetPositionVector(const Code: Integer): TPdfVector;
     // The vertical displacement of the CID: /W2, else the second value of /DW2 (default -1000)

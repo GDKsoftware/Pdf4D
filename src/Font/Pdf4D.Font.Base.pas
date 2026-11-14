@@ -66,7 +66,6 @@ type
 
     function TryGetNameEntry(const Key: string; out Value: string): Boolean;
 
-    function GetWidths: TArray<Single>;
     function HasWidthsOrMissingWidth: Boolean;
     function TryGetWidthFromWidthsArray(const Code: Integer; out Width: Single): Boolean;
     function ReadWidth(const Code: Integer): Single;
@@ -98,6 +97,8 @@ type
     procedure LogWarning(const Fmt: string; const Args: array of const);
     procedure LogError(const Fmt: string; const Args: array of const);
 
+    // The /Widths entry as floats (0 for a member that is no number), empty when there is none
+    function GetWidths: TArray<Single>;
     function GetName: string; virtual;
     function GetSubType: string;
 

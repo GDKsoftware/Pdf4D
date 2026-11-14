@@ -50,6 +50,10 @@ type
     function ReadEncodingFromFont: TPdfEncoding; virtual; abstract;
     // The font owns Encoding from now on, and returns it
     function AdoptEncoding(const Encoding: TPdfEncoding): TPdfEncoding;
+    // Makes Encoding (shared or adopted) the encoding of the font, for a subclass that reads it in its own way
+    procedure AssignEncoding(const Encoding: TPdfEncoding);
+    // The glyph list of the font is the Adobe glyph list, whatever the name of the font
+    procedure AssignAdobeGlyphList;
 
     // PDSimpleFont.getSymbolicFlag: the flag of the descriptor. False when there is no descriptor.
     function TryGetSymbolicFlag(out Symbolic: Boolean): Boolean;
@@ -72,7 +76,7 @@ type
     function TryGetEncoding(out Encoding: TPdfEncoding): Boolean;
     function GlyphList: TGlyphList;
     // PDSimpleFont.isSymbolic: a font is symbolic unless it is proven not to be
-    function IsSymbolic: Boolean;
+    function IsSymbolic: Boolean; virtual;
 
     function ReadCode(const Data: TBytes; var Position: Integer): Integer; override;
     function IsVertical: Boolean; override;
@@ -127,6 +131,16 @@ function TPDSimpleFont.AdoptEncoding(const Encoding: TPdfEncoding): TPdfEncoding
 begin
   FOwnedEncodings.Add(Encoding);
   Result := Encoding;
+end;
+
+procedure TPDSimpleFont.AssignEncoding(const Encoding: TPdfEncoding);
+begin
+  FEncoding := Encoding;
+end;
+
+procedure TPDSimpleFont.AssignAdobeGlyphList;
+begin
+  FGlyphList := TGlyphList.AdobeGlyphList;
 end;
 
 procedure TPDSimpleFont.ReadEncoding;
