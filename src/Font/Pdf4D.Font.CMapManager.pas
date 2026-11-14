@@ -83,7 +83,8 @@ end;
 
 class function TCMapManager.ParseCMap(const Source: TRandomAccessRead): TCMap;
 begin
-  const Parser = TCMapParser.Create(True);
+  // PDFBox parses the CMaps of a document with the non-strict parser: the last byte of a bfrange target carries over
+  const Parser = TCMapParser.Create(False);
   try
     Result := Parser.Parse(Source);
   finally

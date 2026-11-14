@@ -43,6 +43,9 @@ type
     procedure TestBfRangeWithArray;
 
     [Test]
+    procedure TestBfRangeCarriesOverTheLastByteOfTheTarget;
+
+    [Test]
     procedure TestTwoByteCodespace;
 
     [Test]
@@ -162,6 +165,19 @@ begin
     Assert.AreEqual(#$FB01, UnicodeOf(CMap, 2));
     Assert.AreEqual('b', UnicodeOf(CMap, $11));
     Assert.AreEqual('<none>', UnicodeOf(CMap, $13));
+  finally
+    CMap.Free;
+  end;
+end;
+
+procedure TCMapManagerTests.TestBfRangeCarriesOverTheLastByteOfTheTarget;
+begin
+  // From PDFBOX-5350: <3104> maps to <BFD0>, so <31E0> is <BFD0> plus 220 = <C0AC>
+  const CMap = ParseText('1 begincodespacerange <0000> <FFFF> endcodespacerange 1 beginbfrange <3104> <31F5> <BFD0> endbfrange');
+  try
+    Assert.AreEqual(#$BFD0, UnicodeOf(CMap, $3104));
+    Assert.AreEqual(#$C000, UnicodeOf(CMap, $3134));
+    Assert.AreEqual(#$C0AC, UnicodeOf(CMap, $31E0));
   finally
     CMap.Free;
   end;
