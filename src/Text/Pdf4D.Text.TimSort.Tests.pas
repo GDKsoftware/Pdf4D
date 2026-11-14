@@ -18,6 +18,10 @@ type
     function Values(const Count: Integer): TArray<Integer>;
     // Sorts the indices 0..Count-1 by the values with a comparison that treats values closer than 60 as equal (not transitive)
     function SortByTolerance(const Count: Integer; out Completed: Boolean): Int64;
+    // The same for the keys of one of the block patterns (0 to 3) of 5000 items, with a tolerance that is not 60
+    function SortPattern(const Pattern, Tolerance: Integer; out Completed: Boolean): Int64;
+    class function PatternKey(const Pattern, Index: Integer): Integer; static;
+    class function IndexHash(const Indices: TList<Integer>): Int64; static;
 
   public
     [Test]
@@ -28,6 +32,9 @@ type
 
     [Test]
     procedure TestInconsistentComparisonIsReportedWithPartialOrder;
+
+    [Test]
+    procedure TestLongRunsMatchJdk;
 
     [Test]
     procedure TestConsistentComparisonSortsStably;
@@ -43,6 +50,13 @@ type
     Key: Integer;
     Position: Integer;
   end;
+
+const
+  PatternItemCount = 5000;
+  HashModulus = 1000000007;
+  // From java.util.Collections.sort (JDK 21) on the same keys and comparison; every sort completed
+  JdkHashesForToleranceOne: array[0..3] of Int64 = (600998443, 160199627, 618583199, 414318878);
+  JdkHashesForToleranceTwentyFive: array[0..3] of Int64 = (600998443, 600998443, 211293410, 710172078);
 
 { TTimSortTests }
 
@@ -85,11 +99,72 @@ begin
         end;
       end);
 
-    Result := 0;
-    for var Index in Indices do
+    Result := IndexHash(Indices);
+  finally
+    Indices.Free;
+  end;
+end;
+
+class function TTimSortTests.IndexHash(const Indices: TList<Integer>): Int64;
+begin
+  Result := 0;
+  for var Index in Indices do
+  begin
+    Result := (Result * 31 + Index) mod HashModulus;
+  end;
+end;
+
+// Pattern 0: ascending blocks in scrambled order, 1: descending blocks, 2: two interleaving series of ascending blocks,
+// 3: alternating ascending and descending blocks with overlapping ranges. The runs are long, so the merges gallop.
+class function TTimSortTests.PatternKey(const Pattern, Index: Integer): Integer;
+begin
+  case Pattern of
+    0: Result := (((Index div 500) * 7) mod 10) * 10000 + (Index mod 500) * 3;
+    1: Result := (((Index div 500) * 7) mod 10) * 10000 + (499 - (Index mod 500)) * 3;
+    2: Result := (Index mod 250) * 8 + ((Index div 250) mod 2) * 1000 + ((Index div 250) div 2) * 37;
+  else
     begin
-      Result := (Result * 31 + Index) mod 1000000007;
+      const Block = Index div 100;
+      const Offset = (Block * 13) mod 200;
+      if Block mod 2 = 0 then
+      begin
+        Result := (Index mod 100) * 10 + Offset;
+      end
+      else
+      begin
+        Result := (99 - (Index mod 100)) * 10 + Offset;
+      end;
     end;
+  end;
+end;
+
+function TTimSortTests.SortPattern(const Pattern, Tolerance: Integer; out Completed: Boolean): Int64;
+begin
+  const Indices = TList<Integer>.Create;
+  try
+    for var Index := 0 to PatternItemCount - 1 do
+    begin
+      Indices.Add(Index);
+    end;
+
+    Completed := TTimSort.Sort<Integer>(Indices,
+      function(const Left, Right: Integer): Integer
+      begin
+        const Difference = PatternKey(Pattern, Left) - PatternKey(Pattern, Right);
+        if Abs(Difference) < Tolerance then
+        begin
+          Result := 0;
+        end
+        else if Difference < 0 then
+        begin
+          Result := -1;
+        end
+        else
+        begin
+          Result := 1;
+        end;
+      end);
+    Result := IndexHash(Indices);
   finally
     Indices.Free;
   end;
@@ -115,6 +190,18 @@ begin
   var Completed: Boolean;
   Assert.AreEqual<Int64>(219308268, SortByTolerance(2000, Completed));
   Assert.IsFalse(Completed);
+end;
+
+procedure TTimSortTests.TestLongRunsMatchJdk;
+begin
+  for var Pattern := 0 to 3 do
+  begin
+    var Completed: Boolean;
+    Assert.AreEqual<Int64>(JdkHashesForToleranceOne[Pattern], SortPattern(Pattern, 1, Completed), Format('Pattern %d, tolerance 1', [Pattern]));
+    Assert.IsTrue(Completed);
+    Assert.AreEqual<Int64>(JdkHashesForToleranceTwentyFive[Pattern], SortPattern(Pattern, 25, Completed), Format('Pattern %d, tolerance 25', [Pattern]));
+    Assert.IsTrue(Completed);
+  end;
 end;
 
 procedure TTimSortTests.TestConsistentComparisonSortsStably;

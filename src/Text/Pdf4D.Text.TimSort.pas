@@ -23,6 +23,7 @@ type
     const MinGallopStart = 7;
     const InitialTmpStorageLength = 256;
     const MaxStackLength = 49;
+    const ContractViolationMessage = 'Comparison method violates its general contract';
 
   private
     FItems: TArray<Integer>;
@@ -35,9 +36,10 @@ type
 
     constructor Create(const Items: TArray<Integer>; const Comparison: TComparison<Integer>);
 
-    class procedure Copy(const Source: TArray<Integer>; const SourcePosition: Integer; var Target: TArray<Integer>; const TargetPosition, Count: Integer); static;
-    class procedure ReverseRange(var Items: TArray<Integer>; const First, Till: Integer); static;
+    class procedure Copy(const Source: TArray<Integer>; const SourcePosition: Integer; const Target: TArray<Integer>; const TargetPosition, Count: Integer); static;
+    class procedure ReverseRange(const Items: TArray<Integer>; const First, Till: Integer); static;
     class function MinRunLength(const Count: Integer): Integer; static;
+    class procedure RaiseContractViolation; static;
 
     function CountRunAndMakeAscending(const First, Till: Integer): Integer;
     procedure BinarySort(const First, Till, Start: Integer);
@@ -113,7 +115,7 @@ begin
   end;
 end;
 
-class procedure TTimSort.Copy(const Source: TArray<Integer>; const SourcePosition: Integer; var Target: TArray<Integer>; const TargetPosition, Count: Integer);
+class procedure TTimSort.Copy(const Source: TArray<Integer>; const SourcePosition: Integer; const Target: TArray<Integer>; const TargetPosition, Count: Integer);
 begin
   // Move copes with a source and a target that overlap, as System.arraycopy does
   if Count > 0 then
@@ -122,7 +124,7 @@ begin
   end;
 end;
 
-class procedure TTimSort.ReverseRange(var Items: TArray<Integer>; const First, Till: Integer);
+class procedure TTimSort.ReverseRange(const Items: TArray<Integer>; const First, Till: Integer);
 begin
   var Low := First;
   var High := Till - 1;
@@ -134,6 +136,11 @@ begin
     Inc(Low);
     Dec(High);
   end;
+end;
+
+class procedure TTimSort.RaiseContractViolation;
+begin
+  raise EComparisonViolation.Create(ContractViolationMessage);
 end;
 
 class function TTimSort.MinRunLength(const Count: Integer): Integer;
@@ -403,21 +410,21 @@ procedure TTimSort.MergeCollapse;
 begin
   while FStackSize > 1 do
   begin
-    var N := FStackSize - 2;
-    if ((N > 0) and (FRunLen[N - 1] <= FRunLen[N] + FRunLen[N + 1])) or
-       ((N > 1) and (FRunLen[N - 2] <= FRunLen[N] + FRunLen[N - 1])) then
+    var RunIndex := FStackSize - 2;
+    if ((RunIndex > 0) and (FRunLen[RunIndex - 1] <= FRunLen[RunIndex] + FRunLen[RunIndex + 1])) or
+       ((RunIndex > 1) and (FRunLen[RunIndex - 2] <= FRunLen[RunIndex] + FRunLen[RunIndex - 1])) then
     begin
-      if FRunLen[N - 1] < FRunLen[N + 1] then
+      if FRunLen[RunIndex - 1] < FRunLen[RunIndex + 1] then
       begin
-        Dec(N);
+        Dec(RunIndex);
       end;
     end
-    else if (N < 0) or (FRunLen[N] > FRunLen[N + 1]) then
+    else if (RunIndex < 0) or (FRunLen[RunIndex] > FRunLen[RunIndex + 1]) then
     begin
       // The invariant holds
       Break;
     end;
-    MergeAt(N);
+    MergeAt(RunIndex);
   end;
 end;
 
@@ -425,12 +432,12 @@ procedure TTimSort.MergeForceCollapse;
 begin
   while FStackSize > 1 do
   begin
-    var N := FStackSize - 2;
-    if (N > 0) and (FRunLen[N - 1] < FRunLen[N + 1]) then
+    var RunIndex := FStackSize - 2;
+    if (RunIndex > 0) and (FRunLen[RunIndex - 1] < FRunLen[RunIndex + 1]) then
     begin
-      Dec(N);
+      Dec(RunIndex);
     end;
-    MergeAt(N);
+    MergeAt(RunIndex);
   end;
 end;
 
@@ -451,9 +458,9 @@ begin
   Dec(FStackSize);
 
   // Where the first item of run 2 goes in run 1: the items before it are in place
-  const K = GallopRight(FItems[Base2], FItems, Base1, Len1, 0);
-  Inc(Base1, K);
-  Dec(Len1, K);
+  const SkippedCount = GallopRight(FItems[Base2], FItems, Base1, Len1, 0);
+  Inc(Base1, SkippedCount);
+  Dec(Len1, SkippedCount);
   if Len1 = 0 then
   begin
     Exit;
@@ -648,7 +655,7 @@ begin
   end
   else if Len1 = 0 then
   begin
-    raise EComparisonViolation.Create('Comparison method violates its general contract');
+    RaiseContractViolation;
   end
   else
   begin
@@ -808,7 +815,7 @@ begin
   end
   else if Len2 = 0 then
   begin
-    raise EComparisonViolation.Create('Comparison method violates its general contract');
+    RaiseContractViolation;
   end
   else
   begin
