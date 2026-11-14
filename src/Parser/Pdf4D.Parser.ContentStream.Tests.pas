@@ -64,6 +64,9 @@ type
     procedure TestNumbersAndKeywords;
 
     [Test]
+    procedure TestNegativeZeroIsZero;
+
+    [Test]
     procedure TestArrayAndDictionaryOperands;
 
     [Test]
@@ -422,6 +425,14 @@ begin
   Start('-5 +3 .5 1.25 --7 1-2 true false null foo');
 
   Assert.AreEqual('-5, 3, f0.5, f1.25, -7, 12, true, false, null, op foo', DescribeAll);
+end;
+
+procedure TPdfStreamParserTests.TestNegativeZeroIsZero;
+begin
+  // A matrix such as "-1 0 -0 -1" is found in real files
+  Start('-0 -00 +0');
+
+  Assert.AreEqual('0, 0, 0', DescribeAll);
 end;
 
 procedure TPdfStreamParserTests.TestArrayAndDictionaryOperands;

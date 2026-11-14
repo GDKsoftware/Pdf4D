@@ -263,8 +263,9 @@ begin
     Magnitude := (Magnitude * 10) + UInt64(Digit);
   end;
 
-  if IsNegative then
+  if IsNegative and (Magnitude > 0) then
   begin
+    // Written so that the magnitude of Low(Int64) does not overflow
     Value := -Int64(Magnitude - 1) - 1;
   end
   else
