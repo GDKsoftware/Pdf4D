@@ -59,7 +59,10 @@ type
     function Resources: TPDResources;
     // Port of PDPage.getThreadBeads: one entry for each entry of /B, in order. An entry that is not a dictionary stays an
     // entry (without rectangle), like the null entry of PDFBox.
-    function ThreadBeads: TArray<TPDThreadBead>;
+    // The number of entries of /B, 0 when there is no array
+    function ThreadBeadCount: Integer;
+    // Only the first MaxCount entries are read, so that a huge array costs no more than the limit
+    function ThreadBeads(const MaxCount: Integer): TArray<TPDThreadBead>;
 
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
@@ -68,6 +71,7 @@ type
 implementation
 
 uses
+  System.Math,
   System.Generics.Collections,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Names,
@@ -223,7 +227,20 @@ begin
   Result := FResources;
 end;
 
-function TPDPage.ThreadBeads: TArray<TPDThreadBead>;
+function TPDPage.ThreadBeadCount: Integer;
+begin
+  var Beads: TCosArray;
+  if FDictionary.TryGetCosArray(TCosNames.B, Beads) then
+  begin
+    Result := Beads.Count;
+  end
+  else
+  begin
+    Result := 0;
+  end;
+end;
+
+function TPDPage.ThreadBeads(const MaxCount: Integer): TArray<TPDThreadBead>;
 begin
   var Beads: TCosArray;
   if not FDictionary.TryGetCosArray(TCosNames.B, Beads) then
@@ -231,8 +248,8 @@ begin
     Exit(nil);
   end;
 
-  SetLength(Result, Beads.Count);
-  for var Index := 0 to Beads.Count - 1 do
+  SetLength(Result, Min(Beads.Count, Max(MaxCount, 0)));
+  for var Index := 0 to High(Result) do
   begin
     var Rectangle: TCosArray;
     const Bead = Beads.GetObject(Index);

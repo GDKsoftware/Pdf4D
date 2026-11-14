@@ -14,7 +14,7 @@ uses
 
 type
   // Sorts text by direction first, then top to bottom, and left to right within a line. The comparison uses a tolerance, so
-  // it is not transitive: sort with TIterativeMergeSort, which copes with that.
+  // it is not transitive: the stripper sorts with TTimSort first and falls back to TIterativeMergeSort when TimSort detects that.
   TTextPositionComparator = class
   public
     class function Compare(const Left, Right: TTextPosition): Integer; static;

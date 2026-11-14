@@ -42,6 +42,12 @@ type
     property StartedPages: Integer read FStartedPages;
   end;
 
+  // Fails on every write, like a destination that is full
+  TFailingWriter = class(TStringWriter)
+  public
+    procedure Write(const Value: string); override;
+  end;
+
   [TestFixture]
   TStripperCollectTests = class
   private
@@ -107,7 +113,22 @@ type
     procedure TestFloatMaskIsRestored;
 
     [Test]
+    procedure TestFloatMaskIsRestoredAfterAFailingWriter;
+
+    [Test]
     procedure TestStripperCanRunAgain;
+
+    [Test]
+    procedure TestThreadBeadsReadOnlyTheFirstEntries;
+
+    [Test]
+    procedure TestBeadsBeyondTheLimitAreLoggedAndIgnored;
+
+    [Test]
+    procedure TestDeeplyNestedMarkedContentIsBounded;
+
+    [Test]
+    procedure TestProcessPageWithoutWriteTextIsRejected;
   end;
 
 implementation
@@ -120,6 +141,20 @@ uses
 const
   ShowA = 'BT /F1 12 Tf 100 700 Td (A) Tj ET';
   ShowFont = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+  // T is in the bead [0 400 612 792] of the tests, U is below it
+  TwoLetterContent = 'BT /F1 12 Tf 100 700 Td (T) Tj ET BT /F1 12 Tf 100 100 Td (U) Tj ET';
+  BeadEntry = '<< /R [0 0 10 10] >> ';
+  BeadsOnThePage = 600;
+  BeadsUsed = 500;
+  NestedSequenceCount = 100000;
+  MarkedContentDepthLimit = 1000;
+
+{ TFailingWriter }
+
+procedure TFailingWriter.Write(const Value: string);
+begin
+  raise EWriteError.Create('The destination is full');
+end;
 
 { TCollectingStripper }
 
@@ -316,7 +351,7 @@ end;
 
 procedure TStripperCollectTests.TestBeadsSplitArticles;
 begin
-  const Content = 'BT /F1 12 Tf 100 700 Td (T) Tj ET BT /F1 12 Tf 100 100 Td (U) Tj ET';
+  const Content = TwoLetterContent;
   FStripper.GetText(OpenSinglePage(Content, '/B [<< /R [0 400 612 792] >>]'));
 
   // One bead gives three articles: before the bead, in the bead and after it. The text at y = 700 lies in the bead
@@ -329,7 +364,7 @@ end;
 
 procedure TStripperCollectTests.TestNoBeadsSeparationPutsEverythingInArticleZero;
 begin
-  const Content = 'BT /F1 12 Tf 100 700 Td (T) Tj ET BT /F1 12 Tf 100 100 Td (U) Tj ET';
+  const Content = TwoLetterContent;
   FStripper.ShouldSeparateByBeads := False;
   FStripper.GetText(OpenSinglePage(Content, '/B [<< /R [0 400 612 792] >>]'));
 
@@ -341,7 +376,8 @@ procedure TStripperCollectTests.TestNullBeadEntryKeepsItsPlace;
 begin
   const Content = 'BT /F1 12 Tf 100 700 Td (T) Tj ET';
   const Document = OpenSinglePage(Content, '/B [null << /R [0 400 612 792] >>]');
-  const Beads = Document.Pages.Get(0).ThreadBeads;
+  const Page = Document.Pages.Get(0);
+  const Beads = Page.ThreadBeads(MaxInt);
   Assert.AreEqual<Integer>(2, Length(Beads));
   Assert.IsFalse(Beads[0].HasRectangle);
   Assert.IsTrue(Beads[1].HasRectangle);
@@ -426,6 +462,26 @@ begin
   Assert.IsTrue(Before = GetExceptionMask);
 end;
 
+procedure TStripperCollectTests.TestFloatMaskIsRestoredAfterAFailingWriter;
+begin
+  const Before = GetExceptionMask;
+  const Writer = TFailingWriter.Create;
+  try
+    const Document = OpenBuilder(NewThreePageBuilder(''));
+    Assert.WillRaise(
+      procedure
+      begin
+        FStripper.WriteText(Document, Writer);
+      end, EWriteError);
+  finally
+    Writer.Free;
+  end;
+
+  Assert.IsTrue(Before = GetExceptionMask);
+  // The stripper can be used again
+  Assert.AreEqual<Integer>(3, Length(FStripper.GetText(FModels.Document).Trim.Split([#10])));
+end;
+
 procedure TStripperCollectTests.TestStripperCanRunAgain;
 begin
   const Document = OpenBuilder(NewThreePageBuilder(''));
@@ -435,6 +491,72 @@ begin
   Assert.AreEqual<Integer>(6, FStripper.Pages.Count);
   Assert.AreEqual('A', FStripper.ArticleText(3, 0));
   Assert.AreEqual('C', FStripper.ArticleText(5, 0));
+end;
+
+procedure TStripperCollectTests.TestThreadBeadsReadOnlyTheFirstEntries;
+begin
+  const Document = OpenSinglePage(ShowA, '/B [<< /R [0 0 10 10] >> null << /R [0 400 612 792] >> null null]');
+  const Page = Document.Pages.Get(0);
+
+  const Beads = Page.ThreadBeads(3);
+
+  Assert.AreEqual<Integer>(5, Page.ThreadBeadCount);
+  Assert.AreEqual<Integer>(3, Length(Beads));
+  Assert.IsTrue(Beads[0].HasRectangle);
+  Assert.IsFalse(Beads[1].HasRectangle);
+  Assert.IsTrue(Beads[2].HasRectangle);
+  Assert.AreEqual<Integer>(0, Length(Page.ThreadBeads(0)));
+end;
+
+procedure TStripperCollectTests.TestBeadsBeyondTheLimitAreLoggedAndIgnored;
+begin
+  var Beads := '/B [';
+  for var Index := 1 to BeadsOnThePage do
+  begin
+    Beads := Beads + BeadEntry;
+  end;
+
+  FStripper.GetText(OpenSinglePage(ShowA, Beads + ']'));
+
+  // Each bead gives two articles, and one more is for the text outside the beads
+  Assert.AreEqual<Integer>(BeadsUsed * 2 + 1, Length(FStripper.Pages[0]));
+  Assert.IsTrue(FModels.HasLogLine('article beads'));
+end;
+
+procedure TStripperCollectTests.TestDeeplyNestedMarkedContentIsBounded;
+begin
+  const Builder = TStringBuilder.Create;
+  try
+    for var Index := 1 to NestedSequenceCount do
+    begin
+      Builder.Append('/A BMC ');
+    end;
+    Builder.Append(ShowA);
+    for var Index := 1 to NestedSequenceCount do
+    begin
+      Builder.Append(' EMC');
+    end;
+    Builder.Append(' ').Append(ShowA.Replace('(A)', '(B)').Replace('700', '600'));
+
+    FStripper.GetText(OpenSinglePage(Builder.ToString));
+  finally
+    Builder.Free;
+  end;
+
+  // The EMC operators balance the sequences that were not kept, so the text after them is read as usual
+  Assert.AreEqual('A|B', FStripper.ArticleText(0, 0));
+  Assert.IsTrue(FModels.HasLogLine(Format('nested deeper than %d levels', [MarkedContentDepthLimit])));
+end;
+
+procedure TStripperCollectTests.TestProcessPageWithoutWriteTextIsRejected;
+begin
+  const Document = OpenSinglePage(ShowA);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      FStripper.ProcessPage(Document.Pages.Get(0));
+    end, EInvalidOpException);
 end;
 
 end.

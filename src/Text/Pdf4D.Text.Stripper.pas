@@ -19,59 +19,26 @@ uses
   Pdf4D.Model.Page,
   Pdf4D.Model.PageTree,
   Pdf4D.Text.LegacyStreamEngine,
+  Pdf4D.Text.OverlapColumn,
   Pdf4D.Text.TextPosition;
 
 type
-  // The y values of the characters that were shown at one x position
-  TOverlapYValues = class
-  private
-    FValues: TList<Single>;
-
-    function LowerBound(const Value: Single): Integer;
-
-  public
-    constructor Create;
-    destructor Destroy; override;
-
-    // The values are kept in the order of Float.compare, without doubles (a TreeSet of Float)
-    procedure Add(const Value: Single);
-    function HasValueIn(const From, Till: Single): Boolean;
-  end;
-
-  // The positions where one character was shown, as x with its y values (a TreeMap of Float to a TreeSet of Float)
-  TOverlapColumn = class
-  private
-    FX: TList<Single>;
-    FYValues: TObjectList<TOverlapYValues>;
-
-    function LowerBound(const Value: Single): Integer;
-
-  public
-    constructor Create;
-    destructor Destroy; override;
-
-    procedure Add(const X, Y: Single);
-    // Whether a position with x in [X - Tolerance, X + Tolerance) has a y in [Y - Tolerance, Y + Tolerance). Java throws when
-    // the range runs backwards (a negative tolerance); here that is an empty range.
-    function HasNear(const X, Y, Tolerance: Single): Boolean;
-  end;
-
   // The ten list item formats of PDFTextStripper.LIST_ITEM_EXPRESSIONS, matched on the whole string and in the order of
   // PDFBox, without a regular expression engine
   TListItemPatterns = record
+  private
+    class function IsAsciiDigit(const Character: Char): Boolean; static;
+    class function IsAllDigits(const Text: string; const First, Count: Integer): Boolean; static;
+    class function IsAllIn(const Text: string; const First, Count: Integer; const Allowed: string): Boolean; static;
+    class function IsSingleIn(const Text: string; const First, Count: Integer; const Lower, Upper: Char): Boolean; static;
+    class function MatchesPattern(const Index: Integer; const Text: string): Boolean; static;
+
   public
     const NoMatch = -1;
 
     // The index of the first pattern that matches, or NoMatch
     class function IndexOf(const Text: string): Integer; static;
     class function Matches(const Text: string): Boolean; static;
-
-  private
-    class function IsAsciiDigit(const C: Char): Boolean; static;
-    class function IsAllDigits(const Text: string; const First, Count: Integer): Boolean; static;
-    class function IsAllIn(const Text: string; const First, Count: Integer; const Allowed: string): Boolean; static;
-    class function IsSingleIn(const Text: string; const First, Count: Integer; const Lower, Upper: Char): Boolean; static;
-    class function MatchesPattern(const Index: Integer; const Text: string): Boolean; static;
   end;
 
   // The flags of a text position while the lines are written (PositionWrapper)
@@ -121,6 +88,7 @@ type
   TPdfTextStripper = class(TLegacyPdfStreamEngine)
   private
     const MaxBeadsPerPage = 500;
+    const MaxMarkedContentDepth = 1000;
     const SoftHyphen = #$00AD;
 
   private
@@ -150,6 +118,8 @@ type
     FAverageCharTolerance: Single;
     FBeadRectangles: TArray<TPDThreadBead>;
     FMarkedContents: TObjectList<TPDMarkedContent>;
+    FUncountedMarkedContentDepth: Integer;
+    FIsDepthLimitLogged: Boolean;
     FFirstActualTextPosition: Boolean;
     FHasActualText: Boolean;
     FActualText: string;
@@ -205,7 +175,7 @@ type
     function NeedsWordSeparator(const ExpectedStartOfNextWordX: Single; const Metrics: TPositionMetrics): Boolean;
     procedure ResetLineExtent;
     function CreateWord(const Text: string; const Positions: TArray<TTextPosition>): TWordWithPositions;
-    function NormalizeWord(const Word: string): string;
+    function NormalizeWord(const Text: string): string;
     function Normalize(const Line: TLine): TArray<TWordWithPositions>;
     procedure WriteLine(const Line: TArray<TWordWithPositions>);
     function HandleLineSeparation(const Current, LastPosition, LastLineStartPosition: TPositionWrapper; const MaxHeightForLine: Single): TPositionWrapper;
@@ -236,7 +206,7 @@ type
     procedure WritePageStart; virtual;
     procedure WritePageEnd; virtual;
     // PDFBox runs bidi here. Pdf4D keeps the order of the file, so the word stays as it is.
-    function HandleDirection(const Word: string): string; virtual;
+    function HandleDirection(const Text: string): string; virtual;
     // Adds the position to the article that it lies in, unless it repeats a position that was shown already. The callee
     // becomes the owner of Text.
     procedure ProcessTextPosition(const Text: TTextPosition); override;
@@ -324,9 +294,9 @@ const
 
 { TListItemPatterns }
 
-class function TListItemPatterns.IsAsciiDigit(const C: Char): Boolean;
+class function TListItemPatterns.IsAsciiDigit(const Character: Char): Boolean;
 begin
-  Result := (C >= '0') and (C <= '9');
+  Result := (Character >= '0') and (Character <= '9');
 end;
 
 class function TListItemPatterns.IsAllDigits(const Text: string; const First, Count: Integer): Boolean;
@@ -408,121 +378,6 @@ begin
   FPosition := Position;
 end;
 
-{ TOverlapYValues }
-
-constructor TOverlapYValues.Create;
-begin
-  inherited Create;
-  FValues := TList<Single>.Create;
-end;
-
-destructor TOverlapYValues.Destroy;
-begin
-  FValues.Free;
-  inherited;
-end;
-
-function TOverlapYValues.LowerBound(const Value: Single): Integer;
-begin
-  Result := 0;
-  var High := FValues.Count;
-  while Result < High do
-  begin
-    const Middle = Result + (High - Result) div 2;
-    if TJavaFloat.Compare(FValues[Middle], Value) < 0 then
-    begin
-      Result := Middle + 1;
-    end
-    else
-    begin
-      High := Middle;
-    end;
-  end;
-end;
-
-procedure TOverlapYValues.Add(const Value: Single);
-begin
-  const Index = LowerBound(Value);
-  if (Index >= FValues.Count) or not TJavaFloat.IsSame(FValues[Index], Value) then
-  begin
-    FValues.Insert(Index, Value);
-  end;
-end;
-
-function TOverlapYValues.HasValueIn(const From, Till: Single): Boolean;
-begin
-  const Index = LowerBound(From);
-  Result := (Index < FValues.Count) and (TJavaFloat.Compare(FValues[Index], Till) < 0);
-end;
-
-{ TOverlapColumn }
-
-constructor TOverlapColumn.Create;
-begin
-  inherited Create;
-  FX := TList<Single>.Create;
-  FYValues := TObjectList<TOverlapYValues>.Create(True);
-end;
-
-destructor TOverlapColumn.Destroy;
-begin
-  FYValues.Free;
-  FX.Free;
-  inherited;
-end;
-
-function TOverlapColumn.LowerBound(const Value: Single): Integer;
-begin
-  Result := 0;
-  var High := FX.Count;
-  while Result < High do
-  begin
-    const Middle = Result + (High - Result) div 2;
-    if TJavaFloat.Compare(FX[Middle], Value) < 0 then
-    begin
-      Result := Middle + 1;
-    end
-    else
-    begin
-      High := Middle;
-    end;
-  end;
-end;
-
-procedure TOverlapColumn.Add(const X, Y: Single);
-begin
-  const Index = LowerBound(X);
-  if (Index >= FX.Count) or not TJavaFloat.IsSame(FX[Index], X) then
-  begin
-    FX.Insert(Index, X);
-    FYValues.Insert(Index, TOverlapYValues.Create);
-  end;
-  FYValues[Index].Add(Y);
-end;
-
-function TOverlapColumn.HasNear(const X, Y, Tolerance: Single): Boolean;
-begin
-  Result := False;
-  const XFrom: Single = X - Tolerance;
-  const XTill: Single = X + Tolerance;
-  const YFrom: Single = Y - Tolerance;
-  const YTill: Single = Y + Tolerance;
-  if (TJavaFloat.Compare(XFrom, XTill) > 0) or (TJavaFloat.Compare(YFrom, YTill) > 0) then
-  begin
-    Exit;
-  end;
-
-  var Index := LowerBound(XFrom);
-  while (Index < FX.Count) and (TJavaFloat.Compare(FX[Index], XTill) < 0) do
-  begin
-    if FYValues[Index].HasValueIn(YFrom, YTill) then
-    begin
-      Exit(True);
-    end;
-    Inc(Index);
-  end;
-end;
-
 { TPdfTextStripper }
 
 constructor TPdfTextStripper.Create;
@@ -575,6 +430,8 @@ begin
   FCharacterListMapping.Clear;
   // PDFBox keeps these between runs, so that the state of an unbalanced BDC leaks into the next document
   FMarkedContents.Clear;
+  FUncountedMarkedContentDepth := 0;
+  FIsDepthLimitLogged := False;
   FHasActualText := False;
   FActualText := '';
   FFirstActualTextPosition := False;
@@ -672,6 +529,11 @@ end;
 
 procedure TPdfTextStripper.ProcessPage(const Page: TPDPage);
 begin
+  if not Assigned(FOutput) then
+  begin
+    raise EInvalidOpException.Create('ProcessPage writes to the output of WriteText, so it cannot be called on its own');
+  end;
+
   if not IsPageSelected then
   begin
     Exit;
@@ -700,25 +562,27 @@ procedure TPdfTextStripper.EnsureArticleLists(const NumberOfArticleSections: Int
 begin
   // The lists of earlier pages are emptied and kept, also when this page needs fewer: the list never shrinks, which decides
   // the article of a character outside all beads
-  for var Article in FCharactersByArticle do
+  for var ExistingArticle in FCharactersByArticle do
   begin
-    Article.Clear;
+    ExistingArticle.Clear;
   end;
 
   while FCharactersByArticle.Count < NumberOfArticleSections do
   begin
-    FCharactersByArticle.Add(TObjectList<TTextPosition>.Create(True));
+    const Article = TObjectList<TTextPosition>.Create(True);
+    FCharactersByArticle.Add(Article);
   end;
 end;
 
 procedure TPdfTextStripper.FillBeadRectangles(const Page: TPDPage);
 begin
-  FBeadRectangles := Page.ThreadBeads;
-  if Length(FBeadRectangles) > MaxBeadsPerPage then
+  const BeadCount = Page.ThreadBeadCount;
+  // The page is not the current page of the engine yet, so the engine cannot log for it
+  if (BeadCount > MaxBeadsPerPage) and Assigned(Page.Context.Log) then
   begin
-    LogWarning('The page has %d article beads, only the first %d are used', [Length(FBeadRectangles), MaxBeadsPerPage]);
-    SetLength(FBeadRectangles, MaxBeadsPerPage);
+    Page.Context.Log.Warning('The page has %d article beads, only the first %d are used', [BeadCount, MaxBeadsPerPage]);
   end;
+  FBeadRectangles := Page.ThreadBeads(MaxBeadsPerPage);
 
   const MediaBox = Page.MediaBox;
   const CropBox = Page.CropBox;
@@ -879,7 +743,8 @@ begin
 
     if Line.Count > 0 then
     begin
-      WriteLine(Normalize(Line));
+      const LastWords = Normalize(Line);
+      WriteLine(LastWords);
       WriteParagraphEnd;
     end;
   finally
@@ -1047,7 +912,8 @@ end;
 
 procedure TPdfTextStripper.StartNewLine(const Current: TPositionWrapper; const Line: TLine);
 begin
-  WriteLine(Normalize(Line));
+  const Words = Normalize(Line);
+  WriteLine(Words);
   Line.Clear;
   FLastLineStartPosition := HandleLineSeparation(Current, FLastPosition, FLastLineStartPosition, FMaxHeightForLine);
   ResetLineExtent;
@@ -1056,9 +922,10 @@ end;
 function TPdfTextStripper.NeedsWordSeparator(const ExpectedStartOfNextWordX: Single; const Metrics: TPositionMetrics): Boolean;
 begin
   // Only when the last character was not a word separator already
+  const LastUnicode = FLastPosition.Position.Unicode;
   Result := (not TJavaFloat.IsSame(ExpectedStartOfNextWordX, ExpectedStartOfNextWordXResetValue) and
              (ExpectedStartOfNextWordX < Metrics.X) and
-             ((FWordSeparator = '') or not FLastPosition.Position.Unicode.EndsWith(FWordSeparator, False)));
+             ((FWordSeparator = '') or not LastUnicode.EndsWith(FWordSeparator, False)));
 end;
 
 procedure TPdfTextStripper.ProcessLinePosition(const Position: TTextPosition; const Line: TLine);
@@ -1242,16 +1109,16 @@ end;
 
 // Some characters of the Alphabetic and Arabic presentation forms are changed to their NFKC form. Only that range: NFKC
 // converts too many other things, such as the micro sign to the Greek letter.
-function TPdfTextStripper.NormalizeWord(const Word: string): string;
+function TPdfTextStripper.NormalizeWord(const Text: string): string;
 begin
   var Builder: TStringBuilder := nil;
   try
     var CopiedUpTo := 1;
-    for var Index := 1 to Length(Word) do
+    for var Index := 1 to Length(Text) do
     begin
-      const C = Word[Index];
-      const IsInRange = ((C >= FirstPresentationForm) and (C <= LastArabicPresentationFormA)) or
-                        ((C >= FirstArabicPresentationFormB) and (C <= LastArabicPresentationFormB));
+      const Character = Text[Index];
+      const IsInRange = ((Character >= FirstPresentationForm) and (Character <= LastArabicPresentationFormA)) or
+                        ((Character >= FirstArabicPresentationFormB) and (Character <= LastArabicPresentationFormB));
       if not IsInRange then
       begin
         Continue;
@@ -1259,24 +1126,24 @@ begin
 
       if not Assigned(Builder) then
       begin
-        Builder := TStringBuilder.Create(Length(Word) * 2);
+        Builder := TStringBuilder.Create(Length(Text) * 2);
       end;
-      Builder.Append(Word, CopiedUpTo - 1, Index - CopiedUpTo);
+      Builder.Append(Text, CopiedUpTo - 1, Index - CopiedUpTo);
 
       // Some fonts map U+FDF2 differently than the Unicode spec: they add an extra U+0627 to compensate
-      if (C = ArabicLigatureAllah) and (Index > 1) and ((Word[Index - 1] = ArabicAlef) or (Word[Index - 1] = ArabicAlefIsolated)) then
+      if (Character = ArabicLigatureAllah) and (Index > 1) and ((Text[Index - 1] = ArabicAlef) or (Text[Index - 1] = ArabicAlefIsolated)) then
       begin
         Builder.Append(ArabicLamLamHeh);
       end
       else
       begin
         var Normalized: string;
-        if not TPdfUnicodeText.Instance.TryGetPresentationForm(C, Normalized) then
+        if not TPdfUnicodeText.Instance.TryGetPresentationForm(Character, Normalized) then
         begin
-          Normalized := C;
+          Normalized := Character;
         end;
         // The decomposed Hebrew and Arabic letters come in reverse order
-        if (C >= FirstHebrewForm) and (Length(Normalized) > 1) then
+        if (Character >= FirstHebrewForm) and (Length(Normalized) > 1) then
         begin
           Normalized := ReverseString(Normalized);
         end;
@@ -1287,9 +1154,9 @@ begin
 
     if not Assigned(Builder) then
     begin
-      Exit(HandleDirection(Word));
+      Exit(HandleDirection(Text));
     end;
-    Builder.Append(Word, CopiedUpTo - 1, Length(Word) - CopiedUpTo + 1);
+    Builder.Append(Text, CopiedUpTo - 1, Length(Text) - CopiedUpTo + 1);
     Result := HandleDirection(Builder.ToString);
   finally
     Builder.Free;
@@ -1306,7 +1173,8 @@ begin
     begin
       if not Assigned(Item.Position) then
       begin
-        Words.Add(CreateWord(LineBuilder.ToString, WordPositions.ToArray));
+        const CompletedWord = CreateWord(LineBuilder.ToString, WordPositions.ToArray);
+        Words.Add(CompletedWord);
         LineBuilder.Clear;
         WordPositions.Clear;
       end
@@ -1319,7 +1187,8 @@ begin
 
     if LineBuilder.Length > 0 then
     begin
-      Words.Add(CreateWord(LineBuilder.ToString, WordPositions.ToArray));
+      const LastWord = CreateWord(LineBuilder.ToString, WordPositions.ToArray);
+      Words.Add(LastWord);
     end;
     Result := Words.ToArray;
   finally
@@ -1329,9 +1198,9 @@ begin
   end;
 end;
 
-function TPdfTextStripper.HandleDirection(const Word: string): string;
+function TPdfTextStripper.HandleDirection(const Text: string): string;
 begin
-  Result := Word;
+  Result := Text;
 end;
 
 procedure TPdfTextStripper.WriteLine(const Line: TArray<TWordWithPositions>);
@@ -1410,6 +1279,19 @@ end;
 
 procedure TPdfTextStripper.BeginMarkedContentSequence(const Tag: string; const Properties: TCosDictionary);
 begin
+  if FMarkedContents.Count >= MaxMarkedContentDepth then
+  begin
+    // Deeper sequences are only counted, so that their EMC operators stay balanced
+    if not FIsDepthLimitLogged then
+    begin
+      FIsDepthLimitLogged := True;
+      LogWarning('Marked content is nested deeper than %d levels, the sequences below that are ignored', [MaxMarkedContentDepth]);
+    end;
+    Inc(FUncountedMarkedContentDepth);
+    inherited;
+    Exit;
+  end;
+
   const MarkedContent = TPDMarkedContent.Create(Tag, Properties);
   FMarkedContents.Add(MarkedContent);
   // A sequence without ActualText ends the actual text of the one around it, as in PDFBox
@@ -1424,7 +1306,11 @@ end;
 
 procedure TPdfTextStripper.EndMarkedContentSequence;
 begin
-  if FMarkedContents.Count > 0 then
+  if FUncountedMarkedContentDepth > 0 then
+  begin
+    Dec(FUncountedMarkedContentDepth);
+  end
+  else if FMarkedContents.Count > 0 then
   begin
     var Ignored: string;
     if FMarkedContents.Last.TryGetActualText(Ignored) then
