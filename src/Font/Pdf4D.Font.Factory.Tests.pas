@@ -35,6 +35,12 @@ type
     procedure TestPdfFailureIsRemembered;
 
     [Test]
+    procedure TestRangeErrorIsRememberedAndRaisedAsParseException;
+
+    [Test]
+    procedure TestMathErrorIsRememberedAndRaisedAsParseException;
+
+    [Test]
     procedure TestLibraryFailureIsNotRemembered;
   end;
 
@@ -109,6 +115,16 @@ end;
 procedure TFontFactoryTests.TestPdfFailureIsRemembered;
 begin
   CheckFailsOnceOnly(EPdfParseException);
+end;
+
+procedure TFontFactoryTests.TestRangeErrorIsRememberedAndRaisedAsParseException;
+begin
+  CheckFailsOnceOnly(ERangeError);
+end;
+
+procedure TFontFactoryTests.TestMathErrorIsRememberedAndRaisedAsParseException;
+begin
+  CheckFailsOnceOnly(EOverflow);
 end;
 
 procedure TFontFactoryTests.TestLibraryFailureIsNotRemembered;

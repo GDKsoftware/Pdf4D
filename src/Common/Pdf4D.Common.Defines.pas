@@ -86,7 +86,7 @@ end;
 
 class function TPdfFailure.IsFatal(const Failure: Exception): Boolean;
 begin
-  Result := ((Failure is EExternal) or (Failure is EInvalidPointer) or (Failure is EAbort));
+  Result := (((Failure is EExternal) and (not IsInputFailure(Failure))) or (Failure is EInvalidPointer) or (Failure is EAbort));
 end;
 
 { TPdfLoadOptions }

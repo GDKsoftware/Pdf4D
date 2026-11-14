@@ -29,7 +29,7 @@ type
     class procedure CheckFontType(const Dictionary: TCosDictionary; const Context: TPDDocumentContext); static;
     class procedure LogWarning(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
     class procedure LogError(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
-    class function IsRecoverableFailure(const Failure: Exception): Boolean; static;
+    class procedure RememberFailure(const Dictionary: TCosDictionary; const Context: TPDDocumentContext); static;
     class function CreateNewFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
 
   public
@@ -217,8 +217,8 @@ begin
         raise;
       end;
 
-      Context.AddCachedObject(Dictionary, TPDFontFailure.Create);
-      if IsRecoverableFailure(Failure) then
+      RememberFailure(Dictionary, Context);
+      if Failure is EPdfException then
       begin
         raise;
       end;
@@ -251,9 +251,15 @@ begin
   Result := (Assigned(Context) and Assigned(Dictionary) and Context.TryGetCachedObject(Dictionary, Cached) and (Cached is TPDFontFailure));
 end;
 
-class function TPDFontFactory.IsRecoverableFailure(const Failure: Exception): Boolean;
+class procedure TPDFontFactory.RememberFailure(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
 begin
-  Result := ((Failure is EPdfException) or TPdfFailure.IsInputFailure(Failure));
+  const Marker = TPDFontFailure.Create;
+  try
+    Context.AddCachedObject(Dictionary, Marker);
+  except
+    Marker.Free;
+    raise;
+  end;
 end;
 
 class function TPDFontFactory.CreateDefaultFont(const Context: TPDDocumentContext): TPDFont;
@@ -271,6 +277,5 @@ begin
   end;
   Result.OwnDictionary;
 end;
-
 
 end.

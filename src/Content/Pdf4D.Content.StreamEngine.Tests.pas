@@ -107,6 +107,7 @@ type
     procedure RunAbortCase;
     procedure RunUnsupportedFailureCase;
     procedure RunFailureProcessor(const FailureClass: ExceptClass; const Content: string);
+    procedure CheckInputFailureIsLogged(const FailureClass: ExceptClass);
 
   public
     [Setup]
@@ -216,6 +217,12 @@ type
 
     [Test]
     procedure TestAccessViolationInAnOperatorIsRaised;
+
+    [Test]
+    procedure TestRangeErrorInAnOperatorIsLogged;
+
+    [Test]
+    procedure TestMathErrorInAnOperatorIsLogged;
 
     [Test]
     procedure TestAbortInAnOperatorIsRaised;
@@ -912,6 +919,24 @@ end;
 procedure TStreamEngineTests.TestAccessViolationInAnOperatorIsRaised;
 begin
   Assert.WillRaise(RunAccessViolationCase, EAccessViolation);
+end;
+
+procedure TStreamEngineTests.CheckInputFailureIsLogged(const FailureClass: ExceptClass);
+begin
+  RunFailureProcessor(FailureClass, 'BT /F1 12 Tf XX (A) Tj XX (B) Tj ET');
+
+  Assert.AreEqual<Integer>(2, FEngine.Glyphs.Count, 'the page goes on after the failing operator');
+  Assert.AreEqual<Integer>(2, CountLogLines(FailureClass.ClassName));
+end;
+
+procedure TStreamEngineTests.TestRangeErrorInAnOperatorIsLogged;
+begin
+  CheckInputFailureIsLogged(ERangeError);
+end;
+
+procedure TStreamEngineTests.TestMathErrorInAnOperatorIsLogged;
+begin
+  CheckInputFailureIsLogged(EOverflow);
 end;
 
 procedure TStreamEngineTests.TestAbortInAnOperatorIsRaised;
