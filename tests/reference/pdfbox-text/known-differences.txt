@@ -1,0 +1,10 @@
+# Known differences between Pdf4D and the expected texts of the PDFBox 3.0.8 test suite.
+# The expected texts in this folder are copies of the .txt files in pdfbox/src/test/resources (input and org/apache/pdfbox/text)
+# of apache-pdfbox 3.0.8 (https://archive.apache.org/dist/pdfbox/3.0.8/pdfbox-3.0.8-src.zip), licensed under Apache-2.0.
+# They are made by fetch-reference-text.ps1; see manifest.csv. A line is: <expected text file> # <reason>.
+BidiSample.pdf.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+BidiSample.pdf-sorted.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+FC60_Times.pdf.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+FC60_Times.pdf-sorted.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3); PDFBox 3.0.8 itself also differs from this reference file (made by an older PDFBox), so the file is no Pdf4D bug
+PDFBOX-4531-bidi-ligature-1.pdf.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3)
+PDFBOX-4531-bidi-ligature-1.pdf-sorted.txt # right-to-left text stays in file order, there is no bidi reordering (spec section 3)

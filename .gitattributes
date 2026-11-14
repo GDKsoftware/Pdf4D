@@ -11,3 +11,5 @@ tests/fonts/*.pfb binary
 src/Resources/*.res binary
 src/Resources/resources.csv text eol=lf
 src/Resources/afm-MustRead.html -text
+tests/reference/pdfbox-text/*.txt -text
+tests/reference/pdfbox-text/manifest.csv text eol=lf

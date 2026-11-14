@@ -220,7 +220,8 @@ uses
   Pdf4D.Tests.TextDump in 'Support\Pdf4D.Tests.TextDump.pas',
   Pdf4D.Tests.TextGolden in 'Support\Pdf4D.Tests.TextGolden.pas',
   Pdf4D.Tests.TextGolden.Comparer.Tests in 'Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas',
-  Pdf4D.Tests.TextGolden.Tests in 'Acceptance\Pdf4D.Tests.TextGolden.Tests.pas';
+  Pdf4D.Tests.TextGolden.Tests in 'Acceptance\Pdf4D.Tests.TextGolden.Tests.pas',
+  Pdf4D.Tests.PdfBoxText.Tests in 'Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
