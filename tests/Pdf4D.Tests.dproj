@@ -232,6 +232,13 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.ExtendedGraphicsState.pas"/>
         <DCCReference Include="..\src\Content\Pdf4D.Content.GraphicsState.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Resources.Tests.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.StreamEngine.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.OperatorProcessor.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.Text.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.State.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.DrawObject.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.MarkedContent.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.StreamEngine.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Document.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.TreeWalker.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.pas"/>
