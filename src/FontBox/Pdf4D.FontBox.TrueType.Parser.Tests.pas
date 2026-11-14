@@ -99,6 +99,9 @@ type
     procedure TestNameStringOutsideTableIsSkipped;
 
     [Test]
+    procedure TestUtf16NameStringOfOneByteIsReplaced;
+
+    [Test]
     procedure TestDuplicateDirectoryEntryLastOneWins;
 
     [Test]
@@ -485,6 +488,38 @@ begin
       var Naming: TNamingTable;
       Assert.IsTrue(Font.TryGetNaming(Naming));
       Assert.IsFalse(Naming.NameRecords[0].HasValue);
+    finally
+      Font.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
+end;
+
+// Found by the fuzz: a UTF-16 name string of one byte made the RTL raise EEncodingError out of the parser
+procedure TTrueTypeParserTests.TestUtf16NameStringOfOneByteIsReplaced;
+begin
+  const Data = TTestFonts.Bytes(LiberationSans);
+  const NameOffset = TableOffset(Data, TNamingTable.TableTag);
+  const RecordSize = 12;
+  const PlatformField = 0;
+  const StringLengthField = 8;
+
+  var WindowsRecord := 0;
+  while (((Data[NameOffset + 6 + (RecordSize * WindowsRecord) + PlatformField] shl 8) or
+          Data[NameOffset + 7 + (RecordSize * WindowsRecord) + PlatformField]) <> TNameRecord.PlatformWindows) do
+  begin
+    Inc(WindowsRecord);
+  end;
+  Write16(Data, NameOffset + 6 + (RecordSize * WindowsRecord) + StringLengthField, 1);
+
+  const Parser = TTTFParser.Create;
+  try
+    const Font = Parser.Parse(Data);
+    try
+      var Naming: TNamingTable;
+      Assert.IsTrue(Font.TryGetNaming(Naming));
+      Assert.AreEqual(string(Char($FFFD)), Naming.NameRecords[WindowsRecord].Value);
     finally
       Font.Free;
     end;

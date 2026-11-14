@@ -666,15 +666,15 @@ begin
 
   if HasMark and (FirstUnit = BomLittleEndian) then
   begin
-    Result := TEncoding.Unicode.GetString(Bytes, 2, System.Length(Bytes) - 2);
+    Result := TTTFDataStream.DecodeUtf16(Bytes, 2, False);
   end
   else if HasMark and (FirstUnit = BomBigEndian) then
   begin
-    Result := TEncoding.BigEndianUnicode.GetString(Bytes, 2, System.Length(Bytes) - 2);
+    Result := TTTFDataStream.DecodeUtf16(Bytes, 2, True);
   end
   else
   begin
-    Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+    Result := TTTFDataStream.DecodeUtf16(Bytes, 0, True);
   end;
 end;
 
@@ -719,7 +719,7 @@ begin
   end
   else if (NameRecord.PlatformId = TNameRecord.PlatformIso) and (NameRecord.PlatformEncodingId = 1) then
   begin
-    Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+    Result := TTTFDataStream.DecodeUtf16(Bytes, 0, True);
   end
   else
   begin

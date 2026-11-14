@@ -28,6 +28,10 @@ type
     procedure GuardAvailable(const Count: Int64);
 
   public
+    // The UTF-16 text of the bytes from Offset on. A last byte that is no whole unit becomes U+FFFD, as in Java (the RTL raises
+    // EEncodingError for such a byte).
+    class function DecodeUtf16(const Bytes: TBytes; const Offset: Integer; const IsBigEndian: Boolean): string; static;
+
     // The next byte, or -1 at the end of the data
     function Read: Integer; virtual; abstract;
     // Number of bytes read, or -1 at the end of the data
@@ -98,6 +102,7 @@ uses
 const
   SecondsPerDay = 86400.0;
   FixedPointDivisor = 65536;
+  ReplacementCharacter = #$FFFD;
   // PDFBox limit for the size of an array in RandomAccessReadDataStream
   MaximumDataSize = Int64(MaxInt) - 8;
 
@@ -195,6 +200,33 @@ begin
   Result := Result + (FractionPart / FixedPointDivisor);
 end;
 
+class function TTTFDataStream.DecodeUtf16(const Bytes: TBytes; const Offset: Integer; const IsBigEndian: Boolean): string;
+begin
+  Result := '';
+  const Count = Length(Bytes) - Offset;
+  if Count <= 0 then
+  begin
+    Exit;
+  end;
+
+  const WholeUnitsSize = Count and not 1;
+  if WholeUnitsSize > 0 then
+  begin
+    if IsBigEndian then
+    begin
+      Result := TEncoding.BigEndianUnicode.GetString(Bytes, Offset, WholeUnitsSize);
+    end
+    else
+    begin
+      Result := TEncoding.Unicode.GetString(Bytes, Offset, WholeUnitsSize);
+    end;
+  end;
+  if Odd(Count) then
+  begin
+    Result := Result + ReplacementCharacter;
+  end;
+end;
+
 function TTTFDataStream.ReadString(const Length: Integer; const Encoding: TTTFStringEncoding): string;
 begin
   const Bytes = ReadBytes(Length);
@@ -209,7 +241,7 @@ begin
     end;
     TTTFStringEncoding.Utf16BE:
     begin
-      Result := TEncoding.BigEndianUnicode.GetString(Bytes);
+      Result := DecodeUtf16(Bytes, 0, True);
     end;
   else
     raise ENotSupportedException.CreateFmt('Unsupported string encoding: %d', [Ord(Encoding)]);
