@@ -82,8 +82,13 @@ begin
     try
       Font := TPDFontFactory.GetFont(TCosDictionary(FontSetting.GetObject(0)), Resources.Context);
     except
-      on Error: EPdfException do
+      on Error: Exception do
       begin
+        const IsRecoverable = ((Error is EPdfException) or TPdfFailure.IsInputFailure(Error));
+        if not IsRecoverable then
+        begin
+          raise;
+        end;
         if Assigned(Resources.Context.Log) then
         begin
           Resources.Context.Log.Error('Could not read the font of an ExtGState: %s', [Error.Message]);

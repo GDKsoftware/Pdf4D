@@ -42,11 +42,19 @@ type
         IsNumber: array[0..GlyphBoundsOperandCount - 1] of Boolean;
       end;
 
+      // What the document context keeps per glyph procedure stream: the glyph procedures of all codes and fonts that point
+      // at one stream read it once. Found is False for a stream that has no readable first operator.
+      TFirstOperatorEntry = class
+        Found: Boolean;
+        FirstOperator: TFirstOperator;
+      end;
+
   private
     FFont: TPDType3Font;
     FStream: TCosStream;
 
     function TryReadPrefix(out Prefix: TBytes): Boolean;
+    function TryReadStreamFirstOperator(out FirstOperator: TFirstOperator): Boolean;
     function TryGetFirstOperator(out FirstOperator: TFirstOperator): Boolean;
     function TryReadFirstOperator(const Prefix: TBytes; out FirstOperator: TFirstOperator): Boolean;
     function TryReadOperands(const Parser: TPdfStreamParser; const Operands: TObjectList<TObject>; out FirstOperator: TFirstOperator): Boolean;
@@ -187,18 +195,8 @@ begin
   Prefix := nil;
   Result := False;
   try
-    const Decoded = FStream.CreateDecodedStream;
-    try
-      const Count = Min(Decoded.Size, Int64(MaxPrefixBytes));
-      SetLength(Prefix, Count);
-      Decoded.Position := 0;
-      if Count > 0 then
-      begin
-        Decoded.ReadBuffer(Prefix, Integer(Count));
-      end;
-    finally
-      Decoded.Free;
-    end;
+    // Only the prefix is decoded: reaching the limit is no error, and a stream that expands to gigabytes costs no more
+    Prefix := FStream.DecodePrefix(MaxPrefixBytes);
     Result := True;
   except
     on Failure: Exception do
@@ -281,10 +279,32 @@ begin
   end;
 end;
 
-function TPDType3CharProc.TryGetFirstOperator(out FirstOperator: TFirstOperator): Boolean;
+function TPDType3CharProc.TryReadStreamFirstOperator(out FirstOperator: TFirstOperator): Boolean;
 begin
   var Prefix: TBytes;
   Result := (TryReadPrefix(Prefix) and TryReadFirstOperator(Prefix, FirstOperator));
+end;
+
+function TPDType3CharProc.TryGetFirstOperator(out FirstOperator: TFirstOperator): Boolean;
+begin
+  const Context = FFont.Context;
+  if not Assigned(Context) then
+  begin
+    Exit(TryReadStreamFirstOperator(FirstOperator));
+  end;
+
+  var Cached: TObject;
+  if Context.TryGetCachedObject(TPDCacheScope.GlyphPrefix, FStream, Cached) then
+  begin
+    FirstOperator := TFirstOperatorEntry(Cached).FirstOperator;
+    Exit(TFirstOperatorEntry(Cached).Found);
+  end;
+
+  const Entry = TFirstOperatorEntry.Create;
+  Context.AddCachedObject(TPDCacheScope.GlyphPrefix, FStream, Entry);
+  Entry.Found := TryReadStreamFirstOperator(Entry.FirstOperator);
+  FirstOperator := Entry.FirstOperator;
+  Result := Entry.Found;
 end;
 
 function TPDType3CharProc.TryGetWidth(out Width: Single): Boolean;

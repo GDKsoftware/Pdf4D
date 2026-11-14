@@ -36,6 +36,7 @@ type
     FHasCIDToGIDMap: Boolean;
     FIsEmbedded: Boolean;
     FIsDamaged: Boolean;
+    FIsNonEmbeddedGidWarningGiven: Boolean;
     FCmap: TCmapSubtable;
     FHasBoundingBox: Boolean;
     FBoundingBox: TBoundingBox;
@@ -344,8 +345,13 @@ begin
   const IsSameFont = (FHasCIDToGIDMap and (not FIsDamaged) and (GetBaseFont = FTtf.Name));
   if IsSameFont then
   begin
-    // Acrobat allows non-embedded GIDs. PDFBOX-5612: should happen only if it's really the same font
-    LogWarning('Using non-embedded GIDs in font %s', [GetBaseFont]);
+    // Acrobat allows non-embedded GIDs. PDFBOX-5612: should happen only if it's really the same font. PDFBox logs this for
+    // every glyph; once per font is enough, because the glyph budget of a page does not bound the size of the log.
+    if not FIsNonEmbeddedGidWarningGiven then
+    begin
+      FIsNonEmbeddedGidWarningGiven := True;
+      LogWarning('Using non-embedded GIDs in font %s', [GetBaseFont]);
+    end;
     Exit(MapCIDToGID(FCIDToGID, CodeToCID(Code)));
   end;
 
@@ -397,7 +403,13 @@ function TPDCIDFontType2.GetHeight(const Code: Integer): Single;
 begin
   // Really we want the BBox (for text extraction); shouldn't this be the yMax/yMin?
   const Header = FTtf.HorizontalHeader;
-  Result := Single(Header.Ascender + (-Header.Descender)) / Single(FTtf.UnitsPerEm);
+  // A font without units per em counts as 1, like the bounding box of FontBox does
+  var UnitsPerEm := Single(FTtf.UnitsPerEm);
+  if UnitsPerEm = 0 then
+  begin
+    UnitsPerEm := 1;
+  end;
+  Result := Single(Header.Ascender + (-Header.Descender)) / UnitsPerEm;
 end;
 
 function TPDCIDFontType2.GetWidthFromFont(const Code: Integer): Single;
@@ -405,7 +417,8 @@ begin
   const GID = CodeToGID(Code);
   Result := FTtf.GetAdvanceWidth(GID);
   const UnitsPerEm = Single(FTtf.UnitsPerEm);
-  if UnitsPerEm <> 1000 then
+  // A font without units per em counts as 1000, like the bounding box of FontBox does
+  if (UnitsPerEm <> 1000) and (UnitsPerEm <> 0) then
   begin
     Result := Result * (Single(1000) / UnitsPerEm);
   end;

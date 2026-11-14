@@ -24,6 +24,19 @@ uses
   Pdf4D.Model.DocumentContext;
 
 type
+  // The parsed ToUnicode CMap of one stream, kept by the document context so that fonts that share the stream parse and
+  // charge it once. CMap is nil for a stream that could not be parsed (a failure is not tried again either).
+  TToUnicodeCacheEntry = class
+  private
+    FCMap: TCMap;
+
+  public
+    constructor Create(const CMap: TCMap);
+    destructor Destroy; override;
+
+    property CMap: TCMap read FCMap;
+  end;
+
   // The font dictionary, its widths and its /ToUnicode CMap. The subclasses (simple fonts, Type 3 and composite fonts)
   // add the encoding and the font program. A font belongs to the document context that cached it; it is not thread
   // safe, like the document.
@@ -51,10 +64,14 @@ type
     FSpaceWidth: Single;
     FHasSpaceWidth: Boolean;
     FCodeToWidth: TDictionary<Integer, Single>;
+    FIsScaleWarningGiven: Boolean;
 
     procedure LoadFontDescriptor;
     function BuildDescriptorDictionary(const Metrics: TFontMetrics): TCosDictionary;
     procedure LoadUnicodeCMap;
+    procedure LoadStreamUnicodeCMap(const Stream: TCosStream);
+    procedure LoadOtherUnicodeCMap(const Source: TCosBase);
+    procedure UseToUnicodeCMap(const CMap: TCMap; const OwnsCMap: Boolean);
     function TryReadToUnicodeCMap(const Source: TCosBase; out CMap: TCMap; out OwnsCMap: Boolean): Boolean;
     function TryChargeToUnicodeBudget(const CMap: TCMap): Boolean;
     procedure ReplaceToUnicodeCMap(const CMap: TCMap; const OwnsCMap: Boolean);
@@ -71,6 +88,7 @@ type
     function ReadWidth(const Code: Integer): Single;
     procedure CacheWidth(const Code: Integer; const Width: Single);
 
+    function CalculateAverageFontWidth: Single;
     function ReadSpaceWidth: Single;
     function GetSpaceWidthFromToUnicode: Single;
     function GetSpaceWidthFromEncoding: Single;
@@ -89,6 +107,10 @@ type
     // PDFont.readCMap: a name is a predefined CMap (shared, OwnsCMap is False), a stream an embedded CMap that the
     // caller owns (OwnsCMap is True). Raises EPdfParseException for anything else and for an unknown name.
     function ReadCMap(const Source: TCosBase; out OwnsCMap: Boolean): TCMap;
+    // A glyph width of the font program in thousandths of text space: width times the 1000 scale of the font matrix.
+    // Java calculates that in double. A font matrix or a width that cannot be scaled to a finite value gives 0 and one
+    // warning per font, where PDFBox continues with an infinity or NaN.
+    function ScaleToTextSpace(const Width: Single): Single;
     // The CMap of /ToUnicode, owned by the font. False when there is none.
     function TryGetToUnicodeCMap(out CMap: TCMap): Boolean;
     // The font becomes the owner of Descriptor and frees the one it had
@@ -162,6 +184,20 @@ uses
   Pdf4D.Font.CMapManager,
   Pdf4D.Font.Standard14,
   Pdf4D.IO.RandomAccessRead;
+
+{ TToUnicodeCacheEntry }
+
+constructor TToUnicodeCacheEntry.Create(const CMap: TCMap);
+begin
+  inherited Create;
+  FCMap := CMap;
+end;
+
+destructor TToUnicodeCacheEntry.Destroy;
+begin
+  FCMap.Free;
+  inherited;
+end;
 
 { TPDFont }
 
@@ -265,19 +301,62 @@ begin
   end;
 
   // A stream is parsed only while the document has budget left; a predefined CMap is shared and costs nothing
-  const IsStream = (ToUnicode is TCosStream);
-  const CanParse = (not IsStream) or (not Assigned(FContext)) or (not FContext.IsToUnicodeBudgetExhausted);
-  if not CanParse then
+  if (ToUnicode is TCosStream) and Assigned(FContext) then
+  begin
+    LoadStreamUnicodeCMap(TCosStream(ToUnicode));
+  end
+  else
+  begin
+    LoadOtherUnicodeCMap(ToUnicode);
+  end;
+end;
+
+procedure TPDFont.LoadStreamUnicodeCMap(const Stream: TCosStream);
+begin
+  var Cached: TObject;
+  if FContext.TryGetCachedObject(TPDCacheScope.ToUnicode, Stream, Cached) then
+  begin
+    const CachedCMap = TToUnicodeCacheEntry(Cached).CMap;
+    if Assigned(CachedCMap) then
+    begin
+      UseToUnicodeCMap(CachedCMap, False);
+    end;
+    Exit;
+  end;
+
+  if FContext.IsToUnicodeBudgetExhausted then
   begin
     Exit;
   end;
 
   var CMap: TCMap;
   var OwnsCMap: Boolean;
-  if not TryReadToUnicodeCMap(ToUnicode, CMap, OwnsCMap) then
+  const IsRead = TryReadToUnicodeCMap(Stream, CMap, OwnsCMap);
+  if (not IsRead) and FContext.IsToUnicodeBudgetExhausted then
   begin
+    // Over budget: the document drops every further ToUnicode CMap anyway, so nothing is worth keeping
     Exit;
   end;
+
+  FContext.AddCachedObject(TPDCacheScope.ToUnicode, Stream, TToUnicodeCacheEntry.Create(CMap));
+  if IsRead then
+  begin
+    UseToUnicodeCMap(CMap, False);
+  end;
+end;
+
+procedure TPDFont.LoadOtherUnicodeCMap(const Source: TCosBase);
+begin
+  var CMap: TCMap;
+  var OwnsCMap: Boolean;
+  if TryReadToUnicodeCMap(Source, CMap, OwnsCMap) then
+  begin
+    UseToUnicodeCMap(CMap, OwnsCMap);
+  end;
+end;
+
+procedure TPDFont.UseToUnicodeCMap(const CMap: TCMap; const OwnsCMap: Boolean);
+begin
   ReplaceToUnicodeCMap(CMap, OwnsCMap);
 
   const IsInvalid = (Assigned(FToUnicodeCMap) and (not FToUnicodeCMap.HasUnicodeMappings));
@@ -512,6 +591,21 @@ begin
   Result := False;
 end;
 
+function TPDFont.ScaleToTextSpace(const Width: Single): Single;
+begin
+  if GetFontMatrix.TryScaleWidthToTextSpace(Width, Result) then
+  begin
+    Exit;
+  end;
+
+  if not FIsScaleWarningGiven then
+  begin
+    FIsScaleWarningGiven := True;
+    LogWarning('The font matrix of %s gives a glyph width that is out of range', [Name]);
+  end;
+  Result := 0;
+end;
+
 function TPDFont.GetWidths: TArray<Single>;
 begin
   if not FHasWidths then
@@ -617,26 +711,36 @@ begin
     Exit(FAverageFontWidth);
   end;
 
+  FAverageFontWidth := CalculateAverageFontWidth;
+  Result := FAverageFontWidth;
+end;
+
+function TPDFont.CalculateAverageFontWidth: Single;
+begin
   var TotalWidth: Single := 0;
   var CharacterCount: Single := 0;
-  for var Width in GetWidths do
-  begin
-    if Width > 0 then
+  try
+    for var Width in GetWidths do
     begin
-      TotalWidth := TotalWidth + Width;
-      CharacterCount := CharacterCount + 1;
+      if Width > 0 then
+      begin
+        TotalWidth := TotalWidth + Width;
+        CharacterCount := CharacterCount + 1;
+      end;
+    end;
+
+    if TotalWidth > 0 then
+    begin
+      Exit(TotalWidth / CharacterCount);
+    end;
+    Result := 0;
+  except
+    // Java float arithmetic gives Infinity here, and this does the same on every platform
+    on EMathError do
+    begin
+      Result := Single.PositiveInfinity;
     end;
   end;
-
-  if TotalWidth > 0 then
-  begin
-    FAverageFontWidth := TotalWidth / CharacterCount;
-  end
-  else
-  begin
-    FAverageFontWidth := 0;
-  end;
-  Result := FAverageFontWidth;
 end;
 
 function TPDFont.GetSpaceWidth: Single;

@@ -50,11 +50,6 @@ uses
   Pdf4D.Cos.Names,
   Pdf4D.Font.Factory;
 
-type
-  // What the context holds for a font dictionary that could not be made, so that the failure is logged and costs time once
-  TPDFontFailure = class
-  end;
-
 { TPDResources }
 
 constructor TPDResources.Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
@@ -91,13 +86,17 @@ begin
     Font := TPDFontFactory.GetFont(FontDictionary, FContext);
     Result := True;
   except
-    on Error: EPdfException do
+    on Error: Exception do
     begin
+      const IsRecoverable = ((Error is EPdfException) or TPdfFailure.IsInputFailure(Error));
+      if not IsRecoverable then
+      begin
+        raise;
+      end;
       if Assigned(FContext.Log) then
       begin
         FContext.Log.Error('Could not read font ''%s'': %s', [Name, Error.Message]);
       end;
-      FContext.AddCachedObject(FontDictionary, TPDFontFailure.Create);
       Result := False;
     end;
   end;
@@ -113,8 +112,7 @@ begin
     Exit(False);
   end;
 
-  var Cached: TObject;
-  if FContext.TryGetCachedObject(Value, Cached) and (Cached is TPDFontFailure) then
+  if TPDFontFactory.HasFailed(TCosDictionary(Value), FContext) then
   begin
     Exit(False);
   end;

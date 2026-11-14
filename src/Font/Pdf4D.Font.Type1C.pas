@@ -39,7 +39,6 @@ type
     function GetNameInFont(const GlyphName: string): string;
     function ReadFontMatrix: TPdfMatrix;
     function GenerateBoundingBox: TBoundingBox;
-    function ScaleToTextSpace(const Width: Single): Single;
     function ReadGlyphWidth(const GlyphName: string): Single;
 
   protected
@@ -250,14 +249,6 @@ begin
 
   // The embedded font is not shared, so the damaged charstrings are reported to the log of the document
   Result := FCffFont.GetWidthForGID(FCffFont.NameToGID(GlyphName), DocumentLog);
-end;
-
-function TPDType1CFont.ScaleToTextSpace(const Width: Single): Single;
-begin
-  // The font matrix goes through an AffineTransform with the 1000 scale; Java calculates that in double
-  const Matrix = GetFontMatrix;
-  const Thousand: Double = 1000;
-  Result := Single(Double(Matrix.GetValue(0, 0)) * Thousand * Double(Width) + Double(Matrix.GetValue(2, 0)));
 end;
 
 function TPDType1CFont.GetWidthFromFont(const Code: Integer): Single;

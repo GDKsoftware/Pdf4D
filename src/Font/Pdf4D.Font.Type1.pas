@@ -50,7 +50,6 @@ type
     function TryGetSymbolName(const GlyphName: string; out SymbolName: string): Boolean;
     function ReadFontMatrix: TPdfMatrix;
     function GenerateBoundingBox: TBoundingBox;
-    function ScaleToTextSpace(const Width: Single): Single;
 
   protected
     function ReadEncodingFromFont: TPdfEncoding; override;
@@ -436,14 +435,6 @@ begin
     Exit(FoundName);
   end;
   Result := '.notdef';
-end;
-
-function TPDType1Font.ScaleToTextSpace(const Width: Single): Single;
-begin
-  // The font matrix goes through an AffineTransform with the 1000 scale; Java calculates that in double
-  const Matrix = GetFontMatrix;
-  const Thousand: Double = 1000;
-  Result := Single(Double(Matrix.GetValue(0, 0)) * Thousand * Double(Width) + Double(Matrix.GetValue(2, 0)));
 end;
 
 function TPDType1Font.GetWidthFromFont(const Code: Integer): Single;

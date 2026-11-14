@@ -25,7 +25,6 @@ type
   private
     const PfbStart = Ord('%');
     const AverageCharacterWidth = 500;
-    const Thousand = 1000;
 
   private
     // The program of the font: one of the two, or the TrueType substitute in FType1Font
@@ -445,18 +444,9 @@ end;
 // that cannot be scaled to a finite value gives no width, where PDFBox continues with an infinity or NaN.
 function TPDCIDFontType0.ScaleToTextSpace(const Width: Single): Single;
 begin
-  const Matrix = GetFontMatrix;
-  try
-    const Scaled: Double = Double(Matrix.GetValue(0, 0)) * Thousand * Double(Width) + Double(Matrix.GetValue(2, 0));
-    if (not IsNan(Scaled)) and (Abs(Scaled) <= MaxSingle) then
-    begin
-      Exit(Single(Scaled));
-    end;
-  except
-    on EMathError do
-    begin
-      // The same as a value that is out of range
-    end;
+  if GetFontMatrix.TryScaleWidthToTextSpace(Width, Result) then
+  begin
+    Exit;
   end;
 
   if not FIsScaleWarningGiven then

@@ -509,7 +509,8 @@ begin
   const GID = CodeToGID(Code);
   Result := FTtf.GetAdvanceWidth(GID);
   const UnitsPerEm = Single(FTtf.UnitsPerEm);
-  if UnitsPerEm <> 1000 then
+  // A font without units per em counts as 1000, like the bounding box of FontBox does
+  if (UnitsPerEm <> 1000) and (UnitsPerEm <> 0) then
   begin
     Result := Result * (Single(1000) / UnitsPerEm);
   end;

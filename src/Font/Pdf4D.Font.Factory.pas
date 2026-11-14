@@ -24,6 +24,7 @@ type
     class procedure CheckFontType(const Dictionary: TCosDictionary; const Context: TPDDocumentContext); static;
     class procedure LogWarning(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
     class procedure LogError(const Context: TPDDocumentContext; const Fmt: string; const Args: array of const); static;
+    class function IsRecoverableFailure(const Failure: Exception): Boolean; static;
 
   public
     // PDFontFactory.createFont: a new font that the caller owns. Dictionary stays with the document and has to outlive the
@@ -32,7 +33,11 @@ type
     // The font of a dictionary, made once per document: the font is kept by Context, so the caller does not own it and
     // must not use it after the document is freed. Without a Context this is CreateFont, and the caller owns the font;
     // that is why Context is required here.
+    // A dictionary that failed once is remembered by the context: it is not parsed again (the font program of a Type 0
+    // font can be big), and GetFont raises EPdfParseException for it at once.
     class function GetFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
+    // True when an earlier GetFont for Dictionary failed
+    class function HasFailed(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): Boolean; static;
     // Helvetica with WinAnsiEncoding, like PDType1Font.HELVETICA. The caller owns the font.
     class function CreateDefaultFont(const Context: TPDDocumentContext): TPDFont; static;
     // PDFontFactory.createDescendantFont: the CID font of a Type 0 font, which the caller owns. Parent stays the owner of
@@ -55,6 +60,11 @@ uses
   Pdf4D.Font.Type3,
   Pdf4D.Font.TrueType,
   Pdf4D.Font.Type1C;
+
+type
+  // What the context holds for a font dictionary that could not be made
+  TPDFontFailure = class
+  end;
 
 const
   HelveticaName = 'Helvetica';
@@ -180,16 +190,42 @@ begin
   var Cached: TObject;
   if Context.TryGetCachedObject(Dictionary, Cached) then
   begin
+    if Cached is TPDFontFailure then
+    begin
+      raise EPdfParseException.Create('The font could not be read earlier');
+    end;
     Exit(TPDFont(Cached));
   end;
 
-  Result := CreateFont(Dictionary, Context);
+  try
+    Result := CreateFont(Dictionary, Context);
+  except
+    on Failure: Exception do
+    begin
+      if IsRecoverableFailure(Failure) then
+      begin
+        Context.AddCachedObject(Dictionary, TPDFontFailure.Create);
+      end;
+      raise;
+    end;
+  end;
   try
     Context.AddCachedObject(Dictionary, Result);
   except
     Result.Free;
     raise;
   end;
+end;
+
+class function TPDFontFactory.HasFailed(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): Boolean;
+begin
+  var Cached: TObject;
+  Result := (Assigned(Context) and Assigned(Dictionary) and Context.TryGetCachedObject(Dictionary, Cached) and (Cached is TPDFontFailure));
+end;
+
+class function TPDFontFactory.IsRecoverableFailure(const Failure: Exception): Boolean;
+begin
+  Result := ((Failure is EPdfException) or TPdfFailure.IsInputFailure(Failure));
 end;
 
 class function TPDFontFactory.CreateDefaultFont(const Context: TPDDocumentContext): TPDFont;
