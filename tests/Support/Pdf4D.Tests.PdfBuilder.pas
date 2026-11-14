@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Builds small synthetic PDF files with exact offsets, for the tests of the parser.
 unit Pdf4D.Tests.PdfBuilder;

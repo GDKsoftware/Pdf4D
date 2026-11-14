@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Tests for Pdf4D.Model.Resources, Pdf4D.Model.FormXObject, Pdf4D.Model.ExtendedGraphicsState and the resources of the page
 unit Pdf4D.Model.Resources.Tests;

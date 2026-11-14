@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Tests for Pdf4D.Text.LegacyStreamEngine. The expected values of the Helvetica and embedded font cases were confirmed with

@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Tests for Pdf4D.Text.TimSort. The expected hashes are what java.util.Arrays.sort (JDK 21) gives for the same data.

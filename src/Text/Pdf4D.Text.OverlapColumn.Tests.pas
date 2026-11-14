@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Tests for Pdf4D.Text.ChunkedSortedList and Pdf4D.Text.OverlapColumn: the order of a TreeMap, and the time on hostile input
 unit Pdf4D.Text.OverlapColumn.Tests;

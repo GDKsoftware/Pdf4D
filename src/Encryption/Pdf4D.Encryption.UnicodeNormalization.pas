@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Replaces java.text.Normalizer (NFKC) as used by pdfbox/src/main/java/org/apache/pdfbox/pdmodel/encryption/SaslPrep.java (3.0.8)
 // The algorithm is the one of Unicode Standard Annex 15: full compatibility decomposition, canonical ordering, canonical composition.

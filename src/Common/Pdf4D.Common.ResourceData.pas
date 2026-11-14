@@ -1,3 +1,4 @@
+// Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/resources/org/apache/pdfbox/resources and fontbox/src/main/resources/org/apache/fontbox/cmap (3.0.8), as data
