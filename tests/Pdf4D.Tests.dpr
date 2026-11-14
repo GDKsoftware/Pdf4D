@@ -206,6 +206,7 @@ uses
   Pdf4D.Api.Outline.Interfaces in '..\src\Api\Pdf4D.Api.Outline.Interfaces.pas',
   Pdf4D.Api.Field.Interfaces in '..\src\Api\Pdf4D.Api.Field.Interfaces.pas',
   Pdf4D.Api.Attachment.Interfaces in '..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas',
+  Pdf4D.Api.GuardedWriter in '..\src\Api\Pdf4D.Api.GuardedWriter.pas',
   Pdf4D.Api.DocumentHandle in '..\src\Api\Pdf4D.Api.DocumentHandle.pas',
   Pdf4D.Api.Page in '..\src\Api\Pdf4D.Api.Page.pas',
   Pdf4D.Api.OutlineItem in '..\src\Api\Pdf4D.Api.OutlineItem.pas',

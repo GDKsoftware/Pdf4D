@@ -24,6 +24,7 @@ type
     function TryGetPageIndex(out Index: Integer): Boolean;
     function Children: TArray<IPdfOutlineItem>;
 
+    function Handle: IPdfDocumentHandle;
     // The item of the model, valid as long as the document is
     function ModelItem: TPDOutlineItem;
   end;
@@ -61,6 +62,11 @@ end;
 function TPdfOutlineItem.Children: TArray<IPdfOutlineItem>;
 begin
   Result := Wrap(FHandle, FItem.Children);
+end;
+
+function TPdfOutlineItem.Handle: IPdfDocumentHandle;
+begin
+  Result := FHandle;
 end;
 
 function TPdfOutlineItem.ModelItem: TPDOutlineItem;

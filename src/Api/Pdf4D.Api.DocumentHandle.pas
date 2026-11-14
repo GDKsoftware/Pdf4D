@@ -6,6 +6,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  Pdf4D.Api.GuardedWriter,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Log,
@@ -33,7 +34,8 @@ type
 
     procedure BuildLabels;
     function ReadLabels: TArray<string>;
-    class function ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem; static;
+    function ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
+    class procedure RaiseWriterFailure(const Writer: TPdfGuardedWriter); static;
     procedure WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
 
   public
@@ -133,35 +135,60 @@ begin
   end;
 end;
 
-// A bookmark that is not one of this API is a mistake of the caller
-class function TPdfDocumentHandle.ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
+// A bookmark that is not one of this document is a mistake of the caller
+function TPdfDocumentHandle.ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
 begin
   if not Assigned(Bookmark) then
   begin
     Exit(nil);
   end;
 
-  const Item = (TObject(Bookmark) as TPdfOutlineItem);
+  if not (Bookmark is TPdfOutlineItem) then
+  begin
+    raise EArgumentException.Create('The bookmark does not come from this library');
+  end;
+
+  const Item = (Bookmark as TPdfOutlineItem);
+  if (Item.Handle as TObject) <> Self then
+  begin
+    raise EArgumentException.Create('The bookmark belongs to another document');
+  end;
   Result := Item.ModelItem;
 end;
 
 procedure TPdfDocumentHandle.WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
 begin
+  const Guarded = TPdfGuardedWriter.Create(Writer);
   try
-    WriteTextInStripper(Writer, Options);
-  except
-    on Failure: EPdfException do
-    begin
-      raise;
-    end;
-    on Failure: Exception do
-    begin
-      if not TPdfFailure.IsInputFailure(Failure) then
+    try
+      WriteTextInStripper(Guarded, Options);
+    except
+      on Failure: EPdfException do
       begin
         raise;
       end;
-      raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+      on Failure: Exception do
+      begin
+        RaiseWriterFailure(Guarded);
+        if not TPdfFailure.IsInputFailure(Failure) then
+        begin
+          raise;
+        end;
+        raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+      end;
     end;
+    RaiseWriterFailure(Guarded);
+  finally
+    Guarded.Free;
+  end;
+end;
+
+// The exception of the writer of the caller comes back as it was, not as a failure of the file
+class procedure TPdfDocumentHandle.RaiseWriterFailure(const Writer: TPdfGuardedWriter);
+begin
+  if Writer.HasFailure then
+  begin
+    raise Writer.TakeFailure;
   end;
 end;
 

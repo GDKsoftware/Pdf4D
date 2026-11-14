@@ -57,8 +57,9 @@ type
   // A loaded document. It lives as long as any interface that came from it: a page, an outline item, a field or an
   // attachment keeps it alive, also when the IPdfDocument itself is released.
   //
-  // Failures of the file itself end in an EPdfException descendant. An index outside the pages raises
-  // EArgumentOutOfRangeException.
+  // Input problems (the file, its content) raise EPdfException descendants; invalid arguments raise EArgument* exceptions: an
+  // index outside the pages raises EArgumentOutOfRangeException, and a bookmark of another document or one that this library
+  // did not make raises EArgumentException. An exception of the Writer that is given to WriteText is raised as it was.
   IPdfDocument = interface
     ['{F6B2D834-0E71-4A9C-B5D3-3C8A1E7F9024}']
 
@@ -81,8 +82,8 @@ type
     function Fields: TArray<IPdfField>;
     function Attachments: TArray<IPdfAttachment>;
 
-    // The text of all pages with the default options, as PDFBox's PDFTextStripper writes it. Only EPdfException
-    // descendants are raised.
+    // The text of all pages with the default options, as PDFBox's PDFTextStripper writes it, except that right-to-left text
+    // comes in the order of the file (there is no bidi pass, see docs/porting.md)
     function ExtractText: string; overload;
     function ExtractText(const Options: TPdfTextOptions): string; overload;
     // Writes the text to Writer instead of returning it

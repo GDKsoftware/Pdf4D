@@ -277,6 +277,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Outline.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Field.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.GuardedWriter.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Page.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.OutlineItem.pas"/>

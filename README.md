@@ -66,8 +66,14 @@ begin
 end;
 ```
 
-A document is not thread-safe, but different documents can be used in different threads. Only `EPdfException`
-descendants are raised.
+The text is what PDFBox's `PDFTextStripper` writes, with one deviation: right-to-left text (Hebrew, Arabic) comes in the
+order of the file, because there is no bidi pass. See `docs/porting.md`.
+
+A document is not thread-safe, but different documents can be used in different threads. Input problems (the file or its
+content) raise `EPdfException` descendants; invalid arguments raise `EArgument*` exceptions. A bookmark option
+(`StartBookmark`, `EndBookmark`) that belongs to another document, or that this library did not make, raises
+`EArgumentException`. An exception of the `TTextWriter` that you give to `WriteText` is raised as it was, with its own
+class and message.
 
 ## Building and testing
 
