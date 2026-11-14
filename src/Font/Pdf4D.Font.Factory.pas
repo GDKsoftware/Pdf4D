@@ -23,7 +23,9 @@ type
   // Makes the right font class for a font dictionary: Type 1 (with or without /FontFile3), MMType1, TrueType, Type 3 and Type0.
   TPDFontFactory = class
   private
+{$IFDEF PDF4D_TESTS}
     class var FCreatorOverride: TPDFontCreator;
+{$ENDIF}
 
     class function HasFontFile3(const Dictionary: TCosDictionary): Boolean; static;
     class function CreateType1Font(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont; static;
@@ -53,8 +55,10 @@ type
     // nothing and has to outlive the font. Raises EPdfParseException for a dictionary that is not a font or has another
     // subtype than CIDFontType0 or CIDFontType2.
     class function CreateDescendantFont(const Dictionary: TCosDictionary; const Parent: TPDCIDFontParent): TPDCIDFont; static;
-    // For tests only: replaces the font creation in GetFont. Set before use, reset to nil afterwards.
+{$IFDEF PDF4D_TESTS}
+    // For tests only, compiled when PDF4D_TESTS is defined: replaces the font creation in GetFont. Set before use, reset to nil afterwards.
     class property CreatorOverride: TPDFontCreator read FCreatorOverride write FCreatorOverride;
+{$ENDIF}
   end;
 
 implementation
@@ -238,11 +242,13 @@ end;
 
 class function TPDFontFactory.CreateNewFont(const Dictionary: TCosDictionary; const Context: TPDDocumentContext): TPDFont;
 begin
+{$IFDEF PDF4D_TESTS}
   if Assigned(FCreatorOverride) then
   begin
     Exit(FCreatorOverride(Dictionary, Context));
   end;
 
+{$ENDIF}
   Result := CreateFont(Dictionary, Context);
 end;
 

@@ -47,6 +47,7 @@
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
         <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_Define>PDF4D_TESTS;$(DCC_Define)</DCC_Define>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Content;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;..\src\Resources;..\src\Text;..\src\FontBox;..\src\Font;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>

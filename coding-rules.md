@@ -18,3 +18,4 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 - Only `System.*` units in the library. No `Winapi.*`, `Vcl.*`, `FMX.*` or inline assembler.
 - Every unit that ports PDFBox code names the PDFBox source files and the PDFBox version in its header.
 - Zero hints and zero warnings on all platforms.
+- Test hooks (`TPDFontFactory.CreatorOverride`, the setter of `TCMap.MappingLimit`) exist only when `PDF4D_TESTS` is defined. The define is set in `tests/Pdf4D.Tests.dproj` only, so library code never sees the hooks.

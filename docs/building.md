@@ -7,6 +7,10 @@
 - For Linux64: the Linux64 SDK (for example `ubuntu26.04.sdk` in `Documents\Embarcadero\Studio\SDKs`) registered as the default Linux64 SDK in the IDE (Tools > Options > Deployment > SDK Manager), and WSL with a distribution named `Ubuntu`.
 - Linux64 links `System.ZLib` against the system zlib (`-lz`). The SDK therefore needs `usr/lib/x86_64-linux-gnu/libz.so`, the development link that `zlib1g-dev` provides. When the SDK only has `libz.so.1`, copy or link it as `libz.so` in that folder. `build.ps1` checks for the file before it builds Linux64, in the default Linux64 SDK that the IDE has registered (or in the folder given with `-LinuxSdkPath`), and stops with an error that names the path when it is missing. The script never copies anything itself.
 
+## The PDF4D_TESTS define
+
+`tests\Pdf4D.Tests.dproj` defines `PDF4D_TESTS` for every configuration and platform. It switches on test hooks that the library does not have without it: `TPDFontFactory.CreatorOverride` (replaces the font creation in `GetFont`) and the setter of `TCMap.MappingLimit`. Do not define it in a project that uses the library.
+
 ## Building and running
 
 ```powershell

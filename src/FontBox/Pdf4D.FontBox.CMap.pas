@@ -109,7 +109,9 @@ type
     FSegmentsByLength: TDictionary<Integer, TArray<TCIDSegment>>;
     FCidLengths: TArray<Integer>;
 
+{$IFDEF PDF4D_TESTS}
     class var FMappingLimitOverride: Integer;
+{$ENDIF}
 
     class function GetMappingLimit: Integer; static;
 
@@ -168,9 +170,14 @@ type
     // is added later drops the index again and ToCID goes back to scanning.
     procedure Seal;
 
-    // The most mappings one CMap takes. Set it to 0 to restore the default MaxCMapMappings. Only for tests: it is not
-    // thread-safe to change while CMaps are being filled.
+{$IFDEF PDF4D_TESTS}
+    // The most mappings one CMap takes. Writable only when PDF4D_TESTS is defined (tests): set it to 0 to restore the default
+    // MaxCMapMappings. It is not thread-safe to change while CMaps are being filled.
     class property MappingLimit: Integer read GetMappingLimit write FMappingLimitOverride;
+{$ELSE}
+    // The most mappings one CMap takes: MaxCMapMappings
+    class property MappingLimit: Integer read GetMappingLimit;
+{$ENDIF}
 
     property Name: string read FName write FName;
     property Version: string read FVersion write FVersion;
@@ -897,14 +904,15 @@ end;
 
 class function TCMap.GetMappingLimit: Integer;
 begin
+{$IFDEF PDF4D_TESTS}
   if FMappingLimitOverride > 0 then
   begin
     Result := FMappingLimitOverride;
-  end
-  else
-  begin
-    Result := MaxCMapMappings;
+    Exit;
   end;
+
+{$ENDIF}
+  Result := MaxCMapMappings;
 end;
 
 function TCMap.IsFull: Boolean;
