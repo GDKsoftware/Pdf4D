@@ -124,6 +124,12 @@ type
     procedure TestWriterExceptionIsRaisedAsItWas;
 
     [Test]
+    procedure TestNilWriterIsAnArgumentError;
+
+    [Test]
+    procedure TestGuardedWriterForwardsCharAndLines;
+
+    [Test]
     procedure TestConcurrentExtractionMatchesSequential;
 
     [Test]
@@ -135,6 +141,7 @@ implementation
 uses
   System.IOUtils,
   Pdf4D.Api.Document,
+  Pdf4D.Api.GuardedWriter,
   Pdf4D.Common.Defines,
   Pdf4D.Model.Tests.Support,
   Pdf4D.Tests.Corpus,
@@ -155,6 +162,8 @@ const
   ForeignBookmarkMessage = 'does not come from this library';
   OtherDocumentMessage = 'belongs to another document';
   DiskFullMessage = 'The destination is full';
+  BChar: Char = 'B';
+  ForwardedText = 'ABC' + sLineBreak + sLineBreak;
 
 { TExtractionThread }
 
@@ -518,6 +527,37 @@ begin
     begin
       Document.ExtractText(Options);
     end, EArgumentException, OtherDocumentMessage);
+end;
+
+procedure TApiTextTests.TestNilWriterIsAnArgumentError;
+begin
+  const Document = TPdfDocument.Load(TCorpus.PdfPath(HelloFile));
+
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.WriteText(nil, TPdfTextOptions.Default);
+    end, EArgumentNilException);
+end;
+
+procedure TApiTextTests.TestGuardedWriterForwardsCharAndLines;
+begin
+  const Destination = TStringWriter.Create;
+  try
+    const Guarded = TPdfGuardedWriter.Create(Destination);
+    try
+      Guarded.Write('A');
+      Guarded.Write(BChar);
+      Guarded.WriteLine('C');
+      Guarded.WriteLine;
+    finally
+      Guarded.Free;
+    end;
+
+    Assert.AreEqual(ForwardedText, Destination.ToString);
+  finally
+    Destination.Free;
+  end;
 end;
 
 procedure TApiTextTests.TestWriterExceptionIsRaisedAsItWas;

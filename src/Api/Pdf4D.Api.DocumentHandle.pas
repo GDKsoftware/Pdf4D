@@ -158,6 +158,11 @@ end;
 
 procedure TPdfDocumentHandle.WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
 begin
+  if not Assigned(Writer) then
+  begin
+    raise EArgumentNilException.Create('Writer');
+  end;
+
   const Guarded = TPdfGuardedWriter.Create(Writer);
   try
     try
@@ -165,6 +170,7 @@ begin
     except
       on Failure: EPdfException do
       begin
+        RaiseWriterFailure(Guarded);
         raise;
       end;
       on Failure: Exception do
