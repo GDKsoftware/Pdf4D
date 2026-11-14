@@ -9,7 +9,8 @@ uses
   System.SysUtils,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.DocumentContext,
-  Pdf4D.Model.Rectangle;
+  Pdf4D.Model.Rectangle,
+  Pdf4D.Model.Resources;
 
 type
   // A page of the page tree, which owns it. It holds the page dictionary and does not own that.
@@ -17,6 +18,7 @@ type
   private
     FDictionary: TCosDictionary;
     FContext: TPDDocumentContext;
+    FResources: TPDResources;
 
     function TryGetInheritedBox(const Key: string; out Box: TPdfRectangle): Boolean;
     function GetOwnBox(const Key: string): TPdfRectangle;
@@ -24,6 +26,7 @@ type
   public
     // The page does not own Dictionary or Context
     constructor Create(const Dictionary: TCosDictionary; const Context: TPDDocumentContext);
+    destructor Destroy; override;
 
     // Inherited from the page tree, US Letter when there is none
     function MediaBox: TPdfRectangle;
@@ -42,6 +45,11 @@ type
     function TryGetResources(out Resources: TCosDictionary): Boolean;
     // The streams of /Contents. Entries that are no stream are left out.
     function ContentStreams: TArray<TCosStream>;
+    // PDPage.hasContents: /Contents is a stream with data or an array with items
+    function HasContents: Boolean;
+    // The inherited resources, made on first use and owned by the page. A page without resources dictionary gives empty
+    // resources (PDFBox gives null), so that a caller needs no nil check.
+    function Resources: TPDResources;
 
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
@@ -69,6 +77,12 @@ begin
   inherited Create;
   FDictionary := Dictionary;
   FContext := Context;
+end;
+
+destructor TPDPage.Destroy;
+begin
+  FResources.Free;
+  inherited;
 end;
 
 function TPDPage.TryGetInheritedBox(const Key: string; out Box: TPdfRectangle): Boolean;
@@ -164,6 +178,39 @@ begin
   begin
     Resources := nil;
   end;
+end;
+
+function TPDPage.HasContents: Boolean;
+begin
+  Result := False;
+  var Value: TCosBase;
+  if not FDictionary.TryGetDictionaryObject(TCosNames.Contents, Value) then
+  begin
+    Exit;
+  end;
+
+  if Value is TCosStream then
+  begin
+    Result := (Length(TCosStream(Value).ReadRawPrefix(1)) > 0);
+  end
+  else if Value is TCosArray then
+  begin
+    Result := (TCosArray(Value).Count > 0);
+  end;
+end;
+
+function TPDPage.Resources: TPDResources;
+begin
+  if not Assigned(FResources) then
+  begin
+    var Dictionary: TCosDictionary;
+    if not TryGetResources(Dictionary) then
+    begin
+      Dictionary := nil;
+    end;
+    FResources := TPDResources.Create(Dictionary, FContext);
+  end;
+  Result := FResources;
 end;
 
 function TPDPage.ContentStreams: TArray<TCosStream>;

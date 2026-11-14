@@ -222,6 +222,12 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Tests.Support.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.Tests.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.GraphicsState.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Resources.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.FormXObject.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.ExtendedGraphicsState.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.GraphicsState.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Resources.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Document.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.TreeWalker.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.pas"/>
