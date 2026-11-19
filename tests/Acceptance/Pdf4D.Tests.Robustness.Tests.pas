@@ -129,6 +129,7 @@ uses
   Pdf4D.Tests.Corpus,
   Pdf4D.Tests.StructureDump,
   Pdf4D.Tests.TextDocuments,
+  Pdf4D.Tests.PositionDump,
   Pdf4D.Tests.TextDump;
 
 const
@@ -555,6 +556,7 @@ begin
         if FWork = TFuzzWork.Text then
         begin
           TTextDump.Dump(Document, True);
+          TPositionDump.Probe(Document);
         end;
       finally
         Stream.Free;
@@ -572,6 +574,7 @@ begin
       try
         const Document: IPdfDocument = TPdfDocument.Load(Stream, Options);
         TTextDump.Dump(Document, True);
+        TPositionDump.Probe(Document);
       finally
         Stream.Free;
       end;
