@@ -56,6 +56,9 @@ type
     procedure TestDiacriticMergeBehindBaseCharacterWhenItDoesNotOverlap;
 
     [Test]
+    procedure TestDiacriticMergeKeepsOrTakesTheActualTextSpan;
+
+    [Test]
     procedure TestDiacriticTableCharacterUsesCombiningMark;
 
     [Test]
@@ -184,6 +187,21 @@ begin
   Base.MergeDiacritic(Diacritic);
 
   Assert.AreEqual('e'#$0301, Base.Unicode);
+end;
+
+procedure TTextPositionTests.TestDiacriticMergeKeepsOrTakesTheActualTextSpan;
+begin
+  const Outside = NewPosition('e', 100, 700, 6);
+  const OwnSpan = NewPosition('e', 100, 700, 6);
+  OwnSpan.ActualTextSpan := 4;
+  const Diacritic = NewPosition(#$00B4, 101, 700, 3);
+  Diacritic.ActualTextSpan := 7;
+
+  Outside.MergeDiacritic(Diacritic);
+  OwnSpan.MergeDiacritic(Diacritic);
+
+  Assert.AreEqual<Integer>(7, Outside.ActualTextSpan, 'the base takes the sequence of the diacritic');
+  Assert.AreEqual<Integer>(4, OwnSpan.ActualTextSpan, 'the base keeps its own sequence');
 end;
 
 procedure TTextPositionTests.TestDiacriticTableCharacterUsesCombiningMark;

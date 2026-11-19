@@ -21,6 +21,12 @@ type
     function HandleDirection(const Text: string): string; override;
   end;
 
+  // Makes the protected spreading of characters reachable
+  TProportionalCountsStripper = class(TPdfPositionStripper)
+  public
+    class function CountsOf(const CharCount, PositionCount: Integer): TArray<Integer>;
+  end;
+
   [TestFixture]
   TPdfPositionStripperTests = class
   private
@@ -33,7 +39,7 @@ type
     FPositioned: TPdfPositionedText;
 
     function NewBuilder(const Content: string): TTestPdfBuilder;
-    function NewTwoPageBuilder(const FirstContent, SecondContent: string): TTestPdfBuilder;
+    function NewTwoPageBuilder(const FirstContent, SecondContent: string; const Kids: string = '3 0 R 5 0 R'): TTestPdfBuilder;
     function NewLigatureBuilder(const Content, Mappings: string): TTestPdfBuilder;
     // The text of the text stripper and of the position stripper with the same options. The builder is freed.
     procedure ExtractBoth(const Builder: TTestPdfBuilder; const SortByPosition: Boolean; out Expected, Actual: string);
@@ -85,6 +91,12 @@ type
 
     [Test]
     procedure TestLocateOutOfRangeRaises;
+
+    [Test]
+    procedure TestPageReferencedTwiceGivesPageIndexOfEachOccurrence;
+
+    [Test]
+    procedure TestSpreadingVeryLongWordDoesNotOverflow;
   end;
 
 implementation
@@ -107,6 +119,13 @@ begin
   end;
 end;
 
+{ TProportionalCountsStripper }
+
+class function TProportionalCountsStripper.CountsOf(const CharCount, PositionCount: Integer): TArray<Integer>;
+begin
+  Result := ProportionalCounts(CharCount, PositionCount);
+end;
+
 { TPdfPositionStripperTests }
 
 procedure TPdfPositionStripperTests.Setup;
@@ -125,10 +144,10 @@ begin
   Result := TTextTestDocuments.NewBuilder(TTextTestDocuments.HelveticaF1, Content);
 end;
 
-function TPdfPositionStripperTests.NewTwoPageBuilder(const FirstContent, SecondContent: string): TTestPdfBuilder;
+function TPdfPositionStripperTests.NewTwoPageBuilder(const FirstContent, SecondContent: string; const Kids: string): TTestPdfBuilder;
 begin
   const Resources = '/Resources << /Font << /F1 10 0 R >> >>';
-  Result := TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>');
+  Result := TModelTestDocuments.NewBuilder(Format('<< /Type /Pages /Kids [%s] /Count 2 >>', [Kids]));
   try
     Result.AddObject(3, Format('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R %s >>', [Resources]));
     Result.AddStreamObject(4, '', TEncoding.ASCII.GetBytes(FirstContent));
@@ -400,6 +419,31 @@ begin
       FPositioned.Locate(Length(FPositioned.Text), 2);
     end,
     EArgumentOutOfRangeException);
+end;
+
+procedure TPdfPositionStripperTests.TestPageReferencedTwiceGivesPageIndexOfEachOccurrence;
+begin
+  Extract(NewTwoPageBuilder('BT /F1 12 Tf 100 700 Td (Same page) Tj ET', 'BT /F1 12 Tf 100 700 Td (Unused) Tj ET', '3 0 R 3 0 R'));
+
+  Assert.AreEqual<Integer>(2, Length(FPositioned.Text.Split(['Same page'], TStringSplitOptions.None)) - 1, 'the page is read twice');
+  Assert.AreEqual<Integer>(0, FPositioned.Glyphs[0].PageIndex);
+  Assert.AreEqual<Integer>(1, FPositioned.Glyphs[High(FPositioned.Glyphs)].PageIndex);
+end;
+
+procedure TPdfPositionStripperTests.TestSpreadingVeryLongWordDoesNotOverflow;
+begin
+  const Count = 70000;
+
+  const Counts = TProportionalCountsStripper.CountsOf(Count, Count);
+
+  Assert.AreEqual<Integer>(Count, Length(Counts));
+  for var Index := 0 to High(Counts) do
+  begin
+    if Counts[Index] <> 1 then
+    begin
+      Assert.Fail(Format('position %d got %d characters', [Index, Counts[Index]]));
+    end;
+  end;
 end;
 
 end.

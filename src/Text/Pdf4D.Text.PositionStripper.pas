@@ -38,10 +38,11 @@ type
     function RawCounts(const Positions: TArray<TTextPosition>): TArray<Integer>;
     function NormalizedCounts(const Positions: TArray<TTextPosition>): TArray<Integer>;
     function NormalizedLengthAfter(const Previous: Char; const HasPrevious: Boolean; const Piece: string): Integer;
-    class function ProportionalCounts(const CharCount, PositionCount: Integer): TArray<Integer>; static;
     class function Sum(const Counts: TArray<Integer>): Integer; static;
 
   protected
+    class function ProportionalCounts(const CharCount, PositionCount: Integer): TArray<Integer>; static;
+
     procedure BeginPage(const Page: TPDPage); override;
     procedure WriteLineSeparator; override;
     procedure WriteString(const Text: string; const TextPositions: TArray<TTextPosition>); override;
@@ -104,7 +105,7 @@ end;
 procedure TPdfPositionStripper.BeginPage(const Page: TPDPage);
 begin
   inherited;
-  FPageIndex := Document.Pages.IndexOf(Page.CosObject);
+  FPageIndex := CurrentPageNo - 1;
   FCropLowerLeft := TPointF.Create(Page.CropBox.LowerLeftX, Page.CropBox.LowerLeftY);
   FLog := Page.Context.Log;
   Inc(FLineIndex);
@@ -242,7 +243,7 @@ begin
 
   for var Character := 0 to CharCount - 1 do
   begin
-    const Owner = Character * PositionCount div CharCount;
+    const Owner = Int64(Character) * PositionCount div CharCount;
     Inc(Result[Owner]);
   end;
 end;

@@ -535,6 +535,11 @@ begin
   if TryFindDiacriticIndex(Diacritic, Index) then
   begin
     InsertDiacritic(Index, Diacritic);
+    // A base glyph that is outside an ActualText sequence joins the sequence of the diacritic that was merged into it
+    if FActualTextSpan = 0 then
+    begin
+      FActualTextSpan := Diacritic.FActualTextSpan;
+    end;
   end;
 end;
 
