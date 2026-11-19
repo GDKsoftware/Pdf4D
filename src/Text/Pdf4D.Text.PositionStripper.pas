@@ -139,11 +139,6 @@ end;
 function TPdfPositionStripper.AddGlyph(const Position: TTextPosition): Integer;
 begin
   Result := -1;
-  if not Assigned(Position.Font) then
-  begin
-    Exit;
-  end;
-
   var Quad: TPdfQuad;
   if not TGlyphQuad.TryCreate(Position, FCropLowerLeft, Quad) then
   begin
@@ -156,6 +151,7 @@ begin
   Box.WordIndex := FWordIndex;
   Box.Quad := Quad;
   Box.WidthOfSpace := Position.WidthOfSpace;
+  Box.ActualTextSpan := Position.ActualTextSpan;
   Result := FGlyphs.Add(Box);
 end;
 
@@ -176,16 +172,16 @@ end;
 // are measured one by one; when even that does not add up, the characters are spread evenly.
 function TPdfPositionStripper.CharCounts(const Text: string; const Positions: TArray<TTextPosition>): TArray<Integer>;
 begin
-  Result := RawCounts(Positions);
-  if Sum(Result) = Length(Text) then
+  const Raw = RawCounts(Positions);
+  if Sum(Raw) = Length(Text) then
   begin
-    Exit;
+    Exit(Raw);
   end;
 
-  Result := NormalizedCounts(Positions);
-  if Sum(Result) = Length(Text) then
+  const Normalized = NormalizedCounts(Positions);
+  if Sum(Normalized) = Length(Text) then
   begin
-    Exit;
+    Exit(Normalized);
   end;
 
   if Assigned(FLog) then
@@ -237,6 +233,7 @@ end;
 
 class function TPdfPositionStripper.ProportionalCounts(const CharCount, PositionCount: Integer): TArray<Integer>;
 begin
+  Result := nil;
   SetLength(Result, PositionCount);
   if PositionCount = 0 then
   begin

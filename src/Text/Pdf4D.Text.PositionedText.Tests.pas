@@ -44,10 +44,17 @@ type
     [TestCase('StartZero', '0,1')]
     [TestCase('NegativeLength', '1,-1')]
     [TestCase('PastTheEnd', '4,3')]
+    [TestCase('MaxInt', '2147483647,2147483647')]
     procedure TestLocateOutOfRangeRaises(const Start, Length: Integer);
 
     [Test]
     procedure TestGlyphOfCharOutOfRangeRaises;
+
+    [Test]
+    procedure TestLocateOfHugeQuadsDoesNotRaise;
+
+    [Test]
+    procedure TestLocateActualTextTakesAllGlyphsOfTheSequence;
   end;
 
 implementation
@@ -67,6 +74,7 @@ begin
   Result.LineIndex := LineIndex;
   Result.WordIndex := LineIndex;
   Result.WidthOfSpace := 3;
+  Result.ActualTextSpan := 0;
   Result.Quad := TPdfQuad.Create(TPointF.Create(Left, 0), TPointF.Create(Left + 10, 0), TPointF.Create(Left + 10, 10), TPointF.Create(Left, 10));
 end;
 
@@ -163,6 +171,45 @@ begin
       FText.GlyphOfChar(5);
     end,
     EArgumentOutOfRangeException);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateOfHugeQuadsDoesNotRaise;
+begin
+  const Huge: Single = 1E30;
+  var First := Box(0, 0, 0);
+  var Second := Box(0, 0, 10);
+  First.Quad := TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(Huge, 0), TPointF.Create(Huge, Huge), TPointF.Create(0, Huge));
+  Second.Quad := TPdfQuad.Create(TPointF.Create(Huge, 0), TPointF.Create(Huge, 0), TPointF.Create(Huge, Huge), TPointF.Create(Huge, Huge));
+  FText := TPdfPositionedText.Create('ab', [First, Second], [0, 1]);
+  var Runs: TArray<TPdfLocatedRun>;
+
+  Assert.WillNotRaise(
+    procedure
+    begin
+      Runs := FText.Locate(1, 2);
+    end);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
+  Assert.IsTrue(Runs[0].Quads[0].IsFinite);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateActualTextTakesAllGlyphsOfTheSequence;
+begin
+  var First := Box(0, 0, 0);
+  var Second := Box(0, 0, 10);
+  var Other := Box(0, 0, 20);
+  First.ActualTextSpan := 1;
+  Second.ActualTextSpan := 1;
+  FText := TPdfPositionedText.Create('XYZ', [First, Second, Other], [0, 0, 2]);
+
+  const Runs = FText.Locate(2, 1);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual('Y', Runs[0].Text);
+  Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(20), Double(Runs[0].Quads[0].P2.X), Tolerance);
 end;
 
 end.

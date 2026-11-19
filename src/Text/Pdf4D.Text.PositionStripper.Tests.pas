@@ -11,9 +11,16 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Model.Tests.Support,
   Pdf4D.Tests.PdfBuilder,
-  Pdf4D.Text.PositionedText;
+  Pdf4D.Text.PositionedText,
+  Pdf4D.Text.PositionStripper;
 
 type
+  // Adds a character to every word of more than two characters, so that the text no longer matches the positions however it is measured
+  TTrailingMarkStripper = class(TPdfPositionStripper)
+  protected
+    function HandleDirection(const Text: string): string; override;
+  end;
+
   [TestFixture]
   TPdfPositionStripperTests = class
   private
@@ -53,6 +60,18 @@ type
     procedure TestSortedOutputMapsToRightGlyph;
 
     [Test]
+    procedure TestAllahLigatureTakesTheCharactersOfItsGlyph;
+
+    [Test]
+    procedure TestWordThatDoesNotAddUpIsSpreadOverItsGlyphsAndLogged;
+
+    [Test]
+    procedure TestGlyphWithoutQuadGivesMinusOneAndKeepsText;
+
+    [Test]
+    procedure TestLocateActualTextHighlightsAllGlyphsOfTheSequence;
+
+    [Test]
     procedure TestLocateSingleWord;
 
     [Test]
@@ -72,11 +91,21 @@ implementation
 
 uses
   Pdf4D.Tests.TextDocuments,
-  Pdf4D.Text.PositionStripper,
   Pdf4D.Text.Stripper;
 
 const
   Tolerance = 0.001;
+
+{ TTrailingMarkStripper }
+
+function TTrailingMarkStripper.HandleDirection(const Text: string): string;
+begin
+  Result := Text;
+  if Length(Text) > 2 then
+  begin
+    Result := Text + '!';
+  end;
+end;
 
 { TPdfPositionStripperTests }
 
@@ -224,6 +253,75 @@ begin
   begin
     Assert.IsTrue(Glyph.Quad.P1.X >= FirstGlyph.Quad.P1.X - Tolerance, 'no glyph lies left of the first one');
   end;
+end;
+
+procedure TPdfPositionStripperTests.TestAllahLigatureTakesTheCharactersOfItsGlyph;
+begin
+  Extract(NewLigatureBuilder('BT /F1 12 Tf 100 700 Td (AB) Tj ET', '2 beginbfchar <41> <0627> <42> <FDF2> endbfchar'));
+
+  Assert.IsTrue(FPositioned.Text.StartsWith(#$0627#$0644#$0644#$0647), 'the Allah ligature is written as lam lam heh after the alef');
+  const AlefGlyph = FPositioned.GlyphOfChar(0);
+  const LigatureGlyph = FPositioned.GlyphOfChar(1);
+  Assert.IsTrue(AlefGlyph >= 0);
+  Assert.AreNotEqual<Integer>(AlefGlyph, LigatureGlyph);
+  Assert.AreEqual<Integer>(LigatureGlyph, FPositioned.GlyphOfChar(2));
+  Assert.AreEqual<Integer>(LigatureGlyph, FPositioned.GlyphOfChar(3));
+  Assert.IsFalse(FModels.HasLogLine('spread evenly'), 'the characters were attributed exactly');
+end;
+
+procedure TPdfPositionStripperTests.TestWordThatDoesNotAddUpIsSpreadOverItsGlyphsAndLogged;
+begin
+  const Builder = NewBuilder('BT /F1 12 Tf 100 700 Td (A) Tj (B) Tj (C) Tj ET');
+  try
+    const Stripper = TTrailingMarkStripper.Create;
+    try
+      FPositioned := Stripper.Extract(FModels.Open(Builder));
+    finally
+      Stripper.Free;
+    end;
+  finally
+    Builder.Free;
+  end;
+
+  Assert.IsTrue(FPositioned.Text.StartsWith('ABC!'));
+  const FirstGlyph = FPositioned.GlyphOfChar(0);
+  const SecondGlyph = FPositioned.GlyphOfChar(2);
+  const ThirdGlyph = FPositioned.GlyphOfChar(3);
+  Assert.IsTrue(FirstGlyph >= 0);
+  Assert.AreNotEqual<Integer>(FirstGlyph, SecondGlyph);
+  Assert.AreNotEqual<Integer>(SecondGlyph, ThirdGlyph);
+  Assert.AreEqual<Integer>(FirstGlyph, FPositioned.GlyphOfChar(1));
+  Assert.IsTrue(FModels.HasLogLine('spread evenly'), 'the debug line is logged');
+end;
+
+procedure TPdfPositionStripperTests.TestGlyphWithoutQuadGivesMinusOneAndKeepsText;
+begin
+  const Content = 'BT /F1 12 Tf 100 700 Td (A) Tj 0 0 0 0 150 700 Tm (B) Tj ET';
+  var Expected: string;
+  var Actual: string;
+  ExtractBoth(NewBuilder(Content), False, Expected, Actual);
+  Assert.AreEqual(Expected, Actual, 'the text does not change');
+
+  Extract(NewBuilder(Content));
+
+  const BIndex = FPositioned.Text.IndexOf('B');
+  Assert.IsTrue(BIndex > 0, 'the text has the B');
+  Assert.IsTrue(FPositioned.GlyphOfChar(0) >= 0);
+  Assert.AreEqual<Integer>(-1, FPositioned.GlyphOfChar(BIndex));
+end;
+
+procedure TPdfPositionStripperTests.TestLocateActualTextHighlightsAllGlyphsOfTheSequence;
+begin
+  Extract(NewBuilder('BT /F1 12 Tf 100 700 Td /Span <</ActualText (XY)>> BDC (AB) Tj EMC ET'));
+
+  Assert.IsTrue(FPositioned.Text.StartsWith('XY'), 'the text is the actual text');
+  const Runs = FPositioned.Locate(2, 1);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual('Y', Runs[0].Text);
+  Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
+  Assert.AreEqual(Double(100), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(116.008), Double(Runs[0].Quads[0].P2.X), Tolerance);
 end;
 
 procedure TPdfPositionStripperTests.TestLocateSingleWord;

@@ -74,6 +74,9 @@ type
     [TestCase('NaN', 'True')]
     [TestCase('Infinity', 'False')]
     procedure TestNonFiniteMatrixGivesNoQuad(const IsNaNValue: Boolean);
+
+    [Test]
+    procedure TestNilFontGivesNoQuad;
   end;
 
 implementation
@@ -265,6 +268,16 @@ begin
   end;
   const Font = OpenFont(TTextTestDocuments.HelveticaF1, '');
   const Position = NewPosition(Font, TPdfMatrix.Create(12, 0, 0, Value, 100, 700), 106.672, 700, 6.672);
+  var Quad: TPdfQuad;
+
+  const Created = TGlyphQuad.TryCreate(Position, TPointF.Create(0, 0), Quad);
+
+  Assert.IsFalse(Created);
+end;
+
+procedure TGlyphQuadTests.TestNilFontGivesNoQuad;
+begin
+  const Position = NewPosition(nil, TPdfMatrix.Create(12, 0, 0, 12, 100, 700), 106.672, 700, 6.672);
   var Quad: TPdfQuad;
 
   const Created = TGlyphQuad.TryCreate(Position, TPointF.Create(0, 0), Quad);

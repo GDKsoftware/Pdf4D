@@ -28,6 +28,12 @@ type
     procedure TestExtendEnclosesBothHeights;
 
     [Test]
+    procedure TestExtendBelowSelfAndRotated;
+
+    [Test]
+    procedure TestExtendOfHugeQuadsDoesNotRaise;
+
+    [Test]
     procedure TestIsFiniteFalseForNaN;
   end;
 
@@ -91,6 +97,41 @@ begin
   Assert.AreEqual(Double(15), Double(Union.P4.Y), Tolerance);
   Assert.AreEqual(Double(10), Double(Union.P1.X), Tolerance);
   Assert.AreEqual(Double(38), Double(Union.P2.X), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendBelowSelfAndRotated;
+begin
+  const First = TPdfQuad.Create(TPointF.Create(10, 0), TPointF.Create(20, 0), TPointF.Create(20, 10), TPointF.Create(10, 10));
+  const Second = TPdfQuad.Create(TPointF.Create(20, -4), TPointF.Create(30, -4), TPointF.Create(30, 8), TPointF.Create(20, 8));
+  const RotatedFirst = TPdfQuad.Create(TPointF.Create(0, 10), TPointF.Create(0, 20), TPointF.Create(-10, 20), TPointF.Create(-10, 10));
+  const RotatedSecond = TPdfQuad.Create(TPointF.Create(4, 20), TPointF.Create(4, 30), TPointF.Create(-8, 30), TPointF.Create(-8, 20));
+
+  const Union = First.Extend(Second);
+  const RotatedUnion = RotatedFirst.Extend(RotatedSecond);
+
+  Assert.AreEqual(Double(-4), Double(Union.P1.Y), Tolerance);
+  Assert.AreEqual(Double(-4), Double(Union.P2.Y), Tolerance);
+  Assert.AreEqual(Double(10), Double(Union.P3.Y), Tolerance);
+  Assert.AreEqual(Double(10), Double(Union.P4.Y), Tolerance);
+  Assert.AreEqual(Double(4), Double(RotatedUnion.P1.X), Tolerance);
+  Assert.AreEqual(Double(-10), Double(RotatedUnion.P4.X), Tolerance);
+  Assert.AreEqual(Double(30), Double(RotatedUnion.P2.Y), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendOfHugeQuadsDoesNotRaise;
+begin
+  const Huge: Single = 1E30;
+  const First = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(Huge, 0), TPointF.Create(Huge, Huge), TPointF.Create(0, Huge));
+  const Second = TPdfQuad.Create(TPointF.Create(Huge, 0), TPointF.Create(Huge, 0), TPointF.Create(Huge, Huge), TPointF.Create(Huge, Huge));
+  var Union: TPdfQuad;
+
+  Assert.WillNotRaise(
+    procedure
+    begin
+      Union := First.Extend(Second);
+    end);
+
+  Assert.IsTrue(Union.IsFinite);
 end;
 
 procedure TPdfQuadTests.TestIsFiniteFalseForNaN;

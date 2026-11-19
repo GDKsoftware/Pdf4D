@@ -24,7 +24,7 @@ type
     class function Offset(const Origin, Direction: TPointF; const Distance: Single): TPointF; static;
 
   public
-    // False when the glyph has no finite quad, for instance with a matrix of NaN or infinity
+    // False when the glyph has no finite quad, for instance with a matrix of NaN or infinity, or when the position has no font
     class function TryCreate(const Position: TTextPosition; const CropLowerLeft: TPointF; out Quad: TPdfQuad): Boolean; static;
   end;
 
@@ -46,6 +46,12 @@ const
 
 class function TGlyphQuad.TryCreate(const Position: TTextPosition; const CropLowerLeft: TPointF; out Quad: TPdfQuad): Boolean;
 begin
+  Quad := Default(TPdfQuad);
+  if not Assigned(Position.Font) then
+  begin
+    Exit(False);
+  end;
+
   const Previous = TPdfFloatGuard.Enter;
   try
     const Matrix = Position.TextMatrix;

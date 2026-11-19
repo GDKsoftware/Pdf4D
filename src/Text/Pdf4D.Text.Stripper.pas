@@ -124,6 +124,7 @@ type
     FFirstActualTextPosition: Boolean;
     FHasActualText: Boolean;
     FActualText: string;
+    FActualTextSpan: Integer;
     FCharactersByArticle: TObjectList<TObjectList<TTextPosition>>;
     FCharacterListMapping: TObjectDictionary<string, TOverlapColumn>;
     FDocument: TPDDocument;
@@ -436,6 +437,7 @@ begin
   FIsDepthLimitLogged := False;
   FHasActualText := False;
   FActualText := '';
+  FActualTextSpan := 0;
   FFirstActualTextPosition := False;
 end;
 
@@ -1303,6 +1305,7 @@ begin
   begin
     FActualText := StringReplace(FActualText, SoftHyphen, '', [rfReplaceAll]);
     FFirstActualTextPosition := True;
+    Inc(FActualTextSpan);
   end;
   inherited;
 end;
@@ -1328,6 +1331,7 @@ end;
 
 procedure TPdfTextStripper.ApplyActualText(const Text: TTextPosition);
 begin
+  Text.ActualTextSpan := FActualTextSpan;
   if FFirstActualTextPosition then
   begin
     Text.SetUnicode(FActualText);

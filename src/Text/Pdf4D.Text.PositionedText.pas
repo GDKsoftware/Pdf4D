@@ -7,6 +7,7 @@ unit Pdf4D.Text.PositionedText;
 interface
 
 uses
+  System.Generics.Collections,
   Pdf4D.Common.Quad;
 
 type
@@ -21,6 +22,8 @@ type
     Quad: TPdfQuad;
     // TTextPosition.WidthOfSpace in user space units
     WidthOfSpace: Single;
+    // The number of the ActualText sequence that replaced the text of this glyph (the glyphs of one sequence share it), 0 when there is none
+    ActualTextSpan: Integer;
   end;
 
   // The part of a located range that lies on one page
@@ -40,6 +43,7 @@ type
 
     procedure GuardRange(const Start, Length: Integer);
     function GlyphsOfRange(const Start, Length: Integer): TArray<Integer>;
+    procedure AddActualTextGlyphs(const Found: TList<Integer>);
     function RunOfPage(const Start, Length: Integer; const PageGlyphs: TArray<Integer>): TPdfLocatedRun;
     function QuadsOfLines(const PageGlyphs: TArray<Integer>): TArray<TPdfQuad>;
 
@@ -49,7 +53,7 @@ type
 
     // The glyph of character Index (0-based), or -1
     function GlyphOfChar(const Index: Integer): Integer;
-    // Start is 1-based. Raises EArgumentOutOfRangeException when Start < 1, Length < 0 or Start + Length - 1 > Length(Text).
+    // Start is 1-based. A range that touches the text of an ActualText sequence includes all the glyphs of that sequence. Raises EArgumentOutOfRangeException when Start < 1, Length < 0 or Start + Length - 1 > Length(Text).
     function Locate(const Start, Length: Integer): TArray<TPdfLocatedRun>;
 
     property Text: string read FText;
@@ -59,8 +63,7 @@ type
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Collections;
+  System.SysUtils;
 
 { TPdfPositionedText }
 
@@ -85,7 +88,7 @@ end;
 
 procedure TPdfPositionedText.GuardRange(const Start, Length: Integer);
 begin
-  const IsValid = ((Start >= 1) and (Length >= 0) and (Start + Length - 1 <= System.Length(FText)));
+  const IsValid = ((Start >= 1) and (Length >= 0) and (Length <= System.Length(FText) - Start + 1));
   if not IsValid then
   begin
     raise EArgumentOutOfRangeException.CreateFmt('The range of %d characters from %d lies outside the text of %d characters',
@@ -109,9 +112,48 @@ begin
       end;
     end;
 
+    AddActualTextGlyphs(Found);
     Result := Found.ToArray;
   finally
     Found.Free;
+  end;
+end;
+
+// The text of an ActualText sequence sits on its first glyph, so a range that touches the sequence takes all its glyphs
+procedure TPdfPositionedText.AddActualTextGlyphs(const Found: TList<Integer>);
+begin
+  const Spans = TList<Integer>.Create;
+  try
+    for var Glyph in Found do
+    begin
+      const Span = FGlyphs[Glyph].ActualTextSpan;
+      if (Span <> 0) and not Spans.Contains(Span) then
+      begin
+        Spans.Add(Span);
+      end;
+    end;
+
+    if Spans.Count = 0 then
+    begin
+      Exit;
+    end;
+
+    const InSpans = TList<Integer>.Create;
+    try
+      for var Index := 0 to High(FGlyphs) do
+      begin
+        if Spans.Contains(FGlyphs[Index].ActualTextSpan) and not Found.Contains(Index) then
+        begin
+          InSpans.Add(Index);
+        end;
+      end;
+      Found.AddRange(InSpans);
+    finally
+      InSpans.Free;
+    end;
+    Found.Sort;
+  finally
+    Spans.Free;
   end;
 end;
 

@@ -18,6 +18,7 @@ type
     function GetUp: TPointF;
     // The distance of Point from the baseline of Self along Up, a unit vector
     function HeightOver(const Point, Up: TPointF): Single;
+    function Join(const Other: TPdfQuad): TPdfQuad;
 
   public
     // Start-bottom, end-bottom, end-top, start-top
@@ -29,14 +30,15 @@ type
     function Bounds: TRectF;
     function IsFinite: Boolean;
     // The union of two quads of the same line: along the baseline from P1 and P4 of Self to P2 and P3 of Other, and perpendicular
-    // to the baseline of Self from the lowest bottom to the highest top of both
+    // to the baseline of Self from the lowest bottom to the highest top of both. Self when the result is not finite.
     function Extend(const Other: TPdfQuad): TPdfQuad;
   end;
 
 implementation
 
 uses
-  System.Math;
+  System.Math,
+  Pdf4D.Common.FloatGuard;
 
 { TPdfQuad }
 
@@ -81,7 +83,7 @@ begin
   Result := (Point.X - P1.X) * Up.X + (Point.Y - P1.Y) * Up.Y;
 end;
 
-function TPdfQuad.Extend(const Other: TPdfQuad): TPdfQuad;
+function TPdfQuad.Join(const Other: TPdfQuad): TPdfQuad;
 begin
   var Up := GetUp;
   var UpLength := Sqrt(Up.X * Up.X + Up.Y * Up.Y);
@@ -91,7 +93,7 @@ begin
     UpLength := Sqrt(Up.X * Up.X + Up.Y * Up.Y);
   end;
 
-  const HasHeight = (UpLength > 0);
+  const HasHeight = ((UpLength > 0) and not IsInfinite(UpLength));
   if not HasHeight then
   begin
     Result := TPdfQuad.Create(P1, Other.P2, Other.P3, P4);
@@ -107,6 +109,21 @@ begin
   Result.P2 := TPointF.Create(Other.P2.X + Direction.X * (Bottom - OtherBottom), Other.P2.Y + Direction.Y * (Bottom - OtherBottom));
   Result.P3 := TPointF.Create(Other.P2.X + Direction.X * (Top - OtherBottom), Other.P2.Y + Direction.Y * (Top - OtherBottom));
   Result.P4 := TPointF.Create(P1.X + Direction.X * Top, P1.Y + Direction.Y * Top);
+end;
+
+function TPdfQuad.Extend(const Other: TPdfQuad): TPdfQuad;
+begin
+  const Previous = TPdfFloatGuard.Enter;
+  try
+    Result := Join(Other);
+  finally
+    TPdfFloatGuard.Leave(Previous);
+  end;
+
+  if not Result.IsFinite then
+  begin
+    Result := Self;
+  end;
 end;
 
 end.
