@@ -52,6 +52,18 @@ type
     procedure TestPageLocateFindsInvoiceNumber;
 
     [Test]
+    procedure TestPageTextEqualsExtractTextOfThePage;
+
+    [Test]
+    procedure TestPageLocateOnSecondPage;
+
+    [Test]
+    procedure TestFindSegmentAtPointOnRotatedPage;
+
+    [Test]
+    procedure TestChangingReturnedLayoutArraysLeavesTheLayoutAlone;
+
+    [Test]
     procedure TestRotatedPageGivesSameQuads;
 
     [Test]
@@ -255,6 +267,70 @@ begin
   Assert.AreEqual<Integer>(0, Fragments[0].Start);
   Assert.AreEqual<Integer>(0, Fragments[0].Length);
   Assert.AreEqual(Double(144.016), Double(Fragments[0].Quads[0].P1.X), Tolerance);
+end;
+
+procedure TApiTextLayoutTests.TestPageTextEqualsExtractTextOfThePage;
+begin
+  const Document = LoadBuilder(NewTwoPageBuilder('BT /F1 12 Tf 100 700 Td (First page) Tj 0 -14 Td (more) Tj ET', 'BT /F1 12 Tf 100 700 Td (Second page) Tj ET'));
+
+  Assert.AreEqual(Document.Page(0).ExtractText, Document.Page(0).ExtractTextWithPositions.Text);
+  Assert.AreEqual(Document.Page(1).ExtractText, Document.Page(1).ExtractTextWithPositions.Text);
+  Assert.IsTrue(Document.Page(1).ExtractTextWithPositions.Text.Contains('Second'));
+end;
+
+procedure TApiTextLayoutTests.TestPageLocateOnSecondPage;
+begin
+  const Document = LoadBuilder(NewTwoPageBuilder('BT /F1 12 Tf 100 700 Td (First page) Tj ET', 'BT /F1 12 Tf 150 600 Td (Second page) Tj ET'));
+  const Positioned = Document.Page(1).ExtractTextWithPositions;
+  const Start = Positioned.Text.IndexOf('Second') + 1;
+
+  const Fragments = Positioned.Locate(Start, Length('Second'));
+
+  Assert.AreEqual<Integer>(1, Length(Fragments));
+  Assert.AreEqual<Integer>(1, Fragments[0].PageIndex);
+  Assert.AreEqual('Second', Fragments[0].Text);
+  Assert.AreEqual(Double(150), Double(Fragments[0].Quads[0].P1.X), Tolerance);
+  Assert.IsTrue(Fragments[0].Quads[0].P1.Y < 620, 'the quad lies on the second page text line');
+end;
+
+procedure TApiTextLayoutTests.TestFindSegmentAtPointOnRotatedPage;
+begin
+  const Document = LoadContent('BT /F1 12 Tf 100 700 Td (12 maart 2026) Tj ET', '/Rotate 90');
+  const Layout = Document.Page(0).TextLayout;
+  var Fragment: TPdfTextFragment;
+
+  const IsFoundInside = Layout.TryFindSegmentAt(TPointF.Create(110, 704), Fragment);
+  const FoundText = Fragment.Text;
+  const IsFoundRotatedPoint = Layout.TryFindSegmentAt(TPointF.Create(704, 110), Fragment);
+
+  Assert.IsTrue(IsFoundInside, 'the point is given in PDF user space');
+  Assert.AreEqual('12 maart 2026', FoundText);
+  Assert.IsFalse(IsFoundRotatedPoint);
+end;
+
+procedure TApiTextLayoutTests.TestChangingReturnedLayoutArraysLeavesTheLayoutAlone;
+begin
+  const Document = LoadContent('BT /F1 12 Tf 100 700 Td (12 maart 2026) Tj ET');
+  const Layout = Document.Page(0).TextLayout;
+  var Words := Layout.Words;
+  const OriginalText = Words[0].Text;
+  const OriginalLeft = Words[0].Quads[0].P1.X;
+
+  Words[0].Text := 'changed';
+  Words[0].Quads[0].P1 := TPointF.Create(-1, -1);
+  var Lines := Layout.Lines;
+  Lines[0].Quads[0].P1 := TPointF.Create(-1, -1);
+  var Segments := Layout.Segments;
+  Segments[0].Quads[0].P1 := TPointF.Create(-1, -1);
+  var Found: TPdfTextFragment;
+  Assert.IsTrue(Layout.TryFindWordAt(TPointF.Create(105, 704), Found));
+  Found.Quads[0].P1 := TPointF.Create(-1, -1);
+
+  Assert.AreEqual(OriginalText, Layout.Words[0].Text);
+  Assert.AreEqual(Double(OriginalLeft), Double(Layout.Words[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(OriginalLeft), Double(Layout.Lines[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(OriginalLeft), Double(Layout.Segments[0].Quads[0].P1.X), Tolerance);
+  Assert.IsTrue(Layout.TryFindWordAt(TPointF.Create(105, 704), Found));
 end;
 
 procedure TApiTextLayoutTests.TestRotatedPageGivesSameQuads;

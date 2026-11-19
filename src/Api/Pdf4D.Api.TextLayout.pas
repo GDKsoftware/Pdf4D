@@ -35,6 +35,9 @@ type
     FSegments: TArray<TPdfTextFragment>;
     FLines: TArray<TPdfTextFragment>;
 
+    // Dynamic arrays are shared on assignment, so what leaves the layout is copied, quads included
+    class function CopyOf(const Fragment: TPdfTextFragment): TPdfTextFragment; static;
+    class function CopiesOf(const Fragments: TArray<TPdfTextFragment>): TArray<TPdfTextFragment>; static;
     class function ToFragments(const PageIndex: Integer; const Items: TArray<TPdfLayoutItem>): TArray<TPdfTextFragment>; static;
     class function TryFindAt(const Fragments: TArray<TPdfTextFragment>; const Point: TPointF; out Fragment: TPdfTextFragment): Boolean; static;
 
@@ -114,6 +117,21 @@ begin
   end;
 end;
 
+class function TPdfTextLayout.CopyOf(const Fragment: TPdfTextFragment): TPdfTextFragment;
+begin
+  Result := Fragment;
+  Result.Quads := Copy(Fragment.Quads);
+end;
+
+class function TPdfTextLayout.CopiesOf(const Fragments: TArray<TPdfTextFragment>): TArray<TPdfTextFragment>;
+begin
+  SetLength(Result, Length(Fragments));
+  for var Index := 0 to High(Fragments) do
+  begin
+    Result[Index] := CopyOf(Fragments[Index]);
+  end;
+end;
+
 // A convex quad holds the point when the point lies on the same side of all four edges, whichever way the corners run
 class function TPdfTextLayout.IsInsideQuad(const Point: TPointF; const Quad: TPdfQuad): Boolean;
 begin
@@ -147,7 +165,7 @@ begin
     begin
       if IsInsideQuad(Point, Quad) then
       begin
-        Fragment := Candidate;
+        Fragment := CopyOf(Candidate);
         Exit(True);
       end;
     end;
@@ -169,17 +187,17 @@ end;
 
 function TPdfTextLayout.Words: TArray<TPdfTextFragment>;
 begin
-  Result := FWords;
+  Result := CopiesOf(FWords);
 end;
 
 function TPdfTextLayout.Segments: TArray<TPdfTextFragment>;
 begin
-  Result := FSegments;
+  Result := CopiesOf(FSegments);
 end;
 
 function TPdfTextLayout.Lines: TArray<TPdfTextFragment>;
 begin
-  Result := FLines;
+  Result := CopiesOf(FLines);
 end;
 
 function TPdfTextLayout.TryFindSegmentAt(const Point: TPointF; out Fragment: TPdfTextFragment): Boolean;
