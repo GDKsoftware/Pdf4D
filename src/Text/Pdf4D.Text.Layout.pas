@@ -13,7 +13,8 @@ uses
 
 type
   TPdfLayoutOptions = record
-    // A gap along the baseline of more than this many times the width of a space ends a segment
+    // A gap along the baseline of more than this many times the width of a space ends a segment. Not negative and not NaN: Build raises
+    // EArgumentOutOfRangeException for such a value.
     SegmentGapFactor: Single;
     // A word that ends on a colon ends the segment
     BreakAfterColon: Boolean;
@@ -54,6 +55,8 @@ type
 
     constructor Create(const Positioned: TPdfPositionedText; const PageIndex: Integer; const Options: TPdfLayoutOptions);
 
+    class procedure GuardOptions(const Options: TPdfLayoutOptions); static;
+
     procedure CollectWords;
     procedure AddWord(const First, Last: Integer);
     function BuildWords: TArray<TPdfLayoutItem>;
@@ -73,6 +76,8 @@ type
 implementation
 
 uses
+  System.SysUtils,
+  System.Math,
   System.Character;
 
 { TPdfLayoutOptions }
@@ -87,6 +92,8 @@ end;
 
 class function TPdfTextLayoutBuilder.Build(const Text: TPdfPositionedText; const PageIndex: Integer; const Options: TPdfLayoutOptions): TPdfPageLayout;
 begin
+  GuardOptions(Options);
+
   const Builder = TPdfTextLayoutBuilder.Create(Text, PageIndex, Options);
   try
     Builder.CollectWords;
@@ -97,6 +104,15 @@ begin
     Result.Lines := Builder.BuildLines;
   finally
     Builder.Free;
+  end;
+end;
+
+class procedure TPdfTextLayoutBuilder.GuardOptions(const Options: TPdfLayoutOptions);
+begin
+  const IsValid = ((not IsNaN(Options.SegmentGapFactor)) and (Options.SegmentGapFactor >= 0));
+  if not IsValid then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('The segment gap factor must be zero or more, not %g', [Options.SegmentGapFactor]);
   end;
 end;
 

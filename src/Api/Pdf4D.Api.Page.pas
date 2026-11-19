@@ -135,7 +135,7 @@ begin
 
   const Positioned = FHandle.ExtractPositioned(TextOptions);
   try
-    Result := TPdfTextLayout.Create(TPdfTextLayoutBuilder.Build(Positioned, FIndex, Options));
+    Result := TPdfTextLayout.Create(TPdfTextLayoutBuilder.Build(Positioned, FIndex, Options), Positioned.Text);
   finally
     Positioned.Free;
   end;

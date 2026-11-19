@@ -36,11 +36,18 @@ type
     FOwnedStream: TStream;
     FLabels: TArray<string>;
     FAreLabelsBuilt: Boolean;
+{$IFDEF PDF4D_TESTS}
+    class var FStripperHook: TProc;
+{$ENDIF}
 
     procedure BuildLabels;
     function ReadLabels: TArray<string>;
     function ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
     class procedure RaiseWriterFailure(const Writer: TPdfGuardedWriter); static;
+    // The failure of the file that an EPdfException does not describe yet, as an EPdfParseException. Nil for an EPdfException and for
+    // everything that is no input failure: those are raised as they are.
+    class function TranslatedFailure(const Failure: Exception): Exception; static;
+    class procedure RaiseTranslated(const Failure: Exception); static;
     procedure WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
     function ExtractPositionedInStripper(const Options: TPdfTextOptions): TPdfPositionedText;
     procedure ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
@@ -55,6 +62,12 @@ type
     function PageLabel(const Index: Integer): string;
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
     function ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
+
+{$IFDEF PDF4D_TESTS}
+    // For tests only, compiled when PDF4D_TESTS is defined: runs when a stripper is set up, inside the code that translates failures.
+    // Set before use, reset to nil afterwards.
+    class property StripperHook: TProc read FStripperHook write FStripperHook;
+{$ENDIF}
   end;
 
 implementation
@@ -184,11 +197,8 @@ begin
       on Failure: Exception do
       begin
         RaiseWriterFailure(Guarded);
-        if not TPdfFailure.IsInputFailure(Failure) then
-        begin
-          raise;
-        end;
-        raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+        RaiseTranslated(Failure);
+        raise;
       end;
     end;
     RaiseWriterFailure(Guarded);
@@ -217,12 +227,31 @@ begin
     end;
     on Failure: Exception do
     begin
-      if not TPdfFailure.IsInputFailure(Failure) then
-      begin
-        raise;
-      end;
-      raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+      RaiseTranslated(Failure);
+      raise;
     end;
+  end;
+end;
+
+class function TPdfDocumentHandle.TranslatedFailure(const Failure: Exception): Exception;
+begin
+  const IsTranslated = ((not (Failure is EPdfException)) and TPdfFailure.IsInputFailure(Failure));
+  if IsTranslated then
+  begin
+    Result := EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+  end
+  else
+  begin
+    Result := nil;
+  end;
+end;
+
+class procedure TPdfDocumentHandle.RaiseTranslated(const Failure: Exception);
+begin
+  const Translated = TranslatedFailure(Failure);
+  if Assigned(Translated) then
+  begin
+    raise Translated;
   end;
 end;
 
@@ -252,6 +281,13 @@ end;
 
 procedure TPdfDocumentHandle.ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
 begin
+{$IFDEF PDF4D_TESTS}
+  if Assigned(FStripperHook) then
+  begin
+    FStripperHook;
+  end;
+
+{$ENDIF}
   Stripper.SortByPosition := Options.SortByPosition;
   Stripper.StartPage := Options.StartPage;
   Stripper.EndPage := Options.EndPage;

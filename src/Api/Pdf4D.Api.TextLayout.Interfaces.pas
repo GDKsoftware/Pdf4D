@@ -20,7 +20,7 @@ type
     Text: string;
     Quads: TArray<TPdfQuad>;
     // The 1-based range of the fragment in the text it came from, in UTF-16 code units. For a word, segment or line of a text layout
-    // that is the text of the page with the default options but SortByPosition set. Both are 0 for the result of Locate.
+    // that is IPdfTextLayout.Text. Both are 0 for the result of Locate.
     Start, Length: Integer;
   end;
 
@@ -41,6 +41,8 @@ type
     ['{C41B8E27-0D95-4A3F-B6E8-72F5A1D9C360}']
 
     function PageIndex: Integer;
+    // The text of the page (read with SortByPosition set) that Start and Length of the words, segments and lines refer to
+    function Text: string;
     function Words: TArray<TPdfTextFragment>;
     function Segments: TArray<TPdfTextFragment>;
     function Lines: TArray<TPdfTextFragment>;

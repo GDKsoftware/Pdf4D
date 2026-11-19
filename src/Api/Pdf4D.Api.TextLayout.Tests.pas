@@ -33,6 +33,7 @@ type
     function InvoiceQuadsOf(const Document: IPdfDocument): TArray<TPdfQuad>;
     procedure AssertSameQuads(const Expected, Actual: TArray<TPdfQuad>);
     procedure AssertSamePoint(const Expected, Actual: TPointF);
+    procedure AssertTextFailsWith(const Document: IPdfDocument; const FailureClass: ExceptClass);
 
   public
     [Setup]
@@ -81,15 +82,51 @@ type
     [TestCase('NestedInlineImage', 'BT /F1 12 Tf 100 700 Td (Hi) Tj ET BI /W 1 BI /H 2 ID x EI')]
     [TestCase('UnterminatedString', 'BT /F1 12 Tf 100 700 Td (Hi Tj ET')]
     [TestCase('HugeNumbers', 'BT /F1 12 Tf 1e300 0 0 1e300 1e300 1e300 Tm (Hi) Tj ET')]
-    procedure TestBrokenContentRaisesPdfException(const Content: string);
+    procedure TestBrokenContentFailsLikeExtractText(const Content: string);
 
+    [Test]
+    procedure TestInputFailureOfTheStripperBecomesParseException;
+
+    [Test]
+    procedure TestPdfExceptionOfTheStripperIsRaisedAsItWas;
+
+    [Test]
+    procedure TestOtherFailureOfTheStripperIsRaisedAsItWas;
+
+    [Test]
+    procedure TestLayoutTextHoldsTheRangesOfTheItems;
+
+    [Test]
+    procedure TestNegativeSegmentGapFactorRaises;
+
+    [Test]
+    procedure TestNotANumberSegmentGapFactorRaises;
+
+    [Test]
+    procedure TestQuadContainsPointInsideAndNotOutside;
+
+    [Test]
+    procedure TestObliqueQuadContainsPointInsideAndNotOutside;
+
+    [Test]
+    procedure TestQuadWithCornersTheOtherWayRoundContainsPoint;
+
+    [Test]
+    procedure TestQuadWithoutAreaContainsNoPoint;
+
+    [Test]
+    procedure TestQuadWithNotANumberCornerContainsNoPoint;
   end;
 
 implementation
 
 uses
+  System.Math,
   System.RegularExpressions,
   Pdf4D.Api.Document,
+  Pdf4D.Api.DocumentHandle,
+  Pdf4D.Api.TextLayout,
+  Pdf4D.Common.Quad,
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Defines,
   Pdf4D.Model.Tests.Support,
@@ -109,6 +146,7 @@ end;
 
 procedure TApiTextLayoutTests.TearDown;
 begin
+  TPdfDocumentHandle.StripperHook := nil;
   FStreams.Free;
 end;
 
@@ -341,7 +379,7 @@ begin
   end;
 end;
 
-procedure TApiTextLayoutTests.TestBrokenContentRaisesPdfException(const Content: string);
+procedure TApiTextLayoutTests.TestBrokenContentFailsLikeExtractText(const Content: string);
 begin
   const Document = LoadContent(Content);
 
@@ -364,6 +402,152 @@ begin
   Assert.IsTrue(ExpectedClass = PositionedClass, 'ExtractTextWithPositions must fail like ExtractText');
   Assert.IsTrue(ExpectedClass = LayoutClass, 'TextLayout must fail like ExtractText');
   Assert.IsTrue((not Assigned(ExpectedClass)) or ExpectedClass.InheritsFrom(EPdfException), 'A broken file gives an EPdfException');
+end;
+
+procedure TApiTextLayoutTests.AssertTextFailsWith(const Document: IPdfDocument; const FailureClass: ExceptClass);
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.ExtractTextWithPositions;
+    end, FailureClass);
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.Page(0).ExtractTextWithPositions;
+    end, FailureClass);
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.Page(0).TextLayout;
+    end, FailureClass);
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.ExtractText;
+    end, FailureClass);
+end;
+
+procedure TApiTextLayoutTests.TestInputFailureOfTheStripperBecomesParseException;
+begin
+  const Document = LoadContent(OneLine);
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise ERangeError.Create('Injected failure');
+    end;
+
+  AssertTextFailsWith(Document, EPdfParseException);
+end;
+
+procedure TApiTextLayoutTests.TestPdfExceptionOfTheStripperIsRaisedAsItWas;
+begin
+  const Document = LoadContent(OneLine);
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise EPdfLimitExceededException.Create('Injected failure');
+    end;
+
+  AssertTextFailsWith(Document, EPdfLimitExceededException);
+end;
+
+procedure TApiTextLayoutTests.TestOtherFailureOfTheStripperIsRaisedAsItWas;
+begin
+  const Document = LoadContent(OneLine);
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise EInvalidOperation.Create('Injected failure');
+    end;
+
+  AssertTextFailsWith(Document, EInvalidOperation);
+end;
+
+procedure TApiTextLayoutTests.TestLayoutTextHoldsTheRangesOfTheItems;
+begin
+  const Document = LoadContent('BT /F1 12 Tf 100 700 Td (Nummer: 2024-0815) Tj 0 -14 Td (12 maart 2026) Tj ET');
+  const Layout = Document.Page(0).TextLayout;
+
+  Assert.IsTrue(Length(Layout.Words) > 0);
+  Assert.IsTrue(Length(Layout.Segments) > 0);
+  Assert.IsTrue(Length(Layout.Lines) > 0);
+  for var Fragment in Layout.Words + Layout.Segments + Layout.Lines do
+  begin
+    Assert.AreEqual(Fragment.Text, Copy(Layout.Text, Fragment.Start, Fragment.Length));
+  end;
+end;
+
+procedure TApiTextLayoutTests.TestNegativeSegmentGapFactorRaises;
+begin
+  const Document = LoadContent(OneLine);
+  var Options := TPdfTextLayoutOptions.Default;
+  Options.SegmentGapFactor := -1;
+
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.Page(0).TextLayout(Options);
+    end, EArgumentOutOfRangeException);
+end;
+
+procedure TApiTextLayoutTests.TestNotANumberSegmentGapFactorRaises;
+begin
+  const Document = LoadContent(OneLine);
+  var Options := TPdfTextLayoutOptions.Default;
+  Options.SegmentGapFactor := NaN;
+
+  Assert.WillRaise(
+    procedure
+    begin
+      Document.Page(0).TextLayout(Options);
+    end, EArgumentOutOfRangeException);
+end;
+
+procedure TApiTextLayoutTests.TestQuadContainsPointInsideAndNotOutside;
+begin
+  const Quad = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 0), TPointF.Create(10, 10), TPointF.Create(0, 10));
+
+  Assert.IsTrue(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, 5), Quad));
+  Assert.IsTrue(TPdfTextLayout.IsInsideQuad(TPointF.Create(10, 5), Quad), 'the edge belongs to the quad');
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(15, 5), Quad));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, -1), Quad));
+end;
+
+procedure TApiTextLayoutTests.TestObliqueQuadContainsPointInsideAndNotOutside;
+begin
+  const Quad = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 10), TPointF.Create(5, 15), TPointF.Create(-5, 5));
+
+  Assert.IsTrue(TPdfTextLayout.IsInsideQuad(TPointF.Create(2.5, 7.5), Quad));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(10, 0), Quad));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(0, 12), Quad));
+end;
+
+procedure TApiTextLayoutTests.TestQuadWithCornersTheOtherWayRoundContainsPoint;
+begin
+  const Quad = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(0, 10), TPointF.Create(10, 10), TPointF.Create(10, 0));
+
+  Assert.IsTrue(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, 5), Quad));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(15, 5), Quad));
+end;
+
+procedure TApiTextLayoutTests.TestQuadWithoutAreaContainsNoPoint;
+begin
+  const Corner = TPointF.Create(5, 5);
+  const Dot = TPdfQuad.Create(Corner, Corner, Corner, Corner);
+  const Line = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 0), TPointF.Create(10, 0), TPointF.Create(0, 0));
+
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(Corner, Dot));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(1, 1), Dot));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, 0), Line));
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, 3), Line));
+end;
+
+procedure TApiTextLayoutTests.TestQuadWithNotANumberCornerContainsNoPoint;
+begin
+  const Quad = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 0), TPointF.Create(NaN, 10), TPointF.Create(0, 10));
+
+  Assert.IsFalse(TPdfTextLayout.IsInsideQuad(TPointF.Create(5, 5), Quad));
 end;
 
 end.

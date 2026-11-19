@@ -30,18 +30,22 @@ type
   TPdfTextLayout = class(TInterfacedObject, IPdfTextLayout)
   private
     FPageIndex: Integer;
+    FText: string;
     FWords: TArray<TPdfTextFragment>;
     FSegments: TArray<TPdfTextFragment>;
     FLines: TArray<TPdfTextFragment>;
 
     class function ToFragments(const PageIndex: Integer; const Items: TArray<TPdfLayoutItem>): TArray<TPdfTextFragment>; static;
-    class function IsInsideQuad(const Point: TPointF; const Quad: TPdfQuad): Boolean; static;
     class function TryFindAt(const Fragments: TArray<TPdfTextFragment>; const Point: TPointF; out Fragment: TPdfTextFragment): Boolean; static;
 
   public
-    constructor Create(const Layout: TPdfPageLayout);
+    constructor Create(const Layout: TPdfPageLayout; const Text: string);
+
+    // Whether the point lies in the quad, edges included. A quad that is not finite or has no area contains no point.
+    class function IsInsideQuad(const Point: TPointF; const Quad: TPdfQuad): Boolean; static;
 
     function PageIndex: Integer;
+    function Text: string;
     function Words: TArray<TPdfTextFragment>;
     function Segments: TArray<TPdfTextFragment>;
     function Lines: TArray<TPdfTextFragment>;
@@ -87,10 +91,11 @@ end;
 
 { TPdfTextLayout }
 
-constructor TPdfTextLayout.Create(const Layout: TPdfPageLayout);
+constructor TPdfTextLayout.Create(const Layout: TPdfPageLayout; const Text: string);
 begin
   inherited Create;
   FPageIndex := Layout.PageIndex;
+  FText := Text;
   FWords := ToFragments(Layout.PageIndex, Layout.Words);
   FSegments := ToFragments(Layout.PageIndex, Layout.Segments);
   FLines := ToFragments(Layout.PageIndex, Layout.Lines);
@@ -112,6 +117,11 @@ end;
 // A convex quad holds the point when the point lies on the same side of all four edges, whichever way the corners run
 class function TPdfTextLayout.IsInsideQuad(const Point: TPointF; const Quad: TPdfQuad): Boolean;
 begin
+  if not Quad.IsFinite then
+  begin
+    Exit(False);
+  end;
+
   const Corners: TArray<TPointF> = [Quad.P1, Quad.P2, Quad.P3, Quad.P4];
 
   var HasPositive := False;
@@ -125,7 +135,8 @@ begin
     HasNegative := (HasNegative or (Cross < 0));
   end;
 
-  Result := (not (HasPositive and HasNegative));
+  // Without a nonzero cross product (a quad without area, or a point that is not finite) there is nothing to say the point is inside
+  Result := (HasPositive xor HasNegative);
 end;
 
 class function TPdfTextLayout.TryFindAt(const Fragments: TArray<TPdfTextFragment>; const Point: TPointF; out Fragment: TPdfTextFragment): Boolean;
@@ -149,6 +160,11 @@ end;
 function TPdfTextLayout.PageIndex: Integer;
 begin
   Result := FPageIndex;
+end;
+
+function TPdfTextLayout.Text: string;
+begin
+  Result := FText;
 end;
 
 function TPdfTextLayout.Words: TArray<TPdfTextFragment>;
