@@ -1,0 +1,168 @@
+// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+unit Pdf4D.Text.PositionedText.Tests;
+
+{$EXCESSPRECISION OFF}
+
+interface
+
+uses
+  System.SysUtils,
+  DUnitX.TestFramework,
+  Pdf4D.Text.PositionedText;
+
+type
+  [TestFixture]
+  TPdfPositionedTextTests = class
+  private
+    FText: TPdfPositionedText;
+
+    class function Box(const PageIndex, LineIndex: Integer; const Left: Single): TPdfGlyphBox; static;
+    // 'ab', a line separator, 'cd': the glyphs a and b are on line 0, c and d on line 1, and c and d are on page SecondPage
+    procedure CreateTwoLines(const SecondPage: Integer);
+
+  public
+    [TearDown]
+    procedure TearDown;
+
+    [Test]
+    procedure TestLocateAcrossLinesGivesQuadPerLine;
+
+    [Test]
+    procedure TestLocateAcrossPagesGivesFragmentPerPage;
+
+    [Test]
+    procedure TestLocateOnlySeparatorsIsEmpty;
+
+    [Test]
+    procedure TestLocateEmptyRangeIsEmpty;
+
+    [Test]
+    procedure TestLocateTrimsSeparatorsAtBothEnds;
+
+    [Test]
+    [TestCase('StartZero', '0,1')]
+    [TestCase('NegativeLength', '1,-1')]
+    [TestCase('PastTheEnd', '4,3')]
+    procedure TestLocateOutOfRangeRaises(const Start, Length: Integer);
+
+    [Test]
+    procedure TestGlyphOfCharOutOfRangeRaises;
+  end;
+
+implementation
+
+uses
+  System.Types,
+  Pdf4D.Common.Quad;
+
+const
+  Tolerance = 0.001;
+
+{ TPdfPositionedTextTests }
+
+class function TPdfPositionedTextTests.Box(const PageIndex, LineIndex: Integer; const Left: Single): TPdfGlyphBox;
+begin
+  Result.PageIndex := PageIndex;
+  Result.LineIndex := LineIndex;
+  Result.WordIndex := LineIndex;
+  Result.WidthOfSpace := 3;
+  Result.Quad := TPdfQuad.Create(TPointF.Create(Left, 0), TPointF.Create(Left + 10, 0), TPointF.Create(Left + 10, 10), TPointF.Create(Left, 10));
+end;
+
+procedure TPdfPositionedTextTests.CreateTwoLines(const SecondPage: Integer);
+begin
+  const Glyphs: TArray<TPdfGlyphBox> = [Box(0, 0, 0), Box(0, 0, 10), Box(SecondPage, 1, 0), Box(SecondPage, 1, 10)];
+  const CharToGlyph: TArray<Integer> = [0, 1, -1, 2, 3];
+
+  FText := TPdfPositionedText.Create('ab'#10'cd', Glyphs, CharToGlyph);
+end;
+
+procedure TPdfPositionedTextTests.TearDown;
+begin
+  FreeAndNil(FText);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateAcrossLinesGivesQuadPerLine;
+begin
+  CreateTwoLines(0);
+
+  const Runs = FText.Locate(1, 5);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual('ab'#10'cd', Runs[0].Text);
+  Assert.AreEqual<Integer>(2, Length(Runs[0].Quads));
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(20), Double(Runs[0].Quads[0].P2.X), Tolerance);
+  Assert.AreEqual(Double(20), Double(Runs[0].Quads[1].P2.X), Tolerance);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateAcrossPagesGivesFragmentPerPage;
+begin
+  CreateTwoLines(1);
+
+  const Runs = FText.Locate(2, 3);
+
+  Assert.AreEqual<Integer>(2, Length(Runs));
+  Assert.AreEqual<Integer>(0, Runs[0].PageIndex);
+  Assert.AreEqual('b', Runs[0].Text);
+  Assert.AreEqual<Integer>(1, Runs[1].PageIndex);
+  Assert.AreEqual('c', Runs[1].Text);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateOnlySeparatorsIsEmpty;
+begin
+  CreateTwoLines(0);
+
+  const Runs = FText.Locate(3, 1);
+
+  Assert.AreEqual<Integer>(0, Length(Runs));
+end;
+
+procedure TPdfPositionedTextTests.TestLocateEmptyRangeIsEmpty;
+begin
+  CreateTwoLines(0);
+
+  const Runs = FText.Locate(1, 0);
+
+  Assert.AreEqual<Integer>(0, Length(Runs));
+end;
+
+procedure TPdfPositionedTextTests.TestLocateTrimsSeparatorsAtBothEnds;
+begin
+  CreateTwoLines(0);
+
+  const Runs = FText.Locate(3, 2);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual('c', Runs[0].Text);
+  Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
+end;
+
+procedure TPdfPositionedTextTests.TestLocateOutOfRangeRaises(const Start, Length: Integer);
+begin
+  CreateTwoLines(0);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      FText.Locate(Start, Length);
+    end,
+    EArgumentOutOfRangeException);
+end;
+
+procedure TPdfPositionedTextTests.TestGlyphOfCharOutOfRangeRaises;
+begin
+  CreateTwoLines(0);
+
+  Assert.AreEqual<Integer>(-1, FText.GlyphOfChar(2));
+  Assert.AreEqual<Integer>(2, FText.GlyphOfChar(3));
+  Assert.WillRaise(
+    procedure
+    begin
+      FText.GlyphOfChar(5);
+    end,
+    EArgumentOutOfRangeException);
+end;
+
+end.

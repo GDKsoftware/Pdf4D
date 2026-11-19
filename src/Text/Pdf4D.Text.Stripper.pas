@@ -176,7 +176,6 @@ type
     function NeedsWordSeparator(const ExpectedStartOfNextWordX: Single; const Metrics: TPositionMetrics): Boolean;
     procedure ResetLineExtent;
     function CreateWord(const Text: string; const Positions: TArray<TTextPosition>): TWordWithPositions;
-    function NormalizeWord(const Text: string): string;
     function Normalize(const Line: TLine): TArray<TWordWithPositions>;
     procedure WriteLine(const Line: TArray<TWordWithPositions>);
     function HandleLineSeparation(const Current, LastPosition, LastLineStartPosition: TPositionWrapper; const MaxHeightForLine: Single): TPositionWrapper;
@@ -206,6 +205,8 @@ type
     procedure WriteParagraphSeparator; virtual;
     procedure WritePageStart; virtual;
     procedure WritePageEnd; virtual;
+    // The Alphabetic and Arabic presentation forms of Text in their normal form, and the direction handling of the word
+    function NormalizeWord(const Text: string): string;
     // PDFBox runs bidi here. Pdf4D keeps the order of the file, so the word stays as it is.
     function HandleDirection(const Text: string): string; virtual;
     // Adds the position to the article that it lies in, unless it repeats a position that was shown already. The callee
