@@ -151,6 +151,29 @@ The oracle (every mode) installs a font provider without fonts in `FontMappers.i
    The first line skips only `text: default page 1`, and only on Win64. The second skips only `text: sorted page 10`, on all platforms.
 6. This leniency applies only to `.text.txt`. The structure dump is compared exactly.
 
+## Position goldens
+
+`tests/golden/<name>.positions.txt` holds the positions of the text lines that the PDFBox 3.0.8 `PDFTextStripper` finds, written by `Pdf4DOracle positions <pdf> [password]` (`generate-golden.ps1 -Mode Positions`). `<name>` and the password rule are the same as for the dump. UTF-8 without BOM, LF. One file per corpus file, one line per line of the stripper (not per word, which would make the files seven times larger).
+
+```
+page <n>
+line: <x> <y> <endX> <endY> <glyphs>
+```
+
+The stripper is a subclass with `setSortByPosition(true)`, `setStartPage(1)` and `setEndPage(min(pages, 50))`; all other settings are the PDFBox defaults. `startPage` writes the `page <n>` line, so a page that the stripper skips (a page without content) has no line. `writeString(String, List<TextPosition>)` collects the positions of a line; `writeLineSeparator` and `endPage` end the line. A line without positions is not written.
+
+- `x`, `y`: translate of the text matrix of the first glyph of the line (`TextPosition.getTextMatrix().getTranslateX()` and `getTranslateY()`), relative to the lower left corner of the crop box;
+- `endX`, `endY`: `getEndX()` and `getEndY()` of the last glyph of the line;
+- `glyphs`: the number of positions in the line.
+
+Numbers are written with `%.2f` in `Locale.ROOT` (so `NaN` and `Infinity` as Java writes them). When the stripper throws, a line `error` ends the file. A file that cannot be opened gives only `load-error: <kind>`, as for the text goldens. A file without any page with text gives an empty golden, which is correct and is compared as such.
+
+Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
+
+1. The `page` and `line` lines of both sides are compared one by one: the line kinds and the `glyphs` values must be equal.
+2. The four numbers of a line may differ by 0.02.
+3. Known differences are listed in `tests/golden/<name>.positions.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`, where `<page>` is the number of a page. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error, an `error` line or a different set of pages is always compared.
+
 ## Font width files
 
 `tests/fonts/<font file>.widths.txt` (for example `LiberationSans-Regular.ttf.widths.txt`) is written by `Pdf4DOracle --font-widths <font>` (`tools/oracle/generate-font-widths.ps1`) for the test fonts in `tests/fonts/` (sources and licences in `tests/fonts/manifest.csv`). One line `<key> <width>` per glyph, sorted by key in ordinal (character code) order, so `gid10` comes before `gid2`. Widths are in font units in float format.

@@ -311,6 +311,10 @@
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.TextGolden.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.PositionDump.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.PositionGolden.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.PositionGolden.Comparer.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.PositionGolden.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.TextRobustness.Tests.pas"/>
         <BuildConfiguration Include="Base">

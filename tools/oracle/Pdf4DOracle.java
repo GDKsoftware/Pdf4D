@@ -81,6 +81,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDRadioButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 /**
  * Pdf4D golden oracle. Writes the canonical dump format described in docs/golden-format.md.
@@ -90,6 +91,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --prepare out.pdf
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --encrypt in.pdf out.pdf user owner alg [--nometa]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
@@ -124,6 +126,10 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("text"))
             {
                 out.print(text(new File(args[1]), args.length > 2 ? args[2] : ""));
+            }
+            else if (args.length >= 2 && args[0].equals("positions"))
+            {
+                out.print(positions(new File(args[1]), args.length > 2 ? args[2] : ""));
             }
             else if (args.length >= 2 && args[0].equals("--prepare"))
             {
@@ -901,6 +907,126 @@ public class Pdf4DOracle
                 escaped = escaped.substring(0, escaped.length() - 1) + "\\x20";
             }
             sb.append("| ").append(escaped).append('\n');
+        }
+    }
+
+    // ------------------------------------------------------------- positions
+
+    /** Collects per line of the stripper the first and last glyph position (docs/golden-format.md, "Position goldens"). */
+    static class PositionStripper extends PDFTextStripper
+    {
+        final StringBuilder sb = new StringBuilder();
+        private TextPosition first;
+        private TextPosition last;
+        private int glyphs;
+
+        PositionStripper() throws IOException
+        {
+            super();
+        }
+
+        @Override
+        protected void startPage(PDPage page) throws IOException
+        {
+            sb.append("page ").append(getCurrentPageNo()).append('\n');
+            super.startPage(page);
+        }
+
+        @Override
+        protected void endPage(PDPage page) throws IOException
+        {
+            flushLine();
+            super.endPage(page);
+        }
+
+        @Override
+        protected void writeLineSeparator() throws IOException
+        {
+            flushLine();
+            super.writeLineSeparator();
+        }
+
+        @Override
+        protected void writeString(String text, List<TextPosition> textPositions) throws IOException
+        {
+            if (!textPositions.isEmpty())
+            {
+                if (first == null)
+                {
+                    first = textPositions.get(0);
+                }
+                last = textPositions.get(textPositions.size() - 1);
+                glyphs += textPositions.size();
+            }
+            super.writeString(text, textPositions);
+        }
+
+        private void flushLine()
+        {
+            if (glyphs > 0)
+            {
+                sb.append("line: ").append(fixed2(first.getTextMatrix().getTranslateX())).append(' ')
+                        .append(fixed2(first.getTextMatrix().getTranslateY())).append(' ')
+                        .append(fixed2(last.getEndX())).append(' ').append(fixed2(last.getEndY())).append(' ')
+                        .append(glyphs).append('\n');
+            }
+            first = null;
+            last = null;
+            glyphs = 0;
+        }
+    }
+
+    static String fixed2(float f)
+    {
+        return String.format(java.util.Locale.ROOT, "%.2f", f);
+    }
+
+    static String positions(File file, String password)
+    {
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        try (doc)
+        {
+            int pageCount = 0;
+            try
+            {
+                for (PDPage p : doc.getPages())
+                {
+                    pageCount++;
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count, like in the dump
+            }
+            PositionStripper stripper = new PositionStripper();
+            stripper.setSortByPosition(true);
+            stripper.setStartPage(1);
+            stripper.setEndPage(Math.min(pageCount, 50));
+            try
+            {
+                stripper.getText(doc);
+            }
+            catch (Throwable t)
+            {
+                stripper.sb.append("error\n");
+            }
+            return stripper.sb.toString();
+        }
+        catch (Throwable t)
+        {
+            return "load-error: parse\n";
         }
     }
 

@@ -68,7 +68,7 @@ A run that hits the time limit keeps its thread, so the process can crash when i
 
 ## Oracle modes
 
-The golden files in `tests\golden` are written by the PDFBox 3.0.8 oracle. `tools\oracle\generate-golden.ps1` takes `-Mode Dump` (the structure dump, `*.dump.txt`), `-Mode Text` (the text dump, `*.text.txt`) or `-Mode All` (the default, both), and `-Filter` for part of the corpus. Without a filter the script first removes the files of the chosen modes. The formats are in `golden-format.md`. The comparison of the text goldens counts sections that are only equal after white space is ignored; set `PDF4D_TEXT_LENIENT_REPORT` to a file name to get one line per such section.
+The golden files in `tests\golden` are written by the PDFBox 3.0.8 oracle. `tools\oracle\generate-golden.ps1` takes `-Mode Dump` (the structure dump, `*.dump.txt`), `-Mode Text` (the text dump, `*.text.txt`), `-Mode Positions` (the line positions, `*.positions.txt`) or `-Mode All` (the default, all three), and `-Filter` for part of the corpus. Without a filter the script first removes the files of the chosen modes. The formats are in `golden-format.md`. The comparison of the text goldens counts sections that are only equal after white space is ignored; set `PDF4D_TEXT_LENIENT_REPORT` to a file name to get one line per such section.
 
 ## Resources (rebuilding)
 

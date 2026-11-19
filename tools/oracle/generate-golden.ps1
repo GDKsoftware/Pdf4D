@@ -1,9 +1,9 @@
 # Runs the oracle for every PDF in tests/corpus and writes tests/golden/<path with '/' replaced by '__'>.dump.txt
-# (-Mode Dump) and .text.txt (-Mode Text); the default -Mode All writes both.
+# (-Mode Dump), .text.txt (-Mode Text) and .positions.txt (-Mode Positions); the default -Mode All writes all three.
 # A file whose manifest notes contain password=<x> is opened with that password.
-# Each file runs in its own JVM with a timeout; a timeout is recorded as "load-error: parse" in a dump and as "load-error: timeout" in a text golden.
+# Each file runs in its own JVM with a timeout; a timeout is recorded as "load-error: parse" in a dump and as "load-error: timeout" in a text or positions golden.
 # Files that end in a load-error get an "oracle:load-error-<kind>" note in the manifest.
-param([int]$TimeoutSeconds = 60, [int]$Parallel = 4, [string]$Filter = '', [ValidateSet('Dump','Text','All')][string]$Mode = 'All')
+param([int]$TimeoutSeconds = 60, [int]$Parallel = 4, [string]$Filter = '', [ValidateSet('Dump','Text','Positions','All')][string]$Mode = 'All')
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'oracle-lib.ps1')
 . (Join-Path $PSScriptRoot '..\corpus\manifest-lib.ps1')
@@ -12,7 +12,7 @@ $cp = Get-OracleClasspath
 $corpus = Join-Path $script:RepoRoot 'tests\corpus'
 $golden = Join-Path $script:RepoRoot 'tests\golden'
 New-Item -ItemType Directory -Force $golden | Out-Null
-$modes = @(); if ($Mode -ne 'Text') { $modes += 'dump' }; if ($Mode -ne 'Dump') { $modes += 'text' }
+$modes = @(); if ($Mode -in 'Dump','All') { $modes += 'dump' }; if ($Mode -in 'Text','All') { $modes += 'text' }; if ($Mode -in 'Positions','All') { $modes += 'positions' }
 if (-not $Filter) { foreach ($m in $modes) { Get-ChildItem $golden -Filter "*.$m.txt" | Remove-Item } }
 $manifest = Read-Manifest
 $errBase = Join-Path ([IO.Path]::GetTempPath()) 'pdf4d-oracle-err'
@@ -26,6 +26,7 @@ $fileCount = $files.Count
 $running = @()
 $timeouts = @()
 $textTimeouts = @()
+$positionTimeouts = @()
 
 function Start-One($item) {
     $f = $item.File
@@ -53,7 +54,7 @@ while ($queue.Count -gt 0 -or $running.Count -gt 0) {
             $r.Proc.WaitForExit()
             $marker = if ($r.Mode -eq 'dump') { 'load-error: parse' } else { 'load-error: timeout' }
             [IO.File]::WriteAllText($r.Out, "$marker`n", (New-Object Text.UTF8Encoding($false)))
-            if ($r.Mode -eq 'dump') { $timeouts += $r.Rel } else { $textTimeouts += $r.Rel }
+            if ($r.Mode -eq 'dump') { $timeouts += $r.Rel } elseif ($r.Mode -eq 'text') { $textTimeouts += $r.Rel } else { $positionTimeouts += $r.Rel }
             Write-Warning "timeout ($($r.Mode)): $($r.Rel)"
         } else { $still += $r }
     }
@@ -67,6 +68,12 @@ if ($modes -contains 'text') {
     Write-Host ('{0} text goldens' -f $texts.Count)
     foreach ($t in $texts) { if ($t.Length -eq 0) { Write-Warning "empty text golden: $($t.Name)" } }
     if ($textTimeouts) { Write-Host ('text timeouts: ' + ($textTimeouts -join ', ')) }
+}
+if ($modes -contains 'positions') {
+    $positions = Get-ChildItem $golden -Filter *.positions.txt
+    Write-Host ('{0} position goldens' -f $positions.Count)
+    Write-Host ('{0} of them are empty: the file has no page with text' -f @($positions | Where-Object { $_.Length -eq 0 }).Count)
+    if ($positionTimeouts) { Write-Host ('position timeouts: ' + ($positionTimeouts -join ', ')) }
 }
 if ($modes -notcontains 'dump') { return }
 $dumps = Get-ChildItem $golden -Filter *.dump.txt

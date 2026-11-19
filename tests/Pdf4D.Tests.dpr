@@ -240,6 +240,10 @@ uses
   Pdf4D.Tests.TextGolden in 'Support\Pdf4D.Tests.TextGolden.pas',
   Pdf4D.Tests.TextGolden.Comparer.Tests in 'Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas',
   Pdf4D.Tests.TextGolden.Tests in 'Acceptance\Pdf4D.Tests.TextGolden.Tests.pas',
+  Pdf4D.Tests.PositionDump in 'Support\Pdf4D.Tests.PositionDump.pas',
+  Pdf4D.Tests.PositionGolden in 'Support\Pdf4D.Tests.PositionGolden.pas',
+  Pdf4D.Tests.PositionGolden.Comparer.Tests in 'Support\Pdf4D.Tests.PositionGolden.Comparer.Tests.pas',
+  Pdf4D.Tests.PositionGolden.Tests in 'Acceptance\Pdf4D.Tests.PositionGolden.Tests.pas',
   Pdf4D.Tests.PdfBoxText.Tests in 'Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas',
   Pdf4D.Tests.TextRobustness.Tests in 'Acceptance\Pdf4D.Tests.TextRobustness.Tests.pas';
 

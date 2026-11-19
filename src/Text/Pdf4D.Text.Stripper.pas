@@ -217,6 +217,8 @@ type
     // The text positions of the page, by article (the sections before, in and between the beads). Owned by the stripper.
     property CharactersByArticle: TObjectList<TObjectList<TTextPosition>> read FCharactersByArticle;
     property Document: TPDDocument read FDocument;
+    // 1-based number of the page that is processed, like PDFTextStripper.getCurrentPageNo
+    property CurrentPageNo: Integer read FCurrentPageNo;
     property Output: TTextWriter read FOutput;
 
   public
