@@ -14,25 +14,48 @@ $ErrorActionPreference = 'Stop'
 $RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
 $WslDistro = 'Ubuntu'
 $ProjectFile = Join-Path $PSScriptRoot 'tests\Pdf4D.Tests.dproj'
+$PackageFiles = @('packages\Pdf4D.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
-function Invoke-Build([string]$TargetPlatform) {
-    Write-Host "=== Build $TargetPlatform $Config ==="
-    $command = "call ""$RsVars"" && msbuild ""$ProjectFile"" /t:Build /p:Config=$Config /p:Platform=$TargetPlatform /v:minimal"
-    $output = & cmd /c $command 2>&1 | ForEach-Object { "$_" }
-    $buildExitCode = $LASTEXITCODE
-    $output | ForEach-Object { Write-Host $_ }
-
-    if ($buildExitCode -ne 0) {
-        throw "Build failed for $TargetPlatform (exit code $buildExitCode)"
-    }
-
-    # Hints inside the Embarcadero-supplied DUnitX source are not ours to fix
-    $problems = $output | Where-Object { $_ -match '(warning|hint) [WH]\d{4}' -and $_ -notmatch [regex]::Escape('\Studio\37.0\source\') }
+# Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
+function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
+    $problems = $Output | Where-Object { $_ -match '(warning|hint) [WH]\d{4}' -and $_ -notmatch [regex]::Escape('\Studio\37.0\source\') }
     if ($problems) {
         throw "Build for $TargetPlatform reported hints or warnings"
     }
 }
 
+function Invoke-MsBuild([string]$Project, [string]$TargetPlatform) {
+    $command = "call ""$RsVars"" && msbuild ""$Project"" /t:Build /p:Config=$Config /p:Platform=$TargetPlatform /v:minimal"
+    $output = & cmd /c $command 2>&1 | ForEach-Object { "$_" }
+    $buildExitCode = $LASTEXITCODE
+    $output | ForEach-Object { Write-Host $_ }
+
+    if ($buildExitCode -ne 0) {
+        throw "Build of $Project failed for $TargetPlatform (exit code $buildExitCode)"
+    }
+
+    return $output
+}
+
+# A unit that the package uses but does not contain is reported as W1033 (implicitly imported); that is a forgotten unit in the
+# contains clause, and the message names it
+function Invoke-PackageBuild([string]$TargetPlatform) {
+    foreach ($packageFile in $PackageFiles) {
+        Write-Host "=== Package $([IO.Path]::GetFileNameWithoutExtension($packageFile)) $TargetPlatform $Config ==="
+        $output = Invoke-MsBuild $packageFile $TargetPlatform
+
+        if ($output | Where-Object { $_ -match 'W1033' }) {
+            throw "A package for $TargetPlatform implicitly imports a unit that is missing from its contains clause (W1033)"
+        }
+        Test-NoBuildProblems $output $TargetPlatform
+    }
+}
+
+function Invoke-Build([string]$TargetPlatform) {
+    Write-Host "=== Build $TargetPlatform $Config ==="
+    $output = Invoke-MsBuild $ProjectFile $TargetPlatform
+    Test-NoBuildProblems $output $TargetPlatform
+}
 # Shared state is published lazily and freed by class destructors; initialization and finalization sections are not allowed
 function Test-NoInitializationSections {
     $folders = 'src', 'tests\Support', 'tests\Acceptance' | ForEach-Object { Join-Path $PSScriptRoot $_ } | Where-Object { Test-Path $_ }
@@ -103,6 +126,7 @@ if ($platforms -contains 'Linux64') {
 }
 
 foreach ($targetPlatform in $platforms) {
+    Invoke-PackageBuild $targetPlatform
     Invoke-Build $targetPlatform
     Invoke-Tests $targetPlatform
 }

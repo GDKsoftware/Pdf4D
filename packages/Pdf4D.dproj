@@ -1,0 +1,292 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B3D1F6A2-7C94-4E58-A0B6-2E9D5C1F8A73}</ProjectGuid>
+        <MainSource>Pdf4D.dpk</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <FrameworkType>None</FrameworkType>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectVersion>20.3</ProjectVersion>
+        <TargetedPlatforms>1048579</TargetedPlatforms>
+        <AppType>Package</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Linux64' and '$(Base)'=='true') or '$(Base_Linux64)'!=''">
+        <Base_Linux64>true</Base_Linux64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_DcuOutput>.\$(Platform)\$(Config)\dcu</DCC_DcuOutput>
+        <DCC_BplOutput>.\$(Platform)\$(Config)</DCC_BplOutput>
+        <DCC_DcpOutput>.\$(Platform)\$(Config)</DCC_DcpOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_Description>Pdf4D core: native PDF reader</DCC_Description>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+        <GenDll>true</GenDll>
+        <GenPackage>true</GenPackage>
+        <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+        <SanitizedProjectName>Pdf4D</SanitizedProjectName>
+        <DCC_Hints>true</DCC_Hints>
+        <DCC_Warnings>true</DCC_Warnings>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Document.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Field.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Field.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.GuardedWriter.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Outline.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.OutlineItem.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Page.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Page.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.Interfaces.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextOptions.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Defines.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.FloatGuard.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Log.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Matrix.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Path.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Quad.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.ResourceData.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.SharedInstance.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Utf8.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.GraphicsState.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operator.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.OperatorProcessor.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.DrawObject.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.MarkedContent.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.State.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.Text.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.StreamEngine.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Base.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Boolean.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Dictionary.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Document.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Float.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Integer.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Name.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Names.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Null.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Number.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.ObjectKey.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfArray.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfDocEncoding.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfObject.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.PdfString.pas"/>
+        <DCCReference Include="..\src\Cos\Pdf4D.Cos.Resolver.Interfaces.pas"/>
+        <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.AES.pas"/>
+        <DCCReference Include="..\src\Crypto\Pdf4D.Crypto.RC4.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.AccessPermission.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.Dictionary.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.SaslPrep.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.SecurityHandler.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.StandardSecurityHandler.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.UnicodeData.pas"/>
+        <DCCReference Include="..\src\Encryption\Pdf4D.Encryption.UnicodeNormalization.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.ASCII85.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.ASCIIHex.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Base.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.ByteReader.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Chain.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Factory.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Flate.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Identity.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.LimitedStream.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.LZW.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.Predictor.pas"/>
+        <DCCReference Include="..\src\Filter\Pdf4D.Filter.RunLength.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Base.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFont.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType0.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType2.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.CMapManager.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Descriptor.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.DirFinder.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Encoding.Tables.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Factory.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.FileSystemProvider.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.GlyphList.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Mapper.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.MapperImpl.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Provider.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Simple.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Standard14.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.TrueType.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type0.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.Type3.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Afm.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.AfmParser.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.BoundingBox.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Charset.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.DataInput.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Encoding.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Font.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Parser.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.StandardStrings.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Type1FontUtil.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringWidth.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CMap.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CMapParser.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Encoding.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.FontBoxFont.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.OpenType.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Pfb.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Cmap.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Collection.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.DataStream.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Font.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Headers.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Parser.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Post.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Tables.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Vertical.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Type1.Font.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Type1.Lexer.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Type1.Parser.pas"/>
+        <DCCReference Include="..\src\IO\Pdf4D.IO.RandomAccessRead.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.AcroForm.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DateConverter.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Destination.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DestinationResolver.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Document.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentCatalog.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentInformation.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.ExtendedGraphicsState.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Field.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.FormXObject.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.MarkedContent.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.NumberTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.OutlineItem.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Rectangle.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Resources.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.TreeWalker.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Base.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.BruteForce.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.ContentStream.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Cos.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.ObjectStream.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Pdf.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Security.Interfaces.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.StreamObject.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.Xref.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.XrefStream.pas"/>
+        <DCCReference Include="..\src\Parser\Pdf4D.Parser.XrefTrailerResolver.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Afm.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.CMap.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Fonts.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.GlyphList.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Unicode.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.ChunkedSortedList.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.GlyphQuad.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.IterativeMergeSort.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Layout.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.OverlapColumn.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.PositionedText.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.PositionStripper.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Stripper.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TextPosition.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TextPositionComparator.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.TimSort.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.UnicodeTables.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Package</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">Pdf4D.dpk</Source>
+                </Source>
+                <Excluded_Packages/>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Linux64">True</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

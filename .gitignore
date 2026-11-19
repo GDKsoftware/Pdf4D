@@ -28,3 +28,4 @@ tools/oracle/jdk/
 tools/oracle/classes/
 tools/pdfbox-src/
 tools/corpus/failed-downloads.txt
+packages/*.a

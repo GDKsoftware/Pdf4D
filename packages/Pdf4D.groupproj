@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5A8E2C4D-91B3-4F67-8D20-C7E1A4B93F58}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Pdf4D.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Pdf4D">
+        <MSBuild Projects="Pdf4D.dproj"/>
+    </Target>
+    <Target Name="Pdf4D:Clean">
+        <MSBuild Projects="Pdf4D.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D:Make">
+        <MSBuild Projects="Pdf4D.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Pdf4D"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Pdf4D:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Pdf4D:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

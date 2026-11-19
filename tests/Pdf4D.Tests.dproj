@@ -187,6 +187,8 @@
         <DCCReference Include="..\src\Common\Pdf4D.Common.Matrix.Tests.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Quad.pas"/>
         <DCCReference Include="..\src\Common\Pdf4D.Common.Quad.Tests.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Path.pas"/>
+        <DCCReference Include="..\src\Common\Pdf4D.Common.Path.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Simple.pas"/>

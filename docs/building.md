@@ -19,7 +19,15 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-The script builds `tests\Pdf4D.Tests.dproj` with msbuild, fails on any hint or warning from the project's own code, and runs the tests. It exits non-zero on a failure.
+For each platform the script first builds the core package (`packages\Pdf4D.dproj`), then `tests\Pdf4D.Tests.dproj`, with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+
+## Packages
+
+`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec` and `Render` (and `src\Resources\Pdf4D.Resources.Icc.*`), which later phases put in their own packages. `packages\Pdf4D.groupproj` holds the package; the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
+
+The package lists its units in the `contains` clause, and nothing else is on its search path, so a unit that is missing there stops the build with F2613 (and an implicit import would show as W1033, which `build.ps1` also treats as a failure). When you add a unit under `src`, add it to `packages\Pdf4D.dpk` and `packages\Pdf4D.dproj` as well as to the test project.
+
+The Delphi compiler builds Linux64 packages (the linker writes `bplPdf4D.so`), so Linux64 builds the package like the other platforms. The tests do not link the package: they compile the units from the search path, which keeps the test program free of a package dependency.
 
 ## Linux via WSL
 

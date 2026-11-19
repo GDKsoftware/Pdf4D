@@ -116,6 +116,8 @@ uses
   Pdf4D.Common.Matrix.Tests in '..\src\Common\Pdf4D.Common.Matrix.Tests.pas',
   Pdf4D.Common.Quad in '..\src\Common\Pdf4D.Common.Quad.pas',
   Pdf4D.Common.Quad.Tests in '..\src\Common\Pdf4D.Common.Quad.Tests.pas',
+  Pdf4D.Common.Path in '..\src\Common\Pdf4D.Common.Path.pas',
+  Pdf4D.Common.Path.Tests in '..\src\Common\Pdf4D.Common.Path.Tests.pas',
   Pdf4D.Font.Base in '..\src\Font\Pdf4D.Font.Base.pas',
   Pdf4D.Font.Base.Tests in '..\src\Font\Pdf4D.Font.Base.Tests.pas',
   Pdf4D.Font.Simple in '..\src\Font\Pdf4D.Font.Simple.pas',
