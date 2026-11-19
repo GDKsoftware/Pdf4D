@@ -12,7 +12,9 @@ uses
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Log,
   Pdf4D.Model.Document,
-  Pdf4D.Model.OutlineItem;
+  Pdf4D.Model.OutlineItem,
+  Pdf4D.Text.PositionedText,
+  Pdf4D.Text.Stripper;
 
 type
   // What every API object holds to keep the document alive. The handle never holds an API object, so there is no cycle.
@@ -23,6 +25,8 @@ type
     function Log: TPdfLog;
     function PageLabel(const Index: Integer): string;
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+    // The caller owns the result
+    function ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
   end;
 
   // Owns the document and, when the document was loaded from a file, the stream
@@ -38,6 +42,8 @@ type
     function ModelItemOf(const Bookmark: IPdfOutlineItem): TPDOutlineItem;
     class procedure RaiseWriterFailure(const Writer: TPdfGuardedWriter); static;
     procedure WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
+    function ExtractPositionedInStripper(const Options: TPdfTextOptions): TPdfPositionedText;
+    procedure ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
 
   public
     // OwnedStream may be nil. Both are freed with the handle, the document first.
@@ -48,6 +54,7 @@ type
     function Log: TPdfLog;
     function PageLabel(const Index: Integer): string;
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+    function ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
   end;
 
 implementation
@@ -57,7 +64,7 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.PageLabels,
-  Pdf4D.Text.Stripper;
+  Pdf4D.Text.PositionStripper;
 
 { TPdfDocumentHandle }
 
@@ -199,36 +206,73 @@ begin
   end;
 end;
 
+function TPdfDocumentHandle.ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
+begin
+  try
+    Result := ExtractPositionedInStripper(Options);
+  except
+    on Failure: EPdfException do
+    begin
+      raise;
+    end;
+    on Failure: Exception do
+    begin
+      if not TPdfFailure.IsInputFailure(Failure) then
+      begin
+        raise;
+      end;
+      raise EPdfParseException.CreateFmt('The text cannot be extracted: %s', [Failure.Message]);
+    end;
+  end;
+end;
+
+function TPdfDocumentHandle.ExtractPositionedInStripper(const Options: TPdfTextOptions): TPdfPositionedText;
+begin
+  const Stripper = TPdfPositionStripper.Create;
+  try
+    ConfigureStripper(Stripper, Options);
+
+    Result := Stripper.Extract(FDocument);
+  finally
+    Stripper.Free;
+  end;
+end;
+
 procedure TPdfDocumentHandle.WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
 begin
   const Stripper = TPdfTextStripper.Create;
   try
-    Stripper.SortByPosition := Options.SortByPosition;
-    Stripper.StartPage := Options.StartPage;
-    Stripper.EndPage := Options.EndPage;
-    Stripper.StartBookmark := ModelItemOf(Options.StartBookmark);
-    Stripper.EndBookmark := ModelItemOf(Options.EndBookmark);
-    Stripper.SuppressDuplicateOverlappingText := Options.SuppressDuplicateOverlappingText;
-    Stripper.ShouldSeparateByBeads := Options.ShouldSeparateByBeads;
-    Stripper.AddMoreFormatting := Options.AddMoreFormatting;
-    Stripper.IgnoreContentStreamSpaceGlyphs := Options.IgnoreContentStreamSpaceGlyphs;
-    Stripper.LineSeparator := Options.LineSeparator;
-    Stripper.WordSeparator := Options.WordSeparator;
-    Stripper.ParagraphStart := Options.ParagraphStart;
-    Stripper.ParagraphEnd := Options.ParagraphEnd;
-    Stripper.PageStart := Options.PageStart;
-    Stripper.PageEnd := Options.PageEnd;
-    Stripper.ArticleStart := Options.ArticleStart;
-    Stripper.ArticleEnd := Options.ArticleEnd;
-    Stripper.SpacingTolerance := Options.SpacingTolerance;
-    Stripper.AverageCharTolerance := Options.AverageCharTolerance;
-    Stripper.IndentThreshold := Options.IndentThreshold;
-    Stripper.DropThreshold := Options.DropThreshold;
+    ConfigureStripper(Stripper, Options);
 
     Stripper.WriteText(FDocument, Writer);
   finally
     Stripper.Free;
   end;
+end;
+
+procedure TPdfDocumentHandle.ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
+begin
+  Stripper.SortByPosition := Options.SortByPosition;
+  Stripper.StartPage := Options.StartPage;
+  Stripper.EndPage := Options.EndPage;
+  Stripper.StartBookmark := ModelItemOf(Options.StartBookmark);
+  Stripper.EndBookmark := ModelItemOf(Options.EndBookmark);
+  Stripper.SuppressDuplicateOverlappingText := Options.SuppressDuplicateOverlappingText;
+  Stripper.ShouldSeparateByBeads := Options.ShouldSeparateByBeads;
+  Stripper.AddMoreFormatting := Options.AddMoreFormatting;
+  Stripper.IgnoreContentStreamSpaceGlyphs := Options.IgnoreContentStreamSpaceGlyphs;
+  Stripper.LineSeparator := Options.LineSeparator;
+  Stripper.WordSeparator := Options.WordSeparator;
+  Stripper.ParagraphStart := Options.ParagraphStart;
+  Stripper.ParagraphEnd := Options.ParagraphEnd;
+  Stripper.PageStart := Options.PageStart;
+  Stripper.PageEnd := Options.PageEnd;
+  Stripper.ArticleStart := Options.ArticleStart;
+  Stripper.ArticleEnd := Options.ArticleEnd;
+  Stripper.SpacingTolerance := Options.SpacingTolerance;
+  Stripper.AverageCharTolerance := Options.AverageCharTolerance;
+  Stripper.IndentThreshold := Options.IndentThreshold;
+  Stripper.DropThreshold := Options.DropThreshold;
 end;
 
 end.

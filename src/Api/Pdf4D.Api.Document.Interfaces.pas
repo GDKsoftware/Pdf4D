@@ -11,6 +11,7 @@ uses
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Api.TextOptions,
   Pdf4D.Cos.Document;
 
@@ -89,6 +90,10 @@ type
     function ExtractText(const Options: TPdfTextOptions): string; overload;
     // Writes the text to Writer instead of returning it
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+
+    // The same text as ExtractText with the same options, with the place of every character. Raises the same exceptions as ExtractText.
+    function ExtractTextWithPositions: IPdfPositionedText; overload;
+    function ExtractTextWithPositions(const Options: TPdfTextOptions): IPdfPositionedText; overload;
 
     // The document of the inner layer. It stays valid only as long as this interface (or any other interface of the
     // same document) is alive. The same holds for every object that you get from it.

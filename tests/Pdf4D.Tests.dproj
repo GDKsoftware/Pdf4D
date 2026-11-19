@@ -284,6 +284,7 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.EmbeddedFile.Tests.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.TextOptions.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Page.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Outline.Interfaces.pas"/>
@@ -291,6 +292,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.GuardedWriter.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Page.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.OutlineItem.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Field.pas"/>
@@ -298,6 +300,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Tests.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Text.Tests.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Corpus.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.StructureDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>

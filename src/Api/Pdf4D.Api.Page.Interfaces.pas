@@ -5,6 +5,7 @@ unit Pdf4D.Api.Page.Interfaces;
 interface
 
 uses
+  Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Rectangle;
 
@@ -27,6 +28,11 @@ type
 
     // The text of this page only, with the default options
     function ExtractText: string;
+    // The text of this page with the place of every character, with the default options
+    function ExtractTextWithPositions: IPdfPositionedText;
+    // The words, segments and lines of this page. The text is read with SortByPosition set, whatever the order in the file.
+    function TextLayout: IPdfTextLayout; overload;
+    function TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout; overload;
 
     // The page dictionary of the inner layer. It stays valid only as long as this interface (or any other interface
     // of the same document) is alive.
