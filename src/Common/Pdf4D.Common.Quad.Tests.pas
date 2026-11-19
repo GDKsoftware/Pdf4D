@@ -31,6 +31,31 @@ type
     procedure TestExtendBelowSelfAndRotated;
 
     [Test]
+    procedure TestExtendOfQuadBeforeSelfEnclosesBoth;
+
+    [Test]
+    procedure TestExtendOfQuadBeforeRotatedSelfEnclosesBoth;
+
+    [Test]
+    procedure TestExtendOfQuadInsideSelfKeepsTheOuterEnds;
+
+    [Test]
+    procedure TestExtendOfQuadBehindWithGapEnclosesBoth;
+
+    [Test]
+    [TestCase('Touching', '0,10')]
+    [TestCase('Overlapping', '5,10')]
+    [TestCase('Inside', '12,4')]
+    [TestCase('After', '30,10')]
+    procedure TestGapBeforeIsNotPositiveWhenOtherIsNotWhollyBefore(const OtherLeft, OtherWidth: Single);
+
+    [Test]
+    procedure TestGapBeforeIsTheDistanceBetweenTheQuads;
+
+    [Test]
+    procedure TestBaselineLength;
+
+    [Test]
     procedure TestExtendOfHugeQuadsDoesNotRaise;
 
     [Test]
@@ -116,6 +141,90 @@ begin
   Assert.AreEqual(Double(4), Double(RotatedUnion.P1.X), Tolerance);
   Assert.AreEqual(Double(-10), Double(RotatedUnion.P4.X), Tolerance);
   Assert.AreEqual(Double(30), Double(RotatedUnion.P2.Y), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendOfQuadBeforeSelfEnclosesBoth;
+begin
+  const First = TPdfQuad.Create(TPointF.Create(30, 0), TPointF.Create(40, 0), TPointF.Create(40, 10), TPointF.Create(30, 10));
+  const Second = TPdfQuad.Create(TPointF.Create(10, -2), TPointF.Create(20, -2), TPointF.Create(20, 12), TPointF.Create(10, 12));
+
+  const Union = First.Extend(Second);
+
+  Assert.AreEqual(Double(10), Double(Union.P1.X), Tolerance);
+  Assert.AreEqual(Double(40), Double(Union.P2.X), Tolerance);
+  Assert.AreEqual(Double(40), Double(Union.P3.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Union.P4.X), Tolerance);
+  Assert.AreEqual(Double(-2), Double(Union.P1.Y), Tolerance);
+  Assert.AreEqual(Double(-2), Double(Union.P2.Y), Tolerance);
+  Assert.AreEqual(Double(12), Double(Union.P3.Y), Tolerance);
+  Assert.AreEqual(Double(12), Double(Union.P4.Y), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendOfQuadBeforeRotatedSelfEnclosesBoth;
+begin
+  const First = TPdfQuad.Create(TPointF.Create(0, 10), TPointF.Create(0, 20), TPointF.Create(-10, 20), TPointF.Create(-10, 10));
+  const Second = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(0, 5), TPointF.Create(-10, 5), TPointF.Create(-10, 0));
+
+  const Union = First.Extend(Second);
+
+  Assert.AreEqual(Double(0), Double(Union.P1.Y), Tolerance);
+  Assert.AreEqual(Double(20), Double(Union.P2.Y), Tolerance);
+  Assert.AreEqual(Double(-10), Double(Union.P3.X), Tolerance);
+  Assert.AreEqual(Double(-10), Double(Union.P4.X), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendOfQuadInsideSelfKeepsTheOuterEnds;
+begin
+  const First = TPdfQuad.Create(TPointF.Create(10, 0), TPointF.Create(50, 0), TPointF.Create(50, 10), TPointF.Create(10, 10));
+  const Second = TPdfQuad.Create(TPointF.Create(20, 0), TPointF.Create(30, 0), TPointF.Create(30, 10), TPointF.Create(20, 10));
+
+  const Union = First.Extend(Second);
+
+  Assert.AreEqual(Double(10), Double(Union.P1.X), Tolerance);
+  Assert.AreEqual(Double(50), Double(Union.P2.X), Tolerance);
+  Assert.AreEqual(Double(50), Double(Union.P3.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Union.P4.X), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendOfQuadBehindWithGapEnclosesBoth;
+begin
+  const First = TPdfQuad.Create(TPointF.Create(10, 0), TPointF.Create(20, 0), TPointF.Create(20, 10), TPointF.Create(10, 10));
+  const Second = TPdfQuad.Create(TPointF.Create(50, 0), TPointF.Create(60, 0), TPointF.Create(60, 10), TPointF.Create(50, 10));
+
+  const Union = First.Extend(Second);
+  const Reverse = Second.Extend(First);
+
+  Assert.AreEqual(Double(10), Double(Union.P1.X), Tolerance);
+  Assert.AreEqual(Double(60), Double(Union.P2.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Reverse.P1.X), Tolerance);
+  Assert.AreEqual(Double(60), Double(Reverse.P2.X), Tolerance);
+  Assert.AreEqual(Double(60), Double(Reverse.P3.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Reverse.P4.X), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestGapBeforeIsNotPositiveWhenOtherIsNotWhollyBefore(const OtherLeft, OtherWidth: Single);
+begin
+  const Other = TPdfQuad.Create(TPointF.Create(OtherLeft, 0), TPointF.Create(OtherLeft + OtherWidth, 0),
+                                TPointF.Create(OtherLeft + OtherWidth, 10), TPointF.Create(OtherLeft, 10));
+  const Quad = TPdfQuad.Create(TPointF.Create(10, 0), TPointF.Create(20, 0), TPointF.Create(20, 10), TPointF.Create(10, 10));
+
+  Assert.IsFalse(Quad.GapBefore(Other) > Tolerance);
+end;
+
+procedure TPdfQuadTests.TestGapBeforeIsTheDistanceBetweenTheQuads;
+begin
+  const Other = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 0), TPointF.Create(10, 10), TPointF.Create(0, 10));
+  const Later = TPdfQuad.Create(TPointF.Create(25, 0), TPointF.Create(35, 0), TPointF.Create(35, 10), TPointF.Create(25, 10));
+
+  Assert.AreEqual(Double(15), Double(Later.GapBefore(Other)), Tolerance);
+  Assert.AreEqual(Double(-35), Double(Other.GapBefore(Later)), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestBaselineLength;
+begin
+  const Quad = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(3, 4), TPointF.Create(3, 14), TPointF.Create(0, 10));
+
+  Assert.AreEqual(Double(5), Double(Quad.BaselineLength), Tolerance);
 end;
 
 procedure TPdfQuadTests.TestExtendOfHugeQuadsDoesNotRaise;

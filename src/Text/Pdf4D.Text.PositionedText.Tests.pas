@@ -55,12 +55,28 @@ type
 
     [Test]
     procedure TestLocateActualTextTakesAllGlyphsOfTheSequence;
+
+    [Test]
+    procedure TestLocateGlyphsInReverseOrderOfARunGiveQuadPerRun;
+
+    [Test]
+    procedure TestLocateRightToLeftGlyphsInLogicalOrderGiveOneQuad;
+
+    [Test]
+    procedure TestLocateRunDrawnLaterOnTheLeftDoesNotInvertTheQuad;
+
+    [Test]
+    procedure TestLocateActualTextSequenceAcrossPagesGivesNoTextOnThePageWithoutCharacters;
+
+    [Test]
+    procedure TestLocateWholeLargeTextWithActualTextIsFast;
   end;
 
 implementation
 
 uses
   System.Types,
+  System.Diagnostics,
   Pdf4D.Common.Quad;
 
 const
@@ -210,6 +226,102 @@ begin
   Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
   Assert.AreEqual(Double(0), Double(Runs[0].Quads[0].P1.X), Tolerance);
   Assert.AreEqual(Double(20), Double(Runs[0].Quads[0].P2.X), Tolerance);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateGlyphsInReverseOrderOfARunGiveQuadPerRun;
+begin
+  FText := TPdfPositionedText.Create('ab', [Box(0, 0, 40), Box(0, 0, 0)], [0, 1]);
+
+  const Runs = FText.Locate(1, 2);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual<Integer>(2, Length(Runs[0].Quads));
+  Assert.AreEqual(Double(40), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(50), Double(Runs[0].Quads[0].P2.X), Tolerance);
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[1].P1.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Runs[0].Quads[1].P2.X), Tolerance);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateRightToLeftGlyphsInLogicalOrderGiveOneQuad;
+begin
+  FText := TPdfPositionedText.Create('abc', [Box(0, 0, 20), Box(0, 0, 10), Box(0, 0, 0)], [0, 1, 2]);
+
+  const Runs = FText.Locate(1, 3);
+
+  Assert.AreEqual<Integer>(1, Length(Runs));
+  Assert.AreEqual<Integer>(1, Length(Runs[0].Quads));
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(30), Double(Runs[0].Quads[0].P2.X), Tolerance);
+  Assert.AreEqual(Double(30), Double(Runs[0].Quads[0].P3.X), Tolerance);
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[0].P4.X), Tolerance);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateRunDrawnLaterOnTheLeftDoesNotInvertTheQuad;
+begin
+  FText := TPdfPositionedText.Create('abc', [Box(0, 0, 50), Box(0, 0, 60), Box(0, 0, 0)], [0, 1, 2]);
+
+  const Runs = FText.Locate(1, 3);
+
+  Assert.AreEqual<Integer>(2, Length(Runs[0].Quads));
+  for var Quad in Runs[0].Quads do
+  begin
+    Assert.IsTrue(Quad.P2.X > Quad.P1.X, 'the quad runs forwards');
+  end;
+  Assert.AreEqual(Double(50), Double(Runs[0].Quads[0].P1.X), Tolerance);
+  Assert.AreEqual(Double(70), Double(Runs[0].Quads[0].P2.X), Tolerance);
+  Assert.AreEqual(Double(0), Double(Runs[0].Quads[1].P1.X), Tolerance);
+  Assert.AreEqual(Double(10), Double(Runs[0].Quads[1].P2.X), Tolerance);
+end;
+
+procedure TPdfPositionedTextTests.TestLocateActualTextSequenceAcrossPagesGivesNoTextOnThePageWithoutCharacters;
+begin
+  var First := Box(0, 0, 0);
+  var Second := Box(1, 1, 0);
+  First.ActualTextSpan := 1;
+  Second.ActualTextSpan := 1;
+  FText := TPdfPositionedText.Create('XQ', [First, Second, Box(1, 1, 10)], [0, 2]);
+
+  const Runs = FText.Locate(1, 1);
+
+  Assert.AreEqual<Integer>(2, Length(Runs));
+  Assert.AreEqual<Integer>(0, Runs[0].PageIndex);
+  Assert.AreEqual('X', Runs[0].Text);
+  Assert.AreEqual<Integer>(1, Runs[1].PageIndex);
+  Assert.AreEqual('', Runs[1].Text);
+  Assert.AreEqual<Integer>(1, Length(Runs[1].Quads));
+end;
+
+procedure TPdfPositionedTextTests.TestLocateWholeLargeTextWithActualTextIsFast;
+begin
+  const PageCount = 200;
+  const GlyphsPerPage = 2000;
+  const GlyphsPerLine = 100;
+  const GlyphsPerSequence = 10;
+  const Total = PageCount * GlyphsPerPage;
+
+  var Glyphs: TArray<TPdfGlyphBox>;
+  var CharToGlyph: TArray<Integer>;
+  SetLength(Glyphs, Total);
+  SetLength(CharToGlyph, Total);
+  for var Index := 0 to Total - 1 do
+  begin
+    const PageIndex = Index div GlyphsPerPage;
+    const OnPage = Index mod GlyphsPerPage;
+    Glyphs[Index] := Box(PageIndex, Index div GlyphsPerLine, (OnPage mod GlyphsPerLine) * 10);
+    Glyphs[Index].ActualTextSpan := Index div GlyphsPerSequence + 1;
+    CharToGlyph[Index] := Index;
+  end;
+  FText := TPdfPositionedText.Create(StringOfChar('a', Total), Glyphs, CharToGlyph);
+
+  const Stopwatch = TStopwatch.StartNew;
+  const Runs = FText.Locate(1, Total);
+  const Elapsed = Stopwatch.ElapsedMilliseconds;
+
+  Assert.AreEqual<Integer>(PageCount, Length(Runs));
+  Assert.AreEqual<Integer>(GlyphsPerPage div GlyphsPerLine, Length(Runs[PageCount - 1].Quads));
+  Assert.AreEqual<Integer>(GlyphsPerPage, Length(Runs[0].Text));
+  // Quadratic work would take minutes; the bound leaves room for a slow machine
+  Assert.IsTrue(Elapsed < 2000, Format('Locate took %d ms', [Elapsed]));
 end;
 
 end.
