@@ -25,6 +25,9 @@ type
     procedure TestExtendUsesTheLargerHeight;
 
     [Test]
+    procedure TestExtendEnclosesBothHeights;
+
+    [Test]
     procedure TestIsFiniteFalseForNaN;
   end;
 
@@ -73,6 +76,21 @@ begin
 
   Assert.AreEqual(Double(14), Double(Union.P4.Y - Union.P1.Y), Tolerance);
   Assert.AreEqual(Double(14), Double(Union.P3.Y - Union.P2.Y), Tolerance);
+end;
+
+procedure TPdfQuadTests.TestExtendEnclosesBothHeights;
+begin
+  const Small = TPdfQuad.Create(TPointF.Create(10, -5), TPointF.Create(20, -5), TPointF.Create(20, 7), TPointF.Create(10, 7));
+  const Large = TPdfQuad.Create(TPointF.Create(20, -3), TPointF.Create(38, -3), TPointF.Create(38, 15), TPointF.Create(20, 15));
+
+  const Union = Small.Extend(Large);
+
+  Assert.AreEqual(Double(-5), Double(Union.P1.Y), Tolerance);
+  Assert.AreEqual(Double(-5), Double(Union.P2.Y), Tolerance);
+  Assert.AreEqual(Double(15), Double(Union.P3.Y), Tolerance);
+  Assert.AreEqual(Double(15), Double(Union.P4.Y), Tolerance);
+  Assert.AreEqual(Double(10), Double(Union.P1.X), Tolerance);
+  Assert.AreEqual(Double(38), Double(Union.P2.X), Tolerance);
 end;
 
 procedure TPdfQuadTests.TestIsFiniteFalseForNaN;

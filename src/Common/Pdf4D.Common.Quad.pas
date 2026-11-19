@@ -16,6 +16,8 @@ type
   private
     class function IsFinitePoint(const Point: TPointF): Boolean; static;
     function GetUp: TPointF;
+    // The distance of Point from the baseline of Self along Up, a unit vector
+    function HeightOver(const Point, Up: TPointF): Single;
 
   public
     // Start-bottom, end-bottom, end-top, start-top
@@ -26,8 +28,8 @@ type
     // Axis aligned: Left <= Right and Top <= Bottom, where Top holds the smallest y
     function Bounds: TRectF;
     function IsFinite: Boolean;
-    // The union along the baseline of two quads of the same line: P1 and P4 of Self, P2 and P3 of Other, with the larger height
-    // of both
+    // The union of two quads of the same line: along the baseline from P1 and P4 of Self to P2 and P3 of Other, and perpendicular
+    // to the baseline of Self from the lowest bottom to the highest top of both
     function Extend(const Other: TPdfQuad): TPdfQuad;
   end;
 
@@ -74,24 +76,37 @@ begin
   Result := (IsFinitePoint(P1) and IsFinitePoint(P2) and IsFinitePoint(P3) and IsFinitePoint(P4));
 end;
 
+function TPdfQuad.HeightOver(const Point, Up: TPointF): Single;
+begin
+  Result := (Point.X - P1.X) * Up.X + (Point.Y - P1.Y) * Up.Y;
+end;
+
 function TPdfQuad.Extend(const Other: TPdfQuad): TPdfQuad;
 begin
-  const SelfUp = GetUp;
-  const OtherUp = Other.GetUp;
-  const SelfHeight = SelfUp.X * SelfUp.X + SelfUp.Y * SelfUp.Y;
-  const OtherHeight = OtherUp.X * OtherUp.X + OtherUp.Y * OtherUp.Y;
-  const IsOtherTaller = (OtherHeight > SelfHeight);
-
-  var Up := SelfUp;
-  if IsOtherTaller then
+  var Up := GetUp;
+  var UpLength := Sqrt(Up.X * Up.X + Up.Y * Up.Y);
+  if UpLength = 0 then
   begin
-    Up := OtherUp;
+    Up := Other.GetUp;
+    UpLength := Sqrt(Up.X * Up.X + Up.Y * Up.Y);
   end;
 
-  Result.P1 := P1;
-  Result.P2 := Other.P2;
-  Result.P3 := TPointF.Create(Other.P2.X + Up.X, Other.P2.Y + Up.Y);
-  Result.P4 := TPointF.Create(P1.X + Up.X, P1.Y + Up.Y);
+  const HasHeight = (UpLength > 0);
+  if not HasHeight then
+  begin
+    Result := TPdfQuad.Create(P1, Other.P2, Other.P3, P4);
+    Exit;
+  end;
+
+  const Direction = TPointF.Create(Up.X / UpLength, Up.Y / UpLength);
+  const OtherBottom = HeightOver(Other.P2, Direction);
+  const Bottom = Min(Min(0, HeightOver(Other.P1, Direction)), OtherBottom);
+  const Top = Max(Max(HeightOver(P4, Direction), HeightOver(Other.P3, Direction)), HeightOver(Other.P4, Direction));
+
+  Result.P1 := TPointF.Create(P1.X + Direction.X * Bottom, P1.Y + Direction.Y * Bottom);
+  Result.P2 := TPointF.Create(Other.P2.X + Direction.X * (Bottom - OtherBottom), Other.P2.Y + Direction.Y * (Bottom - OtherBottom));
+  Result.P3 := TPointF.Create(Other.P2.X + Direction.X * (Top - OtherBottom), Other.P2.Y + Direction.Y * (Top - OtherBottom));
+  Result.P4 := TPointF.Create(P1.X + Direction.X * Top, P1.Y + Direction.Y * Top);
 end;
 
 end.
