@@ -51,7 +51,8 @@ inner layer; what they return is valid only while an interface of the document i
 uses
   Pdf4D.Api.Document,
   Pdf4D.Api.Document.Interfaces,
-  Pdf4D.Api.TextOptions;
+  Pdf4D.Api.TextOptions,
+  System.RegularExpressions;
 
 begin
   const Document = TPdfDocument.Load('invoice.pdf');
@@ -67,8 +68,16 @@ begin
 
   // One page only
   Writeln(Document.Page(0).ExtractText);
+
+  // The same text with the place of every character. Text.Locate takes a 1-based range, like Match.Index.
+  const Positioned = Document.Page(0).ExtractTextWithPositions;
+  const Match = TRegEx.Match(Positioned.Text, '\d{4}-\d{4}');
+  for var Fragment in Positioned.Locate(Match.Index, Match.Length) do
+    Writeln(Fragment.PageIndex, ': ', Fragment.Quads[0].Bounds.Left:0:2);
 end;
 ```
+
+`ExtractTextWithPositions` (on a document or a page) returns the same text and, per range, the quads of its characters, one per line, in PDF user space. `Page(n).TextLayout` gives the words, segments and lines of a page, with `TryFindSegmentAt` and `TryFindWordAt` for hover.
 
 The text is what PDFBox's `PDFTextStripper` writes, with one deviation: right-to-left text (Hebrew, Arabic) comes in the
 order of the file, because there is no bidi pass. See `docs/porting.md`.
