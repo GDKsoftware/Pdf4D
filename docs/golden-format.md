@@ -172,7 +172,7 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 
 1. The `page` and `line` lines of both sides are compared one by one: the line kinds and the `glyphs` values must be equal.
 2. The four numbers of a line may differ by 0.02.
-3. Known differences are listed in `tests/golden/<name>.positions.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`, where `<page>` is the number of a page. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error, an `error` line or a different set of pages is always compared.
+3. Known differences are listed in `tests/golden/<name>.positions.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`, where `<page>` is the number of a page. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error or a different set of pages is always compared. An `error` line is a line of the last page before it, so it is skipped together with that page.
 
 ## Font width files
 

@@ -8,7 +8,8 @@ uses
   System.SysUtils,
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Api.Page.Interfaces,
-  Pdf4D.Api.TextLayout.Interfaces;
+  Pdf4D.Api.TextLayout.Interfaces,
+  Pdf4D.Text.PositionedText;
 
 type
   // Writes the position dump of docs/golden-format.md ("Position goldens"), the same lines that the PDFBox oracle writes
@@ -19,6 +20,7 @@ type
 
     class procedure CheckFinite(const Fragments: TArray<TPdfTextFragment>; const Source: string); static;
     class procedure ProbePage(const Page: IPdfPage; const PageNumber: Integer); static;
+    class procedure CheckMappedCharacters(const Positioned: TPdfPositionedText); static;
 
   public
     // Lenient: every exception becomes an "error" line. Strict: only a PDF exception does, any other exception (an access
@@ -29,6 +31,10 @@ type
     // Runs ExtractTextWithPositions and the TextLayout of every page, and raises EInvalidOpException when a quad is not finite.
     // Exceptions of the document itself (EPdfException) go to the caller.
     class procedure Probe(const Document: IPdfDocument); static;
+    // Runs TPdfPositionStripper with the options of the dump, and raises EInvalidOpException when its text differs from that of
+    // TPdfTextStripper or when a character that is not a separator has no glyph, or has a glyph that is out of order or has a quad
+    // that is not finite. A document that makes the text stripper raise an EPdfException is left alone.
+    class procedure CheckMapping(const Document: IPdfDocument); static;
   end;
 
 implementation
@@ -38,6 +44,7 @@ uses
   Pdf4D.Api.Document,
   Pdf4D.Common.Defines,
   Pdf4D.Model.Page,
+  Pdf4D.Text.PositionStripper,
   Pdf4D.Text.Stripper,
   Pdf4D.Text.TextPosition;
 
@@ -226,6 +233,76 @@ begin
   begin
     Inc(PageNumber);
     ProbePage(Page, PageNumber);
+  end;
+end;
+
+class procedure TPositionDump.CheckMappedCharacters(const Positioned: TPdfPositionedText);
+begin
+  var PreviousGlyph := -1;
+  for var Index := 0 to Length(Positioned.Text) - 1 do
+  begin
+    const Character = Positioned.Text[Index + 1];
+    const Glyph = Positioned.GlyphOfChar(Index);
+    const IsSeparator = (Character <= ' ');
+    if (Glyph < 0) and not IsSeparator then
+    begin
+      raise EInvalidOpException.CreateFmt('Character %d (%s) has no glyph', [Index, Character]);
+    end;
+    if Glyph >= 0 then
+    begin
+      if Glyph < PreviousGlyph then
+      begin
+        raise EInvalidOpException.CreateFmt('Character %d has glyph %d, after glyph %d', [Index, Glyph, PreviousGlyph]);
+      end;
+      if not Positioned.Glyphs[Glyph].Quad.IsFinite then
+      begin
+        raise EInvalidOpException.CreateFmt('Character %d has a glyph with a quad that is not finite', [Index]);
+      end;
+      PreviousGlyph := Glyph;
+    end;
+  end;
+end;
+
+class procedure TPositionDump.CheckMapping(const Document: IPdfDocument);
+begin
+  const Model = (Document as TPdfDocument).ModelDocument;
+  const LastPage = Min(Document.PageCount, MaxPages);
+
+  var Expected: string;
+  const TextStripper = TPdfTextStripper.Create;
+  try
+    TextStripper.SortByPosition := True;
+    TextStripper.StartPage := 1;
+    TextStripper.EndPage := LastPage;
+    try
+      Expected := TextStripper.GetText(Model);
+    except
+      on EPdfException do
+      begin
+        Exit;
+      end;
+    end;
+  finally
+    TextStripper.Free;
+  end;
+
+  const PositionStripper = TPdfPositionStripper.Create;
+  try
+    PositionStripper.SortByPosition := True;
+    PositionStripper.StartPage := 1;
+    PositionStripper.EndPage := LastPage;
+    const Positioned = PositionStripper.Extract(Model);
+    try
+      if Positioned.Text <> Expected then
+      begin
+        raise EInvalidOpException.Create('The text of the position stripper differs from that of the text stripper');
+      end;
+      CheckMappedCharacters(Positioned);
+    finally
+      Positioned.Free;
+    end;
+  finally
+    PositionStripper.Free;
   end;
 end;
 

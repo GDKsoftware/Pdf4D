@@ -72,8 +72,11 @@ begin
   // The same text with the place of every character. Text.Locate takes a 1-based range, like Match.Index.
   const Positioned = Document.Page(0).ExtractTextWithPositions;
   const Match = TRegEx.Match(Positioned.Text, '\d{4}-\d{4}');
-  for var Fragment in Positioned.Locate(Match.Index, Match.Length) do
-    Writeln(Fragment.PageIndex, ': ', Fragment.Quads[0].Bounds.Left:0:2);
+  if Match.Success then
+  begin
+    for var Fragment in Positioned.Locate(Match.Index, Match.Length) do
+      Writeln(Fragment.PageIndex, ': ', Fragment.Quads[0].Bounds.Left:0:2);
+  end;
 end;
 ```
 

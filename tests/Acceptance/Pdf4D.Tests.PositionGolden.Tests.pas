@@ -20,6 +20,11 @@ type
     [Test]
     [TestCaseProvider('Pdf4DCorpus')]
     procedure TestCorpus(const RelativePath: string);
+
+    // The golden above is written by a plain text stripper, so this is what puts TPdfPositionStripper itself through the corpus
+    [Test]
+    [TestCaseProvider('Pdf4DCorpus')]
+    procedure TestPositionStripperMapsEveryCharacter(const RelativePath: string);
   end;
 
 implementation
@@ -88,6 +93,35 @@ begin
     const Reported = Copy(Differences, 0, MaxReportedDifferences);
     Assert.Fail(Format('%s: %d differences with PDFBox, the first %d:%s%s',
                        [RelativePath, Length(Differences), Length(Reported), sLineBreak, string.Join(sLineBreak, Reported)]));
+  end;
+end;
+
+procedure TPositionGoldenTests.TestPositionStripperMapsEveryCharacter(const RelativePath: string);
+begin
+  if RelativePath = '' then
+  begin
+    Assert.Fail('The corpus was not found: set PDF4D_CORPUS or run the test program below the tests folder');
+  end;
+
+  var Options := TPdfLoadOptions.Default;
+  Options.Password := TCorpus.PasswordFor(RelativePath);
+  var Document: IPdfDocument := nil;
+  try
+    Document := TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
+  except
+    on EPdfException do
+    begin
+      Exit;
+    end;
+  end;
+
+  try
+    TPositionDump.CheckMapping(Document);
+  except
+    on Failure: EInvalidOpException do
+    begin
+      Assert.Fail(Format('%s: %s', [RelativePath, Failure.Message]));
+    end;
   end;
 end;
 
