@@ -32,6 +32,8 @@ uses
   Pdf4D.Text.LegacyStreamEngine.Tests in '..\src\Text\Pdf4D.Text.LegacyStreamEngine.Tests.pas',
   Pdf4D.Text.GlyphQuad in '..\src\Text\Pdf4D.Text.GlyphQuad.pas',
   Pdf4D.Text.GlyphQuad.Tests in '..\src\Text\Pdf4D.Text.GlyphQuad.Tests.pas',
+  Pdf4D.Text.Layout in '..\src\Text\Pdf4D.Text.Layout.pas',
+  Pdf4D.Text.Layout.Tests in '..\src\Text\Pdf4D.Text.Layout.Tests.pas',
   Pdf4D.Text.PositionedText in '..\src\Text\Pdf4D.Text.PositionedText.pas',
   Pdf4D.Text.PositionedText.Tests in '..\src\Text\Pdf4D.Text.PositionedText.Tests.pas',
   Pdf4D.Text.PositionStripper in '..\src\Text\Pdf4D.Text.PositionStripper.pas',

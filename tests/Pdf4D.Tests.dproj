@@ -103,6 +103,8 @@
         <DCCReference Include="..\src\Text\Pdf4D.Text.LegacyStreamEngine.Tests.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.GlyphQuad.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.GlyphQuad.Tests.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Layout.pas"/>
+        <DCCReference Include="..\src\Text\Pdf4D.Text.Layout.Tests.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.PositionedText.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.PositionedText.Tests.pas"/>
         <DCCReference Include="..\src\Text\Pdf4D.Text.PositionStripper.pas"/>
