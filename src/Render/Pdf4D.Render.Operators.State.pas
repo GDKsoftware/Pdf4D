@@ -107,13 +107,14 @@ uses
   Pdf4D.Cos.Names,
   Pdf4D.Cos.Number,
   Pdf4D.Graphics.LineDash,
+  Pdf4D.Graphics.SoftMask,
   Pdf4D.Graphics.State;
 
 resourcestring
   DashArrayHasNoNumber = 'dash array has a non number element, ignored';
   ExtGStateNotFound = 'name for ''gs'' operator not found in resources: /%s';
   DashPatternInvalid = 'The /D entry of an ExtGState is no dash array with a phase, ignored';
-  SoftMaskNotSupported = 'Soft masks are not supported yet: the /SMask of an ExtGState is ignored';
+  SoftMaskWithoutGroup = 'The /SMask of an ExtGState has no group stream, the soft mask is ignored';
 
 const
   IntentNames: array[0..3] of string = (TCosNames.AbsoluteColorimetric, TCosNames.RelativeColorimetric, TCosNames.Saturation, TCosNames.Perceptual);
@@ -497,14 +498,34 @@ begin
   end;
 end;
 
-// The soft mask itself is kept in the state when soft masks are drawn
+// PDExtendedGraphicsState.copyIntoGraphicsState: the soft mask remembers the CTM of the moment. /None, a value that is no soft mask and
+// a soft mask without group remove the mask; the last two are logged.
 procedure TSetRenderGraphicsStateParametersOperator.ApplySoftMask(const State: TPDExtendedGraphicsState);
 begin
-  var SoftMask: TCosBase;
-  const HasSoftMask = (State.TryGetSoftMask(SoftMask) and (not ((SoftMask is TCosName) and (TCosName(SoftMask).Name = NoSoftMask))));
-  if HasSoftMask then
+  const RenderState = GraphicsEngine.RenderState;
+  RenderState.SoftMask := nil;
+
+  var Value: TCosBase;
+  if not State.TryGetSoftMask(Value) then
   begin
-    Engine.LogWarning(SoftMaskNotSupported, []);
+    Exit;
+  end;
+
+  const IsNone = ((Value is TCosName) and (TCosName(Value).Name = NoSoftMask));
+  if IsNone then
+  begin
+    Exit;
+  end;
+
+  var Mask: IPdfSoftMask;
+  const IsMade = TPDSoftMask.TryCreate(Value, Engine.Resources.Context, GraphicsEngine.GraphicsState.CurrentTransformationMatrix, Mask);
+  if IsMade then
+  begin
+    RenderState.SoftMask := Mask;
+  end
+  else
+  begin
+    Engine.LogWarning(SoftMaskWithoutGroup, []);
   end;
 end;
 

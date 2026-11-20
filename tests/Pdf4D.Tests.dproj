@@ -203,6 +203,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.StrokeNormalizer.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.SoftMaskPaint.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.CancelToken.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.CancelToken.Tests.pas"/>
@@ -227,6 +228,8 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Text.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Images.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Groups.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.SoftMask.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.SoftMaskPaint.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
@@ -248,6 +251,7 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.LineDash.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.SoftMask.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.State.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.ColorBuilder.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Tests.pas"/>

@@ -3,10 +3,9 @@
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/rendering/PageDrawer.java (3.0.8): drawPage, setClip, getStroke, getDashArray,
 // strokePath, fillPath, fillAndStrokePath, clip, adjustClip, endPath and the path construction; the paint is the solid colour of
-// getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage without
-// the soft mask and the transfer function of the graphics state, and without the pre-scaling of strongly reduced images (the device
-// scales), and showTransparencyGroup with the inner class TransparencyGroup (bounds, backdrop) and hasBlendMode. Shadings, patterns
-// and soft masks are not drawn yet.
+// getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage with the
+// transfer function and the soft mask of the graphics state (the soft mask itself is made by Pdf4D.Render.SoftMaskPaint), and showTransparencyGroup
+// with the inner class TransparencyGroup (bounds, backdrop, the group of a soft mask) and hasBlendMode. Shadings and patterns are not drawn yet.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
 // showType3Glyph
 unit Pdf4D.Render.PageDrawer;
@@ -27,6 +26,7 @@ uses
   Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.Image,
+  Pdf4D.Graphics.SoftMask,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
@@ -74,10 +74,23 @@ type
     FLoggedMissingGlyphs: TDictionary<Int64, Boolean>;
     FGroupDepth: Integer;
     FHasLoggedGroupDepth: Boolean;
+    FSoftMaskDepth: Integer;
+    FHasLoggedSoftMaskDepth: Boolean;
+    // The last soft mask that was made, for the state, matrix and device size it was made for; nil for a soft mask that draws nothing
+    FCachedMaskSource: IPdfSoftMask;
+    FCachedMaskMatrix: TPdfMatrix;
+    FCachedMaskWidth: Integer;
+    FCachedMaskHeight: Integer;
+    FCachedMask: TPdfAlphaMask;
 
     function TransformWidth(const Width: Single): Single;
+    function PlainNonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
     function NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
+    function ImageComposite(const Image: TPDImage): TPdfComposite;
     function StrokingComposite: TPdfComposite;
+    function CurrentSoftMask: TPdfAlphaMask;
+    function IsSoftMaskCached(const Mask: IPdfSoftMask): Boolean;
+    function BuildSoftMask(const Mask: IPdfSoftMask): TPdfAlphaMask;
     function SolidPaint(const Color: TPDColor): TPdfPaint;
     function TryBuildStroke(out Stroke: TPdfStrokeStyle): Boolean;
     function TryBuildDashes(out Dashes: TArray<Single>; out Phase: Single): Boolean;
@@ -106,7 +119,8 @@ type
     function TryScaleDown(const Bitmap: TPdfBitmap; const ImageTransform: TPdfMatrix; out Scaled: TPdfBitmap): Boolean;
     procedure DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
     procedure DrawStencil(const Image: TPDImage);
-    function TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect; out Shift: Single): Boolean;
+    procedure ApplyTransferFunction(const Bitmap: TPdfBitmap);
+    function TryGetGroupBounds(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const UsesClips: Boolean; out Bounds: TRect; out Shift: Single): Boolean;
     function GroupShift(const Area: TRectF): Single;
     function IntersectedWithClips(const Area: TRectF): TRectF;
     class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath; static;
@@ -116,8 +130,9 @@ type
     function NeedsBackdrop(const Form: TPDFormXObject): Boolean;
     function BackdropComposite: TPdfComposite;
     procedure DrawGroup(const Form: TPDFormXObject; const Bounds: TRect; const Shift: Single);
-    procedure RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect);
-    procedure RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect);
+    procedure RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect; const Ctm: TPdfMatrix;
+                              const IsSoftMask: Boolean);
+    procedure RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect; const Ctm: TPdfMatrix; const IsSoftMask: Boolean);
     procedure DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect; const Shift: Single);
 
   protected
@@ -132,6 +147,11 @@ type
     destructor Destroy; override;
 
     procedure DrawPage;
+    // Draws the group of a soft mask on a layer of its own, which starts with Backdrop when HasBackdrop. Ctm replaces the CTM of the state,
+    // the state is that of the caller without soft mask. The layer lies at Bounds, and its content Shift lower (see GroupShift). False when
+    // nothing of the group is in the device. The caller owns Image.
+    function TryRenderMaskGroup(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const HasBackdrop: Boolean; const Backdrop: TPdfDeviceColor;
+                                out Bounds: TRect; out Shift: Single; out Image: TPdfBitmap): Boolean;
 
     procedure BeginText; override;
     procedure EndText; override;
@@ -153,6 +173,7 @@ type
     procedure ShowTransparencyGroup(const Form: TPDFormXObject); override;
 
     property Renderer: TPdfRenderer read FRenderer;
+    property Page: TPDPage read FPage;
     // True once the cancel token of the parameters has said so
     property IsCancelled: Boolean read FIsCancelled;
   end;
@@ -164,12 +185,14 @@ uses
   System.SysUtils,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Names,
+  Pdf4D.Cos.PdfArray,
   Pdf4D.Graphics.State,
   Pdf4D.Model.ExtendedGraphicsState,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.GlyphCache,
   Pdf4D.Render.ImageScaler,
   Pdf4D.Render.PageTransform,
+  Pdf4D.Render.SoftMaskPaint,
   Pdf4D.Render.StrokeNormalizer;
 
 const
@@ -209,6 +232,7 @@ end;
 
 destructor TPdfPageDrawer.Destroy;
 begin
+  FCachedMask.Free;
   FLoggedMissingGlyphs.Free;
   FTextClip.Free;
   FLinePath.Free;
@@ -301,12 +325,28 @@ begin
   Result := Min(Max(Alpha, 0), 1);
 end;
 
-function TPdfPageDrawer.NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
+function TPdfPageDrawer.PlainNonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
 begin
   Result := TPdfComposite.Default;
   Result.Alpha := LimitedAlpha(RenderState.NonStrokeAlphaConstant);
   Result.BlendMode := RenderState.BlendMode;
   Result.AntiAlias := (FParams.Options.AntiAlias and IsAntiAliased);
+end;
+
+function TPdfPageDrawer.NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
+begin
+  Result := PlainNonStrokingComposite(IsAntiAliased);
+  Result.SoftMask := CurrentSoftMask;
+end;
+
+// PDFBOX-5307: an image with a /Mask or /SMask of its own ignores the soft mask of the graphics state
+function TPdfPageDrawer.ImageComposite(const Image: TPDImage): TPdfComposite;
+begin
+  Result := PlainNonStrokingComposite(True);
+  if not Image.HasMaskOrSMask then
+  begin
+    Result.SoftMask := CurrentSoftMask;
+  end;
 end;
 
 function TPdfPageDrawer.StrokingComposite: TPdfComposite;
@@ -315,6 +355,57 @@ begin
   Result.Alpha := LimitedAlpha(RenderState.AlphaConstant);
   Result.BlendMode := RenderState.BlendMode;
   Result.AntiAlias := FParams.Options.AntiAlias;
+  Result.SoftMask := CurrentSoftMask;
+end;
+
+// The mask of the soft mask of the graphics state in the pixels of the device, owned by the drawer; nil without soft mask and for a soft
+// mask that draws nothing (Adobe ignores those). The mask lives until the next one is made, which is after the draw call that uses it.
+function TPdfPageDrawer.CurrentSoftMask: TPdfAlphaMask;
+begin
+  const Mask = RenderState.SoftMask;
+  if not Assigned(Mask) then
+  begin
+    Exit(nil);
+  end;
+
+  if not IsSoftMaskCached(Mask) then
+  begin
+    const Built = BuildSoftMask(Mask);
+    FCachedMask.Free;
+    FCachedMask := Built;
+    FCachedMaskSource := Mask;
+    FCachedMaskMatrix := FPageToDevice;
+    FCachedMaskWidth := FDevice.Width;
+    FCachedMaskHeight := FDevice.Height;
+  end;
+  Result := FCachedMask;
+end;
+
+function TPdfPageDrawer.IsSoftMaskCached(const Mask: IPdfSoftMask): Boolean;
+begin
+  Result := ((FCachedMaskSource = Mask) and FCachedMaskMatrix.IsEqual(FPageToDevice) and (FCachedMaskWidth = FDevice.Width) and
+             (FCachedMaskHeight = FDevice.Height));
+end;
+
+// A soft mask that is nested as deep as the limit is left out
+function TPdfPageDrawer.BuildSoftMask(const Mask: IPdfSoftMask): TPdfAlphaMask;
+begin
+  if FSoftMaskDepth >= Max(FParams.Options.MaxSoftMaskDepth, 1) then
+  begin
+    if not FHasLoggedSoftMaskDepth then
+    begin
+      FHasLoggedSoftMaskDepth := True;
+      LogWarning('Soft masks are nested as deep as the limit of %d, the soft mask is skipped', [FParams.Options.MaxSoftMaskDepth]);
+    end;
+    Exit(nil);
+  end;
+
+  Inc(FSoftMaskDepth);
+  try
+    Result := TPdfSoftMaskBuilder.Build(Self, Mask);
+  finally
+    Dec(FSoftMaskDepth);
+  end;
 end;
 
 // getPaint for a colour that is not a pattern
@@ -918,7 +1009,7 @@ begin
     try
       BitmapToDevice := ImageToPage(Scaled.Width, Scaled.Height).Multiply(FPageToDevice);
       ApplyClip;
-      FDevice.DrawBitmap(Scaled, BitmapToDevice, Filter, NonStrokingComposite(True));
+      FDevice.DrawBitmap(Scaled, BitmapToDevice, Filter, ImageComposite(Image));
     finally
       Scaled.Free;
     end;
@@ -926,7 +1017,7 @@ begin
   end;
 
   ApplyClip;
-  FDevice.DrawBitmap(Bitmap, BitmapToDevice, Filter, NonStrokingComposite(True));
+  FDevice.DrawBitmap(Bitmap, BitmapToDevice, Filter, ImageComposite(Image));
 end;
 
 // The matrix that puts the pixel (i, j) of an image of Width x Height pixels on [i, i + 1] x [j, j + 1] of the unit square of the CTM
@@ -1014,6 +1105,17 @@ begin
   end;
 end;
 
+// drawImage: the transfer function of the graphics state (/TR or /TR2) changes the colours of an image; a name (/Identity, /Default) does not
+procedure TPdfPageDrawer.ApplyTransferFunction(const Bitmap: TPdfBitmap);
+begin
+  const Transfer = RenderState.Transfer;
+  const IsFunction = ((Transfer is TCosArray) or (Transfer is TCosDictionary));
+  if IsFunction then
+  begin
+    TPdfImageTransfer.Apply(Bitmap, Transfer, FPage.Context);
+  end;
+end;
+
 procedure TPdfPageDrawer.DrawImage(const Image: TPDImage);
 begin
   if Image.IsStencil then
@@ -1029,6 +1131,7 @@ begin
   end;
 
   try
+    ApplyTransferFunction(Bitmap);
     DrawImageBitmap(Image, Bitmap);
   finally
     Bitmap.Free;
@@ -1050,7 +1153,7 @@ begin
 
   var Bounds: TRect;
   var Shift: Single;
-  if not TryGetGroupBounds(Form, Bounds, Shift) then
+  if not TryGetGroupBounds(Form, GraphicsState.CurrentTransformationMatrix, True, Bounds, Shift) then
   begin
     Exit;
   end;
@@ -1103,7 +1206,7 @@ end;
 
 // The bounds of TransparencyGroup in device pixels: the BBox with the CTM and the matrix of the form, the clip and the device. False
 // when nothing of the group can be seen.
-function TPdfPageDrawer.TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect; out Shift: Single): Boolean;
+function TPdfPageDrawer.TryGetGroupBounds(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const UsesClips: Boolean; out Bounds: TRect; out Shift: Single): Boolean;
 begin
   Bounds := TRect.Empty;
   var Area := TRectF.Create(0, 0, FDevice.Width, FDevice.Height);
@@ -1111,7 +1214,7 @@ begin
   var BBox: TPdfRectangle;
   if Form.TryGetBBox(BBox) then
   begin
-    var Matrix := GraphicsState.CurrentTransformationMatrix;
+    var Matrix := Ctm;
     Matrix.ConcatenateWith(Form.Matrix);
     const Box = PathAround(BBox, Matrix);
     try
@@ -1127,7 +1230,10 @@ begin
     end;
   end;
 
-  Area := IntersectedWithClips(Area);
+  if UsesClips then
+  begin
+    Area := IntersectedWithClips(Area);
+  end;
   if Area.IsEmpty then
   begin
     Exit(False);
@@ -1257,6 +1363,28 @@ begin
   Result.AntiAlias := False;
 end;
 
+function TPdfPageDrawer.TryRenderMaskGroup(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const HasBackdrop: Boolean;
+                                           const Backdrop: TPdfDeviceColor; out Bounds: TRect; out Shift: Single; out Image: TPdfBitmap): Boolean;
+begin
+  Image := nil;
+  Shift := 0;
+  if not TryGetGroupBounds(Form, Ctm, False, Bounds, Shift) then
+  begin
+    Exit(False);
+  end;
+
+  const Layer = FDevice.CreateLayer(Bounds.Width, Bounds.Height);
+  if HasBackdrop then
+  begin
+    Layer.Clear(Backdrop);
+  end;
+
+  const Reference: IPdfRasterDevice = TPdfGroupDevice.Create(Layer, nil);
+  RunGroupContent(Form, Reference, Bounds, Ctm, True);
+  Image := TPdfGroupDevice(Reference).ToBitmap;
+  Result := True;
+end;
+
 // TransparencyGroup and showTransparencyGroupOnGraphics: the group is drawn on a layer of its own, which then is drawn on the device
 // with the alpha constant and the blend mode of the graphics state. The layer starts at the top left of Bounds.
 procedure TPdfPageDrawer.DrawGroup(const Form: TPDFormXObject; const Bounds: TRect; const Shift: Single);
@@ -1277,7 +1405,7 @@ begin
     end;
 
     const Reference: IPdfRasterDevice = TPdfGroupDevice.Create(Image, Alpha);
-    RunGroupContent(Form, Reference, Bounds);
+    RunGroupContent(Form, Reference, Bounds, GraphicsState.CurrentTransformationMatrix, False);
     if Assigned(Backdrop) then
     begin
       TPdfGroupDevice(Reference).RemoveBackdrop(Backdrop, 0, 0);
@@ -1288,29 +1416,47 @@ begin
   end;
 end;
 
-// The group draws on the layer: the matrix to the device moves by the corner of the layer, and so does the clip
-procedure TPdfPageDrawer.RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect);
+// The group draws on the layer: the matrix to the device moves by the corner of the layer, and so does the clip. The path under
+// construction and the glyphs of a text clip belong to the operator that is running, which a soft mask may interrupt (it is made when
+// that operator paints), so the group gets paths of its own.
+procedure TPdfPageDrawer.RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect; const Ctm: TPdfMatrix;
+                                         const IsSoftMask: Boolean);
 begin
   const SavedDevice = FDevice;
   const SavedMatrix = FPageToDevice;
+  const SavedLinePath = FLinePath;
+  const SavedTextClip = FTextClip;
   FDevice := GroupDevice;
   FPageToDevice := SavedMatrix.Multiply(TPdfMatrix.GetTranslateInstance(-Bounds.Left, -Bounds.Top));
+  FLinePath := TPdfPath.Create;
+  FTextClip := TPdfPath.Create;
   FLastClip := nil;
   try
-    RunGroupStream(Form, Bounds);
+    RunGroupStream(Form, Bounds, Ctm, IsSoftMask);
   finally
+    FTextClip.Free;
+    FLinePath.Free;
+    FTextClip := SavedTextClip;
+    FLinePath := SavedLinePath;
     FDevice := SavedDevice;
     FPageToDevice := SavedMatrix;
     FLastClip := nil;
   end;
 end;
 
-// processTransparencyGroup: the blend mode starts at Normal, the alpha constants at 1 (and the soft mask at none)
-procedure TPdfPageDrawer.RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect);
+// processTransparencyGroup: the blend mode starts at Normal, the alpha constants at 1 and the soft mask at none. A soft mask runs on the
+// CTM that gs saw (processSoftMask), and without clip: its image does not depend on where it is drawn.
+procedure TPdfPageDrawer.RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect; const Ctm: TPdfMatrix; const IsSoftMask: Boolean);
 begin
   const State = TPdfRenderGraphicsState(GraphicsState.Clone);
   try
-    State.Clip := TranslatedClip(State.Clip, -Bounds.Left, -Bounds.Top);
+    State.Clip := nil;
+    if not IsSoftMask then
+    begin
+      State.Clip := TranslatedClip(RenderState.Clip, -Bounds.Left, -Bounds.Top);
+    end;
+    State.CurrentTransformationMatrix := Ctm;
+    State.SoftMask := nil;
     State.BlendMode := TPdfBlendMode.Normal;
     State.AlphaConstant := 1;
     State.NonStrokeAlphaConstant := 1;

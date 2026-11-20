@@ -35,6 +35,11 @@ type
     BitmapWidth: Integer;
     BitmapHeight: Integer;
     BitmapPixels: TBytes;
+    // A copy of the soft mask of the composite, which is valid during the call only: its rectangle, the values and the value outside
+    HasSoftMask: Boolean;
+    SoftMaskRectangle: TRect;
+    SoftMaskOutside: Byte;
+    SoftMaskValues: TBytes;
   end;
 
   // Records every call instead of drawing; has no pixels
@@ -223,6 +228,14 @@ begin
   Result.Kind := Kind;
   Result.DeviceBounds := DeviceBounds;
   Result.Composite := Composite;
+  Result.HasSoftMask := Assigned(Composite.SoftMask);
+  if Result.HasSoftMask then
+  begin
+    const Mask = Composite.SoftMask;
+    Result.SoftMaskRectangle := TRect.Create(Mask.Left, Mask.Top, Mask.Left + Mask.Width, Mask.Top + Mask.Height);
+    Result.SoftMaskOutside := Mask.OutsideValue;
+    Result.SoftMaskValues := Copy(Mask.Values);
+  end;
   Result.Paint := TPdfPaint.Solid(TPdfDeviceColor.Transparent);
   Result.ClipDepth := ClipDepthOf(FClip);
 end;

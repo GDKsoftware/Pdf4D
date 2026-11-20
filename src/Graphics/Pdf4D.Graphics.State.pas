@@ -16,6 +16,7 @@ uses
   Pdf4D.Cos.Base,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.LineDash,
+  Pdf4D.Graphics.SoftMask,
   Pdf4D.Render.Device.Interfaces;
 
 type
@@ -46,6 +47,8 @@ type
     NonStrokeAlphaConstant: Single;
     AlphaSource: Boolean;
     Transfer: TCosBase;
+    // The soft mask that gs set; nil for none. Immutable, so a state and its clones share it.
+    SoftMask: IPdfSoftMask;
 
     // The initial state of a page: black DeviceGray, a line width of 1, miter limit 10, no dashes, no clip, Normal blending
     constructor Create;
@@ -110,6 +113,7 @@ begin
   Copy.NonStrokeAlphaConstant := NonStrokeAlphaConstant;
   Copy.AlphaSource := AlphaSource;
   Copy.Transfer := Transfer;
+  Copy.SoftMask := SoftMask;
   Result := Copy;
 end;
 
