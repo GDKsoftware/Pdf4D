@@ -66,6 +66,12 @@ type
     procedure TestGroupBoundsAreClippedToTheDevice;
 
     [Test]
+    procedure TestGroupIsDrawnLowerLikePdfBox;
+
+    [Test]
+    procedure TestGroupShiftFollowsTheFractionOfTheBounds;
+
+    [Test]
     procedure TestGroupOutsideTheClipDrawsNothing;
 
     [Test]
@@ -234,9 +240,33 @@ begin
   Assert.AreEqual<Integer>(40, FDevice.Layers[0].Height);
   const Bitmaps = CallsOfKind(FDevice, TRecordedCallKind.Bitmap);
   Assert.AreEqual(Double(20), Double(Bitmaps[0].DeviceBounds.Left), Tolerance);
-  Assert.AreEqual(Double(60), Double(Bitmaps[0].DeviceBounds.Top), Tolerance);
   Assert.AreEqual(Double(80), Double(Bitmaps[0].DeviceBounds.Right), Tolerance);
-  Assert.AreEqual(Double(100), Double(Bitmaps[0].DeviceBounds.Bottom), Tolerance);
+  // 40 pixels high, lower by the shift of the next test
+  Assert.AreEqual(Double(40), Double(Bitmaps[0].DeviceBounds.Height), Tolerance);
+end;
+
+// PageDrawer.showTransparencyGroupOnGraphics: the image of the group is one row higher than the box (its height is floor(maximum) + 1
+// - floor(minimum) of the bounds in the page), and it is drawn with its top at the top of the box while the content is aligned to its
+// bottom: the content lies one pixel lower than it should. The group of the page lies at (20, 60)-(80, 100) of the device.
+procedure TPageDrawerGroupTests.TestGroupIsDrawnLowerLikePdfBox;
+begin
+  RenderGroup('20 100 60 40 re W n /G1 Do', '/BBox [-1000 -1000 1000 1000] ' + IsolatedGroup, TwoRectangles);
+
+  const Bitmaps = CallsOfKind(FDevice, TRecordedCallKind.Bitmap);
+  Assert.AreEqual(Double(61), Double(Bitmaps[0].DeviceBounds.Top), Tolerance);
+  Assert.AreEqual(Double(101), Double(Bitmaps[0].DeviceBounds.Bottom), Tolerance);
+  Assert.AreEqual(TPdfImageFilter.Nearest, Bitmaps[0].Paint.Filter, 'an integer shift copies the pixels');
+end;
+
+// A box from y = 100.25 to 140.5 has 40.25 pixels, and its image 141 - 100 = 41: the content is 0.75 lower
+procedure TPageDrawerGroupTests.TestGroupShiftFollowsTheFractionOfTheBounds;
+begin
+  RenderGroup('20 100.25 60 40.25 re W n /G1 Do', '/BBox [-1000 -1000 1000 1000] ' + IsolatedGroup, TwoRectangles);
+
+  const Bitmaps = CallsOfKind(FDevice, TRecordedCallKind.Bitmap);
+  // the layer starts at floor(200 - 140.5) = 59
+  Assert.AreEqual(Double(59.75), Double(Bitmaps[0].DeviceBounds.Top), Tolerance);
+  Assert.AreEqual(TPdfImageFilter.Bicubic, Bitmaps[0].Paint.Filter, 'a fraction of a pixel is interpolated');
 end;
 
 procedure TPageDrawerGroupTests.TestGroupBoundsAreClippedToTheDevice;

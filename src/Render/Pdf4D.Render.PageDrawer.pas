@@ -106,7 +106,8 @@ type
     function TryScaleDown(const Bitmap: TPdfBitmap; const ImageTransform: TPdfMatrix; out Scaled: TPdfBitmap): Boolean;
     procedure DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
     procedure DrawStencil(const Image: TPDImage);
-    function TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect): Boolean;
+    function TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect; out Shift: Single): Boolean;
+    function GroupShift(const Area: TRectF): Single;
     function IntersectedWithClips(const Area: TRectF): TRectF;
     class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath; static;
     class function HasBlendMode(const Form: TPDFormXObject; const Done: TList<TCosStream>): Boolean; static;
@@ -114,10 +115,10 @@ type
     class function HasBlendModeChild(const Resources: TCosDictionary; const Done: TList<TCosStream>): Boolean; static;
     function NeedsBackdrop(const Form: TPDFormXObject): Boolean;
     function BackdropComposite: TPdfComposite;
-    procedure DrawGroup(const Form: TPDFormXObject; const Bounds: TRect);
+    procedure DrawGroup(const Form: TPDFormXObject; const Bounds: TRect; const Shift: Single);
     procedure RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect);
     procedure RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect);
-    procedure DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect);
+    procedure DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect; const Shift: Single);
 
   protected
     // The page clip: the crop box
@@ -1048,14 +1049,15 @@ begin
   end;
 
   var Bounds: TRect;
-  if not TryGetGroupBounds(Form, Bounds) then
+  var Shift: Single;
+  if not TryGetGroupBounds(Form, Bounds, Shift) then
   begin
     Exit;
   end;
 
   Inc(FGroupDepth);
   try
-    DrawGroup(Form, Bounds);
+    DrawGroup(Form, Bounds, Shift);
   finally
     Dec(FGroupDepth);
   end;
@@ -1080,9 +1082,28 @@ begin
   end;
 end;
 
+// PageDrawer.showTransparencyGroupOnGraphics draws the image of a group with its top at the top of the box, while TransparencyGroup
+// gives the image one row more than the box (floor(maximum) + 1 - floor(minimum) of the bounds in the page, y upwards) and puts the
+// content at the bottom of it. The content therefore lies lower than it should, by the difference of the two heights (one pixel for
+// a box on whole pixels). That is a bug of PDFBox that the references have, so the port has it: the layer is drawn this much lower.
+// A page that is turned does not follow this rule in PDFBox (the image is drawn through the rotation), so the shift is 0 there.
+function TPdfPageDrawer.GroupShift(const Area: TRectF): Single;
+begin
+  const IsUpright = ((FPageToDevice.ShearX = 0) and (FPageToDevice.ShearY = 0) and (FPageToDevice.ScaleY < 0));
+  if not IsUpright then
+  begin
+    Exit(0);
+  end;
+
+  // The y of the page times the scale, upwards: the translation of the matrix minus the y of the device
+  const Minimum = Double(FPageToDevice.TranslateY) - Area.Bottom;
+  const Maximum = Double(FPageToDevice.TranslateY) - Area.Top;
+  Result := Floor(Maximum) + 1 - Floor(Minimum) - (Maximum - Minimum);
+end;
+
 // The bounds of TransparencyGroup in device pixels: the BBox with the CTM and the matrix of the form, the clip and the device. False
 // when nothing of the group can be seen.
-function TPdfPageDrawer.TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect): Boolean;
+function TPdfPageDrawer.TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect; out Shift: Single): Boolean;
 begin
   Bounds := TRect.Empty;
   var Area := TRectF.Create(0, 0, FDevice.Width, FDevice.Height);
@@ -1113,6 +1134,7 @@ begin
   end;
 
   Bounds := TRect.Create(Floor(Area.Left), Floor(Area.Top), Ceil(Area.Right), Ceil(Area.Bottom));
+  Shift := GroupShift(Area);
   Result := (not Bounds.IsEmpty);
 end;
 
@@ -1237,7 +1259,7 @@ end;
 
 // TransparencyGroup and showTransparencyGroupOnGraphics: the group is drawn on a layer of its own, which then is drawn on the device
 // with the alpha constant and the blend mode of the graphics state. The layer starts at the top left of Bounds.
-procedure TPdfPageDrawer.DrawGroup(const Form: TPDFormXObject; const Bounds: TRect);
+procedure TPdfPageDrawer.DrawGroup(const Form: TPDFormXObject; const Bounds: TRect; const Shift: Single);
 begin
   var Backdrop: TPdfBitmap := nil;
   if NeedsBackdrop(Form) and (not FDevice.TryReadPixels(Bounds, Backdrop)) then
@@ -1260,7 +1282,7 @@ begin
     begin
       TPdfGroupDevice(Reference).RemoveBackdrop(Backdrop, 0, 0);
     end;
-    DrawGroupResult(TPdfGroupDevice(Reference), Bounds);
+    DrawGroupResult(TPdfGroupDevice(Reference), Bounds, Shift);
   finally
     Backdrop.Free;
   end;
@@ -1299,12 +1321,18 @@ begin
   ProcessFormWithState(Form, State);
 end;
 
-procedure TPdfPageDrawer.DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect);
+procedure TPdfPageDrawer.DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect; const Shift: Single);
 begin
   const Image = GroupDevice.ToBitmap;
   try
     ApplyClip;
-    FDevice.DrawBitmap(Image, TPdfMatrix.GetTranslateInstance(Bounds.Left, Bounds.Top), TPdfImageFilter.Nearest, NonStrokingComposite(False));
+    // A shift of whole pixels copies the pixels; a fraction is interpolated, like Java2D does for a translation
+    var Filter := TPdfImageFilter.Nearest;
+    if Frac(Shift) <> 0 then
+    begin
+      Filter := TPdfImageFilter.Bicubic;
+    end;
+    FDevice.DrawBitmap(Image, TPdfMatrix.GetTranslateInstance(Bounds.Left, Bounds.Top + Shift), Filter, NonStrokingComposite(False));
   finally
     Image.Free;
   end;
