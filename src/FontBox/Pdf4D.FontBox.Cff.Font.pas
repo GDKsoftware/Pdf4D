@@ -94,6 +94,10 @@ type
     // The charstring of the glyph, or the .notdef charstring for a GID beyond the CharStrings (as PDFBox). False when the font
     // has no charstrings.
     function TryGetCharString(const GID: Integer; out CharString: TBytes): Boolean;
+    // The charstring of the glyph for a component of the deprecated seac form of endchar, as the PrivateType1CharStringReader of
+    // PDFBox gives it: a CID-keyed font always answers .notdef, a name-keyed font the glyph of the name (.notdef for an unknown
+    // name). Empty when the font has no charstrings. The component is drawn with the local subroutines of the glyph that names it.
+    function SeacCharString(const GlyphName: string): TBytes; virtual;
     // The outline of the glyph in glyph space, from its charstring (a GID beyond the CharStrings gets .notdef, as for the
     // width). False when the font has no charstrings. A damaged charstring gives the outline up to the damage; the warnings go
     // to the log, which may be nil. The caller owns the path.
@@ -126,6 +130,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+
+    function SeacCharString(const GlyphName: string): TBytes; override;
 
     // Takes ownership of the encoding when OwnsEncoding is true
     procedure SetEncoding(const Encoding: TCFFEncoding; const OwnsEncoding: Boolean);
@@ -483,8 +489,21 @@ begin
     Exit(False);
   end;
 
-  Path := TCharStringPath.Type2Path(CharString, GlobalSubrs, LocalSubrsOfGlyph(GID), Log);
+  const Lookup: TFunc<string, TBytes> =
+    function(GlyphName: string): TBytes
+    begin
+      Result := SeacCharString(GlyphName);
+    end;
+  Path := TCharStringPath.Type2Path(CharString, GlobalSubrs, LocalSubrsOfGlyph(GID), Lookup, Log);
   Result := True;
+end;
+
+function TCFFFont.SeacCharString(const GlyphName: string): TBytes;
+begin
+  if not TryGetCharString(0, Result) then
+  begin
+    Result := nil;
+  end;
 end;
 
 function TCFFFont.TryGetPathByCid(const CID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
@@ -569,6 +588,14 @@ end;
 function TCFFType1Font.LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>;
 begin
   Result := FLocalSubrs;
+end;
+
+function TCFFType1Font.SeacCharString(const GlyphName: string): TBytes;
+begin
+  if not TryGetCharString(NameToGID(GlyphName), Result) then
+  begin
+    Result := nil;
+  end;
 end;
 
 function TCFFType1Font.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;

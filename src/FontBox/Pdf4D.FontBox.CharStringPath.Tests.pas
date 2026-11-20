@@ -38,6 +38,9 @@ type
     class function Tokens(const Text: string): TArray<string>; static;
     class procedure CheckSameTokens(const Expected, Actual, Context: string); static;
     class function Type1Subrs: TArray<TBytes>; static;
+    class function SeacBase: TBytes; static;
+    class function SeacAccent: TBytes; static;
+    class function SeacCharString: TBytes; static;
     class function Dummy(const Count: Integer): TArray<TBytes>; static;
     class procedure FindSeac(const Font: TType1Font; out GlyphName: string; out Seac: TSeacOperands); static;
 
@@ -111,6 +114,15 @@ type
     procedure TestType2DivisionIsCollapsed;
 
     [Test]
+    procedure TestType2SeacComposesAccentThroughLookup;
+
+    [Test]
+    procedure TestType2SeacWithoutLookupLeavesOutTheAccent;
+
+    [Test]
+    procedure TestCffFontComposesType2Seac;
+
+    [Test]
     procedure TestCidPathByCid;
 
     [Test]
@@ -158,6 +170,10 @@ const
   RawByte = 200000;
 
   PathTolerance = 0.01;
+  // The base of the seac tests at its place and the accent moved by adx and ady. The last MoveTo after each Z is the pen position
+  // that FontBox leaves behind a closepath; the move of the accent replaces the one of the base.
+  SeacExpected = 'M 10 20 L 60 20 L 60 70 Z M 5 7 L 35 7 L 35 37 Z M 35 37';
+  SeacBaseOnly = 'M 10 20 L 60 20 L 60 70 Z M 60 70';
   Type1Paths = 'paths';
 
 { TCharStringPathTests }
@@ -637,6 +653,88 @@ begin
   const CharString = Encode([100, 100, Rmoveto, 100, 2, Div_, 0, Rlineto, Endchar]);
 
   Assert.AreEqual('M 100 100 L 150 100 Z M 150 100', Type2Described(CharString));
+end;
+
+class function TCharStringPathTests.SeacBase: TBytes;
+begin
+  Result := Encode([10, 20, Rmoveto, 50, 0, Rlineto, 0, 50, Rlineto, Endchar]);
+end;
+
+class function TCharStringPathTests.SeacAccent: TBytes;
+begin
+  Result := Encode([0, 0, Rmoveto, 30, 0, Rlineto, 0, 30, Rlineto, Endchar]);
+end;
+
+// adx ady bchar achar endchar, with the codes 65 (A) and 66 (B) of StandardEncoding
+class function TCharStringPathTests.SeacCharString: TBytes;
+begin
+  Result := Encode([5, 7, 65, 66, Endchar]);
+end;
+
+procedure TCharStringPathTests.TestType2SeacComposesAccentThroughLookup;
+begin
+  const Lookup: TFunc<string, TBytes> =
+    function(GlyphName: string): TBytes
+    begin
+      if GlyphName = 'A' then
+      begin
+        Exit(SeacBase);
+      end;
+      Result := SeacAccent;
+    end;
+
+  const Path = TCharStringPath.Type2Path(SeacCharString, nil, nil, Lookup, FLog);
+  try
+    CheckSameTokens(SeacExpected, Describe(Path), 'seac');
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TCharStringPathTests.TestType2SeacWithoutLookupLeavesOutTheAccent;
+begin
+  const Path = TCharStringPath.Type2Path(SeacCharString, nil, nil, FLog);
+  try
+    Assert.AreEqual('', Describe(Path));
+  finally
+    Path.Free;
+  end;
+  Assert.IsTrue(FMessages.Count > 0, 'The missing accent is logged');
+end;
+
+// Glyph 1 is A, 2 is B (charset SIDs 34 and 35) and 3 is the seac of both
+procedure TCharStringPathTests.TestCffFontComposesType2Seac;
+begin
+  var Options := TCffType1Options.Standard;
+  Options.GlyphCount := 4;
+  Options.CharsetData := TCffTestBuilder.Bytes([0, 0, 34, 0, 35, 0, 36]);
+  Options.CharStrings := [Encode([Endchar]), SeacBase, SeacAccent, SeacCharString];
+  const Parser = TCFFParser.Create(FLog);
+  try
+    const Fonts = Parser.Parse(TCffTestBuilder.Type1Font(Options));
+    try
+      const Font = Fonts[0] as TCFFType1Font;
+      var Path: TPdfPath;
+
+      Assert.IsTrue(Font.TryGetPathByGid(3, Path));
+      try
+        CheckSameTokens(SeacExpected, Describe(Path), 'seac glyph');
+      finally
+        Path.Free;
+      end;
+
+      Assert.IsTrue(Font.TryGetPathByGid(1, Path));
+      try
+        CheckSameTokens(SeacBaseOnly, Describe(Path), 'base glyph');
+      finally
+        Path.Free;
+      end;
+    finally
+      Fonts.Free;
+    end;
+  finally
+    Parser.Free;
+  end;
 end;
 
 procedure TCharStringPathTests.TestCidPathByCid;

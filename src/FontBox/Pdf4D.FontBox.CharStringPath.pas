@@ -17,17 +17,17 @@ type
   // Turns a charstring into the outline of a glyph, in glyph space and with the limits of TCharStringWidth. A charstring that is
   // damaged gives the path up to the damage, with a warning in the log; the caller owns the path.
   TCharStringPath = class
-  private
-    class procedure WarnDamage(const Log: TPdfLog; const Reason: string); static;
-
   public
     // Seac components are found through Lookup (the glyph name of a StandardEncoding code to its charstring, empty when the font
     // has none); without a Lookup the accents of seac are left out.
     class function Type1Path(const CharString: TBytes; const Subrs: TArray<TBytes>; const Lookup: TFunc<string, TBytes>;
                              const Log: TPdfLog = nil): TPdfPath; static;
-    // The deprecated seac form of endchar is not supported: the glyph has no accent then
+    // The deprecated seac form of endchar (adx ady bchar achar) is found through Lookup like the seac of Type 1: the glyph name
+    // of a StandardEncoding code to its Type 2 charstring, empty when the font has none. Without a Lookup the accent is left out.
+    class function Type2Path(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>; const Lookup: TFunc<string, TBytes>;
+                             const Log: TPdfLog = nil): TPdfPath; overload; static;
     class function Type2Path(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
-                             const Log: TPdfLog = nil): TPdfPath; static;
+                             const Log: TPdfLog = nil): TPdfPath; overload; static;
   end;
 
 implementation
@@ -86,6 +86,9 @@ type
     FLookup: TFunc<string, TBytes>;
     FLog: TPdfLog;
     FSeacDepth: Integer;
+    // Set when the items come from a Type 2 charstring: a seac component is then a Type 2 charstring too
+    FIsType2: Boolean;
+    FGlobalSubrs: TArray<TBytes>;
     FNumbers: TList<Double>;
     FCurrent: TPointF;
     FLeftSideBearing: TPointF;
@@ -120,8 +123,9 @@ type
     // The caller owns the outline. A charstring that is damaged gives the outline up to the damage.
     class function Render(const CharString: TBytes; const Subrs: TArray<TBytes>; const Lookup: TFunc<string, TBytes>;
                           const Log: TPdfLog; const SeacDepth: Integer): TGlyphOutline; static;
-    // The outline of a sequence that TType2Converter made. The accents of seac are left out.
-    class function RenderConverted(const Items: TList<TCharStringItem>; const Log: TPdfLog): TGlyphOutline; static;
+    // The outline of a sequence that TType2Converter made. The accents of seac are left out without a Lookup.
+    class function RenderConverted(const Items: TList<TCharStringItem>; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
+                                   const Lookup: TFunc<string, TBytes>; const Log: TPdfLog; const SeacDepth: Integer): TGlyphOutline; static;
   end;
 
   // Type2CharString.convertType1ToType2: the Type 2 operators become the Type 1 operators that the renderer knows
@@ -165,6 +169,16 @@ type
     procedure Convert(const Items: TList<TCharStringItem>);
 
     property Converted: TList<TCharStringItem> read FConverted;
+  end;
+
+  // A Type 2 charstring to an outline: reading, converting and rendering, each with the damage reported to the log
+  TType2Pipeline = class
+  private
+    class procedure WarnDamage(const Log: TPdfLog; const Reason: string); static;
+
+  public
+    class function Outline(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>; const Lookup: TFunc<string, TBytes>;
+                           const Log: TPdfLog; const SeacDepth: Integer): TGlyphOutline; static;
   end;
 
 { TGlyphOutline }
@@ -354,10 +368,13 @@ begin
   end;
 end;
 
-class function TType1Renderer.RenderConverted(const Items: TList<TCharStringItem>; const Log: TPdfLog): TGlyphOutline;
+class function TType1Renderer.RenderConverted(const Items: TList<TCharStringItem>; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
+                                              const Lookup: TFunc<string, TBytes>; const Log: TPdfLog; const SeacDepth: Integer): TGlyphOutline;
 begin
-  const Renderer = TType1Renderer.Create(nil, nil, Log, 0);
+  const Renderer = TType1Renderer.Create(LocalSubrs, Lookup, Log, SeacDepth);
   try
+    Renderer.FIsType2 := True;
+    Renderer.FGlobalSubrs := GlobalSubrs;
     Renderer.Interpret(Items);
     Result := Renderer.FOutline;
     Renderer.FOutline := nil;
@@ -649,7 +666,15 @@ begin
     Exit;
   end;
 
-  const Component = TType1Renderer.Render(CharString, FSubrs, FLookup, FLog, FSeacDepth + 1);
+  var Component: TGlyphOutline;
+  if FIsType2 then
+  begin
+    Component := TType2Pipeline.Outline(CharString, FGlobalSubrs, FSubrs, FLookup, FLog, FSeacDepth + 1);
+  end
+  else
+  begin
+    Component := TType1Renderer.Render(CharString, FSubrs, FLookup, FLog, FSeacDepth + 1);
+  end;
   try
     FOutline.Append(Component, DeltaX, DeltaY);
   finally
@@ -1051,9 +1076,9 @@ begin
   AddCommand(Copy(Numbers, Length(Numbers) - 6, 6), CodeRRCurveTo);
 end;
 
-{ TCharStringPath }
+{ TType2Pipeline }
 
-class procedure TCharStringPath.WarnDamage(const Log: TPdfLog; const Reason: string);
+class procedure TType2Pipeline.WarnDamage(const Log: TPdfLog; const Reason: string);
 begin
   if Assigned(Log) then
   begin
@@ -1061,19 +1086,8 @@ begin
   end;
 end;
 
-class function TCharStringPath.Type1Path(const CharString: TBytes; const Subrs: TArray<TBytes>;
-                                         const Lookup: TFunc<string, TBytes>; const Log: TPdfLog): TPdfPath;
-begin
-  const Outline = TType1Renderer.Render(CharString, Subrs, Lookup, Log, 0);
-  try
-    Result := Outline.ToPath;
-  finally
-    Outline.Free;
-  end;
-end;
-
-class function TCharStringPath.Type2Path(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
-                                         const Log: TPdfLog): TPdfPath;
+class function TType2Pipeline.Outline(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
+                                      const Lookup: TFunc<string, TBytes>; const Log: TPdfLog; const SeacDepth: Integer): TGlyphOutline;
 begin
   const Reader = TType2Reader.Create(GlobalSubrs, LocalSubrs, 0, 0, Log);
   try
@@ -1095,18 +1109,43 @@ begin
           WarnDamage(Log, Failure.Message);
         end;
       end;
-      const Outline = TType1Renderer.RenderConverted(Converter.Converted, Log);
-      try
-        Result := Outline.ToPath;
-      finally
-        Outline.Free;
-      end;
+      Result := TType1Renderer.RenderConverted(Converter.Converted, GlobalSubrs, LocalSubrs, Lookup, Log, SeacDepth);
     finally
       Converter.Free;
     end;
   finally
     Reader.Free;
   end;
+end;
+
+{ TCharStringPath }
+
+class function TCharStringPath.Type1Path(const CharString: TBytes; const Subrs: TArray<TBytes>;
+                                         const Lookup: TFunc<string, TBytes>; const Log: TPdfLog): TPdfPath;
+begin
+  const Outline = TType1Renderer.Render(CharString, Subrs, Lookup, Log, 0);
+  try
+    Result := Outline.ToPath;
+  finally
+    Outline.Free;
+  end;
+end;
+
+class function TCharStringPath.Type2Path(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
+                                         const Lookup: TFunc<string, TBytes>; const Log: TPdfLog): TPdfPath;
+begin
+  const Outline = TType2Pipeline.Outline(CharString, GlobalSubrs, LocalSubrs, Lookup, Log, 0);
+  try
+    Result := Outline.ToPath;
+  finally
+    Outline.Free;
+  end;
+end;
+
+class function TCharStringPath.Type2Path(const CharString: TBytes; const GlobalSubrs, LocalSubrs: TArray<TBytes>;
+                                         const Log: TPdfLog): TPdfPath;
+begin
+  Result := Type2Path(CharString, GlobalSubrs, LocalSubrs, nil, Log);
 end;
 
 end.
