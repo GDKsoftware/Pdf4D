@@ -61,3 +61,10 @@ Includes tables generated with a JDK (java.text.Normalizer and Character.getType
 Unicode Character Database, as a resource in src/Resources (tools/unicode/text-tables.txt).
 Copyright (c) 1991-2022 Unicode, Inc. All rights reserved.
 Distributed under the Unicode License v3, https://www.unicode.org/license.txt. See licenses/Unicode-3.0.txt.
+
+Includes the ICC profile CGATS001Compat-v2-micro.icc of Apache PDFBox (the profile that PDDeviceCMYK loads), as a resource in
+src/Resources. Its copyright tag says CC0 (public domain dedication).
+
+The ICC profiles in tests/icc (see tests/icc/manifest.csv) are only used by the tests: sRGB.icc is the profile of the PDFBox
+test resources, whose copyright tag says "no copyright, use freely"; the other profiles are ICC streams that the PDFs of the
+test corpus embed.

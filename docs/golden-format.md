@@ -203,3 +203,9 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 - `out: !` is an evaluation that PDFBox fails on (an exception). Pdf4D must not raise there, and its result is not compared.
 - `create: !` (before the first `in:` line of a case) is a function that PDFBox cannot make; Pdf4D raises `EPdfParseException` for it.
 - `TestFunctionsMatchPdfBox` compares every other value with a tolerance of 1e-4 (and 1e-6 relative for values above 100).
+
+## Colour reference files
+
+`tests/reference/color/<name>.txt` is written by `Pdf4DOracle --color-batch <spec>` (`tools/oracle/generate-colors.ps1`), one file for `DeviceCMYK` (the profile that `PDDeviceCMYK` loads) and one for each ICC profile in `tests/icc` (`sRGB`, `gray-small`, `gray-gamma`, `cmyk-printer`; the grey and CMYK profiles are the ICC streams of three PDFs in the corpus, see `tests/icc/manifest.csv`). The file starts with `profile: <name>` and holds 200 `in: <numbers>` lines: a grid over the device values (11 steps for 1 component, 5 for 3, 3 for 4) followed by values of a fixed linear congruential generator. The oracle repeats every line and adds ` out: r g b` behind each `in:` line: `ICC_ColorSpace.toRGB` of the profile, in float format. `--color <profile.icc|DeviceCMYK> c1 c2 ...` does one colour, and `intent: n` in a spec (not used in the reference files) overwrites the rendering intent of the header; Java gives the same colour for every intent, so the A2B0 table is the one to use.
+
+- `TestCmykMatchesJava`, `TestSrgbMatchesJava` and `TestCorpusProfilesMatchJava` compare every value with a tolerance of 0.25/255 per channel; the largest difference measured is 0.05/255.

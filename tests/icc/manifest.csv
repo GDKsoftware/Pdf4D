@@ -1,0 +1,5 @@
+file;source;license;notes
+sRGB.icc;https://archive.apache.org/dist/pdfbox/3.0.8/pdfbox-3.0.8-src.zip#pdfbox/src/test/resources/org/apache/pdfbox/pdmodel/sRGB.icc;no copyright, use freely (copyright tag of the profile);sRGB profile with matrix and curves (HP sRGB)
+gray-small.icc;tests/corpus/pdfbox/org/apache/pdfbox/pdmodel/test.unc.pdf;embedded in a corpus PDF;GRAY profile with a kTRC gamma curve (408 bytes)
+gray-gamma.icc;tests/corpus/pdfbox/org/apache/pdfbox/text/BidiSample.pdf;embedded in a corpus PDF;GRAY profile with a kTRC table of 1024 entries (4380 bytes)
+cmyk-printer.icc;tests/corpus/pdfbox-jira/PDFBOX-4418-000314.pdf;embedded in a corpus PDF;CMYK printer profile with A2B0 and A2B1 of type mft2 (557168 bytes)

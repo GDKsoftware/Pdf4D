@@ -17,3 +17,6 @@ src/Resources/afm-MustRead.html -text
 tests/reference/pdfbox-text/*.txt -text
 tests/reference/pdfbox-text/manifest.csv text eol=lf
 tests/reference/functions/*.txt text eol=lf
+tests/reference/color/*.txt text eol=lf
+tests/icc/*.icc binary
+tests/icc/manifest.csv text eol=lf

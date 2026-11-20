@@ -38,6 +38,9 @@ requires
 contains
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
+  Pdf4D.Graphics.Icc.Profile in '..\src\Graphics\Pdf4D.Graphics.Icc.Profile.pas',
+  Pdf4D.Graphics.Icc.Transform in '..\src\Graphics\Pdf4D.Graphics.Icc.Transform.pas',
+  Pdf4D.Resources.Icc in '..\src\Resources\Pdf4D.Resources.Icc.pas',
   Pdf4D.Render.Bitmap in '..\src\Render\Pdf4D.Render.Bitmap.pas',
   Pdf4D.Render.CancelToken in '..\src\Render\Pdf4D.Render.CancelToken.pas',
   Pdf4D.Render.ClipPath in '..\src\Render\Pdf4D.Render.ClipPath.pas',

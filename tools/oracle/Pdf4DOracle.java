@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.awt.color.ICC_ColorSpace;
+import java.awt.color.ICC_Profile;
 import org.apache.fontbox.cff.CFFCIDFont;
 import org.apache.fontbox.cff.CFFFont;
 import org.apache.fontbox.cff.CFFType1Font;
@@ -105,6 +107,8 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --pdf-glyph-paths file.pdf FontName first-last
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --function spec.txt
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color (profile.icc|DeviceCMYK) c1 c2 ...
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color-batch spec.txt
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -142,6 +146,25 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("--function"))
             {
                 out.print(functionCases(new File(args[1])));
+            }
+            else if (args.length >= 3 && args[0].equals("--color"))
+            {
+                StringBuilder sb = new StringBuilder();
+                ICC_ColorSpace space = loadColorSpace(args[1], -1);
+                float[] input = new float[args.length - 2];
+                for (int i = 0; i < input.length; i++)
+                {
+                    input[i] = Float.parseFloat(args[i + 2]);
+                }
+                for (float f : space.toRGB(input))
+                {
+                    sb.append(f).append(' ');
+                }
+                out.println(sb.toString().trim());
+            }
+            else if (args.length >= 2 && args[0].equals("--color-batch"))
+            {
+                out.print(colorCases(new File(args[1])));
             }
             else if (args.length >= 4 && args[0].equals("--pdf-glyph-paths"))
             {
@@ -1614,6 +1637,105 @@ public class Pdf4DOracle
                 {
                     keys.put(key, value);
                 }
+                sb.append(line).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Loads the colour space of a profile the way PDFBox does: DeviceCMYK is the CGATS001Compat-v2-micro.icc of PDFBox,
+     * anything else is an ICC file. intent >= 0 overwrites the rendering intent of the header (to find out which table
+     * the Java colour management uses).
+     */
+    private static ICC_ColorSpace loadColorSpace(String profile, int intent) throws IOException
+    {
+        byte[] data;
+        if (profile.equals("DeviceCMYK"))
+        {
+            try (InputStream is = org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK.class.getResourceAsStream(
+                    "/org/apache/pdfbox/resources/icc/CGATS001Compat-v2-micro.icc"))
+            {
+                data = is.readAllBytes();
+            }
+        }
+        else
+        {
+            data = java.nio.file.Files.readAllBytes(new File(profile).toPath());
+        }
+        if (intent >= 0)
+        {
+            data[64] = 0;
+            data[65] = 0;
+            data[66] = 0;
+            data[67] = (byte) intent;
+        }
+        return new ICC_ColorSpace(ICC_Profile.getInstance(data));
+    }
+
+    /**
+     * Converts device colours to sRGB with ICC_ColorSpace.toRGB. The spec file holds "profile: file.icc" or
+     * "profile: DeviceCMYK" (optionally "intent: n" behind it) and one "in: c1 c2 ..." line per colour. The output repeats
+     * every line, with " out: r g b" behind each "in:" line ("out: !" when Java fails).
+     */
+    private static String colorCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        String profile = null;
+        int intent = -1;
+        ICC_ColorSpace space = null;
+        for (String line : java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8))
+        {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#"))
+            {
+                sb.append(line).append('\n');
+                continue;
+            }
+            int colon = line.indexOf(':');
+            String key = line.substring(0, colon).trim();
+            String value = line.substring(colon + 1).trim();
+            if (key.equals("profile"))
+            {
+                profile = value;
+                intent = -1;
+                space = null;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("intent"))
+            {
+                intent = Integer.parseInt(value);
+                space = null;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("in"))
+            {
+                sb.append("in: ").append(value).append(" out:");
+                try
+                {
+                    if (space == null)
+                    {
+                        space = loadColorSpace(profile, intent);
+                    }
+                    String[] parts = value.split("\\s+");
+                    float[] input = new float[parts.length];
+                    for (int i = 0; i < parts.length; i++)
+                    {
+                        input[i] = Float.parseFloat(parts[i]);
+                    }
+                    for (float f : space.toRGB(input))
+                    {
+                        sb.append(' ').append(f);
+                    }
+                }
+                catch (Throwable t)
+                {
+                    sb.append(" !");
+                }
+                sb.append('\n');
+            }
+            else
+            {
                 sb.append(line).append('\n');
             }
         }

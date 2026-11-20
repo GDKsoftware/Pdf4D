@@ -209,6 +209,12 @@
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.Tests.pas"/>
+        <DCCReference Include="..\src\Resources\Pdf4D.Resources.Icc.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Icc.Profile.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Icc.Transform.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.IccBuilder.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Icc.Profile.Tests.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Icc.Transform.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingDevice.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingDevice.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Base.pas"/>

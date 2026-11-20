@@ -1,5 +1,5 @@
 # Builds the resource files in src/Resources from the PDFBox 3.0.8 sources in tools/pdfbox-src (tools/fetch-pdfbox-src.ps1).
-# Every source file becomes one zlib-compressed RCDATA resource; each group (glyph lists, AFM metrics, CMaps, fonts) is
+# Every source file becomes one zlib-compressed RCDATA resource; each group (glyph lists, AFM metrics, CMaps, fonts, ICC profiles) is
 # one .res file that its linker unit Pdf4D.Resources.<Group>.pas includes with {$R}. The script also writes
 # src/Resources/resources.csv (name;source;sha256;license) with the SHA-256 of the uncompressed bytes and copies the
 # MustRead.html of the AFM files next to the resources, because the AFM licence requires that it stays with the AFM files.
@@ -8,7 +8,7 @@ param(
     [string]$SourceRoot = (Join-Path $PSScriptRoot '..\pdfbox-src'),
     [string]$OutputFolder = (Join-Path $PSScriptRoot '..\..\src\Resources'),
     [string]$RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat',
-    # Rebuilds only the .res file of this group (GLYPHLIST, AFM, CMAP, FONT or UNICODE); resources.csv always lists all groups.
+    # Rebuilds only the .res file of this group (GLYPHLIST, AFM, CMAP, FONT, UNICODE or ICC); resources.csv always lists all groups.
     [string]$OnlyGroup = ''
 )
 
@@ -105,6 +105,11 @@ $unicodeItems = @()
 $textTables = Join-Path $repoRoot 'tools\unicode\text-tables.txt'
 $unicodeItems += , @('TextTables', $textTables, 'Unicode-3.0')
 $groups += , @('Unicode', 'UNICODE', $unicodeItems)
+
+$iccItems = @()
+# The profile that PDDeviceCMYK loads; its copyright tag says CC0
+$iccItems += , @('CMYK', (Join-Path $pdfboxResources 'icc\CGATS001Compat-v2-micro.icc'), 'CC0-1.0')
+$groups += , @('Icc', 'ICC', $iccItems)
 
 $work = Join-Path ([IO.Path]::GetTempPath()) ('pdf4d-resources-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work | Out-Null
