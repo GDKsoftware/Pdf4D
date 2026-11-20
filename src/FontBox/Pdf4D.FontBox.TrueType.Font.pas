@@ -113,6 +113,7 @@ type
     procedure ScalePathToThousandUnits(const Path: TPdfPath);
     // The glyph for a PostScript name (see NameToGID), like getPath of PDFBox: a name the font does not have gives glyph 0
     function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
+    function TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean; override;
 
     // Not owned, and it has to outlive the use of the font. Where TryGetPath logs the glyphs that it cannot read.
     property GlyphLog: TPdfLog read FGlyphLog write FGlyphLog;
@@ -707,6 +708,11 @@ end;
 function TTrueTypeFont.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
 begin
   Result := TryGetGlyphPath(NameToGID(GlyphName), Path, FGlyphLog);
+end;
+
+function TTrueTypeFont.TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Result := TryGetGlyphPath(NameToGID(GlyphName), Path, Log);
 end;
 
 end.

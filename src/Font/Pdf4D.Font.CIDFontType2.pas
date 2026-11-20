@@ -505,7 +505,13 @@ end;
 
 function TPDCIDFontType2.TryGetPathFromOutlines(const Code: Integer; out Path: TPdfPath): Boolean;
 begin
-  const CffFont = FOtf.CFF;
+  var CffFont: TCFFFont;
+  if not FOtf.TryGetCFF(CffFont) then
+  begin
+    LogWarning('The OpenType font %s has no CFF outlines', [GetBaseFont]);
+    Path := nil;
+    Exit(False);
+  end;
   const GID = CodeToGID(Code);
   // PDFBox hands the glyph to a CID-keyed font as a CID
   if CffFont is TCFFCIDFont then

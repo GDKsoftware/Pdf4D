@@ -62,12 +62,16 @@ type
     procedure TestTruncatedFontFile2FallsBack;
 
     [Test]
+    procedure TestOpenTypeWithoutCffTableGivesEmptyPaths;
+
+    [Test]
     procedure TestFactoryCachesPerDocument;
   end;
 
 implementation
 
 uses
+  Pdf4D.Common.Path,
   Pdf4D.Font.Factory,
   Pdf4D.FontBox.TrueType.Cmap,
   Pdf4D.FontBox.TrueType.Parser,
@@ -276,6 +280,30 @@ begin
   Assert.IsFalse(Font.IsEmbedded);
   Assert.IsTrue(Font.IsDamaged);
   Assert.IsTrue(Font.GetWidthFromFont(65) > 0);
+end;
+
+procedure TTrueTypeFontTests.TestOpenTypeWithoutCffTableGivesEmptyPaths;
+begin
+  // An OTTO font whose "CFF " table is missing: the outlines are gone, but the font itself is readable
+  const Bytes = TTestFonts.BytesWithRenamedTable('SourceSansProBold.otf', 'CFF ', 'CFX ');
+  const Font = OpenFont(WinAnsiEntries, Bytes, True);
+  Assert.IsTrue(Font.IsEmbedded, 'the font is read');
+
+  var Path: TPdfPath;
+  Assert.IsTrue(Font.TryGetPath(65, Path));
+  try
+    Assert.IsTrue(Path.IsEmpty, 'an empty path for the missing outlines');
+  finally
+    Path.Free;
+  end;
+
+  Assert.IsTrue(Font.TryGetNormalizedPath(65, Path));
+  try
+    Assert.IsTrue(Path.IsEmpty, 'an empty normalized path for the missing outlines');
+  finally
+    Path.Free;
+  end;
+  Assert.IsTrue(FModels.HasLogLine('CFF'), 'the missing outlines are logged');
 end;
 
 procedure TTrueTypeFontTests.TestFactoryCachesPerDocument;

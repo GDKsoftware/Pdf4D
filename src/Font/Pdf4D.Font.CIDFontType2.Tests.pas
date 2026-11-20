@@ -43,6 +43,9 @@ type
     procedure TestDamagedFontFile2FallsBackWithALogLine;
 
     [Test]
+    procedure TestOpenTypeWithoutCffTableGivesEmptyPaths;
+
+    [Test]
     procedure TestNonEmbeddedFontMapsThroughTheSubstituteCmap;
 
     [Test]
@@ -56,6 +59,7 @@ implementation
 
 uses
   System.Classes,
+  Pdf4D.Common.Path,
   Pdf4D.Font.Factory,
   Pdf4D.Tests.TestFonts,
   Pdf4D.Tests.TextDocuments;
@@ -163,6 +167,34 @@ begin
   Assert.AreEqual(Double(600), Double(Font.GetWidth(CapitalACode)), 0.0001, '/W still decides');
   Assert.IsNotNull(Descendant(Font).GetTrueTypeFont, 'the mapper gives a substitute');
   Assert.IsTrue(Descendant(Font).GetWidthFromFont(CapitalACode) > 0);
+end;
+
+procedure TCIDFontType2FallbackTests.TestOpenTypeWithoutCffTableGivesEmptyPaths;
+begin
+  // An OTTO font whose "CFF " table is missing: the outlines are gone, but the font itself is readable
+  const Builder = NewBuilder('');
+  Builder.AddObject(20, '<< /Type /FontDescriptor /FontName /LiberationSans /Flags 4 /FontFile2 21 0 R >>');
+  TTextTestDocuments.AddFontFile(Builder, 21, '/Length1 1', TTestFonts.BytesWithRenamedTable('SourceSansProBold.otf', 'CFF ', 'CFX '));
+  AddToUnicode(Builder);
+
+  const Font = OpenFonts(Builder, 1)[0];
+  Assert.IsTrue(Descendant(Font).IsEmbedded, 'the font is read');
+
+  var Path: TPdfPath;
+  Assert.IsTrue(Descendant(Font).TryGetPath(CapitalACode, Path));
+  try
+    Assert.IsTrue(Path.IsEmpty, 'an empty path for the missing outlines');
+  finally
+    Path.Free;
+  end;
+
+  Assert.IsTrue(Descendant(Font).TryGetNormalizedPath(CapitalACode, Path));
+  try
+    Assert.IsTrue(Path.IsEmpty, 'an empty normalized path for the missing outlines');
+  finally
+    Path.Free;
+  end;
+  Assert.IsTrue(FModels.HasLogLine('CFF'), 'the missing outlines are logged');
 end;
 
 procedure TCIDFontType2FallbackTests.TestNonEmbeddedFontMapsThroughTheSubstituteCmap;

@@ -572,7 +572,8 @@ begin
     Exit(True);
   end;
 
-  Result := FGenericFont.TryGetPath(GetNameInFont(GlyphName), Path);
+  // A substitute is shared between documents: its glyphs log to the log of this document, not to one of its own
+  Result := FGenericFont.TryGetPathWithLog(GetNameInFont(GlyphName), Path, DocumentLog);
 end;
 
 function TPDType1Font.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;

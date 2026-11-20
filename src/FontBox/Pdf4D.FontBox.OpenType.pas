@@ -51,6 +51,8 @@ type
   public
     // The CFF font, owned by the table. Raises EPdfUnsupportedFeatureException for a font without CFF outlines.
     function CFF: TCFFFont;
+    // The CFF font of a font with CFF outlines, as TryGetGlyphPath finds it; False, and no exception, for a font without
+    function TryGetCFF(out Font: TCFFFont): Boolean;
     // The version says OTTO, or the font has a CFF or CFF2 table
     function IsPostScript: Boolean;
     // False for a font with CFF2 outlines and no CFF table
@@ -141,6 +143,17 @@ begin
     raise EPdfUnsupportedFeatureException.Create('The OpenType font has no CFF table');
   end;
   Result := (Table as TCFFTable).Font;
+end;
+
+function TOpenTypeFont.TryGetCFF(out Font: TCFFFont): Boolean;
+begin
+  var Table: TTTFTable;
+  Font := nil;
+  Result := (IsPostScript and TryGetTable(TCFFTable.TableTag, Table));
+  if Result then
+  begin
+    Font := (Table as TCFFTable).Font;
+  end;
 end;
 
 function TOpenTypeFont.IsPostScript: Boolean;

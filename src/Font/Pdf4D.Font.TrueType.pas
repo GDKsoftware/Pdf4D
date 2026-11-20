@@ -594,7 +594,12 @@ begin
     Exit(False);
   end;
 
-  const CffFont = TOpenTypeFont(FTtf).CFF;
+  var CffFont: TCFFFont;
+  if not TOpenTypeFont(FTtf).TryGetCFF(CffFont) then
+  begin
+    LogWarning('The OpenType font %s has no CFF outlines', [Name]);
+    Exit(False);
+  end;
   var GID := 0;
   if CffFont is TCFFType1Font then
   begin

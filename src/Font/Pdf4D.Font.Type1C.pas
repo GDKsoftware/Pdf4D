@@ -388,7 +388,8 @@ begin
     Exit(FCffFont.TryGetPathByGid(FCffFont.NameToGID(GlyphName), Path, DocumentLog));
   end;
 
-  Result := FGenericFont.TryGetPath(GlyphName, Path);
+  // A substitute is shared between documents: its glyphs log to the log of this document, not to one of its own
+  Result := FGenericFont.TryGetPathWithLog(GlyphName, Path, DocumentLog);
 end;
 
 function TPDType1CFont.TryGetPathOfName(const GlyphName: string; out Path: TPdfPath): Boolean;
@@ -422,21 +423,8 @@ end;
 
 function TPDType1CFont.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
 begin
-  var GlyphName := GetNameInFont(EncodingName(Code));
-  if GlyphName = NoBreakSpaceName then
-  begin
-    if not HasGlyph(SpaceName) then
-    begin
-      Path := TPdfPath.Create;
-      Exit(True);
-    end;
-    GlyphName := SpaceName;
-  end
-  else if GlyphName = SoftHyphenName then
-  begin
-    GlyphName := HyphenName;
-  end;
-
+  // TryGetPathOfName holds the rule for sfthyphen and nbspace
+  const GlyphName = GetNameInFont(EncodingName(Code));
   if TryGetPathOfName(GlyphName, Path) then
   begin
     Exit(True);

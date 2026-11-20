@@ -171,9 +171,11 @@ type
     // caller owns the path. A glyph without contours gives an empty path; False when the font has no outline for the code (or
     // the outline is damaged, which goes to the log). The default has no outlines.
     function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual;
-    // PDVectorFont.getNormalizedPath: the path of the font program, with the glyph .notdef where PDFBox draws it. A TrueType
-    // program is scaled to 1000 units per em; the other programs keep their glyph space, which GetFontMatrix scales, as in
-    // PDFBox. An embedded font whose /Widths differ from the program is not stretched. The caller owns the path.
+    // WARNING: only a TrueType and a CIDFontType2 program is scaled to 1000 units per em here. The path of every other font
+    // stays in the glyph space of its font program (Type 1, CFF and CIDFontType0 programs commonly use 1000 units per em,
+    // but the font matrix decides), so the caller must apply GetFontMatrix, as PageDrawer of PDFBox does.
+    // PDVectorFont.getNormalizedPath: the path of the font program, with the glyph .notdef where PDFBox draws it. An embedded
+    // font whose /Widths differ from the program is not stretched. The caller owns the path.
     function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual;
     // PDVectorFont.hasGlyph: False for a code that the font program has no glyph for
     function HasGlyph(const Code: Integer): Boolean; overload; virtual;

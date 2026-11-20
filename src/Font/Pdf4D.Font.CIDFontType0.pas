@@ -530,7 +530,8 @@ begin
   begin
     Exit(TCFFType1Font(FType1Font).TryGetPathByGid(CID, Path, DocumentLog));
   end;
-  Result := FType1Font.TryGetPath(GetGlyphName(Code), Path);
+  // The substitute is shared between documents: its glyphs log to the log of this document, not to one of its own
+  Result := FType1Font.TryGetPathWithLog(GetGlyphName(Code), Path, DocumentLog);
 end;
 
 function TPDCIDFontType0.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
