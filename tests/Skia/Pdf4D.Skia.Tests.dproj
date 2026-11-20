@@ -94,6 +94,9 @@
         <DCCReference Include="..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.pas"/>
         <DCCReference Include="..\..\src\Render\Skia\Pdf4D.Render.Skia.Backend.pas"/>
         <DCCReference Include="..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.Png.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

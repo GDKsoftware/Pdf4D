@@ -22,7 +22,10 @@ uses
   Pdf4D.Render.Skia.Convert in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Convert.pas',
   Pdf4D.Render.Skia.Device in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.pas',
   Pdf4D.Render.Skia.Backend in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Backend.pas',
-  Pdf4D.Render.Skia.Device.Tests in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas';
+  Pdf4D.Render.Skia.Device.Tests in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas',
+  Pdf4D.Tests.Png in '..\Support\Pdf4D.Tests.Png.pas',
+  Pdf4D.Tests.RenderCompare in '..\Support\Pdf4D.Tests.RenderCompare.pas',
+  Pdf4D.Tests.RenderCompare.Tests in '..\Support\Pdf4D.Tests.RenderCompare.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
