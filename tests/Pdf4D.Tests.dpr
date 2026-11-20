@@ -197,6 +197,8 @@ uses
   Pdf4D.Graphics.Pattern in '..\src\Graphics\Pdf4D.Graphics.Pattern.pas',
   Pdf4D.Codec.Jpeg in '..\src\Codec\Pdf4D.Codec.Jpeg.pas',
   Pdf4D.Codec.Jpeg.Tests in '..\src\Codec\Pdf4D.Codec.Jpeg.Tests.pas',
+  Pdf4D.Codec.CCITTFax in '..\src\Codec\Pdf4D.Codec.CCITTFax.pas',
+  Pdf4D.Codec.CCITTFax.Tests in '..\src\Codec\Pdf4D.Codec.CCITTFax.Tests.pas',
   Pdf4D.Graphics.Image.SampledReader in '..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas',
   Pdf4D.Graphics.Image in '..\src\Graphics\Pdf4D.Graphics.Image.pas',
   Pdf4D.Graphics.LineDash in '..\src\Graphics\Pdf4D.Graphics.LineDash.pas',

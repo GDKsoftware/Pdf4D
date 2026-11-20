@@ -161,6 +161,15 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - `TPDImage` skips one line feed before the data and takes `/ColorTransform` from the decode parameters of the DCT filter, as `jpg.js` is called from pdf.js; PDFBox ignores `/ColorTransform` and asks the Adobe marker and `ImageIO`. A filter that follows DCTDecode is ignored with a warning.
 - Upsampling of a component that is halved horizontally (4:2:2 and 4:2:0, h2v1 and h2v2) follows libjpeg ("fancy upsampling": a triangle filter with weights 3 and 1, `TJpegUpsampling`), because libjpeg inside ImageIO is the reference of PDFBox. jpg.js repeats the nearest sample, so this is a deviation from it; other sampling ratios repeat the nearest sample, as libjpeg does.
 
+## Ported from PDFBox: the CCITT fax decoder
+
+`src/Codec/Pdf4D.Codec.CCITTFax.pas` ports `CCITTFaxFilter.decode` (parameters, choice of the compression type, inversion of the bitmap) and `CCITTFaxDecoderStream` (decode1D, decode2D, getNextChangingElement, the row types, decodeRun, readBit, the code tables and trees) of PDFBox 3.0.8. PDFBox took the stream from TwelveMonkeys ImageIO (BSD 3-Clause; NOTICE and `licenses/TwelveMonkeys-BSD.txt`). The deviations:
+
+- The decoder returns the whole image as a byte array. A damaged row (an unknown code, more changes than the row has columns) keeps the rows before it and leaves the rest white, with one warning; `CCITTFaxFilter` lets the IOException fail the image. A stream that ends early gives the same result without a warning, like PDFBox. `/DamagedRowsBeforeError` and `/EndOfBlock` are read and ignored, like PDFBox.
+- Limits: `Columns * Rows` over `MaxPixels` (the image layer passes the smaller of `MaxBitmapPixels` and 8 times `MaxDecodedStreamSize`) and more than 1 Mi columns raise `EPdfParseException`; PDFBox allows 256 MiB of bytes, with a system property. The code trees are built per decode, so the decoder holds no shared state.
+- `TCCITTFaxParameters.HasEndOfLine` records that `/EndOfLine` exists, because `CCITTFaxFilter` uses the entry for `/K 0` only then (PDFBOX-6080), and finds the type from the first 20 bytes otherwise.
+- Run lengths and positions are limited to half the range of an `Integer`, so a stream of make-up codes cannot overflow.
+
 ## Limits that Pdf4D adds
 
 PDFBox has few limits on hostile input. Pdf4D adds the limits below. The ones with a name are set through `TPdfLoadOptions` (the values are the defaults); the others are fixed in the code. A document that runs into a limit loses the content after it, with a log line, or raises an `EPdfException` descendant, and never hangs, crashes or grows without bound.

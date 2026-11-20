@@ -97,6 +97,7 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Special.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Pattern.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
+        <DCCReference Include="..\src\Codec\Pdf4D.Codec.CCITTFax.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.LineDash.pas"/>

@@ -37,6 +37,7 @@ requires
 
 contains
   Pdf4D.Codec.Jpeg in '..\src\Codec\Pdf4D.Codec.Jpeg.pas',
+  Pdf4D.Codec.CCITTFax in '..\src\Codec\Pdf4D.Codec.CCITTFax.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.Icc.Profile in '..\src\Graphics\Pdf4D.Graphics.Icc.Profile.pas',

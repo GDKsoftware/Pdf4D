@@ -1,9 +1,5 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/ccitt.pdf # Task 23: CCITTFax
-pdfbox-jira/PDFBOX-4831.pdf # Task 23: CCITTFax
-pdfbox/input/merge/multitiff.pdf # Task 23: CCITTFax
-pdfbox-jira/PDFBOX-3785-202097.pdf # Task 23: CCITTFax
 generated/render/colors-special.pdf # Task 24: the other colour spaces
 pdfbox-jira/PDFBOX-4308.pdf # Task 24: the other colour spaces
 pdfbox/input/PDFBOX-3062-005717-p1.pdf # Task 24: the other colour spaces
@@ -49,7 +45,6 @@ pdfbox/org/apache/pdfbox/pdmodel/test.unc.pdf # Task 25: annotations
 pdfbox-jira/PDFBOX-1100-1.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-3656.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-3682.pdf # Task 25: annotations (form fields)
-pdfbox-jira/PDFBOX-3949-MKFYUGZWS3OPXLLVU2Z4LWCTVA5WNOGF.pdf # Task 25: annotations
 pdfbox-jira/PDFBOX-6150.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-6178.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-6178-1.pdf # Task 25: annotations (form fields)

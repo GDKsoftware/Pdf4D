@@ -149,6 +149,7 @@ type
     const CYX = 'CYX';
     const D = 'D';
     const DA = 'DA';
+    const DamagedRowsBeforeError = 'DamagedRowsBeforeError';
     const Darken = 'Darken';
     const Date = 'Date';
     const DCT = 'DCT';
@@ -211,6 +212,7 @@ type
     const Encrypt = 'Encrypt';
     const EncryptedPayload = 'EncryptedPayload';
     const EncryptMetadata = 'EncryptMetadata';
+    const EndOfBlock = 'EndOfBlock';
     const EndOfLine = 'EndOfLine';
     const EntrustPpkef = 'Entrust.PPKEF';
     const Exclusion = 'Exclusion';
