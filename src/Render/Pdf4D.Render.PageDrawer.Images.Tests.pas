@@ -85,6 +85,15 @@ type
 
     [Test]
     procedure TestRotatedImageCtm;
+
+    [Test]
+    procedure TestImageScaledDownByMoreThanHalfIsPrescaled;
+
+    [Test]
+    procedure TestImageScaledDownByLessThanHalfIsDrawnAsIs;
+
+    [Test]
+    procedure TestPrescaledImageKeepsItsPlacementAndAverages;
   end;
 
 implementation
@@ -314,6 +323,52 @@ begin
   const Corner = Calls[0].Paint.BitmapToDevice.TransformPoint(0, 0);
   Assert.AreEqual(Double(50), Double(Corner.X), Double(Tolerance));
   Assert.AreEqual(Double(190), Double(Corner.Y), Double(Tolerance));
+end;
+
+// drawBufferedImage: below the threshold of 0.5 the image is scaled to its size on the device with the averaging filter of
+// Image.getScaledInstance, and that bitmap is drawn at the same place
+procedure TPageDrawerImageTests.TestImageScaledDownByMoreThanHalfIsPrescaled;
+begin
+  RenderImage('20 0 0 20 10 10 cm /Im1 Do', Format(GrayEntries, [64, 64]), Gray(64, 64));
+
+  const Calls = BitmapCalls;
+  Assert.AreEqual<Integer>(1, Length(Calls));
+  Assert.AreEqual(20, Calls[0].BitmapWidth);
+  Assert.AreEqual(20, Calls[0].BitmapHeight);
+end;
+
+procedure TPageDrawerImageTests.TestImageScaledDownByLessThanHalfIsDrawnAsIs;
+begin
+  RenderImage('40 0 0 40 10 10 cm /Im1 Do', Format(GrayEntries, [64, 64]), Gray(64, 64));
+
+  const Calls = BitmapCalls;
+  Assert.AreEqual(64, Calls[0].BitmapWidth);
+  Assert.AreEqual(64, Calls[0].BitmapHeight);
+end;
+
+procedure TPageDrawerImageTests.TestPrescaledImageKeepsItsPlacementAndAverages;
+begin
+  // 8 x 8 pixels of 100, except the first of 200: the block of 4 x 4 pixels of the top left corner averages to 106.25
+  var Data: TBytes;
+  SetLength(Data, 64);
+  for var Index := 0 to 63 do
+  begin
+    Data[Index] := 100;
+  end;
+  Data[0] := 200;
+  RenderImage('2 0 0 2 10 10 cm /Im1 Do', Format(GrayEntries, [8, 8]), Data);
+
+  const Calls = BitmapCalls;
+  Assert.AreEqual<Integer>(1, Length(Calls));
+  Assert.AreEqual(2, Calls[0].BitmapWidth);
+  AssertPixel(Calls[0], 0, 0, 106, 106, 106, 255);
+  AssertPixel(Calls[0], 1, 1, 100, 100, 100, 255);
+  const TopLeft = Calls[0].Paint.BitmapToDevice.TransformPoint(0, 0);
+  const BottomRight = Calls[0].Paint.BitmapToDevice.TransformPoint(2, 2);
+  Assert.AreEqual(Double(10), Double(TopLeft.X), Double(Tolerance));
+  Assert.AreEqual(Double(188), Double(TopLeft.Y), Double(Tolerance));
+  Assert.AreEqual(Double(12), Double(BottomRight.X), Double(Tolerance));
+  Assert.AreEqual(Double(190), Double(BottomRight.Y), Double(Tolerance));
 end;
 
 end.

@@ -102,6 +102,8 @@ type
     class function IsFinitePath(const Path: TPdfPath): Boolean; static;
     function ImageFilter(const Image: TPDImage; const Width, Height: Integer): TPdfImageFilter;
     function TryMakeStencilBitmap(const Mask: TPdfBitmap): Boolean;
+    function ImageToPage(const Width, Height: Integer): TPdfMatrix;
+    function TryScaleDown(const Bitmap: TPdfBitmap; const ImageTransform: TPdfMatrix; out Scaled: TPdfBitmap): Boolean;
     procedure DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
     procedure DrawStencil(const Image: TPDImage);
     function TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect): Boolean;
@@ -165,6 +167,7 @@ uses
   Pdf4D.Model.ExtendedGraphicsState,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.GlyphCache,
+  Pdf4D.Render.ImageScaler,
   Pdf4D.Render.PageTransform,
   Pdf4D.Render.StrokeNormalizer;
 
@@ -175,6 +178,8 @@ const
   Thousand = 1000;
   WidthTolerance = 0.0001;
   MaximumLoggedMissingGlyphs = 1024;
+  // PDFRenderer.imageDownscalingOptimizationThreshold: an image that is drawn at less than this scale is averaged down first
+  ImageDownscalingThreshold = 0.5;
   CodeShift = 48;
   CodeMask = $FFFF;
 
@@ -890,10 +895,11 @@ end;
 // drawBufferedImage: the pixel (i, j) of the bitmap covers [i, i + 1] x [j, j + 1] in a unit square that the CTM maps to the page
 procedure TPdfPageDrawer.DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
 begin
+  var ImageTransform: TPdfMatrix;
   var BitmapToDevice: TPdfMatrix;
   try
-    const UnitSquare = TPdfMatrix.GetTranslateInstance(0, -Bitmap.Height).Multiply(TPdfMatrix.GetScaleInstance(1 / Bitmap.Width, -1 / Bitmap.Height));
-    BitmapToDevice := UnitSquare.Multiply(GraphicsState.CurrentTransformationMatrix).Multiply(FPageToDevice);
+    ImageTransform := ImageToPage(Bitmap.Width, Bitmap.Height);
+    BitmapToDevice := ImageTransform.Multiply(FPageToDevice);
   except
     on Error: EPdfException do
     begin
@@ -902,8 +908,55 @@ begin
     end;
   end;
 
+  const Filter = ImageFilter(Image, Bitmap.Width, Bitmap.Height);
+  // PDFBOX-4516 and others: Java2D scales down badly, so an image that is drawn small gets averaged down to its size first, and
+  // that smaller image is drawn at the same place. It only happens with the bicubic interpolation of the rendering hints.
+  var Scaled: TPdfBitmap := nil;
+  if (Filter = TPdfImageFilter.Bicubic) and TryScaleDown(Bitmap, ImageTransform, Scaled) then
+  begin
+    try
+      BitmapToDevice := ImageToPage(Scaled.Width, Scaled.Height).Multiply(FPageToDevice);
+      ApplyClip;
+      FDevice.DrawBitmap(Scaled, BitmapToDevice, Filter, NonStrokingComposite(True));
+    finally
+      Scaled.Free;
+    end;
+    Exit;
+  end;
+
   ApplyClip;
-  FDevice.DrawBitmap(Bitmap, BitmapToDevice, ImageFilter(Image, Bitmap.Width, Bitmap.Height), NonStrokingComposite(True));
+  FDevice.DrawBitmap(Bitmap, BitmapToDevice, Filter, NonStrokingComposite(True));
+end;
+
+// The matrix that puts the pixel (i, j) of an image of Width x Height pixels on [i, i + 1] x [j, j + 1] of the unit square of the CTM
+function TPdfPageDrawer.ImageToPage(const Width, Height: Integer): TPdfMatrix;
+begin
+  const UnitSquare = TPdfMatrix.GetTranslateInstance(0, -Height).Multiply(TPdfMatrix.GetScaleInstance(1 / Width, -1 / Height));
+  Result := UnitSquare.Multiply(GraphicsState.CurrentTransformationMatrix);
+end;
+
+// The scaling of drawBufferedImage that PDFBox applies before it draws an image that is shown smaller than the threshold in one
+// direction: the size on the device is the size of the image in pixels times the scale of the image and the device, rounded. An
+// image that would become larger than the image limit is drawn as it is.
+function TPdfPageDrawer.TryScaleDown(const Bitmap: TPdfBitmap; const ImageTransform: TPdfMatrix; out Scaled: TPdfBitmap): Boolean;
+begin
+  Scaled := nil;
+  const ScaleX = Abs(ImageTransform.ScalingFactorX * FPageToDevice.ScalingFactorX);
+  const ScaleY = Abs(ImageTransform.ScalingFactorY * FPageToDevice.ScalingFactorY);
+  if not ((ScaleX < ImageDownscalingThreshold) or (ScaleY < ImageDownscalingThreshold)) then
+  begin
+    Exit(False);
+  end;
+
+  const Width = RoundHalfUp(Bitmap.Width * ScaleX);
+  const Height = RoundHalfUp(Bitmap.Height * ScaleY);
+  if (Width < 1) or (Height < 1) or (Width * Height > Max(FParams.Options.MaxImagePixels, 1)) then
+  begin
+    Exit(False);
+  end;
+
+  Scaled := TPdfImageScaler.ScaleSmooth(Bitmap, Integer(Width), Integer(Height));
+  Result := True;
 end;
 
 // The mask becomes the paint colour where it paints: the bitmap of getStencilImage(getNonStrokingPaint()). False when the colour has

@@ -219,6 +219,8 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GroupDevice.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GroupDevice.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.GraphicsDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas"/>

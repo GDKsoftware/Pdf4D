@@ -148,6 +148,8 @@ uses
   Pdf4D.Render.Renderer in '..\src\Render\Pdf4D.Render.Renderer.pas',
   Pdf4D.Render.GroupDevice in '..\src\Render\Pdf4D.Render.GroupDevice.pas',
   Pdf4D.Render.GroupDevice.Tests in '..\src\Render\Pdf4D.Render.GroupDevice.Tests.pas',
+  Pdf4D.Render.ImageScaler in '..\src\Render\Pdf4D.Render.ImageScaler.pas',
+  Pdf4D.Render.ImageScaler.Tests in '..\src\Render\Pdf4D.Render.ImageScaler.Tests.pas',
   Pdf4D.Render.PageDrawer in '..\src\Render\Pdf4D.Render.PageDrawer.pas',
   Pdf4D.Tests.GraphicsDocuments in 'Support\Pdf4D.Tests.GraphicsDocuments.pas',
   Pdf4D.Render.PageDrawer.Paths.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas',

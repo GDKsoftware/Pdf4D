@@ -1,2 +1,0 @@
-# page <n> [<platform>] # <reason>
-page 1 # the 4:2:0 JPEG images: jpg.js upsamples the chroma planes by repetition, libjpeg of PDFBox interpolates (up to 72 per channel on the edges of colour)
