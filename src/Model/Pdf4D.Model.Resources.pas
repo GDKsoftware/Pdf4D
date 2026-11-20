@@ -39,6 +39,9 @@ type
     function IsImageXObject(const Name: string): Boolean;
     function TryGetExtGState(const Name: string; out State: TCosDictionary): Boolean;
     function TryGetProperties(const Name: string; out Properties: TCosDictionary): Boolean;
+    // The entry of /ColorSpace as it is in the file, resolved but not made into a colour space (that is the factory of the
+    // renderer, which is not part of the core). PDResources.hasColorSpace is the same question.
+    function TryGetColorSpace(const Name: string; out Value: TCosBase): Boolean;
 
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
@@ -160,6 +163,11 @@ begin
   begin
     State := TCosDictionary(Value);
   end;
+end;
+
+function TPDResources.TryGetColorSpace(const Name: string; out Value: TCosBase): Boolean;
+begin
+  Result := TryGetResource(TCosNames.ColorSpace, Name, Value);
 end;
 
 function TPDResources.TryGetProperties(const Name: string; out Properties: TCosDictionary): Boolean;
