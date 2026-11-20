@@ -47,7 +47,7 @@ type
 
   public
     // All samples 0. Raises EArgumentOutOfRangeException when Width or Height is under 1, Components is outside 1..MaxRasterComponents,
-    // or the size is over the limit of a bitmap.
+    // or the size or the number of samples is over the limit of a bitmap (MaxBitmapPixels).
     constructor Create(const Width, Height, Components: Integer);
 
     // A pointer to the first sample of row Y; raises EArgumentOutOfRangeException outside the raster
@@ -154,11 +154,19 @@ begin
     raise EArgumentOutOfRangeException.CreateFmt('A raster has 1 to %d components, not %d', [MaxRasterComponents, Components]);
   end;
 
+  // Int64: Width * Height * Components of a bitmap that is within its limit still overflows an Integer
+  const SampleCount = Int64(Width) * Height * Components;
+  if SampleCount > MaxBitmapPixels then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('A raster of %d x %d pixels with %d components exceeds the limit of %d samples',
+                                                 [Width, Height, Components, MaxBitmapPixels]);
+  end;
+
   inherited Create;
   FWidth := Width;
   FHeight := Height;
   FComponents := Components;
-  SetLength(FSamples, Int64(Width) * Height * Components);
+  SetLength(FSamples, SampleCount);
 end;
 
 function TPdfRaster.GetStride: Integer;
@@ -174,7 +182,7 @@ begin
     raise EArgumentOutOfRangeException.CreateFmt('Row %d is outside a raster of %d rows', [Y, FHeight]);
   end;
 
-  Result := @FSamples[Y * GetStride];
+  Result := @FSamples[Int64(Y) * GetStride];
 end;
 
 { TPDColor }

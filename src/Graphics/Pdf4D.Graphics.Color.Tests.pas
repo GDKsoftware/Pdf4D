@@ -75,6 +75,12 @@ type
     procedure TestRasterWithWrongComponentsRaises;
 
     [Test]
+    procedure TestRasterWithMoreSamplesThanTheLimitRaises;
+
+    [Test]
+    procedure TestColorSpaceNameCycleStops;
+
+    [Test]
     procedure TestUnsupportedColorSpacesRaiseUnsupported;
 
     [Test]
@@ -350,6 +356,47 @@ begin
   Assert.AreEqual(0, Integer(Beyond.R));
   Assert.AreEqual(255, Integer(Beyond.G));
   Assert.AreEqual(128, Integer(Beyond.B));
+end;
+
+procedure TColorTests.TestRasterWithMoreSamplesThanTheLimitRaises;
+begin
+  // 134 million pixels are within the limit of a bitmap, the 403 million samples that three components make of them are not
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfRaster.Create(16384, 8192, 3).Free;
+    end,
+    EArgumentOutOfRangeException);
+  // The widest raster that the limit lets through
+  const Raster = TPdfRaster.Create(1, 1, MaxRasterComponents);
+  try
+    Assert.AreEqual(MaxRasterComponents, Raster.Stride);
+  finally
+    Raster.Free;
+  end;
+end;
+
+// /ColorSpace << /A /B /B /A /S /S >>: names that lead back to themselves, as direct values
+procedure TColorTests.TestColorSpaceNameCycleStops;
+begin
+  FBuilder.AddColorSpace('A', TCosName.Create('B'));
+  FBuilder.AddColorSpace('B', TCosName.Create('A'));
+  FBuilder.AddColorSpace('S', TCosName.Create('S'));
+
+  Assert.WillRaise(
+    procedure
+    begin
+      SpaceOf('A');
+    end,
+    EPdfParseException,
+    'two names that point to each other');
+  Assert.WillRaise(
+    procedure
+    begin
+      SpaceOf('S');
+    end,
+    EPdfParseException,
+    'a name that points to itself');
 end;
 
 procedure TColorTests.TestRasterWithWrongComponentsRaises;
