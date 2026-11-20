@@ -108,11 +108,13 @@ The Skia code only uses `System.Skia` API that Delphi 12 and 13 share, and it ha
 
 - `TSkSurface.MakeRaster`, `ISkSurface.Canvas`, `ISkSurface.MakeImageSnapshot`, `ISkImage.ReadPixels`.
 - `ISkCanvas`: `Save`, `Restore`, `RestoreToCount`, `SetMatrix`, `Concat`, `ClipPath`, `DrawPath`, `DrawImageRect`, `Clear`, `SaveLayer`.
-- `TSkPathBuilder` (`MoveTo`, `LineTo`, `QuadTo`, `CubicTo`, `Close`, `Detach`, `FillType`), `TSkPaint` (`Style`, `StrokeWidth`, `StrokeCap`, `StrokeJoin`, `StrokeMiter`, `Color`, `Alpha`, `AntiAlias`, `BlendMode`, `Shader`, `PathEffect`).
+- `TSkPathBuilder` (`MoveTo`, `LineTo`, `QuadTo`, `CubicTo`, `Close`, `Detach`, `FillType`), `TSkPaint` (`Style`, `StrokeWidth`, `StrokeCap`, `StrokeJoin`, `StrokeMiter`, `Color`, `Alpha`, `AntiAlias`, `Shader`, `PathEffect`).
 - `TSkPathEffect.MakeDash`, `TSkImage.MakeRasterCopy`, `ISkImage.MakeShader`, `TSkSamplingOptions` (also `Create(TSkCubicResampler.Mitchell)`), `TSkBlendMode`, `TSkTileMode`.
 
 Also used, outside that list:
 
+- Blend modes use `ISkPaint.Blender` with `TSkBlender.MakeMode(TSkBlendMode)`, not a `BlendMode` property: Delphi 13 has no `ISkPaint.BlendMode`. Check on the first Delphi 12 build that `Blender` and `TSkBlender.MakeMode` exist there (Skia4Delphi 6 has them); if not, `ISkPaint.BlendMode` is the replacement.
+- Soft masks and layers: `ISkCanvas.SaveLayer(Bounds, Paint)`, `ISkCanvas.DrawImage(Image, X, Y, Sampling, Paint)`, `TSkBlendMode.DestIn`, `TSkBlendMode.Hue`, `Saturation`, `Color`, `Luminosity` (the four non-separable modes), `System.Skia` only.
 - `TSkImageInfo.Create(Width, Height, ColorType, AlphaType)` and the enums `TSkColorType`, `TSkAlphaType`, `TSkPaintStyle`, `TSkStrokeCap`, `TSkStrokeJoin`, `TSkPathFillType`, `TSkClipOp`, `TSkFilterMode`, `TSkMipmapMode`: the types that the listed calls take. All of them exist in Delphi 12.
 - `TMatrix` from `System.Math.Vectors` as the matrix type of `SetMatrix` and `MakeShader`.
 - The package `Skia.Package.RTL` in the `requires` clause of `Pdf4D.Render.Skia.dpk`. The Skia package has had this name since Delphi 12; check it when the first Delphi 12 build is made.

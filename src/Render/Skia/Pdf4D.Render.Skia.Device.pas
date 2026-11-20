@@ -9,6 +9,7 @@ interface
 uses
   System.SysUtils,
   System.Types,
+  System.Math.Vectors,
   System.Skia,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
@@ -16,6 +17,8 @@ uses
   Pdf4D.Render.Device.Interfaces;
 
 type
+  TPdfDrawWithComposite = reference to procedure(const Composite: TPdfComposite);
+
   // A raster device on a Skia surface of premultiplied RGBA. Every Skia call runs inside TPdfFloatGuard, because Skia works
   // with floating point exceptions masked and the callers of the device do not.
   TPdfSkiaDevice = class(TInterfacedObject, IPdfRasterDevice)
@@ -31,7 +34,11 @@ type
     procedure CreateSurface;
     procedure ApplyClip(const Clip: IPdfClipPath);
     procedure ClipChain(const Clip: IPdfClipPath);
-    procedure GuardComposite(const Composite: TPdfComposite);
+    // Runs Draw with Composite itself, or, with a soft mask, with a plain composite on a layer that is masked and then put on the canvas
+    procedure Composited(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
+    procedure DrawMasked(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
+    function MaskedArea(const Mask: TPdfAlphaMask): TRect;
+    procedure ApplyMask(const Mask: TPdfAlphaMask; const Area: TRect);
     procedure DrawPath(const Path: TPdfPath; const FillRule: TPdfFillRule; const Transform: TPdfMatrix; const Paint: TPdfPaint;
                        const Composite: TPdfComposite; const Stroke: TPdfStrokeStyle; const IsStroke: Boolean);
     function ReadArea(const Area: TRect): TPdfBitmap;
@@ -61,6 +68,9 @@ implementation
 uses
   Pdf4D.Common.FloatGuard,
   Pdf4D.Render.Skia.Convert;
+
+const
+  MaxChannel = 255;
 
 { TPdfSkiaDevice }
 
@@ -110,17 +120,19 @@ end;
 procedure TPdfSkiaDevice.DrawBitmap(const Bitmap: TPdfBitmap; const BitmapToDevice: TPdfMatrix; const Filter: TPdfImageFilter;
                                     const Composite: TPdfComposite);
 begin
-  GuardComposite(Composite);
-
   TPdfFloatGuard.Run(
     procedure
     begin
-      const Image = TPdfSkiaConvert.Image(Bitmap);
-      const Paint = TPdfSkiaConvert.ImagePaint(Composite);
-      const Destination = TRectF.Create(0, 0, Bitmap.Width, Bitmap.Height);
+      Composited(Composite,
+        procedure(const Plain: TPdfComposite)
+        begin
+          const Image = TPdfSkiaConvert.Image(Bitmap);
+          const Paint = TPdfSkiaConvert.ImagePaint(Plain);
+          const Destination = TRectF.Create(0, 0, Bitmap.Width, Bitmap.Height);
 
-      FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(BitmapToDevice));
-      FCanvas.DrawImageRect(Image, Destination, TPdfSkiaConvert.ImageSampling(Filter), Paint);
+          FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(BitmapToDevice));
+          FCanvas.DrawImageRect(Image, Destination, TPdfSkiaConvert.ImageSampling(Filter), Paint);
+        end);
     end);
 end;
 
@@ -141,7 +153,7 @@ end;
 
 function TPdfSkiaDevice.CreateLayer(const Width, Height: Integer): IPdfRasterDevice;
 begin
-  raise ENotImplemented.Create('Offscreen layers of the Skia device are not implemented yet');
+  Result := TPdfSkiaDevice.Create(Width, Height);
 end;
 
 function TPdfSkiaDevice.TryReadPixels(const Area: TRect; out Bitmap: TPdfBitmap): Boolean;
@@ -210,37 +222,92 @@ begin
   FCanvas.ClipPath(TPdfSkiaConvert.Path(Clip.Path, Clip.FillRule), TSkClipOp.Intersect, False);
 end;
 
-procedure TPdfSkiaDevice.GuardComposite(const Composite: TPdfComposite);
+procedure TPdfSkiaDevice.Composited(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
 begin
-  const IsPlain = ((Composite.BlendMode = TPdfBlendMode.Normal) and not Assigned(Composite.SoftMask));
-  if not IsPlain then
+  const HasSoftMask = Assigned(Composite.SoftMask);
+  if HasSoftMask then
   begin
-    raise ENotImplemented.Create('Blend modes and soft masks of the Skia device are not implemented yet');
+    DrawMasked(Composite, Draw);
+  end
+  else
+  begin
+    Draw(Composite);
   end;
+end;
+
+// The soft mask works as the SoftMask paint of PDFBox: the shape is drawn on a layer, the layer keeps only the part that the
+// mask lets through, and the layer is put on the canvas with the alpha and the blend mode
+procedure TPdfSkiaDevice.DrawMasked(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
+begin
+  const Area = MaskedArea(Composite.SoftMask);
+  const IsEmpty = Area.IsEmpty;
+  if IsEmpty then
+  begin
+    Exit;
+  end;
+
+  var Plain := Composite;
+  Plain.Alpha := 1;
+  Plain.BlendMode := TPdfBlendMode.Normal;
+  Plain.SoftMask := nil;
+
+  FCanvas.SetMatrix(TMatrix.Identity);
+  FCanvas.SaveLayer(TRectF.Create(Area), TPdfSkiaConvert.LayerPaint(Composite));
+  try
+    Draw(Plain);
+    ApplyMask(Composite.SoftMask, Area);
+  finally
+    FCanvas.Restore;
+  end;
+end;
+
+// Outside the mask the mask has OutsideValue; when that is 0, nothing outside the mask can show, so the layer stays small
+function TPdfSkiaDevice.MaskedArea(const Mask: TPdfAlphaMask): TRect;
+begin
+  const DeviceArea = TRect.Create(0, 0, FWidth, FHeight);
+  const HidesOutside = (Mask.OutsideValue = 0);
+  if not HidesOutside then
+  begin
+    Exit(DeviceArea);
+  end;
+
+  const MaskArea = TRect.Create(Mask.Left, Mask.Top, Mask.Left + Mask.Width, Mask.Top + Mask.Height);
+  Result := TRect.Intersect(DeviceArea, MaskArea);
+end;
+
+procedure TPdfSkiaDevice.ApplyMask(const Mask: TPdfAlphaMask; const Area: TRect);
+begin
+  FCanvas.SetMatrix(TMatrix.Identity);
+
+  const Image = TPdfSkiaConvert.MaskImage(Mask, Area);
+  FCanvas.DrawImage(Image, Area.Left, Area.Top, TSkSamplingOptions.Create(TSkFilterMode.Nearest, TSkMipmapMode.None),
+                    TPdfSkiaConvert.MaskPaint(MaxChannel));
 end;
 
 procedure TPdfSkiaDevice.DrawPath(const Path: TPdfPath; const FillRule: TPdfFillRule; const Transform: TPdfMatrix; const Paint: TPdfPaint;
                                   const Composite: TPdfComposite; const Stroke: TPdfStrokeStyle; const IsStroke: Boolean);
 begin
-  GuardComposite(Composite);
-
   TPdfFloatGuard.Run(
     procedure
     begin
-      var SkPaint: ISkPaint;
-      const HasPaint = TPdfSkiaConvert.TryMakePaint(Paint, Transform, Composite, SkPaint);
-      if not HasPaint then
-      begin
-        Exit;
-      end;
+      Composited(Composite,
+        procedure(const Plain: TPdfComposite)
+        begin
+          var SkPaint: ISkPaint;
+          const HasPaint = TPdfSkiaConvert.TryMakePaint(Paint, Transform, Plain, SkPaint);
+          if not HasPaint then
+          begin
+            Exit;
+          end;
 
-      if IsStroke then
-      begin
-        TPdfSkiaConvert.MakeStroke(Stroke, SkPaint);
-      end;
+          if IsStroke then
+          begin
+            TPdfSkiaConvert.MakeStroke(Stroke, SkPaint);
+          end;
 
-      FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(Transform));
-      FCanvas.DrawPath(TPdfSkiaConvert.Path(Path, FillRule), SkPaint);
+          FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(Transform));
+          FCanvas.DrawPath(TPdfSkiaConvert.Path(Path, FillRule), SkPaint);
+        end);
     end);
 end;
 

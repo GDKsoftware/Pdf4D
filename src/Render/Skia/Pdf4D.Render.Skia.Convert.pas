@@ -26,6 +26,8 @@ type
     class function Sampling(const Filter: TPdfImageFilter): TSkSamplingOptions; static;
     class function ScaledAlpha(const Alpha: Byte; const Composite: TPdfComposite): Byte; static;
     class function SolidPaint(const Color: TPdfDeviceColor; const Composite: TPdfComposite): ISkPaint; static;
+    class function BlendMode(const Mode: TPdfBlendMode): TSkBlendMode; static;
+    class procedure ApplyBlendMode(const SkPaint: ISkPaint; const Mode: TPdfBlendMode); static;
     class function ShaderPaint(const Paint: TPdfPaint; const Transform: TPdfMatrix; const Composite: TPdfComposite): ISkPaint; static;
 
   public
@@ -41,6 +43,12 @@ type
     class function TryMakePaint(const Paint: TPdfPaint; const Transform: TPdfMatrix; const Composite: TPdfComposite; out SkPaint: ISkPaint): Boolean; static;
     // A paint for DrawImageRect: opaque white with the alpha of Composite
     class function ImagePaint(const Composite: TPdfComposite): ISkPaint; static;
+    // The paint that puts a finished layer on the canvas: the alpha and the blend mode of Composite
+    class function LayerPaint(const Composite: TPdfComposite): ISkPaint; static;
+    // A paint that takes the alpha of Value as the new alpha of the destination (DstIn); the color is irrelevant
+    class function MaskPaint(const Value: Byte): ISkPaint; static;
+    // An image of Area in device pixels whose alpha is the mask value in every pixel; OutsideValue where Area leaves the mask
+    class function MaskImage(const Mask: TPdfAlphaMask; const Area: TRect): ISkImage; static;
     class procedure MakeStroke(const Stroke: TPdfStrokeStyle; const SkPaint: ISkPaint); static;
     class function ImageSampling(const Filter: TPdfImageFilter): TSkSamplingOptions; static;
     class function MakeColor(const Alpha, Red, Green, Blue: Byte): TAlphaColor; static;
@@ -53,7 +61,8 @@ uses
   System.Math;
 
 const
-  MaxChannel = 255;
+  MaxChannel    = 255;
+  BytesPerPixel = 4;
 
 { TPdfSkiaConvert }
 
@@ -158,6 +167,7 @@ begin
   if Result then
   begin
     SkPaint.AntiAlias := Composite.AntiAlias;
+    ApplyBlendMode(SkPaint, Composite.BlendMode);
   end;
 end;
 
@@ -166,6 +176,43 @@ begin
   Result := TSkPaint.Create;
   Result.Color := MakeColor(ScaledAlpha(MaxChannel, Composite), MaxChannel, MaxChannel, MaxChannel);
   Result.AntiAlias := Composite.AntiAlias;
+  ApplyBlendMode(Result, Composite.BlendMode);
+end;
+
+class function TPdfSkiaConvert.LayerPaint(const Composite: TPdfComposite): ISkPaint;
+begin
+  Result := TSkPaint.Create;
+  Result.Color := MakeColor(ScaledAlpha(MaxChannel, Composite), MaxChannel, MaxChannel, MaxChannel);
+  ApplyBlendMode(Result, Composite.BlendMode);
+end;
+
+class function TPdfSkiaConvert.MaskPaint(const Value: Byte): ISkPaint;
+begin
+  Result := TSkPaint.Create;
+  Result.Color := MakeColor(Value, Value, Value, Value);
+  Result.Blender := TSkBlender.MakeMode(TSkBlendMode.DestIn);
+end;
+
+class function TPdfSkiaConvert.MaskImage(const Mask: TPdfAlphaMask; const Area: TRect): ISkImage;
+begin
+  const Width = Area.Width;
+  const Height = Area.Height;
+  var Pixels: TBytes;
+  SetLength(Pixels, Width * Height * BytesPerPixel);
+
+  var Offset := 0;
+  for var Y := Area.Top to Area.Bottom - 1 do
+  begin
+    for var X := Area.Left to Area.Right - 1 do
+    begin
+      const Value = Mask.ValueAt(X, Y);
+      FillChar(Pixels[Offset], BytesPerPixel, Value);
+      Inc(Offset, BytesPerPixel);
+    end;
+  end;
+
+  const ImageInfo = TSkImageInfo.Create(Width, Height, TSkColorType.RGBA8888, TSkAlphaType.Premul);
+  Result := TSkImage.MakeRasterCopy(ImageInfo, @Pixels[0], Width * BytesPerPixel);
 end;
 
 class procedure TPdfSkiaConvert.MakeStroke(const Stroke: TPdfStrokeStyle; const SkPaint: ISkPaint);
@@ -233,6 +280,39 @@ begin
     TPdfImageFilter.Bicubic  : Result := TSkSamplingOptions.Create(TSkCubicResampler.Mitchell);
   else
     raise ENotSupportedException.CreateFmt('Unsupported image filter: %d', [Ord(Filter)]);
+  end;
+end;
+
+class function TPdfSkiaConvert.BlendMode(const Mode: TPdfBlendMode): TSkBlendMode;
+begin
+  case Mode of
+    TPdfBlendMode.Normal     : Result := TSkBlendMode.SrcOver;
+    TPdfBlendMode.Multiply   : Result := TSkBlendMode.Multiply;
+    TPdfBlendMode.Screen     : Result := TSkBlendMode.Screen;
+    TPdfBlendMode.Overlay    : Result := TSkBlendMode.Overlay;
+    TPdfBlendMode.Darken     : Result := TSkBlendMode.Darken;
+    TPdfBlendMode.Lighten    : Result := TSkBlendMode.Lighten;
+    TPdfBlendMode.ColorDodge : Result := TSkBlendMode.ColorDodge;
+    TPdfBlendMode.ColorBurn  : Result := TSkBlendMode.ColorBurn;
+    TPdfBlendMode.HardLight  : Result := TSkBlendMode.HardLight;
+    TPdfBlendMode.SoftLight  : Result := TSkBlendMode.SoftLight;
+    TPdfBlendMode.Difference : Result := TSkBlendMode.Difference;
+    TPdfBlendMode.Exclusion  : Result := TSkBlendMode.Exclusion;
+    TPdfBlendMode.Hue        : Result := TSkBlendMode.Hue;
+    TPdfBlendMode.Saturation : Result := TSkBlendMode.Saturation;
+    TPdfBlendMode.Color      : Result := TSkBlendMode.Color;
+    TPdfBlendMode.Luminosity : Result := TSkBlendMode.Luminosity;
+  else
+    raise ENotSupportedException.CreateFmt('Unsupported blend mode: %d', [Ord(Mode)]);
+  end;
+end;
+
+class procedure TPdfSkiaConvert.ApplyBlendMode(const SkPaint: ISkPaint; const Mode: TPdfBlendMode);
+begin
+  const IsNormal = (Mode = TPdfBlendMode.Normal);
+  if not IsNormal then
+  begin
+    SkPaint.Blender := TSkBlender.MakeMode(BlendMode(Mode));
   end;
 end;
 
