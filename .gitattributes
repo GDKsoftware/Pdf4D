@@ -16,3 +16,4 @@ src/Resources/resources.csv text eol=lf
 src/Resources/afm-MustRead.html -text
 tests/reference/pdfbox-text/*.txt -text
 tests/reference/pdfbox-text/manifest.csv text eol=lf
+tests/reference/functions/*.txt text eol=lf

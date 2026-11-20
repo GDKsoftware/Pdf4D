@@ -1,0 +1,96 @@
+# Type 2 (exponential interpolation) functions. See docs/golden-format.md.
+case: basic
+type: 2
+domain: 0 1
+c0: 0
+c1: 1
+n: 2
+in: 0 out: 0.0
+in: 0.25 out: 0.0625
+in: 0.5 out: 0.25
+in: 1 out: 1.0
+case: input-is-not-clipped-to-the-domain
+type: 2
+domain: 0 1
+c0: 0
+c1: 1
+n: 2
+in: 2 out: 4.0
+in: -1 out: 1.0
+case: linear-with-range
+type: 2
+domain: 0 1
+range: 0 0.5
+c0: 0 0
+c1: 1 2
+n: 1
+in: 0.1 out: 0.1
+in: 0.7 out: 0.5
+case: square-root
+type: 2
+domain: 0 1
+c0: 0
+c1: 1
+n: 0.5
+in: 0 out: 0.0
+in: 0.25 out: 0.5
+in: -4 out: NaN
+in: NaN out: NaN
+in: Infinity out: Infinity
+case: missing-n-is-minus-one
+type: 2
+domain: 0 1
+c0: 0
+c1: 1
+in: 0.5 out: 2.0
+in: 0 out: Infinity
+case: missing-c0-and-c1
+type: 2
+domain: 0 1
+n: 1
+in: 0.5 out: 0.5
+case: more-c0-than-c1
+type: 2
+domain: 0 1
+c0: 0 5 7
+c1: 1 6
+n: 1
+in: 0.5 out: 0.5 5.5
+case: exponent-zero
+type: 2
+domain: 0 1
+c0: 0.2
+c1: 0.8
+n: 0
+in: 0 out: 0.8
+in: 0.5 out: 0.8
+case: negative-exponent
+type: 2
+domain: 0 1
+c0: 0
+c1: 1
+n: -1
+in: 0 out: Infinity
+in: 0.5 out: 2.0
+case: no-domain
+type: 2
+c0: 0
+c1: 1
+n: 1
+in: 0.5 out: 0.5
+case: range-has-fewer-pairs-than-c0
+type: 2
+domain: 0 1
+range: 0 0.5
+c0: 0 0
+c1: 1 1
+n: 1
+in: 0.9 out: 0.5
+case: inverted-range
+type: 2
+domain: 0 1
+range: 1 0
+c0: 0
+c1: 1
+n: 1
+in: 0.5 out: 1.0

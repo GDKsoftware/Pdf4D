@@ -58,6 +58,7 @@ import org.apache.pdfbox.pdmodel.common.PDNameTreeNode;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.common.function.PDFunction;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -103,6 +104,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --pdf-glyph-paths file.pdf FontName first-last
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --function spec.txt
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -136,6 +138,10 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("--glyph-paths"))
             {
                 out.print(glyphPaths(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("--function"))
+            {
+                out.print(functionCases(new File(args[1])));
             }
             else if (args.length >= 4 && args[0].equals("--pdf-glyph-paths"))
             {
@@ -1526,6 +1532,174 @@ public class Pdf4DOracle
                 doc.protect(policy);
             }
             doc.save(out);
+        }
+    }
+
+    /**
+     * Evaluates PDF functions. The spec file holds blocks that start with a "case: name" line and have the keys type, domain,
+     * range, size, bps, encode, decode, samples (hex), c0, c1, n, bounds, code (type 4), sub2 (type 3: "c0 | c1 | n" of a type 2
+     * function, once per function) and one "in: x y ..." line per evaluation. The output repeats every line, with " out: ..."
+     * behind each "in:" line; "out: !" is an evaluation that PDFBox fails on, and "create: !" a function that PDFBox cannot make.
+     */
+    private static String functionCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        List<String> lines = java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8);
+        PDFunction function = null;
+        Map<String, String> keys = new java.util.HashMap<>();
+        List<String> sub2 = new ArrayList<>();
+        boolean created = false;
+        for (String line : lines)
+        {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#"))
+            {
+                sb.append(line).append('\n');
+                continue;
+            }
+            int colon = line.indexOf(':');
+            String key = line.substring(0, colon).trim();
+            String value = line.substring(colon + 1).trim();
+            if (key.equals("case"))
+            {
+                keys = new java.util.HashMap<>();
+                sub2 = new ArrayList<>();
+                function = null;
+                created = false;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("in"))
+            {
+                if (!created)
+                {
+                    created = true;
+                    try
+                    {
+                        function = buildFunction(keys, sub2);
+                    }
+                    catch (Throwable t)
+                    {
+                        function = null;
+                        sb.append("create: !\n");
+                    }
+                }
+                sb.append("in: ").append(value).append(" out:");
+                try
+                {
+                    String[] parts = value.isEmpty() ? new String[0] : value.split("\\s+");
+                    float[] input = new float[parts.length];
+                    for (int i = 0; i < parts.length; i++)
+                    {
+                        input[i] = Float.parseFloat(parts[i]);
+                    }
+                    float[] result = function.eval(input);
+                    for (float f : result)
+                    {
+                        sb.append(' ').append(f);
+                    }
+                }
+                catch (Throwable t)
+                {
+                    sb.append(" !");
+                }
+                sb.append('\n');
+            }
+            else
+            {
+                if (key.equals("sub2"))
+                {
+                    sub2.add(value);
+                }
+                else
+                {
+                    keys.put(key, value);
+                }
+                sb.append(line).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    private static COSArray functionArray(String text)
+    {
+        COSArray array = new COSArray();
+        for (String part : text.trim().split("\\s+"))
+        {
+            if (part.isEmpty())
+            {
+                continue;
+            }
+            array.add(part.matches("-?\\d+") ? COSInteger.get(Long.parseLong(part)) : new COSFloat(Float.parseFloat(part)));
+        }
+        return array;
+    }
+
+    private static PDFunction buildFunction(Map<String, String> keys, List<String> sub2) throws IOException
+    {
+        int type = Integer.parseInt(keys.get("type"));
+        COSDictionary dictionary = type == 0 || type == 4 ? new COSStream() : new COSDictionary();
+        dictionary.setInt(COSName.FUNCTION_TYPE, type);
+        putFunctionArray(dictionary, COSName.DOMAIN, keys.get("domain"));
+        putFunctionArray(dictionary, COSName.RANGE, keys.get("range"));
+        putFunctionArray(dictionary, COSName.SIZE, keys.get("size"));
+        putFunctionArray(dictionary, COSName.ENCODE, keys.get("encode"));
+        putFunctionArray(dictionary, COSName.DECODE, keys.get("decode"));
+        putFunctionArray(dictionary, COSName.C0, keys.get("c0"));
+        putFunctionArray(dictionary, COSName.C1, keys.get("c1"));
+        putFunctionArray(dictionary, COSName.BOUNDS, keys.get("bounds"));
+        if (keys.containsKey("n"))
+        {
+            dictionary.setItem(COSName.N, functionArray(keys.get("n")).get(0));
+        }
+        if (keys.containsKey("bps"))
+        {
+            dictionary.setInt(COSName.BITS_PER_SAMPLE, Integer.parseInt(keys.get("bps")));
+        }
+        if (type == 3)
+        {
+            COSArray functions = new COSArray();
+            for (String sub : sub2)
+            {
+                String[] parts = sub.split("\\|");
+                COSDictionary child = new COSDictionary();
+                child.setInt(COSName.FUNCTION_TYPE, 2);
+                child.setItem(COSName.DOMAIN, functionArray("0 1"));
+                child.setItem(COSName.C0, functionArray(parts[0]));
+                child.setItem(COSName.C1, functionArray(parts[1]));
+                child.setItem(COSName.N, functionArray(parts[2]).get(0));
+                functions.add(child);
+            }
+            dictionary.setItem(COSName.FUNCTIONS, functions);
+        }
+        if (type == 0 || type == 4)
+        {
+            byte[] data;
+            if (type == 4)
+            {
+                data = keys.get("code").replace("\\n", "\n").getBytes(StandardCharsets.ISO_8859_1);
+            }
+            else
+            {
+                String hex = keys.getOrDefault("samples", "").replace(" ", "");
+                data = new byte[hex.length() / 2];
+                for (int i = 0; i < data.length; i++)
+                {
+                    data[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+                }
+            }
+            try (java.io.OutputStream os = ((COSStream) dictionary).createOutputStream())
+            {
+                os.write(data);
+            }
+        }
+        return PDFunction.create(dictionary);
+    }
+
+    private static void putFunctionArray(COSDictionary dictionary, COSName name, String text)
+    {
+        if (text != null)
+        {
+            dictionary.setItem(name, functionArray(text));
         }
     }
 }
