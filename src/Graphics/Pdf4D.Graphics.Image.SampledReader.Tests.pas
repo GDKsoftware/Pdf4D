@@ -100,6 +100,15 @@ type
 
     [Test]
     procedure TestStencilHasNoColorSpace;
+
+    [Test]
+    procedure TestJavaRoundSaturatesLikeJava;
+
+    [Test]
+    procedure TestHugeDecodeRangeDoesNotRaise;
+
+    [Test]
+    procedure TestHugeMatteDoesNotRaise;
   end;
 
 implementation
@@ -109,6 +118,8 @@ uses
   System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
+  Pdf4D.Cos.Float,
+  Pdf4D.Graphics.Image.SampledReader,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
@@ -545,6 +556,49 @@ begin
   Assert.IsNull(Image.ColorSpace);
   Assert.AreEqual(1, Image.BitsPerComponent);
   Assert.AreEqual<Integer>(2, Length(Image.Decode));
+end;
+
+// Math.round of Java saturates: a value outside the range of an int becomes the nearest bound and not a number becomes 0
+procedure TSampledImageReaderTests.TestJavaRoundSaturatesLikeJava;
+begin
+  Assert.AreEqual(High(Integer), TSampledImageReader.JavaRound(1E30));
+  Assert.AreEqual(Low(Integer), TSampledImageReader.JavaRound(-1E30));
+  Assert.AreEqual(High(Integer), TSampledImageReader.JavaRound(Infinity));
+  Assert.AreEqual(Low(Integer), TSampledImageReader.JavaRound(NegInfinity));
+  Assert.AreEqual(0, TSampledImageReader.JavaRound(NaN));
+  Assert.AreEqual(High(Integer), TSampledImageReader.JavaRound(3E9));
+  Assert.AreEqual(3, TSampledImageReader.JavaRound(2.5));
+  Assert.AreEqual(-2, TSampledImageReader.JavaRound(-2.5));
+end;
+
+// A /Decode with a huge range gives huge samples: the byte is the low eight bits of the saturated value, and nothing is raised
+procedure TSampledImageReaderTests.TestHugeDecodeRangeDoesNotRaise;
+begin
+  const Stream = NewStream(2, 1, 8, 'DeviceGray', [255, 128]);
+  const Decode = TCosArray.Create;
+  Decode.Add(TCosFloat.Create(0));
+  Decode.Add(TCosFloat.Create(1E30));
+  Stream.SetItem(TCosNames.Decode, Decode);
+  const Bitmap = GetImage(NewImage(Stream));
+
+  Assert.AreEqual(2, Bitmap.Width);
+end;
+
+procedure TSampledImageReaderTests.TestHugeMatteDoesNotRaise;
+begin
+  const Stream = NewStream(1, 1, 8, 'DeviceRGB', [10, 20, 30]);
+  const MaskStream = NewStream(1, 1, 8, 'DeviceGray', [128]);
+  const Matte = TCosArray.Create;
+  for var Index := 0 to 2 do
+  begin
+    Matte.Add(TCosFloat.Create(1E30));
+  end;
+  MaskStream.SetItem(TCosNames.Matte, Matte);
+  Stream.SetItem(TCosNames.SMask, MaskStream);
+  FOwned.Extract(MaskStream);
+  const Bitmap = GetImage(NewImage(Stream));
+
+  Assert.AreEqual(1, Bitmap.Width);
 end;
 
 end.

@@ -133,7 +133,8 @@ begin
   end;
 end;
 
-// Math.round(float) of Java: half up, not a number is 0, and the result saturates
+// Math.round(float) of Java: half up, not a number is 0, and the result saturates. The comparison is made on the Double before it
+// is converted: Floor of System.Math returns an Integer, which would wrap.
 class function TSampledImageReader.JavaRound(const Value: Single): Integer;
 begin
   if IsNan(Value) then
@@ -141,16 +142,16 @@ begin
     Exit(0);
   end;
 
-  const Rounded = Floor(Double(Value) + 0.5);
-  if Rounded >= High(Integer) then
+  const Shifted = Double(Value) + 0.5;
+  if Shifted >= Double(High(Integer)) then
   begin
     Exit(High(Integer));
   end;
-  if Rounded <= Low(Integer) then
+  if Shifted <= Double(Low(Integer)) then
   begin
     Exit(Low(Integer));
   end;
-  Result := Trunc(Rounded);
+  Result := Floor(Shifted);
 end;
 
 // (byte) cast of Java: the low eight bits

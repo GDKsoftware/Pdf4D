@@ -747,11 +747,12 @@ begin
   var MatteRed := 0;
   var MatteGreen := 0;
   var MatteBlue := 0;
+  // The products wrap like the int arithmetic of Java
   if Length(Matte) = RgbComponents then
   begin
-    MatteRed := TSampledImageReader.JavaRound(MatteFactor * Matte[0]) * ByteMax;
-    MatteGreen := TSampledImageReader.JavaRound(MatteFactor * Matte[1]) * ByteMax;
-    MatteBlue := TSampledImageReader.JavaRound(MatteFactor * Matte[2]) * ByteMax;
+    MatteRed := Integer(Int64(TSampledImageReader.JavaRound(MatteFactor * Matte[0])) * ByteMax);
+    MatteGreen := Integer(Int64(TSampledImageReader.JavaRound(MatteFactor * Matte[1])) * ByteMax);
+    MatteBlue := Integer(Int64(TSampledImageReader.JavaRound(MatteFactor * Matte[2])) * ByteMax);
   end;
 
   for var Index := 0 to Integer(Int64(Width) * Height) - 1 do
