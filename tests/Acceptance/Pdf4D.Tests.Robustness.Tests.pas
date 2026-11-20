@@ -33,10 +33,10 @@ type
   end;
 
   // What a run does with the bytes. Structure loads a document and dumps its structure, Text also dumps its text, PageText only
-  // dumps the text, LimitedPageText does so with smaller budgets for operators and glyphs, the program
-  // kinds give the bytes to one parser of a font program or CMap and ask it for widths and Unicode, FontClasses loads the
+  // dumps the text, LimitedPageText does so with smaller budgets for operators and glyphs, TightPageText with a much smaller
+  // operator budget for content that makes every operator expensive, the program kinds give the bytes to one parser of a font program or CMap and ask it for widths and Unicode, FontClasses loads the
   // document and asks the PDF font /F1 for widths and Unicode of every code.
-  TFuzzWork = (Structure, Text, PageText, LimitedPageText, TrueTypeProgram, OpenTypeProgram, CffProgram, Type1Program, CMapProgram, FontClasses);
+  TFuzzWork = (Structure, Text, PageText, LimitedPageText, TightPageText, TrueTypeProgram, OpenTypeProgram, CffProgram, Type1Program, CMapProgram, FontClasses);
 
   // Does the work on the bytes; used on the calling thread or on a worker thread
   TMutationRun = class
@@ -148,6 +148,7 @@ const
   ObjectKeyword = 'obj';
   LimitedOperatorBudget = 1000000;
   LimitedGlyphBudget = 200000;
+  TightOperatorBudget = 100000;
   ProbedGlyphs = 400;
   ProbedCodes = 300;
   ProbedFontKey = 'F1';
@@ -562,13 +563,17 @@ begin
         Stream.Free;
       end;
     end;
-    TFuzzWork.PageText, TFuzzWork.LimitedPageText:
+    TFuzzWork.PageText, TFuzzWork.LimitedPageText, TFuzzWork.TightPageText:
     begin
       var Options := TPdfLoadOptions.Default;
-      if FWork = TFuzzWork.LimitedPageText then
+      if FWork in [TFuzzWork.LimitedPageText, TFuzzWork.TightPageText] then
       begin
         Options.MaxOperatorsPerPage := LimitedOperatorBudget;
         Options.MaxGlyphsPerPage := LimitedGlyphBudget;
+      end;
+      if FWork = TFuzzWork.TightPageText then
+      begin
+        Options.MaxOperatorsPerPage := TightOperatorBudget;
       end;
       const Stream = TBytesStream.Create(FBytes);
       try
