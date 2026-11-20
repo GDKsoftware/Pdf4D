@@ -88,6 +88,18 @@ type
 
     [Test]
     procedure TestProgramKeepsIntegersAndReals;
+
+    [Test]
+    procedure TestCopyWithNegativeCountCopiesNothing;
+
+    [Test]
+    procedure TestCopyBeyondTheStackFails;
+
+    [Test]
+    procedure TestRollWithLowestShiftFails;
+
+    [Test]
+    procedure TestRealBeyondTheRangeIsInfinity;
   end;
 
 implementation
@@ -472,6 +484,55 @@ begin
   AssertNear(3.5, Division[0].RealValue, 0.0000001);
   Assert.AreEqual(Ord(TPsOutcome.Failed), Ord(Outcome), 'idiv wants integers');
   AssertCount(0, Length(Failed), 'both operands were taken from the stack');
+end;
+
+procedure TPostScriptFunctionTests.TestCopyWithNegativeCountCopiesNothing;
+begin
+  var Outcome: TPsOutcome;
+
+  const Lowest = Run('{ 7 -2147483648 copy }', [], Outcome);
+  Assert.AreEqual(Ord(TPsOutcome.Completed), Ord(Outcome), 'the lowest count');
+  AssertCount(1, Length(Lowest));
+  Assert.AreEqual(7, Lowest[0].IntValue);
+
+  const Small = Run('{ 7 -5 copy }', [], Outcome);
+  Assert.AreEqual(Ord(TPsOutcome.Completed), Ord(Outcome), 'a small negative count');
+  AssertCount(1, Length(Small));
+end;
+
+procedure TPostScriptFunctionTests.TestCopyBeyondTheStackFails;
+begin
+  var Outcome: TPsOutcome;
+
+  const Values = Run('{ 7 5 copy }', [], Outcome);
+
+  Assert.AreEqual(Ord(TPsOutcome.Failed), Ord(Outcome));
+  AssertCount(1, Length(Values), 'the stack as it was');
+end;
+
+procedure TPostScriptFunctionTests.TestRollWithLowestShiftFails;
+begin
+  var Outcome: TPsOutcome;
+
+  const Values = Run('{ 1 2 3 3 -2147483648 roll }', [], Outcome);
+
+  Assert.AreEqual(Ord(TPsOutcome.Failed), Ord(Outcome), 'PDFBox would pop 2^31 values');
+  AssertCount(3, Length(Values));
+end;
+
+procedure TPostScriptFunctionTests.TestRealBeyondTheRangeIsInfinity;
+begin
+  var Outcome: TPsOutcome;
+
+  const Positive = Run('{ 1.0e999 }', [], Outcome);
+  Assert.AreEqual(Ord(TPsOutcome.Completed), Ord(Outcome));
+  Assert.IsTrue(IsInfinite(Positive[0].RealValue) and (Positive[0].RealValue > 0), '1e999');
+
+  const Negative = Run('{ -1.0e999 }', [], Outcome);
+  Assert.IsTrue(IsInfinite(Negative[0].RealValue) and (Negative[0].RealValue < 0), '-1e999');
+
+  const Tiny = Run('{ 1.0e-999 }', [], Outcome);
+  AssertNear(0, Tiny[0].RealValue, 0, '1e-999');
 end;
 
 end.

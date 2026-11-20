@@ -179,6 +179,7 @@ type
     class function IsRealExponent(const Token: string; const Start: Integer): Boolean; static;
     class function ParseInteger(const Token: string): Integer; static;
     class function ParseReal(const Token: string): Single; static;
+    class function OutOfRangeValue(const Mantissa, Fraction, Exponent: string): Single; static;
     class function LookupOperator(const Token: string): TPsOperator; static;
 
     procedure Add(const Instruction: TPsInstruction);
@@ -710,9 +711,37 @@ begin
   var Value: Double;
   if not TryStrToFloat(Mantissa + '.' + Fraction + Exponent, Value, TFormatSettings.Invariant) then
   begin
-    raise EPdfParseException.CreateFmt('The number %s in a PostScript function is not valid', [Token]);
+    // The text is a well-formed number whose magnitude the RTL refuses: Java's Float.parseFloat gives Infinity or zero
+    if Exponent = '' then
+    begin
+      raise EPdfParseException.CreateFmt('The number %s in a PostScript function is not valid', [Token]);
+    end;
+    Exit(OutOfRangeValue(Mantissa, Fraction, Exponent));
+  end;
+  if Abs(Value) > MaxSingle then
+  begin
+    Exit(OutOfRangeValue(Mantissa, Fraction, '+'));
   end;
   Result := Value;
+end;
+
+class function TPsParser.OutOfRangeValue(const Mantissa, Fraction, Exponent: string): Single;
+begin
+  const IsNegative = Mantissa.StartsWith('-');
+  const IsZero = (Mantissa + Fraction).Replace('-', '').Replace('0', '') = '';
+  const IsSmall = Exponent.StartsWith('e-', True);
+  if IsZero or IsSmall then
+  begin
+    Result := 0;
+  end
+  else if IsNegative then
+  begin
+    Result := NegInfinity;
+  end
+  else
+  begin
+    Result := Infinity;
+  end;
 end;
 
 class function TPsParser.LookupOperator(const Token: string): TPsOperator;
@@ -1466,6 +1495,10 @@ begin
   begin
     Exit(False);
   end;
+  if Count <= 0 then
+  begin
+    Exit(True);
+  end;
 
   const Start = FCount - Count;
   for var Offset := 0 to Count - 1 do
@@ -1502,23 +1535,24 @@ begin
     Exit(True);
   end;
 
-  var UpperSize: Integer;
-  var LowerSize: Integer;
+  // Int64: the negation of Low(Integer) does not fit an Integer
+  var UpperSize: Int64;
+  var LowerSize: Int64;
   if Shift > 0 then
   begin
     UpperSize := Shift;
-    LowerSize := Max(Count - Shift, 0);
+    LowerSize := Max(Int64(Count) - Shift, 0);
   end
   else
   begin
     LowerSize := -Int64(Shift);
-    UpperSize := Max(Count + Shift, 0);
+    UpperSize := Max(Int64(Count) + Shift, 0);
   end;
-  if Int64(LowerSize) + UpperSize > FCount then
+  if LowerSize + UpperSize > FCount then
   begin
     Exit(False);
   end;
-  SwapBlocks(LowerSize, UpperSize);
+  SwapBlocks(Integer(LowerSize), Integer(UpperSize));
   Result := True;
 end;
 
