@@ -3,6 +3,8 @@
 // Tests of the ICC profile parser (ICC.1:2010): the header, the tag table, the transforms of a profile and hostile data
 unit Pdf4D.Graphics.Icc.Profile.Tests;
 
+{$EXCESSPRECISION OFF}
+
 interface
 
 uses

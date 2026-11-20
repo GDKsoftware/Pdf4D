@@ -7,6 +7,7 @@
 unit Pdf4D.Graphics.Icc.Profile;
 
 {$SCOPEDENUMS ON}
+{$EXCESSPRECISION OFF}
 
 interface
 
