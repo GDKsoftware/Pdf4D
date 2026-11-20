@@ -33,6 +33,7 @@ type
     class function Marker(const Value: Word): TBytes; static;
     class function Header(const MarkerCode: Word; const Payload: array of Byte): TBytes; static;
     class function Frame(const Height, Width: Word; const Components: array of Byte): TBytes; static;
+    class function EmptyRefinementFile(const ScanCount: Integer): TBytes; static;
     class function Difference(const Image: TPDImageXObject; const PngPath: string): TImageDifference; static;
     class function IsDctImage(const Stream: TCosStream): Boolean; static;
 
@@ -120,6 +121,12 @@ type
 
     [Test]
     procedure TestGarbageScanDataEndsWithParseErrorOrAnImage;
+
+    [Test]
+    procedure TestEmptyRefinementScansAreBoundedByAWorkBudget;
+
+    [Test]
+    procedure TestAFewRepeatedScansStayWithinTheWorkBudget;
   end;
 
 implementation
@@ -155,7 +162,9 @@ const
   Soi = $FFD8;
   Eoi = $FFD9;
   Sof0 = $FFC0;
+  Sof2 = $FFC2;
   Sof9 = $FFC9;
+  Dht = $FFC4;
   Dqt = $FFDB;
   Sos = $FFDA;
   TruncatedRowsKept = 64;
@@ -669,6 +678,8 @@ begin
   AssertDecodeRaisesParseError(Changed);
 end;
 
+// Over MaxScans scans is an error; a file that repeats a whole scan that often also runs into the work budget first, and the
+// decoder raises its parse error either way
 procedure TJpegImageTests.TestMoreThanThousandScansRaisesParseError;
 begin
   const Data = ReadReference('gray.jpg');
@@ -684,15 +695,44 @@ begin
   Repeated := Repeated + [Hi(Eoi), Lo(Eoi)];
 
   AssertDecodeRaisesParseError(Repeated);
+end;
 
-  const Allowed = Copy(Data, 0, ScanStart);
-  var AtTheLimit := Allowed;
-  for var Count := 1 to MaxScans do
+// A file whose header is a 1024 x 1024 progressive gray image and that has ScanCount scans. Each scan refines the AC coefficients
+// of every block and takes two bytes of data: one code for an end-of-band run over all 16384 blocks. The blocks are all empty, and
+// without a bound on the work each scan still walks over every block.
+class function TJpegImageTests.EmptyRefinementFile(const ScanCount: Integer): TBytes;
+begin
+  const FrameSide = 1024;
+  var QuantizationPayload: TBytes := [0];
+  for var Index := 1 to 64 do
   begin
-    AtTheLimit := AtTheLimit + Scan;
+    QuantizationPayload := QuantizationPayload + [1];
   end;
-  AtTheLimit := AtTheLimit + [Hi(Eoi), Lo(Eoi)];
-  Decode(AtTheLimit).Free;
+  // One code of one bit for symbol 0 in the DC table and for the end-of-band run of 2^14 blocks (symbol $E0) in the AC table
+  const DcTable: TBytes = [$00, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const AcTable: TBytes = [$10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $E0];
+  const RunData: TBytes = [0, 0];
+  const Scan = Join([Header(Sos, [1, 1, $00, 1, 63, $10]), RunData]);
+
+  Result := Join([Marker(Soi), Header(Dqt, QuantizationPayload), Header(Sof2, [8, Hi(FrameSide), Lo(FrameSide), Hi(FrameSide), Lo(FrameSide), 1, 1, $11, 0]),
+                  Header(Dht, DcTable), Header(Dht, AcTable)]);
+  for var Count := 1 to ScanCount do
+  begin
+    Result := Result + Scan;
+  end;
+  Result := Result + Marker(Eoi);
+end;
+
+procedure TJpegImageTests.TestEmptyRefinementScansAreBoundedByAWorkBudget;
+begin
+  AssertDecodeRaisesParseError(EmptyRefinementFile(MaxScans));
+end;
+
+procedure TJpegImageTests.TestAFewRepeatedScansStayWithinTheWorkBudget;
+begin
+  const FewScans = 5;
+
+  Decode(EmptyRefinementFile(FewScans)).Free;
 end;
 
 // Random scan data behind a valid header: the decoder gives an image or EPdfParseException, quickly and without reading outside

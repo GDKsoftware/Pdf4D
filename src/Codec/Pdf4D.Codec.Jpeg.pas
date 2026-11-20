@@ -186,6 +186,7 @@ type
     FSuccessiveAcState: Integer;
     FSuccessiveAcNextValue: Integer;
     FBlockRow: Integer;
+    FBlocksVisited: Int64;
 
     function NextByte: Integer;
     function ReadBit: Integer;
@@ -218,6 +219,9 @@ type
 
     // Decodes the scan and returns how many bytes it took
     function Run: Integer;
+
+    // The blocks that the scan walked over, whether or not they took any data
+    property BlocksVisited: Int64 read FBlocksVisited;
   end;
 
   // JpegImage: the parser, the reconstruction of the components and the colour conversion
@@ -232,6 +236,8 @@ type
     FAdobeTransformCode: Integer;
     FResetInterval: Integer;
     FScanCount: Integer;
+    FBlocksVisited: Int64;
+    FBlockBudget: Int64;
     FDnlScanLines: Integer;
     FQuantizationTables: array[0..15] of TArray<Word>;
     FHuffmanTablesDC: array[0..15] of TJpegHuffmanTable;
@@ -309,6 +315,9 @@ const
   EndOfImageProbableLines = 5;
 
   MaxScans = 1000;
+  // A progressive file has a few tens of scans at most, and each walks over some of the blocks of the frame; a scan that needs no data
+  // (an end-of-band run over empty blocks) still costs a visit per block, so the visits over all scans are bounded
+  MaxBlockVisitsPerBlock = 32;
   MaxComponents = 4;
   MaxSamplingFactor = 4;
   ComponentsOfColor = 3;
@@ -373,6 +382,7 @@ resourcestring
   TooManyPixels = 'JPEG of %d x %d pixels is over the limit of %d pixels';
   BlockBufferTooLarge = 'JPEG of %d x %d pixels needs too many block buffers';
   TooManyScans = 'JPEG has more than %d scans';
+  TooMuchScanWork = 'The scans of the JPEG of %d x %d pixels walk over its blocks more than %d times';
   InvalidScan = 'Invalid JPEG scan header';
   UnknownScanComponent = 'JPEG scan names the unknown component %d';
   BlockOutsideBuffer = 'JPEG block lies outside the block buffer';
@@ -1061,6 +1071,17 @@ begin
   end;
   FEobrun := 0;
 
+  var BlocksPerMcu := 1;
+  if Length(FComponents) > 1 then
+  begin
+    BlocksPerMcu := 0;
+    for var Component in FComponents do
+    begin
+      Inc(BlocksPerMcu, Component.H * Component.V);
+    end;
+  end;
+  Inc(FBlocksVisited, Int64(Count) * BlocksPerMcu);
+
   for var Counter := 1 to Count do
   begin
     if Length(FComponents) = 1 then
@@ -1182,6 +1203,8 @@ begin
   FAdobeTransformCode := 0;
   FResetInterval := 0;
   FScanCount := 0;
+  FBlocksVisited := 0;
+  FBlockBudget := 0;
   FDnlScanLines := DnlScanLines;
 end;
 
@@ -1480,6 +1503,13 @@ begin
   end;
   FFrame.McusPerLine := McusPerLine;
   FFrame.McusPerColumn := McusPerColumn;
+
+  var BlocksPerMcu := 0;
+  for var Component in FFrame.Components do
+  begin
+    Inc(BlocksPerMcu, Component.H * Component.V);
+  end;
+  FBlockBudget := McusPerLine * McusPerColumn * BlocksPerMcu * MaxBlockVisitsPerBlock;
 end;
 
 procedure TJpegDecoder.ReadHuffmanTables;
@@ -1587,7 +1617,15 @@ begin
                                        SuccessiveApproximation shr 4, SuccessiveApproximation and 15, ParseDnlMarker, FLog);
   try
     try
-      Inc(FOffset, Scan.Run);
+      try
+        Inc(FOffset, Scan.Run);
+      finally
+        Inc(FBlocksVisited, Scan.BlocksVisited);
+      end;
+      if FBlocksVisited > FBlockBudget then
+      begin
+        raise EPdfParseException.CreateFmt(TooMuchScanWork, [FFrame.SamplesPerLine, FFrame.ScanLines, MaxBlockVisitsPerBlock]);
+      end;
     except
       on Error: EJpegEoiMarker do
       begin
