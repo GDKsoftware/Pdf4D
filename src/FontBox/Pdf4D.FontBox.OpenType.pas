@@ -10,6 +10,8 @@ interface
 
 uses
   System.SysUtils,
+  Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.Cff.Font,
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Tables,
@@ -54,6 +56,10 @@ type
     // False for a font with CFF2 outlines and no CFF table
     function IsSupportedOTF: Boolean;
     function HasLayoutTables: Boolean;
+
+    // A font with CFF outlines gives the path of the glyph (the glyph id, as for a name-keyed font) from its CFF table;
+    // any other font reads its glyf table
+    function TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean; override;
   end;
 
   // Parses an OpenType font. A font with CFF2 outlines raises EPdfUnsupportedFeatureException, any other broken font
@@ -157,6 +163,20 @@ begin
     end;
   end;
   Result := False;
+end;
+
+function TOpenTypeFont.TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  var Table: TTTFTable;
+  const HasCffOutlines = (IsPostScript and TryGetTable(TCFFTable.TableTag, Table));
+  if HasCffOutlines then
+  begin
+    Result := (Table as TCFFTable).Font.TryGetPathByGid(GID, Path, Log);
+  end
+  else
+  begin
+    Result := inherited TryGetGlyphPath(GID, Path, Log);
+  end;
 end;
 
 { TOTFParser }

@@ -26,6 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.fontbox.cff.CFFCIDFont;
 import org.apache.fontbox.cff.CFFFont;
 import org.apache.fontbox.cff.CFFType1Font;
+import org.apache.fontbox.ttf.GlyphTable;
 import org.apache.fontbox.ttf.OTFParser;
 import org.apache.fontbox.ttf.OpenTypeFont;
 import org.apache.fontbox.ttf.TTFParser;
@@ -97,7 +98,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
- *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb)
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -1148,9 +1149,28 @@ public class Pdf4DOracle
                 }
             }
         }
+        else if (name.endsWith(".ttf"))
+        {
+            try (TrueTypeFont font = new TTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                GlyphTable glyf = font.getGlyph();
+                int n = Math.min(font.getNumberOfGlyphs(), PATH_GLYPH_LIMIT);
+                for (int gid = 0; gid < n; gid++)
+                {
+                    try
+                    {
+                        putPath(paths, "gid" + gid, glyf.getGlyph(gid).getPath());
+                    }
+                    catch (Exception e)
+                    {
+                        // left out
+                    }
+                }
+            }
+        }
         else
         {
-            throw new IOException("Glyph paths are written for Type 1 and CFF fonts only");
+            throw new IOException("Glyph paths are written for Type 1, CFF and TrueType fonts only");
         }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> e : paths.entrySet())

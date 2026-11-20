@@ -198,6 +198,7 @@
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Collection.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.DataStream.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Font.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Glyph.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Headers.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Parser.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.TrueType.Post.pas"/>

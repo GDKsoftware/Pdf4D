@@ -189,7 +189,7 @@ type
 
     procedure LogWarning(const Message: string);
 
-    // TrueType outlines are not made yet: no path
+    // A host without outlines has no path; the fonts that read outlines override this
     function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
 
     // Not owned. Only set while the font is parsed, because the log may be gone when a table is read later.

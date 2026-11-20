@@ -23,7 +23,7 @@ type
     function GetWidth(const GlyphName: string): Single; virtual; abstract;
     function HasGlyph(const GlyphName: string): Boolean; virtual; abstract;
     // The outline of the glyph; the caller owns the path. A font does not cache paths: the glyph cache of the renderer does.
-    // False when the font has no outline for the glyph, or cannot make outlines (a TrueType font does not yet).
+    // False when the font has no outline for the glyph, or when the outline is damaged (the reason goes to the log).
     function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; virtual; abstract;
   end;
 

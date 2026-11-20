@@ -149,6 +149,7 @@ contains
   Pdf4D.FontBox.TrueType.Collection in '..\src\FontBox\Pdf4D.FontBox.TrueType.Collection.pas',
   Pdf4D.FontBox.TrueType.DataStream in '..\src\FontBox\Pdf4D.FontBox.TrueType.DataStream.pas',
   Pdf4D.FontBox.TrueType.Font in '..\src\FontBox\Pdf4D.FontBox.TrueType.Font.pas',
+  Pdf4D.FontBox.TrueType.Glyph in '..\src\FontBox\Pdf4D.FontBox.TrueType.Glyph.pas',
   Pdf4D.FontBox.TrueType.Headers in '..\src\FontBox\Pdf4D.FontBox.TrueType.Headers.pas',
   Pdf4D.FontBox.TrueType.Parser in '..\src\FontBox\Pdf4D.FontBox.TrueType.Parser.pas',
   Pdf4D.FontBox.TrueType.Post in '..\src\FontBox\Pdf4D.FontBox.TrueType.Post.pas',

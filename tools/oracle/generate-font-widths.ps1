@@ -1,5 +1,5 @@
 # Runs the oracle (--font-widths) for every test font in tests/fonts and writes tests/fonts/<font>.widths.txt.
-# With -Paths it runs --glyph-paths instead and writes tests/fonts/<font>.paths.txt for the Type 1 and CFF test fonts.
+# With -Paths it runs --glyph-paths instead and writes tests/fonts/<font>.paths.txt for the Type 1, CFF and TrueType test fonts.
 param([switch]$Paths)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'oracle-lib.ps1')
@@ -9,7 +9,7 @@ $fonts = Join-Path $script:RepoRoot 'tests\fonts'
 if ($Paths) {
     $mode = '--glyph-paths'
     $suffix = '.paths.txt'
-    $extensions = '.otf', '.pfb'
+    $extensions = '.otf', '.pfb', '.ttf'
 }
 else {
     $mode = '--font-widths'
