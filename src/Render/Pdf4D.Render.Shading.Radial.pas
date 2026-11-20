@@ -16,9 +16,10 @@ uses
 
 type
   // Type 3. Like the axial context it takes the colours from a table of steps. A pixel lies on the circle of two values of the
-  // parameter; the larger one in range is used, and failing that a value beyond an end that is extended gives the colour of that end
-  // (the cell S3x of generated/render/shadings.pdf shows that PDFBox prefers a value in range to a larger one that is extended). PDFBox does
-  // not look at the radius of the circle, so neither does this port: the circles with a negative radius are painted as well.
+  // parameter; the larger one in range is used, and failing that the extension decides, as in RadialShadingContext.getRaster: with both
+  // ends extended the larger value, with one the value of that side (the smaller for the start, the larger for the end), and that value is
+  // then extended only when its end has a radius above 0 (coords[5] for the end, coords[2] for the start). The circles with a negative
+  // radius are painted as well (the cell S3x of generated/render/shadings.pdf).
   TPdfRadialShadingContext = class(TPdfShadingContext)
   private
     FCoords: TArray<Single>;
@@ -36,6 +37,9 @@ type
     // The two values of the parameter at the point, smaller first. False when the point is on no circle.
     function TryGetParameters(const U, V: Single; out Smaller, Larger: Double): Boolean;
     class function IsInRange(const Parameter: Double): Boolean; static;
+    // The value that decides when neither of the two is in range: the extended one
+    function TryChooseExtended(const Smaller, Larger: Double; out InputValue: Double): Boolean;
+    // A value beyond an end is brought to that end when the end is extended and has a radius
     function TryExtend(const Parameter: Double; out InputValue: Double): Boolean;
     function TryGetInputValue(const Smaller, Larger: Double; out InputValue: Double): Boolean;
 
@@ -128,40 +132,73 @@ begin
   Result := ((Parameter >= 0) and (Parameter <= 1));
 end;
 
-// A value beyond an end that is extended takes the colour of that end
-function TPdfRadialShadingContext.TryExtend(const Parameter: Double; out InputValue: Double): Boolean;
-begin
-  InputValue := 0;
-  if IsNan(Parameter) then
-  begin
-    Exit(False);
-  end;
-
-  if Parameter < 0 then
-  begin
-    Exit(FExtendStart);
-  end;
-
-  InputValue := 1;
-  Result := ((Parameter > 1) and FExtendEnd);
-end;
-
-// A value in range is taken before one that the extension brings in range, and the larger of two goes first in both cases
-function TPdfRadialShadingContext.TryGetInputValue(const Smaller, Larger: Double; out InputValue: Double): Boolean;
+function TPdfRadialShadingContext.TryChooseExtended(const Smaller, Larger: Double; out InputValue: Double): Boolean;
 begin
   Result := True;
-  if IsInRange(Larger) then
+  InputValue := 0;
+  if FExtendStart and FExtendEnd then
   begin
     InputValue := Larger;
   end
-  else if IsInRange(Smaller) then
+  else if FExtendStart then
   begin
     InputValue := Smaller;
   end
+  else if FExtendEnd then
+  begin
+    InputValue := Larger;
+  end
   else
   begin
-    Result := (TryExtend(Larger, InputValue) or TryExtend(Smaller, InputValue));
+    Result := False;
   end;
+end;
+
+function TPdfRadialShadingContext.TryExtend(const Parameter: Double; out InputValue: Double): Boolean;
+begin
+  InputValue := Parameter;
+  Result := False;
+  if Parameter > 1 then
+  begin
+    Result := (FExtendEnd and (FCoords[5] > 0));
+    InputValue := 1;
+  end
+  else if Parameter < 0 then
+  begin
+    Result := (FExtendStart and (FCoords[2] > 0));
+    InputValue := 0;
+  end;
+end;
+
+// A value in range is taken before one that the extension brings in range; the larger of two in range goes first
+function TPdfRadialShadingContext.TryGetInputValue(const Smaller, Larger: Double; out InputValue: Double): Boolean;
+begin
+  var Chosen: Double := 0;
+  if IsInRange(Smaller) then
+  begin
+    Chosen := Smaller;
+    if IsInRange(Larger) then
+    begin
+      Chosen := Max(Smaller, Larger);
+    end;
+  end
+  else if IsInRange(Larger) then
+  begin
+    Chosen := Larger;
+  end
+  else if not TryChooseExtended(Smaller, Larger, Chosen) then
+  begin
+    InputValue := 0;
+    Exit(False);
+  end;
+
+  if IsInRange(Chosen) then
+  begin
+    InputValue := Chosen;
+    Exit(True);
+  end;
+
+  Result := TryExtend(Chosen, InputValue);
 end;
 
 function TPdfRadialShadingContext.TryGetColorAt(const U, V: Single; out Rgb: Integer): Boolean;

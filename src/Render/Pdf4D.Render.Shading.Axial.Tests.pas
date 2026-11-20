@@ -58,6 +58,12 @@ type
     procedure TestAxialExtendTrueRepeatsEdgeColor;
 
     [Test]
+    procedure TestAxialExtensionTakesTheEndOfTheDomain;
+
+    [Test]
+    procedure TestAxialExtensionOfADomainBeyondTheTableIsTransparent;
+
+    [Test]
     procedure TestAxialBackgroundFillsOutside;
 
     [Test]
@@ -169,6 +175,31 @@ begin
   const After = TShadingPixels.At(FBitmap, 180, 0);
   Assert.IsTrue(TShadingPixels.AreNear(Before, 255, 0, 0, 255, 0), TShadingPixels.Describe(Before));
   Assert.IsTrue(TShadingPixels.AreNear(After, 0, 0, 255, 255, 0), TShadingPixels.Describe(After));
+end;
+
+// AxialShadingContext: an extended end gets inputValue = domain[1], and the table is read at (int) (inputValue * factor): for a domain of
+// 0 to 0.5 that is the middle of the table, the colour of the parameter 0.25 (the table has 201 steps for the diagonal of 200 pixels)
+procedure TAxialShadingTests.TestAxialExtensionTakesTheEndOfTheDomain;
+begin
+  Make(Prefix + RedToBlue + ' /Domain [0 0.5] /Extend [true true]');
+
+  Rasterize(TRect.Create(-50, 0, 150, 1), TPdfMatrix.Identity);
+
+  const Before = TShadingPixels.At(FBitmap, 10, 0);
+  const After = TShadingPixels.At(FBitmap, 180, 0);
+  Assert.IsTrue(TShadingPixels.AreNear(Before, 255, 0, 0, 255, 0), TShadingPixels.Describe(Before));
+  Assert.IsTrue(TShadingPixels.AreNear(After, 191, 0, 63, 255, 2), TShadingPixels.Describe(After));
+end;
+
+// The table lookup of PDFBox is out of the table there (and raises); the pixel gets no colour
+procedure TAxialShadingTests.TestAxialExtensionOfADomainBeyondTheTableIsTransparent;
+begin
+  Make(Prefix + RedToBlue + ' /Domain [2 3] /Extend [false true]');
+
+  Rasterize(TRect.Create(-50, 0, 150, 1), TPdfMatrix.Identity);
+
+  Assert.AreEqual<Integer>(0, TShadingPixels.At(FBitmap, 180, 0).A);
+  Assert.AreEqual<Integer>(255, TShadingPixels.At(FBitmap, 100, 0).A);
 end;
 
 procedure TAxialShadingTests.TestAxialBackgroundFillsOutside;

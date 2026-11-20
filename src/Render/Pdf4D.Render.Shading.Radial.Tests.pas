@@ -60,6 +60,12 @@ type
 
     [Test]
     procedure TestRadialWithoutQuadraticTermIsLinear;
+
+    [Test]
+    procedure TestRadialStartExtensionNeedsAStartRadius;
+
+    [Test]
+    procedure TestRadialEndExtensionNeedsAnEndRadius;
   end;
 
 implementation
@@ -170,6 +176,30 @@ begin
   const Beyond = TShadingPixels.At(FBitmap, 90, 50);
   Assert.AreEqual<Integer>(255, OnFirstCircle.A);
   Assert.IsTrue(TShadingPixels.AreNear(Beyond, 0, 0, 255, 255, 2), TShadingPixels.Describe(Beyond));
+end;
+
+// RadialShadingContext: the start is extended only for extend[0] and coords[2] > 0. From a point (r0 = 0) the pixels beyond the end circle
+// are not painted with the start colour, where the smaller root (below 0) would be extended.
+procedure TRadialShadingTests.TestRadialStartExtensionNeedsAStartRadius;
+begin
+  Make('/ShadingType 3 /ColorSpace /DeviceRGB /Coords [50 50 0 50 50 30] /Extend [true false] ' + RedToBlue);
+
+  Rasterize(TRect.Create(0, 0, 100, 100), TPdfMatrix.Identity);
+
+  Assert.AreEqual<Integer>(0, TShadingPixels.At(FBitmap, 5, 5).A);
+  Assert.AreEqual<Integer>(255, TShadingPixels.At(FBitmap, 60, 50).A);
+end;
+
+// With both ends extended the larger root decides, and an end that has no radius does not extend: the pixels outside the circle that
+// shrinks to a point stay empty
+procedure TRadialShadingTests.TestRadialEndExtensionNeedsAnEndRadius;
+begin
+  Make('/ShadingType 3 /ColorSpace /DeviceRGB /Coords [50 50 30 50 50 0] /Extend [true true] ' + RedToBlue);
+
+  Rasterize(TRect.Create(0, 0, 100, 100), TPdfMatrix.Identity);
+
+  Assert.AreEqual<Integer>(0, TShadingPixels.At(FBitmap, 5, 5).A);
+  Assert.AreEqual<Integer>(255, TShadingPixels.At(FBitmap, 60, 50).A);
 end;
 
 end.

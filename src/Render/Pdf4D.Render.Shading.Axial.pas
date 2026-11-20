@@ -99,15 +99,16 @@ begin
     Exit(False);
   end;
 
+  // An extended end takes the value of the end of the domain, as PDFBox does (which is the end of the colour table for a domain of 0 to 1)
   if InputValue < 0 then
   begin
     Result := FExtendStart;
-    InputValue := 0;
+    InputValue := FDomain[0];
   end
   else if InputValue > 1 then
   begin
     Result := FExtendEnd;
-    InputValue := 1;
+    InputValue := FDomain[1];
   end
   else
   begin
@@ -120,8 +121,13 @@ begin
   var InputValue: Double;
   if TryGetInputValue(U, V, InputValue) then
   begin
-    Rgb := FColorTable[Trunc(InputValue * FFactor)];
-    Exit(True);
+    // PDFBox looks up (int) (inputValue * factor), which for a domain beyond 0 to 1 lies outside the table (and raises there): no colour
+    const Key = InputValue * FFactor;
+    if (Key >= 0) and (Key < Length(FColorTable)) then
+    begin
+      Rgb := FColorTable[Trunc(Key)];
+      Exit(True);
+    end;
   end;
 
   Rgb := RgbBackground;
