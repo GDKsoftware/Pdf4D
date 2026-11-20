@@ -100,6 +100,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.CancelToken.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.ClipPath.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Device.Interfaces.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.GlyphCache.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

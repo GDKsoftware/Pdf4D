@@ -211,10 +211,13 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.GlyphCache.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.GlyphCache.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.GraphicsDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Text.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>

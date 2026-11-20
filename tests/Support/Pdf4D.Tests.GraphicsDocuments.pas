@@ -17,6 +17,7 @@ type
   TGraphicsDocuments = class
   private
     FStreams: TObjectList<TBytesStream>;
+    FLogLines: TList<string>;
 
   public
     const PageSize = 200;
@@ -32,6 +33,9 @@ type
     class function NewBuilder(const Content: TBytes; const Resources: string; const PageEntries: string = ''): TTestPdfBuilder; static;
     // Loads what the builder makes. The caller still owns the builder.
     function Open(const Builder: TTestPdfBuilder): IPdfDocument; overload;
+
+    // The warnings and errors that the documents opened by this object logged, as 'Warning: text'
+    property LogLines: TList<string> read FLogLines;
   end;
 
 implementation
@@ -44,6 +48,7 @@ uses
 const
   PageBody = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %d %d] /Contents 4 0 R /Resources << %s >> %s >>';
   ContentObject = 4;
+  LevelNames: array[TPdfLogLevel] of string = ('Debug', 'Info', 'Warning', 'Error');
 
 { TGraphicsDocuments }
 
@@ -51,10 +56,12 @@ constructor TGraphicsDocuments.Create;
 begin
   inherited Create;
   FStreams := TObjectList<TBytesStream>.Create(True);
+  FLogLines := TList<string>.Create;
 end;
 
 destructor TGraphicsDocuments.Destroy;
 begin
+  FLogLines.Free;
   FStreams.Free;
   inherited;
 end;
@@ -90,7 +97,15 @@ function TGraphicsDocuments.Open(const Builder: TTestPdfBuilder): IPdfDocument;
 begin
   const Stream = TBytesStream.Create(Builder.Build(TXrefStyle.Table));
   FStreams.Add(Stream);
-  Result := TPdfDocument.Load(Stream, TPdfLoadOptions.Default);
+  var Options := TPdfLoadOptions.Default;
+  Options.OnLog := procedure(const Level: TPdfLogLevel; const Message: string)
+    begin
+      if Level >= TPdfLogLevel.Warning then
+      begin
+        FLogLines.Add(Format('%s: %s', [LevelNames[Level], Message]));
+      end;
+    end;
+  Result := TPdfDocument.Load(Stream, Options);
 end;
 
 end.

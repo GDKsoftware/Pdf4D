@@ -16,6 +16,7 @@ uses
   Pdf4D.Model.Page,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
+  Pdf4D.Render.GlyphCache,
   Pdf4D.Render.PageTransform,
   Pdf4D.Render.Renderer.Interfaces;
 
@@ -26,6 +27,7 @@ type
     FDocument: IPdfDocument;
     FModel: TPDDocument;
     FBackend: IPdfRenderBackend;
+    FGlyphCache: TPdfGlyphCache;
 
     class procedure CheckParams(const Params: TPdfRenderParams); static;
     class procedure CheckScaleAndRotation(const Scale: Single; const ExtraRotation: Integer); static;
@@ -42,11 +44,15 @@ type
     // Document must be made by this library (a TPdfDocument): the renderer reads its model. Raises EArgumentNilException for nil and
     // EArgumentException for another implementation of IPdfDocument.
     constructor Create(const Document: IPdfDocument; const Backend: IPdfRenderBackend);
+    destructor Destroy; override;
 
     function Backend: IPdfRenderBackend;
     function PageTransform(const PageIndex: Integer; const Scale: Single; const ExtraRotation: Integer = 0): TPdfPageTransform;
     function RenderPage(const PageIndex: Integer; const Device: IPdfGraphicsDevice; const Params: TPdfRenderParams): TPdfRenderStatus;
     function RenderToBitmap(const PageIndex: Integer; const Params: TPdfRenderParams; out Bitmap: TPdfBitmap): TPdfRenderStatus;
+
+    // The glyph outlines of the pages that this renderer has drawn
+    property GlyphCache: TPdfGlyphCache read FGlyphCache;
   end;
 
 implementation
@@ -88,6 +94,13 @@ begin
   FDocument := Document;
   FModel := Model.ModelDocument;
   FBackend := Backend;
+  FGlyphCache := TPdfGlyphCache.Create(FModel.Context.Log);
+end;
+
+destructor TPdfRenderer.Destroy;
+begin
+  FGlyphCache.Free;
+  inherited;
 end;
 
 function TPdfRenderer.Backend: IPdfRenderBackend;

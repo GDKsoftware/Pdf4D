@@ -51,6 +51,7 @@ contains
   Pdf4D.Render.CancelToken in '..\src\Render\Pdf4D.Render.CancelToken.pas',
   Pdf4D.Render.ClipPath in '..\src\Render\Pdf4D.Render.ClipPath.pas',
   Pdf4D.Render.Device.Interfaces in '..\src\Render\Pdf4D.Render.Device.Interfaces.pas',
+  Pdf4D.Render.GlyphCache in '..\src\Render\Pdf4D.Render.GlyphCache.pas',
   Pdf4D.Render.GraphicsEngine in '..\src\Render\Pdf4D.Render.GraphicsEngine.pas',
   Pdf4D.Render.Operators.Color in '..\src\Render\Pdf4D.Render.Operators.Color.pas',
   Pdf4D.Render.Operators.Path in '..\src\Render\Pdf4D.Render.Operators.Path.pas',

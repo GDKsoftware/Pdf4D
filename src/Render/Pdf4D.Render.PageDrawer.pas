@@ -3,8 +3,10 @@
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/rendering/PageDrawer.java (3.0.8): drawPage, setClip, getStroke, getDashArray,
 // strokePath, fillPath, fillAndStrokePath, clip, adjustClip, endPath and the path construction; the paint is the solid colour of
-// getPaint. Glyphs, images, shadings, patterns, transparency groups and soft masks are not drawn yet.
-// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth and clipToRect
+// getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip. Images, shadings, patterns, transparency
+// groups and soft masks are not drawn yet.
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
+// showType3Glyph
 unit Pdf4D.Render.PageDrawer;
 
 {$EXCESSPRECISION OFF}
@@ -13,9 +15,12 @@ interface
 
 uses
   System.Types,
+  System.Generics.Collections,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Content.GraphicsState,
+  Pdf4D.Font.Base,
+  Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
@@ -53,6 +58,11 @@ type
     // The clip that the device has; the clip chain is immutable, so identity says whether it changed
     FLastClip: IPdfClipPath;
     FIsCancelled: Boolean;
+    // The glyphs of a text object with a clipping mode, in page space; the clip is made at its end
+    FTextClip: TPdfPath;
+    FType3Depth: Integer;
+    // The Type 3 glyphs without procedure that are in the log, so that a long text with one gives one line
+    FLoggedMissingGlyphs: TDictionary<Int64, Boolean>;
 
     function TransformWidth(const Width: Single): Single;
     function NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
@@ -70,6 +80,14 @@ type
     procedure ApplyClip;
     procedure PaintFill(const Path: TPdfPath; const FillRule: TPdfFillRule);
     procedure PaintStroke(const Path: TPdfPath);
+    function GlyphMatrix(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
+                         const Displacement: TPdfVector): TPdfMatrix;
+    procedure ShowFontGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector);
+    procedure DrawGlyph(const GlyphPath: TPdfPath);
+    procedure ShowType3Glyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDType3Font; const Code: Integer);
+    procedure RunType3CharProc(const Font: TPDType3Font; const CharProc: TPDType3CharProc; const TextRenderingMatrix: TPdfMatrix);
+    procedure LogMissingCharProc(const Font: TPDType3Font; const Code: Integer);
+    class function IsFinitePath(const Path: TPdfPath): Boolean; static;
 
   protected
     // The page clip: the crop box
@@ -83,6 +101,10 @@ type
     destructor Destroy; override;
 
     procedure DrawPage;
+
+    procedure BeginText; override;
+    procedure EndText; override;
+    procedure ShowGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector); override;
 
     procedure AppendRectangle(const P0, P1, P2, P3: TPointF); override;
     procedure Clip(const FillRule: TPdfFillRule); override;
@@ -107,12 +129,20 @@ implementation
 uses
   System.Math,
   System.SysUtils,
+  Pdf4D.Cos.Dictionary,
   Pdf4D.Graphics.State,
+  Pdf4D.Render.GlyphCache,
   Pdf4D.Render.PageTransform;
 
 const
   Half = 0.5;
   LargestStyleCode = 2;
+  // A glyph of a font that is not embedded is made as wide as the PDF says (in thousandths of text space)
+  Thousand = 1000;
+  WidthTolerance = 0.0001;
+  MaximumLoggedMissingGlyphs = 1024;
+  CodeShift = 48;
+  CodeMask = $FFFF;
 
 { TPdfPageDrawer }
 
@@ -125,6 +155,8 @@ begin
   FDevice := Device;
   FParams := Params;
   FLinePath := TPdfPath.Create;
+  FTextClip := TPdfPath.Create;
+  FLoggedMissingGlyphs := TDictionary<Int64, Boolean>.Create;
 
   const Transform = TPdfPageTransform.Create(Page.CropBox, Page.Rotation + Params.ExtraRotation, Params.Scale);
   const Whole = Transform.PageToDevice;
@@ -136,6 +168,8 @@ end;
 
 destructor TPdfPageDrawer.Destroy;
 begin
+  FLoggedMissingGlyphs.Free;
+  FTextClip.Free;
   FLinePath.Free;
   inherited;
 end;
@@ -608,6 +642,165 @@ end;
 procedure TPdfPageDrawer.EndPath;
 begin
   FLinePath.Clear;
+end;
+
+// beginTextClip: the text clip starts empty
+procedure TPdfPageDrawer.BeginText;
+begin
+  FTextClip.Clear;
+end;
+
+// endTextClip: the glyphs of the clipping modes become the clip. Like PDFBox this reads the rendering mode at ET.
+procedure TPdfPageDrawer.EndText;
+begin
+  try
+    if RenderState.TextState.RenderingMode.IsClip and (not FTextClip.IsEmpty) then
+    begin
+      RenderState.IntersectClip(FTextClip, FPageToDevice, TPdfFillRule.NonZero);
+      FLastClip := nil;
+    end;
+  finally
+    FTextClip.Clear;
+  end;
+end;
+
+procedure TPdfPageDrawer.ShowGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
+                                   const Displacement: TPdfVector);
+begin
+  if Font is TPDType3Font then
+  begin
+    // PageDrawer.showType3Glyph: invisible text is not run
+    if RenderState.TextState.RenderingMode <> TRenderingMode.Neither then
+    begin
+      ShowType3Glyph(TextRenderingMatrix, TPDType3Font(Font), Code);
+    end;
+  end
+  else
+  begin
+    ShowFontGlyph(TextRenderingMatrix, Font, Code, Displacement);
+  end;
+end;
+
+class function TPdfPageDrawer.IsFinitePath(const Path: TPdfPath): Boolean;
+begin
+  const Bounds = Path.Bounds;
+  Result := (not (IsNan(Bounds.Left) or IsInfinite(Bounds.Left) or IsNan(Bounds.Top) or IsInfinite(Bounds.Top) or
+                  IsNan(Bounds.Right) or IsInfinite(Bounds.Right) or IsNan(Bounds.Bottom) or IsInfinite(Bounds.Bottom)));
+end;
+
+// The path of the font program to page space: the font matrix and the text rendering matrix, with the stretch of a glyph of a font that
+// is not embedded (drawGlyph). A vertical font is not stretched: its displacement has no horizontal part, which would flatten the glyph.
+function TPdfPageDrawer.GlyphMatrix(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
+                                    const Displacement: TPdfVector): TPdfMatrix;
+begin
+  Result := Font.GetFontMatrix.Multiply(TextRenderingMatrix);
+  if Font.IsEmbedded or Font.IsVertical then
+  begin
+    Exit;
+  end;
+
+  const FontWidth = Font.GetWidthFromFont(Code);
+  const PdfWidth = Displacement.X * Thousand;
+  if (FontWidth > 0) and (Abs(FontWidth - PdfWidth) > WidthTolerance) then
+  begin
+    Result := TPdfMatrix.GetScaleInstance(PdfWidth / FontWidth, 1).Multiply(Result);
+  end;
+end;
+
+procedure TPdfPageDrawer.ShowFontGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
+                                       const Displacement: TPdfVector);
+begin
+  var FontPath: TPdfPath;
+  if not FRenderer.GlyphCache.TryGetPath(Font, Code, FontPath) then
+  begin
+    Exit;
+  end;
+
+  const GlyphPath = FontPath.Clone;
+  try
+    GlyphPath.Transform(GlyphMatrix(TextRenderingMatrix, Font, Code, Displacement));
+    DrawGlyph(GlyphPath);
+  finally
+    GlyphPath.Free;
+  end;
+end;
+
+// drawGlyph, from the point where the glyph is a shape in page space
+procedure TPdfPageDrawer.DrawGlyph(const GlyphPath: TPdfPath);
+begin
+  if not IsFinitePath(GlyphPath) then
+  begin
+    LogError('A glyph is skipped: it does not give finite coordinates', []);
+    Exit;
+  end;
+
+  const Mode = RenderState.TextState.RenderingMode;
+  if Mode.IsFill and (not GlyphPath.IsEmpty) then
+  begin
+    ApplyClip;
+    FDevice.FillPath(GlyphPath, FPageToDevice, TPdfFillRule.NonZero, SolidPaint(RenderState.NonStrokingColor), NonStrokingComposite(True));
+  end;
+
+  var Stroke: TPdfStrokeStyle;
+  if Mode.IsStroke and HasSegments(GlyphPath) and TryBuildStroke(Stroke) then
+  begin
+    ApplyClip;
+    FDevice.StrokePath(GlyphPath, FPageToDevice, Stroke, SolidPaint(RenderState.StrokingColor), StrokingComposite);
+  end;
+
+  if Mode.IsClip then
+  begin
+    FTextClip.Append(GlyphPath);
+  end;
+end;
+
+procedure TPdfPageDrawer.LogMissingCharProc(const Font: TPDType3Font; const Code: Integer);
+begin
+  const Key = ((Int64(Code and CodeMask) shl CodeShift) xor Int64(NativeInt(Font.CosObject)));
+  if (FLoggedMissingGlyphs.Count < MaximumLoggedMissingGlyphs) and (not FLoggedMissingGlyphs.ContainsKey(Key)) then
+  begin
+    FLoggedMissingGlyphs.Add(Key, True);
+    LogWarning('No glyph procedure for code %d in Type 3 font %s, the glyph is skipped', [Code, Font.Name]);
+  end;
+end;
+
+// showType3Glyph: the procedure runs with the text rendering matrix, scaled by the font matrix, as CTM
+procedure TPdfPageDrawer.ShowType3Glyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDType3Font; const Code: Integer);
+begin
+  var CharProc: TPDType3CharProc;
+  if not Font.TryGetCharProc(Code, CharProc) then
+  begin
+    LogMissingCharProc(Font, Code);
+    Exit;
+  end;
+
+  if FType3Depth >= Max(FParams.Options.MaxType3Depth, 1) then
+  begin
+    LogWarning('Type 3 glyphs are nested as deep as the limit of %d, the glyph is skipped', [FParams.Options.MaxType3Depth]);
+    Exit;
+  end;
+
+  RunType3CharProc(Font, CharProc, TextRenderingMatrix);
+end;
+
+procedure TPdfPageDrawer.RunType3CharProc(const Font: TPDType3Font; const CharProc: TPDType3CharProc; const TextRenderingMatrix: TPdfMatrix);
+begin
+  var Resources: TCosDictionary;
+  if not CharProc.TryGetResources(Resources) then
+  begin
+    Resources := nil;
+  end;
+
+  const State = GraphicsState.Clone;
+  State.CurrentTransformationMatrix := Font.GetFontMatrix.Multiply(TextRenderingMatrix);
+
+  var NoBox: TPdfRectangle;
+  Inc(FType3Depth);
+  try
+    ProcessChildStream(CharProc.Stream, Resources, State, TPdfMatrix.Identity, False, NoBox);
+  finally
+    Dec(FType3Depth);
+  end;
 end;
 
 end.
