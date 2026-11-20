@@ -843,10 +843,9 @@ begin
   const State = GraphicsState.Clone;
   State.CurrentTransformationMatrix := Font.GetFontMatrix.Multiply(TextRenderingMatrix);
 
-  var NoBox: TPdfRectangle;
   Inc(FType3Depth);
   try
-    ProcessChildStream(CharProc.Stream, Resources, State, TPdfMatrix.Identity, False, NoBox);
+    ProcessType3CharProc(CharProc.Stream, Resources, State);
   finally
     Dec(FType3Depth);
   end;

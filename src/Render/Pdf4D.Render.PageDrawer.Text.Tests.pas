@@ -85,6 +85,15 @@ type
     procedure TestType3MissingCharProcSkipsGlyph;
 
     [Test]
+    procedure TestType3D1IgnoresDeviceColorOperators;
+
+    [Test]
+    procedure TestType3D0AppliesDeviceColorOperators;
+
+    [Test]
+    procedure TestColorOperatorsWorkAgainAfterAD1Glyph;
+
+    [Test]
     procedure TestType3InvisibleModeDrawsNothing;
 
     [Test]
@@ -307,6 +316,37 @@ begin
   Assert.AreEqual<Integer>(1, Length(Fills));
   // 40 glyph units, 0.01 for the font matrix, 10 for the font size
   AssertBounds(100, 96, 104, 100, Fills[0].DeviceBounds);
+end;
+
+// PDFStreamEngine.processStreamOperators: a glyph procedure that starts with d1 is an uncoloured glyph, and the colour operators
+// that PDFBox guards (the colour space and device colour operators) are ignored in it, so the glyph has the colour of the text
+procedure TPageDrawerTextTests.TestType3D1IgnoresDeviceColorOperators;
+begin
+  RenderType3('0 0 1 rg BT /F1 10 Tf 100 100 Td (A) Tj ET', ['50 0 0 0 40 40 d1 1 0 0 rg 0 0 40 40 re f']);
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.AreEqual(Byte(0), Fills[0].Paint.Color.R);
+  Assert.AreEqual(Byte(255), Fills[0].Paint.Color.B);
+end;
+
+procedure TPageDrawerTextTests.TestType3D0AppliesDeviceColorOperators;
+begin
+  RenderType3('0 0 1 rg BT /F1 10 Tf 100 100 Td (A) Tj ET', ['50 0 d0 1 0 0 rg 0 0 40 40 re f']);
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.AreEqual(Byte(255), Fills[0].Paint.Color.R);
+  Assert.AreEqual(Byte(0), Fills[0].Paint.Color.B);
+end;
+
+procedure TPageDrawerTextTests.TestColorOperatorsWorkAgainAfterAD1Glyph;
+begin
+  RenderType3('BT /F1 10 Tf 100 100 Td (A) Tj ET 1 0 0 rg 0 0 10 10 re f', ['50 0 0 0 40 40 d1 0 0 40 40 re f']);
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(2, Length(Fills));
+  Assert.AreEqual(Byte(255), Fills[1].Paint.Color.R);
 end;
 
 procedure TPageDrawerTextTests.TestType3MissingCharProcSkipsGlyph;

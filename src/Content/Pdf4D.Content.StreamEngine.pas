@@ -98,6 +98,8 @@ type
     FIsOperandLimitLogged: Boolean;
     FFormCache: TDictionary<TCosStream, TCachedContent>;
     FMaxOperators: Int64;
+    FShouldProcessColorOperators: Boolean;
+    FIsCharProcPending: Boolean;
     FMaxGlyphs: Integer;
 
     procedure InitPage(const Page: TPDPage);
@@ -120,7 +122,7 @@ type
     procedure RequireCurrentPage;
     procedure CheckStopRequested;
     procedure ProcessStreamOperators(const Data: TBytes);
-    procedure ProcessOperators(const Parser: TPdfStreamParser);
+    procedure ProcessOperators(const Parser: TPdfStreamParser; const IsCharProc: Boolean);
     function TryReadToken(const Parser: TPdfStreamParser; out Token: TObject): Boolean;
     procedure LogOperandLimit;
     procedure RunOperator(const Operator: TContentOperator; const Operands: TObjectList<TObject>);
@@ -178,6 +180,9 @@ type
     // InitialState becomes the only state of a new graphics stack; the engine owns it from the call on. Nil gives a clone
     // of the current state. Matrix is concatenated to the CTM of that state, and then ClipToRect(BBox) is called when HasBBox.
     // The stack and the resources that were current come back when the stream is done, also after an exception.
+    // ProcessChildStream for the glyph procedure of a Type 3 font: a d1 as first operator makes it an uncoloured glyph
+    procedure ProcessType3CharProc(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState);
+
     procedure ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
       const HasBBox: Boolean; const BBox: TPdfRectangle);
 
@@ -228,6 +233,9 @@ type
     // The limits of the document of the current page; the defaults without a page
     property Options: TPdfLoadOptions read GetOptions;
     property Level: Integer read FLevel;
+    // False while the stream that runs is a glyph procedure of a Type 3 font that starts with d1: the colour operators that PDFBox
+    // guards with isShouldProcessColorOperators (CS, cs and the device colour operators) are ignored then
+    property ShouldProcessColorOperators: Boolean read FShouldProcessColorOperators;
   end;
 
 implementation
@@ -246,6 +254,7 @@ uses
 constructor TPdfStreamEngine.Create;
 begin
   inherited Create;
+  FShouldProcessColorOperators := True;
   FProcessors := TObjectDictionary<string, TOperatorProcessorBase>.Create([doOwnsValues]);
   FStack := TObjectList<TPDGraphicsState>.Create(True);
   FActiveStreams := TList<TCosStream>.Create;
@@ -319,6 +328,8 @@ begin
   FGlyphCount := 0;
   FContentBytes := 0;
   FIsOperandLimitLogged := False;
+  FShouldProcessColorOperators := True;
+  FIsCharProcPending := False;
   FFormCache.Clear;
   CacheLimits;
 end;
@@ -610,6 +621,16 @@ begin
   RunStream(Content, Resources, False, InitialState, Matrix, HasBBox, BBox);
 end;
 
+procedure TPdfStreamEngine.ProcessType3CharProc(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState);
+begin
+  FIsCharProcPending := True;
+  try
+    ProcessChildStream(Content, Resources, InitialState, TPdfMatrix.Identity, False, Default(TPdfRectangle));
+  finally
+    FIsCharProcPending := False;
+  end;
+end;
+
 // The engine owns InitialState from here on; BeginFrame hands it to the new graphics stack, so until then every way out
 // frees it
 procedure TPdfStreamEngine.RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
@@ -728,8 +749,11 @@ end;
 procedure TPdfStreamEngine.ProcessStreamOperators(const Data: TBytes);
 begin
   const Parser = TPdfStreamParser.Create(Data, Options, FCurrentPage.Context.Log);
+  // Only the stream that the pending flag was set for is a glyph procedure, not the streams it runs
+  const IsCharProc = FIsCharProcPending;
+  FIsCharProcPending := False;
   try
-    ProcessOperators(Parser);
+    ProcessOperators(Parser, IsCharProc);
   finally
     // The operands that point into the pool of the parser are gone by now
     Parser.Free;
@@ -756,8 +780,14 @@ begin
   end;
 end;
 
-procedure TPdfStreamEngine.ProcessOperators(const Parser: TPdfStreamParser);
+procedure TPdfStreamEngine.ProcessOperators(const Parser: TPdfStreamParser; const IsCharProc: Boolean);
 begin
+  // Every stream starts with the colour operators on, and a glyph procedure that starts with d1 turns them off; the setting of
+  // the stream that this one was started from comes back at the end
+  const PreviousShouldProcessColorOperators = FShouldProcessColorOperators;
+  FShouldProcessColorOperators := True;
+  var IsFirstOperator := True;
+
   // The tokens are made one at a time: a large stream is never held in memory as a list of tokens
   const Operands = TObjectList<TObject>.Create(True);
   try
@@ -766,6 +796,11 @@ begin
     begin
       if Token is TContentOperator then
       begin
+        if IsFirstOperator and IsCharProc and (TContentOperator(Token).Name = TOperatorNames.Type3D1) then
+        begin
+          FShouldProcessColorOperators := False;
+        end;
+        IsFirstOperator := False;
         try
           RunOperator(TContentOperator(Token), Operands);
         finally
@@ -788,6 +823,7 @@ begin
     end;
   finally
     Operands.Free;
+    FShouldProcessColorOperators := PreviousShouldProcessColorOperators;
   end;
 end;
 

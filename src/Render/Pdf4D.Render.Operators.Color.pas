@@ -273,6 +273,12 @@ end;
 
 procedure TSetStrokingColorSpaceOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   const HasName = ((Length(Operands) > 0) and (Operands[0] is TCosName));
   if not HasName then
   begin
@@ -293,6 +299,12 @@ end;
 
 procedure TSetNonStrokingColorSpaceOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   const HasName = ((Length(Operands) > 0) and (Operands[0] is TCosName));
   if not HasName then
   begin
@@ -313,6 +325,12 @@ end;
 
 procedure TSetStrokingDeviceGrayColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.StrokingColorSpace := ResolveColorSpace(TCosNames.DeviceGray);
   inherited Process(Operator, Operands);
 end;
@@ -326,6 +344,12 @@ end;
 
 procedure TSetStrokingDeviceRGBColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.StrokingColorSpace := ResolveColorSpace(TCosNames.DeviceRGB);
   inherited Process(Operator, Operands);
 end;
@@ -339,6 +363,12 @@ end;
 
 procedure TSetStrokingDeviceCMYKColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.StrokingColorSpace := ResolveColorSpace(TCosNames.DeviceCMYK);
   inherited Process(Operator, Operands);
 end;
@@ -352,6 +382,12 @@ end;
 
 procedure TSetNonStrokingDeviceGrayColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.NonStrokingColorSpace := ResolveColorSpace(TCosNames.DeviceGray);
   inherited Process(Operator, Operands);
 end;
@@ -365,6 +401,12 @@ end;
 
 procedure TSetNonStrokingDeviceRGBColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.NonStrokingColorSpace := ResolveColorSpace(TCosNames.DeviceRGB);
   inherited Process(Operator, Operands);
 end;
@@ -378,6 +420,12 @@ end;
 
 procedure TSetNonStrokingDeviceCMYKColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
+  // The glyph procedure of an uncoloured Type 3 glyph (it starts with d1) leaves the colour as the text has it
+  if not Engine.ShouldProcessColorOperators then
+  begin
+    Exit;
+  end;
+
   GraphicsEngine.RenderState.NonStrokingColorSpace := ResolveColorSpace(TCosNames.DeviceCMYK);
   inherited Process(Operator, Operands);
 end;
