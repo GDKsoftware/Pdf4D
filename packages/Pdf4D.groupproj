@@ -6,6 +6,9 @@
         <Projects Include="Pdf4D.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Pdf4D.Render.dproj">
+            <Dependencies>Pdf4D.dproj</Dependencies>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +26,23 @@
     <Target Name="Pdf4D:Make">
         <MSBuild Projects="Pdf4D.dproj" Targets="Make"/>
     </Target>
+    <Target Name="Pdf4D.Render" DependsOnTargets="Pdf4D">
+        <MSBuild Projects="Pdf4D.Render.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Render:Clean" DependsOnTargets="Pdf4D:Clean">
+        <MSBuild Projects="Pdf4D.Render.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Render:Make" DependsOnTargets="Pdf4D:Make">
+        <MSBuild Projects="Pdf4D.Render.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Pdf4D"/>
+        <CallTarget Targets="Pdf4D;Pdf4D.Render"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Pdf4D:Clean"/>
+        <CallTarget Targets="Pdf4D:Clean;Pdf4D.Render:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Pdf4D:Make"/>
+        <CallTarget Targets="Pdf4D:Make;Pdf4D.Render:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Stop'
 $RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
 $WslDistro = 'Ubuntu'
 $ProjectFile = Join-Path $PSScriptRoot 'tests\Pdf4D.Tests.dproj'
-$PackageFiles = @('packages\Pdf4D.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
@@ -64,6 +64,32 @@ function Test-NoInitializationSections {
     if ($offenders) {
         $offenders | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
         throw 'Units under src, tests/Support and tests/Acceptance must not have initialization or finalization sections'
+    }
+}
+
+# Layer boundaries: the core (everything under src except Graphics, Codec, Render and the ICC resources) uses no unit of those
+# folders, and only units under src\Render\Skia use System.Skia. Comment lines are skipped.
+function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$ExcludedFolders) {
+    $sourceFolder = Join-Path $PSScriptRoot 'src'
+    $excluded = $ExcludedFolders | ForEach-Object { (Join-Path $sourceFolder $_) + [IO.Path]::DirectorySeparatorChar }
+    Get-ChildItem -Path $Folder -Include '*.pas', '*.inc' -Recurse |
+        Where-Object { $file = $_.FullName; -not ($excluded | Where-Object { $file.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }) } |
+        Select-String -Pattern $Pattern |
+        Where-Object { $_.Line -notmatch '^\s*//' }
+}
+
+function Test-LayerBoundaries {
+    $sourceFolder = Join-Path $PSScriptRoot 'src'
+    $layerFolders = 'Graphics', 'Codec', 'Render'
+
+    $coreViolations = Get-UsesViolations $sourceFolder '\bPdf4D\.(Render|Graphics|Codec)\.\w|\bPdf4D\.Resources\.Icc\b' $layerFolders |
+        Where-Object { $_.Path -notmatch 'Pdf4D\.Resources\.Icc' }
+    $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b' @('Render\Skia')
+
+    $violations = @($coreViolations) + @($skiaViolations)
+    if ($violations) {
+        $violations | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
+        throw 'Layer boundary violated: the core must not use src\Graphics, src\Codec, src\Render or the ICC resources, and only src\Render\Skia may use System.Skia'
     }
 }
 
@@ -118,6 +144,7 @@ function Invoke-Tests([string]$TargetPlatform) {
 }
 
 Test-NoInitializationSections
+Test-LayerBoundaries
 
 $platforms = if ($Platform -eq 'All') { @('Win32', 'Win64', 'Linux64') } else { @($Platform) }
 
