@@ -11,6 +11,7 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
+  Pdf4D.Common.Path,
   Pdf4D.Common.SharedInstance,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Encoding,
@@ -73,6 +74,9 @@ type
     function GenerateBoundingBox: TBoundingBox;
     function EncodeWithEncoding(const Encoding: TPdfEncoding; const CodePoint: Integer; out Bytes: TBytes): Boolean;
     function EncodeWithBuiltInEncoding(const CodePoint: Integer; out Bytes: TBytes): Boolean;
+    function EncodingName(const Code: Integer): string;
+    function IsPostScriptOutline: Boolean;
+    function TryGetPathFromOutlines(const Code: Integer; out Path: TPdfPath): Boolean;
 
   protected
     function ReadEncodingFromFont: TPdfEncoding; override;
@@ -93,7 +97,14 @@ type
     function GetTrueTypeFont: TTrueTypeFont;
     function GetFontBoxFont: TFontBoxFont; override;
     function HasGlyph(const GlyphName: string): Boolean; overload;
-    function HasGlyph(const Code: Integer): Boolean; overload;
+    function HasGlyph(const Code: Integer): Boolean; overload; override;
+
+    // PDTrueTypeFont.getPath(int): the glyph of CodeToGID, or the CFF outline of an OpenType font with PostScript outlines.
+    // Glyph 0 is drawn as it is. False when the font has no usable glyf table or the glyph is damaged.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    // PDTrueTypeFont.getNormalizedPath: a substitute that is not one of the standard 14 draws no glyph 0; the path is scaled to
+    // 1000 units per em
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
   end;
 
 implementation
@@ -107,6 +118,7 @@ uses
   Pdf4D.Font.Mapper,
   Pdf4D.Font.Standard14,
   Pdf4D.FontBox.Afm,
+  Pdf4D.FontBox.Cff.Font,
   Pdf4D.FontBox.OpenType,
   Pdf4D.FontBox.TrueType.Parser,
   Pdf4D.FontBox.TrueType.Post,
@@ -567,6 +579,85 @@ end;
 function TPDTrueTypeFont.HasGlyph(const Code: Integer): Boolean;
 begin
   Result := (CodeToGID(Code) <> 0);
+end;
+
+function TPDTrueTypeFont.IsPostScriptOutline: Boolean;
+begin
+  Result := ((FTtf is TOpenTypeFont) and TOpenTypeFont(FTtf).IsPostScript);
+end;
+
+function TPDTrueTypeFont.TryGetPathFromOutlines(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Path := nil;
+  if not TOpenTypeFont(FTtf).IsSupportedOTF then
+  begin
+    Exit(False);
+  end;
+
+  const CffFont = TOpenTypeFont(FTtf).CFF;
+  var GID := 0;
+  if CffFont is TCFFType1Font then
+  begin
+    GID := TCFFType1Font(CffFont).NameToGID(EncodingName(Code));
+  end;
+  Result := CffFont.TryGetPathByGid(GID, Path, DocumentLog);
+end;
+
+function TPDTrueTypeFont.EncodingName(const Code: Integer): string;
+begin
+  var Encoding: TPdfEncoding;
+  if TryGetEncoding(Encoding) then
+  begin
+    Result := Encoding.GetName(Code);
+  end
+  else
+  begin
+    Result := NotDefName;
+  end;
+end;
+
+function TPDTrueTypeFont.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  if IsPostScriptOutline then
+  begin
+    // No path from the outlines is an empty glyph
+    if not TryGetPathFromOutlines(Code, Path) then
+    begin
+      Path := TPdfPath.Create;
+    end;
+    Exit(True);
+  end;
+
+  Result := FTtf.TryGetGlyphPath(CodeToGID(Code), Path, DocumentLog);
+end;
+
+function TPDTrueTypeFont.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  var HasPath: Boolean;
+  if IsPostScriptOutline then
+  begin
+    HasPath := TryGetPathFromOutlines(Code, Path);
+  end
+  else
+  begin
+    const GID = CodeToGID(Code);
+    HasPath := FTtf.TryGetGlyphPath(GID, Path, DocumentLog);
+    // Acrobat only draws GID 0 for embedded or standard 14 fonts, see PDFBOX-2372
+    if HasPath and (GID = 0) and (not IsEmbedded) and (not IsStandard14) then
+    begin
+      Path.Free;
+      HasPath := False;
+    end;
+  end;
+
+  if not HasPath then
+  begin
+    Path := TPdfPath.Create;
+    Exit(True);
+  end;
+
+  FTtf.ScalePathToThousandUnits(Path);
+  Result := True;
 end;
 
 function TPDTrueTypeFont.GetGIDToCode: TDictionary<Integer, Integer>;

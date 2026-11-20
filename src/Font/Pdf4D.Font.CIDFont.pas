@@ -13,6 +13,7 @@ uses
   System.Generics.Collections,
   Pdf4D.Common.Log,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.PdfArray,
@@ -136,6 +137,11 @@ type
     function IsDamaged: Boolean; virtual; abstract;
     // PDFont.encode for one code point, which a CID font can do for some cases. False when it cannot (PDFBox throws).
     function TryEncode(const CodePoint: Integer; out Bytes: TBytes): Boolean; virtual; abstract;
+
+    // PDVectorFont of the composite font that owns the CID font; see TPDFont. The caller owns the path.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual; abstract;
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual; abstract;
+    function HasGlyph(const Code: Integer): Boolean; virtual; abstract;
 
     // The /W width of the CID of the code, else /DW (default 1000), in thousandths of text space. Acrobat prefers it to the
     // widths in the font program (PDFBOX-563).

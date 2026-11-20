@@ -12,6 +12,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.CIDFont,
@@ -97,6 +98,11 @@ type
     function GetPositionVector(const Code: Integer): TPdfVector; override;
     function GetFontMatrix: TPdfMatrix; override;
     function GetBoundingBox: TBoundingBox; override;
+
+    // PDType0Font.getPath, getNormalizedPath and hasGlyph: the descendant font answers
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function HasGlyph(const Code: Integer): Boolean; override;
 
     // The CID of the code, 0 when the CMap has no mapping
     function CodeToCID(const Code: Integer): Integer;
@@ -559,6 +565,21 @@ end;
 function TPDType0Font.CodeToGID(const Code: Integer): Integer;
 begin
   Result := FDescendantFont.CodeToGID(Code);
+end;
+
+function TPDType0Font.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := FDescendantFont.TryGetPath(Code, Path);
+end;
+
+function TPDType0Font.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := FDescendantFont.TryGetNormalizedPath(Code, Path);
+end;
+
+function TPDType0Font.HasGlyph(const Code: Integer): Boolean;
+begin
+  Result := FDescendantFont.HasGlyph(Code);
 end;
 
 end.

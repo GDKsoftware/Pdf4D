@@ -11,6 +11,7 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Encoding,
   Pdf4D.Font.Simple,
@@ -41,6 +42,9 @@ type
     function ReadFontMatrix: TPdfMatrix;
     function GenerateBoundingBox: TBoundingBox;
     function ReadGlyphWidth(const GlyphName: string): Single;
+    function EncodingName(const Code: Integer): string;
+    function TryGetGenericPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+    function TryGetPathOfName(const GlyphName: string; out Path: TPdfPath): Boolean;
 
   protected
     function ReadEncodingFromFont: TPdfEncoding; override;
@@ -62,7 +66,13 @@ type
     function GetFontBoxFont: TFontBoxFont; override;
     // The embedded font program, or nil
     function GetCFFType1Font: TCFFType1Font;
-    function HasGlyph(const GlyphName: string): Boolean;
+
+    // PDType1CFont.getPath(int): the glyph name of the encoding as GetNameInFont gives it, with sfthyphen drawn as hyphen and
+    // nbspace as space. A substitute that is not one of the standard 14 draws no .notdef.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function HasGlyph(const Code: Integer): Boolean; overload; override;
+    function HasGlyph(const GlyphName: string): Boolean; overload;
   end;
 
 implementation
@@ -80,6 +90,11 @@ uses
 
 const
   AverageCharacterWidth = 500;
+  NotDefName = '.notdef';
+  SoftHyphenName = 'sfthyphen';
+  HyphenName = 'hyphen';
+  NoBreakSpaceName = 'nbspace';
+  SpaceName = 'space';
 
 { TPDType1CFont }
 
@@ -238,7 +253,7 @@ begin
       Exit(UniName);
     end;
   end;
-  Result := '.notdef';
+  Result := NotDefName;
 end;
 
 function TPDType1CFont.ReadGlyphWidth(const GlyphName: string): Single;
@@ -255,7 +270,7 @@ end;
 function TPDType1CFont.GetWidthFromFont(const Code: Integer): Single;
 begin
   var Encoding: TPdfEncoding;
-  var GlyphName := '.notdef';
+  var GlyphName := NotDefName;
   if TryGetEncoding(Encoding) then
   begin
     GlyphName := Encoding.GetName(Code);
@@ -338,6 +353,97 @@ begin
   Result := FGenericFont.HasGlyph(GlyphName);
 end;
 
+function TPDType1CFont.HasGlyph(const Code: Integer): Boolean;
+begin
+  const GlyphName = GetNameInFont(EncodingName(Code));
+  if GlyphName = SoftHyphenName then
+  begin
+    Exit(HasGlyph(HyphenName));
+  end;
+  if GlyphName = NoBreakSpaceName then
+  begin
+    Exit(HasGlyph(SpaceName));
+  end;
+  Result := HasGlyph(GlyphName);
+end;
+
+function TPDType1CFont.EncodingName(const Code: Integer): string;
+begin
+  var Encoding: TPdfEncoding;
+  if TryGetEncoding(Encoding) then
+  begin
+    Result := Encoding.GetName(Code);
+  end
+  else
+  begin
+    Result := NotDefName;
+  end;
+end;
+
+function TPDType1CFont.TryGetGenericPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  if Assigned(FCffFont) then
+  begin
+    // The embedded font is not shared, so the damaged charstrings are reported to the log of the document
+    Exit(FCffFont.TryGetPathByGid(FCffFont.NameToGID(GlyphName), Path, DocumentLog));
+  end;
+
+  Result := FGenericFont.TryGetPath(GlyphName, Path);
+end;
+
+function TPDType1CFont.TryGetPathOfName(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  // Acrobat only draws .notdef for embedded or standard 14 fonts, see PDFBOX-2372
+  if (GlyphName = NotDefName) and (not IsEmbedded) and (not IsStandard14) then
+  begin
+    Path := TPdfPath.Create;
+    Exit(True);
+  end;
+  if GlyphName = SoftHyphenName then
+  begin
+    Exit(TryGetGenericPath(HyphenName, Path));
+  end;
+  if GlyphName = NoBreakSpaceName then
+  begin
+    if not HasGlyph(SpaceName) then
+    begin
+      Path := TPdfPath.Create;
+      Exit(True);
+    end;
+    Exit(TryGetGenericPath(SpaceName, Path));
+  end;
+  Result := TryGetGenericPath(GlyphName, Path);
+end;
+
+function TPDType1CFont.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetPathOfName(GetNameInFont(EncodingName(Code)), Path);
+end;
+
+function TPDType1CFont.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  var GlyphName := GetNameInFont(EncodingName(Code));
+  if GlyphName = NoBreakSpaceName then
+  begin
+    if not HasGlyph(SpaceName) then
+    begin
+      Path := TPdfPath.Create;
+      Exit(True);
+    end;
+    GlyphName := SpaceName;
+  end
+  else if GlyphName = SoftHyphenName then
+  begin
+    GlyphName := HyphenName;
+  end;
+
+  if TryGetPathOfName(GlyphName, Path) then
+  begin
+    Exit(True);
+  end;
+  Result := TryGetPathOfName(NotDefName, Path);
+end;
+
 function TPDType1CFont.TryEncode(const CodePoint: Integer; out Bytes: TBytes): Boolean;
 begin
   Bytes := nil;
@@ -355,7 +461,7 @@ begin
 
   const NameInFont = GetNameInFont(GlyphName);
   var Code: Integer;
-  const HasGlyphInFont = ((NameInFont <> '.notdef') and FGenericFont.HasGlyph(NameInFont));
+  const HasGlyphInFont = ((NameInFont <> NotDefName) and FGenericFont.HasGlyph(NameInFont));
   if (not HasGlyphInFont) or (not Encoding.NameToCodeMap.TryGetValue(GlyphName, Code)) or (Code < 0) or (Code > High(Byte)) then
   begin
     Exit(False);

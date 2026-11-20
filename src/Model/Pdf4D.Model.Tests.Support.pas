@@ -33,6 +33,8 @@ type
 
     // Loads the file that the builder makes. HeaderMinor is the digit after "1." in the header.
     function Open(const Builder: TTestPdfBuilder; const HeaderMinor: Char = '7'): TPDDocument;
+    // Loads the bytes of a PDF file
+    function OpenBytes(const Data: TBytes): TPDDocument;
 
     function HasLogLine(const Fragment: string): Boolean;
 
@@ -100,7 +102,11 @@ begin
   var Data := Builder.Build(TXrefStyle.Table);
   // "%PDF-1.7" is the first line
   Data[7] := Ord(HeaderMinor);
+  Result := OpenBytes(Data);
+end;
 
+function TModelTestDocuments.OpenBytes(const Data: TBytes): TPDDocument;
+begin
   var Options := TPdfLoadOptions.Default;
   if FMaxDecodedStreamSize > 0 then
   begin

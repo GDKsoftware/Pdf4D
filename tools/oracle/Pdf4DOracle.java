@@ -69,7 +69,10 @@ import org.apache.pdfbox.pdmodel.font.FontInfo;
 import org.apache.pdfbox.pdmodel.font.FontMapper;
 import org.apache.pdfbox.pdmodel.font.FontMappers;
 import org.apache.pdfbox.pdmodel.font.FontProvider;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDVectorFont;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -99,6 +102,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --pdf-glyph-paths file.pdf FontName first-last
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -132,6 +136,10 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("--glyph-paths"))
             {
                 out.print(glyphPaths(new File(args[1])));
+            }
+            else if (args.length >= 4 && args[0].equals("--pdf-glyph-paths"))
+            {
+                out.print(pdfGlyphPaths(new File(args[1]), args[2], args[3]));
             }
             else if (args.length >= 2 && args[0].equals("text"))
             {
@@ -1180,8 +1188,56 @@ public class Pdf4DOracle
         return sb.toString();
     }
 
+    // The normalized path of every code of a range for the font /FontName of the first page: one line
+    // "<code> <1 when hasGlyph, else 0> <commands>" per code, "!" instead of the commands when PDFBox fails on the code
+    static String pdfGlyphPaths(File file, String fontName, String range) throws Exception
+    {
+        String[] bounds = range.split("-");
+        int first = Integer.parseInt(bounds[0]);
+        int last = Integer.parseInt(bounds[1]);
+        StringBuilder sb = new StringBuilder();
+        try (PDDocument document = Loader.loadPDF(file))
+        {
+            PDResources resources = document.getPage(0).getResources();
+            PDFont font = resources.getFont(COSName.getPDFName(fontName));
+            if (!(font instanceof PDVectorFont))
+            {
+                throw new IOException("Font " + fontName + " is not a vector font");
+            }
+            PDVectorFont vectorFont = (PDVectorFont) font;
+            for (int code = first; code <= last; code++)
+            {
+                String commands;
+                try
+                {
+                    commands = pathText(vectorFont.getNormalizedPath(code));
+                }
+                catch (Exception e)
+                {
+                    commands = " !";
+                }
+                boolean has;
+                try
+                {
+                    has = vectorFont.hasGlyph(code);
+                }
+                catch (Exception e)
+                {
+                    has = false;
+                }
+                sb.append(code).append(' ').append(has ? '1' : '0').append(commands).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
     // A glyph whose charstring PDFBox cannot turn into a path is left out of the file
     static void putPath(TreeMap<String, String> paths, String key, GeneralPath path)
+    {
+        paths.put(key, pathText(path));
+    }
+
+    static String pathText(GeneralPath path)
     {
         StringBuilder sb = new StringBuilder();
         float[] c = new float[6];
@@ -1209,7 +1265,7 @@ public class Pdf4DOracle
                 break;
             }
         }
-        paths.put(key, sb.toString());
+        return sb.toString();
     }
 
     static void ttfWidths(TrueTypeFont font, TreeMap<String, String> widths) throws IOException

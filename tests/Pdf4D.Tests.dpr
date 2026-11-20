@@ -149,6 +149,7 @@ uses
   Pdf4D.Font.Factory in '..\src\Font\Pdf4D.Font.Factory.pas',
   Pdf4D.Tests.TextDocuments in 'Support\Pdf4D.Tests.TextDocuments.pas',
   Pdf4D.Font.Type1.Tests in '..\src\Font\Pdf4D.Font.Type1.Tests.pas',
+  Pdf4D.Font.GlyphPath.Tests in '..\src\Font\Pdf4D.Font.GlyphPath.Tests.pas',
   Pdf4D.Font.Type1C.Tests in '..\src\Font\Pdf4D.Font.Type1C.Tests.pas',
   Pdf4D.Font.TrueType.Tests in '..\src\Font\Pdf4D.Font.TrueType.Tests.pas',
   Pdf4D.Font.CIDFontType2.Tests in '..\src\Font\Pdf4D.Font.CIDFontType2.Tests.pas',

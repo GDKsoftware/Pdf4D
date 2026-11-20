@@ -12,6 +12,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.CIDFont,
   Pdf4D.FontBox.BoundingBox,
@@ -55,6 +56,7 @@ type
     function TryGetGIDOfUnicode(const Code: Integer; out GID: Integer): Boolean;
     procedure WarnAboutMissingMapping(const Code: Integer);
     function EncodeEmbeddedToCID(const CodePoint: Integer): Integer;
+    function TryGetPathFromOutlines(const Code: Integer; out Path: TPdfPath): Boolean;
     class function FirstCodePoint(const Text: string): Integer; static;
 
   public
@@ -74,6 +76,13 @@ type
     // otherwise
     function TryEncode(const CodePoint: Integer; out Bytes: TBytes): Boolean; override;
 
+    // PDCIDFontType2.getPath: the glyph of CodeToGID, or the CFF outline of an OpenType font with PostScript outlines. False
+    // when the font has no usable glyf table or the glyph is damaged.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    // PDCIDFontType2.getNormalizedPath: a substitute draws no glyph 0, and the path is scaled to 1000 units per em
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function HasGlyph(const Code: Integer): Boolean; override;
+
     // The embedded or substituted font; a substitute is shared
     function GetTrueTypeFont: TTrueTypeFont;
   end;
@@ -86,6 +95,7 @@ uses
   Pdf4D.Cos.Names,
   Pdf4D.Font.Descriptor,
   Pdf4D.Font.Mapper,
+  Pdf4D.FontBox.Cff.Font,
   Pdf4D.FontBox.CMap,
   Pdf4D.FontBox.TrueType.Parser,
   Pdf4D.Model.Rectangle;
@@ -491,6 +501,68 @@ end;
 function TPDCIDFontType2.GetTrueTypeFont: TTrueTypeFont;
 begin
   Result := FTtf;
+end;
+
+function TPDCIDFontType2.TryGetPathFromOutlines(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  const CffFont = FOtf.CFF;
+  const GID = CodeToGID(Code);
+  // PDFBox hands the glyph to a CID-keyed font as a CID
+  if CffFont is TCFFCIDFont then
+  begin
+    Exit(TCFFCIDFont(CffFont).TryGetPathByCid(GID, Path, DocumentLog));
+  end;
+  Result := CffFont.TryGetPathByGid(GID, Path, DocumentLog);
+end;
+
+function TPDCIDFontType2.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  if Assigned(FOtf) and FOtf.IsPostScript then
+  begin
+    // No path from the outlines is an empty glyph
+    if not TryGetPathFromOutlines(Code, Path) then
+    begin
+      Path := TPdfPath.Create;
+    end;
+    Exit(True);
+  end;
+
+  Result := FTtf.TryGetGlyphPath(CodeToGID(Code), Path, DocumentLog);
+end;
+
+function TPDCIDFontType2.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  var HasPath: Boolean;
+  if Assigned(FOtf) and FOtf.IsPostScript then
+  begin
+    HasPath := TryGetPathFromOutlines(Code, Path);
+  end
+  else
+  begin
+    const GID = CodeToGID(Code);
+    HasPath := FTtf.TryGetGlyphPath(GID, Path, DocumentLog);
+    // Acrobat only draws GID 0 for embedded CIDFonts, see PDFBOX-2372
+    if HasPath and (GID = 0) and (not IsEmbedded) then
+    begin
+      Path.Free;
+      HasPath := False;
+    end;
+  end;
+
+  if not HasPath then
+  begin
+    // An empty glyph, for instance a space
+    Path := TPdfPath.Create;
+    Exit(True);
+  end;
+
+  FTtf.ScalePathToThousandUnits(Path);
+  Result := True;
+end;
+
+function TPDCIDFontType2.HasGlyph(const Code: Integer): Boolean;
+begin
+  Result := (CodeToGID(Code) <> 0);
 end;
 
 end.

@@ -220,6 +220,7 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.Factory.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextDocuments.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.Tests.pas"/>
+        <DCCReference Include="..\src\Font\Pdf4D.Font.GlyphPath.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.TrueType.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.CIDFontType2.Tests.pas"/>

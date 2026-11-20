@@ -108,6 +108,9 @@ type
     // False when the font has no usable glyf table or the glyph is damaged; the reason goes to the log. OpenType fonts with CFF
     // outlines override this.
     function TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean; virtual;
+    // Scales a path in font units to 1000 units per em, as PDFBox does for a normalized path. A font without units per em is not
+    // scaled.
+    procedure ScalePathToThousandUnits(const Path: TPdfPath);
     // The glyph for a PostScript name (see NameToGID), like getPath of PDFBox: a name the font does not have gives glyph 0
     function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
 
@@ -121,7 +124,8 @@ implementation
 
 uses
   System.Generics.Defaults,
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.Common.Matrix;
 
 type
   TCmapPreference = record
@@ -687,6 +691,17 @@ begin
   end;
 
   Result := (Table as TGlyphTable).TryGetPath(GID, Path, Log);
+end;
+
+procedure TTrueTypeFont.ScalePathToThousandUnits(const Path: TPdfPath);
+begin
+  const FontUnits = UnitsPerEm;
+  const NeedsScale = ((FontUnits <> 1000) and (FontUnits <> 0));
+  if NeedsScale then
+  begin
+    const Scale = Single(1000) / FontUnits;
+    Path.Transform(TPdfMatrix.Create(Scale, 0, 0, Scale, 0, 0));
+  end;
 end;
 
 function TTrueTypeFont.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
