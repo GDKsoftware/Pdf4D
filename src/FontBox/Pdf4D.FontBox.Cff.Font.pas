@@ -13,6 +13,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.BoundingBox,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.Cff.Charset,
@@ -64,6 +65,10 @@ type
     FCharStrings: TArray<TBytes>;
     FGlobalSubrs: TArray<TBytes>;
 
+  protected
+    // The local subroutines that the glyph uses
+    function LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>; virtual; abstract;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -89,6 +94,12 @@ type
     // The charstring of the glyph, or the .notdef charstring for a GID beyond the CharStrings (as PDFBox). False when the font
     // has no charstrings.
     function TryGetCharString(const GID: Integer; out CharString: TBytes): Boolean;
+    // The outline of the glyph in glyph space, from its charstring (a GID beyond the CharStrings gets .notdef, as for the
+    // width). False when the font has no charstrings. A damaged charstring gives the outline up to the damage; the warnings go
+    // to the log, which may be nil. The caller owns the path.
+    function TryGetPathByGid(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean;
+    // The same for the glyph that the charset gives to the CID
+    function TryGetPathByCid(const CID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean;
 
     property Charset: TCFFCharset read FCharset;
     property CharStrings: TArray<TBytes> read FCharStrings;
@@ -109,6 +120,9 @@ type
 
     function GetPropertyNumber(const Key: string; const Default: Integer): Integer;
 
+  protected
+    function LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>; override;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -123,6 +137,8 @@ type
     // charstring go to the log of the call, which may be nil.
     function GetWidthForGID(const GID: Integer; const Log: TPdfLog = nil): Single;
     function HasGlyph(const GlyphName: string): Boolean; override;
+    // The outline of the glyph; the .notdef outline for a name that the charset does not have
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
 
     // 0 (.notdef) when the charset has no glyph with this name
     function NameToGID(const Name: string): Integer;
@@ -203,6 +219,9 @@ type
     function TryGetPrivateDict(const GID: Integer; out PrivateDict: TCFFDictionary): Boolean;
     function PrivateWidth(const GID: Integer; const Key: string; const Default: Integer): Integer;
 
+  protected
+    function LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>; override;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -228,6 +247,8 @@ type
     // of the private DICT of that glyph. The log gets the warnings about a damaged charstring and may be nil.
     function GetWidthForCID(const CID: Integer; const Log: TPdfLog = nil): Single;
     function HasGlyph(const Selector: string): Boolean; override;
+    // The selector is a CID in the form \ddddd. A selector that has another form raises EPdfParseException.
+    function TryGetPath(const Selector: string; out Path: TPdfPath): Boolean; override;
 
     property Registry: string read FRegistry;
     property Ordering: string read FOrdering;
@@ -250,6 +271,7 @@ implementation
 uses
   System.Math,
   Pdf4D.Common.Defines,
+  Pdf4D.FontBox.CharStringPath,
   Pdf4D.FontBox.CharStringWidth;
 
 const
@@ -452,6 +474,24 @@ begin
   end;
 end;
 
+function TCFFFont.TryGetPathByGid(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Path := nil;
+  var CharString: TBytes;
+  if not TryGetCharString(GID, CharString) then
+  begin
+    Exit(False);
+  end;
+
+  Path := TCharStringPath.Type2Path(CharString, GlobalSubrs, LocalSubrsOfGlyph(GID), Log);
+  Result := True;
+end;
+
+function TCFFFont.TryGetPathByCid(const CID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Result := TryGetPathByGid(Charset.GetGIDForCID(CID), Path, Log);
+end;
+
 function TCFFFont.GetTopDictNumber(const Key: string; const Default: Double): Double;
 begin
   var Values: TArray<Double>;
@@ -524,6 +564,16 @@ begin
   begin
     Result := DefaultWidthX;
   end;
+end;
+
+function TCFFType1Font.LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>;
+begin
+  Result := FLocalSubrs;
+end;
+
+function TCFFType1Font.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetPathByGid(NameToGID(GlyphName), Path);
 end;
 
 function TCFFType1Font.HasGlyph(const GlyphName: string): Boolean;
@@ -820,6 +870,22 @@ begin
   begin
     Result := nil;
   end;
+end;
+
+function TCFFCIDFont.LocalSubrsOfGlyph(const GID: Integer): TArray<TBytes>;
+begin
+  Result := GetLocalSubrs(GID);
+end;
+
+function TCFFCIDFont.TryGetPath(const Selector: string; out Path: TPdfPath): Boolean;
+begin
+  Path := nil;
+  var CID: Integer;
+  if not TryParseSelector(Selector, CID) then
+  begin
+    raise EPdfParseException.CreateFmt(InvalidSelectorMessage, [Selector]);
+  end;
+  Result := TryGetPathByCid(CID, Path);
 end;
 
 function TCFFCIDFont.GetWidth(const Selector: string): Single;

@@ -186,6 +186,8 @@
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.StandardStrings.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Cff.Type1FontUtil.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringWidth.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringReaders.pas"/>
+        <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CharStringPath.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CMap.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.CMapParser.pas"/>
         <DCCReference Include="..\src\FontBox\Pdf4D.FontBox.Encoding.pas"/>

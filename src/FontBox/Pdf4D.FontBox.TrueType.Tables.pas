@@ -19,6 +19,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.TrueType.DataStream;
 
@@ -187,6 +188,9 @@ type
     function TryGetTable(const Tag: string; out Table: TTTFTable): Boolean; virtual; abstract;
 
     procedure LogWarning(const Message: string);
+
+    // TrueType outlines are not made yet: no path
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
 
     // Not owned. Only set while the font is parsed, because the log may be gone when a table is read later.
     property Log: TPdfLog read FLog write FLog;
@@ -533,6 +537,12 @@ begin
 end;
 
 { TTTFTableHost }
+
+function TTTFTableHost.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  Path := nil;
+  Result := False;
+end;
 
 procedure TTTFTableHost.LogWarning(const Message: string);
 begin

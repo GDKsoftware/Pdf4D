@@ -4,6 +4,7 @@ tests/corpus/**/*.pdf binary
 tests/golden/*.text.txt text eol=lf
 tests/golden/*.text-known-differences.txt text eol=lf
 tests/fonts/*.widths.txt text eol=lf
+tests/fonts/*.paths.txt text eol=lf
 tests/fonts/manifest.csv text eol=lf
 tests/fonts/*.ttf binary
 tests/fonts/*.otf binary

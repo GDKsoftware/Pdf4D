@@ -16,12 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.lang.reflect.Method;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.fontbox.cff.CFFCIDFont;
 import org.apache.fontbox.cff.CFFFont;
+import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.ttf.OTFParser;
 import org.apache.fontbox.ttf.OpenTypeFont;
 import org.apache.fontbox.ttf.TTFParser;
@@ -93,6 +97,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb)
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -122,6 +127,10 @@ public class Pdf4DOracle
             if (args.length >= 2 && args[0].equals("--font-widths"))
             {
                 out.print(fontWidths(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("--glyph-paths"))
+            {
+                out.print(glyphPaths(new File(args[1])));
             }
             else if (args.length >= 2 && args[0].equals("text"))
             {
@@ -1076,6 +1085,111 @@ public class Pdf4DOracle
             sb.append(e.getKey()).append(' ').append(e.getValue()).append('\n');
         }
         return sb.toString();
+    }
+
+    // ---------------------------------------------------------- glyph paths
+
+    private static final int PATH_GLYPH_LIMIT = 300;
+
+    static String glyphPaths(File file) throws Exception
+    {
+        String name = file.getName().toLowerCase();
+        TreeMap<String, String> paths = new TreeMap<>();
+        if (name.endsWith(".pfb"))
+        {
+            Type1Font font = Type1Font.createWithPFB(java.nio.file.Files.readAllBytes(file.toPath()));
+            TreeMap<String, Boolean> glyphs = new TreeMap<>();
+            for (String glyph : font.getCharStringsDict().keySet())
+            {
+                glyphs.put(glyph, Boolean.TRUE);
+            }
+            int count = 0;
+            for (String glyph : glyphs.keySet())
+            {
+                if (count++ >= PATH_GLYPH_LIMIT)
+                {
+                    break;
+                }
+                try
+                {
+                    putPath(paths, glyph, font.getPath(glyph));
+                }
+                catch (Exception e)
+                {
+                    // left out
+                }
+            }
+        }
+        else if (name.endsWith(".otf"))
+        {
+            try (OpenTypeFont font = new OTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                CFFFont cff = font.getCFF().getFont();
+                int n = Math.min(cff.getNumCharStrings(), PATH_GLYPH_LIMIT);
+                for (int gid = 0; gid < n; gid++)
+                {
+                    try
+                    {
+                        if (cff instanceof CFFCIDFont)
+                        {
+                            CFFCIDFont cid = (CFFCIDFont) cff;
+                            int cidValue = cid.getCharset().getCIDForGID(gid);
+                            putPath(paths, "cid" + cidValue, cid.getType2CharString(cidValue).getPath());
+                        }
+                        else
+                        {
+                            putPath(paths, "gid" + gid, ((CFFType1Font) cff).getType2CharString(gid).getPath());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // left out
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw new IOException("Glyph paths are written for Type 1 and CFF fonts only");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> e : paths.entrySet())
+        {
+            sb.append(e.getKey()).append(e.getValue()).append('\n');
+        }
+        return sb.toString();
+    }
+
+    // A glyph whose charstring PDFBox cannot turn into a path is left out of the file
+    static void putPath(TreeMap<String, String> paths, String key, GeneralPath path)
+    {
+        StringBuilder sb = new StringBuilder();
+        float[] c = new float[6];
+        for (PathIterator it = path.getPathIterator(null); !it.isDone(); it.next())
+        {
+            switch (it.currentSegment(c))
+            {
+            case PathIterator.SEG_MOVETO:
+                sb.append(" M ").append(num(c[0])).append(' ').append(num(c[1]));
+                break;
+            case PathIterator.SEG_LINETO:
+                sb.append(" L ").append(num(c[0])).append(' ').append(num(c[1]));
+                break;
+            case PathIterator.SEG_QUADTO:
+                sb.append(" Q ").append(num(c[0])).append(' ').append(num(c[1])).append(' ')
+                        .append(num(c[2])).append(' ').append(num(c[3]));
+                break;
+            case PathIterator.SEG_CUBICTO:
+                sb.append(" C ").append(num(c[0])).append(' ').append(num(c[1])).append(' ')
+                        .append(num(c[2])).append(' ').append(num(c[3])).append(' ')
+                        .append(num(c[4])).append(' ').append(num(c[5]));
+                break;
+            default:
+                sb.append(" Z");
+                break;
+            }
+        }
+        paths.put(key, sb.toString());
     }
 
     static void ttfWidths(TrueTypeFont font, TreeMap<String, String> widths) throws IOException

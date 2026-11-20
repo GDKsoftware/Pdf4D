@@ -9,10 +9,11 @@ unit Pdf4D.FontBox.FontBoxFont;
 interface
 
 uses
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.BoundingBox;
 
 type
-  // Glyph paths are left out: Pdf4D does not render
+  // The glyph outlines are in glyph space: the caller scales them with the FontMatrix
   TFontBoxFont = class abstract
   public
     // Empty when the font has no name
@@ -21,6 +22,9 @@ type
     function FontMatrix: TArray<Single>; virtual; abstract;
     function GetWidth(const GlyphName: string): Single; virtual; abstract;
     function HasGlyph(const GlyphName: string): Boolean; virtual; abstract;
+    // The outline of the glyph; the caller owns the path. A font does not cache paths: the glyph cache of the renderer does.
+    // False when the font has no outline for the glyph, or cannot make outlines (a TrueType font does not yet).
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; virtual; abstract;
   end;
 
 implementation

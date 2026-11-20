@@ -137,6 +137,8 @@ contains
   Pdf4D.FontBox.Cff.StandardStrings in '..\src\FontBox\Pdf4D.FontBox.Cff.StandardStrings.pas',
   Pdf4D.FontBox.Cff.Type1FontUtil in '..\src\FontBox\Pdf4D.FontBox.Cff.Type1FontUtil.pas',
   Pdf4D.FontBox.CharStringWidth in '..\src\FontBox\Pdf4D.FontBox.CharStringWidth.pas',
+  Pdf4D.FontBox.CharStringReaders in '..\src\FontBox\Pdf4D.FontBox.CharStringReaders.pas',
+  Pdf4D.FontBox.CharStringPath in '..\src\FontBox\Pdf4D.FontBox.CharStringPath.pas',
   Pdf4D.FontBox.CMap in '..\src\FontBox\Pdf4D.FontBox.CMap.pas',
   Pdf4D.FontBox.CMapParser in '..\src\FontBox\Pdf4D.FontBox.CMapParser.pas',
   Pdf4D.FontBox.Encoding in '..\src\FontBox\Pdf4D.FontBox.Encoding.pas',

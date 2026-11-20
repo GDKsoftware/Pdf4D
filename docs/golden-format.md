@@ -181,3 +181,11 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 - Type 1 (`.pfb`): key is the glyph name, width is `Type1Font.getWidth(name)`.
 - CFF (also inside `.otf`): key `gid<n>` for n = 0 .. number of charstrings - 1, width is `CFFFont.getType2CharString(n).getWidth()`.
 - TrueType (`.ttf`, and `.otf` without CFF): key `gid<n>`, width is the advance width from `hmtx` (`TrueTypeFont.getAdvanceWidth(n)`).
+
+## Glyph path files
+
+`tests/fonts/<font file>.paths.txt` is written by `Pdf4DOracle --glyph-paths <font>` (`tools/oracle/generate-font-widths.ps1 -Paths`) for the Type 1 and CFF test fonts (`.pfb` and `.otf`). One line `<key> <commands>` per glyph, the first 300 glyphs of the font, sorted by key in ordinal order. The commands come from the path iterator of the `getPath()` of FontBox, in glyph space and separated by single spaces: `M x y`, `L x y`, `Q x1 y1 x y`, `C x1 y1 x2 y2 x y` and `Z`, with the numbers in float format. A glyph with an empty path has the key only. A glyph whose charstring PDFBox cannot turn into a path is left out.
+
+- Type 1 (`.pfb`): key is the glyph name, the first 300 names in ordinal order, path is `Type1Font.getPath(name)`.
+- CFF (inside `.otf`): key `gid<n>` for n = 0 .. 299 for a name-keyed font (`CFFType1Font.getType2CharString(n).getPath()`), and `cid<n>` for a CID-keyed font, where n is the CID of the first 300 GIDs (`CFFCIDFont.getType2CharString(n).getPath()`).
+
