@@ -69,8 +69,10 @@ type
 
   TPdfShadingRasterizer = class
   private
-    class function CreateContext(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect): TPdfShadingContext; static;
-    class function CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect): TPdfShadingContext; static;
+    class function CreateContext(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                 const Cancel: IPdfCancelToken): TPdfShadingContext; static;
+    class function CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                     const Cancel: IPdfCancelToken): TPdfShadingContext; static;
     class procedure PaintRows(const Context: TPdfShadingContext; const DeviceArea: TRect; const Cancel: IPdfCancelToken; const Bitmap: TPdfBitmap); static;
 
   public
@@ -173,7 +175,7 @@ class function TPdfShadingRasterizer.Rasterize(const Shading: TPDShading; const 
 begin
   Result := TPdfBitmap.Create(DeviceArea.Width, DeviceArea.Height);
   try
-    const Context = CreateContext(Shading, ShadingToDevice, DeviceArea);
+    const Context = CreateContext(Shading, ShadingToDevice, DeviceArea, Cancel);
     if Assigned(Context) then
     begin
       try
@@ -188,8 +190,8 @@ begin
   end;
 end;
 
-class function TPdfShadingRasterizer.CreateContext(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix;
-                                                   const DeviceArea: TRect): TPdfShadingContext;
+class function TPdfShadingRasterizer.CreateContext(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                                   const Cancel: IPdfCancelToken): TPdfShadingContext;
 begin
   Result := nil;
   if Shading is TPDShadingType1 then
@@ -206,18 +208,18 @@ begin
   end
   else if Shading is TPDShadingMesh then
   begin
-    Result := CreateMeshContext(TPDShadingMesh(Shading), ShadingToDevice, DeviceArea);
+    Result := CreateMeshContext(TPDShadingMesh(Shading), ShadingToDevice, DeviceArea, Cancel);
   end;
 end;
 
-class function TPdfShadingRasterizer.CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix;
-                                                       const DeviceArea: TRect): TPdfShadingContext;
+class function TPdfShadingRasterizer.CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                                       const Cancel: IPdfCancelToken): TPdfShadingContext;
 begin
   case Shading.ShadingType of
-    4 : Result := TPdfType4ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
-    5 : Result := TPdfType5ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
-    6 : Result := TPdfType6ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
-    7 : Result := TPdfType7ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
+    4 : Result := TPdfType4ShadingContext.Create(Shading, ShadingToDevice, DeviceArea, Cancel);
+    5 : Result := TPdfType5ShadingContext.Create(Shading, ShadingToDevice, DeviceArea, Cancel);
+    6 : Result := TPdfType6ShadingContext.Create(Shading, ShadingToDevice, DeviceArea, Cancel);
+    7 : Result := TPdfType7ShadingContext.Create(Shading, ShadingToDevice, DeviceArea, Cancel);
   else
     raise EArgumentOutOfRangeException.CreateFmt('A mesh shading is of the type 4 to 7, not %d', [Shading.ShadingType]);
   end;

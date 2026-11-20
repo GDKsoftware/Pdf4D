@@ -17,6 +17,7 @@ uses
   Pdf4D.Graphics.Shading,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Shading.Context,
+  Pdf4D.Render.Shading.Patch,
   Pdf4D.Tests.ShadingBuilder;
 
 type
@@ -46,6 +47,10 @@ type
     procedure AssertPainted(const X, Y: Integer);
     procedure AssertTransparent(const X, Y: Integer);
     class function SquarePatch: TMeshData; static;
+    // The data of two patches that are not padded to whole bytes: flags of 2 bits and colours of 4 bits
+    class function UnpaddedPatches: TBytes; static;
+    class function SquareTensorPoints(const InnerX, InnerY: Double): TArray<TPdfPatchPoint>; static;
+    class function PatchColors: TPdfPatchColors; static;
     class function WidePatch(const WithInnerPoints: Boolean): TBytes; static;
     class function HugePatchStrip(const PatchCount: Integer): TBytes; static;
 
@@ -76,11 +81,21 @@ type
 
     [Test]
     procedure TestPatchWithoutDataPaintsNothingAndWarns;
+
+    [Test]
+    procedure TestPatchDataIsNotPaddedToWholeBytes;
+
+    [Test]
+    procedure TestTensorPatchWithStraightSidesAndInnerPointsInsideHasFewCells;
+
+    [Test]
+    procedure TestTensorPatchWithAnInnerPointOutsideKeepsTheHighestLevel;
   end;
 
 implementation
 
 uses
+  System.Classes,
   Pdf4D.Render.Shading.Triangle;
 
 const
@@ -203,6 +218,134 @@ begin
     begin
       Result[ColorStart + ColorIndex] := 7;
     end;
+  end;
+end;
+
+// A patch of the type 6 with the flag 0: the sides of the rectangle from x0 to x1 and y 10 to 90, and four colours. Every value is written with
+// the number of bits it has in the shading: flag 2, coordinate 8 and colour 4.
+class function TPatchShadingTests.UnpaddedPatches: TBytes;
+const
+  SideY: array[0..3] of Integer = (10, 37, 63, 90);
+var
+  Bits: TBits;
+  Count: Integer;
+
+  procedure Add(const Value, BitCount: Integer);
+  begin
+    for var Position := BitCount - 1 downto 0 do
+    begin
+      Bits.Size := Count + 1;
+      Bits[Count] := (((Value shr Position) and 1) = 1);
+      Inc(Count);
+    end;
+  end;
+
+  procedure AddPatch(const Left, Right: Integer);
+  begin
+    const Third = (Right - Left) div 3;
+    Add(0, 2);
+    // From the lower left corner up the left side, along the top, down the right side and back along the bottom
+    for var Index := 0 to 3 do
+    begin
+      Add(Left, 8);
+      Add(SideY[Index], 8);
+    end;
+    for var Index := 1 to 3 do
+    begin
+      Add(Left + Index * Third, 8);
+      Add(90, 8);
+    end;
+    for var Index := 2 downto 0 do
+    begin
+      Add(Right, 8);
+      Add(SideY[Index], 8);
+    end;
+    for var Index := 2 downto 1 do
+    begin
+      Add(Left + Index * Third, 8);
+      Add(10, 8);
+    end;
+    for var Corner := 0 to 3 do
+    begin
+      Add(IfThen(Corner = 0, 15, 0), 4);
+      Add(IfThen(Corner = 1, 15, 0), 4);
+      Add(IfThen(Corner >= 2, 15, 0), 4);
+    end;
+  end;
+
+begin
+  Bits := TBits.Create;
+  try
+    Count := 0;
+    AddPatch(5, 41);
+    AddPatch(59, 95);
+    SetLength(Result, (Count + 7) div 8);
+    for var Position := 0 to Count - 1 do
+    begin
+      if Bits[Position] then
+      begin
+        Result[Position div 8] := Result[Position div 8] or (128 shr (Position mod 8));
+      end;
+    end;
+  finally
+    Bits.Free;
+  end;
+end;
+
+// readPatch of PDFBox reads no padding after a patch: the second patch starts right after the colours of the first, here 2 bits after a byte
+procedure TPatchShadingTests.TestPatchDataIsNotPaddedToWholeBytes;
+begin
+  Make('/ShadingType 6 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 4 /BitsPerFlag 2 /Decode [0 255 0 255 0 1 0 1 0 1]', UnpaddedPatches);
+
+  RasterizeSquare(100);
+
+  AssertPainted(20, 50);
+  AssertPainted(77, 50);
+  AssertTransparent(50, 50);
+end;
+
+// 16 points in the order of the data: the outline of the square from (10, 10) to (90, 90) with straight sides and the four inner points
+class function TPatchShadingTests.SquareTensorPoints(const InnerX, InnerY: Double): TArray<TPdfPatchPoint>;
+begin
+  SetLength(Result, 16);
+  for var Index := 0 to 11 do
+  begin
+    Result[Index] := TPdfPatchPoint.Create(SquareOutline[Index, 0], SquareOutline[Index, 1]);
+  end;
+  Result[12] := TPdfPatchPoint.Create(InnerX, InnerY);
+  Result[13] := TPdfPatchPoint.Create(37, 63);
+  Result[14] := TPdfPatchPoint.Create(63, 63);
+  Result[15] := TPdfPatchPoint.Create(63, 37);
+end;
+
+class function TPatchShadingTests.PatchColors: TPdfPatchColors;
+begin
+  Result[0] := [1, 0, 0];
+  Result[1] := [0, 1, 0];
+  Result[2] := [0, 0, 1];
+  Result[3] := [1, 1, 0];
+end;
+
+// TensorPatch.calcLevel: straight sides of 80 pixels that no inner point leaves are cut into 2 x 2 cells, two triangles each
+procedure TPatchShadingTests.TestTensorPatchWithStraightSidesAndInnerPointsInsideHasFewCells;
+begin
+  const Patch = TPdfTensorPatch.Create(SquareTensorPoints(37, 37), PatchColors);
+  try
+    Assert.AreEqual<Integer>(8, Length(Patch.Triangles));
+  finally
+    Patch.Free;
+  end;
+end;
+
+// An inner point at (130, 130) lies on the same side of both sides at x = 10 and x = 90 and of both at y = 10 and y = 90, so the patch
+// bulges out of them and is cut into the 16 x 16 cells of the highest level
+procedure TPatchShadingTests.TestTensorPatchWithAnInnerPointOutsideKeepsTheHighestLevel;
+begin
+  const Patch = TPdfTensorPatch.Create(SquareTensorPoints(130, 130), PatchColors);
+  try
+    Assert.AreEqual<Integer>(512, Length(Patch.Triangles));
+  finally
+    Patch.Free;
   end;
 end;
 

@@ -13,6 +13,7 @@ uses
   System.Types,
   Pdf4D.Common.Matrix,
   Pdf4D.Graphics.Shading,
+  Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Render.Shading.Triangle;
 
 const
@@ -43,8 +44,9 @@ type
     class function EdgeEquationValue(const Point, First, Second: TPdfPatchPoint): Double; static;
     class function IsEdgeALine(const Edge: TPdfPatchEdge): Boolean; static;
     class function Distance(const First, Second: TPdfPatchPoint): Double; static;
-    // 2 ^ level parts: a straight side gets fewer parts the shorter it is, any other side the most
-    class function DivisionsOf(const FirstSide, SecondSide: TPdfPatchEdge): Integer; static;
+    // 2 ^ level parts: a straight side gets fewer parts the shorter it is, any other side the most, and so does a pair of sides with an
+    // inner control point that lies outside of them (KeepsHighLevel)
+    class function DivisionsOf(const FirstSide, SecondSide: TPdfPatchEdge; const KeepsHighLevel: Boolean): Integer; static;
     class function Bernstein(const Index: Integer; const T: Double): Double; static;
     function ColumnEdge(const Column: Integer): TPdfPatchEdge;
     function RowEdge(const Row: Integer): TPdfPatchEdge;
@@ -58,6 +60,10 @@ type
 
     procedure SetControlPoint(const Row, Column: Integer; const Point: TPdfPatchPoint);
     function ControlPoint(const Row, Column: Integer): TPdfPatchPoint;
+    // Whether an inner control point keeps the highest level of the divisions in the direction of the columns and of the rows (a Coons
+    // patch has none of its own: its inner points follow from the sides)
+    function KeepsHighLevelAlongColumns: Boolean; virtual;
+    function KeepsHighLevelAlongRows: Boolean; virtual;
 
   public
     // The side of the patch that a following patch with the edge flag 1, 2 or 3 starts on (CoonsPatch.getFlag1Edge and so on)
@@ -77,6 +83,15 @@ type
 
   // Type 7: the 12 points around the patch and then the 4 inner control points
   TPdfTensorPatch = class(TPdfPatch)
+  private
+    // isOnSameSideCC and isOnSameSideDD: a point on the same side of both opposite sides is outside of the patch
+    function IsOnSameSideOfColumns(const Point: TPdfPatchPoint): Boolean;
+    function IsOnSameSideOfRows(const Point: TPdfPatchPoint): Boolean;
+
+  protected
+    function KeepsHighLevelAlongColumns: Boolean; override;
+    function KeepsHighLevelAlongRows: Boolean; override;
+
   public
     // Points are the 16 points in the order of the data
     constructor Create(const Points: TArray<TPdfPatchPoint>; const CornerColors: TPdfPatchColors);
@@ -101,7 +116,8 @@ type
 
   public
     // PointCount is 12 for the type 6 and 16 for the type 7
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const PointCount: Integer);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
+                       const PointCount: Integer);
   end;
 
   TPdfType6ShadingContext = class(TPdfPatchMeshesShadingContext)
@@ -109,7 +125,7 @@ type
     function MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch; override;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
   end;
 
   TPdfType7ShadingContext = class(TPdfPatchMeshesShadingContext)
@@ -117,7 +133,7 @@ type
     function MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch; override;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
   end;
 
 implementation
@@ -198,6 +214,16 @@ begin
   end;
 end;
 
+function TPdfPatch.KeepsHighLevelAlongColumns: Boolean;
+begin
+  Result := False;
+end;
+
+function TPdfPatch.KeepsHighLevelAlongRows: Boolean;
+begin
+  Result := False;
+end;
+
 function TPdfPatch.ColumnEdge(const Column: Integer): TPdfPatchEdge;
 begin
   for var Row := 0 to 3 do
@@ -233,10 +259,10 @@ begin
   Result := Sqrt(Sqr(First.X - Second.X) + Sqr(First.Y - Second.Y));
 end;
 
-class function TPdfPatch.DivisionsOf(const FirstSide, SecondSide: TPdfPatchEdge): Integer;
+class function TPdfPatch.DivisionsOf(const FirstSide, SecondSide: TPdfPatchEdge; const KeepsHighLevel: Boolean): Integer;
 begin
   var Level := MaxLevel;
-  if IsEdgeALine(FirstSide) and IsEdgeALine(SecondSide) then
+  if IsEdgeALine(FirstSide) and IsEdgeALine(SecondSide) and (not KeepsHighLevel) then
   begin
     const FirstLength = Distance(FirstSide[0], FirstSide[3]);
     const SecondLength = Distance(SecondSide[0], SecondSide[3]);
@@ -317,8 +343,8 @@ end;
 // Patch.getShadedTriangles: a cell with two corners on one point gives only the triangle that still has an area
 function TPdfPatch.Triangles: TArray<TPdfShadedTriangle>;
 begin
-  const UDivisions = DivisionsOf(ColumnEdge(0), ColumnEdge(3));
-  const VDivisions = DivisionsOf(RowEdge(0), RowEdge(3));
+  const UDivisions = DivisionsOf(ColumnEdge(0), ColumnEdge(3), KeepsHighLevelAlongColumns);
+  const VDivisions = DivisionsOf(RowEdge(0), RowEdge(3), KeepsHighLevelAlongRows);
   var Grid: TArray<TPdfMeshVertex>;
   const Stride = VDivisions + 1;
   SetLength(Grid, (UDivisions + 1) * Stride);
@@ -336,20 +362,22 @@ begin
   begin
     for var Column := 0 to VDivisions - 1 do
     begin
-      const First = Grid[Row * Stride + Column];
-      const Second = Grid[Row * Stride + Column + 1];
-      const Third = Grid[(Row + 1) * Stride + Column + 1];
-      const Fourth = Grid[(Row + 1) * Stride + Column];
-      const HasLowerTriangle = (not (Overlaps(First, Second) or Overlaps(First, Fourth)));
-      const HasUpperTriangle = (not (Overlaps(Third, Second) or Overlaps(Third, Fourth)));
+      // The corners of getShadedTriangles: p0 and p2 are opposite, p1 is the next one in the direction of the rows (u) and p3 in the
+      // direction of the columns (v)
+      const P0 = Grid[Row * Stride + Column];
+      const P1 = Grid[(Row + 1) * Stride + Column];
+      const P2 = Grid[(Row + 1) * Stride + Column + 1];
+      const P3 = Grid[Row * Stride + Column + 1];
+      const HasLowerTriangle = (not (Overlaps(P0, P1) or Overlaps(P0, P3)));
+      const HasUpperTriangle = (not (HasLowerTriangle and (Overlaps(P2, P1) or Overlaps(P2, P3))));
       if HasLowerTriangle then
       begin
-        Result[Count] := TPdfShadedTriangle.Create(First, Second, Fourth);
+        Result[Count] := TPdfShadedTriangle.Create(P0, P1, P3);
         Inc(Count);
       end;
       if HasUpperTriangle then
       begin
-        Result[Count] := TPdfShadedTriangle.Create(Fourth, Second, Third);
+        Result[Count] := TPdfShadedTriangle.Create(P3, P1, P2);
         Inc(Count);
       end;
     end;
@@ -404,6 +432,32 @@ end;
 
 { TPdfTensorPatch }
 
+function TPdfTensorPatch.IsOnSameSideOfColumns(const Point: TPdfPatchPoint): Boolean;
+begin
+  const FirstColumn = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(3, 0));
+  const LastColumn = EdgeEquationValue(Point, ControlPoint(0, 3), ControlPoint(3, 3));
+  Result := ((FirstColumn * LastColumn) > 0);
+end;
+
+function TPdfTensorPatch.IsOnSameSideOfRows(const Point: TPdfPatchPoint): Boolean;
+begin
+  const FirstRow = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(0, 3));
+  const LastRow = EdgeEquationValue(Point, ControlPoint(3, 0), ControlPoint(3, 3));
+  Result := ((FirstRow * LastRow) > 0);
+end;
+
+function TPdfTensorPatch.KeepsHighLevelAlongColumns: Boolean;
+begin
+  Result := (IsOnSameSideOfColumns(ControlPoint(1, 1)) or IsOnSameSideOfColumns(ControlPoint(1, 2)) or
+             IsOnSameSideOfColumns(ControlPoint(2, 1)) or IsOnSameSideOfColumns(ControlPoint(2, 2)));
+end;
+
+function TPdfTensorPatch.KeepsHighLevelAlongRows: Boolean;
+begin
+  Result := (IsOnSameSideOfRows(ControlPoint(1, 1)) or IsOnSameSideOfRows(ControlPoint(1, 2)) or
+             IsOnSameSideOfRows(ControlPoint(2, 1)) or IsOnSameSideOfRows(ControlPoint(2, 2)));
+end;
+
 constructor TPdfTensorPatch.Create(const Points: TArray<TPdfPatchPoint>; const CornerColors: TPdfPatchColors);
 begin
   inherited Initialize(CornerColors);
@@ -428,9 +482,9 @@ end;
 { TPdfPatchMeshesShadingContext }
 
 constructor TPdfPatchMeshesShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                                 const PointCount: Integer);
+                                                 const Cancel: IPdfCancelToken; const PointCount: Integer);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
   FPointCount := PointCount;
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
@@ -446,7 +500,7 @@ end;
 // PDMeshBasedShadingType.collectPatches
 procedure TPdfPatchMeshesShadingContext.ReadPatches;
 begin
-  while not FReader.IsAtEnd do
+  while (not FReader.IsAtEnd) and (not IsStopped) do
   begin
     var Flag: Integer;
     if not FReader.TryReadFlag(Flag) then
@@ -571,18 +625,19 @@ begin
   end;
 
   Result := (TryReadPoints(FirstPoint, Points) and TryReadColors(FirstColor, Colors));
+  // The data of a patch is not padded to a whole number of bytes here: readPatch of PDFBox does not read any padding
   if Result then
   begin
-    FReader.AlignToByte;
     Patch := MakePatch(Points, Colors);
   end;
 end;
 
 { TPdfType6ShadingContext }
 
-constructor TPdfType6ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+constructor TPdfType6ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                           const Cancel: IPdfCancelToken);
 begin
-  inherited Create(Shading, ShadingToDevice, DeviceArea, CoonsPointCount);
+  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, CoonsPointCount);
 end;
 
 function TPdfType6ShadingContext.MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch;
@@ -592,9 +647,10 @@ end;
 
 { TPdfType7ShadingContext }
 
-constructor TPdfType7ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+constructor TPdfType7ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                           const Cancel: IPdfCancelToken);
 begin
-  inherited Create(Shading, ShadingToDevice, DeviceArea, TensorPointCount);
+  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, TensorPointCount);
 end;
 
 function TPdfType7ShadingContext.MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch;

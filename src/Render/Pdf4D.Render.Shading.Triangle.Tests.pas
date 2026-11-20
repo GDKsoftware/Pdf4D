@@ -15,10 +15,25 @@ uses
   Pdf4D.Common.Matrix,
   Pdf4D.Graphics.Shading,
   Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Render.Shading.Context,
   Pdf4D.Tests.ShadingBuilder;
 
 type
+  // Says no for the first asks and yes after them, and counts the asks
+  TCancelAfterToken = class(TInterfacedObject, IPdfCancelToken)
+  private
+    FAllowed: Integer;
+    FAsked: Integer;
+
+  public
+    constructor Create(const Allowed: Integer);
+
+    function IsCancelled: Boolean;
+
+    property Asked: Integer read FAsked;
+  end;
+
   [TestFixture]
   TTriangleShadingTests = class
   private
@@ -79,12 +94,44 @@ type
 
     [Test]
     procedure TestDegenerateTrianglesPaintAPointAndALine;
+
+    [Test]
+    procedure TestThinTriangleIsFattenedByItsSides;
+
+    [Test]
+    procedure TestCornersThatDifferByAThousandthAreATriangleNotAPoint;
+
+    [Test]
+    procedure TestLatticeRowLongerThanTheDataPaintsNothingAndWarns;
+
+    [Test]
+    procedure TestCancelledTokenStopsTheMeshBeforeItIsPainted;
+
+    [Test]
+    procedure TestLineBetweenFarApartCornersIsBounded;
+
+    [Test]
+    procedure TestCornersFarBeyondTheDeviceRaiseNothing;
   end;
 
 implementation
 
 uses
   Pdf4D.Render.Shading.Triangle;
+
+{ TCancelAfterToken }
+
+constructor TCancelAfterToken.Create(const Allowed: Integer);
+begin
+  inherited Create;
+  FAllowed := Allowed;
+end;
+
+function TCancelAfterToken.IsCancelled: Boolean;
+begin
+  Inc(FAsked);
+  Result := (FAsked > FAllowed);
+end;
 
 { TTriangleShadingTests }
 
@@ -311,6 +358,108 @@ begin
   AssertPixel(40, 60, 0, 255, 0, 2);
   AssertPixel(80, 60, 0, 0, 255, 2);
   AssertTransparent(60, 40);
+end;
+
+// calcPixelTable draws the three sides of a triangle with Bresenham's algorithm after it has filled it: a triangle that is thinner than a pixel
+// and holds no pixel centre is still visible. The corners (10, 10.4), (90, 10.4) and (50, 10.7) round to the pixels (10, 10), (90, 10) and
+// (50, 11); no pixel lies inside.
+procedure TTriangleShadingTests.TestThinTriangleIsFattenedByItsSides;
+begin
+  var Data: TMeshData;
+  Data.AddVertex(0, 10, 104, Red);
+  Data.AddVertex(0, 90, 104, Green);
+  Data.AddVertex(0, 50, 107, Blue);
+  Make('/ShadingType 4 /BitsPerFlag 8 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 8 /Decode [0 255 0 25.5 0 1 0 1 0 1]', Data.Bytes);
+
+  RasterizeHundred;
+
+  AssertPixel(10, 10, 255, 0, 0, 2);
+  AssertPixel(90, 10, 0, 255, 0, 2);
+  AssertPixel(50, 10, 128, 127, 0, 3);
+  AssertPainted(30, 10);
+  AssertPainted(50, 11);
+  AssertTransparent(50, 20);
+end;
+
+// calcDeg counts the corners that differ by 1/1000 or more, not the pixels they round to: these corners are a triangle, whose sides end on the
+// same pixel. The last side that is drawn gives the pixel the colour of the third corner.
+procedure TTriangleShadingTests.TestCornersThatDifferByAThousandthAreATriangleNotAPoint;
+begin
+  var Data: TMeshData;
+  Data.AddVertex(0, 200, 200, Red);
+  Data.AddVertex(0, 202, 200, Green);
+  Data.AddVertex(0, 200, 203, Blue);
+  Make('/ShadingType 4 /BitsPerFlag 8 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 8 /Decode [0 25.5 0 25.5 0 1 0 1 0 1]', Data.Bytes);
+
+  RasterizeHundred;
+
+  AssertPixel(20, 20, 0, 0, 255, 2);
+  AssertTransparent(21, 20);
+end;
+
+// A /VerticesPerRow that two rows of the data cannot hold is not allocated: nothing is painted and the warning says why
+procedure TTriangleShadingTests.TestLatticeRowLongerThanTheDataPaintsNothingAndWarns;
+begin
+  var Data: TMeshData;
+  Data.AddVertex(-1, 10, 10, Red);
+  Data.AddVertex(-1, 90, 10, Green);
+  Data.AddVertex(-1, 10, 90, Blue);
+  Data.AddVertex(-1, 90, 90, Yellow);
+  Make('/ShadingType 5 /VerticesPerRow 50000000 ' + MeshEntries, Data.Bytes);
+
+  RasterizeHundred;
+
+  AssertTransparent(50, 50);
+  Assert.IsTrue(FDocument.HasLogLine('VerticesPerRow'));
+end;
+
+// A token that cancels after a few asks stops the triangles while they are made, so that nothing of them is painted
+procedure TTriangleShadingTests.TestCancelledTokenStopsTheMeshBeforeItIsPainted;
+begin
+  var Data: TMeshData;
+  for var Index := 1 to 200 do
+  begin
+    Data.AddVertex(0, 0, 0, Red);
+    Data.AddVertex(0, 250, 0, Green);
+    Data.AddVertex(0, 0, 250, Blue);
+  end;
+  MakeFreeForm(Data.Bytes);
+  const Token = TCancelAfterToken.Create(2);
+  const TokenReference: IPdfCancelToken = Token;
+
+  FBitmap := TPdfShadingRasterizer.Rasterize(FShading, TPdfMatrix.Identity, TRect.Create(0, 0, 100, 100), TokenReference);
+
+  AssertTransparent(10, 0);
+  AssertTransparent(10, 5);
+  Assert.IsTrue(Token.Asked >= 3, 'the token is asked while the mesh is made');
+end;
+
+// Two corners 2 * 10^9 pixels apart: the line between them has no more steps than the limit of the work allows, and nothing runs for long
+procedure TTriangleShadingTests.TestLineBetweenFarApartCornersIsBounded;
+begin
+  var Data: TMeshData;
+  Data.AddVertex(0, 0, 0, Red);
+  Data.AddVertex(0, 255, 255, Green);
+  Data.AddVertex(0, 255, 255, Green);
+  Make('/ShadingType 4 /BitsPerFlag 8 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 8 /Decode [-1000000000 1000000000 -1000000000 1000000000 0 1 0 1 0 1]',
+       Data.Bytes);
+
+  RasterizeHundred;
+
+  AssertTransparent(50, 50);
+  Assert.AreEqual<Integer>(1, FDocument.CountLogLines('work limit'), 'one warning');
+end;
+
+// Corners of 10^37 pixels away are far beyond any device: they are limited and the conversion to whole pixels cannot overflow
+procedure TTriangleShadingTests.TestCornersFarBeyondTheDeviceRaiseNothing;
+begin
+  Make('/ShadingType 4 /BitsPerFlag 8 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 8 /Decode [-1e38 1e38 -1e38 1e38 0 1 0 1 0 1]',
+       OneTriangle.Bytes);
+
+  RasterizeHundred;
+
+  Assert.AreEqual<Integer>(100, FBitmap.Width);
+  AssertTransparent(50, 50);
 end;
 
 end.

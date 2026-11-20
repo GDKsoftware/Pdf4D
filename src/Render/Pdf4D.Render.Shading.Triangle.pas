@@ -14,6 +14,7 @@ uses
   System.Types,
   Pdf4D.Common.Matrix,
   Pdf4D.Graphics.Shading,
+  Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Render.Shading.Context;
 
 const
@@ -22,6 +23,11 @@ const
   // The most triangles that one shading paints in all. A patch is cut into up to 512 triangles, so this is what bounds the time of
   // a shading of many patches.
   MaxMeshTriangles = 4000000;
+  // The most work that one shading does for its pixels: a step of a line, a pixel that is tested against a triangle, a triangle. What is
+  // more is skipped with a warning, so that a few bytes of data cannot keep a render busy for long.
+  MaxMeshWork = 100000000;
+  // A corner of a triangle is limited to this distance from the origin of the device, far beyond any device
+  MaxMeshCoordinate = 1073741824;
 
 type
   // A vertex or a corner of a patch in device space, with its colour values (the one value for a function)
@@ -33,39 +39,56 @@ type
     class function Create(const X, Y: Double; const Color: TArray<Single>): TPdfMeshVertex; static;
   end;
 
-  // ShadedTriangle: a triangle with a colour at every corner. Corners that fall on the same pixel make a point or a line, which
-  // PDFBox paints as such (the degree 1 and 2).
+  // A line of pixels between two pixels, with a colour at each end (Line): Bresenham's algorithm gives its pixels
+  TPdfMeshLine = record
+    Start: TPoint;
+    Finish: TPoint;
+    StartColor: TArray<Single>;
+    FinishColor: TArray<Single>;
+
+    class function Create(const Start, Finish: TPoint; const StartColor, FinishColor: TArray<Single>): TPdfMeshLine; static;
+    // The colour at the pixel (X, Y) of the line: linear along x, or along y for a vertical line (Line.calcColor)
+    function ColorAt(const X, Y: Integer): TArray<Single>;
+  end;
+
+  // ShadedTriangle: a triangle with a colour at every corner. The degree is the number of corners that differ by 1/1000 pixel or more: a
+  // degree of 2 is a line and of 1 a point. Three different corners in one line stay a triangle without area, as in PDFBox.
   TPdfShadedTriangle = record
   private
     FCorners: array[0..2] of TPdfMeshVertex;
     FDegree: Integer;
-    FLineStart: Integer;
-    FLineEnd: Integer;
-    FDoubleArea: Double;
+    FLine: TPdfMeshLine;
+    FArea: Double;
+    FValue0: Double;
+    FValue1: Double;
+    FValue2: Double;
 
-    class function RoundedX(const Vertex: TPdfMeshVertex): Integer; static;
-    class function RoundedY(const Vertex: TPdfMeshVertex): Integer; static;
-    function HasSameRoundedPoint(const First, Second: Integer): Boolean;
-    procedure DetermineDegree;
-    procedure ChooseLineEnds;
+    class function Overlaps(const First, Second: TPdfMeshVertex): Boolean; static;
+    class function EdgeValue(const X, Y: Double; const First, Second: TPdfMeshVertex): Double; static;
+    class function AreaOf(const X, Y: Double; const First, Second: TPdfMeshVertex): Double; static;
+    class function CornerPixel(const Vertex: TPdfMeshVertex): TPoint; static;
+    function CalculateDegree: Integer;
+    procedure MakeLine;
 
   public
     class function Create(const First, Second, Third: TPdfMeshVertex): TPdfShadedTriangle; static;
+    // Math.round: half up, within the range of an Integer
+    class function RoundHalfUp(const Value: Double): Integer; static;
 
-    // 1 for a point, 2 for a line (also three corners in a line), 3 for a triangle
+    // 0 for a triangle with a corner that is no number (nothing is painted), 1 for a point, 2 for a line, 3 for a triangle
     property Degree: Integer read FDegree;
+    // The line of a triangle of the degree 2
+    property Line: TPdfMeshLine read FLine;
     function Corner(const Index: Integer): TPdfMeshVertex;
-    // The pixels that the corners cover; the line has the corners LineStart and LineEnd
-    function LineStart: TPdfMeshVertex;
-    function LineEnd: TPdfMeshVertex;
+    // The rounded corners of the triangle as pixels, which is the box that PDFBox tests
     function BoundaryLeft: Integer;
     function BoundaryRight: Integer;
     function BoundaryTop: Integer;
     function BoundaryBottom: Integer;
-    // Whether the point (X, Y) lies in the triangle, its sides included. Only for a triangle (degree 3).
-    function Contains(const X, Y: Double): Boolean;
-    // The colour values at (X, Y), the weighted sum of the colours of the corners. Only for a triangle (degree 3).
-    function CalcColor(const X, Y: Double): TArray<Single>;
+    // Whether the pixel (X, Y) lies in the triangle, its sides included. Only for a triangle (degree 3).
+    function Contains(const X, Y: Integer): Boolean;
+    // The colour values at the pixel (X, Y), weighted by the areas of the triangles with the sides. Only for a triangle (degree 3).
+    function CalcColor(const X, Y: Integer): TArray<Single>;
   end;
 
   // The bits of the data of a mesh shading, the most significant bit first
@@ -78,6 +101,7 @@ type
     constructor Create(const Bytes: TBytes);
 
     function IsAtEnd: Boolean;
+    function RemainingBits: Int64;
     // False when fewer than BitCount bits (1 to 32) are left; nothing is read then
     function TryRead(const BitCount: Integer; out Value: Int64): Boolean;
     // The data of one vertex or patch is padded to a whole number of bytes
@@ -103,6 +127,8 @@ type
     class function IsLayoutValid(const Shading: TPDShadingMesh): Boolean; static;
     class function HasDecodeForColors(const Shading: TPDShadingMesh): Boolean; static;
     class function Interpolate(const Value: Int64; const MaxSource: Int64; const Minimum, Maximum: Single): Single; static;
+    // The data of one vertex is padded to a whole number of bytes
+    procedure AlignToByte;
 
   public
     destructor Destroy; override;
@@ -112,7 +138,8 @@ type
     class function TryOpen(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; out Reader: TPdfMeshReader): Boolean; static;
 
     function IsAtEnd: Boolean;
-    procedure AlignToByte;
+    // How many vertices (a point and its colour, padded to a whole number of bytes) the rest of the data can hold at most
+    function RemainingVertexCount: Int64;
     // A flag is cut down to its last two bits
     function TryReadFlag(out Flag: Integer): Boolean;
     function TryReadPoint(out X, Y: Double): Boolean;
@@ -128,22 +155,36 @@ type
   TPdfGouraudShadingContext = class abstract(TPdfShadingContext)
   private
     const Painted = $1000000;
+    // The cancel token is asked once for this much work
+    const CancelInterval = 4096;
 
   private
     FArea: TRect;
     FPixels: TArray<Integer>;
+    FCancel: IPdfCancelToken;
     FElementCount: Integer;
     FTriangleCount: Integer;
+    FWork: Int64;
+    FWorkChecked: Int64;
+    FIsStopped: Boolean;
     FIsLimitReported: Boolean;
 
     procedure PlotPixel(const X, Y: Integer; const Color: TArray<Single>);
-    procedure PlotPoint(const Triangle: TPdfShadedTriangle);
-    procedure PlotLine(const Triangle: TPdfShadedTriangle);
+    function IsInArea(const X, Y: Integer): Boolean;
+    function IsBeyondArea(const Position, Step, Low, High: Int64): Boolean;
     procedure FillTriangle(const Triangle: TPdfShadedTriangle);
-    class function LineParameter(const Start, Finish: Integer; const Current: Integer): Single; static;
+    class function Sanitized(const Values: TArray<Single>): TArray<Single>; static;
 
   protected
-    constructor InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+    constructor InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                               const Cancel: IPdfCancelToken);
+
+    // Counts Units of work. False when the shading has to stop: it is cancelled, or has done more than MaxMeshWork (a warning, once).
+    function Charge(const Units: Int64): Boolean;
+    // The work is over: the reading of the rest of the data is skipped
+    property IsStopped: Boolean read FIsStopped;
+    // Bresenham's line: the pixels in the area get their colour from the line
+    procedure PlotLine(const Line: TPdfMeshLine);
 
     // Counts a triangle or a patch of TriangleCount triangles. False when this shading has reached the limit of MaxMeshElements elements
     // or MaxMeshTriangles triangles, and the element must not be painted; the warning is given once.
@@ -169,7 +210,7 @@ type
     function TryExtendTriangle(const Flag: Integer; const Vertex: TPdfMeshVertex): Boolean;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
   end;
 
   // Type 5: a lattice of vertices in rows, two triangles to a cell
@@ -182,7 +223,7 @@ type
     function TryDrawRows(const Upper, Lower: TArray<TPdfMeshVertex>): Boolean;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
   end;
 
 implementation
@@ -196,6 +237,11 @@ const
   MaxBitsPerValue = 32;
   // The barycentric weights of a point on a side are zero up to rounding
   InsideTolerance = 0.0000001;
+  // The accuracy of the degree of a triangle (1/1000 pixel) and of a point that two corners share
+  Thousand = 1000;
+  // The steps of a line are counted as work in packs of this size
+  LineChargeSteps = 1024;
+  OverlapDistance = 0.001;
   EdgeFlagNewTriangle = 0;
   EdgeFlagLastSide = 1;
   EdgeFlagFirstAndLastCorner = 2;
@@ -209,88 +255,157 @@ begin
   Result.Color := Color;
 end;
 
+// Math.round as a 64 bit number: half up
+function HalfUp(const Value: Double): Int64;
+begin
+  const Shifted = Value + 0.5;
+  Result := Trunc(Shifted);
+  if Result > Shifted then
+  begin
+    Dec(Result);
+  end;
+end;
+
+{ TPdfMeshLine }
+
+class function TPdfMeshLine.Create(const Start, Finish: TPoint; const StartColor, FinishColor: TArray<Single>): TPdfMeshLine;
+begin
+  Result.Start := Start;
+  Result.Finish := Finish;
+  Result.StartColor := StartColor;
+  Result.FinishColor := FinishColor;
+end;
+
+function TPdfMeshLine.ColorAt(const X, Y: Integer): TArray<Single>;
+begin
+  if Start = Finish then
+  begin
+    Exit(StartColor);
+  end;
+
+  // Single arithmetic in the order of Line.calcColor: c0 * (p1 - p) / l + c1 * (p - p0) / l
+  const IsVertical = (Start.X = Finish.X);
+  var Length: Single;
+  var Before, After: Integer;
+  if IsVertical then
+  begin
+    Length := Finish.Y - Start.Y;
+    Before := Finish.Y - Y;
+    After := Y - Start.Y;
+  end
+  else
+  begin
+    Length := Finish.X - Start.X;
+    Before := Finish.X - X;
+    After := X - Start.X;
+  end;
+
+  SetLength(Result, System.Length(StartColor));
+  for var Index := 0 to High(Result) do
+  begin
+    const FromStart = Single(Single(StartColor[Index] * Single(Before)) / Length);
+    const FromFinish = Single(Single(FinishColor[Index] * Single(After)) / Length);
+    Result[Index] := Single(FromStart + FromFinish);
+  end;
+end;
+
 { TPdfShadedTriangle }
+
+class function TPdfShadedTriangle.RoundHalfUp(const Value: Double): Integer;
+begin
+  if IsNan(Value) then
+  begin
+    Exit(0);
+  end;
+
+  Result := HalfUp(Max(Min(Value, Double(MaxMeshCoordinate)), -Double(MaxMeshCoordinate)));
+end;
 
 class function TPdfShadedTriangle.Create(const First, Second, Third: TPdfMeshVertex): TPdfShadedTriangle;
 begin
   Result.FCorners[0] := First;
   Result.FCorners[1] := Second;
   Result.FCorners[2] := Third;
-  Result.DetermineDegree;
+  for var Index := 0 to 2 do
+  begin
+    if IsNan(Result.FCorners[Index].X) or IsNan(Result.FCorners[Index].Y) then
+    begin
+      Result.FDegree := 0;
+      Exit;
+    end;
+    // No device is as big as this; it keeps the products of the edge equations far from overflow
+    Result.FCorners[Index].X := Max(Min(Result.FCorners[Index].X, Double(MaxMeshCoordinate)), -Double(MaxMeshCoordinate));
+    Result.FCorners[Index].Y := Max(Min(Result.FCorners[Index].Y, Double(MaxMeshCoordinate)), -Double(MaxMeshCoordinate));
+  end;
+
+  Result.FArea := AreaOf(Result.FCorners[0].X, Result.FCorners[0].Y, Result.FCorners[1], Result.FCorners[2]);
+  Result.FDegree := Result.CalculateDegree;
+  if Result.FDegree = 2 then
+  begin
+    Result.MakeLine;
+  end;
+  Result.FValue0 := EdgeValue(Result.FCorners[0].X, Result.FCorners[0].Y, Result.FCorners[1], Result.FCorners[2]);
+  Result.FValue1 := EdgeValue(Result.FCorners[1].X, Result.FCorners[1].Y, Result.FCorners[2], Result.FCorners[0]);
+  Result.FValue2 := EdgeValue(Result.FCorners[2].X, Result.FCorners[2].Y, Result.FCorners[0], Result.FCorners[1]);
 end;
 
-// Java's Math.round: half up
-class function TPdfShadedTriangle.RoundedX(const Vertex: TPdfMeshVertex): Integer;
+// Two points are one when they differ by less than 1/1000 in both directions (ShadedTriangle.overlaps)
+class function TPdfShadedTriangle.Overlaps(const First, Second: TPdfMeshVertex): Boolean;
 begin
-  Result := Floor(Vertex.X + 0.5);
+  Result := ((Abs(First.X - Second.X) < OverlapDistance) and (Abs(First.Y - Second.Y) < OverlapDistance));
 end;
 
-class function TPdfShadedTriangle.RoundedY(const Vertex: TPdfMeshVertex): Integer;
+class function TPdfShadedTriangle.EdgeValue(const X, Y: Double; const First, Second: TPdfMeshVertex): Double;
 begin
-  Result := Floor(Vertex.Y + 0.5);
+  Result := (Second.Y - First.Y) * (X - First.X) - (Second.X - First.X) * (Y - First.Y);
 end;
 
-function TPdfShadedTriangle.HasSameRoundedPoint(const First, Second: Integer): Boolean;
+// getArea: the area of the triangle of the point (X, Y) and the vertices First and Second
+class function TPdfShadedTriangle.AreaOf(const X, Y: Double; const First, Second: TPdfMeshVertex): Double;
 begin
-  const SameX = (RoundedX(FCorners[First]) = RoundedX(FCorners[Second]));
-  const SameY = (RoundedY(FCorners[First]) = RoundedY(FCorners[Second]));
-  Result := (SameX and SameY);
+  Result := Abs((Second.X - First.X) * (Second.Y - Y) - (Second.X - X) * (Second.Y - First.Y)) / 2;
 end;
 
-// The degree is the number of different pixels under the corners. Three different pixels in one line make a line as well, because
-// such a triangle has no area to fill.
-procedure TPdfShadedTriangle.DetermineDegree;
+class function TPdfShadedTriangle.CornerPixel(const Vertex: TPdfMeshVertex): TPoint;
 begin
-  FLineStart := 0;
-  FLineEnd := 1;
-  FDoubleArea := ((FCorners[1].X - FCorners[0].X) * (FCorners[2].Y - FCorners[0].Y) -
-                  (FCorners[2].X - FCorners[0].X) * (FCorners[1].Y - FCorners[0].Y));
+  Result := TPoint.Create(RoundHalfUp(Vertex.X), RoundHalfUp(Vertex.Y));
+end;
 
-  const FirstEqualsSecond = HasSameRoundedPoint(0, 1);
-  const SecondEqualsThird = HasSameRoundedPoint(1, 2);
-  const ThirdEqualsFirst = HasSameRoundedPoint(2, 0);
-  if FirstEqualsSecond and SecondEqualsThird then
+// The number of different corners, at the accuracy of 1/1000 pixel (calcDeg)
+function TPdfShadedTriangle.CalculateDegree: Integer;
+begin
+  var X, Y: array[0..2] of Int64;
+  for var Index := 0 to 2 do
   begin
-    FDegree := 1;
-  end
-  else if FirstEqualsSecond then
+    X[Index] := HalfUp(FCorners[Index].X * Thousand);
+    Y[Index] := HalfUp(FCorners[Index].Y * Thousand);
+  end;
+
+  Result := 0;
+  for var Index := 0 to 2 do
   begin
-    FDegree := 2;
-    FLineEnd := 2;
-  end
-  else if SecondEqualsThird or ThirdEqualsFirst then
-  begin
-    FDegree := 2;
-  end
-  else if FDoubleArea = 0 then
-  begin
-    FDegree := 2;
-    ChooseLineEnds;
-  end
-  else
-  begin
-    FDegree := 3;
+    var IsKnown := False;
+    for var Earlier := 0 to Index - 1 do
+    begin
+      IsKnown := (IsKnown or ((X[Earlier] = X[Index]) and (Y[Earlier] = Y[Index])));
+    end;
+    if not IsKnown then
+    begin
+      Inc(Result);
+    end;
   end;
 end;
 
-// Of three pixels in one line, the two that are farthest apart are the ends
-procedure TPdfShadedTriangle.ChooseLineEnds;
+// A triangle of the degree 2 is the line between two of its corners
+procedure TPdfShadedTriangle.MakeLine;
 begin
-  var Longest := -1.0;
-  for var First := 0 to 1 do
+  if Overlaps(FCorners[1], FCorners[2]) and (not Overlaps(FCorners[0], FCorners[2])) then
   begin
-    for var Second := First + 1 to 2 do
-    begin
-      const DeltaX = RoundedX(FCorners[First]) - RoundedX(FCorners[Second]);
-      const DeltaY = RoundedY(FCorners[First]) - RoundedY(FCorners[Second]);
-      const Distance = (Sqr(Double(DeltaX)) + Sqr(Double(DeltaY)));
-      if Distance > Longest then
-      begin
-        Longest := Distance;
-        FLineStart := First;
-        FLineEnd := Second;
-      end;
-    end;
+    FLine := TPdfMeshLine.Create(CornerPixel(FCorners[0]), CornerPixel(FCorners[2]), FCorners[0].Color, FCorners[2].Color);
+  end
+  else
+  begin
+    FLine := TPdfMeshLine.Create(CornerPixel(FCorners[1]), CornerPixel(FCorners[2]), FCorners[1].Color, FCorners[2].Color);
   end;
 end;
 
@@ -299,55 +414,54 @@ begin
   Result := FCorners[Index];
 end;
 
-function TPdfShadedTriangle.LineStart: TPdfMeshVertex;
-begin
-  Result := FCorners[FLineStart];
-end;
-
-function TPdfShadedTriangle.LineEnd: TPdfMeshVertex;
-begin
-  Result := FCorners[FLineEnd];
-end;
-
 function TPdfShadedTriangle.BoundaryLeft: Integer;
 begin
-  Result := Floor(Min(FCorners[0].X, Min(FCorners[1].X, FCorners[2].X)));
+  Result := Min(CornerPixel(FCorners[0]).X, Min(CornerPixel(FCorners[1]).X, CornerPixel(FCorners[2]).X));
 end;
 
 function TPdfShadedTriangle.BoundaryRight: Integer;
 begin
-  Result := Ceil(Max(FCorners[0].X, Max(FCorners[1].X, FCorners[2].X)));
+  Result := Max(CornerPixel(FCorners[0]).X, Max(CornerPixel(FCorners[1]).X, CornerPixel(FCorners[2]).X));
 end;
 
 function TPdfShadedTriangle.BoundaryTop: Integer;
 begin
-  Result := Floor(Min(FCorners[0].Y, Min(FCorners[1].Y, FCorners[2].Y)));
+  Result := Min(CornerPixel(FCorners[0]).Y, Min(CornerPixel(FCorners[1]).Y, CornerPixel(FCorners[2]).Y));
 end;
 
 function TPdfShadedTriangle.BoundaryBottom: Integer;
 begin
-  Result := Ceil(Max(FCorners[0].Y, Max(FCorners[1].Y, FCorners[2].Y)));
+  Result := Max(CornerPixel(FCorners[0]).Y, Max(CornerPixel(FCorners[1]).Y, CornerPixel(FCorners[2]).Y));
 end;
 
-function TPdfShadedTriangle.Contains(const X, Y: Double): Boolean;
+// The pixel is outside when a corner and the pixel lie on different sides of the opposite side; on a side it is inside. For three corners
+// in one line every pixel is inside, as in PDFBox (all values are 0).
+function TPdfShadedTriangle.Contains(const X, Y: Integer): Boolean;
 begin
-  const FirstWeight = ((FCorners[1].X - X) * (FCorners[2].Y - Y) - (FCorners[2].X - X) * (FCorners[1].Y - Y)) / FDoubleArea;
-  const SecondWeight = ((FCorners[2].X - X) * (FCorners[0].Y - Y) - (FCorners[0].X - X) * (FCorners[2].Y - Y)) / FDoubleArea;
-  const ThirdWeight = 1 - FirstWeight - SecondWeight;
-  Result := ((FirstWeight >= -InsideTolerance) and (SecondWeight >= -InsideTolerance) and (ThirdWeight >= -InsideTolerance));
+  Result := False;
+  if EdgeValue(X, Y, FCorners[1], FCorners[2]) * FValue0 < 0 then
+  begin
+    Exit;
+  end;
+  if EdgeValue(X, Y, FCorners[2], FCorners[0]) * FValue1 < 0 then
+  begin
+    Exit;
+  end;
+  Result := (EdgeValue(X, Y, FCorners[0], FCorners[1]) * FValue2 >= 0);
 end;
 
-function TPdfShadedTriangle.CalcColor(const X, Y: Double): TArray<Single>;
+// Single arithmetic like PDFBox: the weights are floats of the ratios of the areas. A triangle without area gives weights that are no
+// numbers, which the colour conversion takes as 0 or the largest value.
+function TPdfShadedTriangle.CalcColor(const X, Y: Integer): TArray<Single>;
 begin
-  const FirstWeight = ((FCorners[1].X - X) * (FCorners[2].Y - Y) - (FCorners[2].X - X) * (FCorners[1].Y - Y)) / FDoubleArea;
-  const SecondWeight = ((FCorners[2].X - X) * (FCorners[0].Y - Y) - (FCorners[0].X - X) * (FCorners[2].Y - Y)) / FDoubleArea;
-  const ThirdWeight = 1 - FirstWeight - SecondWeight;
+  const FirstWeight = Single(AreaOf(X, Y, FCorners[1], FCorners[2]) / FArea);
+  const SecondWeight = Single(AreaOf(X, Y, FCorners[2], FCorners[0]) / FArea);
+  const ThirdWeight = Single(AreaOf(X, Y, FCorners[0], FCorners[1]) / FArea);
   SetLength(Result, Length(FCorners[0].Color));
   for var Index := 0 to High(Result) do
   begin
-    Result[Index] := (FCorners[0].Color[Index] * FirstWeight +
-                      FCorners[1].Color[Index] * SecondWeight +
-                      FCorners[2].Color[Index] * ThirdWeight);
+    Result[Index] := Single(Single(Single(FCorners[0].Color[Index] * FirstWeight) + Single(FCorners[1].Color[Index] * SecondWeight)) +
+                            Single(FCorners[2].Color[Index] * ThirdWeight));
   end;
 end;
 
@@ -362,6 +476,11 @@ end;
 function TPdfMeshBitReader.IsAtEnd: Boolean;
 begin
   Result := (FPosition >= (Int64(Length(FBytes)) * 8));
+end;
+
+function TPdfMeshBitReader.RemainingBits: Int64;
+begin
+  Result := Max(Int64(Length(FBytes)) * 8 - FPosition, 0);
 end;
 
 function TPdfMeshBitReader.TryRead(const BitCount: Integer; out Value: Int64): Boolean;
@@ -465,6 +584,15 @@ begin
     Exit(False);
   end;
 
+  // collectTriangles and collectPatches give nothing when the range of x or y is empty
+  var MinimumX, MaximumX, MinimumY, MaximumY: Single;
+  Shading.TryGetDecode(0, MinimumX, MaximumX);
+  Shading.TryGetDecode(1, MinimumY, MaximumY);
+  if (MinimumX = MaximumX) or (MinimumY = MaximumY) then
+  begin
+    Exit(False);
+  end;
+
   Reader := TPdfMeshReader.Make(Shading, ShadingToDevice, TPdfMeshBitReader.Create(Data));
   Result := True;
 end;
@@ -482,6 +610,13 @@ end;
 procedure TPdfMeshReader.AlignToByte;
 begin
   FBits.AlignToByte;
+end;
+
+function TPdfMeshReader.RemainingVertexCount: Int64;
+begin
+  const BitsOfVertex = 2 * Int64(FBitsPerCoordinate) + Int64(FColorCount) * FBitsPerComponent;
+  const BitsOfBytes = ((BitsOfVertex + 7) div 8) * 8;
+  Result := (FBits.RemainingBits div BitsOfBytes);
 end;
 
 function TPdfMeshReader.ColorCount: Integer;
@@ -551,10 +686,12 @@ end;
 
 { TPdfGouraudShadingContext }
 
-constructor TPdfGouraudShadingContext.InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+constructor TPdfGouraudShadingContext.InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                                     const Cancel: IPdfCancelToken);
 begin
   inherited Initialize(Shading, ShadingToDevice);
   FArea := DeviceArea;
+  FCancel := Cancel;
   SetLength(FPixels, Int64(DeviceArea.Width) * DeviceArea.Height);
 end;
 
@@ -563,11 +700,15 @@ begin
   raise ENotSupportedException.Create('A mesh shading is read by pixel, not by the point of the shading');
 end;
 
+function TPdfGouraudShadingContext.IsInArea(const X, Y: Integer): Boolean;
+begin
+  Result := ((X >= FArea.Left) and (X < FArea.Right) and (Y >= FArea.Top) and (Y < FArea.Bottom));
+end;
+
 function TPdfGouraudShadingContext.TryGetPixel(const X, Y: Integer; out Rgb: Integer): Boolean;
 begin
   Rgb := 0;
-  const IsInArea = ((X >= FArea.Left) and (X < FArea.Right) and (Y >= FArea.Top) and (Y < FArea.Bottom));
-  if IsInArea then
+  if IsInArea(X, Y) then
   begin
     const Stored = FPixels[(Y - FArea.Top) * FArea.Width + (X - FArea.Left)];
     if Stored <> 0 then
@@ -581,86 +722,159 @@ begin
   Result := HasBackground;
 end;
 
+function TPdfGouraudShadingContext.Charge(const Units: Int64): Boolean;
+begin
+  if FIsStopped then
+  begin
+    Exit(False);
+  end;
+
+  Inc(FWork, Units);
+  if FWork > MaxMeshWork then
+  begin
+    FIsStopped := True;
+    Shading.Warn('The mesh shading exceeds the work limit of %d steps; the rest is skipped', [MaxMeshWork]);
+  end
+  else if (FWork div CancelInterval) <> FWorkChecked then
+  begin
+    FWorkChecked := (FWork div CancelInterval);
+    FIsStopped := (Assigned(FCancel) and FCancel.IsCancelled);
+  end;
+  Result := (not FIsStopped);
+end;
+
 function TPdfGouraudShadingContext.TryAddElement(const TriangleCount: Integer): Boolean;
 begin
-  Result := ((FElementCount < MaxMeshElements) and ((FTriangleCount + TriangleCount) <= MaxMeshTriangles));
+  Result := ((not FIsStopped) and (FElementCount < MaxMeshElements) and ((FTriangleCount + TriangleCount) <= MaxMeshTriangles));
   if Result then
   begin
     Inc(FElementCount);
     Inc(FTriangleCount, TriangleCount);
-    Exit;
+    Exit(Charge(1));
   end;
 
-  if not FIsLimitReported then
+  if (not FIsStopped) and (not FIsLimitReported) then
   begin
     FIsLimitReported := True;
     Shading.Warn('The mesh shading exceeds the limit of %d triangles or patches (or %d triangles); the rest is skipped', [MaxMeshElements, MaxMeshTriangles]);
   end;
 end;
 
+// The values that a triangle without area gives are no numbers or infinite; Java cuts those to 0 and to the largest value
+class function TPdfGouraudShadingContext.Sanitized(const Values: TArray<Single>): TArray<Single>;
+begin
+  Result := Copy(Values);
+  for var Index := 0 to High(Result) do
+  begin
+    if IsNan(Result[Index]) then
+    begin
+      Result[Index] := 0;
+    end
+    else if IsInfinite(Result[Index]) then
+    begin
+      Result[Index] := IfThen(Result[Index] > 0, MaxSingle, -MaxSingle);
+    end;
+  end;
+end;
+
 procedure TPdfGouraudShadingContext.PlotPixel(const X, Y: Integer; const Color: TArray<Single>);
 begin
-  const IsInArea = ((X >= FArea.Left) and (X < FArea.Right) and (Y >= FArea.Top) and (Y < FArea.Bottom));
-  if not IsInArea then
+  if not IsInArea(X, Y) then
   begin
     Exit;
   end;
 
-  var Values := Color;
+  var Values := Sanitized(Color);
   if Shading.HasFunction then
   begin
-    Values := Shading.EvalFunction(Values);
+    Values := Sanitized(Shading.EvalFunction(Values));
   end;
   FPixels[(Y - FArea.Top) * FArea.Width + (X - FArea.Left)] := (ConvertToRgb(Values) or Painted);
 end;
 
 procedure TPdfGouraudShadingContext.DrawTriangle(const Triangle: TPdfShadedTriangle);
 begin
+  if not Charge(1) then
+  begin
+    Exit;
+  end;
+
   case Triangle.Degree of
-    1: PlotPoint(Triangle);
-    2: PlotLine(Triangle);
+    0: ;
+    2: PlotLine(Triangle.Line);
   else
     FillTriangle(Triangle);
   end;
 end;
 
-procedure TPdfGouraudShadingContext.PlotPoint(const Triangle: TPdfShadedTriangle);
+// Whether a line that goes on in the direction of Step has left the range Low..High - 1 for good
+function TPdfGouraudShadingContext.IsBeyondArea(const Position, Step, Low, High: Int64): Boolean;
 begin
-  const Corner = Triangle.Corner(0);
-  PlotPixel(Floor(Corner.X + 0.5), Floor(Corner.Y + 0.5), Corner.Color);
+  Result := (((Step > 0) and (Position >= High)) or ((Step < 0) and (Position < Low)));
 end;
 
-// Line.calcColor: the colour follows x, or y for a vertical line
-class function TPdfGouraudShadingContext.LineParameter(const Start, Finish: Integer; const Current: Integer): Single;
+// Line.calcLine: Bresenham's algorithm. Only the pixels in the area are plotted; the line stops when it has left the area for good, and the
+// steps count as work.
+procedure TPdfGouraudShadingContext.PlotLine(const Line: TPdfMeshLine);
 begin
-  Result := (Current - Start) / (Finish - Start);
-end;
-
-procedure TPdfGouraudShadingContext.PlotLine(const Triangle: TPdfShadedTriangle);
-begin
-  const Start = Triangle.LineStart;
-  const Finish = Triangle.LineEnd;
-  const StartX = Floor(Start.X + 0.5);
-  const StartY = Floor(Start.Y + 0.5);
-  const FinishX = Floor(Finish.X + 0.5);
-  const FinishY = Floor(Finish.Y + 0.5);
-  const StepCount = Max(Abs(FinishX - StartX), Abs(FinishY - StartY));
-  const IsVertical = (StartX = FinishX);
-  for var Step := 0 to StepCount do
+  var X: Int64 := Line.Start.X;
+  var Y: Int64 := Line.Start.Y;
+  const FinishX: Int64 = Line.Finish.X;
+  const FinishY: Int64 = Line.Finish.Y;
+  const IsOutside = ((Max(X, FinishX) < FArea.Left) or (Min(X, FinishX) >= FArea.Right) or
+                     (Max(Y, FinishY) < FArea.Top) or (Min(Y, FinishY) >= FArea.Bottom));
+  if IsOutside then
   begin
-    const X = StartX + Floor((FinishX - StartX) * Step / StepCount + 0.5);
-    const Y = StartY + Floor((FinishY - StartY) * Step / StepCount + 0.5);
-    const Parameter = IfThen(IsVertical, LineParameter(StartY, FinishY, Y), LineParameter(StartX, FinishX, X));
-    var Color: TArray<Single>;
-    SetLength(Color, Length(Start.Color));
-    for var Index := 0 to High(Color) do
-    begin
-      Color[Index] := (Start.Color[Index] * (1 - Parameter) + Finish.Color[Index] * Parameter);
-    end;
-    PlotPixel(X, Y, Color);
+    Exit;
   end;
+
+  const DeltaX = Abs(FinishX - X);
+  const DeltaY = Abs(FinishY - Y);
+  const StepX = IfThen(X < FinishX, 1, -1);
+  const StepY = IfThen(Y < FinishY, 1, -1);
+  var Error := DeltaX - DeltaY;
+  var Pending := 0;
+  while True do
+  begin
+    if IsInArea(Integer(X), Integer(Y)) then
+    begin
+      PlotPixel(Integer(X), Integer(Y), Line.ColorAt(Integer(X), Integer(Y)));
+    end;
+
+    const IsDone = ((X = FinishX) and (Y = FinishY));
+    const HasLeft = (IsBeyondArea(X, StepX, FArea.Left, FArea.Right) or IsBeyondArea(Y, StepY, FArea.Top, FArea.Bottom));
+    if IsDone or HasLeft then
+    begin
+      Break;
+    end;
+
+    const Doubled = 2 * Error;
+    if Doubled > -DeltaY then
+    begin
+      Dec(Error, DeltaY);
+      Inc(X, StepX);
+    end;
+    if Doubled < DeltaX then
+    begin
+      Inc(Error, DeltaX);
+      Inc(Y, StepY);
+    end;
+
+    Inc(Pending);
+    if Pending = LineChargeSteps then
+    begin
+      if not Charge(Pending) then
+      begin
+        Exit;
+      end;
+      Pending := 0;
+    end;
+  end;
+  Charge(Pending);
 end;
 
+// calcPixelTable: the pixels of the box of the triangle that lie in it, and then its three sides as lines, which fattens the triangle and
+// closes the seams between neighbours
 procedure TPdfGouraudShadingContext.FillTriangle(const Triangle: TPdfShadedTriangle);
 begin
   const Left = Max(Triangle.BoundaryLeft, FArea.Left);
@@ -669,6 +883,11 @@ begin
   const Bottom = Min(Triangle.BoundaryBottom, FArea.Bottom - 1);
   for var X := Left to Right do
   begin
+    if not Charge(Max(Bottom - Top + 1, 1)) then
+    begin
+      Exit;
+    end;
+
     for var Y := Top to Bottom do
     begin
       if Triangle.Contains(X, Y) then
@@ -677,13 +896,21 @@ begin
       end;
     end;
   end;
+
+  const First = TPoint.Create(TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(0).X), TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(0).Y));
+  const Second = TPoint.Create(TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(1).X), TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(1).Y));
+  const Third = TPoint.Create(TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(2).X), TPdfShadedTriangle.RoundHalfUp(Triangle.Corner(2).Y));
+  PlotLine(TPdfMeshLine.Create(First, Second, Triangle.Corner(0).Color, Triangle.Corner(1).Color));
+  PlotLine(TPdfMeshLine.Create(Second, Third, Triangle.Corner(1).Color, Triangle.Corner(2).Color));
+  PlotLine(TPdfMeshLine.Create(Third, First, Triangle.Corner(2).Color, Triangle.Corner(0).Color));
 end;
 
 { TPdfType4ShadingContext }
 
-constructor TPdfType4ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+constructor TPdfType4ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                           const Cancel: IPdfCancelToken);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
     try
@@ -698,7 +925,7 @@ end;
 // placed.
 procedure TPdfType4ShadingContext.ReadTriangles;
 begin
-  while not FReader.IsAtEnd do
+  while (not FReader.IsAtEnd) and (not IsStopped) do
   begin
     var Flag: Integer;
     var Vertex: TPdfMeshVertex;
@@ -788,9 +1015,10 @@ end;
 
 { TPdfType5ShadingContext }
 
-constructor TPdfType5ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect);
+constructor TPdfType5ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
+                                           const Cancel: IPdfCancelToken);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
     try
@@ -811,13 +1039,21 @@ begin
     Exit;
   end;
 
+  // Two rows are needed for a triangle. A row longer than the data, or than the limit, is never read: it would only be an allocation.
+  const RowsFit = ((Int64(VerticesPerRow) * 2 <= FReader.RemainingVertexCount) and (VerticesPerRow <= MaxMeshElements));
+  if not RowsFit then
+  begin
+    Shading.Warn('The mesh shading has /VerticesPerRow %d, which does not fit two rows in its data or the limit of %d; nothing is painted', [VerticesPerRow, MaxMeshElements]);
+    Exit;
+  end;
+
   var Upper, Lower: TArray<TPdfMeshVertex>;
   if not TryReadRow(VerticesPerRow, Upper) then
   begin
     Exit;
   end;
 
-  while TryReadRow(VerticesPerRow, Lower) do
+  while (not IsStopped) and TryReadRow(VerticesPerRow, Lower) do
   begin
     if not TryDrawRows(Upper, Lower) then
     begin
