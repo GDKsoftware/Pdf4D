@@ -40,10 +40,13 @@ type
   public
     Marker: Integer;
 
+    class var DestroyedCount: Integer;
+
+    destructor Destroy; override;
     function Clone: TPDGraphicsState; override;
   end;
 
-  TChildMode = (None, Plain, Failing);
+  TChildMode = (None, Plain, Failing, NilContent);
 
   TClipRecord = record
     Rect: TPdfRectangle;
@@ -70,6 +73,7 @@ type
     FGlyphs: TList<TGlyphRecord>;
     FStackSizeAfterChild: Integer;
     FChildFailureSeen: Boolean;
+    FNilContentRejected: Boolean;
 
     procedure RunChild(const Form: TPDFormXObject);
 
@@ -96,6 +100,7 @@ type
     property Glyphs: TList<TGlyphRecord> read FGlyphs;
     property StackSizeAfterChild: Integer read FStackSizeAfterChild;
     property ChildFailureSeen: Boolean read FChildFailureSeen;
+    property NilContentRejected: Boolean read FNilContentRejected;
   end;
 
   [TestFixture]
@@ -153,12 +158,21 @@ type
     procedure TestChildStreamHonoursFormDepth;
 
     [Test]
+    procedure TestChildStreamWithoutContentIsRejected;
+
+    [Test]
     procedure TestDocumentExposesModel;
   end;
 
 implementation
 
 { TMarkedGraphicsState }
+
+destructor TMarkedGraphicsState.Destroy;
+begin
+  Inc(DestroyedCount);
+  inherited;
+end;
 
 function TMarkedGraphicsState.Clone: TPDGraphicsState;
 begin
@@ -249,8 +263,19 @@ begin
   const State = TMarkedGraphicsState.Create;
   State.Marker := 7;
   try
-    ProcessChildStream(Form.Stream, Resources, State, Form.Matrix, HasBBox, BBox);
+    if FChildMode = TChildMode.NilContent then
+    begin
+      ProcessChildStream(nil, Resources, State, Form.Matrix, HasBBox, BBox);
+    end
+    else
+    begin
+      ProcessChildStream(Form.Stream, Resources, State, Form.Matrix, HasBBox, BBox);
+    end;
   except
+    on EArgumentNilException do
+    begin
+      FNilContentRejected := True;
+    end;
     on Failure: EPdfParseException do
     begin
       FChildFailureSeen := True;
@@ -435,6 +460,19 @@ begin
   Assert.AreEqual<Integer>(0, FEngine.StackSizeAfterChild);
   Assert.AreEqual<Integer>(1, FEngine.Glyphs.Count);
   Assert.AreEqual<Integer>(2, FEngine.Glyphs[0].StackSize);
+end;
+
+procedure TStreamEngineHooksTests.TestChildStreamWithoutContentIsRejected;
+begin
+  TMarkedGraphicsState.DestroyedCount := 0;
+  FEngine.ChildMode := TChildMode.NilContent;
+  const Builder = NewBuilder('q /Fm0 Do Q', 1);
+  AddForm(Builder, 0, '', 'q Q', '');
+  Run(Builder);
+
+  Assert.IsTrue(FEngine.NilContentRejected);
+  Assert.AreEqual<Integer>(1, TMarkedGraphicsState.DestroyedCount, 'The initial state is freed');
+  Assert.AreEqual<Integer>(0, FEngine.StackSizeAfterChild);
 end;
 
 procedure TStreamEngineHooksTests.TestChildStreamCountsAgainstBudget;

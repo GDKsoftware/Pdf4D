@@ -590,6 +590,11 @@ end;
 procedure TPdfStreamEngine.ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
   const HasBBox: Boolean; const BBox: TPdfRectangle);
 begin
+  if Content = nil then
+  begin
+    InitialState.Free;
+    raise EArgumentNilException.Create('Content');
+  end;
   RunStream(Content, Resources, False, InitialState, Matrix, HasBBox, BBox);
 end;
 
