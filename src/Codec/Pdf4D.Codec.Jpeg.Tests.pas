@@ -123,6 +123,15 @@ type
     procedure TestGarbageScanDataEndsWithParseErrorOrAnImage;
 
     [Test]
+    procedure TestFancyUpsamplingH2V1MatchesLibjpeg;
+
+    [Test]
+    procedure TestFancyUpsamplingH2V2MatchesLibjpeg;
+
+    [Test]
+    procedure TestFancyUpsamplingKeepsConstantAreasConstant;
+
+    [Test]
     procedure TestEmptyRefinementScansAreBoundedByAWorkBudget;
 
     [Test]
@@ -148,15 +157,15 @@ const
   JpegCorpusFile = 'generated/render/jpeg.pdf';
   ImagesFolder = 'images';
   SelectionFile = 'selection.txt';
-  // Without chroma subsampling the decoder is within a few levels of PDFBox. With it, jpg.js repeats the nearest chroma sample where
-  // libjpeg interpolates, which differs most where the colour changes quickly (measured: 72 and 1.4 on average for the photo of the
-  // PDFBox tests, 56 and 4.2 for the generated image with its colour ramps, 60 and 3.2 in the corpus).
+  // The decoder is within a few levels of PDFBox, with and without chroma subsampling, because it upsamples like libjpeg does (the
+  // differences left are the rounding of the colour conversion; measured: 3 and 0.13 for the generated 4:2:0 images, 0 to 3 for the rest)
   MaxLargestDifference = 4;
   MaxMeanDifference = 0.5;
-  MaxLargestSubsampled = 80;
-  MaxMeanSubsampled = 5.0;
   // A CMYK image with /Decode [1 0 ...] puts the dark colours where the conversion to RGB amplifies a difference (measured: 11 and 0.13)
   MaxLargestInvertedCmyk = 12;
+  // Over all the images of the corpus (measured: 5 and 0.33 for the worst photo, and the inverted CMYK image above with 11)
+  MaxLargestCorpus = 12;
+  MaxMeanCorpus = 0.4;
   MinimumComparedCorpusImages = 11;
   MaxScans = 1000;
   Soi = $FFD8;
@@ -360,8 +369,8 @@ end;
 
 procedure TJpegImageTests.TestBaselineRgb420;
 begin
-  AssertImageMatches('JpegRgb420', MaxLargestSubsampled, MaxMeanSubsampled);
-  AssertImageMatches('PdfboxRgb', MaxLargestSubsampled, MaxMeanSubsampled);
+  AssertImageMatches('JpegRgb420', MaxLargestDifference, MaxMeanDifference);
+  AssertImageMatches('PdfboxRgb', MaxLargestDifference, MaxMeanDifference);
 end;
 
 procedure TJpegImageTests.TestBaselineRgb444;
@@ -371,12 +380,12 @@ end;
 
 procedure TJpegImageTests.TestProgressive;
 begin
-  AssertImageMatches('JpegProgressive', MaxLargestSubsampled, MaxMeanSubsampled);
+  AssertImageMatches('JpegProgressive', MaxLargestDifference, MaxMeanDifference);
 end;
 
 procedure TJpegImageTests.TestRestartInterval;
 begin
-  AssertImageMatches('JpegRestart', MaxLargestSubsampled, MaxMeanSubsampled);
+  AssertImageMatches('JpegRestart', MaxLargestDifference, MaxMeanDifference);
 end;
 
 // jpegcmyk.jpg of the PDFBox tests is YCCK (Adobe transform 2); cmyk.jpg has Adobe transform 0
@@ -452,7 +461,7 @@ begin
         const Image = TPDImageXObject.Create(Stream, Resources);
         try
           const Measured = Difference(Image, PngPath);
-          const IsClose = ((Measured.Largest <= MaxLargestSubsampled) and (Measured.Mean <= MaxMeanSubsampled));
+          const IsClose = ((Measured.Largest <= MaxLargestCorpus) and (Measured.Mean <= MaxMeanCorpus));
           if not IsClose then
           begin
             Misses.Add(Format('%s page %d image %s: largest difference %d, mean difference %.3f', [Entry, PageIndex + 1, Name, Measured.Largest, Measured.Mean]));
@@ -763,6 +772,52 @@ begin
     end;
   end;
   Assert.Pass;
+end;
+
+// h2v1_fancy_upsample of libjpeg: a triangle filter, the sample itself weighs 3 and its neighbour 1, the ends keep their sample
+procedure TJpegImageTests.TestFancyUpsamplingH2V1MatchesLibjpeg;
+begin
+  const Source: TBytes = [10, 20, 30, 40];
+  var Target: TBytes;
+  SetLength(Target, 8);
+
+  TJpegUpsampling.UpsampleRowH2V1(Source, Length(Source), Target);
+
+  const Expected: TBytes = [10, 13, 17, 23, 27, 33, 37, 40];
+  AssertSamplesEqual(Expected, Target);
+end;
+
+// h2v2_fancy_upsample: the sample weighs 3 and the sample of the nearest other row 1 vertically, then 3 and 1 horizontally; the
+// sums are rounded with the alternating bias 8 and 7 of libjpeg
+procedure TJpegImageTests.TestFancyUpsamplingH2V2MatchesLibjpeg;
+begin
+  const Near: TBytes = [10, 20, 30];
+  const Far: TBytes = [50, 60, 70];
+  var Target: TBytes;
+  SetLength(Target, 6);
+
+  TJpegUpsampling.UpsampleRowH2V2(Near, Far, Length(Near), Target);
+
+  const Expected: TBytes = [20, 22, 28, 32, 38, 40];
+  AssertSamplesEqual(Expected, Target);
+end;
+
+procedure TJpegImageTests.TestFancyUpsamplingKeepsConstantAreasConstant;
+begin
+  const Flat: TBytes = [77, 77, 77, 77, 77];
+  var Wide: TBytes;
+  SetLength(Wide, 10);
+  var Tall: TBytes;
+  SetLength(Tall, 10);
+
+  TJpegUpsampling.UpsampleRowH2V1(Flat, Length(Flat), Wide);
+  TJpegUpsampling.UpsampleRowH2V2(Flat, Flat, Length(Flat), Tall);
+
+  for var Index := 0 to 9 do
+  begin
+    Assert.AreEqual<Integer>(77, Wide[Index], 'h2v1');
+    Assert.AreEqual<Integer>(77, Tall[Index], 'h2v2');
+  end;
 end;
 
 end.

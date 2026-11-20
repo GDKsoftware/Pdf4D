@@ -49,6 +49,17 @@ type
     property Samples: TBytes read FSamples;
   end;
 
+  // The "fancy" (triangle filter) upsampling of libjpeg (jdsample.c, h2v1_fancy_upsample and h2v2_fancy_upsample), which ImageIO
+  // uses for the PDFBox reference. jpg.js repeats the nearest sample instead (see docs/porting.md).
+  TJpegUpsampling = record
+    // Source holds Count samples (Count > 2), Target gets 2 * Count
+    class procedure UpsampleRowH2V1(const Source: TBytes; const Count: Integer; var Target: TBytes); static;
+    // Near is the row that the output row lies in, Far the nearest row on the other side of the output row (the row above for the
+    // upper output row of a pair, the row below for the lower one; the row itself at the edge of the image). Both hold Count
+    // samples (Count > 2); Target gets 2 * Count.
+    class procedure UpsampleRowH2V2(const Near, Far: TBytes; const Count: Integer; var Target: TBytes); static;
+  end;
+
 implementation
 
 uses
@@ -224,6 +235,9 @@ type
     property BlocksVisited: Int64 read FBlocksVisited;
   end;
 
+  // How a component is brought to the size of the image
+  TFancyUpsampling = (None, H2V1, H2V2);
+
   // JpegImage: the parser, the reconstruction of the components and the colour conversion
   TJpegDecoder = class
   private
@@ -265,6 +279,9 @@ type
     procedure QuantizeAndInverse(const Component: TJpegComponent; const BlockBufferOffset: Integer);
     procedure InverseRows(const Component: TJpegComponent; const BlockBufferOffset: Integer);
     procedure InverseColumns(const Component: TJpegComponent; const BlockBufferOffset: Integer);
+    procedure ReadComponentRow(const Component: TJpegComponent; const Row, Count: Integer; var Buffer: TBytes);
+    function GetFancyUpsampling(const Component: TJpegComponent): TFancyUpsampling;
+    procedure UpsampleComponentFancy(const Component: TJpegComponent; const Mode: TFancyUpsampling; const Position, Count: Integer; const Target: TBytes);
     function LinearizeBlockData: TBytes;
     function ComponentCount: Integer;
     function IsColorConversionNeeded: Boolean;
@@ -627,6 +644,44 @@ end;
 procedure TJpegFrame.SetComponentId(const Id, ComponentIndex: Integer);
 begin
   FComponentIndexOfId[Id] := ComponentIndex;
+end;
+
+{ TJpegUpsampling }
+
+class procedure TJpegUpsampling.UpsampleRowH2V1(const Source: TBytes; const Count: Integer; var Target: TBytes);
+begin
+  Target[0] := Source[0];
+  Target[1] := Byte((Source[0] * 3 + Source[1] + 2) shr 2);
+  for var Index := 1 to Count - 2 do
+  begin
+    const Value = Source[Index] * 3;
+    Target[Index * 2] := Byte((Value + Source[Index - 1] + 1) shr 2);
+    Target[Index * 2 + 1] := Byte((Value + Source[Index + 1] + 2) shr 2);
+  end;
+  const Last = Count - 1;
+  Target[Last * 2] := Byte((Source[Last] * 3 + Source[Last - 1] + 1) shr 2);
+  Target[Last * 2 + 1] := Source[Last];
+end;
+
+class procedure TJpegUpsampling.UpsampleRowH2V2(const Near, Far: TBytes; const Count: Integer; var Target: TBytes);
+begin
+  var ThisSum := Near[0] * 3 + Far[0];
+  var NextSum := Near[1] * 3 + Far[1];
+  Target[0] := Byte((ThisSum * 4 + 8) shr 4);
+  Target[1] := Byte((ThisSum * 3 + NextSum + 7) shr 4);
+  var LastSum := ThisSum;
+  ThisSum := NextSum;
+  for var Index := 1 to Count - 2 do
+  begin
+    NextSum := Near[Index + 1] * 3 + Far[Index + 1];
+    Target[Index * 2] := Byte((ThisSum * 3 + LastSum + 8) shr 4);
+    Target[Index * 2 + 1] := Byte((ThisSum * 3 + NextSum + 7) shr 4);
+    LastSum := ThisSum;
+    ThisSum := NextSum;
+  end;
+  const Last = Count - 1;
+  Target[Last * 2] := Byte((ThisSum * 3 + LastSum + 8) shr 4);
+  Target[Last * 2 + 1] := Byte((ThisSum * 4 + 7) shr 4);
 end;
 
 { TJpegScanDecoder }
@@ -1871,8 +1926,88 @@ begin
   Result := FFrame.Components.Count;
 end;
 
+// The Count samples of row Row of a component, from its block buffer
+procedure TJpegDecoder.ReadComponentRow(const Component: TJpegComponent; const Row, Count: Integer; var Buffer: TBytes);
+begin
+  const BlocksPerScanline = (Component.BlocksPerLine + 1) shl 3;
+  const Output = Component.BlockData;
+  const Index = (BlocksPerScanline * (Row and not 7)) or ((Row and 7) shl 3);
+  const LastColumn = Count - 1;
+  const MaxXOffset = ((LastColumn and not 7) shl 3) or (LastColumn and 7);
+  if (Int64(Index) + MaxXOffset) >= Length(Output) then
+  begin
+    raise EPdfParseException.Create(BlockOutsideBuffer);
+  end;
+
+  for var X := 0 to LastColumn do
+  begin
+    Buffer[X] := Byte(Output[Index + (((X and not 7) shl 3) or (X and 7))]);
+  end;
+end;
+
+// The component that libjpeg upsamples with its triangle filter: twice as wide as it is stored, and stored with the full height
+// (h2v1) or half of it (h2v2), and wider than 2 samples
+function TJpegDecoder.GetFancyUpsampling(const Component: TJpegComponent): TFancyUpsampling;
+begin
+  Result := TFancyUpsampling.None;
+  const StoredWidth = CeilDiv(FFrame.SamplesPerLine, 2);
+  if (Component.H * 2 = FFrame.MaxH) and (StoredWidth > 2) then
+  begin
+    if Component.V = FFrame.MaxV then
+    begin
+      Result := TFancyUpsampling.H2V1;
+    end
+    else if Component.V * 2 = FFrame.MaxV then
+    begin
+      Result := TFancyUpsampling.H2V2;
+    end;
+  end;
+end;
+
+// The samples of the component at the size of the image, by the triangle filter of libjpeg, into Target at Position, Count apart
+procedure TJpegDecoder.UpsampleComponentFancy(const Component: TJpegComponent; const Mode: TFancyUpsampling; const Position, Count: Integer; const Target: TBytes);
+begin
+  const Width = FFrame.SamplesPerLine;
+  const Height = FFrame.ScanLines;
+  const StoredWidth = Integer(CeilDiv(Width, 2));
+  const StoredHeight = IfThen(Mode = TFancyUpsampling.H2V2, Integer(CeilDiv(Height, 2)), Height);
+
+  var Near: TBytes;
+  var Far: TBytes;
+  var Row: TBytes;
+  SetLength(Near, StoredWidth);
+  SetLength(Far, StoredWidth);
+  SetLength(Row, StoredWidth * 2);
+
+  var TargetIndex := Position;
+  for var Y := 0 to Height - 1 do
+  begin
+    if Mode = TFancyUpsampling.H2V2 then
+    begin
+      // The row that the output row lies in and the nearest row on the other side of it; at the top and the bottom of the image
+      // that is the row itself
+      const StoredRow = Y shr 1;
+      const OtherRow = EnsureRange(IfThen((Y and 1) = 0, StoredRow - 1, StoredRow + 1), 0, StoredHeight - 1);
+      ReadComponentRow(Component, StoredRow, StoredWidth, Near);
+      ReadComponentRow(Component, OtherRow, StoredWidth, Far);
+      TJpegUpsampling.UpsampleRowH2V2(Near, Far, StoredWidth, Row);
+    end
+    else
+    begin
+      ReadComponentRow(Component, Y, StoredWidth, Near);
+      TJpegUpsampling.UpsampleRowH2V1(Near, StoredWidth, Row);
+    end;
+
+    for var X := 0 to Width - 1 do
+    begin
+      Target[TargetIndex] := Row[X];
+      Inc(TargetIndex, Count);
+    end;
+  end;
+end;
+
 // #getLinearizedBlockData for the size of the image: every sample is that of the block that holds it, the samples of a subsampled
-// component repeated
+// component repeated; except that libjpeg interpolates a component that is halved horizontally (h2v1, h2v2), see TJpegUpsampling
 function TJpegDecoder.LinearizeBlockData: TBytes;
 begin
   const Width = FFrame.SamplesPerLine;
@@ -1885,6 +2020,13 @@ begin
   for var Position := 0 to Count - 1 do
   begin
     const Component = FFrame.Components[Position];
+    const Mode = GetFancyUpsampling(Component);
+    if Mode <> TFancyUpsampling.None then
+    begin
+      UpsampleComponentFancy(Component, Mode, Position, Count, Result);
+      Continue;
+    end;
+
     const ScaleX = Component.H / FFrame.MaxH;
     const ScaleY = Component.V / FFrame.MaxV;
     const BlocksPerScanline = (Component.BlocksPerLine + 1) shl 3;

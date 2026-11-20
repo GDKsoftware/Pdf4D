@@ -159,7 +159,7 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - `JpegImage.getData` is called for the size of the JPEG itself, with neither `forceRGB` nor `forceRGBA`: the colour conversions to RGB(A) and the `decodeTransform` of `IMAGE_DECODERS` builds are not ported, except that a file that is not from a PDF has its CMYK inverted (`IsSourcePdf` false).
 - The colour conversions write through a clamping and rounding function that follows `Uint8ClampedArray` (round half to even).
 - `TPDImage` skips one line feed before the data and takes `/ColorTransform` from the decode parameters of the DCT filter, as `jpg.js` is called from pdf.js; PDFBox ignores `/ColorTransform` and asks the Adobe marker and `ImageIO`. A filter that follows DCTDecode is ignored with a warning.
-- Upsampling of subsampled components repeats the nearest sample (`jpg.js`), where `ImageIO` (libjpeg) interpolates ("fancy upsampling"); the comparison with PDFBox in the tests allows for that.
+- Upsampling of a component that is halved horizontally (4:2:2 and 4:2:0, h2v1 and h2v2) follows libjpeg ("fancy upsampling": a triangle filter with weights 3 and 1, `TJpegUpsampling`), because libjpeg inside ImageIO is the reference of PDFBox. jpg.js repeats the nearest sample, so this is a deviation from it; other sampling ratios repeat the nearest sample, as libjpeg does.
 
 ## Limits that Pdf4D adds
 
