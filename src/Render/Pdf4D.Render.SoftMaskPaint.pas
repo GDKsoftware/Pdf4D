@@ -49,12 +49,15 @@ type
     class function Build(const Drawer: TPdfPageDrawer; const Mask: IPdfSoftMask): TPdfAlphaMask; static;
 
     // The alpha of Image (IsAlpha) or its luminosity as a mask whose top left pixel lies at (Left, Top) of the device, outside which the
-    // mask has OutsideValue. Transfer may be nil and is applied to the values and to OutsideValue. Image holds premultiplied values over
+    // mask has OutsideValue. Transfer may be nil and is applied to the values only, not to OutsideValue (SoftPaintContext.getRaster).
+    // Image holds premultiplied values over
     // a black backdrop, as the layer of a group does.
     class function MaskFromImage(const Image: TPdfBitmap; const Left, Top: Integer; const IsAlpha: Boolean; const OutsideValue: Byte;
                                  const Transfer: TPDFunction): TPdfAlphaMask; static;
     // The luminosity of a colour in 0..255, with the weights of the gray conversion of Java2D (0.299, 0.587 and 0.114)
     class function Luminosity(const Color: TPdfDeviceColor): Byte; static;
+    // The value outside the mask for a backdrop colour: bc of SoftMask, (299 * red + 587 * green + 114 * blue) / 1000
+    class function BackdropValue(const Color: TPdfDeviceColor): Byte; static;
   end;
 
 implementation
@@ -84,6 +87,10 @@ const
   BlueWeight = 29;
   WeightShift = 8;
   WeightRounding = 128;
+  BackdropRedWeight = 299;
+  BackdropGreenWeight = 587;
+  BackdropBlueWeight = 114;
+  BackdropDivisor = 1000;
   ColorChannels = 3;
   AlphaSubType = 'Alpha';
 
@@ -224,7 +231,7 @@ begin
     var OutsideValue: Byte := 0;
     if HasBackdrop then
     begin
-      OutsideValue := Luminosity(Backdrop);
+      OutsideValue := BackdropValue(Backdrop);
     end;
     Result := MaskFromImage(Image, Bounds.Left, Bounds.Top, IsAlpha, OutsideValue, Mask.TransferFunction);
   finally
@@ -282,11 +289,16 @@ begin
   Result := GrayOf(Color.R, Color.G, Color.B);
 end;
 
+class function TPdfSoftMaskBuilder.BackdropValue(const Color: TPdfDeviceColor): Byte;
+begin
+  Result := Byte((BackdropRedWeight * Color.R + BackdropGreenWeight * Color.G + BackdropBlueWeight * Color.B) div BackdropDivisor);
+end;
+
 class function TPdfSoftMaskBuilder.MaskFromImage(const Image: TPdfBitmap; const Left, Top: Integer; const IsAlpha: Boolean;
                                                  const OutsideValue: Byte; const Transfer: TPDFunction): TPdfAlphaMask;
 begin
   const Table = TPdfImageTransfer.Table(Transfer);
-  Result := TPdfAlphaMask.Create(Left, Top, Image.Width, Image.Height, Table[OutsideValue]);
+  Result := TPdfAlphaMask.Create(Left, Top, Image.Width, Image.Height, OutsideValue);
   try
     const Values = Result.Values;
     var Index := 0;

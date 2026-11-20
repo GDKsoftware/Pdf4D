@@ -79,6 +79,15 @@ type
     procedure TestAlphaMaskIgnoresTheBackdropColor;
 
     [Test]
+    procedure TestTransferFunctionDoesNotMapTheBackdropOutside;
+
+    [Test]
+    procedure TestMaskGroupStartsWithBlackColours;
+
+    [Test]
+    procedure TestMaskGroupStartsWithBlackStrokeColour;
+
+    [Test]
     procedure TestEmptySoftMaskIsIgnored;
 
     [Test]
@@ -290,6 +299,49 @@ begin
 
   const Fills = CallsOfKind(FDevice, TRecordedCallKind.Fill);
   Assert.AreEqual<Integer>(0, Fills[0].SoftMaskOutside);
+end;
+
+// An inverting /TR does not map the value outside the box: PDFBox gives bc / 255 there, so black stays masked
+procedure TPageDrawerSoftMaskTests.TestTransferFunctionDoesNotMapTheBackdropOutside;
+begin
+  RenderMasked(MaskedFill, '/S /Luminosity /TR << /FunctionType 2 /Domain [0 1] /C0 [1] /C1 [0] /N 1 >>');
+
+  const Fills = CallsOfKind(FDevice, TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(0, Fills[0].SoftMaskOutside);
+end;
+
+// processSoftMask: the group starts with DeviceGray black as non-stroking colour, whatever the page has set
+procedure TPageDrawerSoftMaskTests.TestMaskGroupStartsWithBlackColours;
+begin
+  const Builder = NewBuilder('1 0 0 rg /GsMask gs 20 20 50 50 re f');
+  try
+    AddMask(Builder, '/S /Luminosity', GroupEntries, '0 0 100 100 re f');
+    Render(Builder);
+  finally
+    Builder.Free;
+  end;
+
+  const Fills = CallsOfKind(FDevice.Layers[0], TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.AreEqual<Integer>(0, Fills[0].Paint.Color.R);
+  Assert.AreEqual<Integer>(0, Fills[0].Paint.Color.G);
+  Assert.AreEqual<Integer>(0, Fills[0].Paint.Color.B);
+end;
+
+procedure TPageDrawerSoftMaskTests.TestMaskGroupStartsWithBlackStrokeColour;
+begin
+  const Builder = NewBuilder('1 0 0 RG /GsMask gs 20 20 50 50 re f');
+  try
+    AddMask(Builder, '/S /Luminosity', GroupEntries, '10 10 80 80 re S');
+    Render(Builder);
+  finally
+    Builder.Free;
+  end;
+
+  const Strokes = CallsOfKind(FDevice.Layers[0], TRecordedCallKind.Stroke);
+  Assert.AreEqual<Integer>(1, Length(Strokes));
+  Assert.AreEqual<Integer>(0, Strokes[0].Paint.Color.R);
+  Assert.AreEqual<Integer>(0, Strokes[0].Paint.Color.G);
 end;
 
 // The box of the group lies outside of the page: nothing of it is drawn

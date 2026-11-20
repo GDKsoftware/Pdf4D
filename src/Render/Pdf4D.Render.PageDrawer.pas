@@ -233,6 +233,7 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Graphics.Color.Device,
   Pdf4D.Graphics.Color.Pattern,
   Pdf4D.Graphics.Color.Special,
   Pdf4D.Graphics.State,
@@ -260,6 +261,18 @@ const
   ImageDownscalingThreshold = 0.5;
   CodeShift = 48;
   CodeMask = $FFFF;
+
+// processSoftMask: the text matrices are new, and the colours are the initial colour of DeviceGray (black) for stroking and not stroking
+procedure StartWithBlackDeviceGray(const State: TPdfRenderGraphicsState);
+begin
+  const Gray = TPDDeviceGray.Instance;
+  State.SetTextMatrix(TPdfMatrix.Identity);
+  State.SetTextLineMatrix(TPdfMatrix.Identity);
+  State.NonStrokingColorSpace := Gray;
+  State.NonStrokingColor := Gray.InitialColor;
+  State.StrokingColorSpace := Gray;
+  State.StrokingColor := Gray.InitialColor;
+end;
 
 type
   // What the tiling paint asks of the drawer that owns it. The drawer frees the factory that holds this, before it is gone itself.
@@ -2012,6 +2025,10 @@ begin
     State.BlendMode := TPdfBlendMode.Normal;
     State.AlphaConstant := 1;
     State.NonStrokeAlphaConstant := 1;
+    if IsSoftMask then
+    begin
+      StartWithBlackDeviceGray(State);
+    end;
   except
     State.Free;
     raise;

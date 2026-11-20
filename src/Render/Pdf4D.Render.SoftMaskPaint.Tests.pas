@@ -51,7 +51,10 @@ type
     procedure TestTransferFunctionApplied;
 
     [Test]
-    procedure TestTransferFunctionAppliedToTheValueOutsideToo;
+    procedure TestTransferFunctionNotAppliedToTheValueOutside;
+
+    [Test]
+    procedure TestBackdropValueUsesTheWeightsOfPdfBox;
 
     [Test]
     procedure TestMaskLiesAtTheGivenPosition;
@@ -219,14 +222,15 @@ begin
   end;
 end;
 
-procedure TSoftMaskBuilderTests.TestTransferFunctionAppliedToTheValueOutsideToo;
+// SoftPaintContext.getRaster: the value outside the mask image is bc / 255, the transfer function maps the values inside the image only
+procedure TSoftMaskBuilderTests.TestTransferFunctionNotAppliedToTheValueOutside;
 begin
   const Image = FilledBitmap(TPdfDeviceColor.White);
   const Transfer = SquareFunction;
   try
     const Mask = TPdfSoftMaskBuilder.MaskFromImage(Image, 0, 0, False, 128, Transfer);
     try
-      Assert.AreEqual(Double(0.25 * 255), Double(Mask.OutsideValue), Tolerance);
+      Assert.AreEqual<Integer>(128, Mask.OutsideValue);
       Assert.AreEqual<Integer>(255, Mask.ValueAt(1, 1));
     finally
       Mask.Free;
@@ -235,6 +239,14 @@ begin
     Transfer.Free;
     Image.Free;
   end;
+end;
+
+// SoftMask: bc = (299 * red + 587 * green + 114 * blue) / 1000 with an integer division
+procedure TSoftMaskBuilderTests.TestBackdropValueUsesTheWeightsOfPdfBox;
+begin
+  Assert.AreEqual<Integer>(76, TPdfSoftMaskBuilder.BackdropValue(TPdfDeviceColor.Create(255, 0, 0)));
+  Assert.AreEqual<Integer>(255, TPdfSoftMaskBuilder.BackdropValue(TPdfDeviceColor.White));
+  Assert.AreEqual<Integer>(0, TPdfSoftMaskBuilder.BackdropValue(TPdfDeviceColor.Create(0, 0, 0)));
 end;
 
 procedure TSoftMaskBuilderTests.TestMaskLiesAtTheGivenPosition;

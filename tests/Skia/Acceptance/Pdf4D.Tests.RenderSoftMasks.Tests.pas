@@ -154,8 +154,8 @@ begin
   const Bitmap = Render(BlueEverywhere, '/S /Luminosity ' + Inverse, '1 g 0 0 100 100 re f');
   try
     AssertPixel(Bitmap, 50, 50, TPdfDeviceColor.White);
-    // Outside the box the mask is black, which the function makes white
-    AssertPixel(Bitmap, 150, 150, TPdfDeviceColor.Create(0, 0, 255));
+    // Outside the box the mask is black, and the function does not map that value (SoftPaintContext.getRaster): the fill stays hidden
+    AssertPixel(Bitmap, 150, 150, TPdfDeviceColor.White);
   finally
     Bitmap.Free;
   end;
