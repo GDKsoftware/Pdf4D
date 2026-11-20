@@ -72,6 +72,15 @@ type
     procedure TestDefaultDecodeIsThatOfTheAlternate;
 
     [Test]
+    procedure TestValidProfileWithItselfAsAlternateGivesADecode;
+
+    [Test]
+    procedure TestProfilesThatAreEachOthersAlternateGiveADecode;
+
+    [Test]
+    procedure TestBrokenProfileWithItselfAsAlternateUsesTheDeviceSpace;
+
+    [Test]
     procedure TestMissingNTakesTheComponentsOfTheProfile;
   end;
 
@@ -343,6 +352,50 @@ begin
   Assert.AreEqual<Integer>(6, Length(Decode));
   Assert.AreEqual(0.0, Decode[0], 0.0);
   Assert.AreEqual(1.0, Decode[5], 0.0);
+end;
+
+procedure TIccBasedTests.TestValidProfileWithItselfAsAlternateGivesADecode;
+begin
+  const IccArray = FBuilder.NewIccArray(TIccTestFiles.ReadProfile('sRGB.icc'), 3);
+  FBuilder.IccStreamOf(IccArray).SetItem(TCosNames.Alternate, FBuilder.NewReference(IccArray, 7));
+
+  const Space = FBuilder.CreateSpace(IccArray);
+  const Decode = Space.GetDefaultDecode(8);
+
+  Assert.AreEqual<Integer>(6, Length(Decode));
+  Assert.AreEqual(1.0, Decode[5], 0.0);
+  Assert.AreEqual(1, FBuilder.WarningCount, 'one warning');
+  AssertRgb([0.2, 0.4, 0.6], Space.ToRgb([0.2, 0.4, 0.6]), 0.05);
+end;
+
+procedure TIccBasedTests.TestProfilesThatAreEachOthersAlternateGiveADecode;
+begin
+  const First = FBuilder.NewIccArray(TIccTestFiles.ReadProfile('sRGB.icc'), 3);
+  const Second = FBuilder.NewIccArray(TIccTestFiles.ReadProfile('sRGB.icc'), 3);
+  FBuilder.IccStreamOf(First).SetItem(TCosNames.Alternate, FBuilder.NewReference(Second, 8));
+  FBuilder.IccStreamOf(Second).SetItem(TCosNames.Alternate, FBuilder.NewReference(First, 9));
+
+  const FirstSpace = FBuilder.CreateSpace(First);
+  const SecondSpace = FBuilder.CreateSpace(Second);
+
+  Assert.AreEqual<Integer>(6, Length(FirstSpace.GetDefaultDecode(8)));
+  Assert.AreEqual<Integer>(6, Length(SecondSpace.GetDefaultDecode(8)));
+  Assert.IsTrue(FBuilder.WarningCount >= 1, 'the cycle is reported');
+end;
+
+procedure TIccBasedTests.TestBrokenProfileWithItselfAsAlternateUsesTheDeviceSpace;
+begin
+  const IccArray = FBuilder.NewIccArray(BrokenProfile, 3);
+  FBuilder.IccStreamOf(IccArray).SetItem(TCosNames.Alternate, FBuilder.NewReference(IccArray, 7));
+
+  const Space = FBuilder.CreateSpace(IccArray);
+  const Again = FBuilder.CreateSpace(IccArray);
+
+  Assert.AreEqual(3, Space.NumberOfComponents);
+  AssertRgb([0.2, 0.4, 0.6], Space.ToRgb([0.2, 0.4, 0.6]), 0.0, 'the device space of N');
+  Assert.AreEqual<Integer>(6, Length(Space.GetDefaultDecode(8)));
+  Assert.AreSame(Space, Again);
+  Assert.AreEqual(1, FBuilder.WarningCount, 'one warning');
 end;
 
 procedure TIccBasedTests.TestMissingNTakesTheComponentsOfTheProfile;

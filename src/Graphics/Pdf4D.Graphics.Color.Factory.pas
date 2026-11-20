@@ -6,6 +6,8 @@
 // EPdfUnsupportedFeatureException until they are ported.
 unit Pdf4D.Graphics.Color.Factory;
 
+{$EXCESSPRECISION OFF}
+
 interface
 
 uses
@@ -69,10 +71,45 @@ resourcestring
   ColorSpaceTooDeep = 'Colour spaces are nested deeper than %d levels';
   ColorSpaceNotPorted = 'The colour space %s is not supported yet';
   IccNeedsStream = 'An ICCBased colour space array must have a stream as second element';
+  IccRefersToItself = 'An ICCBased colour space is being made while its alternate asks for it again';
 
 const
   IccElementCount = 2;
   IccStreamIndex = 1;
+
+type
+  // The ICCBased arrays that this thread is making, innermost last. Colour spaces nest at most MaxColorSpaceDepth + 1 deep.
+  TIccArraysInProgress = record
+    Items: array[0..MaxColorSpaceDepth + 1] of TCosArray;
+    Count: Integer;
+
+    function Contains(const IccArray: TCosArray): Boolean;
+    procedure Push(const IccArray: TCosArray);
+    procedure Pop;
+  end;
+
+threadvar
+  IccInProgress: TIccArraysInProgress;
+
+function TIccArraysInProgress.Contains(const IccArray: TCosArray): Boolean;
+begin
+  Result := False;
+  for var Index := 0 to Count - 1 do
+  begin
+    Result := (Result or (Items[Index] = IccArray));
+  end;
+end;
+
+procedure TIccArraysInProgress.Push(const IccArray: TCosArray);
+begin
+  Items[Count] := IccArray;
+  Inc(Count);
+end;
+
+procedure TIccArraysInProgress.Pop;
+begin
+  Dec(Count);
+end;
 
 { TPDColorSpaceFactory }
 
@@ -292,7 +329,28 @@ begin
       Result := CreateAt(Alternate, Context, nil, False, NextDepth);
     end;
 
-  const IccSpace = TPDICCBased.Create(TCosStream(Resolve(Items.GetObject(IccStreamIndex))), Context, ResolveAlternate);
+  // A profile that cannot be used makes the space ask for its alternate, which may be an array that leads back to this one: that
+  // alternate counts as absent (the caller falls back to the device space of N). Only the depth limit would stop it otherwise.
+  if IccInProgress.Contains(Items) then
+  begin
+    raise EPdfParseException.Create(IccRefersToItself);
+  end;
+
+  var IccSpace: TPDICCBased;
+  IccInProgress.Push(Items);
+  try
+    IccSpace := TPDICCBased.Create(TCosStream(Resolve(Items.GetObject(IccStreamIndex))), Context, ResolveAlternate);
+  finally
+    IccInProgress.Pop;
+  end;
+
+  // Made meanwhile through another way in: keep the space that the context knows
+  var Cached: TObject;
+  if Context.TryGetCachedObject(TPDCacheScope.ColorSpace, Items, Cached) then
+  begin
+    IccSpace.Free;
+    Exit(TPDColorSpace(Cached));
+  end;
   Context.AddCachedObject(TPDCacheScope.ColorSpace, Items, IccSpace);
   Result := IccSpace;
 end;

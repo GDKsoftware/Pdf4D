@@ -40,6 +40,7 @@ type
     FIsSRGB: Boolean;
     FAlternate: TPDColorSpace;
     FIsAlternateKnown: Boolean;
+    FIsDecodeBusy: Boolean;
 
     procedure ReadRange;
     procedure LoadProfile;
@@ -48,7 +49,9 @@ type
     procedure FallBackToAlternate(const Reason: string);
     function ResolveAlternateOfStream: TPDColorSpace;
     function ResolveDeviceSpaceOfN: TPDColorSpace;
+    function DeviceNameOfN: string;
     function GetAlternate: TPDColorSpace;
+    procedure BreakAlternateCycle;
     procedure LogWarning(const Fmt: string; const Args: array of const);
 
   public
@@ -85,6 +88,7 @@ resourcestring
   IccUnknownComponents = 'The ICC based colour space has %d components, which no device colour space has';
   IccFallbackWarning = 'Cannot read the embedded ICC profile (%s), using the alternate colour space %s';
   IccComponentsDiffer = 'the profile has %d components and /N says %d';
+  IccAlternateCycle = 'The alternate colour space of an ICC based colour space leads back to itself, using %s';
 
 const
   GrayComponents = 1;
@@ -228,11 +232,48 @@ begin
     end;
   end;
 
+  // The alternate is this space itself, through the cache of the context
+  if Result = Self then
+  begin
+    Result := nil;
+    LogWarning(IccAlternateCycle, [DeviceNameOfN]);
+    Exit;
+  end;
+
   const IsMatching = (Assigned(Result) and (Result.NumberOfComponents = FNumberOfComponents));
   if not IsMatching then
   begin
     Result := nil;
   end;
+end;
+
+function TPDICCBased.DeviceNameOfN: string;
+begin
+  try
+    Result := ResolveDeviceSpaceOfN.Name;
+  except
+    on Error: EPdfParseException do
+    begin
+      Result := '';
+    end;
+  end;
+end;
+
+// Alternates that refer to each other (A to B and B to A) meet in GetDefaultDecode, which asks the alternate; the space that is
+// asked a second time while it waits for its alternate drops that alternate for the device space of N
+procedure TPDICCBased.BreakAlternateCycle;
+begin
+  FAlternate := nil;
+  try
+    FAlternate := ResolveDeviceSpaceOfN;
+  except
+    on Error: EPdfParseException do
+    begin
+      FAlternate := nil;
+    end;
+  end;
+  FIsAlternateKnown := True;
+  LogWarning(IccAlternateCycle, [DeviceNameOfN]);
 end;
 
 procedure TPDICCBased.FallBackToAlternate(const Reason: string);
@@ -289,13 +330,28 @@ end;
 
 function TPDICCBased.GetDefaultDecode(const BitsPerComponent: Integer): TArray<Single>;
 begin
-  const Space = GetAlternate;
-  if Assigned(Space) then
+  if FIsDecodeBusy then
   begin
-    Exit(Space.GetDefaultDecode(BitsPerComponent));
+    BreakAlternateCycle;
+    if Assigned(FAlternate) then
+    begin
+      Exit(FAlternate.GetDefaultDecode(BitsPerComponent));
+    end;
+    Exit(inherited GetDefaultDecode(BitsPerComponent));
   end;
 
-  Result := inherited GetDefaultDecode(BitsPerComponent);
+  FIsDecodeBusy := True;
+  try
+    const Space = GetAlternate;
+    if Assigned(Space) then
+    begin
+      Exit(Space.GetDefaultDecode(BitsPerComponent));
+    end;
+
+    Result := inherited GetDefaultDecode(BitsPerComponent);
+  finally
+    FIsDecodeBusy := False;
+  end;
 end;
 
 function TPDICCBased.InitialColor: TPDColor;

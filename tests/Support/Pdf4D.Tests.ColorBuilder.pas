@@ -39,6 +39,9 @@ type
     // [/ICCBased stream]; the stream has /N, holds Profile, and has an /Alternate when AlternateName is not empty
     function NewIccArray(const Profile: TBytes; const Components: Integer; const AlternateName: string = ''): TCosArray;
     function IccStreamOf(const IccArray: TCosArray): TCosStream;
+    // An indirect reference to Target, which the reference owns from now on (the builder owns the reference). With it an object
+    // can refer to the object that holds it, which a direct structure cannot.
+    function NewReference(const Target: TCosBase; const Number: Integer): TCosBase;
     // Takes over Value
     procedure AddColorSpace(const Name: string; const Value: TCosBase);
     function CreateSpace(const Value: TCosBase; const WasDefault: Boolean = False): TPDColorSpace;
@@ -54,6 +57,8 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Names,
+  Pdf4D.Cos.ObjectKey,
+  Pdf4D.Cos.PdfObject,
   Pdf4D.Graphics.Color.Factory,
   Pdf4D.Tests.IccBuilder;
 
@@ -119,6 +124,15 @@ end;
 function TColorTestBuilder.IccStreamOf(const IccArray: TCosArray): TCosStream;
 begin
   Result := TCosStream(IccArray.Get(1));
+end;
+
+function TColorTestBuilder.NewReference(const Target: TCosBase; const Number: Integer): TCosBase;
+begin
+  FOwned.Extract(Target);
+  const Reference = TCosObject.Create(TCosObjectKey.Make(Number, 0), nil);
+  Reference.SetObject(Target);
+  FOwned.Add(Reference);
+  Result := Reference;
 end;
 
 procedure TColorTestBuilder.AddColorSpace(const Name: string; const Value: TCosBase);
