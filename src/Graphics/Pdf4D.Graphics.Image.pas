@@ -2,8 +2,9 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/image/PDImage.java, PDImageXObject.java (getImage, applyMask,
-// scaleImage, extractMatte, getMask, getSoftMask) and PDInlineImage.java (3.0.8). The JPEG and CCITT decoders are not ported yet;
-// JPEG 2000 and JBIG2 are not supported, with the message of PDFBox for a missing plugin.
+// scaleImage, extractMatte, getMask, getSoftMask) and PDInlineImage.java (3.0.8), and of the use of DCTFilter.java (the decoder itself is
+// Pdf4D.Codec.Jpeg). The CCITT decoder is not ported yet; JPEG 2000 and JBIG2 are not supported, with the message of PDFBox for a
+// missing plugin.
 unit Pdf4D.Graphics.Image;
 
 {$EXCESSPRECISION OFF}
@@ -36,6 +37,9 @@ type
     function BuildSource(const ForOpaque: Boolean): TSampledImageSource;
     function ReadSamples: TBytes;
     class procedure RaiseForImageFilter(const FilterName: string); static;
+    function FilterCount: Integer;
+    function DctColorTransform(const FilterIndex: Integer): Integer;
+    function DecodeJpeg(const Data: TBytes; const FilterIndex: Integer): TBytes;
 
   protected
     constructor Create(const Parameters: TCosDictionary; const Resources: TPDResources);
@@ -132,6 +136,7 @@ uses
   Pdf4D.Cos.Names,
   Pdf4D.Cos.Number,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Codec.Jpeg,
   Pdf4D.Filter.Chain,
   Pdf4D.Filter.Factory,
   Pdf4D.Graphics.Color.Device,
@@ -140,7 +145,6 @@ uses
 resourcestring
   JpxNotInstalled = 'Cannot read JPEG2000 image: Java Advanced Imaging (JAI) Image I/O Tools are not installed';
   Jbig2NotInstalled = 'Cannot read JBIG2 image: jbig2-imageio is not installed';
-  JpegNotPorted = 'Cannot read a JPEG image: the DCTDecode filter is not supported yet';
   CcittNotPorted = 'Cannot read a CCITT fax image: the CCITTFaxDecode filter is not supported yet';
   NoColorSpace = 'could not determine color space';
   InlineIndexedNotSupported = 'Inline images with an abbreviated Indexed colour space are not supported yet';
@@ -148,6 +152,8 @@ resourcestring
 
 const
   ByteMax = 255;
+  LineFeed = 10;
+  MaxJpegComponents = 4;
   ExtraBitsOfGray = 8;
   GrayRed = 77;
   GrayGreen = 150;
@@ -367,11 +373,75 @@ begin
   begin
     raise EPdfUnsupportedFeatureException.Create(Jbig2NotInstalled);
   end;
-  if CanonicalName = TCosNames.DCTDecode then
-  begin
-    raise EPdfUnsupportedFeatureException.Create(JpegNotPorted);
-  end;
   raise EPdfUnsupportedFeatureException.Create(CcittNotPorted);
+end;
+
+function TPDImage.FilterCount: Integer;
+begin
+  Result := 0;
+  var Value: TCosBase;
+  if not Lookup(TCosNames.Filter, Value) then
+  begin
+    Exit;
+  end;
+
+  if Value is TCosArray then
+  begin
+    Result := TCosArray(Value).Count;
+  end
+  else if Value is TCosName then
+  begin
+    Result := 1;
+  end;
+end;
+
+// The /ColorTransform of the decode parameters of the filter at FilterIndex, -1 when there is none
+function TPDImage.DctColorTransform(const FilterIndex: Integer): Integer;
+begin
+  Result := -1;
+  var Entry: TCosBase;
+  const HasParameters = (Lookup(TCosNames.DecodeParms, Entry) or Parameters.TryGetDictionaryObject(TCosNames.DP, Entry));
+  if not HasParameters then
+  begin
+    Exit;
+  end;
+
+  var FilterParameters: TCosBase := nil;
+  if Entry is TCosDictionary then
+  begin
+    FilterParameters := Entry;
+  end
+  else if (Entry is TCosArray) and (FilterIndex < TCosArray(Entry).Count) then
+  begin
+    FilterParameters := TCosArray(Entry).GetObject(FilterIndex);
+  end;
+
+  var Transform: TCosBase;
+  const HasTransform = ((FilterParameters is TCosDictionary) and TCosDictionary(FilterParameters).TryGetDictionaryObject(TCosNames.ColorTransform, Transform));
+  if HasTransform and (Transform is TCosNumber) then
+  begin
+    Result := TCosNumber(Transform).IntValue;
+  end;
+end;
+
+// DCTFilter: the samples of the JPEG as gray, RGB or CMYK. A line feed before the data is skipped, like PDFBox does.
+function TPDImage.DecodeJpeg(const Data: TBytes; const FilterIndex: Integer): TBytes;
+begin
+  var JpegData := Data;
+  const StartsWithLineFeed = ((Length(Data) > 0) and (Data[0] = LineFeed));
+  if StartsWithLineFeed then
+  begin
+    JpegData := Copy(Data, 1, Length(Data) - 1);
+  end;
+
+  const MaxPixels = Min(MaxBitmapPixels, Resources.Context.Options.MaxDecodedStreamSize div MaxJpegComponents);
+  const Options = TJpegDecodeOptions.ForPdf(DctColorTransform(FilterIndex), MaxPixels);
+  const Decoded = TJpegImage.Decode(JpegData, Options, Log);
+  try
+    Result := Decoded.Samples;
+  finally
+    Decoded.Free;
+  end;
 end;
 
 // The sample bytes: the filters up to an image filter, then that filter
@@ -379,10 +449,22 @@ function TPDImage.ReadSamples: TBytes;
 begin
   var Remaining: TArray<string>;
   Result := DecodeSamples(Remaining);
-  if Length(Remaining) > 0 then
+  if Length(Remaining) = 0 then
+  begin
+    Exit;
+  end;
+
+  const IsJpeg = (TFilterFactory.CanonicalName(Remaining[0]) = TCosNames.DCTDecode);
+  if not IsJpeg then
   begin
     RaiseForImageFilter(Remaining[0]);
   end;
+
+  if Length(Remaining) > 1 then
+  begin
+    LogWarning('The filters after DCTDecode are ignored', []);
+  end;
+  Result := DecodeJpeg(Result, FilterCount - Length(Remaining));
 end;
 
 function TPDImage.BuildSource(const ForOpaque: Boolean): TSampledImageSource;

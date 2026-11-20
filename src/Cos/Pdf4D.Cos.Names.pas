@@ -130,6 +130,7 @@ type
     const ColorDodge = 'ColorDodge';
     const Colors = 'Colors';
     const ColorSpace = 'ColorSpace';
+    const ColorTransform = 'ColorTransform';
     const Columns = 'Columns';
     const Compatible = 'Compatible';
     const Components = 'Components';

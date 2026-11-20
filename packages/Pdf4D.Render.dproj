@@ -93,6 +93,7 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Device.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
+        <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.LineDash.pas"/>

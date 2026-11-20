@@ -1,0 +1,21 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</XObject <</JpegCmyk 10 0 R /JpegCmykInverted 11 0 R /JpegGray 5 0 R /JpegProgressive 8 0 R /JpegRestart 9 0 R /JpegRgb420 6 0 R /JpegRgb444 7 0 R /PdfboxGray 13 0 R /PdfboxRgb 12 0 R /PdfboxYcck 14 0 R /PdfboxYcckInverted 15 0 R>>>> /Type /Page>>
+object 4 0: <</Length 484>> stream sha256=df76b7988f0c1ea35c4fb002eb9b9093d3a033ee3821665da14f65ef2b39cfa4
+object 5 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /DCTDecode /Height 45 /Length 938 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=cca8f4cc24e23235ba62963b570d3fb9fd1c5b09ca906807bea6a35e4e185501
+object 6 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 45 /Length 1543 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=46bc5e28f69a5c8246658aec5d9b8e1c8796615e50c726573bf34e68a64660b5
+object 7 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 45 /Length 2236 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=69af608d346c0b681bfefbdbc3ba40db3698026b31c403a6045bda0da998769f
+object 8 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 45 /Length 1448 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=209a32d524cba838322b8ca5a19f1ca59cd0350fb317d33c48646482d6703ef0
+object 9 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 45 /Length 1555 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=b2f5f75360bdb3cfcafb0da978f56cd6c006867adaa5794240dfec850bda119d
+object 10 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /DCTDecode /Height 45 /Length 2707 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=16621df8a220fa9c4367f7e676e475fd8344205ad6f6ef12168bb0e7e665075f
+object 11 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Decode [1 0 1 0 1 0 1 0] /Filter /DCTDecode /Height 45 /Length 2707 /Subtype /Image /Type /XObject /Width 61>> stream partial=DCTDecode sha256=16621df8a220fa9c4367f7e676e475fd8344205ad6f6ef12168bb0e7e665075f
+object 12 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /DCTDecode /Height 287 /Length 57489 /Subtype /Image /Type /XObject /Width 344>> stream partial=DCTDecode sha256=4478a3f41f3c2204e1db8d4ca8898ca6e3fc42c93814ec3c89e26504158125e4
+object 13 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /DCTDecode /Height 287 /Length 49928 /Subtype /Image /Type /XObject /Width 344>> stream partial=DCTDecode sha256=23be1588ff57ee43b99d514ee2a63b0245cee0f6445155fb94b583dfafa1b1ee
+object 14 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /DCTDecode /Height 287 /Length 102636 /Subtype /Image /Type /XObject /Width 343>> stream partial=DCTDecode sha256=9bf1b7162f6175e27fc079003d9b3c32fb391a11e7e32f33a726e5a87ce1de90
+object 15 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Decode [1 0 1 0 1 0 1 0] /Filter /DCTDecode /Height 287 /Length 102636 /Subtype /Image /Type /XObject /Width 343>> stream partial=DCTDecode sha256=9bf1b7162f6175e27fc079003d9b3c32fb391a11e7e32f33a726e5a87ce1de90

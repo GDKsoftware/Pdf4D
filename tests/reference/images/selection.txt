@@ -12,3 +12,4 @@ pdfbox-jira/PDFBOX-4308.pdf
 pdfbox-jira/PDFBOX-3999-GeneralForbearance.pdf
 pdfbox-jira/PDFBOX-1031-1.pdf
 pdfbox-jira/PDFBOX-4153-WXMDXCYRWFDCMOSFQJ5OAJIAFXYRZ5OA.pdf
+generated/render/jpeg.pdf

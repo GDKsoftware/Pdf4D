@@ -145,6 +145,22 @@ Unit names use the application prefix `Pdf4D`, for example `Pdf4D.Cos.Dictionary
 - The cache of system fonts is never evicted: a font that was picked stays in memory until the process ends (PDFBox keeps them in soft references). It is bounded by the installed fonts and the scan limits.
 - The extra limits of the next section.
 
+## Ported from pdf.js: the JPEG decoder
+
+`src/Codec/Pdf4D.Codec.Jpeg.pas` is a port of `src/core/jpg.js` of pdf.js, release tag `v6.5.438` (Apache License 2.0; NOTICE names it). `tools/fetch-pdfjs-src.ps1` downloads that file and the two it imports from, from this one tag, into `tools/pdfjs-src/` (ignored by git). The tag is also named in the unit header and in the script; change the three together. PDFBox leaves JPEG to `javax.imageio`, which has no Delphi counterpart; the Delphi code follows `DCTFilter` for what it hands on (gray, RGB, CMYK samples; YCCK converted to CMYK; no inversion of CMYK for a file from a PDF) and `jpg.js` for the decoding itself. The structure of `jpg.js` is kept (`TJpegDecoder` is `JpegImage`, `TJpegScanDecoder` is `decodeScan` with its nested functions, `QuantizeAndInverse`, `BuildComponentData`, `LinearizeBlockData` for `#getLinearizedBlockData`, `BuildImage` for `getData`). The deviations:
+
+- The Huffman tables are canonical code tables (maximum and minimum code per length), not the nested arrays of `buildHuffmanTable`. Valid tables decode the same values; an over-subscribed table does not build a strange tree but raises `EPdfParseException`.
+- The data of a scan that ends before the scan does ends the scan like an EOI marker does in `jpg.js` (one warning, the rows decoded so far stay). `jpg.js` reads `undefined` bytes there and goes on decoding zero bits.
+- Every access is checked: the quantization and Huffman table indexes, the component ids of a scan, the block offsets, the data offsets. A `jpg.js` access outside an array gives `undefined` or a `RangeError`; the port raises `EPdfParseException` where the data is needed, and ignores a coefficient index past 63 (a store to an undefined index in JavaScript).
+- A scan decodes at most the MCUs of the frame, also when stray restart markers follow a scan of a file without a restart interval (`jpg.js` would read the whole scan again).
+- Limits, with the sizes in `Int64`: at most `MaxPixels` pixels, at most 256 MiB of samples, a block buffer of at most 4 samples per pixel and component (plus 1 Mi samples) and 128 Mi samples, at most 1000 scans, 1, 3 or 4 components with sampling factors from 1 to 4, 8 bit samples. All of them raise `EPdfParseException`; `jpg.js` has none of them (and accepts 2 components and other precisions).
+- A frame height of 0 (to be defined by a DNL marker) is an error; `jpg.js` produces an empty image. A DNL marker that corrects the number of lines and the re-parse that follows are ported.
+- Arithmetic coding, lossless and hierarchical processes (SOF3, SOF5 to SOF7, SOF9 to SOF11, SOF13 to SOF15) raise `EPdfParseException`; `jpg.js` fails on them with a generic error.
+- `JpegImage.getData` is called for the size of the JPEG itself, with neither `forceRGB` nor `forceRGBA`: the colour conversions to RGB(A) and the `decodeTransform` of `IMAGE_DECODERS` builds are not ported, except that a file that is not from a PDF has its CMYK inverted (`IsSourcePdf` false).
+- The colour conversions write through a clamping and rounding function that follows `Uint8ClampedArray` (round half to even).
+- `TPDImage` skips one line feed before the data and takes `/ColorTransform` from the decode parameters of the DCT filter, as `jpg.js` is called from pdf.js; PDFBox ignores `/ColorTransform` and asks the Adobe marker and `ImageIO`. A filter that follows DCTDecode is ignored with a warning.
+- Upsampling of subsampled components repeats the nearest sample (`jpg.js`), where `ImageIO` (libjpeg) interpolates ("fancy upsampling"); the comparison with PDFBox in the tests allows for that.
+
 ## Limits that Pdf4D adds
 
 PDFBox has few limits on hostile input. Pdf4D adds the limits below. The ones with a name are set through `TPdfLoadOptions` (the values are the defaults); the others are fixed in the code. A document that runs into a limit loses the content after it, with a log line, or raises an `EPdfException` descendant, and never hangs, crashes or grows without bound.
