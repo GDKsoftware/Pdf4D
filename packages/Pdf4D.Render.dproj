@@ -105,6 +105,9 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.State.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
