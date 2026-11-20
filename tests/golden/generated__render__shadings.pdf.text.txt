@@ -1,0 +1,13 @@
+text: default page 1
+|
+text: default page 2
+| Ab
+text: sorted page 1
+|
+text: sorted page 2
+| Ab
+text: range 2-3
+| Ab
+text: separators 1-2
+| <PAGE><A></A></PAGE>
+| <PAGE><A><P>Ab</P></A></PAGE>

@@ -1,0 +1,93 @@
+%PDF-1.7
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R  >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [12 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 20 20] /XStep 20 /YStep 20 /Resources << >> /Length 80 >>
+stream
+1 0 0 rg 0 0 10 10 re f 0 0 1 rg 10 10 10 10 re f 0 0.6 0 RG 2 w 0 20 m 20 0 l S
+endstream
+endobj
+4 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 2 /TilingType 1 /BBox [0 0 16 16] /XStep 16 /YStep 16 /Resources << >> /Length 36 >>
+stream
+8 8 m 16 8 l 8 16 l h f 0 0 4 4 re f
+endstream
+endobj
+5 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 2 /BBox [0 0 30 30] /XStep 12 /YStep 12 /Resources << >> /Length 59 >>
+stream
+0.9 0.5 0 rg 0 0 30 30 re f 0 0.3 0.6 RG 1 w 0 0 30 30 re S
+endstream
+endobj
+6 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 3 /BBox [0 0 10 10] /XStep 25 /YStep 18 /Resources << >> /Length 51 >>
+stream
+0.5 0 0.5 rg 5 5 m 10 5 l 5 10 l h f 0 0 10 10 re S
+endstream
+endobj
+7 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8 /Resources << >> /Length 47 >>
+stream
+0 0.7 0.7 rg 0 0 4 4 re f 0 0 0 rg 4 4 4 4 re f
+endstream
+endobj
+8 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 40 40] /XStep 40 /YStep 40 /Resources << /Pattern << /PIn 7 0 R >> >> /Length 63 >>
+stream
+/Pattern cs /PIn scn 0 0 40 40 re f 1 0 0 RG 2 w 0 0 40 40 re S
+endstream
+endobj
+9 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 20 20] /XStep 20 /YStep 20 /Matrix [0.7 0.7 -0.7 0.7 0 0] /Resources << >> /Length 60 >>
+stream
+0.2 0.2 0.8 rg 0 0 10 20 re f 0.8 0.8 0.1 rg 10 0 10 20 re f
+endstream
+endobj
+10 0 obj
+<< /Type /Pattern /PatternType 1 /PaintType 1 /TilingType 1 /BBox [0 0 60 60] /XStep 60 /YStep 60 /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> >> >> /Length 56 >>
+stream
+0.9 g 0 0 60 60 re f BT /F1 24 Tf 0 g 5 20 Td (Pa) Tj ET
+endstream
+endobj
+11 0 obj
+<<  /Length 484 >>
+stream
+0.9 g 0 0 400 400 re f
+/Pattern cs /PC scn 10 290 100 100 re f
+/CsU cs 1 0 0 /PU scn 120 290 100 100 re f 0 0.6 0 /PU scn 230 290 100 100 re f
+/Pattern cs /PO scn 10 170 100 100 re f /PS scn 120 170 100 100 re f /PN scn 230 170 100 100 re f
+/PM scn 10 50 100 100 re f /PB scn 120 50 100 100 re f
+/Pattern CS /PC SCN 8 w 235 55 m 320 140 l S
+/Pattern cs /PC scn 340 50 m 390 50 l 365 140 l f
+/Pattern cs /PO scn 340 160 40 40 re f
+BT /F1 70 Tf 10 5 Td /Pattern cs /PC scn (Tile) Tj ET
+
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 400] /Contents 11 0 R /Resources << /Pattern << /PC 3 0 R /PU 4 0 R /PO 5 0 R /PS 6 0 R /PN 8 0 R /PM 9 0 R /PB 10 0 R >> /ColorSpace << /CsU [/Pattern /DeviceRGB] >> /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> >> >>  >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000009 00000 n 
+0000000059 00000 n 
+0000000117 00000 n 
+0000000359 00000 n 
+0000000557 00000 n 
+0000000778 00000 n 
+0000000991 00000 n 
+0000001196 00000 n 
+0000001447 00000 n 
+0000001700 00000 n 
+0000002017 00000 n 
+0000002554 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R >>
+startxref
+2890
+%%EOF

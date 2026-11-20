@@ -1,0 +1,18 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [12 0 R] /Type /Pages>>
+object 3 0: <</BBox [0 0 20 20] /Length 80 /PaintType 1 /PatternType 1 /Resources <<>> /TilingType 1 /Type /Pattern /XStep 20 /YStep 20>> stream sha256=740c5ca8b5d3ffc00020674c047f1302aaa29c1bd15ba26a984375b231af90cb
+object 4 0: <</BBox [0 0 16 16] /Length 36 /PaintType 2 /PatternType 1 /Resources <<>> /TilingType 1 /Type /Pattern /XStep 16 /YStep 16>> stream sha256=5da2d63c5e9ee7889536c3a631ce8147cdf7e1f88d52f4f59a9b92eb3796583d
+object 5 0: <</BBox [0 0 30 30] /Length 59 /PaintType 1 /PatternType 1 /Resources <<>> /TilingType 2 /Type /Pattern /XStep 12 /YStep 12>> stream sha256=ea6bfbe691b8cf910797bf814bb1ee9fd023d35b108fdc7e8f1efe0d6354568d
+object 6 0: <</BBox [0 0 10 10] /Length 51 /PaintType 1 /PatternType 1 /Resources <<>> /TilingType 3 /Type /Pattern /XStep 25 /YStep 18>> stream sha256=fc520ea73d1700d135218685ec18f3b5edc96f56a274fb39f0cd0d9d4af5346b
+object 7 0: <</BBox [0 0 8 8] /Length 47 /PaintType 1 /PatternType 1 /Resources <<>> /TilingType 1 /Type /Pattern /XStep 8 /YStep 8>> stream sha256=fad05b2b967dfa31c1538f96f2f2cfa7a09b198ce033dc9ee4b895eba5dfe8b6
+object 8 0: <</BBox [0 0 40 40] /Length 63 /PaintType 1 /PatternType 1 /Resources <</Pattern <</PIn 7 0 R>>>> /TilingType 1 /Type /Pattern /XStep 40 /YStep 40>> stream sha256=ad3ff835897a073caa45cd75c7cbecebbf4639492c02caf7ecd400b9e117f1ca
+object 9 0: <</BBox [0 0 20 20] /Length 60 /Matrix [0.7 0.7 -0.7 0.7 0 0] /PaintType 1 /PatternType 1 /Resources <<>> /TilingType 1 /Type /Pattern /XStep 20 /YStep 20>> stream sha256=7c7cadee54779dc3d39635e4522299e6104de7c8581a01ceba597d52f508cdcf
+object 10 0: <</BBox [0 0 60 60] /Length 56 /PaintType 1 /PatternType 1 /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /TilingType 1 /Type /Pattern /XStep 60 /YStep 60>> stream sha256=90e3f56cecf8d99f8eea2c480c27dfaa861abf0f0dc71787d81c9a09c8d100c9
+object 11 0: <</Length 484>> stream sha256=7d2cb120fa74674688e92a4d7fc43fd65cdb7fb5b08b029a7ea476657068cf8e
+object 12 0: <</Contents 11 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ColorSpace <</CsU [/Pattern /DeviceRGB]>> /Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>> /Pattern <</PB 10 0 R /PC 3 0 R /PM 9 0 R /PN 8 0 R /PO 5 0 R /PS 6 0 R /PU 4 0 R>>>> /Type /Page>>

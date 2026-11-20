@@ -103,6 +103,8 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --encrypt in.pdf out.pdf user owner alg [--nometa]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java make-render-tests ccitt outdir tifdir
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java render file.pdf dpi outdir [password] [only-page]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --pdf-glyph-paths file.pdf FontName first-last
@@ -178,6 +180,15 @@ public class Pdf4DOracle
             {
                 out.print(images(new File(args[1]), new File(args[2]), args.length > 3 ? args[3] : ""));
             }
+            else if (args.length >= 3 && args[0].equals("make-render-tests"))
+            {
+                makeRenderTests(args[1], new File(args[2]), args.length > 3 ? new File(args[3]) : null);
+            }
+            else if (args.length >= 4 && args[0].equals("render"))
+            {
+                out.print(render(new File(args[1]), Float.parseFloat(args[2]), new File(args[3]),
+                        args.length > 4 ? pw(args[4]) : "", args.length > 5 ? Integer.parseInt(args[5]) : 0));
+            }
             else if (args.length >= 2 && args[0].equals("positions"))
             {
                 out.print(positions(new File(args[1]), args.length > 2 ? args[2] : ""));
@@ -215,6 +226,143 @@ public class Pdf4DOracle
     static String pw(String s)
     {
         return s.equals("<empty>") ? "" : s;
+    }
+
+    // ------------------------------------------------------------------ make-render-tests
+
+    /**
+     * Writes the render test files that need the PDFBox API: ccitt.pdf, with the CCITT images of the TIFF files in
+     * tifDir (ccittg3.tif is Group 3, ccittg4.tif is Group 4) made by CCITTFactory, the same with /BlackIs1 and an image
+     * mask. The other test files come from tools/oracle/make-render-pdfs.py.
+     */
+    static void makeRenderTests(String name, File outDir, File tifDir) throws Exception
+    {
+        if (!name.equals("ccitt"))
+        {
+            throw new IllegalArgumentException("unknown render test file " + name);
+        }
+        outDir.mkdirs();
+        try (PDDocument doc = new PDDocument())
+        {
+            PDPage page = new PDPage(new PDRectangle(400, 300));
+            doc.addPage(page);
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g4 =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g3 =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg3.tif"));
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g4Black =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            COSDictionary parms = (COSDictionary) g4Black.getCOSObject().getDictionaryObject(COSName.DECODE_PARMS);
+            parms.setBoolean(COSName.getPDFName("BlackIs1"), true);
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject mask =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            mask.getCOSObject().setBoolean(COSName.IMAGE_MASK, true);
+            mask.getCOSObject().removeItem(COSName.COLORSPACE);
+            try (PDPageContentStream content = new PDPageContentStream(doc, page))
+            {
+                content.setNonStrokingColor(0.9f, 0.9f, 0.6f);
+                content.addRect(0, 0, 400, 300);
+                content.fill();
+                content.drawImage(g4, 10, 160, 192, 128);
+                content.drawImage(g3, 210, 160, 192, 128);
+                content.drawImage(g4Black, 10, 20, 96, 64);
+                content.setNonStrokingColor(0.8f, 0.1f, 0.1f);
+                content.drawImage(mask, 120, 20, 96, 64);
+                content.drawImage(g4, 230, 20, 48, 32);
+            }
+            doc.setVersion(1.7f);
+            doc.save(new File(outDir, name + ".pdf"));
+        }
+    }
+
+    // ------------------------------------------------------------------ render
+
+    private static final int MAX_RENDER_PAGES = 50;
+
+    /**
+     * Renders the pages 1 to min(pages, 50) with PDFRenderer.renderImageWithDPI(page, dpi, ImageType.RGB) to
+     * outDir/&lt;name&gt;.p&lt;nnn&gt;.png (name: -Dpdf4d.render.name, default the file name) and lists them: "page n w h ok" or "page n error Class" per page,
+     * or "load-error: kind". onlyPage (not 0) renders that page only.
+     */
+    static String render(File file, float dpi, File outDir, String password, int onlyPage) throws Exception
+    {
+        System.setProperty("java.awt.headless", "true");
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        StringBuilder sb = new StringBuilder();
+        outDir.mkdirs();
+        // The name of the golden files (path with __, with .pdf) comes from the script; without it the file name is used
+        String name = System.getProperty("pdf4d.render.name", file.getName());
+        try (doc)
+        {
+            int pageCount = 0;
+            try
+            {
+                for (PDPage p : doc.getPages())
+                {
+                    pageCount++;
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count
+            }
+            int last = Math.min(pageCount, MAX_RENDER_PAGES);
+            org.apache.pdfbox.rendering.PDFRenderer renderer = new org.apache.pdfbox.rendering.PDFRenderer(doc);
+            for (int n = 1; n <= last; n++)
+            {
+                if (onlyPage != 0 && n != onlyPage)
+                {
+                    continue;
+                }
+                try
+                {
+                    java.awt.image.BufferedImage image = renderer.renderImageWithDPI(n - 1, dpi,
+                            org.apache.pdfbox.rendering.ImageType.RGB);
+                    writePng(image, new File(outDir, String.format("%s.p%03d.png", name, n)));
+                    sb.append("page ").append(n).append(' ').append(image.getWidth()).append(' ')
+                            .append(image.getHeight()).append(" ok\n");
+                }
+                catch (Throwable t)
+                {
+                    sb.append("page ").append(n).append(" error ").append(t.getClass().getSimpleName()).append('\n');
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            // a failing close
+        }
+        return sb.toString();
+    }
+
+    /** PNG with the strongest compression of the Java writer, to keep the reference files small. */
+    static void writePng(java.awt.image.BufferedImage image, File target) throws IOException
+    {
+        javax.imageio.ImageWriter writer = javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
+        javax.imageio.ImageWriteParam param = writer.getDefaultWriteParam();
+        param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(0.0f);
+        try (javax.imageio.stream.ImageOutputStream stream = javax.imageio.ImageIO.createImageOutputStream(target))
+        {
+            writer.setOutput(stream);
+            writer.write(null, new javax.imageio.IIOImage(image, null, null), param);
+        }
+        finally
+        {
+            writer.dispose();
+        }
     }
 
     // ------------------------------------------------------------------ dump

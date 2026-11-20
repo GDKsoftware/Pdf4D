@@ -1,0 +1,21 @@
+text: default page 1
+| Annotations
+text: default page 2
+| R
+| otated page
+text: default page 3
+|
+text: sorted page 1
+| Annotations
+text: sorted page 2
+| Rotated page
+text: sorted page 3
+|
+text: range 2-3
+| R
+| otated page
+|
+text: separators 1-2
+| <PAGE><A><P>Annotations</P></A></PAGE>
+| <PAGE><A><P>R<EOL>
+| otated page</P></A></PAGE>

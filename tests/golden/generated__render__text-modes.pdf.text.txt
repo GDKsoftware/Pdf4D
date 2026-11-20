@@ -1,0 +1,55 @@
+text: default page 1
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| abcabcabcabc
+| S p a c e d  o u t  w o r d s
+| rise Rotated
+text: default page 2
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| abcabcabcabc
+| S p a c e d  o u t  w o r d s
+| rise Rotated
+text: sorted page 1
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| abcabcabcabc
+| rise Rotated
+| S p a c e d  o u t  w o r d s
+text: sorted page 2
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| abcabcabcabc
+| rise Rotated
+| S p a c e d  o u t  w o r d s
+text: range 2-3
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| Agy Agy Agy Agy
+| abcabcabcabc
+| S p a c e d  o u t  w o r d s
+| rise Rotated
+text: separators 1-2
+| <PAGE><A><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>abcabcabcabc<EOL>
+| S<W>p<W>a<W>c<W>e<W>d<W> <W>o<W>u<W>t<W> <W>w<W>o<W>r<W>d<W>s<EOL>
+| rise<W>Rotated</P></A></PAGE>
+| <PAGE><A><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>Agy<W>Agy<W>Agy<W>Agy<EOL>
+| </P><P>abcabcabcabc<EOL>
+| S<W>p<W>a<W>c<W>e<W>d<W> <W>o<W>u<W>t<W> <W>w<W>o<W>r<W>d<W>s<EOL>
+| rise<W>Rotated</P></A></PAGE>

@@ -218,3 +218,26 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 - `TestImagesMatchPdfBox` (`Pdf4D.Graphics.Image.SampledReader.Tests`) compares `TPDImage.TryGetImage` with each file, both flattened on white, with at most 1 per channel. Images with a CCITT, JPEG 2000 or JBIG2 filter, and with a JPEG filter (see `TestCorpusJpegImagesMatch`), and the colour spaces that are not ported yet are left out until their tasks are done.
 - `tests/corpus/generated/render/jpeg.pdf` is written by `tools/oracle/make-jpeg-tests.py` (Pillow, only to run the script) from the JPEG files in `tests/reference/jpeg`: the generated `gray.jpg`, `rgb420.jpg`, `rgb444.jpg`, `progressive.jpg` (the same coefficients as `rgb420.jpg`), `restart.jpg` (a restart interval, the same coefficients), `cmyk.jpg` (Adobe transform 0), and `pdfbox-jpeg.jpg`, `pdfbox-jpeg256.jpg` and `pdfbox-jpegcmyk.jpg` (the YCCK file), which are `jpeg.jpg`, `jpeg256.jpg` and `jpegcmyk.jpg` of the PDFBox test resources. The files are committed, so the PDF does not depend on the Pillow version; running the script again rewrites the PDF from them. The page lists the images as 11 XObjects, each with the usual image reference in `tests/reference/images/generated__render__jpeg.pdf` (`generate-images.ps1` and `selection.txt`) and the usual dump, text and position goldens.
 - `Pdf4D.Codec.Jpeg.Tests` compares the DCT images of `jpeg.pdf` and of the other files of the selection with those references: at most 4 per channel and 0.5 on average (`TestCorpusJpegImagesMatch` and the named tests). The thresholds are wide because PDFBox decodes with libjpeg (an accurate IDCT and fancy upsampling) and Pdf4D with the integer IDCT and nearest-neighbour upsampling of pdf.js.
+
+
+## Render reference files
+
+`tests/reference/render/<dpi>/` holds the pages as PDFBox 3.0.8 renders them: `PDFRenderer.renderImageWithDPI(page, dpi, ImageType.RGB)` with the hermetic font mapper, white background, anti-aliasing on, written as an 8-bit RGB PNG with the strongest compression of the Java writer. `tools/oracle/generate-render.ps1 -Dpi 72|150 [-Filter <part of the path>]` runs `Pdf4DOracle render <pdf> <dpi> <outdir> [password]` for every file of the corpus (72) or for the pages in `150/selection.txt` (`<corpus file>;<page>` per line, `#` starts a comment), four files at a time, with a time-out of 120 seconds per file, and reports the total size in MB at the end.
+
+- `<name>.p<nnn>.png`: page `nnn` (three digits, from 1) of the file; `<name>` is the path relative to `tests/corpus` with `/` replaced by `__`, with the `.pdf`, as in `tests/golden` (`generated__render__paths.pdf.p001.png`). The 72 DPI set holds pages 1 to min(pages, 50); the 150 DPI set only the listed pages.
+- `<name>.render.txt`: one line per page, `page <n> <width> <height> ok` or `page <n> error <JavaExceptionClass>` (no PNG for such a page), or only `load-error: <kind>` (`parse`, `unsupported`, `wrong-password`, `timeout`). A file whose manifest notes contain `password=<x>` is opened with that password.
+
+### Comparison
+
+`TRenderCompare` (`tests/Support/Pdf4D.Tests.RenderCompare.pas`) compares two bitmaps; the acceptance test `TRenderGoldenTests.TestCorpus72Dpi` (`tests/Skia/Acceptance`) renders every page of the `render.txt` that says `ok` with `RenderToBitmap(FromDpi(72))` and compares it with the PNG.
+
+- A pixel differs when a channel differs by more than `PixelTolerance` (16).
+- A page is equal when the share of differing pixels is at most `MaxDifferentFraction` (0.01) and the sizes are equal. A different size is always a difference.
+- A page that PDFBox cannot render (`error` in `render.txt`) and a file with a `load-error` are not compared; Pdf4D must not raise on them, which the robustness tests cover.
+- When `PDF4D_RENDER_OUTPUT` names a folder, a page that differs is written there as `<name>.p<nnn>.png` (the Pdf4D render) and `<name>.p<nnn>.diff.png` (red where a pixel differs, the reference dimmed elsewhere).
+- Known differences: `tests/reference/render/<name>.render-known-differences.txt`, one line `page <n> [<platform>] # <reason>` per page (`<platform>` is `Win32`, `Win64` or `Linux64`; without it the page is skipped everywhere). Empty lines and lines that start with `#` are ignored.
+- Pending: `tests/reference/render/pending.txt`, one line `<corpus file> # Task <n>: <subject>` per file that uses a feature that is not built yet. The pages of a pending file are rendered and reported but a difference is not a failure. When every page of a pending file is equal the test fails with "remove from pending.txt", so the list only shrinks. It must be empty when the renderer is done.
+
+### Synthetic test files
+
+`tests/corpus/generated/render/` also holds the files that `tools/oracle/generate-render-tests.ps1` writes: `make-render-pdfs.py` (standard library only, deterministic) writes `paths`, `clip`, `text-modes`, `colors-device`, `colors-special`, `transparency`, `softmask`, `shadings`, `patterns`, `optional-content`, `annotations` and `rotated`; `Pdf4DOracle make-render-tests ccitt` writes `ccitt.pdf` with `CCITTFactory` from `tests/reference/ccitt/ccittg3.tif` and `ccittg4.tif` (written with Pillow, committed). They have the usual dump, text and position goldens.

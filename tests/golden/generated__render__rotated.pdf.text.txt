@@ -1,0 +1,98 @@
+text: default page 1
+| TOP
+| origin
+text: default page 2
+| T
+| O
+| P
+| origin
+text: default page 3
+| TOP
+| origin
+text: default page 4
+| T
+| O
+| P
+| or
+| ig
+| in
+text: default page 5
+| T
+| O
+| P
+| or
+| ig
+| in
+text: default page 6
+| T
+| O
+| P
+| origin
+text: default page 7
+| TOP
+| origin
+text: default page 8
+| T
+| O
+| P
+| origin
+text: default page 9
+| T
+| O
+| P
+| or
+| ig
+| in
+text: default page 10
+| TOP
+| origin
+text: default page 11
+| TOP
+| origin
+text: sorted page 1
+| TOP
+| origin
+text: sorted page 2
+| TOP
+| origin
+text: sorted page 3
+| TOP
+| origin
+text: sorted page 4
+| TOP
+| origin
+text: sorted page 5
+| TOP
+| origin
+text: sorted page 6
+| TOP
+| origin
+text: sorted page 7
+| TOP
+| origin
+text: sorted page 8
+| TOP
+| origin
+text: sorted page 9
+| TOP
+| origin
+text: sorted page 10
+| TOP
+| origin
+text: sorted page 11
+| TOP
+| origin
+text: range 2-3
+| T
+| O
+| P
+| origin
+| TOP
+| origin
+text: separators 1-2
+| <PAGE><A><P>TOP<EOL>
+| </P><P>origin</P></A></PAGE>
+| <PAGE><A><P>T<EOL>
+| O<EOL>
+| </P><P>P<EOL>
+| </P><P>origin</P></A></PAGE>

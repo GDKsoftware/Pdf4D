@@ -1,0 +1,14 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [8 0 R] /Type /Pages>>
+object 3 0: <</Alternate /DeviceRGB /Filter /FlateDecode /Length 2466 /N 3>> stream sha256=bfb1c597bf5bf922bca57de556b972695e2ff60de305b43dc98c91f4d4154497
+object 4 0: <</Alternate /DeviceCMYK /Filter /FlateDecode /Length 386741 /N 4>> stream sha256=35f401731df11a4eba3502af632e51d68bc394bcb7d34632a331c1ba3f4a0bf6
+object 5 0: <</Alternate /DeviceGray /Filter /FlateDecode /Length 3239 /N 1>> stream sha256=bad673993556e6b0887d39ea77607649277a6ccaa6a2d454ec077dad52adc122
+object 6 0: <</Alternate /DeviceRGB /Length 18 /N 3>> stream sha256=5b5eab2f84b60baa86e8bc2060c10ffe8a9f37c33cef47c27b4900cc325623b8
+object 7 0: <</Length 4354>> stream sha256=810cd7634cd1b294346d5796986f56cf1826610cce1a09a3a39f6ff5e0f106d1
+object 8 0: <</Contents 7 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ColorSpace <</CsBad [/ICCBased 6 0 R] /CsCmyk [/ICCBased 4 0 R] /CsGray [/ICCBased 5 0 R] /CsRgb [/ICCBased 3 0 R]>>>> /Type /Page>>

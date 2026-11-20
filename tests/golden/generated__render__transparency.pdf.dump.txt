@@ -1,0 +1,22 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 3
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+page 2: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+page 3: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 3 /Kids [4 0 R 12 0 R 14 0 R] /Type /Pages>>
+object 3 0: <</Length 4011>> stream sha256=98cd0e075cda4cefcf89a528482ec337d950c0080b2bbc1b4b5b1a25ce5c23c7
+object 4 0: <</Contents 3 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ExtGState <</GsA25 <</CA 0.25 /ca 0.25>> /GsA50 <</CA 0.5 /ca 0.5>> /GsAlphaMode <</BM /Multiply /ca 0.7>> /GsBmArray <</BM [/Foo /Multiply]>> /GsColor <</BM /Color>> /GsColorBurn <</BM /ColorBurn>> /GsColorDodge <</BM /ColorDodge>> /GsDarken <</BM /Darken>> /GsDifference <</BM /Difference>> /GsExclusion <</BM /Exclusion>> /GsFillOnly <</ca 0.4>> /GsHardLight <</BM /HardLight>> /GsHue <</BM /Hue>> /GsLighten <</BM /Lighten>> /GsLuminosity <</BM /Luminosity>> /GsMultiply <</BM /Multiply>> /GsNormal <</BM /Normal>> /GsOverlay <</BM /Overlay>> /GsSaturation <</BM /Saturation>> /GsScreen <</BM /Screen>> /GsSoftLight <</BM /SoftLight>> /GsStrokeOnly <</CA 0.4>>>>>> /Type /Page>>
+object 5 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I true /K false /S /Transparency>> /Length 51 /Subtype /Form /Type /XObject>> stream sha256=3a1bd87e539983accbf79aeb9dc30f10787f6561f3a283d4bb618989fda2743d
+object 6 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I true /K false /S /Transparency>> /Length 66 /Resources <</ExtGState <</GsHalf <</ca 0.5>> /GsMultiply <</BM /Multiply>>>>>> /Subtype /Form /Type /XObject>> stream sha256=d1951b6bb742036b6b43cde83782c933b9d68b2ddd33879ce7b8469127be49d8
+object 7 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I false /K false /S /Transparency>> /Length 66 /Resources <</ExtGState <</GsHalf <</ca 0.5>> /GsMultiply <</BM /Multiply>>>>>> /Subtype /Form /Type /XObject>> stream sha256=d1951b6bb742036b6b43cde83782c933b9d68b2ddd33879ce7b8469127be49d8
+object 8 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I true /K true /S /Transparency>> /Length 62 /Resources <</ExtGState <</GsHalf <</ca 0.5>> /GsMultiply <</BM /Multiply>>>>>> /Subtype /Form /Type /XObject>> stream sha256=1cbd6abfcbceaf3d15dbb4d19d7909a22cd861278551114a6c230d26f42446b7
+object 9 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I true /K false /S /Transparency>> /Length 62 /Resources <</ExtGState <</GsHalf <</ca 0.5>> /GsMultiply <</BM /Multiply>>>>>> /Subtype /Form /Type /XObject>> stream sha256=1cbd6abfcbceaf3d15dbb4d19d7909a22cd861278551114a6c230d26f42446b7
+object 10 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /I false /K false /S /Transparency>> /Length 61 /Resources <</XObject <</GrPlain 5 0 R>>>> /Subtype /Form /Type /XObject>> stream sha256=82a12d86472fb3b27dca11459cb9f9f7106df065afb0e4233c8f89c79117a560
+object 11 0: <</Length 319>> stream sha256=5f6e5c7dfa6beaa77d2abcaa132f0d1fe1769a8813fdd0dafe0889ec6bf7b09e
+object 12 0: <</Contents 11 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ExtGState <</GrA <</ca 1>> /GsHalf <</CA 0.5 /ca 0.5>>>> /XObject <</Gr0 5 0 R /Gr1 6 0 R /Gr2 7 0 R /Gr3 8 0 R /Gr4 9 0 R /Gr5 10 0 R>>>> /Type /Page>>
+object 13 0: <</Length 337>> stream sha256=1b4b1732874b349e8a6caa3afc9d4d23584acba5469ea7148a1aeaf0f7eaf064
+object 14 0: <</Contents 13 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ExtGState <</GrA <</ca 1>> /GsHalf <</CA 0.5 /ca 0.5>>>> /XObject <</Gr0 5 0 R /Gr1 6 0 R /Gr2 7 0 R /Gr3 8 0 R /Gr4 9 0 R /Gr5 10 0 R>>>> /Type /Page>>

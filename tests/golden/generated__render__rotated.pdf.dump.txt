@@ -1,0 +1,40 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 11
+page 1: media=[0 0 300 400] crop=[0 0 300 400] rotate=0 label=
+page 2: media=[0 0 300 400] crop=[0 0 300 400] rotate=90 label=
+page 3: media=[0 0 300 400] crop=[0 0 300 400] rotate=180 label=
+page 4: media=[0 0 300 400] crop=[0 0 300 400] rotate=270 label=
+page 5: media=[0 0 300 400] crop=[0 0 300 400] rotate=270 label=
+page 6: media=[0 0 300 400] crop=[0 0 300 400] rotate=90 label=
+page 7: media=[0 0 400 500] crop=[50 60 250 340] rotate=0 label=
+page 8: media=[0 0 400 500] crop=[50 60 250 340] rotate=90 label=
+page 9: media=[-50 -50 350 450] crop=[-20 -10 200 250] rotate=270 label=
+page 10: media=[0 0 400 500] crop=[0 0 300 300] rotate=0 label=
+page 11: media=[0 0 400 500] crop=[0 0 400 500] rotate=180 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 11 /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R] /Type /Pages>>
+object 3 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 4 0: <</Contents 3 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 0 /Type /Page>>
+object 5 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 6 0: <</Contents 5 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 90 /Type /Page>>
+object 7 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 8 0: <</Contents 7 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 180 /Type /Page>>
+object 9 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 10 0: <</Contents 9 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 270 /Type /Page>>
+object 11 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 12 0: <</Contents 11 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate -90 /Type /Page>>
+object 13 0: <</Length 244>> stream sha256=4f427b07003593b54d91724419d17da806dea9e7eef08b75f427b74f4557f685
+object 14 0: <</Contents 13 0 R /MediaBox [0 0 300 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 450 /Type /Page>>
+object 15 0: <</Length 244>> stream sha256=2bdd3c7818517cedecf057d2426672421a747ef93d7c1a5cb774a387b442bbbb
+object 16 0: <</Contents 15 0 R /CropBox [50 60 250 340] /MediaBox [0 0 400 500] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Type /Page>>
+object 17 0: <</Length 244>> stream sha256=2bdd3c7818517cedecf057d2426672421a747ef93d7c1a5cb774a387b442bbbb
+object 18 0: <</Contents 17 0 R /CropBox [50 60 250 340] /MediaBox [0 0 400 500] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 90 /Type /Page>>
+object 19 0: <</Length 244>> stream sha256=2bdd3c7818517cedecf057d2426672421a747ef93d7c1a5cb774a387b442bbbb
+object 20 0: <</Contents 19 0 R /CropBox [-20 -10 200 250] /MediaBox [-50 -50 350 450] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 270 /Type /Page>>
+object 21 0: <</Length 244>> stream sha256=2bdd3c7818517cedecf057d2426672421a747ef93d7c1a5cb774a387b442bbbb
+object 22 0: <</Contents 21 0 R /CropBox [-100 -100 300 300] /MediaBox [0 0 400 500] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Type /Page>>
+object 23 0: <</Length 244>> stream sha256=2bdd3c7818517cedecf057d2426672421a747ef93d7c1a5cb774a387b442bbbb
+object 24 0: <</Contents 23 0 R /MediaBox [400 500 0 0] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 180 /Type /Page>>

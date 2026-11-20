@@ -78,6 +78,10 @@ A run that hits the time limit keeps its thread, so the process can crash when i
 
 The golden files in `tests\golden` are written by the PDFBox 3.0.8 oracle. `tools\oracle\generate-golden.ps1` takes `-Mode Dump` (the structure dump, `*.dump.txt`), `-Mode Text` (the text dump, `*.text.txt`), `-Mode Positions` (the line positions, `*.positions.txt`) or `-Mode All` (the default, all three), and `-Filter` for part of the corpus. Without a filter the script first removes the files of the chosen modes. The formats are in `golden-format.md`. The comparison of the text goldens counts sections that are only equal after white space is ignored; set `PDF4D_TEXT_LENIENT_REPORT` to a file name to get one line per such section.
 
+## Render reference images
+
+`tools\oracle\generate-render.ps1 -Dpi 72` writes the PDFBox renders of every corpus page to `tests\reference\render\72` (about 45 MB, in plain git) and `-Dpi 150` those of `tests\reference\render\150\selection.txt`; `tools\oracle\generate-render-tests.ps1` writes the synthetic render test files. `PDF4D_RENDER_OUTPUT` names a folder where `Pdf4D.Skia.Tests` writes the Pdf4D render and a difference image of every page that differs from its reference. The format and the comparison are in `golden-format.md`.
+
 ## Resources (rebuilding)
 
 The glyph lists, the AFM files of the standard 14 fonts, the predefined CMaps and LiberationSans live in `src\Resources` as one `.res` file per group. Each source file is a zlib-compressed `RCDATA` resource, named by `TPdfResourceData.NameOf` (for example `PDF4D_CMAP_UNIGB_UCS2_H`), and one small unit per group (`Pdf4D.Resources.<Group>.pas`) links the `.res` with `{$R}`. The `.res` files, `resources.csv` (name, source, SHA-256 of the uncompressed bytes, licence) and `afm-MustRead.html` are committed; never edit them by hand.

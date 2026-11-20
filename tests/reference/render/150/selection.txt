@@ -1,0 +1,14 @@
+# <corpus file>;<page>: the pages that are also rendered at 150 DPI (tools/oracle/generate-render.ps1 -Dpi 150)
+generated/render/paths.pdf;1
+generated/render/clip.pdf;1
+generated/render/text-modes.pdf;1
+generated/render/colors-device.pdf;1
+generated/render/images.pdf;1
+generated/render/jpeg.pdf;1
+generated/render/transparency.pdf;1
+generated/render/shadings.pdf;1
+generated/render/patterns.pdf;1
+generated/render/rotated.pdf;2
+pdfbox/input/rendering/survey.pdf;1
+pdfbox/input/rendering/source.pdf;1
+pdfbox/input/rendering/test-landscape2.pdf;1

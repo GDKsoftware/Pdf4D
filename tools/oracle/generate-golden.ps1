@@ -19,7 +19,7 @@ $errBase = Join-Path ([IO.Path]::GetTempPath()) 'pdf4d-oracle-err'
 New-Item -ItemType Directory -Force $errBase | Out-Null
 
 $files = Get-ChildItem $corpus -Recurse -File -Filter *.pdf | Sort-Object FullName
-if ($Filter) { $files = $files | Where-Object { $_.FullName -like "*$Filter*" } }
+if ($Filter) { $files = $files | Where-Object { $_.FullName.Replace([char]92, [char]47) -like "*$Filter*" } }
 $queue = New-Object System.Collections.Queue
 foreach ($f in $files) { foreach ($m in $modes) { $queue.Enqueue([pscustomobject]@{ File = $f; Mode = $m }) } }
 $fileCount = $files.Count

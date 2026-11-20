@@ -1,0 +1,68 @@
+%PDF-1.7
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R  >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [8 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 100 100] /Group << /S /Transparency /CS /DeviceGray >> /Resources << /ExtGState << /H << /ca 0.5 >> >> >> /Length 47 >>
+stream
+0 g 10 10 60 60 re f /H gs 0 g 40 40 55 55 re f
+endstream
+endobj
+4 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 100 100] /Group << /S /Transparency /CS /DeviceGray >> /Resources << /Shading << /Sh1 << /ShadingType 2 /ColorSpace /DeviceGray /Coords [0 0 100 0] /Function << /FunctionType 2 /Domain [0 1] /C0 [0] /C1 [1] /N 1 >> /Extend [true true] >> >> >> /Length 28 >>
+stream
+/Sh1 sh 0 g 40 40 20 20 re f
+endstream
+endobj
+5 0 obj
+<< /Type /XObject /Subtype /Form /BBox [20 20 80 80] /Group << /S /Transparency /CS /DeviceGray >> /Length 20 >>
+stream
+1 g 0 0 100 100 re f
+endstream
+endobj
+6 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 100 100] /Group << /S /Transparency /CS /DeviceRGB >> /Length 50 >>
+stream
+1 0 0 rg 0 0 50 100 re f 0 1 0 rg 50 0 50 100 re f
+endstream
+endobj
+7 0 obj
+<<  /Length 1085 >>
+stream
+0.95 g 0 0 400 400 re f 0.3 0.6 0.9 rg 0 130 400 40 re f 1 0.9 0 rg 0 270 400 30 re f
+q 1 0 0 1 10 295 cm /SmAlpha gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 105 295 cm /SmLum gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 200 295 cm /SmLumBc gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 295 295 cm /SmLumBc0 gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 10 200 cm /SmLumTr gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 105 200 cm /SmLumId gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 200 200 cm /SmRgb gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q 1 0 0 1 295 200 cm /SmAlphaTr gs 0.8 0.1 0.1 rg 0 0 100 100 re f 0 0.5 0 rg 0 40 100 20 re f Q
+q /SmLum gs 1 0 0 1 20 20 cm /SmNone gs 0 0 0.8 rg 0 0 80 80 re f Q
+q 0.6 0 0 0.6 150 20 cm /SmLum gs 0.1 0.5 0.1 rg 0 0 100 100 re f Q
+q 1 0 0 1 280 20 cm /SmLum gs q /SmLumTr gs 0.5 0 0.5 rg 0 0 100 100 re f Q 0 0.3 0.8 rg 0 0 50 50 re f Q
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 400] /Contents 7 0 R /Resources << /ExtGState << /SmAlpha << /SMask << /Type /Mask /S /Alpha /G 3 0 R >> >> /SmLum << /SMask << /Type /Mask /S /Luminosity /G 4 0 R >> >> /SmLumBc << /SMask << /Type /Mask /S /Luminosity /G 5 0 R /BC [0.5] >> >> /SmLumBc0 << /SMask << /Type /Mask /S /Luminosity /G 5 0 R /BC [0] >> >> /SmLumTr << /SMask << /Type /Mask /S /Luminosity /G 4 0 R /TR << /FunctionType 2 /Domain [0 1] /C0 [1] /C1 [0] /N 1 >> >> >> /SmLumId << /SMask << /Type /Mask /S /Luminosity /G 4 0 R /TR /Identity >> >> /SmRgb << /SMask << /Type /Mask /S /Luminosity /G 6 0 R >> >> /SmAlphaTr << /SMask << /Type /Mask /S /Alpha /G 3 0 R /TR << /FunctionType 2 /Domain [0 1] /C0 [1] /C1 [0] /N 1 >> >> >> /SmNone << /SMask /None >> >> >>  >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000009 00000 n 
+0000000059 00000 n 
+0000000116 00000 n 
+0000000360 00000 n 
+0000000723 00000 n 
+0000000889 00000 n 
+0000001084 00000 n 
+0000002222 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+3026
+%%EOF
