@@ -111,6 +111,9 @@ type
     procedure TestStitchingFanOutIsBounded;
 
     [Test]
+    procedure TestSampleTablesOfOneTreeAreBoundedTogether;
+
+    [Test]
     procedure TestIdentityGivesItsInput;
 
     [Test]
@@ -518,6 +521,26 @@ begin
     procedure
     begin
       OpenFunction([Outer, Inner, '<< /FunctionType 2 /Domain [0 1] /C0 [0] /C1 [1] /N 1 >>']);
+    end, EPdfParseException);
+end;
+
+// Three tables of 6 million samples each (a 1 bit table is small as data, large once it is read) are over the limit together
+procedure TFunctionTests.TestSampleTablesOfOneTreeAreBoundedTogether;
+begin
+  var Data: TBytes := nil;
+  SetLength(Data, 750000);
+  const Domain = '0 1';
+  const TwoTables = FBuilder.NewType3(Domain, '0.5', '0 1 0 1',
+    [NewType0(Domain, '0 1', '6000000', 1, Data), NewType0(Domain, '0 1', '6000000', 1, Data)]);
+  const ThreeTables = FBuilder.NewType3(Domain, '0.3 0.6', '0 1 0 1 0 1',
+    [NewType0(Domain, '0 1', '6000000', 1, Data), NewType0(Domain, '0 1', '6000000', 1, Data),
+     NewType0(Domain, '0 1', '6000000', 1, Data)]);
+
+  Make(TwoTables);
+  Assert.WillRaise(
+    procedure
+    begin
+      Make(ThreeTables);
     end, EPdfParseException);
 end;
 

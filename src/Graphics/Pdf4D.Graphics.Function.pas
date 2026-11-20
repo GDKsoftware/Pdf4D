@@ -26,6 +26,8 @@ const
   MaxStitchingDepth = 8;
   // Functions that one call of TPDFunction.Create may build, the nested ones included
   MaxFunctionsPerCreate = 10000;
+  // Sample values that all type 0 functions of one call of TPDFunction.Create may hold together
+  MaxSampledFunctionSamplesPerCreate = MaxSampledFunctionSamples;
 
 type
   // A PDF function: numbers in, numbers out. The functions copy what they need from the dictionary, so the dictionary may go
@@ -80,6 +82,7 @@ type
   private
     FContext: TPDDocumentContext;
     FCount: Integer;
+    FSampleCount: Int64;
 
     function BuildFromDictionary(const Dictionary: TCosDictionary; const StitchingDepth: Integer): TPDFunction;
 
@@ -87,6 +90,8 @@ type
     constructor Create(const Context: TPDDocumentContext);
 
     function Build(const Value: TCosBase; const StitchingDepth: Integer): TPDFunction;
+    // Called by a sampled function before it reads its table; raises when the tree of functions would hold too many samples
+    procedure ChargeSamples(const Count: Int64);
   end;
 
   // Type 0: a table of samples with multilinear interpolation
@@ -102,13 +107,13 @@ type
 
     procedure ReadSizes(const Dictionary: TCosDictionary);
     procedure ReadEncodeAndDecode(const Dictionary: TCosDictionary);
-    procedure ReadSamples(const Stream: TCosStream; const BitsPerSample: Integer);
+    procedure ReadSamples(const Stream: TCosStream; const BitsPerSample: Integer; const Builder: TPDFunctionBuilder);
     function SampleValue(const Coordinates: TArray<Integer>; const OutputIndex: Integer): Integer;
     function InterpolateSamples(const Position: TArray<Single>; const Previous, Next, Coordinates: TArray<Integer>;
                                 const Step: Integer): TArray<Single>;
 
   protected
-    constructor Initialize(const Context: TPDDocumentContext; const Dictionary: TCosDictionary);
+    constructor Initialize(const Context: TPDDocumentContext; const Dictionary: TCosDictionary; const Builder: TPDFunctionBuilder);
 
     function Calculate(const Input: TArray<Single>): TArray<Single>; override;
 
@@ -463,13 +468,23 @@ begin
   raise EPdfParseException.Create('A function must be a dictionary, a stream or the name /Identity');
 end;
 
+procedure TPDFunctionBuilder.ChargeSamples(const Count: Int64);
+begin
+  FSampleCount := FSampleCount + Count;
+  if FSampleCount > MaxSampledFunctionSamplesPerCreate then
+  begin
+    raise EPdfParseException.CreateFmt('The sampled functions inside a function hold more than %d sample values',
+                                       [MaxSampledFunctionSamplesPerCreate]);
+  end;
+end;
+
 function TPDFunctionBuilder.BuildFromDictionary(const Dictionary: TCosDictionary; const StitchingDepth: Integer): TPDFunction;
 begin
   const FunctionType = Dictionary.GetInt(TCosNames.FunctionType, -1);
   case FunctionType of
     TypeSampled:
     begin
-      Result := TPDFunctionType0.Initialize(FContext, Dictionary);
+      Result := TPDFunctionType0.Initialize(FContext, Dictionary, Self);
     end;
     TypeExponential:
     begin
@@ -492,7 +507,8 @@ end;
 
 { TPDFunctionType0 }
 
-constructor TPDFunctionType0.Initialize(const Context: TPDDocumentContext; const Dictionary: TCosDictionary);
+constructor TPDFunctionType0.Initialize(const Context: TPDDocumentContext; const Dictionary: TCosDictionary;
+                                        const Builder: TPDFunctionBuilder);
 begin
   inherited Initialize(Context, Dictionary);
   const InputCount = NumberOfInputParameters;
@@ -517,7 +533,7 @@ begin
 
   ReadSizes(Dictionary);
   ReadEncodeAndDecode(Dictionary);
-  ReadSamples(TCosStream(Dictionary), BitsPerSample);
+  ReadSamples(TCosStream(Dictionary), BitsPerSample, Builder);
   FSampleMaximum := Power(2, BitsPerSample) - 1;
 end;
 
@@ -582,7 +598,7 @@ end;
 
 // A table that is cut short has zeros after its last whole sample, as in PDFBox. A table that needs more than
 // MaxSampledFunctionSamples values is read up to that number, and the function warns.
-procedure TPDFunctionType0.ReadSamples(const Stream: TCosStream; const BitsPerSample: Integer);
+procedure TPDFunctionType0.ReadSamples(const Stream: TCosStream; const BitsPerSample: Integer; const Builder: TPDFunctionBuilder);
 begin
   var Wanted: Int64 := FOutputCount;
   for var Size in FSizes do
@@ -600,7 +616,9 @@ begin
 
   const Bytes = ReadStreamBytes(Stream);
   const Available = (Int64(Length(Bytes)) * 8) div BitsPerSample;
-  SetLength(FSamples, Min(Wanted, Available));
+  const SampleCount = Min(Wanted, Available);
+  Builder.ChargeSamples(SampleCount);
+  SetLength(FSamples, SampleCount);
   var Reader := TSampleBitReader.Create(Bytes);
   for var Index := 0 to Length(FSamples) - 1 do
   begin
