@@ -39,6 +39,7 @@ contains
   Pdf4D.Api.Attachment in '..\src\Api\Pdf4D.Api.Attachment.pas',
   Pdf4D.Api.Document.Interfaces in '..\src\Api\Pdf4D.Api.Document.Interfaces.pas',
   Pdf4D.Api.Document in '..\src\Api\Pdf4D.Api.Document.pas',
+  Pdf4D.Api.DocumentModel.Interfaces in '..\src\Api\Pdf4D.Api.DocumentModel.Interfaces.pas',
   Pdf4D.Api.DocumentHandle in '..\src\Api\Pdf4D.Api.DocumentHandle.pas',
   Pdf4D.Api.Field.Interfaces in '..\src\Api\Pdf4D.Api.Field.Interfaces.pas',
   Pdf4D.Api.Field in '..\src\Api\Pdf4D.Api.Field.pas',

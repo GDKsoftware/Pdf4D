@@ -10,6 +10,7 @@ uses
   Pdf4D.Api.Attachment.Interfaces,
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Api.DocumentHandle,
+  Pdf4D.Api.DocumentModel.Interfaces,
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
@@ -22,7 +23,7 @@ uses
   Pdf4D.Model.Document;
 
 type
-  TPdfDocument = class(TInterfacedObject, IPdfDocument)
+  TPdfDocument = class(TInterfacedObject, IPdfDocument, IPdfDocumentModel)
   private
     FHandle: IPdfDocumentHandle;
 

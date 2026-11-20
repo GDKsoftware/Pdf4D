@@ -88,6 +88,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentModel.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Field.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Field.pas"/>

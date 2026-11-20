@@ -286,6 +286,7 @@
         <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.DrawObject.pas"/>
         <DCCReference Include="..\src\Content\Pdf4D.Content.Operators.MarkedContent.pas"/>
         <DCCReference Include="..\src\Content\Pdf4D.Content.StreamEngine.Tests.pas"/>
+        <DCCReference Include="..\src\Content\Pdf4D.Content.StreamEngine.Hooks.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Document.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.TreeWalker.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.NameTree.pas"/>
@@ -311,6 +312,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Field.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Attachment.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.GuardedWriter.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentModel.Interfaces.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.DocumentHandle.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Page.pas"/>

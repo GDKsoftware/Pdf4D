@@ -22,6 +22,7 @@ uses
   Pdf4D.Font.Base,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
+  Pdf4D.Model.Rectangle,
   Pdf4D.Model.Resources,
   Pdf4D.Parser.ContentStream;
 
@@ -47,6 +48,9 @@ type
   TPdfStreamEngine = class
   private
     type
+      // Ends the page without a log line, like a budget that is used up, because the subclass asked for it
+      EStopRequested = class(EPdfLimitExceededException);
+
       // What a nested stream replaces: the resources and the graphics stack
       TStreamFrame = record
         PreviousResources: TPDResources;
@@ -109,7 +113,12 @@ type
     function TryChargeContentBytes(const Count: Int64): Boolean;
     procedure RunPageContent;
     procedure ProcessForm(const Form: TPDFormXObject);
-    procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const Matrix: TPdfMatrix);
+    procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+      const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+    procedure RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+      const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+    procedure RequireCurrentPage;
+    procedure CheckStopRequested;
     procedure ProcessStreamOperators(const Data: TBytes);
     procedure ProcessOperators(const Parser: TPdfStreamParser);
     function TryReadToken(const Parser: TPdfStreamParser; out Token: TObject): Boolean;
@@ -117,10 +126,11 @@ type
     procedure RunOperator(const Operator: TContentOperator; const Operands: TObjectList<TObject>);
     function CreateFrameResources(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TPDResources;
 
-    function BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+    function BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState): TStreamFrame;
     procedure EndFrame(const Frame: TStreamFrame);
 
     procedure CountOperator;
+    procedure RunProcessor(const Processor: TOperatorProcessorBase; const Operator: TContentOperator; const Operands: TArray<TCosBase>);
     procedure CountGlyph;
     procedure HandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception);
 
@@ -131,6 +141,15 @@ type
     // Called by ProcessPage after the page is set up, inside the floating point guard. A subclass prepares what it reads from
     // the page here.
     procedure PrepareEngineForPage(const Page: TPDPage); virtual;
+    // The graphics state at the bottom of the stack of a page, made by ProcessPage. A subclass with a state of its own
+    // returns it here; it overrides TPDGraphicsState.Clone as well.
+    function CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState; virtual;
+    // Asked after every operator and before every content stream. True ends the page like a used up budget does, but
+    // without a line in the log.
+    function StopRequested: Boolean; virtual;
+    // Where PDFBox calls clipToRect: at the start of a form (after its matrix), a group, a pattern, an annotation and a Type 3
+    // glyph. Nothing by default.
+    procedure ClipToRect(const Rect: TPdfRectangle); virtual;
     procedure ApplyTextAdjustment(const Tx, Ty: Single); virtual;
     procedure ShowText(const Bytes: TBytes); virtual;
     // Called for operators without a processor. Nothing by default.
@@ -148,8 +167,16 @@ type
     // EPdfException of the structure of the page is raised as it is.
     procedure ProcessPage(const Page: TPDPage); virtual;
 
-    procedure ShowTransparencyGroup(const Form: TPDFormXObject);
-    procedure ShowForm(const Form: TPDFormXObject);
+    procedure ShowTransparencyGroup(const Form: TPDFormXObject); virtual;
+    procedure ShowForm(const Form: TPDFormXObject); virtual;
+
+    // Runs Content with Resources (nil: those of the running stream) on the recursion guard, the budgets and the cache of
+    // decoded form content that a form uses. Level is left to the caller, as in PDFBox where the Do operator keeps it.
+    // InitialState becomes the only state of a new graphics stack; the engine owns it from the call on. Nil gives a clone
+    // of the current state. Matrix is concatenated to the CTM of that state, and then ClipToRect(BBox) is called when HasBBox.
+    // The stack and the resources that were current come back when the stream is done, also after an exception.
+    procedure ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
+      const HasBBox: Boolean; const BBox: TPdfRectangle);
 
     procedure BeginText; virtual;
     procedure EndText; virtual;
@@ -279,7 +306,7 @@ begin
 
   FCurrentPage := Page;
   FStack.Clear;
-  FStack.Add(TPDGraphicsState.Create);
+  FStack.Add(CreateInitialGraphicsState(Page));
   FIgnoredSaves := 0;
   FIsDepthWarningGiven := False;
   FResources := nil;
@@ -339,11 +366,38 @@ procedure TPdfStreamEngine.PrepareEngineForPage(const Page: TPDPage);
 begin
 end;
 
+function TPdfStreamEngine.CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState;
+begin
+  Result := TPDGraphicsState.Create;
+end;
+
+function TPdfStreamEngine.StopRequested: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TPdfStreamEngine.ClipToRect(const Rect: TPdfRectangle);
+begin
+end;
+
+procedure TPdfStreamEngine.CheckStopRequested;
+begin
+  if StopRequested then
+  begin
+    raise EStopRequested.Create('A stop was requested');
+  end;
+end;
+
 procedure TPdfStreamEngine.RunPageContent;
 begin
   try
     ProcessPageContent;
   except
+    on Failure: EStopRequested do
+    begin
+      // The subclass asked for it: no line in the log
+      Exit;
+    end;
     on Failure: EPdfLimitExceededException do
     begin
       LogError('Processing of the page stopped, the text so far is kept: %s', [Failure.Message]);
@@ -367,7 +421,7 @@ end;
 procedure TPdfStreamEngine.ProcessPageContent;
 begin
   const Data = ReadPageContent;
-  ProcessContent(Data, nil, False, TPdfMatrix.Identity);
+  ProcessContent(Data, nil, False, nil, TPdfMatrix.Identity, False, Default(TPdfRectangle));
 end;
 
 procedure TPdfStreamEngine.ChargeContentBytes(const Count: Int64);
@@ -512,35 +566,62 @@ begin
   ProcessForm(Form);
 end;
 
-procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject);
+procedure TPdfStreamEngine.RequireCurrentPage;
 begin
   if not Assigned(FCurrentPage) then
   begin
     raise EInvalidOpException.Create('No current page, call ProcessPage instead');
   end;
+end;
 
-  // PDFBox only has the depth limit. A form that draws itself would use up all the depth, 50 times over at every level.
-  if FActiveStreams.Contains(Form.Stream) then
-  begin
-    LogWarning('Form XObject draws itself (recursion), skipped', []);
-    Exit;
-  end;
-
-  var Data: TBytes;
-  if not TryGetFormContent(Form.Stream, Data) then
-  begin
-    Exit;
-  end;
-
+procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject);
+begin
   var FormResources: TCosDictionary;
   if not Form.TryGetResources(FormResources) then
   begin
     FormResources := nil;
   end;
 
-  FActiveStreams.Add(Form.Stream);
+  var BBox: TPdfRectangle;
+  const HasBBox = Form.TryGetBBox(BBox);
+  RunStream(Form.Stream, FormResources, Form.HasEmptyResources, nil, Form.Matrix, HasBBox, BBox);
+end;
+
+procedure TPdfStreamEngine.ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
+  const HasBBox: Boolean; const BBox: TPdfRectangle);
+begin
+  RunStream(Content, Resources, False, InitialState, Matrix, HasBBox, BBox);
+end;
+
+// The engine owns InitialState from here on; BeginFrame hands it to the new graphics stack, so until then every way out
+// frees it
+procedure TPdfStreamEngine.RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+  const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+begin
+  var Data: TBytes;
   try
-    ProcessContent(Data, FormResources, Form.HasEmptyResources, Form.Matrix);
+    RequireCurrentPage;
+    // PDFBox only has the depth limit. A form that draws itself would use up all the depth, 50 times over at every level.
+    if FActiveStreams.Contains(Stream) then
+    begin
+      LogWarning('Form XObject draws itself (recursion), skipped', []);
+      InitialState.Free;
+      Exit;
+    end;
+
+    if not TryGetFormContent(Stream, Data) then
+    begin
+      InitialState.Free;
+      Exit;
+    end;
+  except
+    InitialState.Free;
+    raise;
+  end;
+
+  FActiveStreams.Add(Stream);
+  try
+    ProcessContent(Data, Resources, HasEmptyResources, InitialState, Matrix, HasBBox, BBox);
   finally
     FActiveStreams.Delete(FActiveStreams.Count - 1);
   end;
@@ -559,14 +640,21 @@ begin
   end;
 end;
 
-function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState): TStreamFrame;
 begin
   Result := Default(TStreamFrame);
-  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state. Everything that
-  // can fail is made first, so that a failure leaves the engine as it was.
+  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state, or with the state
+  // the caller gives. Everything that can fail is made first, so that a failure leaves the engine as it was.
   const NewStack = TObjectList<TPDGraphicsState>.Create(True);
   try
-    NewStack.Add(FStack.Last.Clone);
+    if Assigned(InitialState) then
+    begin
+      NewStack.Add(InitialState);
+    end
+    else
+    begin
+      NewStack.Add(FStack.Last.Clone);
+    end;
     Result.CreatedResources := CreateFrameResources(StreamResources, HasEmptyResources);
   except
     NewStack.Free;
@@ -600,13 +688,20 @@ begin
   Frame.CreatedResources.Free;
 end;
 
-procedure TPdfStreamEngine.ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const Matrix: TPdfMatrix);
+procedure TPdfStreamEngine.ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+  const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
 begin
-  const Frame = BeginFrame(Resources, HasEmptyResources);
+  const Frame = BeginFrame(Resources, HasEmptyResources, InitialState);
   try
+    CheckStopRequested;
     var Ctm := GraphicsState.CurrentTransformationMatrix;
     Ctm.ConcatenateWith(Matrix);
     GraphicsState.CurrentTransformationMatrix := Ctm;
+    // PDFBox clips to the BBox of a form after its matrix is part of the CTM
+    if HasBBox then
+    begin
+      ClipToRect(BBox);
+    end;
     ProcessStreamOperators(Data);
   finally
     EndFrame(Frame);
@@ -722,12 +817,19 @@ begin
   CountOperator;
 
   var Processor: TOperatorProcessorBase;
-  if not FProcessors.TryGetValue(Operator.Name, Processor) then
+  if FProcessors.TryGetValue(Operator.Name, Processor) then
+  begin
+    RunProcessor(Processor, Operator, Operands);
+  end
+  else
   begin
     UnsupportedOperator(Operator, Operands);
-    Exit;
   end;
+  CheckStopRequested;
+end;
 
+procedure TPdfStreamEngine.RunProcessor(const Processor: TOperatorProcessorBase; const Operator: TContentOperator; const Operands: TArray<TCosBase>);
+begin
   try
     Processor.Process(Operator, Operands);
   except

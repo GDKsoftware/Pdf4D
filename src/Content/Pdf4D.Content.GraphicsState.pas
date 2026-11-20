@@ -57,6 +57,11 @@ type
     FTextLineMatrix: TPdfMatrix;
     FHasTextLineMatrix: Boolean;
 
+  protected
+    // Copies the fields of this class into Target. A Clone of a subclass makes its own object, calls this, and copies the
+    // fields it adds.
+    procedure CopyBaseTo(const Target: TPDGraphicsState);
+
   public
     // A public field because a record in a property cannot be changed in place (State.TextState.FontSize := 12)
     TextState: TPDTextState;
@@ -64,8 +69,9 @@ type
     // The CTM is the identity, the text state is TPDTextState.Create and there are no text matrices
     constructor Create;
 
-    // An independent copy: changing the copy leaves this state alone. The font is shared, as in PDFBox.
-    function Clone: TPDGraphicsState;
+    // An independent copy: changing the copy leaves this state alone. The font is shared, as in PDFBox. A subclass that adds
+    // fields overrides this, so that q and the start of a form keep them.
+    function Clone: TPDGraphicsState; virtual;
 
     // The text matrices are null until BT sets them, as in PDFBox
     function TryGetTextMatrix(out Matrix: TPdfMatrix): Boolean;
@@ -134,15 +140,20 @@ begin
   TextState := TPDTextState.Create;
 end;
 
+procedure TPDGraphicsState.CopyBaseTo(const Target: TPDGraphicsState);
+begin
+  Target.FCurrentTransformationMatrix := FCurrentTransformationMatrix;
+  Target.TextState := TextState;
+  Target.FTextMatrix := FTextMatrix;
+  Target.FHasTextMatrix := FHasTextMatrix;
+  Target.FTextLineMatrix := FTextLineMatrix;
+  Target.FHasTextLineMatrix := FHasTextLineMatrix;
+end;
+
 function TPDGraphicsState.Clone: TPDGraphicsState;
 begin
   Result := TPDGraphicsState.Create;
-  Result.FCurrentTransformationMatrix := FCurrentTransformationMatrix;
-  Result.TextState := TextState;
-  Result.FTextMatrix := FTextMatrix;
-  Result.FHasTextMatrix := FHasTextMatrix;
-  Result.FTextLineMatrix := FTextLineMatrix;
-  Result.FHasTextLineMatrix := FHasTextLineMatrix;
+  CopyBaseTo(Result);
 end;
 
 function TPDGraphicsState.TryGetTextMatrix(out Matrix: TPdfMatrix): Boolean;
