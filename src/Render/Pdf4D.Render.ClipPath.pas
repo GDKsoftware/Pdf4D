@@ -20,6 +20,8 @@ type
     FTransform: TPdfMatrix;
     FFillRule: TPdfFillRule;
 
+    procedure ReleaseParents;
+
   public
     // Parent is nil for the first path. Takes ownership of Path.
     constructor Create(const Parent: IPdfClipPath; const Path: TPdfPath; const Transform: TPdfMatrix; const FillRule: TPdfFillRule);
@@ -46,8 +48,31 @@ end;
 
 destructor TPdfClipPath.Destroy;
 begin
+  ReleaseParents;
   FPath.Free;
   inherited;
+end;
+
+// Releasing the parent from the destructor would recurse once per link of a long chain. Instead every parent that nobody else holds
+// is cut off from its own parent before it is released, so each destructor finds no parent left.
+procedure TPdfClipPath.ReleaseParents;
+begin
+  var Link := FParent;
+  FParent := nil;
+
+  while Assigned(Link) do
+  begin
+    var Next: IPdfClipPath := nil;
+    const Node = (Link as TObject);
+    const IsOnlyHeldHere = ((Node is TPdfClipPath) and (TPdfClipPath(Node).RefCount = 1));
+    if IsOnlyHeldHere then
+    begin
+      Next := TPdfClipPath(Node).FParent;
+      TPdfClipPath(Node).FParent := nil;
+    end;
+
+    Link := Next;
+  end;
 end;
 
 function TPdfClipPath.Parent: IPdfClipPath;

@@ -10,13 +10,15 @@ uses
   System.SysUtils,
   System.Types,
   System.Math,
+  System.Skia,
   DUnitX.TestFramework,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.Device.Interfaces,
-  Pdf4D.Render.Skia.Backend;
+  Pdf4D.Render.Skia.Backend,
+  Pdf4D.Render.Skia.Device;
 
 type
   TRgb = record
@@ -43,6 +45,12 @@ type
 
   public
     class function Blend(const Mode: TPdfBlendMode; const Backdrop, Source: TPdfDeviceColor): TPdfDeviceColor; static;
+  end;
+
+  // A device whose surface cannot be made
+  TPdfNoSurfaceDevice = class(TPdfSkiaDevice)
+  protected
+    function MakeSurface: ISkSurface; override;
   end;
 
   [TestFixture]
@@ -171,6 +179,24 @@ type
 
     [Test]
     procedure TestBitmapWithBlendMode;
+
+    [Test]
+    procedure TestSurfaceThatCannotBeMadeRaisesOutOfMemory;
+
+    [Test]
+    procedure TestFailedClipLeavesTheDeviceUnclipped;
+
+    [Test]
+    procedure TestVeryLongClipChain;
+
+    [Test]
+    procedure TestNearSingularBitmapPaintDrawsNothing;
+
+    [Test]
+    procedure TestSoftMaskAtAnOffsetWithOutsideValue;
+
+    [Test]
+    procedure TestClipCombinedWithSoftMask;
 
     [Test]
     procedure TestExceptionMaskSurvivesDrawing;
@@ -329,6 +355,13 @@ begin
 
   Result := ToColor(MakeRgb(Separable(Mode, BackdropRgb.R, SourceRgb.R), Separable(Mode, BackdropRgb.G, SourceRgb.G),
                             Separable(Mode, BackdropRgb.B, SourceRgb.B)));
+end;
+
+{ TPdfNoSurfaceDevice }
+
+function TPdfNoSurfaceDevice.MakeSurface: ISkSurface;
+begin
+  Result := nil;
 end;
 
 { TPdfSkiaDeviceTests }
@@ -994,6 +1027,105 @@ begin
   FSnapshot := FDevice.ToBitmap;
 
   Assert.IsTrue(MaskBefore = GetExceptionMask, 'The device must give the floating point exception mask back as it found it');
+end;
+
+procedure TPdfSkiaDeviceTests.TestSurfaceThatCannotBeMadeRaisesOutOfMemory;
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfNoSurfaceDevice.Create(4, 4);
+    end,
+    EOutOfMemory);
+end;
+
+procedure TPdfSkiaDeviceTests.TestFailedClipLeavesTheDeviceUnclipped;
+begin
+  const GoodClip = NewClip(nil, 2, 2, 5, 5);
+  FDevice.SetClip(GoodClip);
+
+  const BadClip = TPdfClipPath.Create(nil, NewRectPath(0, 0, 10, 10), TPdfMatrix.Identity, TPdfFillRule(99));
+  Assert.WillRaise(
+    procedure
+    begin
+      FDevice.SetClip(BadClip);
+    end,
+    ENotSupportedException);
+
+  FillWholeDevice(Red, NoAntiAlias);
+  AssertPixel(8, 8, TPdfDeviceColor.Create(255, 0, 0));
+
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(GoodClip);
+  FillWholeDevice(Red, NoAntiAlias);
+  AssertPixel(3, 3, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(8, 8);
+end;
+
+procedure TPdfSkiaDeviceTests.TestVeryLongClipChain;
+begin
+  var Clip: IPdfClipPath;
+  for var Index := 1 to 100000 do
+  begin
+    Clip := NewClip(Clip, 2, 2, 8, 8);
+  end;
+
+  FDevice.SetClip(Clip);
+  FillWholeDevice(Red, NoAntiAlias);
+
+  AssertPixel(5, 5, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(1, 1);
+end;
+
+procedure TPdfSkiaDeviceTests.TestNearSingularBitmapPaintDrawsNothing;
+begin
+  const Tile = NewTile;
+  const Path = NewRectPath(0, 0, 10, 10);
+  try
+    const BitmapToDevice = TPdfMatrix.GetScaleInstance(1E30, 1E30);
+    const Paint = TPdfPaint.FromBitmap(Tile, BitmapToDevice, TPdfTileMode.&Repeat, TPdfImageFilter.Nearest);
+    FDevice.FillPath(Path, TPdfMatrix.GetScaleInstance(1E-10, 1E-10), TPdfFillRule.NonZero, Paint, NoAntiAlias);
+  finally
+    Path.Free;
+    Tile.Free;
+  end;
+
+  AssertTransparent(0, 0);
+  AssertTransparent(5, 5);
+end;
+
+procedure TPdfSkiaDeviceTests.TestSoftMaskAtAnOffsetWithOutsideValue;
+begin
+  const Mask = NewMask(3, 3, 2, 2, 255, 128);
+  try
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(Red, Composite);
+  finally
+    Mask.Free;
+  end;
+
+  AssertPixel(3, 3, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(4, 4, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(0, 0, TPdfDeviceColor.Create(128, 0, 0, 128), 1);
+  AssertPixel(8, 8, TPdfDeviceColor.Create(128, 0, 0, 128), 1);
+end;
+
+procedure TPdfSkiaDeviceTests.TestClipCombinedWithSoftMask;
+begin
+  FDevice.SetClip(NewClip(nil, 0, 0, 5, 5));
+
+  const Mask = NewMask(0, 0, 10, 10, 255, 0);
+  try
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(Red, Composite);
+  finally
+    Mask.Free;
+  end;
+
+  AssertPixel(2, 2, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(7, 7);
 end;
 
 end.

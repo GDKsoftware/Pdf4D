@@ -34,6 +34,7 @@ type
     procedure CreateSurface;
     procedure ApplyClip(const Clip: IPdfClipPath);
     procedure ClipChain(const Clip: IPdfClipPath);
+    procedure ResetCanvasClip;
     // Runs Draw with Composite itself, or, with a soft mask, with a plain composite on a layer that is masked and then put on the canvas
     procedure Composited(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
     procedure DrawMasked(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);
@@ -42,6 +43,10 @@ type
     procedure DrawPath(const Path: TPdfPath; const FillRule: TPdfFillRule; const Transform: TPdfMatrix; const Paint: TPdfPaint;
                        const Composite: TPdfComposite; const Stroke: TPdfStrokeStyle; const IsStroke: Boolean);
     function ReadArea(const Area: TRect): TPdfBitmap;
+
+  protected
+    // Nil when Skia cannot allocate the surface
+    function MakeSurface: ISkSurface; virtual;
 
   public
     // Raises EArgumentOutOfRangeException like TPdfBitmap.CheckSize
@@ -177,49 +182,88 @@ begin
   Result := ReadArea(TRect.Create(0, 0, FWidth, FHeight));
 end;
 
+function TPdfSkiaDevice.MakeSurface: ISkSurface;
+begin
+  Result := TSkSurface.MakeRaster(FWidth, FHeight, TSkColorType.RGBA8888, TSkAlphaType.Premul);
+end;
+
 procedure TPdfSkiaDevice.CreateSurface;
 begin
   TPdfFloatGuard.Run(
     procedure
     begin
-      FSurface := TSkSurface.MakeRaster(FWidth, FHeight, TSkColorType.RGBA8888, TSkAlphaType.Premul);
-      FCanvas := FSurface.Canvas;
-      FBaseLevel := FCanvas.Save;
+      FSurface := MakeSurface;
+      const HasSurface = Assigned(FSurface);
+      if HasSurface then
+      begin
+        FCanvas := FSurface.Canvas;
+        FBaseLevel := FCanvas.Save;
+      end;
     end);
 
   const HasSurface = Assigned(FSurface);
   if not HasSurface then
   begin
-    raise EOutOfMemory.CreateFmt('Skia could not make a %d x %d surface', [FWidth, FHeight]);
+    // The RTL raises its own preallocated EOutOfMemory; a new instance would never be freed by the exception cleanup
+    OutOfMemoryError;
   end;
 end;
 
+// When the clip cannot be applied the device has no clip, on the canvas and in FClip, so the next SetClip starts from a known state
 procedure TPdfSkiaDevice.ApplyClip(const Clip: IPdfClipPath);
+begin
+  FClip := nil;
+  try
+    TPdfFloatGuard.Run(
+      procedure
+      begin
+        FCanvas.RestoreToCount(FBaseLevel);
+        FCanvas.Save;
+        ClipChain(Clip);
+      end);
+  except
+    ResetCanvasClip;
+    raise;
+  end;
+
+  FClip := Clip;
+end;
+
+procedure TPdfSkiaDevice.ResetCanvasClip;
 begin
   TPdfFloatGuard.Run(
     procedure
     begin
       FCanvas.RestoreToCount(FBaseLevel);
       FCanvas.Save;
-      ClipChain(Clip);
     end);
-
-  FClip := Clip;
 end;
 
-// From the root to the leaf: every path narrows the clip of the paths before it
+// From the root to the leaf: every path narrows the clip of the paths before it. Iterative, because a file can chain very many clips.
 procedure TPdfSkiaDevice.ClipChain(const Clip: IPdfClipPath);
 begin
-  const HasClip = Assigned(Clip);
-  if not HasClip then
+  var Count := 0;
+  var Link := Clip;
+  while Assigned(Link) do
   begin
-    Exit;
+    Inc(Count);
+    Link := Link.Parent;
   end;
 
-  ClipChain(Clip.Parent);
+  var Chain: TArray<IPdfClipPath>;
+  SetLength(Chain, Count);
+  Link := Clip;
+  for var Index := Count - 1 downto 0 do
+  begin
+    Chain[Index] := Link;
+    Link := Link.Parent;
+  end;
 
-  FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(Clip.Transform));
-  FCanvas.ClipPath(TPdfSkiaConvert.Path(Clip.Path, Clip.FillRule), TSkClipOp.Intersect, False);
+  for var Item in Chain do
+  begin
+    FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(Item.Transform));
+    FCanvas.ClipPath(TPdfSkiaConvert.Path(Item.Path, Item.FillRule), TSkClipOp.Intersect, False);
+  end;
 end;
 
 procedure TPdfSkiaDevice.Composited(const Composite: TPdfComposite; const Draw: TPdfDrawWithComposite);

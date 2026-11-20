@@ -58,7 +58,8 @@ implementation
 
 uses
   System.SysUtils,
-  System.Math;
+  System.Math,
+  Pdf4D.Common.Defines;
 
 const
   MaxChannel    = 255;
@@ -94,8 +95,16 @@ begin
     Exit(False);
   end;
 
-  Inverse := TPdfMatrix.Create(D / Determinant, -B / Determinant, -C / Determinant, A / Determinant,
-                               (C * F - D * E) / Determinant, (B * E - A * F) / Determinant);
+  try
+    Inverse := TPdfMatrix.Create(D / Determinant, -B / Determinant, -C / Determinant, A / Determinant,
+                                 (C * F - D * E) / Determinant, (B * E - A * F) / Determinant);
+  except
+    on EPdfParseException do
+    begin
+      Exit(False);
+    end;
+  end;
+
   Result := True;
 end;
 
@@ -340,7 +349,17 @@ begin
     Exit;
   end;
 
-  const LocalMatrix = Paint.BitmapToDevice.Multiply(InverseTransform);
+  // A transform that is nearly singular makes the product overflow; the paint then covers nothing, like a singular one
+  var LocalMatrix: TPdfMatrix;
+  try
+    LocalMatrix := Paint.BitmapToDevice.Multiply(InverseTransform);
+  except
+    on EPdfParseException do
+    begin
+      Exit;
+    end;
+  end;
+
   const Tile = TileMode(Paint.TileMode);
   const Shader = Image(Paint.Bitmap).MakeShader(Matrix(LocalMatrix), Sampling(Paint.Filter), Tile, Tile);
 

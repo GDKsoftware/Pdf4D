@@ -28,6 +28,12 @@ type
 
     [Test]
     procedure TestClipOwnsItsPath;
+
+    [Test]
+    procedure TestVeryLongChainIsReleasedWithoutRecursion;
+
+    [Test]
+    procedure TestSharedParentSurvivesReleaseOfItsChild;
   end;
 
 implementation
@@ -83,6 +89,32 @@ begin
   const Clip = NewClip(nil, TPdfFillRule.NonZero);
 
   Assert.AreEqual(3, Clip.Path.PointCount);
+end;
+
+procedure TPdfClipPathTests.TestVeryLongChainIsReleasedWithoutRecursion;
+begin
+  var Last: IPdfClipPath;
+  for var Index := 1 to 100000 do
+  begin
+    Last := NewClip(Last, TPdfFillRule.NonZero);
+  end;
+
+  Assert.IsNotNull(Last);
+  Last := nil;
+  Assert.IsNull(Last);
+end;
+
+procedure TPdfClipPathTests.TestSharedParentSurvivesReleaseOfItsChild;
+begin
+  const Shared = NewClip(nil, TPdfFillRule.EvenOdd);
+  var Child: IPdfClipPath := NewClip(Shared, TPdfFillRule.NonZero);
+  var Grandchild: IPdfClipPath := NewClip(Child, TPdfFillRule.NonZero);
+
+  Child := nil;
+  Grandchild := nil;
+
+  Assert.AreEqual(TPdfFillRule.EvenOdd, Shared.FillRule);
+  Assert.IsNotNull(Shared.Path);
 end;
 
 end.
