@@ -1,7 +1,5 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/patterns.pdf # Task 22: tiling patterns
-pdfbox/input/rendering/survey.pdf # Task 22: tiling patterns
 generated/render/ccitt.pdf # Task 23: CCITTFax
 pdfbox-jira/PDFBOX-4831.pdf # Task 23: CCITTFax
 pdfbox/input/merge/multitiff.pdf # Task 23: CCITTFax

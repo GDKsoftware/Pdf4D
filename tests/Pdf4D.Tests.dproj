@@ -223,6 +223,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.GraphicsDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Text.Tests.pas"/>
@@ -243,6 +244,9 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Patch.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Function.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Shading.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.PatternDocuments.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Pattern.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
@@ -260,6 +264,8 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Pattern.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Special.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Pattern.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>

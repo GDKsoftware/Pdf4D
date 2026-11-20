@@ -104,6 +104,7 @@
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGroups.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderSoftMasks.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderTiling.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -6,9 +6,10 @@
 // getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage with the
 // transfer function and the soft mask of the graphics state (the soft mask itself is made by Pdf4D.Render.SoftMaskPaint), and showTransparencyGroup
 // with the inner class TransparencyGroup (bounds, backdrop, the group of a soft mask) and hasBlendMode, and shadingFill, intersectShadingBBox and the shading
-// paint of getPaint (shading patterns as fill and stroke colour; the shading itself is made by Pdf4D.Render.Shading.Context). Tiling patterns are not drawn yet.
-// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
-// showType3Glyph
+// paint of getPaint (shading patterns as fill and stroke colour; the shading itself is made by Pdf4D.Render.Shading.Context), and the tiling patterns of
+// getPaint with drawTilingPattern (the cell is made by Pdf4D.Render.TilingPaint, which ports TilingPaint and TilingPaintFactory).
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph,
+// showType3Glyph and processTilingPattern
 unit Pdf4D.Render.PageDrawer;
 
 {$EXCESSPRECISION OFF}
@@ -27,6 +28,7 @@ uses
   Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.Image,
+  Pdf4D.Graphics.Pattern,
   Pdf4D.Graphics.Shading,
   Pdf4D.Graphics.SoftMask,
   Pdf4D.Model.FormXObject,
@@ -37,7 +39,8 @@ uses
   Pdf4D.Render.GraphicsEngine,
   Pdf4D.Render.GroupDevice,
   Pdf4D.Render.Renderer,
-  Pdf4D.Render.Renderer.Interfaces;
+  Pdf4D.Render.Renderer.Interfaces,
+  Pdf4D.Render.TilingPaint;
 
 type
   // What is done with the paint of a pattern while its bitmap exists
@@ -90,6 +93,15 @@ type
     // The shadings and shading patterns that were made, by the dictionary they come from; a nil value is one that could not be made
     FShadings: TObjectDictionary<TCosDictionary, TPDShading>;
     FShadingPatterns: TObjectDictionary<TCosDictionary, TPDShadingPattern>;
+    // The same for the tiling patterns, which are views on their streams
+    FTilingPatterns: TObjectDictionary<TCosDictionary, TPDTilingPattern>;
+    // TilingPaintFactory: the cells that were made. Nil only while the drawer is being made or destroyed.
+    FTilingPaints: TPdfTilingPaintFactory;
+    // The patterns whose cells are being drawn, inside each other
+    FPatternDepth: Integer;
+    FHasLoggedPatternDepth: Boolean;
+    // The warnings of the tiling paint that are in the log, so that a pattern that is used on every glyph gives one line
+    FLoggedTilingWarnings: TDictionary<string, Boolean>;
 
     function TransformWidth(const Width: Single): Single;
     function PlainNonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
@@ -101,8 +113,17 @@ type
     function BuildSoftMask(const Mask: IPdfSoftMask): TPdfAlphaMask;
     function SolidPaint(const Color: TPDColor): TPdfPaint;
     function TryGetShading(const Value: TCosBase; out Shading: TPDShading): Boolean;
-    function TryGetShadingPattern(const Color: TPDColor; out Pattern: TPDShadingPattern): Boolean;
+    function TryGetPatternValue(const Color: TPDColor; out Value: TCosBase): Boolean;
+    class function IsTilingPattern(const Value: TCosBase): Boolean; static;
+    function TryGetShadingPattern(const Color: TPDColor; const Value: TCosBase; out Pattern: TPDShadingPattern): Boolean;
+    function TryGetTilingPattern(const Color: TPDColor; const Value: TCosBase; out Pattern: TPDTilingPattern): Boolean;
     class function IsPatternColor(const Color: TPDColor): Boolean; static;
+    class function UnderlyingColorSpace(const Color: TPDColor): TPDColorSpace; static;
+    function IsPatternDepthReached: Boolean;
+    procedure LogTilingWarning(const Fmt: string; const Args: array of const);
+    procedure WithShadingPaint(const Color: TPDColor; const Value: TCosBase; const Bounds: TRectF; const Action: TPdfPaintAction);
+    procedure WithTilingPaint(const Color: TPDColor; const Value: TCosBase; const Bounds: TRectF; const Action: TPdfPaintAction);
+    function CreateTilingState(const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace; const Color: TPDColor): TPDGraphicsState;
     class function DeviceBoundsOf(const Path: TPdfPath; const Transform: TPdfMatrix): TRectF; static;
     class function WholePixels(const Area: TRectF): TRect; static;
     function StrokeBoundsOf(const Path: TPdfPath; const Stroke: TPdfStrokeStyle): TRectF;
@@ -173,6 +194,12 @@ type
     function TryRenderMaskGroup(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const HasBackdrop: Boolean; const Backdrop: TPdfDeviceColor;
                                 out Bounds: TRect; out Image: TPdfBitmap): Boolean;
 
+    // PageDrawer.drawTilingPattern: draws the content of the pattern on Layer, a layer of the device with the cell of the pattern. PatternMatrix is
+    // the matrix of the content and LayerTransform goes from the space after it to the pixels of the layer. ColorSpace and Color are those of
+    // an uncoloured pattern.
+    procedure DrawTilingPattern(const Layer: IPdfRasterDevice; const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace; const Color: TPDColor;
+                                const PatternMatrix, LayerTransform: TPdfMatrix);
+
     procedure BeginText; override;
     procedure EndText; override;
     procedure ShowGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector); override;
@@ -207,11 +234,13 @@ uses
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray,
   Pdf4D.Graphics.Color.Pattern,
+  Pdf4D.Graphics.Color.Special,
   Pdf4D.Graphics.State,
   Pdf4D.Model.ExtendedGraphicsState,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.GlyphCache,
   Pdf4D.Render.ImageScaler,
+  Pdf4D.Render.Options,
   Pdf4D.Render.PageTransform,
   Pdf4D.Render.Shading.Context,
   Pdf4D.Render.SoftMaskPaint,
@@ -226,10 +255,62 @@ const
   Thousand = 1000;
   WidthTolerance = 0.0001;
   MaximumLoggedMissingGlyphs = 1024;
+  MaximumLoggedTilingWarnings = 256;
   // PDFRenderer.imageDownscalingOptimizationThreshold: an image that is drawn at less than this scale is averaged down first
   ImageDownscalingThreshold = 0.5;
   CodeShift = 48;
   CodeMask = $FFFF;
+
+type
+  // What the tiling paint asks of the drawer that owns it. The drawer frees the factory that holds this, before it is gone itself.
+  TPdfPageDrawerTilingHost = class(TInterfacedObject, IPdfTilingHost)
+  private
+    FDrawer: TPdfPageDrawer;
+
+  public
+    constructor Create(const Drawer: TPdfPageDrawer);
+
+    function InitialMatrix: TPdfMatrix;
+    function Options: TPdfRenderOptions;
+    procedure LogWarning(const Fmt: string; const Args: array of const);
+    function CreateLayer(const Width, Height: Integer): IPdfRasterDevice;
+    procedure DrawTilingPattern(const Layer: IPdfRasterDevice; const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace;
+                                const Color: TPDColor; const PatternMatrix: TPdfMatrix; const LayerTransform: TPdfMatrix);
+  end;
+
+{ TPdfPageDrawerTilingHost }
+
+constructor TPdfPageDrawerTilingHost.Create(const Drawer: TPdfPageDrawer);
+begin
+  inherited Create;
+  FDrawer := Drawer;
+end;
+
+function TPdfPageDrawerTilingHost.InitialMatrix: TPdfMatrix;
+begin
+  Result := FDrawer.InitialMatrix;
+end;
+
+function TPdfPageDrawerTilingHost.Options: TPdfRenderOptions;
+begin
+  Result := FDrawer.FParams.Options;
+end;
+
+procedure TPdfPageDrawerTilingHost.LogWarning(const Fmt: string; const Args: array of const);
+begin
+  FDrawer.LogTilingWarning(Fmt, Args);
+end;
+
+function TPdfPageDrawerTilingHost.CreateLayer(const Width, Height: Integer): IPdfRasterDevice;
+begin
+  Result := FDrawer.FDevice.CreateLayer(Width, Height);
+end;
+
+procedure TPdfPageDrawerTilingHost.DrawTilingPattern(const Layer: IPdfRasterDevice; const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace;
+                                                     const Color: TPDColor; const PatternMatrix: TPdfMatrix; const LayerTransform: TPdfMatrix);
+begin
+  FDrawer.DrawTilingPattern(Layer, Pattern, ColorSpace, Color, PatternMatrix, LayerTransform);
+end;
 
 { TPdfPageDrawer }
 
@@ -246,6 +327,9 @@ begin
   FLoggedMissingGlyphs := TDictionary<Int64, Boolean>.Create;
   FShadings := TObjectDictionary<TCosDictionary, TPDShading>.Create([doOwnsValues]);
   FShadingPatterns := TObjectDictionary<TCosDictionary, TPDShadingPattern>.Create([doOwnsValues]);
+  FTilingPatterns := TObjectDictionary<TCosDictionary, TPDTilingPattern>.Create([doOwnsValues]);
+  FLoggedTilingWarnings := TDictionary<string, Boolean>.Create;
+  FTilingPaints := TPdfTilingPaintFactory.Create(TPdfPageDrawerTilingHost.Create(Self));
 
   const Transform = TPdfPageTransform.Create(Page.CropBox, Page.Rotation + Params.ExtraRotation, Params.Scale);
   const Whole = Transform.PageToDevice;
@@ -258,6 +342,9 @@ end;
 
 destructor TPdfPageDrawer.Destroy;
 begin
+  FTilingPaints.Free;
+  FLoggedTilingWarnings.Free;
+  FTilingPatterns.Free;
   FShadingPatterns.Free;
   FShadings.Free;
   FCachedMask.Free;
@@ -470,18 +557,28 @@ begin
   Result := Assigned(Shading);
 end;
 
-// getPattern of PDPattern for the pattern colour. A pattern that is missing or that is no shading pattern gives False (PDFBox fails
-// and the operator paints nothing); the tiling patterns are painted by a later task.
-function TPdfPageDrawer.TryGetShadingPattern(const Color: TPDColor; out Pattern: TPDShadingPattern): Boolean;
+// getPattern of PDPattern for the pattern colour: the dictionary or stream of the pattern. A pattern that is missing gives False (PDFBox fails
+// and the operator paints nothing).
+function TPdfPageDrawer.TryGetPatternValue(const Color: TPDColor; out Value: TCosBase): Boolean;
 begin
-  Pattern := nil;
-  var Value: TCosBase;
-  if not Resources.TryGetPattern(Color.PatternName, Value) then
+  Result := Resources.TryGetPattern(Color.PatternName, Value);
+  if not Result then
   begin
     LogError('The pattern ''%s'' was not found, nothing is painted', [Color.PatternName]);
-    Exit(False);
   end;
+end;
 
+// PDAbstractPattern.create: PatternType 1 is a tiling pattern, anything else is taken for a shading pattern
+class function TPdfPageDrawer.IsTilingPattern(const Value: TCosBase): Boolean;
+begin
+  const PatternType = TCosDictionary(Value).GetInt(TCosNames.PatternType, 0);
+  Result := (PatternType = TilingPatternType);
+end;
+
+// A pattern that is no shading pattern gives False and a line in the log
+function TPdfPageDrawer.TryGetShadingPattern(const Color: TPDColor; const Value: TCosBase; out Pattern: TPDShadingPattern): Boolean;
+begin
+  Pattern := nil;
   const Key = TCosDictionary(Value);
   if FShadingPatterns.TryGetValue(Key, Pattern) then
   begin
@@ -499,6 +596,62 @@ begin
   end;
   FShadingPatterns.Add(Key, Pattern);
   Result := Assigned(Pattern);
+end;
+
+// A tiling pattern that cannot be made (it is no stream) gives False and a line in the log, once
+function TPdfPageDrawer.TryGetTilingPattern(const Color: TPDColor; const Value: TCosBase; out Pattern: TPDTilingPattern): Boolean;
+begin
+  Pattern := nil;
+  const Key = TCosDictionary(Value);
+  if FTilingPatterns.TryGetValue(Key, Pattern) then
+  begin
+    Exit(Assigned(Pattern));
+  end;
+
+  try
+    Pattern := TPDTilingPattern.Create(Value);
+  except
+    on Failure: EPdfException do
+    begin
+      Pattern := nil;
+      LogError('The pattern ''%s'' is skipped: %s', [Color.PatternName, Failure.Message]);
+    end;
+  end;
+  FTilingPatterns.Add(Key, Pattern);
+  Result := Assigned(Pattern);
+end;
+
+// The colour space of the colour of an uncoloured pattern: the underlying space of the Pattern space. Nil when there is none.
+class function TPdfPageDrawer.UnderlyingColorSpace(const Color: TPDColor): TPDColorSpace;
+begin
+  Result := nil;
+  if Color.ColorSpace is TPDPatternColorSpace then
+  begin
+    Result := TPDPatternColorSpace(Color.ColorSpace).UnderlyingColorSpace;
+  end;
+end;
+
+// PDFBox has no limit on patterns in patterns besides the stack
+function TPdfPageDrawer.IsPatternDepthReached: Boolean;
+begin
+  Result := (FPatternDepth >= Max(FParams.Options.MaxPatternDepth, 1));
+  if Result and (not FHasLoggedPatternDepth) then
+  begin
+    FHasLoggedPatternDepth := True;
+    LogWarning('Patterns are nested as deep as the limit of %d, the pattern is skipped', [FParams.Options.MaxPatternDepth]);
+  end;
+end;
+
+procedure TPdfPageDrawer.LogTilingWarning(const Fmt: string; const Args: array of const);
+begin
+  const Message = Format(Fmt, Args);
+  const IsKnown = FLoggedTilingWarnings.ContainsKey(Message);
+  const IsRoomLeft = (FLoggedTilingWarnings.Count < MaximumLoggedTilingWarnings);
+  if (not IsKnown) and IsRoomLeft then
+  begin
+    FLoggedTilingWarnings.Add(Message, True);
+    LogWarning('%s', [Message]);
+  end;
 end;
 
 class function TPdfPageDrawer.DeviceBoundsOf(const Path: TPdfPath; const Transform: TPdfMatrix): TRectF;
@@ -579,13 +732,120 @@ begin
   end;
 end;
 
-// getPaint for a shading pattern, with intersectShadingBBox: the pattern is the shading placed by its matrix in the initial space of
-// the stream, and the box of the shading cuts what is painted. PDFBox intersects the Area of the shape with the box; here the device
-// gets the box as one more link of the clip, which cuts without anti-aliasing. Action paints with the paint and the clip that was made.
+// getPaint for a pattern colour. Action paints with the paint and the clip that was made.
 procedure TPdfPageDrawer.WithPatternPaint(const Color: TPDColor; const Bounds: TRectF; const Action: TPdfPaintAction);
 begin
+  var Value: TCosBase;
+  if not TryGetPatternValue(Color, Value) then
+  begin
+    Exit;
+  end;
+
+  if IsTilingPattern(Value) then
+  begin
+    WithTilingPaint(Color, Value, Bounds, Action);
+  end
+  else
+  begin
+    WithShadingPaint(Color, Value, Bounds, Action);
+  end;
+end;
+
+// getPaint for a tiling pattern: the paint repeats the cell, which is made once for the colour and the matrices (TilingPaintFactory). A coloured
+// pattern has no colour of its own to key on, an uncoloured one has the components of its colour in the underlying space.
+procedure TPdfPageDrawer.WithTilingPaint(const Color: TPDColor; const Value: TCosBase; const Bounds: TRectF; const Action: TPdfPaintAction);
+begin
+  var Pattern: TPDTilingPattern;
+  if (not TryGetTilingPattern(Color, Value, Pattern)) or IsPatternDepthReached then
+  begin
+    Exit;
+  end;
+
+  var Area: TRect;
+  if not TryGetPatternArea(Bounds, nil, Area) then
+  begin
+    Exit;
+  end;
+
+  var ColorSpace: TPDColorSpace := nil;
+  var CellColor := TPDColor.Create(nil, nil);
+  if Pattern.PaintType <> PaintTypeColored then
+  begin
+    ColorSpace := UnderlyingColorSpace(Color);
+    CellColor := TPDColor.Create(ColorSpace, Color.Components);
+  end;
+
+  var Paint: TPdfPaint;
+  if FTilingPaints.TryGetPaint(Pattern, ColorSpace, CellColor, FPageToDevice, Area, Paint) then
+  begin
+    Action(Paint);
+  end;
+end;
+
+// drawTilingPattern and processTilingPattern: the content of the pattern runs on the layer of the cell, with a clean graphics state whose clip is
+// the box of the pattern. The page drawer of PDFBox draws a group in a pattern upside down (flipTG) because the graphics of the cell is not
+// turned over; the layer of a group here is drawn with the matrix of the cell, so it needs no such correction.
+procedure TPdfPageDrawer.DrawTilingPattern(const Layer: IPdfRasterDevice; const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace;
+                                           const Color: TPDColor; const PatternMatrix, LayerTransform: TPdfMatrix);
+begin
+  var BBox: TPdfRectangle;
+  if not Pattern.TryGetBBox(BBox) then
+  begin
+    Exit;
+  end;
+
+  var PatternResources: TCosDictionary;
+  if not Pattern.TryGetResources(PatternResources) then
+  begin
+    PatternResources := nil;
+  end;
+
+  const SavedDevice = FDevice;
+  const SavedMatrix = FPageToDevice;
+  const SavedLinePath = FLinePath;
+  const SavedTextClip = FTextClip;
+  const SavedLastClip = FLastClip;
+  FDevice := Layer;
+  FPageToDevice := LayerTransform;
+  FLinePath := TPdfPath.Create;
+  FTextClip := TPdfPath.Create;
+  FLastClip := nil;
+  Inc(FPatternDepth);
+  try
+    ProcessChildStream(Pattern.Stream, PatternResources, CreateTilingState(Pattern, ColorSpace, Color), PatternMatrix, True, BBox);
+  finally
+    Dec(FPatternDepth);
+    FTextClip.Free;
+    FLinePath.Free;
+    FTextClip := SavedTextClip;
+    FLinePath := SavedLinePath;
+    FDevice := SavedDevice;
+    FPageToDevice := SavedMatrix;
+    FLastClip := SavedLastClip;
+  end;
+end;
+
+// The state that processTilingPattern pushes: new, without clip; an uncoloured pattern paints with its colour in the underlying space
+function TPdfPageDrawer.CreateTilingState(const Pattern: TPDTilingPattern; const ColorSpace: TPDColorSpace; const Color: TPDColor): TPDGraphicsState;
+begin
+  const State = TPdfRenderGraphicsState.Create;
+  if Pattern.PaintType <> PaintTypeColored then
+  begin
+    State.NonStrokingColorSpace := ColorSpace;
+    State.StrokingColorSpace := ColorSpace;
+    State.NonStrokingColor := Color;
+    State.StrokingColor := Color;
+  end;
+  Result := State;
+end;
+
+// getPaint for a shading pattern, with intersectShadingBBox: the pattern is the shading placed by its matrix in the initial space of
+// the stream, and the box of the shading cuts what is painted. PDFBox intersects the Area of the shape with the box; here the device
+// gets the box as one more link of the clip, which cuts without anti-aliasing.
+procedure TPdfPageDrawer.WithShadingPaint(const Color: TPDColor; const Value: TCosBase; const Bounds: TRectF; const Action: TPdfPaintAction);
+begin
   var Pattern: TPDShadingPattern;
-  if not TryGetShadingPattern(Color, Pattern) then
+  if not TryGetShadingPattern(Color, Value, Pattern) then
   begin
     Exit;
   end;
@@ -619,17 +879,18 @@ end;
 procedure TPdfPageDrawer.FillWithColor(const Path: TPdfPath; const FillRule: TPdfFillRule; const Color: TPDColor; const IsAntiAliased: Boolean);
 begin
   ApplyClip;
-  const Composite = NonStrokingComposite(IsAntiAliased);
   if not IsPatternColor(Color) then
   begin
-    FDevice.FillPath(Path, FPageToDevice, FillRule, SolidPaint(Color), Composite);
+    FDevice.FillPath(Path, FPageToDevice, FillRule, SolidPaint(Color), NonStrokingComposite(IsAntiAliased));
     Exit;
   end;
 
+  // The composite is made when the paint is there: making the cell of a pattern may build another soft mask, which replaces the one that the
+  // composite would point to
   WithPatternPaint(Color, DeviceBoundsOf(Path, FPageToDevice),
     procedure(const Paint: TPdfPaint)
     begin
-      FDevice.FillPath(Path, FPageToDevice, FillRule, Paint, Composite);
+      FDevice.FillPath(Path, FPageToDevice, FillRule, Paint, NonStrokingComposite(IsAntiAliased));
     end);
 end;
 

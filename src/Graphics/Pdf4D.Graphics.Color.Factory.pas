@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: PDColorSpace.create (pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/color/PDColorSpace.java, 3.0.8) and the
-// colour space part of PDResources.getColorSpace. The colour spaces besides the device spaces, ICCBased and the name /Pattern give an
+// colour space part of PDResources.getColorSpace. The colour spaces besides the device spaces, ICCBased and Pattern give an
 // EPdfUnsupportedFeatureException until they are ported.
 unit Pdf4D.Graphics.Color.Factory;
 
@@ -37,6 +37,7 @@ type
     class function TryGetDefaultName(const Name: string; out DefaultName: string): Boolean; static;
     class function TryCreateDevice(const Name: string; out Space: TPDColorSpace): Boolean; static;
     class function CreateIccBased(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace; static;
+    class function CreatePattern(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace; static;
     class function CreateNamedResource(const Name: string; const Context: TPDDocumentContext; const Resources: TPDResources; const WasDefault: Boolean;
                                        const Depth: Integer): TPDColorSpace; static;
     class function IsDeviceKind(const Kind: string; out DeviceName: string): Boolean; static;
@@ -61,7 +62,8 @@ uses
   Pdf4D.Cos.PdfObject,
   Pdf4D.Graphics.Color.Device,
   Pdf4D.Graphics.Color.IccBased,
-  Pdf4D.Graphics.Color.Pattern;
+  Pdf4D.Graphics.Color.Pattern,
+  Pdf4D.Graphics.Color.Special;
 
 resourcestring
   ColorSpaceNil = 'The colour space is missing';
@@ -304,14 +306,42 @@ begin
     Exit(CreateIccBased(Items, Context, Depth));
   end;
 
+  if Kind = TCosNames.Pattern then
+  begin
+    Exit(CreatePattern(Items, Context, Depth));
+  end;
+
   const IsPortLater = ((Kind = TCosNames.CalGray) or (Kind = TCosNames.CalRGB) or (Kind = TCosNames.Lab) or (Kind = TCosNames.Indexed) or
-                       (Kind = TCosNames.I) or (Kind = TCosNames.Separation) or (Kind = TCosNames.DeviceN) or (Kind = TCosNames.Pattern));
+                       (Kind = TCosNames.I) or (Kind = TCosNames.Separation) or (Kind = TCosNames.DeviceN));
   if IsPortLater then
   begin
     raise EPdfUnsupportedFeatureException.CreateFmt(ColorSpaceNotPorted, [Kind]);
   end;
 
   raise EPdfParseException.CreateFmt(ColorSpaceBadKind, [Kind]);
+end;
+
+// PDColorSpace.create for [/Pattern] and [/Pattern base]: the underlying space has no resources of its own, as in PDFBox
+class function TPDColorSpaceFactory.CreatePattern(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace;
+begin
+  const HasUnderlyingSpace = (Items.Count > 1);
+  if not HasUnderlyingSpace then
+  begin
+    Exit(TPDPattern.Instance);
+  end;
+
+  const UnderlyingSpace = CreateAt(Items.GetObject(1), Context, nil, False, Depth + 1);
+  const PatternSpace = TPDPatternColorSpace.Create(UnderlyingSpace);
+
+  // Made meanwhile through another way in: keep the space that the context knows
+  var Cached: TObject;
+  if Context.TryGetCachedObject(TPDCacheScope.ColorSpace, Items, Cached) then
+  begin
+    PatternSpace.Free;
+    Exit(TPDColorSpace(Cached));
+  end;
+  Context.AddCachedObject(TPDCacheScope.ColorSpace, Items, PatternSpace);
+  Result := PatternSpace;
 end;
 
 class function TPDColorSpaceFactory.CreateIccBased(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace;

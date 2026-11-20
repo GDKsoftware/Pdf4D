@@ -25,7 +25,7 @@ type
     // The colour that the operands, which are all numbers, make in Space
     function MakeColor(const Space: TPDColorSpace; const Operands: TArray<TCosBase>): TPDColor;
     // The colour of a pattern: the name that ends the operands, or no name (which paints nothing) when the operands have none
-    function PatternColor(const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
+    function PatternColor(const Space: TPDColorSpace; const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
   end;
 
   // The operators of the two kinds (stroking and non-stroking) of colour differ only in the part of the state they work on
@@ -196,15 +196,28 @@ begin
   Result := TPDColor.Create(Space, Components);
 end;
 
-function TColorOperatorProcessor.PatternColor(const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
+function TColorOperatorProcessor.PatternColor(const Space: TPDColorSpace; const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
 begin
   var PatternName := '';
+  var ComponentCount := Length(Operands);
   if HasName then
   begin
     PatternName := TCosName(Operands[High(Operands)]).Name;
+    Dec(ComponentCount);
   end;
 
-  Result := TPDPattern.ColorOf(PatternName);
+  // The numbers before the name are the colour of an uncoloured pattern in the underlying space
+  var Components: TArray<Single>;
+  for var Index := 0 to ComponentCount - 1 do
+  begin
+    if Operands[Index] is TCosNumber then
+    begin
+      Components := Components + [NumberAt(Operands, Index)];
+    end;
+  end;
+
+  Result := TPDColor.Create(Space, Components);
+  Result.PatternName := PatternName;
 end;
 
 { TSetColorOperator }
@@ -215,7 +228,7 @@ begin
   const HasName = ((Length(Operands) > 0) and (Operands[High(Operands)] is TCosName));
   if Space is TPDPattern then
   begin
-    SetColor(PatternColor(Operands, HasName));
+    SetColor(PatternColor(Space, Operands, HasName));
     Exit;
   end;
 

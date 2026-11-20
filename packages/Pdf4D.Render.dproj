@@ -94,6 +94,8 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Pattern.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Special.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Pattern.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
@@ -117,6 +119,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.State.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas"/>

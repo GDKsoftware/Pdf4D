@@ -84,6 +84,9 @@ type
     procedure TestUnsupportedColorSpacesRaiseUnsupported;
 
     [Test]
+    procedure TestPatternArrayGivesTheUnderlyingSpace;
+
+    [Test]
     procedure TestPatternNameGivesThePatternSpace;
 
     [Test]
@@ -111,6 +114,8 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Graphics.Color.Device,
   Pdf4D.Graphics.Color.Factory,
+  Pdf4D.Graphics.Color.Pattern,
+  Pdf4D.Graphics.Color.Special,
   Pdf4D.Render.Bitmap,
   Pdf4D.Tests.Functions,
   Pdf4D.Tests.IccBuilder;
@@ -423,6 +428,26 @@ begin
   end;
 end;
 
+procedure TColorTests.TestPatternArrayGivesTheUnderlyingSpace;
+begin
+  const WithoutBase = TCosArray.Create;
+  WithoutBase.Add(TCosName.Create('Pattern'));
+  FBuilder.AddColorSpace('CSPattern', WithoutBase);
+  const WithBase = TCosArray.Create;
+  WithBase.Add(TCosName.Create('Pattern'));
+  WithBase.Add(TCosName.Create('DeviceRGB'));
+  FBuilder.AddColorSpace('CSPatternRgb', WithBase);
+
+  const Plain = SpaceOf('CSPattern');
+  const Uncolored = SpaceOf('CSPatternRgb');
+
+  Assert.IsTrue(Plain is TPDPattern);
+  Assert.IsFalse(Plain is TPDPatternColorSpace, 'the space without a base is the shared one');
+  Assert.IsTrue(Uncolored is TPDPatternColorSpace);
+  Assert.AreEqual('DeviceRGB', TPDPatternColorSpace(Uncolored).UnderlyingColorSpace.Name);
+  Assert.IsTrue(Uncolored = SpaceOf('CSPatternRgb'), 'made once per document');
+end;
+
 procedure TColorTests.TestPatternNameGivesThePatternSpace;
 begin
   const Space = SpaceOf('Pattern');
@@ -439,16 +464,6 @@ end;
 
 procedure TColorTests.TestUnsupportedColorSpacesRaiseUnsupported;
 begin
-  const PatternArray = TCosArray.Create;
-  PatternArray.Add(TCosName.Create('Pattern'));
-  FBuilder.AddColorSpace('CSPattern', PatternArray);
-  Assert.WillRaise(
-    procedure
-    begin
-      SpaceOf('CSPattern');
-    end,
-    EPdfUnsupportedFeatureException);
-
   const LabArray = TCosArray.Create;
   LabArray.Add(TCosName.Create('Lab'));
   LabArray.Add(TCosDictionary.Create);

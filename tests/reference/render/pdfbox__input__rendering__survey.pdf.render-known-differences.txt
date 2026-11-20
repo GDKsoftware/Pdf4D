@@ -1,0 +1,2 @@
+# <page> [<platform>] # <reason>
+page 1 # Task 24: the red header and the logo are images with an Indexed colour space, which is not supported yet (the log says "Image skipped: The colour space Indexed is not supported yet"); the tiling patterns of the page are equal. Task 24 removes this file.
