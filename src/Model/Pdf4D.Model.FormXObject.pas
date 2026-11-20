@@ -12,10 +12,18 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Common.Matrix,
+  Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Rectangle;
 
 type
+  // PDTransparencyGroup: the entries of /Group that the renderer reads. ColorSpace is the entry as it is in the file (nil when absent).
+  TPDTransparencyGroupAttributes = record
+    IsIsolated: Boolean;
+    IsKnockout: Boolean;
+    ColorSpace: TCosBase;
+  end;
+
   // A view on a Form XObject stream. It owns nothing; the stream belongs to the document.
   TPDFormXObject = class
   private
@@ -34,6 +42,8 @@ type
     function HasEmptyResources: Boolean;
     // /Group << /S /Transparency >>
     function IsTransparencyGroup: Boolean;
+    // PDTransparencyGroup.isIsolated, isKnockout and getColorSpace. False when the form has no /Group dictionary.
+    function TryGetGroup(out Group: TPDTransparencyGroupAttributes): Boolean;
 
     property Stream: TCosStream read FStream;
   end;
@@ -41,7 +51,6 @@ type
 implementation
 
 uses
-  Pdf4D.Cos.Base,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray;
 
@@ -104,6 +113,25 @@ function TPDFormXObject.IsTransparencyGroup: Boolean;
 begin
   var Group: TCosDictionary;
   Result := (FStream.TryGetCosDictionary(TCosNames.Group, Group) and (Group.GetNameAsString(TCosNames.S, '') = TCosNames.Transparency));
+end;
+
+function TPDFormXObject.TryGetGroup(out Group: TPDTransparencyGroupAttributes): Boolean;
+begin
+  Group := Default(TPDTransparencyGroupAttributes);
+  var Dictionary: TCosDictionary;
+  Result := FStream.TryGetCosDictionary(TCosNames.Group, Dictionary);
+  if not Result then
+  begin
+    Exit;
+  end;
+
+  Group.IsIsolated := Dictionary.GetBoolean(TCosNames.I, False);
+  Group.IsKnockout := Dictionary.GetBoolean(TCosNames.K, False);
+  var Space: TCosBase;
+  if Dictionary.TryGetDictionaryObject(TCosNames.CS, Space) then
+  begin
+    Group.ColorSpace := Space;
+  end;
 end;
 
 end.

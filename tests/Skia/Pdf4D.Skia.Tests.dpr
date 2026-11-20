@@ -30,7 +30,8 @@ uses
   Pdf4D.Tests.Corpus in '..\Support\Pdf4D.Tests.Corpus.pas',
   Pdf4D.Tests.FontProvider in '..\Support\Pdf4D.Tests.FontProvider.pas',
   Pdf4D.Tests.TextGolden in '..\Support\Pdf4D.Tests.TextGolden.pas',
-  Pdf4D.Tests.RenderGolden.Tests in 'Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas';
+  Pdf4D.Tests.RenderGolden.Tests in 'Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas',
+  Pdf4D.Tests.RenderGroups.Tests in 'Acceptance\Pdf4D.Tests.RenderGroups.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

@@ -106,6 +106,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Device.Interfaces.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GlyphCache.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.GroupDevice.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Image.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

@@ -5,7 +5,8 @@
 // strokePath, fillPath, fillAndStrokePath, clip, adjustClip, endPath and the path construction; the paint is the solid colour of
 // getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage without
 // the soft mask and the transfer function of the graphics state, and without the pre-scaling of strongly reduced images (the device
-// scales). Shadings, patterns, transparency groups and soft masks are not drawn yet.
+// scales), and showTransparencyGroup with the inner class TransparencyGroup (bounds, backdrop) and hasBlendMode. Shadings, patterns
+// and soft masks are not drawn yet.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
 // showType3Glyph
 unit Pdf4D.Render.PageDrawer;
@@ -20,15 +21,19 @@ uses
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Content.GraphicsState,
+  Pdf4D.Cos.Base,
+  Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Base,
   Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.Image,
+  Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.GraphicsEngine,
+  Pdf4D.Render.GroupDevice,
   Pdf4D.Render.Renderer,
   Pdf4D.Render.Renderer.Interfaces;
 
@@ -67,6 +72,8 @@ type
     FType3Depth: Integer;
     // The Type 3 glyphs without procedure that are in the log, so that a long text with one gives one line
     FLoggedMissingGlyphs: TDictionary<Int64, Boolean>;
+    FGroupDepth: Integer;
+    FHasLoggedGroupDepth: Boolean;
 
     function TransformWidth(const Width: Single): Single;
     function NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
@@ -97,6 +104,18 @@ type
     function TryMakeStencilBitmap(const Mask: TPdfBitmap): Boolean;
     procedure DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
     procedure DrawStencil(const Image: TPDImage);
+    function TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect): Boolean;
+    function IntersectedWithClips(const Area: TRectF): TRectF;
+    class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath; static;
+    class function HasBlendMode(const Form: TPDFormXObject; const Done: TList<TCosStream>): Boolean; static;
+    class function HasBlendModeState(const Resources: TCosDictionary): Boolean; static;
+    class function HasBlendModeChild(const Resources: TCosDictionary; const Done: TList<TCosStream>): Boolean; static;
+    function NeedsBackdrop(const Form: TPDFormXObject): Boolean;
+    function BackdropComposite: TPdfComposite;
+    procedure DrawGroup(const Form: TPDFormXObject; const Bounds: TRect);
+    procedure RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect);
+    procedure RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect);
+    procedure DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect);
 
   protected
     // The page clip: the crop box
@@ -128,6 +147,7 @@ type
     procedure FillAndStrokePath(const FillRule: TPdfFillRule); override;
     procedure ShadingFill(const ShadingName: string); override;
     procedure DrawImage(const Image: TPDImage); override;
+    procedure ShowTransparencyGroup(const Form: TPDFormXObject); override;
 
     property Renderer: TPdfRenderer read FRenderer;
     // True once the cancel token of the parameters has said so
@@ -140,8 +160,10 @@ uses
   System.Math,
   System.SysUtils,
   Pdf4D.Common.Defines,
-  Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.Names,
   Pdf4D.Graphics.State,
+  Pdf4D.Model.ExtendedGraphicsState,
+  Pdf4D.Render.ClipPath,
   Pdf4D.Render.GlyphCache,
   Pdf4D.Render.PageTransform,
   Pdf4D.Render.StrokeNormalizer;
@@ -957,6 +979,282 @@ begin
     DrawImageBitmap(Image, Bitmap);
   finally
     Bitmap.Free;
+  end;
+end;
+
+// showTransparencyGroup, with the depth limit of the options
+procedure TPdfPageDrawer.ShowTransparencyGroup(const Form: TPDFormXObject);
+begin
+  if FGroupDepth >= Max(FParams.Options.MaxTransparencyGroupDepth, 1) then
+  begin
+    if not FHasLoggedGroupDepth then
+    begin
+      FHasLoggedGroupDepth := True;
+      LogWarning('Transparency groups are nested as deep as the limit of %d, the group is skipped', [FParams.Options.MaxTransparencyGroupDepth]);
+    end;
+    Exit;
+  end;
+
+  var Bounds: TRect;
+  if not TryGetGroupBounds(Form, Bounds) then
+  begin
+    Exit;
+  end;
+
+  Inc(FGroupDepth);
+  try
+    DrawGroup(Form, Bounds);
+  finally
+    Dec(FGroupDepth);
+  end;
+end;
+
+// The area is cut with the bounds of each path of the clip chain: a chain of rectangles gives the exact intersection, another shape a
+// slightly larger area, which only costs a few pixels of layer
+function TPdfPageDrawer.IntersectedWithClips(const Area: TRectF): TRectF;
+begin
+  Result := Area;
+  var Link := RenderState.Clip;
+  while Assigned(Link) and (not Result.IsEmpty) do
+  begin
+    const Shape = Link.Path.Clone;
+    try
+      Shape.Transform(Link.Transform);
+      Result := TRectF.Intersect(Result, Shape.Bounds);
+    finally
+      Shape.Free;
+    end;
+    Link := Link.Parent;
+  end;
+end;
+
+// The bounds of TransparencyGroup in device pixels: the BBox with the CTM and the matrix of the form, the clip and the device. False
+// when nothing of the group can be seen.
+function TPdfPageDrawer.TryGetGroupBounds(const Form: TPDFormXObject; out Bounds: TRect): Boolean;
+begin
+  Bounds := TRect.Empty;
+  var Area := TRectF.Create(0, 0, FDevice.Width, FDevice.Height);
+
+  var BBox: TPdfRectangle;
+  if Form.TryGetBBox(BBox) then
+  begin
+    var Matrix := GraphicsState.CurrentTransformationMatrix;
+    Matrix.ConcatenateWith(Form.Matrix);
+    const Box = PathAround(BBox, Matrix);
+    try
+      Box.Transform(FPageToDevice);
+      if not IsFinitePath(Box) then
+      begin
+        LogError('A transparency group is skipped: its bounding box does not give finite coordinates', []);
+        Exit(False);
+      end;
+      Area := TRectF.Intersect(Area, Box.Bounds);
+    finally
+      Box.Free;
+    end;
+  end;
+
+  Area := IntersectedWithClips(Area);
+  if Area.IsEmpty then
+  begin
+    Exit(False);
+  end;
+
+  Bounds := TRect.Create(Floor(Area.Left), Floor(Area.Top), Ceil(Area.Right), Ceil(Area.Bottom));
+  Result := (not Bounds.IsEmpty);
+end;
+
+// The clip chain in the pixels of a layer whose top left corner lies at (-OffsetX, -OffsetY) of the device
+class function TPdfPageDrawer.TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath;
+begin
+  Result := nil;
+  const Chain = TList<IPdfClipPath>.Create;
+  try
+    var Link := Clip;
+    while Assigned(Link) do
+    begin
+      Chain.Add(Link);
+      Link := Link.Parent;
+    end;
+
+    const Shift = TPdfMatrix.GetTranslateInstance(OffsetX, OffsetY);
+    for var Index := Chain.Count - 1 downto 0 do
+    begin
+      const Original = Chain[Index];
+      Result := TPdfClipPath.Create(Result, Original.Path.Clone, Original.Transform.Multiply(Shift), Original.FillRule);
+    end;
+  finally
+    Chain.Free;
+  end;
+end;
+
+class function TPdfPageDrawer.HasBlendModeState(const Resources: TCosDictionary): Boolean;
+begin
+  Result := False;
+  var States: TCosDictionary;
+  if not Resources.TryGetCosDictionary(TCosNames.ExtGState, States) then
+  begin
+    Exit;
+  end;
+
+  for var Name in States.Keys do
+  begin
+    var Dictionary: TCosDictionary;
+    if States.TryGetCosDictionary(Name, Dictionary) then
+    begin
+      const State = TPDExtendedGraphicsState.Create(Dictionary);
+      try
+        if State.GetBlendModeName <> TCosNames.Normal then
+        begin
+          Exit(True);
+        end;
+      finally
+        State.Free;
+      end;
+    end;
+  end;
+end;
+
+class function TPdfPageDrawer.HasBlendModeChild(const Resources: TCosDictionary; const Done: TList<TCosStream>): Boolean;
+begin
+  Result := False;
+  var XObjects: TCosDictionary;
+  if not Resources.TryGetCosDictionary(TCosNames.XObject, XObjects) then
+  begin
+    Exit;
+  end;
+
+  for var Name in XObjects.Keys do
+  begin
+    var Stream: TCosStream;
+    if XObjects.TryGetCosStream(Name, Stream) then
+    begin
+      const Child = TPDFormXObject.Create(Stream);
+      try
+        if Child.IsTransparencyGroup and HasBlendMode(Child, Done) then
+        begin
+          Exit(True);
+        end;
+      finally
+        Child.Free;
+      end;
+    end;
+  end;
+end;
+
+// hasBlendMode: a group, or a group inside it, whose resources have an ExtGState with another blend mode than Normal. A group that is
+// met twice counts once, so that a group that draws itself ends.
+class function TPdfPageDrawer.HasBlendMode(const Form: TPDFormXObject; const Done: TList<TCosStream>): Boolean;
+begin
+  Result := False;
+  if Done.Contains(Form.Stream) then
+  begin
+    Exit;
+  end;
+  Done.Add(Form.Stream);
+
+  var Resources: TCosDictionary;
+  if Form.TryGetResources(Resources) then
+  begin
+    Result := (HasBlendModeState(Resources) or HasBlendModeChild(Resources, Done));
+  end;
+end;
+
+// A group that is not isolated shows the backdrop to the blend modes inside it; without a blend mode the backdrop changes nothing
+function TPdfPageDrawer.NeedsBackdrop(const Form: TPDFormXObject): Boolean;
+begin
+  var Group: TPDTransparencyGroupAttributes;
+  Result := (Form.TryGetGroup(Group) and (not Group.IsIsolated));
+  if Result then
+  begin
+    const Done = TList<TCosStream>.Create;
+    try
+      Result := HasBlendMode(Form, Done);
+    finally
+      Done.Free;
+    end;
+  end;
+end;
+
+// The backdrop is copied as it is
+function TPdfPageDrawer.BackdropComposite: TPdfComposite;
+begin
+  Result := TPdfComposite.Default;
+  Result.AntiAlias := False;
+end;
+
+// TransparencyGroup and showTransparencyGroupOnGraphics: the group is drawn on a layer of its own, which then is drawn on the device
+// with the alpha constant and the blend mode of the graphics state. The layer starts at the top left of Bounds.
+procedure TPdfPageDrawer.DrawGroup(const Form: TPDFormXObject; const Bounds: TRect);
+begin
+  var Backdrop: TPdfBitmap := nil;
+  if NeedsBackdrop(Form) and (not FDevice.TryReadPixels(Bounds, Backdrop)) then
+  begin
+    Backdrop := nil;
+  end;
+
+  try
+    const Image = FDevice.CreateLayer(Bounds.Width, Bounds.Height);
+    var Alpha: IPdfRasterDevice := nil;
+    if Assigned(Backdrop) then
+    begin
+      Alpha := FDevice.CreateLayer(Bounds.Width, Bounds.Height);
+      Image.DrawBitmap(Backdrop, TPdfMatrix.Identity, TPdfImageFilter.Nearest, BackdropComposite);
+    end;
+
+    const Reference: IPdfRasterDevice = TPdfGroupDevice.Create(Image, Alpha);
+    RunGroupContent(Form, Reference, Bounds);
+    if Assigned(Backdrop) then
+    begin
+      TPdfGroupDevice(Reference).RemoveBackdrop(Backdrop, 0, 0);
+    end;
+    DrawGroupResult(TPdfGroupDevice(Reference), Bounds);
+  finally
+    Backdrop.Free;
+  end;
+end;
+
+// The group draws on the layer: the matrix to the device moves by the corner of the layer, and so does the clip
+procedure TPdfPageDrawer.RunGroupContent(const Form: TPDFormXObject; const GroupDevice: IPdfRasterDevice; const Bounds: TRect);
+begin
+  const SavedDevice = FDevice;
+  const SavedMatrix = FPageToDevice;
+  FDevice := GroupDevice;
+  FPageToDevice := SavedMatrix.Multiply(TPdfMatrix.GetTranslateInstance(-Bounds.Left, -Bounds.Top));
+  FLastClip := nil;
+  try
+    RunGroupStream(Form, Bounds);
+  finally
+    FDevice := SavedDevice;
+    FPageToDevice := SavedMatrix;
+    FLastClip := nil;
+  end;
+end;
+
+// processTransparencyGroup: the blend mode starts at Normal, the alpha constants at 1 (and the soft mask at none)
+procedure TPdfPageDrawer.RunGroupStream(const Form: TPDFormXObject; const Bounds: TRect);
+begin
+  const State = TPdfRenderGraphicsState(GraphicsState.Clone);
+  try
+    State.Clip := TranslatedClip(State.Clip, -Bounds.Left, -Bounds.Top);
+    State.BlendMode := TPdfBlendMode.Normal;
+    State.AlphaConstant := 1;
+    State.NonStrokeAlphaConstant := 1;
+  except
+    State.Free;
+    raise;
+  end;
+  ProcessFormWithState(Form, State);
+end;
+
+procedure TPdfPageDrawer.DrawGroupResult(const GroupDevice: TPdfGroupDevice; const Bounds: TRect);
+begin
+  const Image = GroupDevice.ToBitmap;
+  try
+    ApplyClip;
+    FDevice.DrawBitmap(Image, TPdfMatrix.GetTranslateInstance(Bounds.Left, Bounds.Top), TPdfImageFilter.Nearest, NonStrokingComposite(False));
+  finally
+    Image.Free;
   end;
 end;
 

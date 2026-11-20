@@ -112,7 +112,7 @@ type
     procedure ChargeContentBytes(const Count: Int64);
     function TryChargeContentBytes(const Count: Int64): Boolean;
     procedure RunPageContent;
-    procedure ProcessForm(const Form: TPDFormXObject);
+    procedure ProcessForm(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
     procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
       const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
     procedure RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
@@ -169,6 +169,9 @@ type
 
     procedure ShowTransparencyGroup(const Form: TPDFormXObject); virtual;
     procedure ShowForm(const Form: TPDFormXObject); virtual;
+    // Runs a form like ShowForm does, but on InitialState (not nil) as the only state of the new graphics stack; the engine owns it from
+    // the call on. For a subclass that draws a group with a changed state.
+    procedure ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
 
     // Runs Content with Resources (nil: those of the running stream) on the recursion guard, the budgets and the cache of
     // decoded form content that a form uses. Level is left to the caller, as in PDFBox where the Do operator keeps it.
@@ -558,12 +561,21 @@ end;
 
 procedure TPdfStreamEngine.ShowTransparencyGroup(const Form: TPDFormXObject);
 begin
-  ProcessForm(Form);
+  ProcessForm(Form, nil);
 end;
 
 procedure TPdfStreamEngine.ShowForm(const Form: TPDFormXObject);
 begin
-  ProcessForm(Form);
+  ProcessForm(Form, nil);
+end;
+
+procedure TPdfStreamEngine.ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
+begin
+  if not Assigned(InitialState) then
+  begin
+    raise EArgumentNilException.Create('InitialState');
+  end;
+  ProcessForm(Form, InitialState);
 end;
 
 procedure TPdfStreamEngine.RequireCurrentPage;
@@ -574,7 +586,7 @@ begin
   end;
 end;
 
-procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject);
+procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
 begin
   var FormResources: TCosDictionary;
   if not Form.TryGetResources(FormResources) then
@@ -584,7 +596,7 @@ begin
 
   var BBox: TPdfRectangle;
   const HasBBox = Form.TryGetBBox(BBox);
-  RunStream(Form.Stream, FormResources, Form.HasEmptyResources, nil, Form.Matrix, HasBBox, BBox);
+  RunStream(Form.Stream, FormResources, Form.HasEmptyResources, InitialState, Form.Matrix, HasBBox, BBox);
 end;
 
 procedure TPdfStreamEngine.ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;

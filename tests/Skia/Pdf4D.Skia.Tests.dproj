@@ -102,6 +102,7 @@
         <DCCReference Include="..\Support\Pdf4D.Tests.FontProvider.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.TextGolden.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGroups.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

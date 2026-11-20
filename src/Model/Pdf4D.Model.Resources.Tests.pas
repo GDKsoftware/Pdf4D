@@ -68,6 +68,9 @@ type
     procedure TestTransparencyGroup;
 
     [Test]
+    procedure TestTransparencyGroupAttributes;
+
+    [Test]
     procedure TestFormResourcesVariants;
 
     [Test]
@@ -148,6 +151,7 @@ begin
     Builder.AddObject(24, '<< /XObject << /Fm1 23 0 R >> >>');
     Builder.AddStreamObject(25, '/Type /XObject /Subtype /Form /Resources 7', Ascii('/Fm1 Do'));
     Builder.AddStreamObject(26, '/Type /XObject /Subtype /Form /Matrix [1 0 0]', Ascii('0 0 m'));
+    Builder.AddStreamObject(27, '/Type /XObject /Subtype /Form /Group << /S /Transparency /I true /K true /CS /DeviceRGB >>', Ascii('0 0 m'));
     Result := FModels.Open(Builder);
   finally
     Builder.Free;
@@ -322,6 +326,44 @@ begin
     Assert.AreEqual(Double(5), Double(WithMatrix.Matrix.TranslateY), 0.0001);
   finally
     WithMatrix.Free;
+  end;
+end;
+
+procedure TResourcesTests.TestTransparencyGroupAttributes;
+begin
+  const Document = OpenDocument('/XObject << /Fm1 21 0 R /Fm2 22 0 R /Fm7 27 0 R >>', []);
+  const Resources = Document.Pages.Get(0).Resources;
+  var Stream: TCosStream;
+  var Attributes: TPDTransparencyGroupAttributes;
+
+  Assert.IsTrue(Resources.TryGetXObject('Fm7', Stream));
+  const Full = TPDFormXObject.Create(Stream);
+  try
+    Assert.IsTrue(Full.TryGetGroup(Attributes));
+    Assert.IsTrue(Attributes.IsIsolated);
+    Assert.IsTrue(Attributes.IsKnockout);
+    Assert.IsTrue(Assigned(Attributes.ColorSpace));
+  finally
+    Full.Free;
+  end;
+
+  Assert.IsTrue(Resources.TryGetXObject('Fm2', Stream));
+  const Minimal = TPDFormXObject.Create(Stream);
+  try
+    Assert.IsTrue(Minimal.TryGetGroup(Attributes));
+    Assert.IsFalse(Attributes.IsIsolated);
+    Assert.IsFalse(Attributes.IsKnockout);
+    Assert.IsFalse(Assigned(Attributes.ColorSpace));
+  finally
+    Minimal.Free;
+  end;
+
+  Assert.IsTrue(Resources.TryGetXObject('Fm1', Stream));
+  const NoGroup = TPDFormXObject.Create(Stream);
+  try
+    Assert.IsFalse(NoGroup.TryGetGroup(Attributes));
+  finally
+    NoGroup.Free;
   end;
 end;
 

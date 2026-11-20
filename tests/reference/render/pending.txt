@@ -1,6 +1,5 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/transparency.pdf # Task 18: transparency groups and blend modes
 generated/render/softmask.pdf # Task 19: soft masks and transfer functions
 generated/render/shadings.pdf # Task 20: shadings
 generated/render/patterns.pdf # Task 22: tiling patterns
