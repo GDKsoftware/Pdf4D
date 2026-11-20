@@ -1,0 +1,17 @@
+p1-0	Im1bit	8x8 bpc=1 cs=DeviceGray	[]	ok type=10
+p1-1	Im2bit	4x4 bpc=2 cs=DeviceGray	[]	ok type=1
+p1-2	Im4bit	5x3 bpc=4 cs=DeviceGray	[COSName{FlateDecode}]	ok type=1
+p1-3	Im8rgb	8x8 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p1-4	Im16gray	4x4 bpc=16 cs=DeviceGray	[COSName{FlateDecode}]	ok type=1
+p1-5	Im1bitDecode	8x8 bpc=1 cs=DeviceGray	[]	ok type=10
+p1-6	Im8grayDecode	4x4 bpc=8 cs=DeviceGray	[COSName{FlateDecode}]	ok type=1
+p1-7	ImRgbDecode	8x8 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p1-8	ImColorKey	8x8 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2
+p1-9	ImStencil	8x8 bpc=1 cs=DeviceGray	[]	ok type=10
+p1-10	ImStencilDecode	8x8 bpc=1 cs=DeviceGray	[]	ok type=10
+p1-11	ImSMask	8x8 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2
+p1-12	ImSMaskBig	4x4 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2
+p1-13	ImMask	8x8 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2
+p1-14	ImInterpolate	4x4 bpc=8 cs=DeviceGray	[COSName{FlateDecode}]	ok type=1
+p1-15	ImCmyk	4x4 bpc=8 cs=DeviceCMYK	[COSName{FlateDecode}]	ok type=1
+p1-16	ImHex	4x4 bpc=8 cs=DeviceGray	[COSName{ASCIIHexDecode}]	ok type=1

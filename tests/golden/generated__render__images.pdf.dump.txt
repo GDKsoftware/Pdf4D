@@ -1,0 +1,30 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</XObject <</Im16gray 9 0 R /Im1bit 5 0 R /Im1bitDecode 10 0 R /Im2bit 6 0 R /Im4bit 7 0 R /Im8grayDecode 11 0 R /Im8rgb 8 0 R /ImCmyk 23 0 R /ImColorKey 13 0 R /ImHex 24 0 R /ImInterpolate 22 0 R /ImMask 20 0 R /ImRgbDecode 12 0 R /ImSMask 16 0 R /ImSMaskBig 18 0 R /ImStencil 14 0 R /ImStencilDecode 15 0 R>>>> /Type /Page>>
+object 4 0: <</Length 1043>> stream sha256=cce87188c0e1ade9223c76d8527621223090da563c2860e60e90a8e5784439f5
+object 5 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /Height 8 /Length 8 /Subtype /Image /Type /XObject /Width 8>> stream sha256=77ce8ffa3e5e0bacf8b693a1edd26f22e7a4039aafca3c944e4020a977ecbc8a
+object 6 0: <</BitsPerComponent 2 /ColorSpace /DeviceGray /Height 4 /Length 4 /Subtype /Image /Type /XObject /Width 4>> stream sha256=80544713875de626467e6cdae16e7b9d9d46be277f7bf06f2e931d0f96d4d9e3
+object 7 0: <</BitsPerComponent 4 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 3 /Length 17 /Subtype /Image /Type /XObject /Width 5>> stream sha256=3ecc54da15eaecbce26ef1ced07a5d129d9f588dbbfa9ad22be65ac7246c34f2
+object 8 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 8 /Length 129 /Subtype /Image /Type /XObject /Width 8>> stream sha256=d82dc9039776f7d119db57a113aa912787141713b1dc617c33fb909ba5335075
+object 9 0: <</BitsPerComponent 16 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 4 /Length 41 /Subtype /Image /Type /XObject /Width 4>> stream sha256=6c064fe051add11edc07727b594eb48711df843e08445bba2cd786bc16bc58e8
+object 10 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /Decode [1 0] /Height 8 /Length 8 /Subtype /Image /Type /XObject /Width 8>> stream sha256=77ce8ffa3e5e0bacf8b693a1edd26f22e7a4039aafca3c944e4020a977ecbc8a
+object 11 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Decode [1 0] /Filter /FlateDecode /Height 4 /Length 25 /Subtype /Image /Type /XObject /Width 4>> stream sha256=a8faed6abbf35c12a4b26e40f6feb19d736d90045c83b9f9a31f638d323e6811
+object 12 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Decode [1 0 0 1 0.2 0.8] /Filter /FlateDecode /Height 8 /Length 129 /Subtype /Image /Type /XObject /Width 8>> stream sha256=d82dc9039776f7d119db57a113aa912787141713b1dc617c33fb909ba5335075
+object 13 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 8 /Length 134 /Mask [0 10 0 10 0 10] /Subtype /Image /Type /XObject /Width 8>> stream sha256=0b846430d2cb84bc641674a68b669828c452dcd68daec3cd341720ea7068970e
+object 14 0: <</Height 8 /ImageMask true /Length 8 /Subtype /Image /Type /XObject /Width 8>> stream sha256=77ce8ffa3e5e0bacf8b693a1edd26f22e7a4039aafca3c944e4020a977ecbc8a
+object 15 0: <</Decode [1 0] /Height 8 /ImageMask true /Length 8 /Subtype /Image /Type /XObject /Width 8>> stream sha256=77ce8ffa3e5e0bacf8b693a1edd26f22e7a4039aafca3c944e4020a977ecbc8a
+object 16 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 8 /Length 129 /SMask 17 0 R /Subtype /Image /Type /XObject /Width 8>> stream sha256=d82dc9039776f7d119db57a113aa912787141713b1dc617c33fb909ba5335075
+object 17 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 4 /Length 25 /Subtype /Image /Type /XObject /Width 4>> stream sha256=a8faed6abbf35c12a4b26e40f6feb19d736d90045c83b9f9a31f638d323e6811
+object 18 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 4 /Length 44 /SMask 19 0 R /Subtype /Image /Type /XObject /Width 4>> stream sha256=e1247d738729b1161362cdf7cf17393166a28f2c5b1f79d18de36037c0b23a7f
+object 19 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 8 /Length 75 /Subtype /Image /Type /XObject /Width 8>> stream sha256=3f9f32d2261ccaa2aff69d8348e605ee3f2d8dd645941592095cc6a6f6729d1f
+object 20 0: <</BitsPerComponent 8 /ColorSpace /DeviceRGB /Filter /FlateDecode /Height 8 /Length 129 /Mask 21 0 R /Subtype /Image /Type /XObject /Width 8>> stream sha256=d82dc9039776f7d119db57a113aa912787141713b1dc617c33fb909ba5335075
+object 21 0: <</BitsPerComponent 1 /Height 8 /ImageMask true /Length 8 /Subtype /Image /Type /XObject /Width 8>> stream sha256=77ce8ffa3e5e0bacf8b693a1edd26f22e7a4039aafca3c944e4020a977ecbc8a
+object 22 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /FlateDecode /Height 4 /Interpolate true /Length 25 /Subtype /Image /Type /XObject /Width 4>> stream sha256=a8faed6abbf35c12a4b26e40f6feb19d736d90045c83b9f9a31f638d323e6811
+object 23 0: <</BitsPerComponent 8 /ColorSpace /DeviceCMYK /Filter /FlateDecode /Height 4 /Length 27 /Subtype /Image /Type /XObject /Width 4>> stream sha256=f6da15d576d6a2ea02c0c4072fb5008494425e0a151e1028f99dea90e14a0846
+object 24 0: <</BitsPerComponent 8 /ColorSpace /DeviceGray /Filter /ASCIIHexDecode /Height 4 /Length 33 /Subtype /Image /Type /XObject /Width 4>> stream sha256=a8faed6abbf35c12a4b26e40f6feb19d736d90045c83b9f9a31f638d323e6811

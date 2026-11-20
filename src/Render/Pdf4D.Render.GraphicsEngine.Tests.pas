@@ -17,6 +17,7 @@ uses
   Pdf4D.Content.Operator,
   Pdf4D.Cos.Base,
   Pdf4D.Common.Path,
+  Pdf4D.Graphics.Image,
   Pdf4D.Graphics.State,
   Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Page,
@@ -52,6 +53,7 @@ type
     procedure FillPath(const FillRule: TPdfFillRule); override;
     procedure FillAndStrokePath(const FillRule: TPdfFillRule); override;
     procedure ShadingFill(const ShadingName: string); override;
+    procedure DrawImage(const Image: TPDImage); override;
 
     property Calls: TList<string> read FCalls;
     property Clips: TList<IPdfClipPath> read FClips;
@@ -323,6 +325,11 @@ end;
 procedure TRecordingGraphicsEngine.ShadingFill(const ShadingName: string);
 begin
   FCalls.Add('Shading ' + ShadingName);
+end;
+
+procedure TRecordingGraphicsEngine.DrawImage(const Image: TPDImage);
+begin
+  FCalls.Add(Format('Image %d x %d', [Image.Width, Image.Height]));
 end;
 
 { TGraphicsEngineTests }

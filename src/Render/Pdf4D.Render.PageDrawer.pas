@@ -3,8 +3,9 @@
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/rendering/PageDrawer.java (3.0.8): drawPage, setClip, getStroke, getDashArray,
 // strokePath, fillPath, fillAndStrokePath, clip, adjustClip, endPath and the path construction; the paint is the solid colour of
-// getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip. Images, shadings, patterns, transparency
-// groups and soft masks are not drawn yet.
+// getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage without
+// the soft mask and the transfer function of the graphics state, and without the pre-scaling of strongly reduced images (the device
+// scales). Shadings, patterns, transparency groups and soft masks are not drawn yet.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
 // showType3Glyph
 unit Pdf4D.Render.PageDrawer;
@@ -22,8 +23,10 @@ uses
   Pdf4D.Font.Base,
   Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
+  Pdf4D.Graphics.Image,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
+  Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.GraphicsEngine,
   Pdf4D.Render.Renderer,
@@ -54,6 +57,7 @@ type
     FPageToDevice: TPdfMatrix;
     // Of the matrix of the page without the offset of the region, as xformScalingFactorX
     FScalingFactorX: Single;
+    FScalingFactorY: Single;
     FLinePath: TPdfPath;
     // The clip that the device has; the clip chain is immutable, so identity says whether it changed
     FLastClip: IPdfClipPath;
@@ -88,6 +92,10 @@ type
     procedure RunType3CharProc(const Font: TPDType3Font; const CharProc: TPDType3CharProc; const TextRenderingMatrix: TPdfMatrix);
     procedure LogMissingCharProc(const Font: TPDType3Font; const Code: Integer);
     class function IsFinitePath(const Path: TPdfPath): Boolean; static;
+    function ImageFilter(const Image: TPDImage; const Width, Height: Integer): TPdfImageFilter;
+    function TryMakeStencilBitmap(const Mask: TPdfBitmap): Boolean;
+    procedure DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
+    procedure DrawStencil(const Image: TPDImage);
 
   protected
     // The page clip: the crop box
@@ -118,6 +126,7 @@ type
     procedure FillPath(const FillRule: TPdfFillRule); override;
     procedure FillAndStrokePath(const FillRule: TPdfFillRule); override;
     procedure ShadingFill(const ShadingName: string); override;
+    procedure DrawImage(const Image: TPDImage); override;
 
     property Renderer: TPdfRenderer read FRenderer;
     // True once the cancel token of the parameters has said so
@@ -129,6 +138,7 @@ implementation
 uses
   System.Math,
   System.SysUtils,
+  Pdf4D.Common.Defines,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Graphics.State,
   Pdf4D.Render.GlyphCache,
@@ -164,6 +174,7 @@ begin
   FPageToDevice := TPdfMatrix.Create(Whole.ScaleX, Whole.ShearY, Whole.ShearX, Whole.ScaleY, Whole.TranslateX - Params.Region.Left,
                                      Whole.TranslateY - Params.Region.Top);
   FScalingFactorX := Abs(Whole.ScalingFactorX);
+  FScalingFactorY := Abs(Whole.ScalingFactorY);
 end;
 
 destructor TPdfPageDrawer.Destroy;
@@ -800,6 +811,136 @@ begin
     ProcessChildStream(CharProc.Stream, Resources, State, TPdfMatrix.Identity, False, NoBox);
   finally
     Dec(FType3Depth);
+  end;
+end;
+
+// Java's Math.round: half up
+function RoundHalfUp(const Value: Single): Int64;
+begin
+  if IsNan(Value) then
+  begin
+    Exit(0);
+  end;
+  if Abs(Value) >= High(Integer) then
+  begin
+    Exit(Sign(Value) * Int64(High(Integer)));
+  end;
+  Result := Floor(Double(Value) + Half);
+end;
+
+// The filter of drawImage: an image that is not scaled up gets the smooth (bicubic) interpolation of the rendering hints, also when
+// it is scaled down (PDFBOX-2364); an image that is scaled up gets the nearest neighbour unless it says /Interpolate (PDFBOX-2302)
+function TPdfPageDrawer.ImageFilter(const Image: TPDImage; const Width, Height: Integer): TPdfImageFilter;
+begin
+  if Image.Interpolate then
+  begin
+    Exit(TPdfImageFilter.Bicubic);
+  end;
+
+  const Matrix = GraphicsState.CurrentTransformationMatrix;
+  const IsScaledUp = ((Width <= Abs(RoundHalfUp(Matrix.ScalingFactorX * FScalingFactorX))) or
+                      (Height <= Abs(RoundHalfUp(Matrix.ScalingFactorY * FScalingFactorY))));
+  if IsScaledUp then
+  begin
+    Result := TPdfImageFilter.Nearest;
+  end
+  else
+  begin
+    Result := TPdfImageFilter.Bicubic;
+  end;
+end;
+
+// drawBufferedImage: the pixel (i, j) of the bitmap covers [i, i + 1] x [j, j + 1] in a unit square that the CTM maps to the page
+procedure TPdfPageDrawer.DrawImageBitmap(const Image: TPDImage; const Bitmap: TPdfBitmap);
+begin
+  var BitmapToDevice: TPdfMatrix;
+  try
+    const UnitSquare = TPdfMatrix.GetTranslateInstance(0, -Bitmap.Height).Multiply(TPdfMatrix.GetScaleInstance(1 / Bitmap.Width, -1 / Bitmap.Height));
+    BitmapToDevice := UnitSquare.Multiply(GraphicsState.CurrentTransformationMatrix).Multiply(FPageToDevice);
+  except
+    on Error: EPdfException do
+    begin
+      LogError('An image is skipped: the transformation does not give finite coordinates', []);
+      Exit;
+    end;
+  end;
+
+  ApplyClip;
+  FDevice.DrawBitmap(Bitmap, BitmapToDevice, ImageFilter(Image, Bitmap.Width, Bitmap.Height), NonStrokingComposite(True));
+end;
+
+// The mask becomes the paint colour where it paints: the bitmap of getStencilImage(getNonStrokingPaint()). False when the colour has
+// no RGB value (a pattern that is not painted yet).
+function TPdfPageDrawer.TryMakeStencilBitmap(const Mask: TPdfBitmap): Boolean;
+begin
+  var Color: TPdfDeviceColor;
+  try
+    Color := SolidPaint(RenderState.NonStrokingColor).Color;
+  except
+    on Error: Exception do
+    begin
+      const IsRecoverable = ((Error is EPdfException) or (Error is EInvalidOpException) or (Error is EArgumentException));
+      if not IsRecoverable then
+      begin
+        raise;
+      end;
+      LogWarning('A stencil mask is skipped: its colour is not painted yet: %s', [Error.Message]);
+      Exit(False);
+    end;
+  end;
+
+  for var Y := 0 to Mask.Height - 1 do
+  begin
+    const Row = Mask.ScanLine(Y);
+    for var X := 0 to Mask.Width - 1 do
+    begin
+      if Row[X * 4 + 3] <> 0 then
+      begin
+        Row[X * 4] := Color.R;
+        Row[X * 4 + 1] := Color.G;
+        Row[X * 4 + 2] := Color.B;
+      end;
+    end;
+  end;
+  Result := True;
+end;
+
+procedure TPdfPageDrawer.DrawStencil(const Image: TPDImage);
+begin
+  var Mask: TPdfBitmap;
+  if not Image.TryGetStencilMask(FParams.Options.MaxImagePixels, Mask) then
+  begin
+    Exit;
+  end;
+
+  try
+    if TryMakeStencilBitmap(Mask) then
+    begin
+      DrawImageBitmap(Image, Mask);
+    end;
+  finally
+    Mask.Free;
+  end;
+end;
+
+procedure TPdfPageDrawer.DrawImage(const Image: TPDImage);
+begin
+  if Image.IsStencil then
+  begin
+    DrawStencil(Image);
+    Exit;
+  end;
+
+  var Bitmap: TPdfBitmap;
+  if not Image.TryGetImage(FParams.Options.MaxImagePixels, Bitmap) then
+  begin
+    Exit;
+  end;
+
+  try
+    DrawImageBitmap(Image, Bitmap);
+  finally
+    Bitmap.Free;
   end;
 end;
 

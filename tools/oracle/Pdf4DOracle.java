@@ -174,6 +174,10 @@ public class Pdf4DOracle
             {
                 out.print(text(new File(args[1]), args.length > 2 ? args[2] : ""));
             }
+            else if (args.length >= 3 && args[0].equals("images"))
+            {
+                out.print(images(new File(args[1]), new File(args[2]), args.length > 3 ? args[3] : ""));
+            }
             else if (args.length >= 2 && args[0].equals("positions"))
             {
                 out.print(positions(new File(args[1]), args.length > 2 ? args[2] : ""));
@@ -1026,6 +1030,87 @@ public class Pdf4DOracle
     static String fixed2(float f)
     {
         return String.format(java.util.Locale.ROOT, "%.2f", f);
+    }
+
+    private static final int MAX_IMAGE_PIXELS = 360000;
+    private static final int MAX_IMAGES_PER_PAGE = 24;
+
+    /**
+     * Writes PDImageXObject.getImage() of every image XObject in the resources of each page as
+     * p&lt;page&gt;-&lt;index&gt;.png (the page from 1, the index from 0 over the images of that page, in the order of the
+     * resource dictionary) into outDir, and lists them. Images of more than MAX_IMAGE_PIXELS pixels are left out.
+     */
+    static String images(File file, File outDir, String password) throws Exception
+    {
+        StringBuilder sb = new StringBuilder();
+        outDir.mkdirs();
+        try (PDDocument doc = Loader.loadPDF(file, password))
+        {
+            int pageNumber = 0;
+            for (PDPage page : doc.getPages())
+            {
+                pageNumber++;
+                org.apache.pdfbox.pdmodel.PDResources resources = page.getResources();
+                if (resources == null)
+                {
+                    continue;
+                }
+                int index = 0;
+                for (COSName name : resources.getXObjectNames())
+                {
+                    org.apache.pdfbox.pdmodel.graphics.PDXObject xobject;
+                    try
+                    {
+                        xobject = resources.getXObject(name);
+                    }
+                    catch (Throwable t)
+                    {
+                        continue;
+                    }
+                    if (!(xobject instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject))
+                    {
+                        continue;
+                    }
+                    if (index >= MAX_IMAGES_PER_PAGE)
+                    {
+                        break;
+                    }
+                    org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject image =
+                            (org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) xobject;
+                    String label = "p" + pageNumber + "-" + index;
+                    index++;
+                    String filters = String.valueOf(image.getStream().getFilters());
+                    String size = image.getWidth() + "x" + image.getHeight() + " bpc=" + image.getBitsPerComponent();
+                    try
+                    {
+                        size += " cs=" + image.getColorSpace().getName();
+                    }
+                    catch (Throwable t)
+                    {
+                        size += " cs=?";
+                    }
+                    if ((long) image.getWidth() * image.getHeight() > MAX_IMAGE_PIXELS)
+                    {
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\tskipped: large\n");
+                        continue;
+                    }
+                    try
+                    {
+                        java.awt.image.BufferedImage bim = image.getImage();
+                        javax.imageio.ImageIO.write(bim, "png", new File(outDir, label + ".png"));
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\tok type=").append(bim.getType()).append('\n');
+                    }
+                    catch (Throwable t)
+                    {
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\terror: ").append(t.getClass().getSimpleName()).append('\n');
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 
     static String positions(File file, String password)

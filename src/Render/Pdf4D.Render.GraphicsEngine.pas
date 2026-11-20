@@ -17,6 +17,7 @@ uses
   Pdf4D.Content.OperatorProcessor,
   Pdf4D.Content.StreamEngine,
   Pdf4D.Cos.Base,
+  Pdf4D.Graphics.Image,
   Pdf4D.Graphics.State,
   Pdf4D.Model.Page,
   Pdf4D.Render.Device.Interfaces;
@@ -42,7 +43,8 @@ type
 
     // The corners in the order of the re operator: lower left, lower right, upper right, upper left
     procedure AppendRectangle(const P0, P1, P2, P3: TPointF); virtual; abstract;
-    // procedure DrawImage(const Image: TPDImage); virtual; abstract; is added together with TPDImage
+    // The image of Do or an inline image, drawn with the current transformation matrix
+    procedure DrawImage(const Image: TPDImage); virtual; abstract;
     procedure Clip(const FillRule: TPdfFillRule); virtual; abstract;
     procedure MoveTo(const X, Y: Single); virtual; abstract;
     procedure LineTo(const X, Y: Single); virtual; abstract;
@@ -79,6 +81,7 @@ uses
   Pdf4D.Content.Operators.Text,
   Pdf4D.Cos.Number,
   Pdf4D.Render.Operators.Color,
+  Pdf4D.Render.Operators.Image,
   Pdf4D.Render.Operators.Path,
   Pdf4D.Render.Operators.State;
 
@@ -90,6 +93,7 @@ begin
   TTextOperators.Register(Self);
   TMarkedContentOperators.Register(Self);
   TPathOperators.Register(Self);
+  TImageOperators.Register(Self);
   TColorOperators.Register(Self);
   TRenderStateOperators.Register(Self);
 end;

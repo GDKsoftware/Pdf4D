@@ -1,0 +1,7 @@
+p1-0	Im0	60x412 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p1-1	Im1	14x14 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p2-0	Im0	14x14 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p2-1	Im1	57x407 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p2-2	Im2	56x53 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p3-0	Im0	60x405 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p3-1	Im1	14x14 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1

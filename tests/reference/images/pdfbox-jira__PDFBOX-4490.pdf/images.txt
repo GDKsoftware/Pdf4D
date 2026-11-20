@@ -1,0 +1,4 @@
+p1-0	ImX1	459x78 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=2
+p3-0	Im3	720x960 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	skipped: large
+p3-1	Im7	300x297 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1
+p3-2	Im8	346x67 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=1

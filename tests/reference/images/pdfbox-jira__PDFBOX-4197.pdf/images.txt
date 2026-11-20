@@ -1,0 +1,1 @@
+p1-0	Im7	759x168 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2

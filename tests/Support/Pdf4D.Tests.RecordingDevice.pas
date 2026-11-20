@@ -7,6 +7,7 @@ unit Pdf4D.Tests.RecordingDevice;
 interface
 
 uses
+  System.SysUtils,
   System.Types,
   System.Generics.Collections,
   Pdf4D.Common.Matrix,
@@ -30,6 +31,10 @@ type
     FillRule: TPdfFillRule;
     // The length of the clip chain at that moment (of the new clip for SetClip)
     ClipDepth: Integer;
+    // Bitmap: a copy of the pixels (premultiplied RGBA) and the size of the bitmap that was drawn
+    BitmapWidth: Integer;
+    BitmapHeight: Integer;
+    BitmapPixels: TBytes;
   end;
 
   // Records every call instead of drawing; has no pixels
@@ -166,6 +171,9 @@ begin
 
     var Call := NewCall(TRecordedCallKind.Bitmap, BoundsAfterTransform(Outline, BitmapToDevice), Composite);
     Call.Paint := TPdfPaint.FromBitmap(Bitmap, BitmapToDevice, TPdfTileMode.Decal, Filter);
+    Call.BitmapWidth := Bitmap.Width;
+    Call.BitmapHeight := Bitmap.Height;
+    Call.BitmapPixels := Copy(Bitmap.Pixels);
     FCalls.Add(Call);
   finally
     Outline.Free;

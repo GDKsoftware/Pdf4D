@@ -93,6 +93,8 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Device.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.LineDash.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.State.pas"/>
         <DCCReference Include="..\src\Resources\Pdf4D.Resources.Icc.pas"/>
@@ -103,6 +105,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.GlyphCache.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Image.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.State.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.pas"/>

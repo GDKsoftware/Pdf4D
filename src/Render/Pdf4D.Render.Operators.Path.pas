@@ -1,7 +1,8 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
-// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/operator/graphics/*.java (3.0.8)
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/operator/graphics/*.java (3.0.8), without Do and BI (see
+// Pdf4D.Render.Operators.Image)
 unit Pdf4D.Render.Operators.Path;
 
 {$EXCESSPRECISION OFF}
@@ -11,7 +12,6 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Content.Operator,
-  Pdf4D.Content.Operators.DrawObject,
   Pdf4D.Cos.Base,
   Pdf4D.Render.GraphicsEngine;
 
@@ -86,12 +86,6 @@ type
     procedure Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>); override;
   end;
 
-  // Do. Forms are run as the core operator does; images are logged and skipped until they are drawn.
-  TDrawObjectGraphicsOperator = class(TDrawObjectOperator)
-  public
-    procedure Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>); override;
-  end;
-
   // n
   TEndPathOperator = class(TGraphicsOperatorProcessor)
   public
@@ -161,15 +155,8 @@ type
     procedure Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>); override;
   end;
 
-  // BI. Logs; the inline image is not drawn yet.
-  TBeginInlineImageOperator = class(TGraphicsOperatorProcessor)
-  public
-    function Name: string; override;
-    procedure Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>); override;
-  end;
-
   TPathOperators = record
-    // The path construction, painting and clipping operators, Do and the inline image and shading operators
+    // The path construction, painting and clipping operators and the shading operator
     class procedure Register(const Engine: TPdfGraphicsEngine); static;
   end;
 
@@ -185,8 +172,6 @@ uses
 resourcestring
   WithoutMoveTo = '%s (%g, %g) without initial MoveTo';
   CloseWithoutMoveTo = 'ClosePath without initial MoveTo';
-  ImageNotSupported = 'Drawing images is not supported yet: Do for an image is skipped';
-  InlineImageNotSupported = 'Drawing inline images is not supported yet: BI is skipped';
   ShadingNameMissing = 'Operator %s needs a shading name';
   ShadingNotSupported = 'Painting shadings is not supported yet: sh is skipped';
 
@@ -210,7 +195,6 @@ begin
   Engine.AddOperator(TCurveToOperator.Create(Engine));
   Engine.AddOperator(TCurveToReplicateFinalPointOperator.Create(Engine));
   Engine.AddOperator(TCurveToReplicateInitialPointOperator.Create(Engine));
-  Engine.AddOperator(TDrawObjectGraphicsOperator.Create(Engine));
   Engine.AddOperator(TEndPathOperator.Create(Engine));
   Engine.AddOperator(TFillEvenOddAndStrokePathOperator.Create(Engine));
   Engine.AddOperator(TFillEvenOddRuleOperator.Create(Engine));
@@ -221,7 +205,6 @@ begin
   Engine.AddOperator(TMoveToOperator.Create(Engine));
   Engine.AddOperator(TStrokePathOperator.Create(Engine));
   Engine.AddOperator(TShadingFillOperator.Create(Engine));
-  Engine.AddOperator(TBeginInlineImageOperator.Create(Engine));
 end;
 
 { TAppendRectangleToPathOperator }
@@ -447,20 +430,6 @@ begin
   end;
 end;
 
-{ TDrawObjectGraphicsOperator }
-
-procedure TDrawObjectGraphicsOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
-begin
-  const IsImage = ((Length(Operands) > 0) and (Operands[0] is TCosName) and Engine.Resources.IsImageXObject(TCosName(Operands[0]).Name));
-  if IsImage then
-  begin
-    Engine.LogWarning(ImageNotSupported, []);
-    Exit;
-  end;
-
-  inherited Process(Operator, Operands);
-end;
-
 { TEndPathOperator }
 
 function TEndPathOperator.Name: string;
@@ -614,22 +583,6 @@ begin
   end;
 
   Engine.LogWarning(ShadingNotSupported, []);
-end;
-
-{ TBeginInlineImageOperator }
-
-function TBeginInlineImageOperator.Name: string;
-begin
-  Result := TOperatorNames.BeginInlineImage;
-end;
-
-procedure TBeginInlineImageOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
-begin
-  const HasImageData = (Length(Operator.ImageData) > 0);
-  if HasImageData then
-  begin
-    Engine.LogWarning(InlineImageNotSupported, []);
-  end;
 end;
 
 end.
