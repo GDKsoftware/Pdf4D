@@ -81,9 +81,6 @@ type
     procedure TestColorSpaceNameCycleStops;
 
     [Test]
-    procedure TestUnsupportedColorSpacesRaiseUnsupported;
-
-    [Test]
     procedure TestPatternArrayGivesTheUnderlyingSpace;
 
     [Test]
@@ -460,20 +457,6 @@ begin
       Space.InitialColor.ToRgb;
     end,
     EInvalidOpException);
-end;
-
-procedure TColorTests.TestUnsupportedColorSpacesRaiseUnsupported;
-begin
-  const LabArray = TCosArray.Create;
-  LabArray.Add(TCosName.Create('Lab'));
-  LabArray.Add(TCosDictionary.Create);
-  FBuilder.AddColorSpace('CSLab', LabArray);
-  Assert.WillRaise(
-    procedure
-    begin
-      SpaceOf('CSLab');
-    end,
-    EPdfUnsupportedFeatureException);
 end;
 
 procedure TColorTests.TestInvalidColorSpacesRaiseParseException;

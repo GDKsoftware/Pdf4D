@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: PDColorSpace.create (pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/color/PDColorSpace.java, 3.0.8) and the
-// colour space part of PDResources.getColorSpace. The colour spaces besides the device spaces, ICCBased and Pattern give an
-// EPdfUnsupportedFeatureException until they are ported.
+// colour space part of PDResources.getColorSpace, with the reading of the arrays of PDIndexed, PDSeparation, PDDeviceN,
+// PDDeviceNAttributes and PDDeviceNProcess.
 unit Pdf4D.Graphics.Color.Factory;
 
 {$EXCESSPRECISION OFF}
@@ -13,8 +13,11 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Cos.Base,
+  Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Graphics.&Function,
   Pdf4D.Graphics.Color,
+  Pdf4D.Graphics.Color.Special,
   Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Resources;
 
@@ -37,6 +40,25 @@ type
     class function TryGetDefaultName(const Name: string; out DefaultName: string): Boolean; static;
     class function TryCreateDevice(const Name: string; out Space: TPDColorSpace): Boolean; static;
     class function CreateIccBased(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace; static;
+    class function CreateCieBased(const Kind: string; const Items: TCosArray; const Context: TPDDocumentContext): TPDColorSpace; static;
+    class function CreateIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                 const Depth: Integer): TPDColorSpace; static;
+    class function CreateSeparation(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                    const Depth: Integer): TPDColorSpace; static;
+    class function CreateDeviceN(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                 const Depth: Integer): TPDColorSpace; static;
+    class function ReadLookupData(const Items: TCosArray): TBytes; static;
+    class function ReadColorantNames(const Items: TCosArray): TArray<string>; static;
+    class function ReadNameList(const Value: TCosBase; const Description: string): TArray<string>; static;
+    class function ReadDeviceNAttributes(const Attributes: TCosDictionary; const ColorantNames: TArray<string>; const Context: TPDDocumentContext;
+                                         const Resources: TPDResources; const Depth: Integer): TPDDeviceNAttributes; static;
+    class procedure ReadProcess(const Process: TCosDictionary; const Context: TPDDocumentContext; const Depth: Integer;
+                                var Attributes: TPDDeviceNAttributes); static;
+    class function ReadColorants(const Colorants: TCosDictionary; const ColorantNames: TArray<string>; const Context: TPDDocumentContext;
+                                 const Resources: TPDResources; const Depth: Integer): TArray<TPDDeviceNColorant>; static;
+    class function CreateTintTransform(const Items: TCosArray; const Context: TPDDocumentContext): TPDFunction; static;
+    // Makes the context the owner of Space under Items, unless the context has a space for Items by now
+    class function StoreInContext(const Items: TCosArray; const Context: TPDDocumentContext; const Space: TPDColorSpace): TPDColorSpace; static;
     class function CreatePattern(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace; static;
     class function CreateNamedResource(const Name: string; const Context: TPDDocumentContext; const Resources: TPDResources; const WasDefault: Boolean;
                                        const Depth: Integer): TPDColorSpace; static;
@@ -48,7 +70,8 @@ type
     // space, and /DefaultGray, /DefaultRGB and /DefaultCMYK replace the device spaces unless WasDefault says that the value is the
     // default itself. A space that is not shared is made once per document (the context owns it): the same object (the same
     // array, the same name in the resources) gives the same colour space. Raises EPdfParseException for a value that is no
-    // colour space and EPdfUnsupportedFeatureException for one that is not ported yet. Resources may not be nil.
+    // colour space, a colour space that is incomplete, one that leads back to itself and spaces that are nested deeper than
+    // MaxColorSpaceDepth. Resources may not be nil.
     class function Create(const Value: TCosBase; const Resources: TPDResources; const WasDefault: Boolean = False): TPDColorSpace; static;
   end;
 
@@ -58,12 +81,14 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
-  Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.Null,
+  Pdf4D.Cos.Number,
+  Pdf4D.Cos.PdfString,
   Pdf4D.Cos.PdfObject,
+  Pdf4D.Graphics.Color.Cie,
   Pdf4D.Graphics.Color.Device,
   Pdf4D.Graphics.Color.IccBased,
-  Pdf4D.Graphics.Color.Pattern,
-  Pdf4D.Graphics.Color.Special;
+  Pdf4D.Graphics.Color.Pattern;
 
 resourcestring
   ColorSpaceNil = 'The colour space is missing';
@@ -72,44 +97,59 @@ resourcestring
   ColorSpaceBadKind = 'Invalid colour space kind: %s';
   ColorSpaceBadValue = 'A colour space is a name or an array, not %s';
   ColorSpaceTooDeep = 'Colour spaces are nested deeper than %d levels';
-  ColorSpaceNotPorted = 'The colour space %s is not supported yet';
+  IndexedTooShort = 'An Indexed colour space array needs a base, a hival and a lookup table';
+  IndexedHivalNotANumber = 'The hival of an Indexed colour space is no number';
+  IndexedBadLookup = 'The lookup table of an Indexed colour space is no string or stream: %s';
+  IndexedLookupUnreadable = 'The lookup table of an Indexed colour space cannot be read: %s';
+  SeparationTooShort = 'A Separation colour space array needs a name, an alternate colour space and a tint transform';
+  DeviceNTooShort = 'A DeviceN colour space array needs colorant names, an alternate colour space and a tint transform';
+  DeviceNBadNames = 'The colorant names of a DeviceN colour space are no array of names';
+  ProcessBadComponents = 'The components of the /Process of a DeviceN colour space are no array of names';
+  ColorantNotSeparation = 'The colorant %s of a DeviceN colour space is no Separation colour space';
   IccNeedsStream = 'An ICCBased colour space array must have a stream as second element';
-  IccRefersToItself = 'An ICCBased colour space is being made while its alternate asks for it again';
+  ColorSpaceRefersToItself = 'A colour space is being made while one of its parts asks for it again';
 
 const
   IccElementCount = 2;
   IccStreamIndex = 1;
+  IndexedBaseIndex = 1;
+  IndexedHivalIndex = 2;
+  IndexedLookupIndex = 3;
+  ColorantNameIndex = 1;
+  AlternateIndex = 2;
+  TintTransformIndex = 3;
+  DeviceNAttributesIndex = 4;
 
 type
-  // The ICCBased arrays that this thread is making, innermost last. Colour spaces nest at most MaxColorSpaceDepth + 1 deep.
-  TIccArraysInProgress = record
+  // The colour space arrays that this thread is making, innermost last. Colour spaces nest at most MaxColorSpaceDepth + 1 deep.
+  TColorSpaceArraysInProgress = record
     Items: array[0..MaxColorSpaceDepth + 1] of TCosArray;
     Count: Integer;
 
-    function Contains(const IccArray: TCosArray): Boolean;
-    procedure Push(const IccArray: TCosArray);
+    function Contains(const ColorSpaceArray: TCosArray): Boolean;
+    procedure Push(const ColorSpaceArray: TCosArray);
     procedure Pop;
   end;
 
 threadvar
-  IccInProgress: TIccArraysInProgress;
+  ArraysInProgress: TColorSpaceArraysInProgress;
 
-function TIccArraysInProgress.Contains(const IccArray: TCosArray): Boolean;
+function TColorSpaceArraysInProgress.Contains(const ColorSpaceArray: TCosArray): Boolean;
 begin
   Result := False;
   for var Index := 0 to Count - 1 do
   begin
-    Result := (Result or (Items[Index] = IccArray));
+    Result := (Result or (Items[Index] = ColorSpaceArray));
   end;
 end;
 
-procedure TIccArraysInProgress.Push(const IccArray: TCosArray);
+procedure TColorSpaceArraysInProgress.Push(const ColorSpaceArray: TCosArray);
 begin
-  Items[Count] := IccArray;
+  Items[Count] := ColorSpaceArray;
   Inc(Count);
 end;
 
-procedure TIccArraysInProgress.Pop;
+procedure TColorSpaceArraysInProgress.Pop;
 begin
   Dec(Count);
 end;
@@ -289,7 +329,19 @@ begin
     raise EPdfParseException.CreateFmt(ColorSpaceBadKind, [First.ClassName]);
   end;
 
-  Result := CreateFromKind(TCosName(First).Name, Items, Context, Resources, Depth);
+  // A part of the array that leads back to the array itself would make it for ever (the depth limit stops that as well, but only
+  // after every part has been made at every level)
+  if ArraysInProgress.Contains(Items) then
+  begin
+    raise EPdfParseException.Create(ColorSpaceRefersToItself);
+  end;
+
+  ArraysInProgress.Push(Items);
+  try
+    Result := CreateFromKind(TCosName(First).Name, Items, Context, Resources, Depth);
+  finally
+    ArraysInProgress.Pop;
+  end;
 end;
 
 class function TPDColorSpaceFactory.CreateFromKind(const Kind: string; const Items: TCosArray; const Context: TPDDocumentContext;
@@ -311,11 +363,25 @@ begin
     Exit(CreatePattern(Items, Context, Depth));
   end;
 
-  const IsPortLater = ((Kind = TCosNames.CalGray) or (Kind = TCosNames.CalRGB) or (Kind = TCosNames.Lab) or (Kind = TCosNames.Indexed) or
-                       (Kind = TCosNames.I) or (Kind = TCosNames.Separation) or (Kind = TCosNames.DeviceN));
-  if IsPortLater then
+  const IsCieBased = ((Kind = TCosNames.CalGray) or (Kind = TCosNames.CalRGB) or (Kind = TCosNames.Lab));
+  if IsCieBased then
   begin
-    raise EPdfUnsupportedFeatureException.CreateFmt(ColorSpaceNotPorted, [Kind]);
+    Exit(CreateCieBased(Kind, Items, Context));
+  end;
+
+  if Kind = TCosNames.Indexed then
+  begin
+    Exit(CreateIndexed(Items, Context, Resources, Depth));
+  end;
+
+  if Kind = TCosNames.Separation then
+  begin
+    Exit(CreateSeparation(Items, Context, Resources, Depth));
+  end;
+
+  if Kind = TCosNames.DeviceN then
+  begin
+    Exit(CreateDeviceN(Items, Context, Resources, Depth));
   end;
 
   raise EPdfParseException.CreateFmt(ColorSpaceBadKind, [Kind]);
@@ -331,17 +397,7 @@ begin
   end;
 
   const UnderlyingSpace = CreateAt(Items.GetObject(1), Context, nil, False, Depth + 1);
-  const PatternSpace = TPDPatternColorSpace.Create(UnderlyingSpace);
-
-  // Made meanwhile through another way in: keep the space that the context knows
-  var Cached: TObject;
-  if Context.TryGetCachedObject(TPDCacheScope.ColorSpace, Items, Cached) then
-  begin
-    PatternSpace.Free;
-    Exit(TPDColorSpace(Cached));
-  end;
-  Context.AddCachedObject(TPDCacheScope.ColorSpace, Items, PatternSpace);
-  Result := PatternSpace;
+  Result := StoreInContext(Items, Context, TPDPatternColorSpace.Create(UnderlyingSpace));
 end;
 
 class function TPDColorSpaceFactory.CreateIccBased(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace;
@@ -360,30 +416,244 @@ begin
       Result := CreateAt(Alternate, Context, nil, False, NextDepth);
     end;
 
-  // A profile that cannot be used makes the space ask for its alternate, which may be an array that leads back to this one: that
-  // alternate counts as absent (the caller falls back to the device space of N). Only the depth limit would stop it otherwise.
-  if IccInProgress.Contains(Items) then
-  begin
-    raise EPdfParseException.Create(IccRefersToItself);
-  end;
+  // A profile that cannot be used makes the space ask for its alternate, which may be an array that leads back to this one:
+  // CreateFromArray raises for that, and the alternate counts as absent (the space falls back to the device space of N)
+  Result := StoreInContext(Items, Context, TPDICCBased.Create(TCosStream(Resolve(Items.GetObject(IccStreamIndex))), Context, ResolveAlternate));
+end;
 
-  var IccSpace: TPDICCBased;
-  IccInProgress.Push(Items);
-  try
-    IccSpace := TPDICCBased.Create(TCosStream(Resolve(Items.GetObject(IccStreamIndex))), Context, ResolveAlternate);
-  finally
-    IccInProgress.Pop;
-  end;
-
+class function TPDColorSpaceFactory.StoreInContext(const Items: TCosArray; const Context: TPDDocumentContext; const Space: TPDColorSpace): TPDColorSpace;
+begin
   // Made meanwhile through another way in: keep the space that the context knows
   var Cached: TObject;
   if Context.TryGetCachedObject(TPDCacheScope.ColorSpace, Items, Cached) then
   begin
-    IccSpace.Free;
+    Space.Free;
     Exit(TPDColorSpace(Cached));
   end;
-  Context.AddCachedObject(TPDCacheScope.ColorSpace, Items, IccSpace);
-  Result := IccSpace;
+
+  Context.AddCachedObject(TPDCacheScope.ColorSpace, Items, Space);
+  Result := Space;
+end;
+
+class function TPDColorSpaceFactory.CreateCieBased(const Kind: string; const Items: TCosArray; const Context: TPDDocumentContext): TPDColorSpace;
+begin
+  var Space: TPDColorSpace;
+  if Kind = TCosNames.CalGray then
+  begin
+    Space := TPDCalGray.Create(Items);
+  end
+  else if Kind = TCosNames.CalRGB then
+  begin
+    Space := TPDCalRGB.Create(Items);
+  end
+  else
+  begin
+    Space := TPDLab.Create(Items);
+  end;
+
+  Result := StoreInContext(Items, Context, Space);
+end;
+
+class function TPDColorSpaceFactory.ReadLookupData(const Items: TCosArray): TBytes;
+begin
+  var Lookup: TCosBase := nil;
+  if Items.Count > IndexedLookupIndex then
+  begin
+    Lookup := Resolve(Items.GetObject(IndexedLookupIndex));
+  end;
+
+  if (not Assigned(Lookup)) or (Lookup is TCosNull) then
+  begin
+    Exit(nil);
+  end;
+
+  if Lookup is TCosString then
+  begin
+    Exit(TCosString(Lookup).Bytes);
+  end;
+
+  if not (Lookup is TCosStream) then
+  begin
+    raise EPdfParseException.CreateFmt(IndexedBadLookup, [Lookup.ClassName]);
+  end;
+
+  try
+    Result := TCosStream(Lookup).DecodePrefix(MaxIndexedEntries * MaxRasterComponents);
+  except
+    on Failure: Exception do
+    begin
+      if TPdfFailure.IsInputFailure(Failure) then
+      begin
+        raise EPdfParseException.CreateFmt(IndexedLookupUnreadable, [Failure.Message]);
+      end;
+      raise;
+    end;
+  end;
+end;
+
+// PDIndexed(COSArray, PDResources): the base comes from the reference where there is one, the table from a string or a stream
+class function TPDColorSpaceFactory.CreateIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                  const Depth: Integer): TPDColorSpace;
+begin
+  const HasParts = (Items.Count > IndexedHivalIndex);
+  if not HasParts then
+  begin
+    raise EPdfParseException.Create(IndexedTooShort);
+  end;
+
+  const Base = CreateAt(Items.Get(IndexedBaseIndex), Context, Resources, False, Depth + 1);
+  const Hival = Resolve(Items.GetObject(IndexedHivalIndex));
+  if not (Hival is TCosNumber) then
+  begin
+    raise EPdfParseException.Create(IndexedHivalNotANumber);
+  end;
+
+  Result := StoreInContext(Items, Context, TPDIndexed.Create(Base, TCosNumber(Hival).IntValue, ReadLookupData(Items)));
+end;
+
+class function TPDColorSpaceFactory.CreateTintTransform(const Items: TCosArray; const Context: TPDDocumentContext): TPDFunction;
+begin
+  Result := TPDFunction.Create(Items.GetObject(TintTransformIndex), Context);
+end;
+
+// PDSeparation(COSArray, PDResources); the colorant name is only read as a name (a value that is no name gives the empty name)
+class function TPDColorSpaceFactory.CreateSeparation(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                     const Depth: Integer): TPDColorSpace;
+begin
+  const HasParts = (Items.Count > TintTransformIndex);
+  if not HasParts then
+  begin
+    raise EPdfParseException.Create(SeparationTooShort);
+  end;
+
+  var ColorantName := '';
+  const ColorantValue = Resolve(Items.GetObject(ColorantNameIndex));
+  if ColorantValue is TCosName then
+  begin
+    ColorantName := TCosName(ColorantValue).Name;
+  end;
+
+  const Alternate = CreateAt(Items.Get(AlternateIndex), Context, Resources, False, Depth + 1);
+  Result := StoreInContext(Items, Context, TPDSeparation.Create(ColorantName, Alternate, CreateTintTransform(Items, Context)));
+end;
+
+class function TPDColorSpaceFactory.ReadNameList(const Value: TCosBase; const Description: string): TArray<string>;
+begin
+  if not (Value is TCosArray) then
+  begin
+    raise EPdfParseException.Create(Description);
+  end;
+
+  const Names = TCosArray(Value);
+  SetLength(Result, Names.Count);
+  for var Index := 0 to Names.Count - 1 do
+  begin
+    const Item = Resolve(Names.GetObject(Index));
+    if not (Item is TCosName) then
+    begin
+      raise EPdfParseException.Create(Description);
+    end;
+    Result[Index] := TCosName(Item).Name;
+  end;
+end;
+
+class function TPDColorSpaceFactory.ReadColorantNames(const Items: TCosArray): TArray<string>;
+begin
+  Result := ReadNameList(Resolve(Items.GetObject(ColorantNameIndex)), DeviceNBadNames);
+end;
+
+// PDDeviceNProcess.getColorSpace (without resources) and getComponents
+class procedure TPDColorSpaceFactory.ReadProcess(const Process: TCosDictionary; const Context: TPDDocumentContext; const Depth: Integer;
+                                                 var Attributes: TPDDeviceNAttributes);
+begin
+  Attributes.HasProcess := True;
+  var ComponentNames: TCosArray;
+  if Process.TryGetCosArray(TCosNames.Components, ComponentNames) then
+  begin
+    Attributes.ProcessComponents := ReadNameList(ComponentNames, ProcessBadComponents);
+  end;
+
+  var SpaceValue: TCosBase;
+  if Process.TryGetDictionaryObject(TCosNames.ColorSpace, SpaceValue) then
+  begin
+    Attributes.ProcessColorSpace := CreateAt(SpaceValue, Context, nil, False, Depth + 1);
+  end;
+end;
+
+// PDDeviceNAttributes.getColorants: only the colorants that the space names are made (the others are never looked at)
+class function TPDColorSpaceFactory.ReadColorants(const Colorants: TCosDictionary; const ColorantNames: TArray<string>;
+                                                  const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                  const Depth: Integer): TArray<TPDDeviceNColorant>;
+begin
+  Result := nil;
+  for var ColorantName in ColorantNames do
+  begin
+    var Value: TCosBase;
+    if not Colorants.TryGetDictionaryObject(ColorantName, Value) then
+    begin
+      Continue;
+    end;
+
+    const Space = CreateAt(Value, Context, Resources, False, Depth + 1);
+    if not (Space is TPDSeparation) then
+    begin
+      raise EPdfParseException.CreateFmt(ColorantNotSeparation, [ColorantName]);
+    end;
+
+    var Colorant: TPDDeviceNColorant;
+    Colorant.Name := ColorantName;
+    Colorant.Separation := TPDSeparation(Space);
+    Result := Result + [Colorant];
+  end;
+end;
+
+class function TPDColorSpaceFactory.ReadDeviceNAttributes(const Attributes: TCosDictionary; const ColorantNames: TArray<string>;
+                                                          const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                          const Depth: Integer): TPDDeviceNAttributes;
+begin
+  Result := Default(TPDDeviceNAttributes);
+  Result.IsNChannel := (Attributes.GetNameAsString(TCosNames.Subtype, '') = TCosNames.NChannel);
+
+  var Process: TCosDictionary;
+  if Attributes.TryGetCosDictionary(TCosNames.Process, Process) then
+  begin
+    ReadProcess(Process, Context, Depth, Result);
+  end;
+
+  var Colorants: TCosDictionary;
+  if Attributes.TryGetCosDictionary(TCosNames.Colorants, Colorants) then
+  begin
+    Result.Colorants := ReadColorants(Colorants, ColorantNames, Context, Resources, Depth);
+  end;
+end;
+
+// PDDeviceN(COSArray, PDResources); attributes that are no dictionary count as absent
+class function TPDColorSpaceFactory.CreateDeviceN(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                  const Depth: Integer): TPDColorSpace;
+begin
+  const HasParts = (Items.Count > TintTransformIndex);
+  if not HasParts then
+  begin
+    raise EPdfParseException.Create(DeviceNTooShort);
+  end;
+
+  const ColorantNames = ReadColorantNames(Items);
+  const Alternate = CreateAt(Items.Get(AlternateIndex), Context, Resources, False, Depth + 1);
+
+  var AttributesValue: TCosBase := nil;
+  if Items.Count > DeviceNAttributesIndex then
+  begin
+    AttributesValue := Resolve(Items.GetObject(DeviceNAttributesIndex));
+  end;
+
+  const HasAttributes = (AttributesValue is TCosDictionary);
+  var Attributes := Default(TPDDeviceNAttributes);
+  if HasAttributes then
+  begin
+    Attributes := ReadDeviceNAttributes(TCosDictionary(AttributesValue), ColorantNames, Context, Resources, Depth);
+  end;
+
+  Result := StoreInContext(Items, Context, TPDDeviceN.Create(ColorantNames, Alternate, CreateTintTransform(Items, Context), HasAttributes, Attributes));
 end;
 
 end.

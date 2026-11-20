@@ -1,2 +1,2 @@
 # <page> [<platform>] # <reason>
-page 1 # Task 24: the red header and the logo are images with an Indexed colour space, which is not supported yet (the log says "Image skipped: The colour space Indexed is not supported yet"); the tiling patterns of the page are equal. Task 24 removes this file.
+page 1 # Task 29: the colours of the Indexed images are those of PDFBox (Task 24); what differs is 1 pixel wide seams where the strips of the red header and the select box touch (the images are drawn at fractional positions after TryScaleDown and Skia gives their edge pixels partial coverage, Java2D does not; drawing the images without anti-aliasing took 794 differing flat pixels to 665 and did not close the gap). Image edge placement of DrawBitmap, not a colour space.

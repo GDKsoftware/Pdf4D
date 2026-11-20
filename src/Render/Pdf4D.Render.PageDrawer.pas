@@ -536,9 +536,16 @@ begin
   end;
 end;
 
-// getPaint for a colour that is not a pattern
+// getPaint for a colour that is not a pattern. PDFBOX-4900: "The special colorant name None shall not produce any visible output", so the
+// colour of such a Separation space is the transparent colour.
 function TPdfPageDrawer.SolidPaint(const Color: TPDColor): TPdfPaint;
 begin
+  const IsNoneColorant = ((Color.ColorSpace is TPDSeparation) and TPDSeparation(Color.ColorSpace).IsNone);
+  if IsNoneColorant then
+  begin
+    Exit(TPdfPaint.Solid(TPdfDeviceColor.Create(0, 0, 0, 0)));
+  end;
+
   Result := TPdfPaint.Solid(Color.ToRgb.ToDeviceColor);
 end;
 

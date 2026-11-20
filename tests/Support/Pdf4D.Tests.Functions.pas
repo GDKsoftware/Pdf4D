@@ -12,6 +12,7 @@ uses
   System.Generics.Collections,
   Pdf4D.Common.Defines,
   Pdf4D.Common.Log,
+  Pdf4D.Cos.Base,
   Pdf4D.Cos.PdfArray,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.DocumentContext;
@@ -80,6 +81,8 @@ type
     function NewType3(const Domain, Bounds, Encode: string; const SubFunctions: array of TCosDictionary): TCosDictionary;
     // The function that a case of a reference file describes
     function NewFromCase(const FunctionCase: TFunctionCase): TCosDictionary;
+    // Takes a function that the builder made out of its ownership, for an array or a dictionary that takes it over
+    function Detach(const Value: TCosBase): TCosBase;
 
     function WarningCount: Integer;
 
@@ -105,7 +108,6 @@ implementation
 uses
   System.IOUtils,
   System.Math,
-  Pdf4D.Cos.Base,
   Pdf4D.Cos.Float,
   Pdf4D.Cos.Integer,
   Pdf4D.Cos.Names;
@@ -236,6 +238,12 @@ begin
     FOwned.Extract(SubFunction);
     Functions.Add(SubFunction);
   end;
+end;
+
+function TFunctionTestBuilder.Detach(const Value: TCosBase): TCosBase;
+begin
+  FOwned.Extract(Value);
+  Result := Value;
 end;
 
 function TFunctionTestBuilder.WarningCount: Integer;

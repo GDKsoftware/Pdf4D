@@ -118,7 +118,7 @@ type
     procedure TestPatternNameIsTheColorInThePatternSpace;
 
     [Test]
-    procedure TestUnsupportedColorSpaceFallsBackToGray;
+    procedure TestLabColorSpaceIsSelected;
 
     [Test]
     procedure TestLineStateOperators;
@@ -491,12 +491,13 @@ begin
   Assert.AreEqual('Pattern', State.NonStrokingColorSpace.Name);
 end;
 
-procedure TGraphicsEngineTests.TestUnsupportedColorSpaceFallsBackToGray;
+procedure TGraphicsEngineTests.TestLabColorSpaceIsSelected;
 begin
   Run('/CSLab cs');
 
-  Assert.AreEqual('DeviceGray', State.NonStrokingColor.ColorSpace.Name);
-  Assert.IsTrue(HasLogLine('not supported yet'));
+  Assert.AreEqual('Lab', State.NonStrokingColor.ColorSpace.Name);
+  Assert.AreEqual('Lab', State.NonStrokingColorSpace.Name);
+  Assert.AreEqual<Integer>(3, Length(State.NonStrokingColor.Components));
 end;
 
 procedure TGraphicsEngineTests.TestLineStateOperators;

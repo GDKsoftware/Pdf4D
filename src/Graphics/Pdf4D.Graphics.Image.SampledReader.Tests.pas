@@ -124,6 +124,7 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Cos.PdfString,
   Pdf4D.Model.Document,
   Pdf4D.Model.Page,
   Pdf4D.Tests.Corpus,
@@ -455,9 +456,21 @@ end;
 
 procedure TSampledImageReaderTests.TestShortIndexedLookupClamps;
 begin
-  // A lookup table that has fewer entries than the sample says: the last entry is used (the Indexed colour space is ported in
-  // Task 24, together with this test)
-  Assert.Pass;
+  // hival 3, but the lookup table (7 bytes) holds two complete entries: the indexes above the last entry use the last entry
+  const Stream = NewStream(3, 1, 8, '', [0, 1, 3]);
+  const Lookup: TBytes = [$FF, $00, $00, $00, $00, $FF, $00];
+  const Items = TCosArray.Create;
+  Items.Add(TCosName.Create(TCosNames.Indexed));
+  Items.Add(TCosName.Create(TCosNames.DeviceRGB));
+  Items.Add(TCosInteger.Create(3));
+  Items.Add(TCosString.Create(Lookup, True));
+  Stream.SetItem(TCosNames.ColorSpace, Items);
+
+  const Bitmap = GetImage(NewImage(Stream));
+
+  AssertPixel(Bitmap, 0, 0, 255, 0, 0, 255);
+  AssertPixel(Bitmap, 1, 0, 0, 0, 255, 255);
+  AssertPixel(Bitmap, 2, 0, 0, 0, 255, 255);
 end;
 
 procedure TSampledImageReaderTests.TestJpxIsSkippedWithLog;

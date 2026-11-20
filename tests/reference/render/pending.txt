@@ -1,10 +1,5 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/colors-special.pdf # Task 24: the other colour spaces
-pdfbox-jira/PDFBOX-4308.pdf # Task 24: the other colour spaces
-pdfbox/input/PDFBOX-3062-005717-p1.pdf # Task 24: the other colour spaces
-pdfbox-jira/PDFBOX-3951-FIHUZWDDL2VGPOE34N6YHWSIGSH5LVGZ.pdf # Task 24: the other colour spaces
-pdfbox-jira/PDFBOX-4750.pdf # Task 24: the other colour spaces
 generated/render/annotations.pdf # Task 25: annotations
 generated/render/optional-content.pdf # Task 25: optional content
 pdfbox/input/compression/acroform.pdf # Task 25: annotations (form fields)

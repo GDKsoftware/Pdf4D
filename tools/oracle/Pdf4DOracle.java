@@ -111,6 +111,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --function spec.txt
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color (profile.icc|DeviceCMYK) c1 c2 ...
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color-batch spec.txt
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color-pdf-batch spec.txt
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -167,6 +168,10 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("--color-batch"))
             {
                 out.print(colorCases(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("--color-pdf-batch"))
+            {
+                out.print(colorPdfCases(new File(args[1])));
             }
             else if (args.length >= 4 && args[0].equals("--pdf-glyph-paths"))
             {
@@ -1975,6 +1980,115 @@ public class Pdf4DOracle
             else
             {
                 sb.append(line).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * The colour spaces of the resources of page 1 of a PDF file: "pdf: file", "space: resource name", then
+     * "in: c1 c2 ..." (toRGB) and "img: components b1 b2 ..." (toRGBImage of a raster of one row of 8-bit samples).
+     */
+    private static String colorPdfCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        PDDocument doc = null;
+        PDResources resources = null;
+        org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace space = null;
+        try
+        {
+            for (String line : java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8))
+            {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#"))
+                {
+                    sb.append(line).append('\n');
+                    continue;
+                }
+                int colon = line.indexOf(':');
+                String key = line.substring(0, colon).trim();
+                String value = line.substring(colon + 1).trim();
+                if (key.equals("pdf"))
+                {
+                    if (doc != null)
+                    {
+                        doc.close();
+                    }
+                    doc = Loader.loadPDF(new File(value));
+                    resources = doc.getPage(0).getResources();
+                    sb.append(line).append('\n');
+                }
+                else if (key.equals("space"))
+                {
+                    sb.append(line).append('\n');
+                    try
+                    {
+                        space = resources.getColorSpace(COSName.getPDFName(value));
+                    }
+                    catch (Throwable t)
+                    {
+                        space = null;
+                    }
+                }
+                else if (key.equals("in") || key.equals("img"))
+                {
+                    sb.append(key).append(": ").append(value).append(" out:");
+                    try
+                    {
+                        String[] parts = value.split("\\s+");
+                        if (key.equals("in"))
+                        {
+                            float[] input = new float[parts.length];
+                            for (int i = 0; i < parts.length; i++)
+                            {
+                                input[i] = Float.parseFloat(parts[i]);
+                            }
+                            for (float f : space.toRGB(input))
+                            {
+                                sb.append(' ').append(f);
+                            }
+                        }
+                        else
+                        {
+                            int components = Integer.parseInt(parts[0]);
+                            int width = (parts.length - 1) / components;
+                            java.awt.image.WritableRaster raster = java.awt.image.Raster.createBandedRaster(
+                                    java.awt.image.DataBuffer.TYPE_BYTE, width, 1, components, new java.awt.Point(0, 0));
+                            int[] pixel = new int[components];
+                            for (int x = 0; x < width; x++)
+                            {
+                                for (int c = 0; c < components; c++)
+                                {
+                                    pixel[c] = Integer.parseInt(parts[1 + x * components + c]);
+                                }
+                                raster.setPixel(x, 0, pixel);
+                            }
+                            java.awt.image.BufferedImage image = space.toRGBImage(raster);
+                            int[] rgb = null;
+                            for (int x = 0; x < width; x++)
+                            {
+                                rgb = image.getRaster().getPixel(x, 0, rgb);
+                                sb.append(' ').append(rgb[0]).append(' ').append(rgb[1]).append(' ').append(rgb[2]);
+                            }
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        sb.append(" !");
+                    }
+                    sb.append('\n');
+                }
+                else
+                {
+                    sb.append(line).append('\n');
+                }
+            }
+        }
+        finally
+        {
+            if (doc != null)
+            {
+                doc.close();
             }
         }
         return sb.toString();

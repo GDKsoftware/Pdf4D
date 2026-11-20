@@ -48,6 +48,7 @@ type
     function WarningCount: Integer;
 
     property Resources: TPDResources read FResources;
+    property Functions: TFunctionTestBuilder read FFunctions;
     property Context: TPDDocumentContext read GetContext;
   end;
 

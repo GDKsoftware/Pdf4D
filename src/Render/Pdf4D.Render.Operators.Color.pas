@@ -19,8 +19,8 @@ type
   // The base of the colour operators: finding a colour space by name and setting a colour from the operands
   TColorOperatorProcessor = class abstract(TGraphicsOperatorProcessor)
   protected
-    // The colour space of a name of /ColorSpace in the resources, or a device name. A space that is not supported yet is logged and
-    // replaced by DeviceGray; a name that is no colour space raises EPdfParseException.
+    // The colour space of a name of /ColorSpace in the resources, or a device name; a name that is no colour space raises
+    // EPdfParseException.
     function ResolveColorSpace(const SpaceName: string): TPDColorSpace;
     // The colour that the operands, which are all numbers, make in Space
     function MakeColor(const Space: TPDColorSpace; const Operands: TArray<TCosBase>): TPDColor;
@@ -143,7 +143,6 @@ uses
   Pdf4D.Graphics.State;
 
 resourcestring
-  ColorSpaceNotSupported = 'The colour space /%s is not supported yet, DeviceGray is used instead: %s';
   ColorNameNeedsPatternSpace = 'The colour of %s is a name, which needs the Pattern colour space: skipped';
 
 { TColorOperators }
@@ -170,15 +169,7 @@ function TColorOperatorProcessor.ResolveColorSpace(const SpaceName: string): TPD
 begin
   const NameOperand = TCosName.Create(SpaceName);
   try
-    try
-      Result := TPDColorSpaceFactory.Create(NameOperand, Engine.Resources);
-    except
-      on Failure: EPdfUnsupportedFeatureException do
-      begin
-        Engine.LogWarning(ColorSpaceNotSupported, [SpaceName, Failure.Message]);
-        Result := TPDDeviceGray.Instance;
-      end;
-    end;
+    Result := TPDColorSpaceFactory.Create(NameOperand, Engine.Resources);
   finally
     NameOperand.Free;
   end;

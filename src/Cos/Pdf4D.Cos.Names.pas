@@ -33,6 +33,7 @@ type
     const AHx = 'AHx';
     const AIMetaData = 'AIMetaData';
     const AIS = 'AIS';
+    const All = 'All';
     const AllOff = 'AllOff';
     const AllOn = 'AllOn';
     const Alpha = 'Alpha';
@@ -368,6 +369,7 @@ type
     const Name = 'Name';
     const Names = 'Names';
     const Navigator = 'Navigator';
+    const NChannel = 'NChannel';
     const NeedAppearances = 'NeedAppearances';
     const NewWindow = 'NewWindow';
     const Next = 'Next';

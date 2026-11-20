@@ -89,6 +89,10 @@ type
     class procedure StoreRgbRow(const Bitmap: TPdfBitmap; const Y: Integer; const Rgb: PByte); static;
     // Converts the raster with the transform, row by row with its cache
     class function ConvertWithTransform(const Raster: TPdfRaster; const Transform: TIccTransform): TPdfBitmap; static;
+    // (int) of a float in Java: not a number is 0, a value outside the range of an integer is the closest integer
+    class function TruncateToInteger(const Value: Single): Integer; static;
+    // (int) of Value * 255f in Java, and the 8 bits of it that the packed int raster of a PDFBox RGB image keeps (so that 1.2 wraps)
+    class function TruncateChannelToByte(const Value: Single): Byte; static;
 
   public
     function Name: string; virtual; abstract;
@@ -112,6 +116,7 @@ const
   ByteScale = 255.0;
   RoundingOffset = 0.5;
   BytesPerRgbPixel = 3;
+  ByteMask = $FF;
 
 { TPdfRgb }
 
@@ -278,6 +283,32 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+class function TPDColorSpace.TruncateToInteger(const Value: Single): Integer;
+begin
+  if IsNan(Value) then
+  begin
+    Exit(0);
+  end;
+
+  if Value >= 2147483647.0 then
+  begin
+    Exit(MaxInt);
+  end;
+
+  if Value <= -2147483648.0 then
+  begin
+    Exit(Low(Integer));
+  end;
+
+  Result := Trunc(Value);
+end;
+
+class function TPDColorSpace.TruncateChannelToByte(const Value: Single): Byte;
+begin
+  const Scaled: Single = Value * Single(ByteScale);
+  Result := Byte(TruncateToInteger(Scaled) and ByteMask);
 end;
 
 function TPDColorSpace.GetDefaultDecode(const BitsPerComponent: Integer): TArray<Single>;

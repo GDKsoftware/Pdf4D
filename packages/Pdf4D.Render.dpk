@@ -47,6 +47,7 @@ contains
   Pdf4D.Graphics.Color.IccBased in '..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas',
   Pdf4D.Graphics.Color.Factory in '..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas',
   Pdf4D.Graphics.Color.Pattern in '..\src\Graphics\Pdf4D.Graphics.Color.Pattern.pas',
+  Pdf4D.Graphics.Color.Cie in '..\src\Graphics\Pdf4D.Graphics.Color.Cie.pas',
   Pdf4D.Graphics.Color.Special in '..\src\Graphics\Pdf4D.Graphics.Color.Special.pas',
   Pdf4D.Graphics.Pattern in '..\src\Graphics\Pdf4D.Graphics.Pattern.pas',
   Pdf4D.Graphics.Image in '..\src\Graphics\Pdf4D.Graphics.Image.pas',

@@ -264,6 +264,7 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Pattern.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Cie.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Special.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Pattern.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
@@ -277,7 +278,10 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.SoftMask.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.State.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.ColorBuilder.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.ColorSpaceReferences.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Tests.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Cie.Tests.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Special.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Png.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Png.Tests.pas"/>

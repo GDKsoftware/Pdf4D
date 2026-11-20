@@ -45,7 +45,6 @@ type
 
     class function CleanInput(const Value: Single): Single; static;
     class procedure LabToXyz(const L, A, B: Double; const Xyz: PDouble); static;
-    class procedure XyzToSrgb(const Xyz: PDouble; const Output: PSingle); static;
     class function SrgbEncode(const Linear: Double): Double; static;
     class function LabInverse(const Value: Double): Double; static;
 
@@ -69,6 +68,10 @@ type
 
   public
     constructor Create(const Profile: TIccProfile);
+
+    // D50 XYZ (3 values) to sRGB (3 values of 0..1) through the colorants and the curve of the sRGB profile; also what the CIE-based
+    // colour spaces of PDF use for their XYZ
+    class procedure XyzToSrgb(const Xyz: PDouble; const Output: PSingle); static;
 
     // Input has NumberOfComponents values of 0..1 (anything else is clamped, not a number is 0), Output gets 3 values of 0..1.
     // Never raises.

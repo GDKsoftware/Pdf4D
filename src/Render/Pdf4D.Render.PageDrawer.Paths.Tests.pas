@@ -32,6 +32,7 @@ type
     FDeviceReference: IPdfRasterDevice;
 
     procedure Render(const Content: string; const Resources: string = '');
+    class function SeparationResources(const ColorantName: string): string; static;
     function HasLogLine(const Fragment: string): Boolean;
     function CallsOf(const Kind: TRecordedCallKind): TArray<TRecordedCall>;
     procedure AssertNear(const Expected, Actual: Single);
@@ -106,6 +107,12 @@ type
 
     [Test]
     procedure TestFormBBoxClipsTheForm;
+
+    [Test]
+    procedure TestSeparationNoneIsInvisible;
+
+    [Test]
+    procedure TestSeparationSpotColorIsPainted;
   end;
 
 implementation
@@ -136,6 +143,12 @@ begin
   FRenderer := nil;
   FDocument := nil;
   FreeAndNil(FDocuments);
+end;
+
+class function TPageDrawerPathTests.SeparationResources(const ColorantName: string): string;
+begin
+  Result := Format('/ColorSpace << /CsNone [/Separation /%s /DeviceRGB << /FunctionType 2 /Domain [0 1] /C0 [1 1 1] /C1 [1 0 0] /N 1 >>] >>',
+                   [ColorantName]);
 end;
 
 procedure TPageDrawerPathTests.Render(const Content: string; const Resources: string);
@@ -424,6 +437,28 @@ begin
   finally
     ClipPath.Free;
   end;
+end;
+
+procedure TPageDrawerPathTests.TestSeparationNoneIsInvisible;
+begin
+  // PDFBOX-4900: the colorant /None shows nothing, so PDFBox fills with the transparent colour
+  Render('/CsNone cs 1 sc 10 10 100 50 re f', SeparationResources('None'));
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.AreEqual(TPdfPaintKind.Solid, Fills[0].Paint.Kind);
+  Assert.AreEqual(Byte(0), Fills[0].Paint.Color.A);
+end;
+
+procedure TPageDrawerPathTests.TestSeparationSpotColorIsPainted;
+begin
+  Render('/CsNone cs 1 sc 10 10 100 50 re f', SeparationResources('Spot'));
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.AreEqual(Byte(255), Fills[0].Paint.Color.A);
+  Assert.AreEqual(Byte(255), Fills[0].Paint.Color.R);
+  Assert.AreEqual(Byte(0), Fills[0].Paint.Color.G);
 end;
 
 end.
