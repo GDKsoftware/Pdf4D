@@ -1,2 +1,0 @@
-# The soft masks are drawn (Task 19). The groups of /SmLum, /SmLumTr and /SmLumId paint a gradient with the sh operator, which draws nothing until Task 20 builds shadings; the other soft masks of the page equal the reference.
-page 1 # Task 20: shadings (sh in the group of three soft masks); remove this line when the page equals the reference
