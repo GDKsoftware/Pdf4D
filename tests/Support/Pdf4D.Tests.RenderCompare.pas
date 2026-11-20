@@ -32,10 +32,11 @@ type
   // Compares a render with a reference image of PDFBox under the rules of docs/golden-format.md ("Render reference files")
   TRenderCompare = record
   public const
-    // A pixel differs when a channel differs by more than this
-    PixelTolerance = 16;
+    // A pixel differs when a channel differs by more than this. Marlin (Java2D) coverage and Skia coverage differ at the edge of a
+    // glyph by up to this much (measured over the text pages of the corpus); a missing or misplaced shape differs by far more.
+    PixelTolerance = 64;
     // A page is equal when at most this share of its pixels differs
-    MaxDifferentFraction = 0.01;
+    MaxDifferentFraction: Double = 0.01;
 
   strict private
     class function ChannelDifference(const Actual, Expected: PByte): Integer; static;

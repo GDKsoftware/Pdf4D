@@ -95,9 +95,9 @@ begin
     const Within = TRenderCompare.Compare(AtTolerance, Expected);
     const Beyond = TRenderCompare.Compare(OverTolerance, Expected);
 
-    Assert.IsTrue(Within.IsEqual, 'a difference of 16 is within the tolerance');
+    Assert.IsTrue(Within.IsEqual, 'a difference of the tolerance is within it');
     Assert.AreEqual(TRenderCompare.PixelTolerance, Within.MaxDifference);
-    Assert.AreEqual(Int64(100), Beyond.DifferentPixels, 'a difference of 17 differs');
+    Assert.AreEqual(Int64(100), Beyond.DifferentPixels, 'a difference of one more differs');
     Assert.IsFalse(Beyond.IsEqual);
   finally
     Expected.Free;

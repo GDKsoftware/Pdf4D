@@ -1,0 +1,29 @@
+# <corpus file> # Task <n>: <subject>
+# Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
+generated/render/transparency.pdf # Task 18: transparency groups and blend modes
+generated/render/softmask.pdf # Task 19: soft masks and transfer functions
+generated/render/shadings.pdf # Task 20: shadings
+generated/render/patterns.pdf # Task 22: tiling patterns
+pdfbox/input/rendering/survey.pdf # Task 22: tiling patterns
+generated/render/ccitt.pdf # Task 23: CCITTFax
+pdfbox-jira/PDFBOX-4831.pdf # Task 23: CCITTFax
+pdfbox/input/merge/multitiff.pdf # Task 23: CCITTFax
+pdfbox-jira/PDFBOX-3785-202097.pdf # Task 23: CCITTFax
+generated/render/colors-special.pdf # Task 24: the other colour spaces
+pdfbox-jira/PDFBOX-4308.pdf # Task 24: the other colour spaces
+pdfbox/input/PDFBOX-3062-005717-p1.pdf # Task 24: the other colour spaces
+pdfbox-jira/PDFBOX-3951-FIHUZWDDL2VGPOE34N6YHWSIGSH5LVGZ.pdf # Task 24: the other colour spaces
+pdfbox-jira/PDFBOX-4750.pdf # Task 24: the other colour spaces
+generated/render/annotations.pdf # Task 25: annotations
+generated/render/optional-content.pdf # Task 25: optional content
+pdfbox/input/compression/acroform.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/encryption/Acroform-PDFBOX-2333.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/annotation/AnnotationTypes.pdf # Task 25: annotations
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/AcroFormsBasicFields.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/AcroFormsRotation.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/AlignmentTests.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/ControlCharacters.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/MultilineFields.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX3812-acrobat-multiline-auto.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX-3835-input-acrobat-wrap.pdf # Task 25: annotations (form fields)
+pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX-5784.pdf # Task 25: annotations (form fields)

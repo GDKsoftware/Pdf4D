@@ -49,7 +49,7 @@
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Define>PDF4D_TESTS;$(DCC_Define)</DCC_Define>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\..\src\Common;..\..\src\IO;..\..\src\Cos;..\..\src\Parser;..\..\src\Content;..\..\src\Filter;..\..\src\Crypto;..\..\src\Encryption;..\..\src\Model;..\..\src\Api;..\..\src\Resources;..\..\src\Text;..\..\src\FontBox;..\..\src\Font;..\..\src\Render;..\..\src\Render\Skia;..\ThirdParty\DEC\Source;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\src\Common;..\..\src\IO;..\..\src\Cos;..\..\src\Parser;..\..\src\Content;..\..\src\Filter;..\..\src\Crypto;..\..\src\Encryption;..\..\src\Model;..\..\src\Api;..\..\src\Resources;..\..\src\Text;..\..\src\FontBox;..\..\src\Font;..\..\src\Render;..\..\src\Render\Skia;..\..\src\Graphics;..\..\src\Codec;..\Support;..\ThirdParty\DEC\Source;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Skia_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -97,6 +97,11 @@
         <DCCReference Include="..\Support\Pdf4D.Tests.Png.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.ReferenceBackends.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.Corpus.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.FontProvider.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.TextGolden.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

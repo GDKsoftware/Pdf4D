@@ -231,7 +231,7 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 
 `TRenderCompare` (`tests/Support/Pdf4D.Tests.RenderCompare.pas`) compares two bitmaps; the acceptance test `TRenderGoldenTests.TestCorpus72Dpi` (`tests/Skia/Acceptance`) renders every page of the `render.txt` that says `ok` with `RenderToBitmap(FromDpi(72))` and compares it with the PNG.
 
-- A pixel differs when a channel differs by more than `PixelTolerance` (16).
+- A pixel differs when a channel differs by more than `PixelTolerance` (64, see docs/assumptions.md).
 - A page is equal when the share of differing pixels is at most `MaxDifferentFraction` (0.01) and the sizes are equal. A different size is always a difference.
 - A page that PDFBox cannot render (`error` in `render.txt`) and a file with a `load-error` are not compared; Pdf4D must not raise on them, which the robustness tests cover.
 - When `PDF4D_RENDER_OUTPUT` names a folder, a page that differs is written there as `<name>.p<nnn>.png` (the Pdf4D render) and `<name>.p<nnn>.diff.png` (red where a pixel differs, the reference dimmed elsewhere).

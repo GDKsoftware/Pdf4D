@@ -1,0 +1,2 @@
+# page <n> [<platform>] # <reason>
+page 1 # the page is dominated by a 4:2:0 JPEG image: jpg.js upsamples the chroma planes by repetition, libjpeg of PDFBox interpolates
