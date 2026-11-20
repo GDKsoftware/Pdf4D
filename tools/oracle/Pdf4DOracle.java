@@ -318,6 +318,11 @@ public class Pdf4DOracle
             {
                 // the pages found so far count
             }
+            if (pageCount == 0)
+            {
+                // an empty listing would be taken for a failed run
+                sb.append("pages: 0\n");
+            }
             int last = Math.min(pageCount, MAX_RENDER_PAGES);
             org.apache.pdfbox.rendering.PDFRenderer renderer = new org.apache.pdfbox.rendering.PDFRenderer(doc);
             for (int n = 1; n <= last; n++)

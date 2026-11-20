@@ -49,8 +49,10 @@ type
     class function CropOf(const Source: TPdfBitmap; const Region: TRect): TPdfBitmap; static;
     class procedure SaveRegionOutput(const RelativePath: string; const Page: Integer; const Region, Full: TPdfBitmap); static;
     class procedure SaveOutput(const RelativePath: string; const Page: Integer; const Actual, Expected: TPdfBitmap); static;
-    class function Differences(const RelativePath: string; const Document: IPdfDocument; const ListedPages: TArray<Integer>): TArray<string>; static;
-    class function PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer): string; static;
+    class function Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument; const ListedPages: TArray<Integer>): TArray<string>; static;
+    class function PageLineCount(const RenderListing: string): Integer; static;
+    class function HasNoReference(const RenderListing: string): Boolean; static;
+    class function PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Expected: TPdfBitmap): string; static;
 
   public
     [Setup]
@@ -62,6 +64,11 @@ type
     [Test]
     [TestCaseProvider('Pdf4DRenderCorpus')]
     procedure TestCorpus72Dpi(const RelativePath: string);
+
+    // The files that PDFBox could not render are the ones in no-reference.txt, no more and no fewer, so that a truncated or timed-out
+    // listing cannot make a file pass unseen
+    [Test]
+    procedure TestFilesWithoutReferenceAreListed;
 
     // The viewer renders regions of a page; a region must equal the same crop of the whole page
     [Test]
@@ -81,6 +88,7 @@ implementation
 uses
   System.Classes,
   System.IOUtils,
+  System.Math,
   System.StrUtils,
   Pdf4D.Api.Document,
   Pdf4D.Common.Defines,
@@ -98,15 +106,28 @@ const
   OutputEnvironmentVariable = 'PDF4D_RENDER_OUTPUT';
   ReferenceDpi = 72;
   MaxReportedDifferences = 10;
+  // tools/oracle/generate-render.ps1 renders pages 1 to min(pages, 50) of a file
+  MaxRenderedPages = 50;
   PageMarker = 'page ';
   OkMarker = ' ok';
   RegionLeft = 37;
   RegionTop = 53;
   RegionRight = 237;
   RegionBottom = 253;
-  // Skia puts the pixels on an exact sample boundary and the edge of a path at the border of the device on either side, depending on
-  // where the device starts, so a region is equal to the crop of the page up to those few pixels
-  MaxRegionDifferentFraction = 0.02;
+  // A region is rendered on a device of its own, with the page moved by a whole number of pixels, so it should be the crop of the full
+  // page. Two things of Skia (not of the renderer; checked on the pixels) make it differ:
+  // 1. along the border of the device, the coverage of a path or a glyph that the border cuts is another one (up to 60 levels in the
+  //    last three pixels), so the pixels along the border are left out;
+  // 2. Skia works in single precision, and where a sample lies exactly on the boundary of two texels of an image that is drawn with
+  //    the nearest neighbour (generated/render/images.pdf puts 4 x 4 images on whole points at 50 points: every 12.5 points a pixel
+  //    centre is on a boundary), the rounding of the matrix decides which texel it takes, and the matrix has other rounding errors
+  //    on another translation. That moves whole columns of pixels (1.2% of the region); no other file has it.
+  // What is left is held to a tolerance of 16 and 0.1% of the pixels, and nothing else.
+  RegionTolerance = 16;
+  RegionBorder = 4;
+  MaxRegionDifferentFraction = 0.001;
+  MaxRegionNearestTieFraction = 0.015;
+  NearestTieFile = 'generated/render/images.pdf';
   BytesPerPixel = 4;
 
 { TRenderCorpusCaseProvider }
@@ -203,15 +224,16 @@ begin
   Result := Format('%s.p%.3d', [TCorpus.GoldenName(RelativePath), Page]);
 end;
 
-// With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: file, page, share of different pixels, largest difference
+// With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: file, page, share of different pixels, largest
+// difference, whether the sizes are equal, share of the flat pixels that differ, share of the edge pixels that differ
 class procedure TRenderGoldenTests.LogComparison(const RelativePath: string; const Page: Integer; const Comparison: TRenderComparison);
 begin
   const Folder = GetEnvironmentVariable(OutputEnvironmentVariable);
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s%s', [RelativePath, Page, Comparison.DifferentFraction, Comparison.MaxDifference,
-                                                                                               BoolToStr(Comparison.HasSameSize, True), sLineBreak]));
+    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [RelativePath, Page, Comparison.DifferentFraction, Comparison.MaxDifference,
+                                                                                               BoolToStr(Comparison.HasSameSize, True), Comparison.DifferentFlatFraction, Comparison.DifferentEdgeFraction, sLineBreak]));
   end;
 end;
 
@@ -251,33 +273,32 @@ begin
 end;
 
 // Empty when the page equals its reference, otherwise what differs
-class function TRenderGoldenTests.PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer): string;
+class function TRenderGoldenTests.PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Expected: TPdfBitmap): string;
 begin
-  const Expected = TPng.Read(TPath.Combine(ReferenceFolder(ReferenceDpi), OutputName(RelativePath, Page) + '.png'));
+  var Actual: TPdfBitmap := nil;
   try
-    var Actual: TPdfBitmap := nil;
-    try
-      const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TReferenceBackends.Create);
-      Renderer.RenderToBitmap(Page - 1, TPdfRenderParams.FromDpi(ReferenceDpi), Actual);
+    const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TReferenceBackends.Create);
+    Renderer.RenderToBitmap(Page - 1, TPdfRenderParams.FromDpi(ReferenceDpi), Actual);
 
-      const Comparison = TRenderCompare.Compare(Actual, Expected);
-      LogComparison(RelativePath, Page, Comparison);
-      if Comparison.IsEqual then
-      begin
-        Exit('');
-      end;
-
-      SaveOutput(RelativePath, Page, Actual, Expected);
-      Result := Format('page %d: %s', [Page, Comparison.Describe]);
-    finally
-      Actual.Free;
+    const Comparison = TRenderCompare.Compare(Actual, Expected);
+    LogComparison(RelativePath, Page, Comparison);
+    if Comparison.IsEqual then
+    begin
+      Exit('');
     end;
+
+    SaveOutput(RelativePath, Page, Actual, Expected);
+    Result := Format('page %d: %s', [Page, Comparison.Describe]);
   finally
-    Expected.Free;
+    Actual.Free;
   end;
 end;
 
-class function TRenderGoldenTests.Differences(const RelativePath: string; const Document: IPdfDocument; const ListedPages: TArray<Integer>): TArray<string>;
+// The reference of a listed page must be there and be a PNG, also for a file that is pending: nothing is compared without it, and
+// that is a failure, not a difference. An exception of the render is a difference of a file that is not pending; in a pending file
+// only a feature that is not supported yet (the one that made it pending) may raise, anything else fails the test.
+class function TRenderGoldenTests.Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument;
+                                               const ListedPages: TArray<Integer>): TArray<string>;
 begin
   Result := nil;
   const Known = TTextGoldenComparer.LoadKnownDifferences(TPath.Combine(RenderFolder, TCorpus.GoldenName(RelativePath) + '.render-known-differences.txt'));
@@ -288,21 +309,50 @@ begin
       Continue;
     end;
 
-    var Difference: string;
+    const PngPath = TPath.Combine(ReferenceFolder(ReferenceDpi), OutputName(RelativePath, Page) + '.png');
+    Assert.IsTrue(TFile.Exists(PngPath), Format('%s page %d: the reference image %s is missing', [RelativePath, Page, PngPath]));
+    const Expected = TPng.Read(PngPath);
     try
-      Difference := PageDifference(RelativePath, Document, Page);
-    except
-      on Failure: Exception do
-      begin
-        Difference := Format('page %d: %s: %s', [Page, Failure.ClassName, Failure.Message]);
+      var Difference: string;
+      try
+        Difference := PageDifference(RelativePath, Document, Page, Expected);
+      except
+        on Failure: Exception do
+        begin
+          if IsPending and (not (Failure is EPdfUnsupportedFeatureException)) then
+          begin
+            raise;
+          end;
+          Difference := Format('page %d: %s: %s', [Page, Failure.ClassName, Failure.Message]);
+        end;
       end;
-    end;
 
-    if Difference <> '' then
-    begin
-      Result := Result + [Difference];
+      if Difference <> '' then
+      begin
+        Result := Result + [Difference];
+      end;
+    finally
+      Expected.Free;
     end;
   end;
+end;
+
+// The lines "page <n> ..." of a listing, whatever they say about the page
+class function TRenderGoldenTests.PageLineCount(const RenderListing: string): Integer;
+begin
+  Result := 0;
+  for var Line in RenderListing.Split([#10]) do
+  begin
+    if Line.Trim.StartsWith(PageMarker) then
+    begin
+      Inc(Result);
+    end;
+  end;
+end;
+
+class function TRenderGoldenTests.HasNoReference(const RenderListing: string): Boolean;
+begin
+  Result := (Length(ListedPages(RenderListing)) = 0);
 end;
 
 procedure TRenderGoldenTests.TestCorpus72Dpi(const RelativePath: string);
@@ -312,11 +362,15 @@ begin
     Assert.Fail('The corpus was not found: set PDF4D_CORPUS or run the test program below the tests folder');
   end;
 
-  const Listing = TFile.ReadAllText(TPath.Combine(ReferenceFolder(ReferenceDpi), TCorpus.GoldenName(RelativePath) + '.render.txt'), TEncoding.UTF8);
+  const ListingPath = TPath.Combine(ReferenceFolder(ReferenceDpi), TCorpus.GoldenName(RelativePath) + '.render.txt');
+  Assert.IsTrue(TFile.Exists(ListingPath), Format('%s: the render listing %s is missing', [RelativePath, ListingPath]));
+  const Listing = TFile.ReadAllText(ListingPath, TEncoding.UTF8);
+  Assert.IsTrue(Listing.Trim <> '', Format('%s: the render listing is empty', [RelativePath]));
   const Pages = ListedPages(Listing);
   if Length(Pages) = 0 then
   begin
-    // PDFBox cannot render the file; the robustness tests cover that Pdf4D does not crash on it
+    // PDFBox cannot render the file (TestFilesWithoutReferenceAreListed pins which files); the robustness tests cover that Pdf4D does
+    // not crash on it
     Exit;
   end;
 
@@ -324,8 +378,11 @@ begin
   Options.Password := TCorpus.PasswordFor(RelativePath);
   const Document: IPdfDocument = TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
 
+  // PDFBox renders the first 50 pages, and the listing has a line for each of them; a shorter one is cut off
+  Assert.AreEqual<Integer>(Min(Document.PageCount, MaxRenderedPages), PageLineCount(Listing), Format('%s: the render listing has another number of pages than the file', [RelativePath]));
+
   const IsPending = MatchStr(RelativePath, TRenderCompare.PendingFiles(TPath.Combine(RenderFolder, 'pending.txt')));
-  const Found = Differences(RelativePath, Document, Pages);
+  const Found = Differences(RelativePath, IsPending, Document, Pages);
   const Verdict = TRenderCompare.Judge(IsPending, Found);
   if IsPending and (Length(Found) > 0) then
   begin
@@ -358,17 +415,66 @@ begin
     Assert.AreEqual<Integer>(RegionRight - RegionLeft, Region.Width);
     Assert.AreEqual<Integer>(RegionBottom - RegionTop, Region.Height);
     Crop := CropOf(Full, Params.Region);
-    const Comparison = TRenderCompare.Compare(Region, Crop);
-    if not Comparison.IsEqual then
+    const Compared = Int64(Region.Width - 2 * RegionBorder) * (Region.Height - 2 * RegionBorder);
+    const Different = TRenderCompare.CountAbove(Region, Crop, RegionTolerance, RegionBorder);
+    var Allowed := MaxRegionDifferentFraction;
+    if RelativePath = NearestTieFile then
+    begin
+      Allowed := MaxRegionNearestTieFraction;
+    end;
+    if Different > Allowed * Compared then
     begin
       SaveRegionOutput(RelativePath, Page, Region, Full);
     end;
-    Assert.IsTrue(Comparison.DifferentFraction <= MaxRegionDifferentFraction, Format('%s page %d: the region differs from the crop, %s', [RelativePath, Page, Comparison.Describe]));
+    Assert.IsTrue(Different <= Allowed * Compared, Format('%s page %d: %d of %d pixels of the region differ from the crop by more than %d', [RelativePath, Page, Different, Compared, RegionTolerance]));
   finally
     Crop.Free;
     Region.Free;
     Full.Free;
   end;
+end;
+
+procedure TRenderGoldenTests.TestFilesWithoutReferenceAreListed;
+begin
+  Assert.IsTrue(Length(TCorpus.Files) > 0, 'The corpus was not found: set PDF4D_CORPUS or run the test program below the tests folder');
+
+  const ListedPath = TPath.Combine(RenderFolder, 'no-reference.txt');
+  Assert.IsTrue(TFile.Exists(ListedPath), 'tests/reference/render/no-reference.txt is missing');
+  const Listed = TRenderCompare.PendingFiles(ListedPath);
+
+  var Found: TArray<string> := nil;
+  for var RelativePath in TCorpus.Files do
+  begin
+    const ListingPath = TPath.Combine(ReferenceFolder(ReferenceDpi), TCorpus.GoldenName(RelativePath) + '.render.txt');
+    Assert.IsTrue(TFile.Exists(ListingPath), Format('%s: the render listing %s is missing', [RelativePath, ListingPath]));
+    const Listing = TFile.ReadAllText(ListingPath, TEncoding.UTF8);
+    Assert.IsTrue(Listing.Trim <> '', Format('%s: the render listing is empty', [RelativePath]));
+    if HasNoReference(Listing) then
+    begin
+      Found := Found + [RelativePath];
+    end;
+  end;
+
+  var Unexpected: TArray<string> := nil;
+  for var RelativePath in Found do
+  begin
+    if not MatchStr(RelativePath, Listed) then
+    begin
+      Unexpected := Unexpected + [RelativePath];
+    end;
+  end;
+  var Missing: TArray<string> := nil;
+  for var RelativePath in Listed do
+  begin
+    if not MatchStr(RelativePath, Found) then
+    begin
+      Missing := Missing + [RelativePath];
+    end;
+  end;
+
+  Assert.AreEqual<Integer>(0, Length(Unexpected) + Length(Missing),
+                           Format('The files without a reference differ from no-reference.txt. Not in the list: %s. In the list, but with a reference: %s',
+                                  [string.Join(', ', Unexpected), string.Join(', ', Missing)]));
 end;
 
 end.

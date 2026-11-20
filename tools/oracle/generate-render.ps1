@@ -54,7 +54,7 @@ function Start-One($job) {
     $pw = ''
     if ($manifest.Contains($job.Rel) -and $manifest[$job.Rel].notes -match 'password=(\S+)') { $pw = $Matches[1] }
     $pdf = Join-Path $corpus $job.Rel.Replace('/', '\')
-    $a = @('-Xmx2g', '-Djava.awt.headless=true', "-Dpdf4d.render.name=$name", '-cp', "`"$cp`"", 'Pdf4DOracle', 'render', "`"$pdf`"", "$Dpi", "`"$target`"")
+    $a = @('-Xmx2g', '-Djava.awt.headless=true', "`"-Dpdf4d.render.name=$name`"", '-cp', "`"$cp`"", 'Pdf4DOracle', 'render', "`"$pdf`"", "$Dpi", "`"$target`"")
     # The password and the page are positional; <empty> stands for the empty password
     $a += $(if ($pw) { $pw } else { '<empty>' })
     $a += "$($job.Page)"
@@ -90,4 +90,8 @@ $loadErrors = @($listings | Where-Object { (Get-Content $_.FullName -TotalCount 
 $pageErrors = @($listings | Where-Object { (Get-Content $_.FullName) -match ' error ' })
 Write-Host ('{0} files, {1} PNG files, {2:N1} MB in total ({3:N1} MB of PNG)' -f $listings.Count, $pngs.Count, ((($pngs + $listings) | Measure-Object Length -Sum).Sum / 1MB), ($bytes / 1MB))
 Write-Host ('{0} files with a load error, {1} files with a page error' -f $loadErrors.Count, $pageErrors.Count)
-if ($timeouts) { Write-Host ('timeouts: ' + ($timeouts -join ', ')) }
+if ($timeouts) {
+    Write-Host ("timeouts: " + ($timeouts -join ", "))
+    Write-Error "$($timeouts.Count) files timed out, the references of those files are not usable: run again or raise -TimeoutSeconds"
+    exit 1
+}
