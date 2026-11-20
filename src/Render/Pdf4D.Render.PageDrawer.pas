@@ -84,6 +84,7 @@ type
     procedure ApplyClip;
     procedure PaintFill(const Path: TPdfPath; const FillRule: TPdfFillRule);
     procedure PaintStroke(const Path: TPdfPath);
+    procedure DrawStroke(const Path: TPdfPath; const Stroke: TPdfStrokeStyle; const Paint: TPdfPaint);
     function GlyphMatrix(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
                          const Displacement: TPdfVector): TPdfMatrix;
     procedure ShowFontGlyph(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer; const Displacement: TPdfVector);
@@ -142,7 +143,8 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Graphics.State,
   Pdf4D.Render.GlyphCache,
-  Pdf4D.Render.PageTransform;
+  Pdf4D.Render.PageTransform,
+  Pdf4D.Render.StrokeNormalizer;
 
 const
   Half = 0.5;
@@ -493,7 +495,18 @@ begin
 
   ApplyClip;
   const Paint = SolidPaint(RenderState.StrokingColor);
-  FDevice.StrokePath(Path, FPageToDevice, Stroke, Paint, StrokingComposite);
+  DrawStroke(Path, Stroke, Paint);
+end;
+
+// Java2D normalizes the geometry of a stroke, see TPdfStrokeNormalizer
+procedure TPdfPageDrawer.DrawStroke(const Path: TPdfPath; const Stroke: TPdfStrokeStyle; const Paint: TPdfPaint);
+begin
+  const Normalized = TPdfStrokeNormalizer.Normalize(Path, FPageToDevice);
+  try
+    FDevice.StrokePath(Normalized, FPageToDevice, Stroke, Paint, StrokingComposite);
+  finally
+    Normalized.Free;
+  end;
 end;
 
 procedure TPdfPageDrawer.StrokePath;
@@ -700,19 +713,22 @@ begin
 end;
 
 // The path of the font program to page space: the font matrix and the text rendering matrix, with the stretch of a glyph of a font that
-// is not embedded (drawGlyph). A vertical font is not stretched: its displacement has no horizontal part, which would flatten the glyph.
+// is not embedded (drawGlyph), when it is not a standard 14 font and has a width of its own in the PDF. A vertical font is not stretched: its
+// displacement has no horizontal part, which would flatten the glyph.
 function TPdfPageDrawer.GlyphMatrix(const TextRenderingMatrix: TPdfMatrix; const Font: TPDFont; const Code: Integer;
                                     const Displacement: TPdfVector): TPdfMatrix;
 begin
   Result := Font.GetFontMatrix.Multiply(TextRenderingMatrix);
-  if Font.IsEmbedded or Font.IsVertical then
+  const IsStretchable = ((not Font.IsEmbedded) and (not Font.IsVertical) and (not Font.IsStandard14) and Font.HasExplicitWidth(Code));
+  if not IsStretchable then
   begin
     Exit;
   end;
 
+  // PDFBOX-5611: a width of zero in the PDF is ignored
   const FontWidth = Font.GetWidthFromFont(Code);
   const PdfWidth = Displacement.X * Thousand;
-  if (FontWidth > 0) and (Abs(FontWidth - PdfWidth) > WidthTolerance) then
+  if (Displacement.X > 0) and (FontWidth > 0) and (Abs(FontWidth - PdfWidth) > WidthTolerance) then
   begin
     Result := TPdfMatrix.GetScaleInstance(PdfWidth / FontWidth, 1).Multiply(Result);
   end;
@@ -756,7 +772,7 @@ begin
   if Mode.IsStroke and HasSegments(GlyphPath) and TryBuildStroke(Stroke) then
   begin
     ApplyClip;
-    FDevice.StrokePath(GlyphPath, FPageToDevice, Stroke, SolidPaint(RenderState.StrokingColor), StrokingComposite);
+    DrawStroke(GlyphPath, Stroke, SolidPaint(RenderState.StrokingColor));
   end;
 
   if Mode.IsClip then

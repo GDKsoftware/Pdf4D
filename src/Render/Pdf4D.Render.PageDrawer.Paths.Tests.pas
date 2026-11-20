@@ -195,7 +195,8 @@ begin
   const Strokes = CallsOf(TRecordedCallKind.Stroke);
   Assert.AreEqual<Integer>(1, Length(Strokes));
   AssertNear(6, Strokes[0].Stroke.Width);
-  AssertBounds(0, 200, 100, 200, Strokes[0].DeviceBounds);
+  // Java2D moves the end points of a stroke to the centre of their pixel
+  AssertBounds(0.5, 200.5, 100.5, 200.5, Strokes[0].DeviceBounds);
 end;
 
 procedure TPageDrawerPathTests.TestZeroLineWidthBecomesQuarterPoint;

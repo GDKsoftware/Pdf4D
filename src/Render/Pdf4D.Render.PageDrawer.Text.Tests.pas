@@ -95,6 +95,12 @@ type
 
     [Test]
     procedure TestVerticalCidFont;
+
+    [Test]
+    procedure TestStandard14AliasIsNotStretched;
+
+    [Test]
+    procedure TestZeroPdfWidthIsNotStretched;
   end;
 
 implementation
@@ -359,8 +365,33 @@ begin
   const Vertical = Fills[1].DeviceBounds;
   AssertNear(Horizontal.Left - 500 / 2 / 1000 * 10, Vertical.Left);
   AssertNear(Horizontal.Top + 0.88 * 10, Vertical.Top);
-  // The horizontal glyph is stretched to the width of 500, the vertical one is not
-  Assert.IsTrue(Vertical.Width > Horizontal.Width);
+  // Neither glyph is stretched: the horizontal one has no width of its own in /W, only the default /DW, and the vertical one has no
+  // horizontal displacement
+  AssertNear(Horizontal.Width, Vertical.Width);
+end;
+
+// drawGlyph stretches the glyph of a font that is not embedded, but not one that PDFBox counts as a standard 14 font: the name
+// TimesNewRoman is an alias of Times-Roman. A font of another name is stretched to the width of the PDF.
+procedure TPageDrawerTextTests.TestStandard14AliasIsNotStretched;
+begin
+  const Resources = '/Font << /F1 << /Type /Font /Subtype /TrueType /BaseFont /TimesNewRoman /FirstChar 105 /LastChar 105 /Widths [1000] >> ' +
+                    '/F2 << /Type /Font /Subtype /TrueType /BaseFont /SomeOtherFont /FirstChar 105 /LastChar 105 /Widths [1000] >> >>';
+  Render('BT /F1 10 Tf 100 100 Td (i) Tj ET BT /F2 10 Tf 100 100 Td (i) Tj ET', Resources);
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(2, Length(Fills));
+  Assert.IsTrue(Fills[0].DeviceBounds.Width < Fills[1].DeviceBounds.Width, 'the alias keeps the width of the glyph, the other font is stretched');
+end;
+
+// PDFBOX-5611: a glyph with a width of zero in the PDF is not stretched to nothing
+procedure TPageDrawerTextTests.TestZeroPdfWidthIsNotStretched;
+begin
+  const Resources = '/Font << /F1 << /Type /Font /Subtype /TrueType /BaseFont /SomeOtherFont /FirstChar 105 /LastChar 105 /Widths [0] >> >>';
+  Render('BT /F1 10 Tf 100 100 Td (i) Tj ET', Resources);
+
+  const Fills = CallsOf(TRecordedCallKind.Fill);
+  Assert.AreEqual<Integer>(1, Length(Fills));
+  Assert.IsTrue(Fills[0].DeviceBounds.Width > 0.5);
 end;
 
 end.

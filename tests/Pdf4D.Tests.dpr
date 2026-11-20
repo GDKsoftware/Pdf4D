@@ -128,6 +128,8 @@ uses
   Pdf4D.Render.Device.Interfaces in '..\src\Render\Pdf4D.Render.Device.Interfaces.pas',
   Pdf4D.Render.ClipPath in '..\src\Render\Pdf4D.Render.ClipPath.pas',
   Pdf4D.Render.ClipPath.Tests in '..\src\Render\Pdf4D.Render.ClipPath.Tests.pas',
+  Pdf4D.Render.StrokeNormalizer in '..\src\Render\Pdf4D.Render.StrokeNormalizer.pas',
+  Pdf4D.Render.StrokeNormalizer.Tests in '..\src\Render\Pdf4D.Render.StrokeNormalizer.Tests.pas',
   Pdf4D.Render.Options in '..\src\Render\Pdf4D.Render.Options.pas',
   Pdf4D.Render.Renderer.Interfaces in '..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas',
   Pdf4D.Render.Options.Tests in '..\src\Render\Pdf4D.Render.Options.Tests.pas',

@@ -64,6 +64,7 @@ contains
   Pdf4D.Render.PageDrawer in '..\src\Render\Pdf4D.Render.PageDrawer.pas',
   Pdf4D.Render.PageTransform in '..\src\Render\Pdf4D.Render.PageTransform.pas',
   Pdf4D.Render.Renderer in '..\src\Render\Pdf4D.Render.Renderer.pas',
-  Pdf4D.Render.Renderer.Interfaces in '..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas';
+  Pdf4D.Render.Renderer.Interfaces in '..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas',
+  Pdf4D.Render.StrokeNormalizer in '..\src\Render\Pdf4D.Render.StrokeNormalizer.pas';
 
 end.
