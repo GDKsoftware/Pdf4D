@@ -157,6 +157,9 @@ type
     procedure ShowText(const Bytes: TBytes); virtual;
     // Called for operators without a processor. Nothing by default.
     procedure UnsupportedOperator(const Operator: TContentOperator; const Operands: TArray<TCosBase>); virtual;
+    // processTransparencyGroup: runs a form like ShowForm does, but on InitialState (not nil) as the only state of the new graphics stack;
+    // the engine owns it from the call on. For a subclass that draws a group with a changed state, without the checks of the Do operator.
+    procedure ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
 
   public
     constructor Create;
@@ -172,9 +175,6 @@ type
 
     procedure ShowTransparencyGroup(const Form: TPDFormXObject); virtual;
     procedure ShowForm(const Form: TPDFormXObject); virtual;
-    // Runs a form like ShowForm does, but on InitialState (not nil) as the only state of the new graphics stack; the engine owns it from
-    // the call on. For a subclass that draws a group with a changed state.
-    procedure ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
 
     // Runs Content with Resources (nil: those of the running stream) on the recursion guard, the budgets and the cache of
     // decoded form content that a form uses. Level is left to the caller, as in PDFBox where the Do operator keeps it.
