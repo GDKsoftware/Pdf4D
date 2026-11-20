@@ -3,7 +3,8 @@
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/shading/PDShading.java, PDShadingType1.java, PDShadingType2.java and
 // PDShadingType3.java (3.0.8), and pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/pattern/PDShadingPattern.java. The types 4 to
-// 7 are made as shadings without data of their own: the renderer paints nothing for them yet.
+// 7 are one class that gives the entries of the mesh data (PDTriangleBasedShadingType.java and PDMeshBasedShadingType.java); the
+// contexts of the renderer read the data.
 unit Pdf4D.Graphics.Shading;
 
 {$EXCESSPRECISION OFF}
@@ -13,6 +14,7 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
+  Pdf4D.Common.Log,
   Pdf4D.Common.Matrix,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
@@ -34,6 +36,7 @@ type
     FDictionary: TCosDictionary;
     FColorSpace: TPDColorSpace;
     FFunctions: TObjectList<TPDFunction>;
+    FLog: TPdfLog;
 
     class function CreateOfType(const ShadingType: Integer; const Dictionary: TCosDictionary): TPDShading; static;
     class function MakeColorSpace(const Dictionary: TCosDictionary; const Resources: TPDResources): TPDColorSpace; static;
@@ -70,20 +73,44 @@ type
     function AntiAlias: Boolean;
     // PDShading.evalFunction: the function, or for an array of functions one for each component
     function EvalFunction(const Input: TArray<Single>): TArray<Single>;
+    function HasFunction: Boolean;
+    // A warning in the log of the document; nothing without a log
+    procedure Warn(const Fmt: string; const Args: array of const);
   end;
 
-  // Types 4 to 7: the type only
+  // Types 4 to 7: the entries of the mesh data. The data itself is the stream of the shading.
   TPDShadingMesh = class(TPDShading)
   private
     FType: Integer;
+    FBitsPerCoordinate: Integer;
+    FBitsPerComponent: Integer;
+    FBitsPerFlag: Integer;
+    FVerticesPerRow: Integer;
+    FDecode: TArray<Single>;
 
   protected
     constructor InitializeMesh(const ShadingType: Integer; const Dictionary: TCosDictionary);
 
+    procedure ReadEntries; override;
     function NeedsFunction: Boolean; override;
 
   public
     function ShadingType: Integer; override;
+    // The number of values of a colour in the data: 1 with a function, else the components of the colour space
+    function ColorComponentCount: Integer;
+    // PDShadingType4.getDecodeForParameter: the range of the Parameter-th value of a vertex (0 x, 1 y, then the colour values); False
+    // when /Decode is too short for it
+    function TryGetDecode(const Parameter: Integer; out Minimum, Maximum: Single): Boolean;
+    // The bytes of the stream with the filters applied. False, with a warning, when the shading is a dictionary without data or
+    // the data cannot be read.
+    function TryReadData(out Data: TBytes): Boolean;
+
+    // -1 when the entry is missing; the renderer judges the values
+    property BitsPerCoordinate: Integer read FBitsPerCoordinate;
+    property BitsPerComponent: Integer read FBitsPerComponent;
+    property BitsPerFlag: Integer read FBitsPerFlag;
+    // Type 5 only
+    property VerticesPerRow: Integer read FVerticesPerRow;
   end;
 
   // Type 1, function-based: a function of (x, y) over the Domain, placed by Matrix
@@ -170,6 +197,7 @@ type
 implementation
 
 uses
+  System.Classes,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Names,
@@ -226,6 +254,7 @@ begin
   const Dictionary = TCosDictionary(Value);
   Result := CreateOfType(Dictionary.GetInt(TCosNames.ShadingType, 0), Dictionary);
   try
+    Result.FLog := Resources.Context.Log;
     Result.FColorSpace := MakeColorSpace(Dictionary, Resources);
     AddFunctions(Dictionary, Resources.Context, Result.FFunctions);
     if Result.NeedsFunction and (Result.FFunctions.Count = 0) then
@@ -413,12 +442,94 @@ begin
   end;
 end;
 
+function TPDShading.HasFunction: Boolean;
+begin
+  Result := (FFunctions.Count > 0);
+end;
+
+procedure TPDShading.Warn(const Fmt: string; const Args: array of const);
+begin
+  if Assigned(FLog) then
+  begin
+    FLog.Warning(Fmt, Args);
+  end;
+end;
+
 { TPDShadingMesh }
 
 constructor TPDShadingMesh.InitializeMesh(const ShadingType: Integer; const Dictionary: TCosDictionary);
 begin
   inherited Initialize(Dictionary);
   FType := ShadingType;
+end;
+
+procedure TPDShadingMesh.ReadEntries;
+begin
+  FBitsPerCoordinate := Dictionary.GetInt(TCosNames.BitsPerCoordinate, -1);
+  FBitsPerComponent := Dictionary.GetInt(TCosNames.BitsPerComponent, -1);
+  FBitsPerFlag := Dictionary.GetInt(TCosNames.BitsPerFlag, -1);
+  FVerticesPerRow := Dictionary.GetInt(TCosNames.VerticesPerRow, -1);
+  FDecode := FloatsOrDefault(TCosNames.Decode, 0, nil);
+end;
+
+function TPDShadingMesh.ColorComponentCount: Integer;
+begin
+  if HasFunction then
+  begin
+    Result := 1;
+  end
+  else
+  begin
+    Result := ColorSpace.NumberOfComponents;
+  end;
+end;
+
+function TPDShadingMesh.TryGetDecode(const Parameter: Integer; out Minimum, Maximum: Single): Boolean;
+begin
+  Minimum := 0;
+  Maximum := 0;
+  const HasRange = (Length(FDecode) >= (Parameter * 2 + 2));
+  if HasRange then
+  begin
+    Minimum := FDecode[Parameter * 2];
+    Maximum := FDecode[Parameter * 2 + 1];
+  end;
+  Result := HasRange;
+end;
+
+function TPDShadingMesh.TryReadData(out Data: TBytes): Boolean;
+begin
+  Data := nil;
+  Result := False;
+  if not (Dictionary is TCosStream) then
+  begin
+    Warn('The mesh shading has no data: it is a dictionary, not a stream', []);
+    Exit;
+  end;
+
+  try
+    const Decoded = TCosStream(Dictionary).CreateDecodedStream;
+    try
+      SetLength(Data, Decoded.Size);
+      if Length(Data) > 0 then
+      begin
+        Decoded.ReadBuffer(Data[0], Length(Data));
+      end;
+    finally
+      Decoded.Free;
+    end;
+    Result := True;
+  except
+    on Failure: Exception do
+    begin
+      if not TPdfFailure.IsInputFailure(Failure) then
+      begin
+        raise;
+      end;
+      Data := nil;
+      Warn('The data of a mesh shading cannot be read: %s', [Failure.Message]);
+    end;
+  end;
 end;
 
 function TPDShadingMesh.NeedsFunction: Boolean;

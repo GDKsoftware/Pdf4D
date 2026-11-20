@@ -233,10 +233,14 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Context.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Axial.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Radial.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Triangle.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Patch.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.ShadingBuilder.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Axial.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Radial.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Triangle.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Patch.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Function.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Shading.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>

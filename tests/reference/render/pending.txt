@@ -1,6 +1,5 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/shadings.pdf # Task 21: mesh shadings (types 4 to 7); the shadings of types 1 to 3 on both pages equal the reference
 generated/render/patterns.pdf # Task 22: tiling patterns
 pdfbox/input/rendering/survey.pdf # Task 22: tiling patterns
 generated/render/ccitt.pdf # Task 23: CCITTFax

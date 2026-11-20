@@ -74,6 +74,8 @@ contains
   Pdf4D.Render.Shading.Context in '..\src\Render\Pdf4D.Render.Shading.Context.pas',
   Pdf4D.Render.Shading.&Function in '..\src\Render\Pdf4D.Render.Shading.Function.pas',
   Pdf4D.Render.Shading.Radial in '..\src\Render\Pdf4D.Render.Shading.Radial.pas',
+  Pdf4D.Render.Shading.Triangle in '..\src\Render\Pdf4D.Render.Shading.Triangle.pas',
+  Pdf4D.Render.Shading.Patch in '..\src\Render\Pdf4D.Render.Shading.Patch.pas',
   Pdf4D.Render.SoftMaskPaint in '..\src\Render\Pdf4D.Render.SoftMaskPaint.pas',
   Pdf4D.Render.StrokeNormalizer in '..\src\Render\Pdf4D.Render.StrokeNormalizer.pas';
 

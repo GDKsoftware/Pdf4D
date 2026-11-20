@@ -64,19 +64,20 @@ type
 
   public
     // False when the pixel is not painted; Rgb as ConvertToRgb says
-    function TryGetPixel(const X, Y: Integer; out Rgb: Integer): Boolean;
+    function TryGetPixel(const X, Y: Integer; out Rgb: Integer): Boolean; virtual;
   end;
 
   TPdfShadingRasterizer = class
   private
     class function CreateContext(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect): TPdfShadingContext; static;
+    class function CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect): TPdfShadingContext; static;
     class procedure PaintRows(const Context: TPdfShadingContext; const DeviceArea: TRect; const Cancel: IPdfCancelToken; const Bitmap: TPdfBitmap); static;
 
   public
     // Paints the shading into a bitmap that covers DeviceArea (device pixels), opaque where the shading has a colour and transparent
     // elsewhere. ShadingToDevice is the CTM (or the pattern matrix after the initial matrix) with the transform of the page. The cancel
-    // token is asked before every row; a cancelled run gives the rows it has made. A shading of the types 4 to 7 gives a transparent
-    // bitmap. Raises EArgumentOutOfRangeException when DeviceArea is empty or too large for a bitmap. Cancel may be nil. The caller owns
+    // token is asked before every row; a cancelled run gives the rows it has made. A mesh shading (the types 4 to 7) paints its triangles and
+    // patches; one without usable data gives a transparent bitmap. Raises EArgumentOutOfRangeException when DeviceArea is empty or too large for a bitmap. Cancel may be nil. The caller owns
     // the result.
     class function Rasterize(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
                              const Cancel: IPdfCancelToken): TPdfBitmap; static;
@@ -89,7 +90,9 @@ uses
   System.Math,
   Pdf4D.Render.Shading.Axial,
   Pdf4D.Render.Shading.&Function,
-  Pdf4D.Render.Shading.Radial;
+  Pdf4D.Render.Shading.Patch,
+  Pdf4D.Render.Shading.Radial,
+  Pdf4D.Render.Shading.Triangle;
 
 const
   ByteScale = 255;
@@ -200,6 +203,23 @@ begin
   else if Shading is TPDShadingType3 then
   begin
     Result := TPdfRadialShadingContext.Create(TPDShadingType3(Shading), ShadingToDevice, DeviceArea);
+  end
+  else if Shading is TPDShadingMesh then
+  begin
+    Result := CreateMeshContext(TPDShadingMesh(Shading), ShadingToDevice, DeviceArea);
+  end;
+end;
+
+class function TPdfShadingRasterizer.CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix;
+                                                       const DeviceArea: TRect): TPdfShadingContext;
+begin
+  case Shading.ShadingType of
+    4 : Result := TPdfType4ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
+    5 : Result := TPdfType5ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
+    6 : Result := TPdfType6ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
+    7 : Result := TPdfType7ShadingContext.Create(Shading, ShadingToDevice, DeviceArea);
+  else
+    raise EArgumentOutOfRangeException.CreateFmt('A mesh shading is of the type 4 to 7, not %d', [Shading.ShadingType]);
   end;
 end;
 
