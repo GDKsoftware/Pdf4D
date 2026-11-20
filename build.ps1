@@ -6,15 +6,25 @@ param(
     [string]$Config = 'Debug',
 
     # The Linux64 SDK folder; by default the one the IDE has registered as the default Linux64 SDK
-    [string]$LinuxSdkPath
+    [string]$LinuxSdkPath,
+
+    # Build and run one test project only; the packages are always built
+    [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'All')]
+    [string]$Suite = 'All'
 )
 
 $ErrorActionPreference = 'Stop'
 
 $RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
 $WslDistro = 'Ubuntu'
-$ProjectFile = Join-Path $PSScriptRoot 'tests\Pdf4D.Tests.dproj'
-$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$BdsFolder = Split-Path -Parent (Split-Path -Parent $RsVars)
+
+# The tests of the core and the renderer run without Skia; the Skia tests get the Skia library next to their program
+$TestProjects = @(
+    @{ Name = 'Pdf4D.Tests'; Folder = 'tests'; NeedsSkia = $false },
+    @{ Name = 'Pdf4D.Skia.Tests'; Folder = 'tests\Skia'; NeedsSkia = $true }
+)
+$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
@@ -51,9 +61,10 @@ function Invoke-PackageBuild([string]$TargetPlatform) {
     }
 }
 
-function Invoke-Build([string]$TargetPlatform) {
-    Write-Host "=== Build $TargetPlatform $Config ==="
-    $output = Invoke-MsBuild $ProjectFile $TargetPlatform
+function Invoke-Build($TestProject, [string]$TargetPlatform) {
+    Write-Host "=== Build $($TestProject.Name) $TargetPlatform $Config ==="
+    $projectFile = Join-Path $PSScriptRoot "$($TestProject.Folder)\$($TestProject.Name).dproj"
+    $output = Invoke-MsBuild $projectFile $TargetPlatform
     Test-NoBuildProblems $output $TargetPlatform
 }
 # Shared state is published lazily and freed by class destructors; initialization and finalization sections are not allowed
@@ -125,21 +136,56 @@ function Get-WslPath([string]$WindowsPath) {
     return $linuxPath
 }
 
-function Invoke-Tests([string]$TargetPlatform) {
-    Write-Host "=== Test $TargetPlatform $Config ==="
-    $outputFolder = Join-Path $PSScriptRoot "tests\$TargetPlatform\$Config"
+# The library that System.Skia loads at run time, from the RAD Studio redistributables
+function Get-SkiaLibraryPath([string]$TargetPlatform) {
+    $relativePath = switch ($TargetPlatform) {
+        'Win32'   { 'Redist\win32\sk4d.dll' }
+        'Win64'   { 'Redist\win64\sk4d.dll' }
+        'Linux64' { 'Redist\linux64\libsk4d.so' }
+    }
+    $libraryPath = Join-Path $BdsFolder $relativePath
+    if (-not (Test-Path -LiteralPath $libraryPath)) {
+        throw "The Skia library for $TargetPlatform is missing: $libraryPath"
+    }
+    return $libraryPath
+}
+
+# SafeLoadLibrary does not look in the folder of the program on Linux, so the test run gets LD_LIBRARY_PATH; the dependencies of
+# libsk4d.so must be there as well
+function Test-SkiaLibraryDependencies([string]$LinuxLibrary) {
+    $dependencies = & wsl -d $WslDistro -- ldd $LinuxLibrary | ForEach-Object { "$_" }
+    $missing = $dependencies | Where-Object { $_ -match 'not found' } | ForEach-Object { ($_ -split '=>')[0].Trim() }
+    if ($missing) {
+        throw "libsk4d.so cannot be loaded in WSL, these libraries are missing: $($missing -join ', '). Install them in the $WslDistro distribution with apt, for example: sudo apt install libfontconfig1 libfreetype6 libgl1"
+    }
+}
+
+function Invoke-Tests($TestProject, [string]$TargetPlatform) {
+    Write-Host "=== Test $($TestProject.Name) $TargetPlatform $Config ==="
+    $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
+
+    if ($TestProject.NeedsSkia) {
+        Copy-Item -LiteralPath (Get-SkiaLibraryPath $TargetPlatform) -Destination $outputFolder -Force
+    }
 
     if ($TargetPlatform -eq 'Linux64') {
-        $linuxBinary = Get-WslPath (Join-Path $outputFolder 'Pdf4D.Tests')
+        $linuxBinary = Get-WslPath (Join-Path $outputFolder $TestProject.Name)
         & wsl -d $WslDistro -- chmod +x $linuxBinary
-        & wsl -d $WslDistro -- $linuxBinary
+        if ($TestProject.NeedsSkia) {
+            $linuxFolder = Get-WslPath $outputFolder
+            Test-SkiaLibraryDependencies "$linuxFolder/libsk4d.so"
+            & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary
+        }
+        else {
+            & wsl -d $WslDistro -- $linuxBinary
+        }
     }
     else {
-        & (Join-Path $outputFolder 'Pdf4D.Tests.exe')
+        & (Join-Path $outputFolder "$($TestProject.Name).exe")
     }
 
     if ($LASTEXITCODE -ne 0) {
-        throw "Tests failed for $TargetPlatform (exit code $LASTEXITCODE)"
+        throw "Tests of $($TestProject.Name) failed for $TargetPlatform (exit code $LASTEXITCODE)"
     }
 }
 
@@ -154,8 +200,10 @@ if ($platforms -contains 'Linux64') {
 
 foreach ($targetPlatform in $platforms) {
     Invoke-PackageBuild $targetPlatform
-    Invoke-Build $targetPlatform
-    Invoke-Tests $targetPlatform
+    foreach ($testProject in ($TestProjects | Where-Object { $Suite -eq 'All' -or $_.Name -eq $Suite })) {
+        Invoke-Build $testProject $targetPlatform
+        Invoke-Tests $testProject $targetPlatform
+    }
 }
 
 Write-Host 'All platforms OK'

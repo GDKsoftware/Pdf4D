@@ -1,0 +1,45 @@
+﻿// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+package Pdf4D.Render.Skia;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Pdf4D Skia render backend'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  Skia.Package.RTL,
+  Pdf4D,
+  Pdf4D.Render;
+
+contains
+  Pdf4D.Render.Skia.Convert in '..\src\Render\Skia\Pdf4D.Render.Skia.Convert.pas',
+  Pdf4D.Render.Skia.Device in '..\src\Render\Skia\Pdf4D.Render.Skia.Device.pas',
+  Pdf4D.Render.Skia.Backend in '..\src\Render\Skia\Pdf4D.Render.Skia.Backend.pas';
+
+end.
