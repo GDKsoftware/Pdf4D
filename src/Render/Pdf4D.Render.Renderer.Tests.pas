@@ -39,9 +39,11 @@ type
   TSlowRasterDevice = class(TInterfacedObject, IPdfRasterDevice)
   private
     FInner: IPdfRasterDevice;
+    FFillCount: PInteger;
 
   public
-    constructor Create(const Inner: IPdfRasterDevice);
+    // FillCount counts the fills (atomically); the caller keeps it alive as long as the device lives
+    constructor Create(const Inner: IPdfRasterDevice; const FillCount: PInteger);
 
     function Width: Integer;
     function Height: Integer;
@@ -59,9 +61,16 @@ type
   end;
 
   TSlowBackend = class(TInterfacedObject, IPdfRenderBackend)
+  private
+    FFillCount: Integer;
+
+    function GetFillCount: Integer;
+
   public
     function Name: string;
     function CreateRasterDevice(const Width, Height: Integer): IPdfRasterDevice;
+
+    property FillCount: Integer read GetFillCount;
   end;
 
   [TestFixture]
@@ -142,6 +151,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Diagnostics,
+  System.SyncObjs,
   Pdf4D.Api.Attachment.Interfaces,
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
@@ -191,10 +201,11 @@ end;
 
 { TSlowRasterDevice }
 
-constructor TSlowRasterDevice.Create(const Inner: IPdfRasterDevice);
+constructor TSlowRasterDevice.Create(const Inner: IPdfRasterDevice; const FillCount: PInteger);
 begin
   inherited Create;
   FInner := Inner;
+  FFillCount := FillCount;
 end;
 
 function TSlowRasterDevice.Width: Integer;
@@ -217,6 +228,7 @@ procedure TSlowRasterDevice.FillPath(const Path: TPdfPath; const Transform: TPdf
 begin
   Sleep(1);
   FInner.FillPath(Path, Transform, FillRule, Paint, Composite);
+  TInterlocked.Increment(FFillCount^);
 end;
 
 procedure TSlowRasterDevice.StrokePath(const Path: TPdfPath; const Transform: TPdfMatrix; const Stroke: TPdfStrokeStyle; const Paint: TPdfPaint;
@@ -260,7 +272,12 @@ end;
 
 function TSlowBackend.CreateRasterDevice(const Width, Height: Integer): IPdfRasterDevice;
 begin
-  Result := TSlowRasterDevice.Create(TRecordingDevice.Create(Width, Height));
+  Result := TSlowRasterDevice.Create(TRecordingDevice.Create(Width, Height), @FFillCount);
+end;
+
+function TSlowBackend.GetFillCount: Integer;
+begin
+  Result := TInterlocked.CompareExchange(FFillCount, 0, 0);
 end;
 
 { TUnrelatedDocument }
@@ -533,7 +550,9 @@ end;
 procedure TPdfRendererTests.TestCancelFromOtherThreadStopsRender;
 begin
   FDocument := FDocuments.Open(ManyRectangles(100000), '');
-  FRenderer := TPdfRenderer.Create(FDocument, TSlowBackend.Create);
+  const Backend = TSlowBackend.Create;
+  const BackendReference: IPdfRenderBackend = Backend;
+  FRenderer := TPdfRenderer.Create(FDocument, BackendReference);
   const Token = TPdfCancelToken.Create;
   const Reference: IPdfCancelToken = Token;
   var Params := TPdfRenderParams.Create(1);
@@ -543,7 +562,12 @@ begin
   const Canceller = TThread.CreateAnonymousThread(
     procedure
     begin
-      Sleep(50);
+      // Cancels once the page is being drawn, so that the render is stopped in the middle and not before it starts
+      const Watch = TStopwatch.StartNew;
+      while (Backend.FillCount = 0) and (Watch.ElapsedMilliseconds < 20000) do
+      begin
+        Sleep(1);
+      end;
       CancelledAt := TStopwatch.GetTimeStamp;
       Token.Cancel;
     end);
@@ -557,6 +581,8 @@ begin
     Assert.AreEqual(TPdfRenderStatus.Cancelled, Status);
     Assert.IsNull(Bitmap);
     Assert.IsTrue(Elapsed < TStopwatch.Frequency, 'The render took more than a second to stop');
+    Assert.IsTrue(Backend.FillCount > 0, 'The cancel came after the first fill, not before the render started');
+    Assert.IsTrue(Backend.FillCount < 100000, 'The cancel stopped the render before the last fill');
   finally
     Canceller.WaitFor;
     Canceller.Free;

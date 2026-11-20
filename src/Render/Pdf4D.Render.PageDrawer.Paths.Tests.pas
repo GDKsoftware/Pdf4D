@@ -32,6 +32,7 @@ type
     FDeviceReference: IPdfRasterDevice;
 
     procedure Render(const Content: string; const Resources: string = '');
+    function HasLogLine(const Fragment: string): Boolean;
     function CallsOf(const Kind: TRecordedCallKind): TArray<TRecordedCall>;
     procedure AssertNear(const Expected, Actual: Single);
     procedure AssertBounds(const Left, Top, Right, Bottom: Single; const Actual: TRectF);
@@ -81,6 +82,9 @@ type
 
     [Test]
     procedure TestHugeCoordinatesDoNotRaise;
+
+    [Test]
+    procedure TestColorSpaceNameCycleDoesNotHang;
 
     [Test]
     procedure TestRestoreGoesBackToTheEarlierClip;
@@ -300,13 +304,33 @@ end;
 
 procedure TPageDrawerPathTests.TestHugeCoordinatesDoNotRaise;
 begin
-  const Huge = '1' + StringOfChar('0', 30) + '.0';
-  const Huger = '2' + StringOfChar('0', 30) + '.0';
+  // 3e38 is the largest Single that a number gives; after the CTM the points are beyond the range of a Single
+  const Scale = '3' + StringOfChar('0', 38) + '.0';
 
-  Render(Format('%s %s m %s 0 l S', [Huge, Huge, Huger]));
-  Render(Format('%s %s m %s 0 l f', [Huge, Huge, Huger]));
+  Render(Format('%s 0 0 %s 0 0 cm 100 100 m 200 0 l S 100 100 m 200 0 l f', [Scale, Scale]));
 
-  Assert.Pass;
+  Assert.AreEqual<Integer>(0, Length(CallsOf(TRecordedCallKind.Stroke)), 'no stroke');
+  Assert.AreEqual<Integer>(0, Length(CallsOf(TRecordedCallKind.Fill)), 'no fill');
+  Assert.IsTrue(HasLogLine('does not give a finite coordinate'), string.Join('|', FDocuments.LogLines.ToArray));
+end;
+
+procedure TPageDrawerPathTests.TestColorSpaceNameCycleDoesNotHang;
+begin
+  const Cycle = '/ColorSpace << /A /B /B /A /S /S >>';
+
+  Render('/A cs 0 0 10 10 re f', Cycle);
+  Render('/S cs 0 0 10 10 re f', Cycle);
+
+  Assert.IsTrue(HasLogLine('Colour spaces are nested deeper'), string.Join('|', FDocuments.LogLines.ToArray));
+end;
+
+function TPageDrawerPathTests.HasLogLine(const Fragment: string): Boolean;
+begin
+  Result := False;
+  for var Line in FDocuments.LogLines do
+  begin
+    Result := (Result or Line.Contains(Fragment));
+  end;
 end;
 
 procedure TPageDrawerPathTests.TestRestoreGoesBackToTheEarlierClip;
