@@ -173,7 +173,6 @@ resourcestring
   WithoutMoveTo = '%s (%g, %g) without initial MoveTo';
   CloseWithoutMoveTo = 'ClosePath without initial MoveTo';
   ShadingNameMissing = 'Operator %s needs a shading name';
-  ShadingNotSupported = 'Painting shadings is not supported yet: sh is skipped';
 
 const
   RectangleOperands = 4;
@@ -582,7 +581,7 @@ begin
     raise EPdfMissingOperandException.CreateFmt(ShadingNameMissing, [Operator.Name]);
   end;
 
-  Engine.LogWarning(ShadingNotSupported, []);
+  GraphicsEngine.ShadingFill(TCosName(Operands[0]).Name);
 end;
 
 end.

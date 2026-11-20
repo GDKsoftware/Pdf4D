@@ -255,13 +255,14 @@ begin
   Assert.IsFalse(Fills[0].HasSoftMask);
 end;
 
-// The box (0, 0)-(100, 100) of the page is (0, 100)-(100, 200) of the device, and the content of a group lies one pixel lower
+// The box (0, 0)-(100, 100) of the page is (0, 100)-(100, 200) of the device. A group that is drawn lies one pixel lower than its box (see
+// the group tests); the references show that the mask of a soft mask does not.
 procedure TPageDrawerSoftMaskTests.TestMaskCoversTheBoxOfTheGroup;
 begin
   RenderMasked(MaskedFill);
 
   const Fills = CallsOfKind(FDevice, TRecordedCallKind.Fill);
-  Assert.AreEqual(TRect.Create(0, 101, 100, 201), Fills[0].SoftMaskRectangle);
+  Assert.AreEqual(TRect.Create(0, 100, 100, 200), Fills[0].SoftMaskRectangle);
   Assert.AreEqual<Integer>(100 * 100, Length(Fills[0].SoftMaskValues));
 end;
 

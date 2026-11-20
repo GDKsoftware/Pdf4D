@@ -24,6 +24,8 @@ type
     function ResolveColorSpace(const SpaceName: string): TPDColorSpace;
     // The colour that the operands, which are all numbers, make in Space
     function MakeColor(const Space: TPDColorSpace; const Operands: TArray<TCosBase>): TPDColor;
+    // The colour of a pattern: the name that ends the operands, or no name (which paints nothing) when the operands have none
+    function PatternColor(const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
   end;
 
   // The operators of the two kinds (stroking and non-stroking) of colour differ only in the part of the state they work on
@@ -137,11 +139,12 @@ uses
   Pdf4D.Cos.Number,
   Pdf4D.Graphics.Color.Device,
   Pdf4D.Graphics.Color.Factory,
+  Pdf4D.Graphics.Color.Pattern,
   Pdf4D.Graphics.State;
 
 resourcestring
   ColorSpaceNotSupported = 'The colour space /%s is not supported yet, DeviceGray is used instead: %s';
-  PatternColorNotSupported = 'Pattern colours are not supported yet: %s skipped';
+  ColorNameNeedsPatternSpace = 'The colour of %s is a name, which needs the Pattern colour space: skipped';
 
 { TColorOperators }
 
@@ -193,18 +196,35 @@ begin
   Result := TPDColor.Create(Space, Components);
 end;
 
+function TColorOperatorProcessor.PatternColor(const Operands: TArray<TCosBase>; const HasName: Boolean): TPDColor;
+begin
+  var PatternName := '';
+  if HasName then
+  begin
+    PatternName := TCosName(Operands[High(Operands)]).Name;
+  end;
+
+  Result := TPDPattern.ColorOf(PatternName);
+end;
+
 { TSetColorOperator }
 
 procedure TSetColorOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
-  const IsPatternColor = ((Length(Operands) > 0) and (Operands[High(Operands)] is TCosName));
-  if IsPatternColor then
+  const Space = GetColorSpace;
+  const HasName = ((Length(Operands) > 0) and (Operands[High(Operands)] is TCosName));
+  if Space is TPDPattern then
   begin
-    Engine.LogWarning(PatternColorNotSupported, [Operator.Name]);
+    SetColor(PatternColor(Operands, HasName));
     Exit;
   end;
 
-  const Space = GetColorSpace;
+  if HasName then
+  begin
+    Engine.LogWarning(ColorNameNeedsPatternSpace, [Operator.Name]);
+    Exit;
+  end;
+
   RequireOperands(Operator, Operands, Space.NumberOfComponents);
   if not CheckArrayTypes(Operands, TCosNumber) then
   begin

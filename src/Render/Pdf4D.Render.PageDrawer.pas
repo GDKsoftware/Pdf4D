@@ -5,7 +5,8 @@
 // strokePath, fillPath, fillAndStrokePath, clip, adjustClip, endPath and the path construction; the paint is the solid colour of
 // getPaint, and showFontGlyph, drawGlyph, beginText, endText, beginTextClip and endTextClip, and drawImage and drawBufferedImage with the
 // transfer function and the soft mask of the graphics state (the soft mask itself is made by Pdf4D.Render.SoftMaskPaint), and showTransparencyGroup
-// with the inner class TransparencyGroup (bounds, backdrop, the group of a soft mask) and hasBlendMode. Shadings and patterns are not drawn yet.
+// with the inner class TransparencyGroup (bounds, backdrop, the group of a soft mask) and hasBlendMode, and shadingFill, intersectShadingBBox and the shading
+// paint of getPaint (shading patterns as fill and stroke colour; the shading itself is made by Pdf4D.Render.Shading.Context). Tiling patterns are not drawn yet.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph and
 // showType3Glyph
 unit Pdf4D.Render.PageDrawer;
@@ -26,6 +27,7 @@ uses
   Pdf4D.Font.Type3,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.Image,
+  Pdf4D.Graphics.Shading,
   Pdf4D.Graphics.SoftMask,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
@@ -38,6 +40,9 @@ uses
   Pdf4D.Render.Renderer.Interfaces;
 
 type
+  // What is done with the paint of a pattern while its bitmap exists
+  TPdfPaintAction = reference to procedure(const Paint: TPdfPaint);
+
   // Draws one page on a device. The page is drawn in page space: the path of an operator is kept after the CTM, and the device gets it
   // with the matrix from page space to device pixels (the scale, the rotation, the flip and the offset of the region).
   TPdfPageDrawer = class(TPdfGraphicsEngine)
@@ -82,6 +87,9 @@ type
     FCachedMaskWidth: Integer;
     FCachedMaskHeight: Integer;
     FCachedMask: TPdfAlphaMask;
+    // The shadings and shading patterns that were made, by the dictionary they come from; a nil value is one that could not be made
+    FShadings: TObjectDictionary<TCosDictionary, TPDShading>;
+    FShadingPatterns: TObjectDictionary<TCosDictionary, TPDShadingPattern>;
 
     function TransformWidth(const Width: Single): Single;
     function PlainNonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
@@ -92,6 +100,18 @@ type
     function IsSoftMaskCached(const Mask: IPdfSoftMask): Boolean;
     function BuildSoftMask(const Mask: IPdfSoftMask): TPdfAlphaMask;
     function SolidPaint(const Color: TPDColor): TPdfPaint;
+    function TryGetShading(const Value: TCosBase; out Shading: TPDShading): Boolean;
+    function TryGetShadingPattern(const Color: TPDColor; out Pattern: TPDShadingPattern): Boolean;
+    class function IsPatternColor(const Color: TPDColor): Boolean; static;
+    class function DeviceBoundsOf(const Path: TPdfPath; const Transform: TPdfMatrix): TRectF; static;
+    class function WholePixels(const Area: TRectF): TRect; static;
+    function StrokeBoundsOf(const Path: TPdfPath; const Stroke: TPdfStrokeStyle): TRectF;
+    function TryGetPatternArea(const Bounds: TRectF; const BoxPath: TPdfPath; out Area: TRect): Boolean;
+    procedure WithPatternPaint(const Color: TPDColor; const Bounds: TRectF; const Action: TPdfPaintAction);
+    procedure PaintShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect; const Action: TPdfPaintAction);
+    procedure FillShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect; const BoxPath: TPdfPath);
+    procedure FillWithColor(const Path: TPdfPath; const FillRule: TPdfFillRule; const Color: TPDColor; const IsAntiAliased: Boolean);
+    procedure StrokeWithColor(const Path: TPdfPath; const Stroke: TPdfStrokeStyle; const Color: TPDColor);
     function TryBuildStroke(out Stroke: TPdfStrokeStyle): Boolean;
     function TryBuildDashes(out Dashes: TArray<Single>; out Phase: Single): Boolean;
     function PathAround(const Rect: TPdfRectangle; const Transform: TPdfMatrix): TPdfPath;
@@ -148,10 +168,10 @@ type
 
     procedure DrawPage;
     // Draws the group of a soft mask on a layer of its own, which starts with Backdrop when HasBackdrop. Ctm replaces the CTM of the state,
-    // the state is that of the caller without soft mask. The layer lies at Bounds, and its content Shift lower (see GroupShift). False when
-    // nothing of the group is in the device. The caller owns Image.
+    // the state is that of the caller without soft mask. The layer lies at Bounds; unlike a group that is drawn, the content of a soft mask is
+    // not lower (the references show the mask exactly on the box). False when nothing of the group is in the device. The caller owns Image.
     function TryRenderMaskGroup(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const HasBackdrop: Boolean; const Backdrop: TPdfDeviceColor;
-                                out Bounds: TRect; out Shift: Single; out Image: TPdfBitmap): Boolean;
+                                out Bounds: TRect; out Image: TPdfBitmap): Boolean;
 
     procedure BeginText; override;
     procedure EndText; override;
@@ -186,17 +206,21 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfArray,
+  Pdf4D.Graphics.Color.Pattern,
   Pdf4D.Graphics.State,
   Pdf4D.Model.ExtendedGraphicsState,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.GlyphCache,
   Pdf4D.Render.ImageScaler,
   Pdf4D.Render.PageTransform,
+  Pdf4D.Render.Shading.Context,
   Pdf4D.Render.SoftMaskPaint,
   Pdf4D.Render.StrokeNormalizer;
 
 const
   Half = 0.5;
+  // A square cap reaches further than half the width in its corners
+  SquareCapReach = 1.5;
   LargestStyleCode = 2;
   // A glyph of a font that is not embedded is made as wide as the PDF says (in thousandths of text space)
   Thousand = 1000;
@@ -220,6 +244,8 @@ begin
   FLinePath := TPdfPath.Create;
   FTextClip := TPdfPath.Create;
   FLoggedMissingGlyphs := TDictionary<Int64, Boolean>.Create;
+  FShadings := TObjectDictionary<TCosDictionary, TPDShading>.Create([doOwnsValues]);
+  FShadingPatterns := TObjectDictionary<TCosDictionary, TPDShadingPattern>.Create([doOwnsValues]);
 
   const Transform = TPdfPageTransform.Create(Page.CropBox, Page.Rotation + Params.ExtraRotation, Params.Scale);
   const Whole = Transform.PageToDevice;
@@ -232,6 +258,8 @@ end;
 
 destructor TPdfPageDrawer.Destroy;
 begin
+  FShadingPatterns.Free;
+  FShadings.Free;
   FCachedMask.Free;
   FLoggedMissingGlyphs.Free;
   FTextClip.Free;
@@ -412,6 +440,213 @@ end;
 function TPdfPageDrawer.SolidPaint(const Color: TPDColor): TPdfPaint;
 begin
   Result := TPdfPaint.Solid(Color.ToRgb.ToDeviceColor);
+end;
+
+class function TPdfPageDrawer.IsPatternColor(const Color: TPDColor): Boolean;
+begin
+  Result := (Assigned(Color.ColorSpace) and (Color.ColorSpace is TPDPattern));
+end;
+
+// A shading is made once for the page, however often it is painted: its functions may hold large tables. One that cannot be made is
+// logged once.
+function TPdfPageDrawer.TryGetShading(const Value: TCosBase; out Shading: TPDShading): Boolean;
+begin
+  const Key = TCosDictionary(Value);
+  if FShadings.TryGetValue(Key, Shading) then
+  begin
+    Exit(Assigned(Shading));
+  end;
+
+  try
+    Shading := TPDShading.Create(Value, Resources);
+  except
+    on Failure: EPdfException do
+    begin
+      Shading := nil;
+      LogError('A shading is skipped: %s', [Failure.Message]);
+    end;
+  end;
+  FShadings.Add(Key, Shading);
+  Result := Assigned(Shading);
+end;
+
+// getPattern of PDPattern for the pattern colour. A pattern that is missing or that is no shading pattern gives False (PDFBox fails
+// and the operator paints nothing); the tiling patterns are painted by a later task.
+function TPdfPageDrawer.TryGetShadingPattern(const Color: TPDColor; out Pattern: TPDShadingPattern): Boolean;
+begin
+  Pattern := nil;
+  var Value: TCosBase;
+  if not Resources.TryGetPattern(Color.PatternName, Value) then
+  begin
+    LogError('The pattern ''%s'' was not found, nothing is painted', [Color.PatternName]);
+    Exit(False);
+  end;
+
+  const Key = TCosDictionary(Value);
+  if FShadingPatterns.TryGetValue(Key, Pattern) then
+  begin
+    Exit(Assigned(Pattern));
+  end;
+
+  try
+    Pattern := TPDShadingPattern.Create(Value, Resources);
+  except
+    on Failure: EPdfException do
+    begin
+      Pattern := nil;
+      LogError('The pattern ''%s'' is skipped: %s', [Color.PatternName, Failure.Message]);
+    end;
+  end;
+  FShadingPatterns.Add(Key, Pattern);
+  Result := Assigned(Pattern);
+end;
+
+class function TPdfPageDrawer.DeviceBoundsOf(const Path: TPdfPath; const Transform: TPdfMatrix): TRectF;
+begin
+  const DevicePath = Path.Clone;
+  try
+    DevicePath.Transform(Transform);
+    Result := DevicePath.Bounds;
+  finally
+    DevicePath.Free;
+  end;
+end;
+
+class function TPdfPageDrawer.WholePixels(const Area: TRectF): TRect;
+begin
+  Result := TRect.Create(Floor(Area.Left), Floor(Area.Top), Ceil(Area.Right), Ceil(Area.Bottom));
+end;
+
+// The bounds that the paint context of Java2D gets for a stroke are those of the stroked shape; the outline is not made here, so the
+// bounds of the path are widened by what the line can reach
+function TPdfPageDrawer.StrokeBoundsOf(const Path: TPdfPath; const Stroke: TPdfStrokeStyle): TRectF;
+begin
+  const Bounds = DeviceBoundsOf(Path, FPageToDevice);
+  const ScaleOfX = Sqrt(Sqr(Double(FPageToDevice.ScaleX)) + Sqr(Double(FPageToDevice.ShearY)));
+  const ScaleOfY = Sqrt(Sqr(Double(FPageToDevice.ShearX)) + Sqr(Double(FPageToDevice.ScaleY)));
+  var Reach: Double := SquareCapReach;
+  if Stroke.Join = TPdfLineJoin.Miter then
+  begin
+    Reach := Max(Reach, Double(Stroke.MiterLimit));
+  end;
+
+  const Margin = Single(Stroke.Width * Half * Reach * Max(ScaleOfX, ScaleOfY) + 1);
+  Result := TRectF.Create(Bounds.Left - Margin, Bounds.Top - Margin, Bounds.Right + Margin, Bounds.Bottom + Margin);
+end;
+
+// The device area that a pattern is painted on: what is painted (Bounds), the device, the BBox of the shading (BoxPath, in page space, may
+// be nil) and the clip. False when there is nothing of it to paint.
+function TPdfPageDrawer.TryGetPatternArea(const Bounds: TRectF; const BoxPath: TPdfPath; out Area: TRect): Boolean;
+begin
+  Area := TRect.Empty;
+  const IsFiniteBounds = (not (IsNan(Bounds.Left) or IsInfinite(Bounds.Left) or IsNan(Bounds.Top) or IsInfinite(Bounds.Top) or
+                               IsNan(Bounds.Right) or IsInfinite(Bounds.Right) or IsNan(Bounds.Bottom) or IsInfinite(Bounds.Bottom)));
+  if not IsFiniteBounds then
+  begin
+    Exit(False);
+  end;
+
+  var Whole := TRectF.Intersect(TRectF.Create(0, 0, FDevice.Width, FDevice.Height), Bounds);
+  if Assigned(BoxPath) then
+  begin
+    if not IsFinitePath(BoxPath) then
+    begin
+      LogError('A shading is skipped: its bounding box does not give finite coordinates', []);
+      Exit(False);
+    end;
+    Whole := TRectF.Intersect(Whole, DeviceBoundsOf(BoxPath, FPageToDevice));
+  end;
+
+  Whole := IntersectedWithClips(Whole);
+  if Whole.IsEmpty then
+  begin
+    Exit(False);
+  end;
+
+  Area := WholePixels(Whole);
+  Result := (not Area.IsEmpty);
+end;
+
+// The bitmap of the shading, as the paint of Action. The bitmap is gone when Action ends.
+procedure TPdfPageDrawer.PaintShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect;
+                                          const Action: TPdfPaintAction);
+begin
+  const Bitmap = TPdfShadingRasterizer.Rasterize(Shading, ShadingToDevice, Area, FParams.Cancel);
+  try
+    Action(TPdfPaint.FromBitmap(Bitmap, TPdfMatrix.GetTranslateInstance(Area.Left, Area.Top), TPdfTileMode.Decal, TPdfImageFilter.Nearest));
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+// getPaint for a shading pattern, with intersectShadingBBox: the pattern is the shading placed by its matrix in the initial space of
+// the stream, and the box of the shading cuts what is painted. PDFBox intersects the Area of the shape with the box; here the device
+// gets the box as one more link of the clip, which cuts without anti-aliasing. Action paints with the paint and the clip that was made.
+procedure TPdfPageDrawer.WithPatternPaint(const Color: TPDColor; const Bounds: TRectF; const Action: TPdfPaintAction);
+begin
+  var Pattern: TPDShadingPattern;
+  if not TryGetShadingPattern(Color, Pattern) then
+  begin
+    Exit;
+  end;
+
+  const PatternToPage = Pattern.Matrix.Multiply(InitialMatrix);
+  var BBox: TPdfRectangle;
+  var BoxPath: TPdfPath := nil;
+  if Pattern.Shading.TryGetBBox(BBox) then
+  begin
+    BoxPath := PathAround(BBox, PatternToPage);
+  end;
+
+  try
+    var Area: TRect;
+    if not TryGetPatternArea(Bounds, BoxPath, Area) then
+    begin
+      Exit;
+    end;
+
+    if Assigned(BoxPath) then
+    begin
+      FDevice.SetClip(TPdfClipPath.Create(RenderState.Clip, BoxPath.Clone, FPageToDevice, TPdfFillRule.NonZero));
+      FLastClip := nil;
+    end;
+    PaintShadingArea(Pattern.Shading, PatternToPage.Multiply(FPageToDevice), Area, Action);
+  finally
+    BoxPath.Free;
+  end;
+end;
+
+procedure TPdfPageDrawer.FillWithColor(const Path: TPdfPath; const FillRule: TPdfFillRule; const Color: TPDColor; const IsAntiAliased: Boolean);
+begin
+  ApplyClip;
+  const Composite = NonStrokingComposite(IsAntiAliased);
+  if not IsPatternColor(Color) then
+  begin
+    FDevice.FillPath(Path, FPageToDevice, FillRule, SolidPaint(Color), Composite);
+    Exit;
+  end;
+
+  WithPatternPaint(Color, DeviceBoundsOf(Path, FPageToDevice),
+    procedure(const Paint: TPdfPaint)
+    begin
+      FDevice.FillPath(Path, FPageToDevice, FillRule, Paint, Composite);
+    end);
+end;
+
+procedure TPdfPageDrawer.StrokeWithColor(const Path: TPdfPath; const Stroke: TPdfStrokeStyle; const Color: TPDColor);
+begin
+  ApplyClip;
+  if not IsPatternColor(Color) then
+  begin
+    DrawStroke(Path, Stroke, SolidPaint(Color));
+    Exit;
+  end;
+
+  WithPatternPaint(Color, StrokeBoundsOf(Path, Stroke),
+    procedure(const Paint: TPdfPaint)
+    begin
+      DrawStroke(Path, Stroke, Paint);
+    end);
 end;
 
 // PDFBOX-5168 and getDashArray. False when the dash pattern makes the line invisible.
@@ -599,9 +834,7 @@ begin
   const Bounds = Path.Bounds;
   const IsLargeRectangle = (IsRectangular(Path) and (Bounds.Right - Bounds.Left > 1) and (Bounds.Bottom - Bounds.Top > 1));
 
-  ApplyClip;
-  const Paint = SolidPaint(RenderState.NonStrokingColor);
-  FDevice.FillPath(Path, FPageToDevice, FillRule, Paint, NonStrokingComposite(not IsLargeRectangle));
+  FillWithColor(Path, FillRule, RenderState.NonStrokingColor, not IsLargeRectangle);
 end;
 
 procedure TPdfPageDrawer.PaintStroke(const Path: TPdfPath);
@@ -612,9 +845,7 @@ begin
     Exit;
   end;
 
-  ApplyClip;
-  const Paint = SolidPaint(RenderState.StrokingColor);
-  DrawStroke(Path, Stroke, Paint);
+  StrokeWithColor(Path, Stroke, RenderState.StrokingColor);
 end;
 
 // Java2D normalizes the geometry of a stroke, see TPdfStrokeNormalizer
@@ -656,9 +887,71 @@ begin
   end;
 end;
 
+// shadingFill: the shading is painted on the area of its BBox (with the CTM) that the clip leaves, in the device. The shading area is
+// the box, or without one the clip; the clip of the device cuts the box where PDFBox intersects the two Areas.
 procedure TPdfPageDrawer.ShadingFill(const ShadingName: string);
 begin
-  LogWarning('Shading fills are not drawn yet: %s skipped', [ShadingName]);
+  var Value: TCosBase;
+  if not Resources.TryGetShading(ShadingName, Value) then
+  begin
+    LogError('shading %s does not exist in resources dictionary', [ShadingName]);
+    Exit;
+  end;
+
+  var Shading: TPDShading;
+  if not TryGetShading(Value, Shading) then
+  begin
+    Exit;
+  end;
+
+  const Ctm = GraphicsState.CurrentTransformationMatrix;
+  var BBox: TPdfRectangle;
+  var BoxPath: TPdfPath := nil;
+  if Shading.TryGetBBox(BBox) then
+  begin
+    BoxPath := PathAround(BBox, Ctm);
+  end;
+
+  try
+    var Area: TRect;
+    if TryGetPatternArea(TRectF.Create(0, 0, FDevice.Width, FDevice.Height), BoxPath, Area) then
+    begin
+      FillShadingArea(Shading, Ctm.Multiply(FPageToDevice), Area, BoxPath);
+    end;
+  finally
+    BoxPath.Free;
+  end;
+end;
+
+// Fills the box (page space), or the area (device pixels) when there is no box, with the bitmap of the shading
+procedure TPdfPageDrawer.FillShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect; const BoxPath: TPdfPath);
+begin
+  ApplyClip;
+  const Composite = NonStrokingComposite(True);
+  const AreaPath = TPdfPath.Create;
+  try
+    AreaPath.MoveTo(Area.Left, Area.Top);
+    AreaPath.LineTo(Area.Right, Area.Top);
+    AreaPath.LineTo(Area.Right, Area.Bottom);
+    AreaPath.LineTo(Area.Left, Area.Bottom);
+    AreaPath.ClosePath;
+
+    var Outline := AreaPath;
+    var OutlineToDevice := TPdfMatrix.Identity;
+    if Assigned(BoxPath) then
+    begin
+      Outline := BoxPath;
+      OutlineToDevice := FPageToDevice;
+    end;
+
+    PaintShadingArea(Shading, ShadingToDevice, Area,
+      procedure(const Paint: TPdfPaint)
+      begin
+        FDevice.FillPath(Outline, OutlineToDevice, TPdfFillRule.NonZero, Paint, Composite);
+      end);
+  finally
+    AreaPath.Free;
+  end;
 end;
 
 // PDFBOX-5715: below a scale of one, a clip that is thinner than two pixels is made two pixels wide, so that the lines that are drawn
@@ -883,15 +1176,13 @@ begin
   const Mode = RenderState.TextState.RenderingMode;
   if Mode.IsFill and (not GlyphPath.IsEmpty) then
   begin
-    ApplyClip;
-    FDevice.FillPath(GlyphPath, FPageToDevice, TPdfFillRule.NonZero, SolidPaint(RenderState.NonStrokingColor), NonStrokingComposite(True));
+    FillWithColor(GlyphPath, TPdfFillRule.NonZero, RenderState.NonStrokingColor, True);
   end;
 
   var Stroke: TPdfStrokeStyle;
   if Mode.IsStroke and HasSegments(GlyphPath) and TryBuildStroke(Stroke) then
   begin
-    ApplyClip;
-    DrawStroke(GlyphPath, Stroke, SolidPaint(RenderState.StrokingColor));
+    StrokeWithColor(GlyphPath, Stroke, RenderState.StrokingColor);
   end;
 
   if Mode.IsClip then
@@ -1364,10 +1655,10 @@ begin
 end;
 
 function TPdfPageDrawer.TryRenderMaskGroup(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const HasBackdrop: Boolean;
-                                           const Backdrop: TPdfDeviceColor; out Bounds: TRect; out Shift: Single; out Image: TPdfBitmap): Boolean;
+                                           const Backdrop: TPdfDeviceColor; out Bounds: TRect; out Image: TPdfBitmap): Boolean;
 begin
   Image := nil;
-  Shift := 0;
+  var Shift: Single;
   if not TryGetGroupBounds(Form, Ctm, False, Bounds, Shift) then
   begin
     Exit(False);

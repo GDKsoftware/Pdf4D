@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: PDColorSpace.create (pdfbox/src/main/java/org/apache/pdfbox/pdmodel/graphics/color/PDColorSpace.java, 3.0.8) and the
-// colour space part of PDResources.getColorSpace. The colour spaces besides the device spaces and ICCBased give an
+// colour space part of PDResources.getColorSpace. The colour spaces besides the device spaces, ICCBased and the name /Pattern give an
 // EPdfUnsupportedFeatureException until they are ported.
 unit Pdf4D.Graphics.Color.Factory;
 
@@ -60,7 +60,8 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.PdfObject,
   Pdf4D.Graphics.Color.Device,
-  Pdf4D.Graphics.Color.IccBased;
+  Pdf4D.Graphics.Color.IccBased,
+  Pdf4D.Graphics.Color.Pattern;
 
 resourcestring
   ColorSpaceNil = 'The colour space is missing';
@@ -236,7 +237,7 @@ begin
 
   if Name = TCosNames.Pattern then
   begin
-    raise EPdfUnsupportedFeatureException.CreateFmt(ColorSpaceNotPorted, [Name]);
+    Exit(TPDPattern.Instance);
   end;
 
   Result := CreateNamedResource(Name, Context, Resources, WasDefault, Depth);

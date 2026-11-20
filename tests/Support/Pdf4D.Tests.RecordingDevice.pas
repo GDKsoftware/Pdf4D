@@ -31,7 +31,7 @@ type
     FillRule: TPdfFillRule;
     // The length of the clip chain at that moment (of the new clip for SetClip)
     ClipDepth: Integer;
-    // Bitmap: a copy of the pixels (premultiplied RGBA) and the size of the bitmap that was drawn
+    // Bitmap, and Fill and Stroke with a bitmap paint: a copy of the pixels (premultiplied RGBA) and the size of the bitmap that was drawn
     BitmapWidth: Integer;
     BitmapHeight: Integer;
     BitmapPixels: TBytes;
@@ -56,6 +56,7 @@ type
     function ClipDepthOf(const Clip: IPdfClipPath): Integer;
     function NewCall(const Kind: TRecordedCallKind; const DeviceBounds: TRectF; const Composite: TPdfComposite): TRecordedCall;
     function BoundsAfterTransform(const Path: TPdfPath; const Transform: TPdfMatrix): TRectF;
+    class function WithPaintBitmap(const Call: TRecordedCall; const Paint: TPdfPaint): TRecordedCall; static;
     function GetLayerCount: Integer;
     function GetLayer(const Index: Integer): TRecordingDevice;
 
@@ -151,6 +152,7 @@ begin
   var Call := NewCall(TRecordedCallKind.Fill, BoundsAfterTransform(Path, Transform), Composite);
   Call.FillRule := FillRule;
   Call.Paint := Paint;
+  Call := WithPaintBitmap(Call, Paint);
   FCalls.Add(Call);
 end;
 
@@ -160,6 +162,7 @@ begin
   var Call := NewCall(TRecordedCallKind.Stroke, BoundsAfterTransform(Path, Transform), Composite);
   Call.Stroke := Stroke;
   Call.Paint := Paint;
+  Call := WithPaintBitmap(Call, Paint);
   FCalls.Add(Call);
 end;
 
@@ -248,6 +251,17 @@ begin
     Result := DevicePath.Bounds;
   finally
     DevicePath.Free;
+  end;
+end;
+
+class function TRecordingDevice.WithPaintBitmap(const Call: TRecordedCall; const Paint: TPdfPaint): TRecordedCall;
+begin
+  Result := Call;
+  if (Paint.Kind = TPdfPaintKind.Bitmap) and Assigned(Paint.Bitmap) then
+  begin
+    Result.BitmapWidth := Paint.Bitmap.Width;
+    Result.BitmapHeight := Paint.Bitmap.Height;
+    Result.BitmapPixels := Copy(Paint.Bitmap.Pixels);
   end;
 end;
 

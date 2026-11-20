@@ -84,6 +84,9 @@ type
     procedure TestUnsupportedColorSpacesRaiseUnsupported;
 
     [Test]
+    procedure TestPatternNameGivesThePatternSpace;
+
+    [Test]
     procedure TestInvalidColorSpacesRaiseParseException;
 
     [Test]
@@ -420,12 +423,29 @@ begin
   end;
 end;
 
-procedure TColorTests.TestUnsupportedColorSpacesRaiseUnsupported;
+procedure TColorTests.TestPatternNameGivesThePatternSpace;
 begin
+  const Space = SpaceOf('Pattern');
+
+  Assert.AreEqual('Pattern', Space.Name);
+  Assert.AreEqual('', Space.InitialColor.PatternName);
   Assert.WillRaise(
     procedure
     begin
-      SpaceOf('Pattern');
+      Space.InitialColor.ToRgb;
+    end,
+    EInvalidOpException);
+end;
+
+procedure TColorTests.TestUnsupportedColorSpacesRaiseUnsupported;
+begin
+  const PatternArray = TCosArray.Create;
+  PatternArray.Add(TCosName.Create('Pattern'));
+  FBuilder.AddColorSpace('CSPattern', PatternArray);
+  Assert.WillRaise(
+    procedure
+    begin
+      SpaceOf('CSPattern');
     end,
     EPdfUnsupportedFeatureException);
 

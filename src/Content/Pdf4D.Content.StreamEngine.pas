@@ -101,6 +101,7 @@ type
     FShouldProcessColorOperators: Boolean;
     FIsCharProcPending: Boolean;
     FMaxGlyphs: Integer;
+    FInitialMatrix: TPdfMatrix;
 
     procedure InitPage(const Page: TPDPage);
     function GetDefaultFont: TPDFont;
@@ -233,6 +234,9 @@ type
     // The limits of the document of the current page; the defaults without a page
     property Options: TPdfLoadOptions read GetOptions;
     property Level: Integer read FLevel;
+    // PDFStreamEngine.getInitialMatrix: the CTM at the start of the page, or of the form that is running after its matrix. A pattern
+    // matrix maps to this space.
+    property InitialMatrix: TPdfMatrix read FInitialMatrix;
     // False while the stream that runs is a glyph procedure of a Type 3 font that starts with d1: the colour operators that PDFBox
     // guards with isShouldProcessColorOperators (CS, cs and the device colour operators) are ignored then
     property ShouldProcessColorOperators: Boolean read FShouldProcessColorOperators;
@@ -319,6 +323,7 @@ begin
   FCurrentPage := Page;
   FStack.Clear;
   FStack.Add(CreateInitialGraphicsState(Page));
+  FInitialMatrix := GraphicsState.CurrentTransformationMatrix;
   FIgnoredSaves := 0;
   FIsDepthWarningGiven := False;
   FResources := nil;
@@ -730,11 +735,15 @@ procedure TPdfStreamEngine.ProcessContent(const Data: TBytes; const Resources: T
   const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
 begin
   const Frame = BeginFrame(Resources, HasEmptyResources, InitialState);
+  const ParentInitialMatrix = FInitialMatrix;
   try
     CheckStopRequested;
     var Ctm := GraphicsState.CurrentTransformationMatrix;
     Ctm.ConcatenateWith(Matrix);
     GraphicsState.CurrentTransformationMatrix := Ctm;
+    // The stream's initial matrix includes the CTM of its parent, so that a pattern is drawn with the transformation of the stream it
+    // is used in
+    FInitialMatrix := Ctm;
     // PDFBox clips to the BBox of a form after its matrix is part of the CTM
     if HasBBox then
     begin
@@ -742,6 +751,7 @@ begin
     end;
     ProcessStreamOperators(Data);
   finally
+    FInitialMatrix := ParentInitialMatrix;
     EndFrame(Frame);
   end;
 end;

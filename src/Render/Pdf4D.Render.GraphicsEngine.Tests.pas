@@ -63,7 +63,7 @@ type
   [TestFixture]
   TGraphicsEngineTests = class
   private
-    const PageHeader = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /ExtGState << %s >> >> >>';
+    const PageHeader = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /ExtGState << %s >> /ColorSpace << /CSLab [/Lab << /WhitePoint [0.95 1 1.09] >>] >> >> >>';
     const FirstStateObject = 5;
 
   private
@@ -115,6 +115,9 @@ type
     procedure TestPatternColorIsLoggedAndSkipped;
 
     [Test]
+    procedure TestPatternNameIsTheColorInThePatternSpace;
+
+    [Test]
     procedure TestUnsupportedColorSpaceFallsBackToGray;
 
     [Test]
@@ -161,7 +164,7 @@ type
     procedure TestMissingOperandsAreLoggedAndSkipped;
 
     [Test]
-    procedure TestShadingFillIsLoggedNotPainted;
+    procedure TestShadingFillReachesTheEngineWithTheName;
   end;
 
   [TestFixture]
@@ -476,12 +479,21 @@ begin
   Run('0.25 g /P1 scn');
 
   Assert.AreEqual<Single>(0.25, State.NonStrokingColor.Components[0]);
-  Assert.IsTrue(HasLogLine('Pattern colours are not supported yet'));
+  Assert.IsTrue(HasLogLine('needs the Pattern colour space'));
+end;
+
+procedure TGraphicsEngineTests.TestPatternNameIsTheColorInThePatternSpace;
+begin
+  Run('/Pattern cs /P1 scn');
+
+  Assert.AreEqual('Pattern', State.NonStrokingColor.ColorSpace.Name);
+  Assert.AreEqual('P1', State.NonStrokingColor.PatternName);
+  Assert.AreEqual('Pattern', State.NonStrokingColorSpace.Name);
 end;
 
 procedure TGraphicsEngineTests.TestUnsupportedColorSpaceFallsBackToGray;
 begin
-  Run('/Pattern cs');
+  Run('/CSLab cs');
 
   Assert.AreEqual('DeviceGray', State.NonStrokingColor.ColorSpace.Name);
   Assert.IsTrue(HasLogLine('not supported yet'));
@@ -623,12 +635,11 @@ begin
   Assert.IsTrue(HasLogLine('too few operands'));
 end;
 
-procedure TGraphicsEngineTests.TestShadingFillIsLoggedNotPainted;
+procedure TGraphicsEngineTests.TestShadingFillReachesTheEngineWithTheName;
 begin
   Run('/Sh1 sh');
 
-  Assert.AreEqual('', CallsAsText);
-  Assert.IsTrue(HasLogLine('Painting shadings is not supported yet'));
+  Assert.AreEqual('Shading Sh1', CallsAsText);
 end;
 
 { TRenderGraphicsStateTests }

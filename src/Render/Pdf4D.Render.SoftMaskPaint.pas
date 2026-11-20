@@ -214,9 +214,8 @@ begin
   const HasBackdrop = ((not IsAlpha) and TryGetBackdropColor(Drawer, Mask, Backdrop));
 
   var Bounds: TRect;
-  var Shift: Single;
   var Image: TPdfBitmap;
-  if not Drawer.TryRenderMaskGroup(Form, Mask.InitialTransformationMatrix, HasBackdrop, Backdrop, Bounds, Shift, Image) then
+  if not Drawer.TryRenderMaskGroup(Form, Mask.InitialTransformationMatrix, HasBackdrop, Backdrop, Bounds, Image) then
   begin
     Exit;
   end;
@@ -227,9 +226,7 @@ begin
     begin
       OutsideValue := Luminosity(Backdrop);
     end;
-    // The image of a group has one row more than its box and holds the content at the bottom, see TPdfPageDrawer.GroupShift
-    const Top = Bounds.Top + Floor(Shift + 0.5);
-    Result := MaskFromImage(Image, Bounds.Left, Top, IsAlpha, OutsideValue, Mask.TransferFunction);
+    Result := MaskFromImage(Image, Bounds.Left, Bounds.Top, IsAlpha, OutsideValue, Mask.TransferFunction);
   finally
     Image.Free;
   end;

@@ -1,6 +1,6 @@
 # <corpus file> # Task <n>: <subject>
 # Files whose render differs from PDFBox because a feature is built in a later task. A file whose pages are all equal must leave this list.
-generated/render/shadings.pdf # Task 20: shadings
+generated/render/shadings.pdf # Task 21: mesh shadings (types 4 to 7); the shadings of types 1 to 3 on both pages equal the reference
 generated/render/patterns.pdf # Task 22: tiling patterns
 pdfbox/input/rendering/survey.pdf # Task 22: tiling patterns
 generated/render/ccitt.pdf # Task 23: CCITTFax
@@ -25,7 +25,6 @@ pdfbox/org/apache/pdfbox/pdmodel/interactive/form/MultilineFields.pdf # Task 25:
 pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX3812-acrobat-multiline-auto.pdf # Task 25: annotations (form fields)
 pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX-3835-input-acrobat-wrap.pdf # Task 25: annotations (form fields)
 pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX-5784.pdf # Task 25: annotations (form fields)
-generated/render/colors-device.pdf # Task 22: the Pattern colour space (a fill in /Pattern without a pattern paints nothing)
 pdfbox/input/compression/attachment.pdf # Task 25: annotations
 pdfbox/org/apache/pdfbox/encryption/PasswordSample-128bit.pdf # Task 25: annotations (form fields)
 pdfbox/org/apache/pdfbox/encryption/PasswordSample-256bit.pdf # Task 25: annotations (form fields)
@@ -58,4 +57,3 @@ pdfbox-jira/PDFBOX-6150.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-6178.pdf # Task 25: annotations (form fields)
 pdfbox-jira/PDFBOX-6178-1.pdf # Task 25: annotations (form fields)
 pdfbox/org/apache/pdfbox/pdmodel/interactive/form/PDFBOX-3656-SF1199AEG (Complete).pdf # Task 25: annotations (form fields)
-generated/render/softmask.pdf # Task 20: shadings (sh in the luminosity groups of three soft masks)

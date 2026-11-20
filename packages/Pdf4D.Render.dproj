@@ -93,10 +93,12 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Device.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Factory.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.Pattern.pas"/>
         <DCCReference Include="..\src\Codec\Pdf4D.Codec.Jpeg.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.LineDash.pas"/>
+        <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Shading.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.SoftMask.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.State.pas"/>
         <DCCReference Include="..\src\Resources\Pdf4D.Resources.Icc.pas"/>
@@ -118,6 +120,10 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Interfaces.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Axial.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Context.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Function.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Shading.Radial.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.SoftMaskPaint.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
