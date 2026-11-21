@@ -1,71 +1,72 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
-// Port of: java.util.TimSort (OpenJDK 21), the sort behind Collections.sort that PDFTextStripper.writePage calls first
+// Independent implementation of the stable natural merge sort that Java's Collections.sort uses (the sort that PDFTextStripper.writePage
+// calls first), following the public description of the algorithm in listsort.txt by Tim Peters (runs, minrun, galloping with
+// MIN_GALLOP 7, merge_lo and merge_hi), the corrected merge-collapse rule of JDK-8072909 / JDK-8203864 (de Gouw et al., "OpenJDK's
+// java.utils.Collection.sort() is broken", 2015) and the documented constants and behaviour of the Java variant (MIN_MERGE 32,
+// IllegalArgumentException for a comparison that violates its contract).
 unit Pdf4D.Text.TimSort;
 
 interface
 
 uses
   System.SysUtils,
+  System.Math,
   System.Generics.Collections,
   System.Generics.Defaults;
 
 type
   EComparisonViolation = class(Exception);
 
-  // The stable merge sort of the JDK (Collections.sort). PDFBox sorts its text positions with it before it falls back to its
-  // own merge sort, and with a comparison that is not transitive (TextPositionComparator) the two give different orders, so
-  // the output of PDFBox is only reproduced by running the same algorithm first. The items are sorted by index, so that a
-  // list that owns them does not free them.
+  // A stable merge sort. PDFBox sorts its text positions with Collections.sort before it falls back to its own merge sort, and with
+  // a comparison that is not transitive (TextPositionComparator) the two give different orders, so the output of PDFBox is only
+  // reproduced by running the same algorithm first. The items are sorted by index, so that a list that owns them does not free them.
   TTimSort = class
   private
     const MinMerge = 32;
-    const MinGallopStart = 7;
-    const InitialTmpStorageLength = 256;
-    const MaxStackLength = 49;
-    const ContractViolationMessage = 'Comparison method violates its general contract';
+    const InitialGallopThreshold = 7;
+    const ContractViolationMessage = 'Comparison method violates its general contract!';
 
   private
     FItems: TArray<Integer>;
     FComparison: TComparison<Integer>;
-    FMinGallop: Integer;
-    FTmp: TArray<Integer>;
-    FStackSize: Integer;
-    FRunBase: TArray<Integer>;
-    FRunLen: TArray<Integer>;
+    FGallopThreshold: Integer;
+    FScratch: TArray<Integer>;
+    FRunStarts: TList<Integer>;
+    FRunLengths: TList<Integer>;
 
     constructor Create(const Items: TArray<Integer>; const Comparison: TComparison<Integer>);
-
-    class procedure Copy(const Source: TArray<Integer>; const SourcePosition: Integer; const Target: TArray<Integer>; const TargetPosition, Count: Integer); static;
-    class procedure ReverseRange(const Items: TArray<Integer>; const First, Till: Integer); static;
-    class function MinRunLength(const Count: Integer): Integer; static;
+    class function MinimumRunLength(const Count: Integer): Integer; static;
     class procedure RaiseContractViolation; static;
 
-    function CountRunAndMakeAscending(const First, Till: Integer): Integer;
-    procedure BinarySort(const First, Till, Start: Integer);
-    function GallopLeft(const Key: Integer; const Source: TArray<Integer>; const Base, Len, Hint: Integer): Integer;
-    function GallopRight(const Key: Integer; const Source: TArray<Integer>; const Base, Len, Hint: Integer): Integer;
-    procedure PushRun(const Base, Len: Integer);
-    procedure MergeCollapse;
-    procedure MergeForceCollapse;
-    procedure MergeAt(const Index: Integer);
-    procedure MergeLo(const Base1, Len1Start, Base2, Len2Start: Integer);
-    procedure MergeHi(const Base1, Len1Start, Base2, Len2Start: Integer);
-    procedure EnsureCapacity(const MinCapacity: Integer);
-    procedure Run;
-    function RunSafely: Boolean;
+    procedure SortAll;
+    procedure SortSmall;
+    procedure SortLarge;
+    function RunLengthAt(const Start, Till: Integer): Integer;
+    procedure ReverseRange(const First, Till: Integer);
+    procedure InsertionSortRange(const First, Till, SortedTill: Integer);
+    procedure PushRun(const Start, Length: Integer);
+    procedure CollapseRuns;
+    procedure CollapseAllRuns;
+    procedure MergeRunPair(const Index: Integer);
+    procedure LoadScratch(const Start, Count: Integer);
+    function GallopBefore(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+    function GallopAfter(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+    procedure MergeFromLeft(const Start1, Count1, Start2, Count2: Integer);
+    procedure MergeFromRight(const Start1, Count1, Start2, Count2: Integer);
+    procedure MoveBlock(const Source: TArray<Integer>; const SourceStart: Integer; const Target: TArray<Integer>; const TargetStart, Count: Integer);
+    procedure StoreGallopThreshold(const Value: Integer);
 
   public
+    destructor Destroy; override;
+
     // Sorts the list. False when the comparison violated its contract (IllegalArgumentException in Java): the list is then
     // partly sorted, as the Java list is, and the caller sorts it again.
     class function Sort<T>(const List: TList<T>; const Comparison: TComparison<T>): Boolean; static;
   end;
 
 implementation
-
-uses
-  Pdf4D.Text.IterativeMergeSort;
 
 { TTimSort }
 
@@ -74,69 +75,90 @@ begin
   inherited Create;
   FItems := Items;
   FComparison := Comparison;
-  FMinGallop := MinGallopStart;
-  const Count = Length(Items);
-  if Count < 2 * InitialTmpStorageLength then
-  begin
-    SetLength(FTmp, Count shr 1);
-  end
-  else
-  begin
-    SetLength(FTmp, InitialTmpStorageLength);
-  end;
-  SetLength(FRunBase, MaxStackLength);
-  SetLength(FRunLen, MaxStackLength);
+  FGallopThreshold := InitialGallopThreshold;
+  FRunStarts := TList<Integer>.Create;
+  FRunLengths := TList<Integer>.Create;
+end;
+
+destructor TTimSort.Destroy;
+begin
+  FRunLengths.Free;
+  FRunStarts.Free;
+  inherited;
 end;
 
 class function TTimSort.Sort<T>(const List: TList<T>; const Comparison: TComparison<T>): Boolean;
 begin
   Result := True;
-  if List.Count < 2 then
+  const Count = List.Count;
+  if Count < 2 then
   begin
     Exit;
   end;
 
-  var Items: TArray<Integer>;
-  SetLength(Items, List.Count);
-  for var Index := 0 to High(Items) do
+  var Order: TArray<Integer>;
+  SetLength(Order, Count);
+  for var Index := 0 to Count - 1 do
   begin
-    Items[Index] := Index;
+    Order[Index] := Index;
   end;
 
-  const Sorter = TTimSort.Create(Items,
+  const Sorter = TTimSort.Create(Order,
     function(const Left, Right: Integer): Integer
     begin
       Result := Comparison(List[Left], List[Right]);
     end);
   try
-    Result := Sorter.RunSafely;
-    TIterativeMergeSort.ApplyOrder<T>(List, Sorter.FItems);
+    try
+      Sorter.SortAll;
+    except
+      on EComparisonViolation do
+      begin
+        Result := False;
+      end;
+    end;
   finally
     Sorter.Free;
   end;
-end;
 
-class procedure TTimSort.Copy(const Source: TArray<Integer>; const SourcePosition: Integer; const Target: TArray<Integer>; const TargetPosition, Count: Integer);
-begin
-  // Move copes with a source and a target that overlap, as System.arraycopy does
-  if Count > 0 then
+  // The order is a permutation also after a violation; swapping applies it without freeing owned items
+  var CurrentAt: TArray<Integer>;
+  var PositionOf: TArray<Integer>;
+  SetLength(CurrentAt, Count);
+  SetLength(PositionOf, Count);
+  for var Index := 0 to Count - 1 do
   begin
-    Move(Source[SourcePosition], Target[TargetPosition], Count * SizeOf(Integer));
+    CurrentAt[Index] := Index;
+    PositionOf[Index] := Index;
+  end;
+
+  for var Target := 0 to Count - 1 do
+  begin
+    const Wanted = Order[Target];
+    const Source = PositionOf[Wanted];
+    if Source <> Target then
+    begin
+      List.Exchange(Target, Source);
+      const Displaced = CurrentAt[Target];
+      CurrentAt[Source] := Displaced;
+      PositionOf[Displaced] := Source;
+      CurrentAt[Target] := Wanted;
+      PositionOf[Wanted] := Target;
+    end;
   end;
 end;
 
-class procedure TTimSort.ReverseRange(const Items: TArray<Integer>; const First, Till: Integer);
+class function TTimSort.MinimumRunLength(const Count: Integer): Integer;
 begin
-  var Low := First;
-  var High := Till - 1;
-  while Low < High do
+  // The first bits of Count, plus one when any lower bit is set, so that Count / result is close to a power of two
+  var Remaining := Count;
+  var LowerBitSet := 0;
+  while Remaining >= MinMerge do
   begin
-    const Swapped = Items[Low];
-    Items[Low] := Items[High];
-    Items[High] := Swapped;
-    Inc(Low);
-    Dec(High);
+    LowerBitSet := LowerBitSet or (Remaining and 1);
+    Remaining := Remaining shr 1;
   end;
+  Result := Remaining + LowerBitSet;
 end;
 
 class procedure TTimSort.RaiseContractViolation;
@@ -144,415 +166,384 @@ begin
   raise EComparisonViolation.Create(ContractViolationMessage);
 end;
 
-class function TTimSort.MinRunLength(const Count: Integer): Integer;
+procedure TTimSort.SortAll;
 begin
-  var Remaining := Count;
-  var Carry := 0;
-  while Remaining >= MinMerge do
+  if Length(FItems) < MinMerge then
   begin
-    Carry := Carry or (Remaining and 1);
-    Remaining := Remaining shr 1;
-  end;
-  Result := Remaining + Carry;
-end;
-
-function TTimSort.RunSafely: Boolean;
-begin
-  try
-    Run;
-    Result := True;
-  except
-    on EComparisonViolation do
-    begin
-      Result := False;
-    end;
+    SortSmall;
+  end
+  else
+  begin
+    SortLarge;
   end;
 end;
 
-procedure TTimSort.Run;
+procedure TTimSort.SortSmall;
 begin
+  const Count = Length(FItems);
+  InsertionSortRange(0, Count, RunLengthAt(0, Count));
+end;
+
+procedure TTimSort.SortLarge;
+begin
+  var Start := 0;
   var Remaining := Length(FItems);
-  if Remaining < 2 then
-  begin
-    Exit;
-  end;
-
-  // A small array gets a "mini-TimSort" without merges
-  if Remaining < MinMerge then
-  begin
-    const InitialRunLength = CountRunAndMakeAscending(0, Remaining);
-    BinarySort(0, Remaining, InitialRunLength);
-    Exit;
-  end;
-
-  var First := 0;
-  const MinRun = MinRunLength(Remaining);
+  const MinRun = MinimumRunLength(Remaining);
   repeat
-    var RunLength := CountRunAndMakeAscending(First, Length(FItems));
+    var RunLength := RunLengthAt(Start, Start + Remaining);
     if RunLength < MinRun then
     begin
-      var Force := MinRun;
-      if Remaining <= MinRun then
-      begin
-        Force := Remaining;
-      end;
-      BinarySort(First, First + Force, First + RunLength);
-      RunLength := Force;
+      const Forced = Min(Remaining, MinRun);
+      InsertionSortRange(Start, Start + Forced, Start + RunLength);
+      RunLength := Forced;
     end;
 
-    PushRun(First, RunLength);
-    MergeCollapse;
-
-    Inc(First, RunLength);
+    PushRun(Start, RunLength);
+    CollapseRuns;
+    Inc(Start, RunLength);
     Dec(Remaining, RunLength);
   until Remaining = 0;
 
-  MergeForceCollapse;
+  CollapseAllRuns;
 end;
 
-function TTimSort.CountRunAndMakeAscending(const First, Till: Integer): Integer;
+// The length of the run that starts at Start: a strictly descending run is reversed, a run that does not descend is kept
+function TTimSort.RunLengthAt(const Start, Till: Integer): Integer;
 begin
-  var RunHigh := First + 1;
-  if RunHigh = Till then
+  if Start + 1 = Till then
   begin
     Exit(1);
   end;
 
-  Inc(RunHigh);
-  if FComparison(FItems[RunHigh - 1], FItems[First]) < 0 then
+  var Next := Start + 2;
+  if FComparison(FItems[Start + 1], FItems[Start]) < 0 then
   begin
-    // Descending
-    while (RunHigh < Till) and (FComparison(FItems[RunHigh], FItems[RunHigh - 1]) < 0) do
+    while (Next < Till) and (FComparison(FItems[Next], FItems[Next - 1]) < 0) do
     begin
-      Inc(RunHigh);
+      Inc(Next);
     end;
-    ReverseRange(FItems, First, RunHigh);
+    ReverseRange(Start, Next);
   end
   else
   begin
-    while (RunHigh < Till) and (FComparison(FItems[RunHigh], FItems[RunHigh - 1]) >= 0) do
+    while (Next < Till) and (FComparison(FItems[Next], FItems[Next - 1]) >= 0) do
     begin
-      Inc(RunHigh);
+      Inc(Next);
     end;
   end;
-  Result := RunHigh - First;
+  Result := Next - Start;
 end;
 
-procedure TTimSort.BinarySort(const First, Till, Start: Integer);
+procedure TTimSort.ReverseRange(const First, Till: Integer);
 begin
-  var Current := Start;
-  if Current = First then
+  var Low := First;
+  var High := Till - 1;
+  while Low < High do
   begin
-    Inc(Current);
+    const Swapped = FItems[Low];
+    FItems[Low] := FItems[High];
+    FItems[High] := Swapped;
+    Inc(Low);
+    Dec(High);
+  end;
+end;
+
+// Sorts First..Till-1 of which First..SortedTill-1 is sorted already, by inserting each following item at the place that a binary
+// search gives, after the items that are not greater
+procedure TTimSort.InsertionSortRange(const First, Till, SortedTill: Integer);
+begin
+  var Next := SortedTill;
+  if Next = First then
+  begin
+    Inc(Next);
   end;
 
-  while Current < Till do
+  while Next < Till do
   begin
-    const Pivot = FItems[Current];
-    var Left := First;
-    var Right := Current;
-    while Left < Right do
+    const Pivot = FItems[Next];
+    var Low := First;
+    var High := Next;
+    while Low < High do
     begin
-      const Middle = (Left + Right) shr 1;
+      const Middle = (Low + High) shr 1;
       if FComparison(Pivot, FItems[Middle]) < 0 then
       begin
-        Right := Middle;
+        High := Middle;
       end
       else
       begin
-        Left := Middle + 1;
+        Low := Middle + 1;
       end;
     end;
 
-    // Slide the items over to make room for the pivot
-    Copy(FItems, Left, FItems, Left + 1, Current - Left);
-    FItems[Left] := Pivot;
-    Inc(Current);
+    for var Index := Next downto Low + 1 do
+    begin
+      FItems[Index] := FItems[Index - 1];
+    end;
+    FItems[Low] := Pivot;
+    Inc(Next);
   end;
 end;
 
-function TTimSort.GallopLeft(const Key: Integer; const Source: TArray<Integer>; const Base, Len, Hint: Integer): Integer;
+procedure TTimSort.PushRun(const Start, Length: Integer);
 begin
-  var LastOffset := 0;
-  var Offset := 1;
-  if FComparison(Key, Source[Base + Hint]) > 0 then
-  begin
-    // Gallop right until Source[Base + Hint + LastOffset] < Key <= Source[Base + Hint + Offset]
-    const MaxOffset = Len - Hint;
-    while (Offset < MaxOffset) and (FComparison(Key, Source[Base + Hint + Offset]) > 0) do
-    begin
-      LastOffset := Offset;
-      Offset := (Offset shl 1) + 1;
-      if Offset <= 0 then
-      begin
-        Offset := MaxOffset;
-      end;
-    end;
-    if Offset > MaxOffset then
-    begin
-      Offset := MaxOffset;
-    end;
-
-    Inc(LastOffset, Hint);
-    Inc(Offset, Hint);
-  end
-  else
-  begin
-    // Gallop left until Source[Base + Hint - Offset] < Key <= Source[Base + Hint - LastOffset]
-    const MaxOffset = Hint + 1;
-    while (Offset < MaxOffset) and (FComparison(Key, Source[Base + Hint - Offset]) <= 0) do
-    begin
-      LastOffset := Offset;
-      Offset := (Offset shl 1) + 1;
-      if Offset <= 0 then
-      begin
-        Offset := MaxOffset;
-      end;
-    end;
-    if Offset > MaxOffset then
-    begin
-      Offset := MaxOffset;
-    end;
-
-    const Previous = LastOffset;
-    LastOffset := Hint - Offset;
-    Offset := Hint - Previous;
-  end;
-
-  // Source[Base + LastOffset] < Key <= Source[Base + Offset]: a binary search finishes it
-  Inc(LastOffset);
-  while LastOffset < Offset do
-  begin
-    const Middle = LastOffset + ((Offset - LastOffset) shr 1);
-    if FComparison(Key, Source[Base + Middle]) > 0 then
-    begin
-      LastOffset := Middle + 1;
-    end
-    else
-    begin
-      Offset := Middle;
-    end;
-  end;
-  Result := Offset;
+  FRunStarts.Add(Start);
+  FRunLengths.Add(Length);
 end;
 
-function TTimSort.GallopRight(const Key: Integer; const Source: TArray<Integer>; const Base, Len, Hint: Integer): Integer;
+// With the top runs X (third from the top), Y, Z and W (the top): the stack is merged until X > Y + Z and Y > Z hold for every
+// triple, also for the triple below the top (the check on W that the first version of the rule lacked)
+procedure TTimSort.CollapseRuns;
 begin
-  var Offset := 1;
-  var LastOffset := 0;
-  if FComparison(Key, Source[Base + Hint]) < 0 then
+  while FRunLengths.Count > 1 do
   begin
-    // Gallop left until Source[Base + Hint - Offset] <= Key < Source[Base + Hint - LastOffset]
-    const MaxOffset = Hint + 1;
-    while (Offset < MaxOffset) and (FComparison(Key, Source[Base + Hint - Offset]) < 0) do
+    var Index := FRunLengths.Count - 2;
+    const BelowTopTooShort = (Index > 0) and (FRunLengths[Index - 1] <= FRunLengths[Index] + FRunLengths[Index + 1]);
+    const TwoBelowTopTooShort = (Index > 1) and (FRunLengths[Index - 2] <= FRunLengths[Index] + FRunLengths[Index - 1]);
+    if BelowTopTooShort or TwoBelowTopTooShort then
     begin
-      LastOffset := Offset;
-      Offset := (Offset shl 1) + 1;
-      if Offset <= 0 then
+      if FRunLengths[Index - 1] < FRunLengths[Index + 1] then
       begin
-        Offset := MaxOffset;
-      end;
-    end;
-    if Offset > MaxOffset then
-    begin
-      Offset := MaxOffset;
-    end;
-
-    const Previous = LastOffset;
-    LastOffset := Hint - Offset;
-    Offset := Hint - Previous;
-  end
-  else
-  begin
-    // Gallop right until Source[Base + Hint + LastOffset] <= Key < Source[Base + Hint + Offset]
-    const MaxOffset = Len - Hint;
-    while (Offset < MaxOffset) and (FComparison(Key, Source[Base + Hint + Offset]) >= 0) do
-    begin
-      LastOffset := Offset;
-      Offset := (Offset shl 1) + 1;
-      if Offset <= 0 then
-      begin
-        Offset := MaxOffset;
-      end;
-    end;
-    if Offset > MaxOffset then
-    begin
-      Offset := MaxOffset;
-    end;
-
-    Inc(LastOffset, Hint);
-    Inc(Offset, Hint);
-  end;
-
-  Inc(LastOffset);
-  while LastOffset < Offset do
-  begin
-    const Middle = LastOffset + ((Offset - LastOffset) shr 1);
-    if FComparison(Key, Source[Base + Middle]) < 0 then
-    begin
-      Offset := Middle;
-    end
-    else
-    begin
-      LastOffset := Middle + 1;
-    end;
-  end;
-  Result := Offset;
-end;
-
-procedure TTimSort.PushRun(const Base, Len: Integer);
-begin
-  FRunBase[FStackSize] := Base;
-  FRunLen[FStackSize] := Len;
-  Inc(FStackSize);
-end;
-
-procedure TTimSort.MergeCollapse;
-begin
-  while FStackSize > 1 do
-  begin
-    var RunIndex := FStackSize - 2;
-    if ((RunIndex > 0) and (FRunLen[RunIndex - 1] <= FRunLen[RunIndex] + FRunLen[RunIndex + 1])) or
-       ((RunIndex > 1) and (FRunLen[RunIndex - 2] <= FRunLen[RunIndex] + FRunLen[RunIndex - 1])) then
-    begin
-      if FRunLen[RunIndex - 1] < FRunLen[RunIndex + 1] then
-      begin
-        Dec(RunIndex);
+        Dec(Index);
       end;
     end
-    else if (RunIndex < 0) or (FRunLen[RunIndex] > FRunLen[RunIndex + 1]) then
+    else if FRunLengths[Index] > FRunLengths[Index + 1] then
     begin
-      // The invariant holds
       Break;
     end;
-    MergeAt(RunIndex);
+    MergeRunPair(Index);
   end;
 end;
 
-procedure TTimSort.MergeForceCollapse;
+procedure TTimSort.CollapseAllRuns;
 begin
-  while FStackSize > 1 do
+  while FRunLengths.Count > 1 do
   begin
-    var RunIndex := FStackSize - 2;
-    if (RunIndex > 0) and (FRunLen[RunIndex - 1] < FRunLen[RunIndex + 1]) then
+    var Index := FRunLengths.Count - 2;
+    if (Index > 0) and (FRunLengths[Index - 1] < FRunLengths[Index + 1]) then
     begin
-      Dec(RunIndex);
+      Dec(Index);
     end;
-    MergeAt(RunIndex);
+    MergeRunPair(Index);
   end;
 end;
 
-procedure TTimSort.MergeAt(const Index: Integer);
+// Merges the runs Index and Index + 1, after the items of the first run that are in place and the items of the second run
+// that are in place are left out
+procedure TTimSort.MergeRunPair(const Index: Integer);
 begin
-  var Base1 := FRunBase[Index];
-  var Len1 := FRunLen[Index];
-  const Base2 = FRunBase[Index + 1];
-  var Len2 := FRunLen[Index + 1];
+  var Start1 := FRunStarts[Index];
+  var Count1 := FRunLengths[Index];
+  const Start2 = FRunStarts[Index + 1];
+  var Count2 := FRunLengths[Index + 1];
 
-  // The current run goes away. If Index is the third last run, the last one slides over.
-  FRunLen[Index] := Len1 + Len2;
-  if Index = FStackSize - 3 then
-  begin
-    FRunBase[Index + 1] := FRunBase[Index + 2];
-    FRunLen[Index + 1] := FRunLen[Index + 2];
-  end;
-  Dec(FStackSize);
+  FRunLengths[Index] := Count1 + Count2;
+  FRunStarts.Delete(Index + 1);
+  FRunLengths.Delete(Index + 1);
 
-  // Where the first item of run 2 goes in run 1: the items before it are in place
-  const SkippedCount = GallopRight(FItems[Base2], FItems, Base1, Len1, 0);
-  Inc(Base1, SkippedCount);
-  Dec(Len1, SkippedCount);
-  if Len1 = 0 then
+  const FirstPlace = GallopAfter(FItems[Start2], Start1, Count1, 0, FItems);
+  Inc(Start1, FirstPlace);
+  Dec(Count1, FirstPlace);
+  if Count1 = 0 then
   begin
     Exit;
   end;
 
-  // Where the last item of run 1 goes in run 2: the items after it are in place
-  Len2 := GallopLeft(FItems[Base1 + Len1 - 1], FItems, Base2, Len2, Len2 - 1);
-  if Len2 = 0 then
+  Count2 := GallopBefore(FItems[Start1 + Count1 - 1], Start2, Count2, Count2 - 1, FItems);
+  if Count2 = 0 then
   begin
     Exit;
   end;
 
-  if Len1 <= Len2 then
+  if Count1 <= Count2 then
   begin
-    MergeLo(Base1, Len1, Base2, Len2);
+    MergeFromLeft(Start1, Count1, Start2, Count2);
   end
   else
   begin
-    MergeHi(Base1, Len1, Base2, Len2);
+    MergeFromRight(Start1, Count1, Start2, Count2);
   end;
 end;
 
-procedure TTimSort.EnsureCapacity(const MinCapacity: Integer);
+procedure TTimSort.LoadScratch(const Start, Count: Integer);
 begin
-  if Length(FTmp) < MinCapacity then
+  if Length(FScratch) < Count then
   begin
-    // The smallest power of two above the capacity, but not above half of the items
-    var NewSize := 1;
-    while (NewSize <= MinCapacity) and (NewSize > 0) do
-    begin
-      NewSize := NewSize shl 1;
-    end;
-    if (NewSize <= 0) or (NewSize > Length(FItems) shr 1) then
-    begin
-      NewSize := Length(FItems) shr 1;
-    end;
-    if NewSize < MinCapacity then
-    begin
-      NewSize := MinCapacity;
-    end;
-    SetLength(FTmp, NewSize);
+    SetLength(FScratch, Count);
+  end;
+  MoveBlock(FItems, Start, FScratch, 0, Count);
+end;
+
+procedure TTimSort.MoveBlock(const Source: TArray<Integer>; const SourceStart: Integer; const Target: TArray<Integer>; const TargetStart, Count: Integer);
+begin
+  if Count > 0 then
+  begin
+    Move(Source[SourceStart], Target[TargetStart], Count * SizeOf(Integer));
   end;
 end;
 
-procedure TTimSort.MergeLo(const Base1, Len1Start, Base2, Len2Start: Integer);
+procedure TTimSort.StoreGallopThreshold(const Value: Integer);
 begin
-  var Len1 := Len1Start;
-  var Len2 := Len2Start;
+  FGallopThreshold := Max(Value, 1);
+end;
 
-  // The first run goes into the temporary array
-  EnsureCapacity(Len1);
-  var Cursor1 := 0;
-  var Cursor2 := Base2;
-  var Dest := Base1;
-  Copy(FItems, Base1, FTmp, 0, Len1);
+// Where Key goes in Source[Start..Start+Count-1], before the items that equal it: the number of items that are less than Key.
+// The search gallops from Hint with steps 1, 3, 7, ... and ends with a binary search.
+function TTimSort.GallopBefore(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+begin
+  var Below := 0;
+  var Above := 1;
+  if FComparison(Key, Source[Start + Hint]) > 0 then
+  begin
+    const Limit = Count - Hint;
+    while (Above < Limit) and (FComparison(Key, Source[Start + Hint + Above]) > 0) do
+    begin
+      Below := Above;
+      Above := Above * 2 + 1;
+      if Above <= 0 then
+      begin
+        Above := Limit;
+      end;
+    end;
+    Above := Min(Above, Limit);
+    Inc(Below, Hint);
+    Inc(Above, Hint);
+  end
+  else
+  begin
+    const Limit = Hint + 1;
+    while (Above < Limit) and (FComparison(Key, Source[Start + Hint - Above]) <= 0) do
+    begin
+      Below := Above;
+      Above := Above * 2 + 1;
+      if Above <= 0 then
+      begin
+        Above := Limit;
+      end;
+    end;
+    Above := Min(Above, Limit);
+    const OldBelow = Below;
+    Below := Hint - Above;
+    Above := Hint - OldBelow;
+  end;
 
-  // The first item of the second run moves, and the degenerate cases end here
-  FItems[Dest] := FItems[Cursor2];
+  Inc(Below);
+  while Below < Above do
+  begin
+    const Middle = Below + ((Above - Below) shr 1);
+    if FComparison(Key, Source[Start + Middle]) > 0 then
+    begin
+      Below := Middle + 1;
+    end
+    else
+    begin
+      Above := Middle;
+    end;
+  end;
+  Result := Above;
+end;
+
+// Where Key goes in Source[Start..Start+Count-1], after the items that equal it: the number of items that are not greater than Key
+function TTimSort.GallopAfter(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+begin
+  var Below := 0;
+  var Above := 1;
+  if FComparison(Key, Source[Start + Hint]) < 0 then
+  begin
+    const Limit = Hint + 1;
+    while (Above < Limit) and (FComparison(Key, Source[Start + Hint - Above]) < 0) do
+    begin
+      Below := Above;
+      Above := Above * 2 + 1;
+      if Above <= 0 then
+      begin
+        Above := Limit;
+      end;
+    end;
+    Above := Min(Above, Limit);
+    const OldBelow = Below;
+    Below := Hint - Above;
+    Above := Hint - OldBelow;
+  end
+  else
+  begin
+    const Limit = Count - Hint;
+    while (Above < Limit) and (FComparison(Key, Source[Start + Hint + Above]) >= 0) do
+    begin
+      Below := Above;
+      Above := Above * 2 + 1;
+      if Above <= 0 then
+      begin
+        Above := Limit;
+      end;
+    end;
+    Above := Min(Above, Limit);
+    Inc(Below, Hint);
+    Inc(Above, Hint);
+  end;
+
+  Inc(Below);
+  while Below < Above do
+  begin
+    const Middle = Below + ((Above - Below) shr 1);
+    if FComparison(Key, Source[Start + Middle]) < 0 then
+    begin
+      Above := Middle;
+    end
+    else
+    begin
+      Below := Middle + 1;
+    end;
+  end;
+  Result := Above;
+end;
+
+// Merges two adjacent runs of which the first is not longer than the second: the first is copied aside and the merge
+// fills the array from the left
+procedure TTimSort.MergeFromLeft(const Start1, Count1, Start2, Count2: Integer);
+begin
+  LoadScratch(Start1, Count1);
+  var Left := 0;
+  var LeftCount := Count1;
+  var Right := Start2;
+  var RightCount := Count2;
+  var Dest := Start1;
+  var Threshold := FGallopThreshold;
+
+  // The first item of the second run is known to precede the first of the first run
+  FItems[Dest] := FItems[Right];
   Inc(Dest);
-  Inc(Cursor2);
-  Dec(Len2);
-  if Len2 = 0 then
+  Inc(Right);
+  Dec(RightCount);
+  if RightCount = 0 then
   begin
-    Copy(FTmp, Cursor1, FItems, Dest, Len1);
+    MoveBlock(FScratch, Left, FItems, Dest, LeftCount);
     Exit;
   end;
-  if Len1 = 1 then
+  if LeftCount = 1 then
   begin
-    Copy(FItems, Cursor2, FItems, Dest, Len2);
-    FItems[Dest + Len2] := FTmp[Cursor1];
+    MoveBlock(FItems, Right, FItems, Dest, RightCount);
+    FItems[Dest + RightCount] := FScratch[Left];
     Exit;
   end;
 
-  var MinGallop := FMinGallop;
   var Finished := False;
   while not Finished do
   begin
-    var Count1 := 0;
-    var Count2 := 0;
+    var LeftWins := 0;
+    var RightWins := 0;
 
-    // The straightforward way, until a run starts to win consistently
+    // One pair at a time, until one run has won Threshold times in a row
     repeat
-      if FComparison(FItems[Cursor2], FTmp[Cursor1]) < 0 then
+      if FComparison(FItems[Right], FScratch[Left]) < 0 then
       begin
-        FItems[Dest] := FItems[Cursor2];
+        FItems[Dest] := FItems[Right];
         Inc(Dest);
-        Inc(Cursor2);
-        Inc(Count2);
-        Count1 := 0;
-        Dec(Len2);
-        if Len2 = 0 then
+        Inc(Right);
+        Inc(RightWins);
+        LeftWins := 0;
+        Dec(RightCount);
+        if RightCount = 0 then
         begin
           Finished := True;
           Break;
@@ -560,159 +551,144 @@ begin
       end
       else
       begin
-        FItems[Dest] := FTmp[Cursor1];
+        FItems[Dest] := FScratch[Left];
         Inc(Dest);
-        Inc(Cursor1);
-        Inc(Count1);
-        Count2 := 0;
-        Dec(Len1);
-        if Len1 = 1 then
+        Inc(Left);
+        Inc(LeftWins);
+        RightWins := 0;
+        Dec(LeftCount);
+        if LeftCount = 1 then
         begin
           Finished := True;
           Break;
         end;
       end;
-    until (Count1 or Count2) >= MinGallop;
-    if Finished then
-    begin
-      Break;
-    end;
+    until (LeftWins or RightWins) >= Threshold;
 
-    // One run wins so consistently that galloping may pay: continue until neither wins consistently any more
-    repeat
-      Count1 := GallopRight(FItems[Cursor2], FTmp, Cursor1, Len1, 0);
-      if Count1 <> 0 then
-      begin
-        Copy(FTmp, Cursor1, FItems, Dest, Count1);
-        Inc(Dest, Count1);
-        Inc(Cursor1, Count1);
-        Dec(Len1, Count1);
-        if Len1 <= 1 then
+    // Galloping, until neither search finds a block of at least the initial threshold
+    if not Finished then
+    begin
+      repeat
+        LeftWins := GallopAfter(FItems[Right], Left, LeftCount, 0, FScratch);
+        if LeftWins <> 0 then
+        begin
+          MoveBlock(FScratch, Left, FItems, Dest, LeftWins);
+          Inc(Dest, LeftWins);
+          Inc(Left, LeftWins);
+          Dec(LeftCount, LeftWins);
+          if LeftCount <= 1 then
+          begin
+            Finished := True;
+            Break;
+          end;
+        end;
+
+        FItems[Dest] := FItems[Right];
+        Inc(Dest);
+        Inc(Right);
+        Dec(RightCount);
+        if RightCount = 0 then
         begin
           Finished := True;
           Break;
         end;
-      end;
-      FItems[Dest] := FItems[Cursor2];
-      Inc(Dest);
-      Inc(Cursor2);
-      Dec(Len2);
-      if Len2 = 0 then
-      begin
-        Finished := True;
-        Break;
-      end;
 
-      Count2 := GallopLeft(FTmp[Cursor1], FItems, Cursor2, Len2, 0);
-      if Count2 <> 0 then
-      begin
-        Copy(FItems, Cursor2, FItems, Dest, Count2);
-        Inc(Dest, Count2);
-        Inc(Cursor2, Count2);
-        Dec(Len2, Count2);
-        if Len2 = 0 then
+        RightWins := GallopBefore(FScratch[Left], Right, RightCount, 0, FItems);
+        if RightWins <> 0 then
+        begin
+          MoveBlock(FItems, Right, FItems, Dest, RightWins);
+          Inc(Dest, RightWins);
+          Inc(Right, RightWins);
+          Dec(RightCount, RightWins);
+          if RightCount = 0 then
+          begin
+            Finished := True;
+            Break;
+          end;
+        end;
+
+        FItems[Dest] := FScratch[Left];
+        Inc(Dest);
+        Inc(Left);
+        Dec(LeftCount);
+        if LeftCount = 1 then
         begin
           Finished := True;
           Break;
         end;
-      end;
-      FItems[Dest] := FTmp[Cursor1];
-      Inc(Dest);
-      Inc(Cursor1);
-      Dec(Len1);
-      if Len1 = 1 then
-      begin
-        Finished := True;
-        Break;
-      end;
-      Dec(MinGallop);
-    until not ((Count1 >= MinGallopStart) or (Count2 >= MinGallopStart));
-    if Finished then
-    begin
-      Break;
-    end;
+        Dec(Threshold);
+      until (LeftWins < InitialGallopThreshold) and (RightWins < InitialGallopThreshold);
 
-    if MinGallop < 0 then
-    begin
-      MinGallop := 0;
+      if not Finished then
+      begin
+        Threshold := Max(Threshold, 0) + 2;
+      end;
     end;
-    // Penalty for leaving the gallop mode
-    Inc(MinGallop, 2);
   end;
+  StoreGallopThreshold(Threshold);
 
-  if MinGallop < 1 then
+  if LeftCount = 1 then
   begin
-    FMinGallop := 1;
+    MoveBlock(FItems, Right, FItems, Dest, RightCount);
+    FItems[Dest + RightCount] := FScratch[Left];
   end
-  else
-  begin
-    FMinGallop := MinGallop;
-  end;
-
-  if Len1 = 1 then
-  begin
-    Copy(FItems, Cursor2, FItems, Dest, Len2);
-    FItems[Dest + Len2] := FTmp[Cursor1];
-  end
-  else if Len1 = 0 then
+  else if LeftCount = 0 then
   begin
     RaiseContractViolation;
   end
   else
   begin
-    Copy(FTmp, Cursor1, FItems, Dest, Len1);
+    MoveBlock(FScratch, Left, FItems, Dest, LeftCount);
   end;
 end;
 
-procedure TTimSort.MergeHi(const Base1, Len1Start, Base2, Len2Start: Integer);
+// The mirror image of MergeFromLeft for a first run that is longer than the second: the second is copied aside and the merge
+// fills the array from the right
+procedure TTimSort.MergeFromRight(const Start1, Count1, Start2, Count2: Integer);
 begin
-  var Len1 := Len1Start;
-  var Len2 := Len2Start;
+  LoadScratch(Start2, Count2);
+  var Left := Start1 + Count1 - 1;
+  var LeftCount := Count1;
+  var Right := Count2 - 1;
+  var RightCount := Count2;
+  var Dest := Start2 + Count2 - 1;
+  var Threshold := FGallopThreshold;
 
-  // The second run goes into the temporary array
-  EnsureCapacity(Len2);
-  Copy(FItems, Base2, FTmp, 0, Len2);
-
-  var Cursor1 := Base1 + Len1 - 1;
-  var Cursor2 := Len2 - 1;
-  var Dest := Base2 + Len2 - 1;
-
-  // The last item of the first run moves, and the degenerate cases end here
-  FItems[Dest] := FItems[Cursor1];
+  // The last item of the first run is known to follow the last item of the second run
+  FItems[Dest] := FItems[Left];
   Dec(Dest);
-  Dec(Cursor1);
-  Dec(Len1);
-  if Len1 = 0 then
+  Dec(Left);
+  Dec(LeftCount);
+  if LeftCount = 0 then
   begin
-    Copy(FTmp, 0, FItems, Dest - (Len2 - 1), Len2);
+    MoveBlock(FScratch, 0, FItems, Dest - (RightCount - 1), RightCount);
     Exit;
   end;
-  if Len2 = 1 then
+  if RightCount = 1 then
   begin
-    Dec(Dest, Len1);
-    Dec(Cursor1, Len1);
-    Copy(FItems, Cursor1 + 1, FItems, Dest + 1, Len1);
-    FItems[Dest] := FTmp[Cursor2];
+    Dec(Dest, LeftCount);
+    Dec(Left, LeftCount);
+    MoveBlock(FItems, Left + 1, FItems, Dest + 1, LeftCount);
+    FItems[Dest] := FScratch[Right];
     Exit;
   end;
 
-  var MinGallop := FMinGallop;
   var Finished := False;
   while not Finished do
   begin
-    var Count1 := 0;
-    var Count2 := 0;
+    var LeftWins := 0;
+    var RightWins := 0;
 
     repeat
-      if FComparison(FTmp[Cursor2], FItems[Cursor1]) < 0 then
+      if FComparison(FScratch[Right], FItems[Left]) < 0 then
       begin
-        FItems[Dest] := FItems[Cursor1];
+        FItems[Dest] := FItems[Left];
         Dec(Dest);
-        Dec(Cursor1);
-        Inc(Count1);
-        Count2 := 0;
-        Dec(Len1);
-        if Len1 = 0 then
+        Dec(Left);
+        Inc(LeftWins);
+        RightWins := 0;
+        Dec(LeftCount);
+        if LeftCount = 0 then
         begin
           Finished := True;
           Break;
@@ -720,107 +696,95 @@ begin
       end
       else
       begin
-        FItems[Dest] := FTmp[Cursor2];
+        FItems[Dest] := FScratch[Right];
         Dec(Dest);
-        Dec(Cursor2);
-        Inc(Count2);
-        Count1 := 0;
-        Dec(Len2);
-        if Len2 = 1 then
+        Dec(Right);
+        Inc(RightWins);
+        LeftWins := 0;
+        Dec(RightCount);
+        if RightCount = 1 then
         begin
           Finished := True;
           Break;
         end;
       end;
-    until (Count1 or Count2) >= MinGallop;
-    if Finished then
-    begin
-      Break;
-    end;
+    until (LeftWins or RightWins) >= Threshold;
 
-    repeat
-      Count1 := Len1 - GallopRight(FTmp[Cursor2], FItems, Base1, Len1, Len1 - 1);
-      if Count1 <> 0 then
-      begin
-        Dec(Dest, Count1);
-        Dec(Cursor1, Count1);
-        Dec(Len1, Count1);
-        Copy(FItems, Cursor1 + 1, FItems, Dest + 1, Count1);
-        if Len1 = 0 then
+    if not Finished then
+    begin
+      repeat
+        LeftWins := LeftCount - GallopAfter(FScratch[Right], Start1, LeftCount, LeftCount - 1, FItems);
+        if LeftWins <> 0 then
+        begin
+          Dec(Dest, LeftWins);
+          Dec(Left, LeftWins);
+          Dec(LeftCount, LeftWins);
+          MoveBlock(FItems, Left + 1, FItems, Dest + 1, LeftWins);
+          if LeftCount = 0 then
+          begin
+            Finished := True;
+            Break;
+          end;
+        end;
+
+        FItems[Dest] := FScratch[Right];
+        Dec(Dest);
+        Dec(Right);
+        Dec(RightCount);
+        if RightCount = 1 then
         begin
           Finished := True;
           Break;
         end;
-      end;
-      FItems[Dest] := FTmp[Cursor2];
-      Dec(Dest);
-      Dec(Cursor2);
-      Dec(Len2);
-      if Len2 = 1 then
-      begin
-        Finished := True;
-        Break;
-      end;
 
-      Count2 := Len2 - GallopLeft(FItems[Cursor1], FTmp, 0, Len2, Len2 - 1);
-      if Count2 <> 0 then
-      begin
-        Dec(Dest, Count2);
-        Dec(Cursor2, Count2);
-        Dec(Len2, Count2);
-        Copy(FTmp, Cursor2 + 1, FItems, Dest + 1, Count2);
-        if Len2 <= 1 then
+        RightWins := RightCount - GallopBefore(FItems[Left], 0, RightCount, RightCount - 1, FScratch);
+        if RightWins <> 0 then
+        begin
+          Dec(Dest, RightWins);
+          Dec(Right, RightWins);
+          Dec(RightCount, RightWins);
+          MoveBlock(FScratch, Right + 1, FItems, Dest + 1, RightWins);
+          if RightCount <= 1 then
+          begin
+            Finished := True;
+            Break;
+          end;
+        end;
+
+        FItems[Dest] := FItems[Left];
+        Dec(Dest);
+        Dec(Left);
+        Dec(LeftCount);
+        if LeftCount = 0 then
         begin
           Finished := True;
           Break;
         end;
-      end;
-      FItems[Dest] := FItems[Cursor1];
-      Dec(Dest);
-      Dec(Cursor1);
-      Dec(Len1);
-      if Len1 = 0 then
-      begin
-        Finished := True;
-        Break;
-      end;
-      Dec(MinGallop);
-    until not ((Count1 >= MinGallopStart) or (Count2 >= MinGallopStart));
-    if Finished then
-    begin
-      Break;
-    end;
+        Dec(Threshold);
+      until (LeftWins < InitialGallopThreshold) and (RightWins < InitialGallopThreshold);
 
-    if MinGallop < 0 then
-    begin
-      MinGallop := 0;
+      if not Finished then
+      begin
+        Threshold := Max(Threshold, 0) + 2;
+      end;
     end;
-    Inc(MinGallop, 2);
   end;
+  StoreGallopThreshold(Threshold);
 
-  if MinGallop < 1 then
+  if RightCount = 1 then
   begin
-    FMinGallop := 1;
+    Dec(Dest, LeftCount);
+    Dec(Left, LeftCount);
+    MoveBlock(FItems, Left + 1, FItems, Dest + 1, LeftCount);
+    FItems[Dest] := FScratch[Right];
   end
-  else
-  begin
-    FMinGallop := MinGallop;
-  end;
-
-  if Len2 = 1 then
-  begin
-    Dec(Dest, Len1);
-    Dec(Cursor1, Len1);
-    Copy(FItems, Cursor1 + 1, FItems, Dest + 1, Len1);
-    FItems[Dest] := FTmp[Cursor2];
-  end
-  else if Len2 = 0 then
+  else if RightCount = 0 then
   begin
     RaiseContractViolation;
   end
   else
   begin
-    Copy(FTmp, 0, FItems, Dest - (Len2 - 1), Len2);
+    MoveBlock(FScratch, 0, FItems, Dest - (RightCount - 1), RightCount);
   end;
 end;
 
