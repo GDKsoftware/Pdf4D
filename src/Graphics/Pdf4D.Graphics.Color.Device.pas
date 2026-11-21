@@ -254,7 +254,11 @@ end;
 
 function TPDDeviceCMYK.ToRgb(const Components: TArray<Single>): TPdfRgb;
 begin
-  const Values = NormalizeComponents(Components);
+  var Values := NormalizeComponents(Components);
+  for var Index := 0 to High(Values) do
+  begin
+    Values[Index] := WrapToSixteenBits(Values[Index]);
+  end;
   var Rgb: array[0..2] of Single;
   FTransform.ToRgb(@Values[0], @Rgb[0]);
   Result := TPdfRgb.Create(Rgb[0], Rgb[1], Rgb[2]);

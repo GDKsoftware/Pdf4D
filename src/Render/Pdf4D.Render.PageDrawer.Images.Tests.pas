@@ -72,6 +72,12 @@ type
     procedure TestInlineImageWithAbbreviatedColorSpaceAndFilter;
 
     [Test]
+    procedure TestInlineImageWithAbbreviatedIndexedColorSpace;
+
+    [Test]
+    procedure TestInlineImageWithIndexedColorSpaceAndAbbreviatedBase;
+
+    [Test]
     procedure TestInlineStencilWithDecode;
 
     [Test]
@@ -270,6 +276,31 @@ begin
   Assert.AreEqual<Integer>(1, Length(Calls));
   AssertPixel(Calls[0], 0, 0, 255, 0, 0, 255);
   AssertPixel(Calls[0], 1, 0, 0, 0, 255, 255);
+end;
+
+// [/I /RGB 1 <...>] is [/Indexed /DeviceRGB 1 <...>] (PDInlineImage.createColorSpace)
+procedure TPageDrawerImageTests.TestInlineImageWithAbbreviatedIndexedColorSpace;
+begin
+  var Content := TEncoding.ASCII.GetBytes('q 40 0 0 40 20 20 cm BI /W 2 /H 1 /BPC 8 /CS [/I /RGB 1 <FF0000 0000FF>] ID ');
+  Content := Content + [1, 0] + TEncoding.ASCII.GetBytes(' EI Q');
+  RenderBytes(Content, ImageResources, '', nil);
+
+  const Calls = BitmapCalls;
+  Assert.AreEqual<Integer>(1, Length(Calls));
+  AssertPixel(Calls[0], 0, 0, 0, 0, 255, 255);
+  AssertPixel(Calls[0], 1, 0, 255, 0, 0, 255);
+end;
+
+procedure TPageDrawerImageTests.TestInlineImageWithIndexedColorSpaceAndAbbreviatedBase;
+begin
+  var Content := TEncoding.ASCII.GetBytes('q 40 0 0 40 20 20 cm BI /W 2 /H 1 /BPC 8 /CS [/Indexed /G 1 <00 FF>] ID ');
+  Content := Content + [0, 1] + TEncoding.ASCII.GetBytes(' EI Q');
+  RenderBytes(Content, ImageResources, '', nil);
+
+  const Calls = BitmapCalls;
+  Assert.AreEqual<Integer>(1, Length(Calls));
+  AssertPixel(Calls[0], 0, 0, 0, 0, 0, 255);
+  AssertPixel(Calls[0], 1, 0, 255, 255, 255, 255);
 end;
 
 procedure TPageDrawerImageTests.TestInlineStencilWithDecode;

@@ -107,11 +107,24 @@ type
 
     [Test]
     procedure TestSpacesAreSharedPerArray;
+
+    [Test]
+    procedure TestSeparationTintOverOneWrapsLikeJava;
+
+    [Test]
+    procedure TestDeviceNWithHugeColorantListRaisesQuickly;
+
+    [Test]
+    procedure TestDictionaryWithColorSpaceEntryIsTheSpaceOfTheEntry;
+
+    [Test]
+    procedure TestDictionaryWithColorSpaceEntryThatIsItselfRaises;
   end;
 
 implementation
 
 uses
+  System.Diagnostics,
   System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Dictionary,
@@ -127,6 +140,8 @@ const
   ColorTolerance = 1.0 / 255.0;
   RedLevel = 255;
   MaxDeviceNColorants = 32;
+  HugeColorantCount = 100000;
+  HugeColorantLimitMilliseconds = 500;
 
 { TSpecialColorSpaceTests }
 
@@ -576,6 +591,65 @@ begin
   Assert.AreSame(FReferences.SpaceOf('Idx'), FReferences.SpaceOf('Idx'));
   Assert.AreSame(FReferences.SpaceOf('Sep'), FReferences.SpaceOf('Sep'));
   Assert.AreSame(FReferences.SpaceOf('DevNAttr'), FReferences.SpaceOf('DevNAttr'));
+end;
+
+// DeviceCMYK through ICC_ColorSpace.toRGB: a tint over 1 does not clamp, the 16-bit value wraps
+procedure TSpecialColorSpaceTests.TestSeparationTintOverOneWrapsLikeJava;
+begin
+  FReferences.CheckColors('SepOverOne', ColorTolerance);
+  FReferences.CheckImages('SepOverOne', 1);
+end;
+
+// The count is checked before anything else is made: the alternate here does not exist, and the message must still be about the colorants
+procedure TSpecialColorSpaceTests.TestDeviceNWithHugeColorantListRaisesQuickly;
+begin
+  const Names = TCosArray.Create;
+  for var Index := 1 to HugeColorantCount do
+  begin
+    Names.Add(TCosName.Create(Format('C%d', [Index])));
+  end;
+  const Items = NewDeviceNArray(Names, TCosName.Create('NoSuchSpace'), NewGrayTint);
+  FBuilder.AddColorSpace('DevNHuge', Items);
+  const Stopwatch = TStopwatch.StartNew;
+  var Message := '';
+
+  try
+    FBuilder.CreateSpace(FBuilder.NewName('DevNHuge'));
+  except
+    on Failure: EPdfParseException do
+    begin
+      Message := Failure.Message;
+    end;
+  end;
+
+  Assert.IsTrue(Message.Contains('colorants'), Message);
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < HugeColorantLimitMilliseconds, Format('Took %d ms', [Stopwatch.ElapsedMilliseconds]));
+end;
+
+// PDColorSpace.create: PDFBOX-4833
+procedure TSpecialColorSpaceTests.TestDictionaryWithColorSpaceEntryIsTheSpaceOfTheEntry;
+begin
+  const Wrapper = TCosDictionary.Create;
+  Wrapper.SetItem(TCosNames.ColorSpace, TCosName.Create(TCosNames.DeviceRGB));
+  FBuilder.AddColorSpace('Wrapped', Wrapper);
+
+  const Space = FBuilder.CreateSpace(FBuilder.NewName('Wrapped'));
+
+  Assert.AreEqual('DeviceRGB', Space.Name);
+end;
+
+// PDFBOX-5315
+procedure TSpecialColorSpaceTests.TestDictionaryWithColorSpaceEntryThatIsItselfRaises;
+begin
+  const Wrapper = TCosDictionary.Create;
+  Wrapper.SetItem(TCosNames.ColorSpace, FBuilder.NewReference(Wrapper, 23));
+
+  Assert.WillRaise(
+    procedure
+    begin
+      FBuilder.CreateSpace(Wrapper);
+    end,
+    EPdfParseException);
 end;
 
 end.

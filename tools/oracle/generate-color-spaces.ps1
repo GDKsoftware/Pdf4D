@@ -30,6 +30,8 @@ $unit3 = [double[]](0, 0.5, 1)
 $ten = [double[]](0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 0.25, 0.75, 1.5)
 # No value over 1 for a tint: PDFBox does not clip the input of a type 2 function and the CMYK conversion of Java differs there
 $tint = [double[]](0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 0.25, 0.75)
+# Over 1 on the type 2 tint of Sep (DeviceCMYK alternate): Java wraps the 16-bit CMYK components of ICC_ColorSpace.toRGB without clamping
+$tintOver = [double[]](0, 0.5, 1, 1.25, 1.5, 2)
 $labA = [double[]](-128, -50, 0, 50, 127)
 $labC = [double[]](-100, -50, 0, 50, 100)
 $bytes5 = [double[]](0, 64, 128, 192, 255)
@@ -57,6 +59,7 @@ $spaces = @(
     @('IdxStream', 1, @(, $indexes), @(, $indexBytes)),
     @('IdxCal', 1, @(, $indexes), @(, $indexBytes)),
     @('Sep', 1, @(, $tint), @(, $sampleBytes)),
+    @('SepOverOne', 1, @(, $tintOver), @(, $sampleBytes)),
     @('SepType4', 1, @(, $tint), @(, $sampleBytes)),
     @('SepAll', 1, @(, $tint), @(, $sampleBytes)),
     @('SepNone', 1, @(, $tint), @(, $sampleBytes)),

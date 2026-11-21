@@ -174,8 +174,10 @@ type
     function ConvertPixelWithTintTransform(const Pixel: PByte): Cardinal;
 
   public
-    // Takes over TintTransform (also when this raises). The colour spaces are not owned. Raises EPdfParseException for no colorant and
-    // for more than MaxDeviceNColorants.
+    // Raises EPdfParseException for no colorant and for more than MaxDeviceNColorants; the factory asks before it builds anything else
+    class procedure CheckColorantCount(const ColorantCount: Integer); static;
+
+    // Takes over TintTransform (also when this raises). The colour spaces are not owned. Raises EPdfParseException like CheckColorantCount.
     constructor Create(const ColorantNames: TArray<string>; const AlternateColorSpace: TPDColorSpace; const TintTransform: TPDFunction;
                        const HasAttributes: Boolean; const Attributes: TPDDeviceNAttributes);
     destructor Destroy; override;
@@ -596,6 +598,15 @@ end;
 
 { TPDDeviceN }
 
+class procedure TPDDeviceN.CheckColorantCount(const ColorantCount: Integer);
+begin
+  const IsCountValid = ((ColorantCount >= 1) and (ColorantCount <= MaxDeviceNColorants));
+  if not IsCountValid then
+  begin
+    raise EPdfParseException.CreateFmt(DeviceNColorantCount, [MaxDeviceNColorants, ColorantCount]);
+  end;
+end;
+
 constructor TPDDeviceN.Create(const ColorantNames: TArray<string>; const AlternateColorSpace: TPDColorSpace; const TintTransform: TPDFunction;
                               const HasAttributes: Boolean; const Attributes: TPDDeviceNAttributes);
 begin
@@ -606,12 +617,7 @@ begin
   FHasAttributes := HasAttributes;
   FAttributes := Attributes;
 
-  const ColorantCount = Length(ColorantNames);
-  const IsCountValid = ((ColorantCount >= 1) and (ColorantCount <= MaxDeviceNColorants));
-  if not IsCountValid then
-  begin
-    raise EPdfParseException.CreateFmt(DeviceNColorantCount, [MaxDeviceNColorants, ColorantCount]);
-  end;
+  CheckColorantCount(Length(ColorantNames));
 
   InitColorConversionCache;
 end;

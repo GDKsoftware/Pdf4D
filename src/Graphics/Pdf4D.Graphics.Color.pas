@@ -91,6 +91,9 @@ type
     class function ConvertWithTransform(const Raster: TPdfRaster; const Transform: TIccTransform): TPdfBitmap; static;
     // (int) of a float in Java: not a number is 0, a value outside the range of an integer is the closest integer
     class function TruncateToInteger(const Value: Single): Integer; static;
+    // ICC_ColorSpace.toRGB: each component goes through (short)(v * 65535f + 0.5f) without a clamp, so that a value over 1 wraps. The result is the
+    // 16-bit value as a fraction of 65535, which is what the colour transform reads.
+    class function WrapToSixteenBits(const Value: Single): Single; static;
     // (int) of Value * 255f in Java, and the 8 bits of it that the packed int raster of a PDFBox RGB image keeps (so that 1.2 wraps)
     class function TruncateChannelToByte(const Value: Single): Byte; static;
 
@@ -117,6 +120,8 @@ const
   RoundingOffset = 0.5;
   BytesPerRgbPixel = 3;
   ByteMask = $FF;
+  SixteenBitMax = $FFFF;
+  RoundingHalf = 0.5;
 
 { TPdfRgb }
 
@@ -303,6 +308,12 @@ begin
   end;
 
   Result := Trunc(Value);
+end;
+
+class function TPDColorSpace.WrapToSixteenBits(const Value: Single): Single;
+begin
+  const Scaled: Single = Value * Single(SixteenBitMax) + Single(RoundingHalf);
+  Result := (TruncateToInteger(Scaled) and SixteenBitMax) / Single(SixteenBitMax);
 end;
 
 class function TPDColorSpace.TruncateChannelToByte(const Value: Single): Byte;

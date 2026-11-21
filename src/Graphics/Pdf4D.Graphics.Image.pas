@@ -16,6 +16,7 @@ uses
   Pdf4D.Common.Log,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.PdfArray,
   Pdf4D.Graphics.Color,
   Pdf4D.Graphics.Image.SampledReader,
   Pdf4D.Model.Resources,
@@ -117,8 +118,12 @@ type
   TPDInlineImage = class(TPDImage)
   private
     FData: TBytes;
+    // The Indexed colour space of an array in /CS: the array is gone after the image, so the context does not hold the space
+    FOwnedColorSpace: TPDColorSpace;
 
+    class function LongNameOf(const Name: string): string; static;
     function FilterNames: TArray<string>;
+    function CreateIndexedColorSpace(const Value: TCosArray): TPDColorSpace;
 
   protected
     function AbbreviationOf(const Name: string): string; override;
@@ -128,6 +133,7 @@ type
   public
     // Parameters, Data and Resources are not owned and must outlive the image
     constructor Create(const Parameters: TCosDictionary; const Data: TBytes; const Resources: TPDResources);
+    destructor Destroy; override;
   end;
 
 implementation
@@ -139,7 +145,6 @@ uses
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.Number,
-  Pdf4D.Cos.PdfArray,
   Pdf4D.Codec.CCITTFax,
   Pdf4D.Codec.Jpeg,
   Pdf4D.Filter.Chain,
@@ -152,7 +157,7 @@ resourcestring
   Jbig2NotInstalled = 'Cannot read JBIG2 image: jbig2-imageio is not installed';
   UnsupportedImageFilter = 'Cannot read an image with the filter %s';
   NoColorSpace = 'could not determine color space';
-  InlineIndexedNotSupported = 'Inline images with an abbreviated Indexed colour space are not supported yet';
+  InlineIndexedBaseNotAName = 'The base of an Indexed colour space of an inline image is a name';
   InlineColorSpaceIllegal = 'Illegal type of inline image color space';
 
 const
@@ -981,26 +986,68 @@ begin
   end;
 end;
 
+// toLongName
+class function TPDInlineImage.LongNameOf(const Name: string): string;
+begin
+  Result := Name;
+  if Name = TCosNames.RGB then
+  begin
+    Result := TCosNames.DeviceRGB;
+  end
+  else if Name = TCosNames.CMYK then
+  begin
+    Result := TCosNames.DeviceCMYK;
+  end
+  else if Name = TCosNames.G then
+  begin
+    Result := TCosNames.DeviceGray;
+  end;
+end;
+
+destructor TPDInlineImage.Destroy;
+begin
+  FOwnedColorSpace.Free;
+  inherited;
+end;
+
+// createColorSpace for an array: [/I base hival lookup] is copied as [/Indexed base hival lookup] with the long name of the base. The copy
+// borrows the items that it does not change, and gives them back before it is freed.
+function TPDInlineImage.CreateIndexedColorSpace(const Value: TCosArray): TPDColorSpace;
+begin
+  const Base = Value.GetObject(1);
+  if not (Base is TCosName) then
+  begin
+    raise EPdfParseException.Create(InlineIndexedBaseNotAName);
+  end;
+
+  const Copy = TCosArray.Create;
+  try
+    Copy.Add(TCosName.Create(TCosNames.Indexed));
+    Copy.Add(TCosName.Create(LongNameOf(TCosName(Base).Name)));
+    for var Index := 2 to Value.Count - 1 do
+    begin
+      Copy.Add(Value.Get(Index));
+    end;
+
+    try
+      Result := TPDColorSpaceFactory.CreateUncachedIndexed(Copy, Resources);
+    finally
+      for var Index := Value.Count - 1 downto 2 do
+      begin
+        Copy.RemoveLast;
+      end;
+    end;
+  finally
+    Copy.Free;
+  end;
+end;
+
 // toLongName, createColorSpace
 function TPDInlineImage.CreateColorSpace(const Value: TCosBase): TPDColorSpace;
 begin
   if Value is TCosName then
   begin
-    var LongName := TCosName(Value).Name;
-    if LongName = TCosNames.RGB then
-    begin
-      LongName := 'DeviceRGB';
-    end
-    else if LongName = TCosNames.CMYK then
-    begin
-      LongName := 'DeviceCMYK';
-    end
-    else if LongName = TCosNames.G then
-    begin
-      LongName := TCosNames.DeviceGray;
-    end;
-
-    const LongValue = TCosName.Create(LongName);
+    const LongValue = TCosName.Create(LongNameOf(TCosName(Value).Name));
     try
       Exit(TPDColorSpaceFactory.Create(LongValue, Resources));
     finally
@@ -1016,12 +1063,10 @@ begin
     begin
       raise EPdfParseException.Create(InlineColorSpaceIllegal);
     end;
-    // The array as it is when it spells Indexed in full; the abbreviations of its base follow with the colour space Indexed
-    if TCosName(First).Name = TCosNames.I then
-    begin
-      raise EPdfUnsupportedFeatureException.Create(InlineIndexedNotSupported);
-    end;
-    Exit(TPDColorSpaceFactory.Create(Value, Resources));
+
+    FreeAndNil(FOwnedColorSpace);
+    FOwnedColorSpace := CreateIndexedColorSpace(TCosArray(Value));
+    Exit(FOwnedColorSpace);
   end;
 
   raise EPdfParseException.Create(InlineColorSpaceIllegal);

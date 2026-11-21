@@ -31,6 +31,8 @@ type
     class function Resolve(const Value: TCosBase): TCosBase; static;
     class function CreateAt(const Value: TCosBase; const Context: TPDDocumentContext; const Resources: TPDResources; const WasDefault: Boolean;
                             const Depth: Integer): TPDColorSpace; static;
+    class function CreateFromDictionary(const Wrapper: TCosDictionary; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                        const WasDefault: Boolean; const Depth: Integer): TPDColorSpace; static;
     class function CreateFromName(const Name: string; const Context: TPDDocumentContext; const Resources: TPDResources; const WasDefault: Boolean;
                                   const Depth: Integer): TPDColorSpace; static;
     class function CreateFromArray(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
@@ -41,6 +43,8 @@ type
     class function TryCreateDevice(const Name: string; out Space: TPDColorSpace): Boolean; static;
     class function CreateIccBased(const Items: TCosArray; const Context: TPDDocumentContext; const Depth: Integer): TPDColorSpace; static;
     class function CreateCieBased(const Kind: string; const Items: TCosArray; const Context: TPDDocumentContext): TPDColorSpace; static;
+    class function BuildIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                const Depth: Integer): TPDColorSpace; static;
     class function CreateIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
                                  const Depth: Integer): TPDColorSpace; static;
     class function CreateSeparation(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
@@ -73,6 +77,9 @@ type
     // colour space, a colour space that is incomplete, one that leads back to itself and spaces that are nested deeper than
     // MaxColorSpaceDepth. Resources may not be nil.
     class function Create(const Value: TCosBase; const Resources: TPDResources; const WasDefault: Boolean = False): TPDColorSpace; static;
+    // An Indexed colour space of an array that does not live as long as the document (the array of an inline image). The caller owns the space,
+    // which keeps no reference to Items, and the context never sees the array. Raises like Create. Resources may not be nil.
+    class function CreateUncachedIndexed(const Items: TCosArray; const Resources: TPDResources): TPDColorSpace; static;
   end;
 
 implementation
@@ -199,7 +206,27 @@ begin
     Exit(CreateFromArray(TCosArray(Resolved), Context, Resources, Depth));
   end;
 
+  if (Resolved is TCosDictionary) and TCosDictionary(Resolved).ContainsKey(TCosNames.ColorSpace) then
+  begin
+    Exit(CreateFromDictionary(TCosDictionary(Resolved), Context, Resources, WasDefault, Depth));
+  end;
+
   raise EPdfParseException.CreateFmt(ColorSpaceBadValue, [Resolved.ClassName]);
+end;
+
+// PDColorSpace.create: a dictionary with a /ColorSpace entry is the space of that entry (PDFBOX-4833); one that points to itself raises (PDFBOX-5315)
+class function TPDColorSpaceFactory.CreateFromDictionary(const Wrapper: TCosDictionary; const Context: TPDDocumentContext;
+                                                         const Resources: TPDResources; const WasDefault: Boolean;
+                                                         const Depth: Integer): TPDColorSpace;
+begin
+  var Entry: TCosBase;
+  const IsFound = Wrapper.TryGetDictionaryObject(TCosNames.ColorSpace, Entry);
+  if (not IsFound) or (Resolve(Entry) = Wrapper) then
+  begin
+    raise EPdfParseException.Create(ColorSpaceRefersToItself);
+  end;
+
+  Result := CreateAt(Entry, Context, Resources, WasDefault, Depth + 1);
 end;
 
 class function TPDColorSpaceFactory.TryGetDefaultName(const Name: string; out DefaultName: string): Boolean;
@@ -492,8 +519,8 @@ begin
 end;
 
 // PDIndexed(COSArray, PDResources): the base comes from the reference where there is one, the table from a string or a stream
-class function TPDColorSpaceFactory.CreateIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
-                                                  const Depth: Integer): TPDColorSpace;
+class function TPDColorSpaceFactory.BuildIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                 const Depth: Integer): TPDColorSpace;
 begin
   const HasParts = (Items.Count > IndexedHivalIndex);
   if not HasParts then
@@ -508,7 +535,23 @@ begin
     raise EPdfParseException.Create(IndexedHivalNotANumber);
   end;
 
-  Result := StoreInContext(Items, Context, TPDIndexed.Create(Base, TCosNumber(Hival).IntValue, ReadLookupData(Items)));
+  Result := TPDIndexed.Create(Base, TCosNumber(Hival).IntValue, ReadLookupData(Items));
+end;
+
+class function TPDColorSpaceFactory.CreateIndexed(const Items: TCosArray; const Context: TPDDocumentContext; const Resources: TPDResources;
+                                                  const Depth: Integer): TPDColorSpace;
+begin
+  Result := StoreInContext(Items, Context, BuildIndexed(Items, Context, Resources, Depth));
+end;
+
+class function TPDColorSpaceFactory.CreateUncachedIndexed(const Items: TCosArray; const Resources: TPDResources): TPDColorSpace;
+begin
+  if not Assigned(Resources) then
+  begin
+    raise EArgumentNilException.Create('Resources');
+  end;
+
+  Result := BuildIndexed(Items, Resources.Context, Resources, 0);
 end;
 
 class function TPDColorSpaceFactory.CreateTintTransform(const Items: TCosArray; const Context: TPDDocumentContext): TPDFunction;
@@ -586,6 +629,8 @@ class function TPDColorSpaceFactory.ReadColorants(const Colorants: TCosDictionar
                                                   const Depth: Integer): TArray<TPDDeviceNColorant>;
 begin
   Result := nil;
+  SetLength(Result, Length(ColorantNames));
+  var Count := 0;
   for var ColorantName in ColorantNames do
   begin
     var Value: TCosBase;
@@ -603,8 +648,10 @@ begin
     var Colorant: TPDDeviceNColorant;
     Colorant.Name := ColorantName;
     Colorant.Separation := TPDSeparation(Space);
-    Result := Result + [Colorant];
+    Result[Count] := Colorant;
+    Inc(Count);
   end;
+  SetLength(Result, Count);
 end;
 
 class function TPDColorSpaceFactory.ReadDeviceNAttributes(const Attributes: TCosDictionary; const ColorantNames: TArray<string>;
@@ -638,6 +685,7 @@ begin
   end;
 
   const ColorantNames = ReadColorantNames(Items);
+  TPDDeviceN.CheckColorantCount(Length(ColorantNames));
   const Alternate = CreateAt(Items.Get(AlternateIndex), Context, Resources, False, Depth + 1);
 
   var AttributesValue: TCosBase := nil;
