@@ -49,7 +49,7 @@ Write-Host ("Copied {0} test resource PDFs" -f $rows.Count)
 $jiraDir = Join-Path $root 'tests\corpus\pdfbox-jira'
 New-Item -ItemType Directory -Force $jiraDir | Out-Null
 $pom = Get-Content (Join-Path $src 'pdfbox\pom.xml') -Raw
-if ($failed.Count) { $failed | Set-Content (Join-Path $root "toolsrpusailed-downloads.txt") -Encoding UTF8 }
+if ($failed.Count) { $failed | Set-Content (Join-Path $root "tools\corpus\failed-downloads.txt") -Encoding UTF8 }
 $jiraRows = @()
 foreach ($m in [regex]::Matches($pom, '(?s)<url>([^<]+)</url>\s*<outputDirectory>[^<]*</outputDirectory>\s*<outputFileName>([^<]+)</outputFileName>(?:\s*<sha512>([0-9a-fA-F]+)</sha512>)?')) {
     $url = $m.Groups[1].Value.Trim(); $name = $m.Groups[2].Value.Trim(); $sha = $m.Groups[3].Value.Trim().ToLower()
