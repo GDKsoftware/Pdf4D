@@ -418,6 +418,7 @@
         <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Golden.Comparer.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Golden.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.Fuzz.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Robustness.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.pas"/>

@@ -9,7 +9,7 @@ uses
   System.Classes,
   DUnitX.TestFramework,
   Pdf4D.Tests.PdfBuilder,
-  Pdf4D.Tests.Robustness.Tests;
+  Pdf4D.Tests.Fuzz;
 
 type
   // The bytes of a content stream, written one piece at a time

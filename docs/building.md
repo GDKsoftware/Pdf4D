@@ -53,7 +53,7 @@ Tests that read corpus files look for a `corpus` folder with a `manifest.csv`, s
 
 ## Fuzz sweeps
 
-`Pdf4D.Tests.Robustness.Tests` and `Pdf4D.Tests.TextRobustness.Tests` mutate corpus files, generate content streams and mutate font programs; every run happens on a worker thread with a time limit and may only succeed or end in an `EPdfException`. The seeds and sizes in the code are fixed. For a larger sweep with other seeds, set these environment variables and run one fixture (the test program takes DUnitX options such as `-r:`):
+The fuzz runs are `Pdf4D.Tests.Robustness.Tests` (mutated corpus files and mutated decoder input: JPEG, CCITT, ICC profile, PostScript function, Type 1 and CFF charstrings, `glyf` table), `Pdf4D.Tests.TextRobustness.Tests` (generated content streams, font programs, hostile documents) in the core test project, and `Pdf4D.Tests.RenderRobustness.Tests` in the Skia test project (every page of the mutated corpus and of 2000 generated graphics streams rendered at 36 DPI with the Skia backend, and hostile image, recursion and geometry documents). The work and the mutation machinery are in `tests\Support\Pdf4D.Tests.Fuzz.pas`. Every run happens on a worker thread with a time limit and may only succeed or end in an `EPdfException`. The seeds and sizes in the code are fixed. For a larger sweep with other seeds, set these environment variables and run one fixture (the test programs take DUnitX options such as `-r:`):
 
 | Variable | Meaning |
 |---|---|
@@ -66,6 +66,7 @@ Tests that read corpus files look for a `corpus` folder with a `manifest.csv`, s
 ```powershell
 $env:PDF4D_FUZZ_SEED = 100000; $env:PDF4D_FUZZ_SCALE = 4
 tests\Win64\Debug\Pdf4D.Tests.exe -r:Pdf4D.Tests.TextRobustness.Tests.TTextRobustnessTests
+tests\Skia\Win64\Debug\Pdf4D.Skia.Tests.exe -r:Pdf4D.Tests.RenderRobustness.Tests.TRenderRobustnessTests
 ```
 
 A run that hits the time limit keeps its thread, so the process can crash when it ends; the failure is reported before that.
