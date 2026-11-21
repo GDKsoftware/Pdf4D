@@ -77,7 +77,6 @@ type
     procedure TestHugeCmykIsSubsampledWithinTheRasterLimit;
 
     [Test]
-    [Ignore('Task 24')]
     procedure TestShortIndexedLookupClamps;
 
     [Test]
