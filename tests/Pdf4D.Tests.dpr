@@ -179,6 +179,7 @@ uses
   Pdf4D.Render.PageDrawer.Pattern.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Pattern.Tests.pas',
   Pdf4D.Render.PageDrawer.OptionalContent.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.OptionalContent.Tests.pas',
   Pdf4D.Render.PageDrawer.Annotations.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Annotations.Tests.pas',
+  Pdf4D.Render.Limits.Tests in '..\src\Render\Pdf4D.Render.Limits.Tests.pas',
   Pdf4D.Render.Renderer.Tests in '..\src\Render\Pdf4D.Render.Renderer.Tests.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',

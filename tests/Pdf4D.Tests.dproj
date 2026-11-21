@@ -250,6 +250,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Pattern.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.OptionalContent.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Annotations.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.Limits.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>

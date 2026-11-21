@@ -19,6 +19,8 @@ const
   DefaultMaxTilingCells: Int64           = 1048576;
   // TilingPaint.MAXEDGE of PDFBox
   DefaultMaxTileEdge                     = 3000;
+  // The work of all mesh shadings of one page together, in the units that MaxMeshWork counts for one shading
+  DefaultMaxShadingWork: Int64           = 400000000;
 
 type
   {$SCOPEDENUMS ON}
@@ -43,12 +45,20 @@ type
     // Pattern cells per fill
     MaxTilingCells: Int64;
     MaxTileEdge: Integer;
+    // Annotations drawn per page; the rest is skipped with a warning
+    MaxAnnotations: Integer;
+    // What all mesh shadings of one page may do together (steps of a line, pixels tested against a triangle, triangles, and a fixed
+    // amount per shading that is painted); when it is spent, further mesh shadings of the page are skipped with a warning
+    MaxShadingWork: Int64;
 
     // Export, opaque white background, anti-aliasing on, annotations on, and the limits above
     class function Default: TPdfRenderOptions; static;
   end;
 
 implementation
+
+uses
+  Pdf4D.Model.Page;
 
 { TPdfRenderOptions }
 
@@ -66,6 +76,8 @@ begin
   Result.MaxType3Depth := DefaultMaxType3Depth;
   Result.MaxTilingCells := DefaultMaxTilingCells;
   Result.MaxTileEdge := DefaultMaxTileEdge;
+  Result.MaxAnnotations := DefaultMaxAnnotations;
+  Result.MaxShadingWork := DefaultMaxShadingWork;
 end;
 
 end.

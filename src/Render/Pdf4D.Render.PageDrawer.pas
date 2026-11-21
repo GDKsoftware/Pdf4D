@@ -46,6 +46,7 @@ uses
   Pdf4D.Render.OptionalContent,
   Pdf4D.Render.Renderer,
   Pdf4D.Render.Renderer.Interfaces,
+  Pdf4D.Render.Shading.Context,
   Pdf4D.Render.TilingPaint;
 
 type
@@ -106,6 +107,8 @@ type
     // The patterns whose cells are being drawn, inside each other
     FPatternDepth: Integer;
     FHasLoggedPatternDepth: Boolean;
+    // The work that all mesh shadings of the page share
+    FShadingBudget: TPdfShadingBudget;
     // The warnings of the tiling paint that are in the log, so that a pattern that is used on every glyph gives one line
     FLoggedTilingWarnings: TDictionary<string, Boolean>;
     FVisibility: TPdfOptionalContentVisibility;
@@ -266,7 +269,6 @@ uses
   Pdf4D.Render.ImageScaler,
   Pdf4D.Render.Options,
   Pdf4D.Render.PageTransform,
-  Pdf4D.Render.Shading.Context,
   Pdf4D.Render.SoftMaskPaint,
   Pdf4D.Render.StrokeNormalizer;
 
@@ -372,6 +374,7 @@ begin
   FTilingPatterns := TObjectDictionary<TCosDictionary, TPDTilingPattern>.Create([doOwnsValues]);
   FLoggedTilingWarnings := TDictionary<string, Boolean>.Create;
   FTilingPaints := TPdfTilingPaintFactory.Create(TPdfPageDrawerTilingHost.Create(Self));
+  FShadingBudget := TPdfShadingBudget.Create(Params.Options.MaxShadingWork);
 
   var Properties: TPDOptionalContentProperties := nil;
   if not Renderer.TryGetOptionalContentProperties(Properties) then
@@ -393,6 +396,7 @@ destructor TPdfPageDrawer.Destroy;
 begin
   FVisibility.Free;
   FTilingPaints.Free;
+  FShadingBudget.Free;
   FLoggedTilingWarnings.Free;
   FTilingPatterns.Free;
   FShadingPatterns.Free;
@@ -446,12 +450,13 @@ end;
 procedure TPdfPageDrawer.DrawAnnotations;
 begin
   const Count = FPage.AnnotationCount;
-  if Count > DefaultMaxAnnotations then
+  const MaxAnnotations = Max(FParams.Options.MaxAnnotations, 0);
+  if Count > MaxAnnotations then
   begin
-    LogWarning('The page has %d annotations, only the first %d are drawn', [Count, DefaultMaxAnnotations]);
+    LogWarning('The page has %d annotations, only the first %d are drawn', [Count, MaxAnnotations]);
   end;
 
-  const Annotations = FPage.Annotations(DefaultMaxAnnotations);
+  const Annotations = FPage.Annotations(MaxAnnotations);
   try
     for var Annotation in Annotations do
     begin
@@ -953,7 +958,13 @@ end;
 procedure TPdfPageDrawer.PaintShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect;
                                           const Action: TPdfPaintAction);
 begin
-  const Bitmap = TPdfShadingRasterizer.Rasterize(Shading, ShadingToDevice, Area, FParams.Cancel);
+  if (Shading is TPDShadingMesh) and FShadingBudget.IsExhausted then
+  begin
+    FShadingBudget.Report(Shading);
+    Exit;
+  end;
+
+  const Bitmap = TPdfShadingRasterizer.Rasterize(Shading, ShadingToDevice, Area, FParams.Cancel, FShadingBudget);
   try
     Action(TPdfPaint.FromBitmap(Bitmap, TPdfMatrix.GetTranslateInstance(Area.Left, Area.Top), TPdfTileMode.Decal, TPdfImageFilter.Nearest));
   finally

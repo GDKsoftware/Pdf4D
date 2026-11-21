@@ -9,6 +9,7 @@ uses
   System.Classes,
   System.Generics.Collections,
   Pdf4D.Api.Document.Interfaces,
+  Pdf4D.Common.Defines,
   Pdf4D.Tests.PdfBuilder;
 
 type
@@ -34,6 +35,8 @@ type
     class function NewBuilder(const Content: TBytes; const Resources: string; const PageEntries: string = ''): TTestPdfBuilder; static;
     // Loads what the builder makes. The caller still owns the builder.
     function Open(const Builder: TTestPdfBuilder): IPdfDocument; overload;
+    // The same with the load limits of LoadOptions; its OnLog is replaced by the log of this object
+    function Open(const Builder: TTestPdfBuilder; const LoadOptions: TPdfLoadOptions): IPdfDocument; overload;
 
     // The warnings and errors that the documents opened by this object logged, as 'Warning: text'
     property LogLines: TList<string> read FLogLines;
@@ -45,7 +48,6 @@ implementation
 
 uses
   Pdf4D.Api.Document,
-  Pdf4D.Common.Defines,
   Pdf4D.Model.Tests.Support;
 
 const
@@ -100,9 +102,14 @@ end;
 
 function TGraphicsDocuments.Open(const Builder: TTestPdfBuilder): IPdfDocument;
 begin
+  Result := Open(Builder, TPdfLoadOptions.Default);
+end;
+
+function TGraphicsDocuments.Open(const Builder: TTestPdfBuilder; const LoadOptions: TPdfLoadOptions): IPdfDocument;
+begin
   const Stream = TBytesStream.Create(Builder.Build(TXrefStyle.Table));
   FStreams.Add(Stream);
-  var Options := TPdfLoadOptions.Default;
+  var Options := LoadOptions;
   Options.OnLog := procedure(const Level: TPdfLogLevel; const Message: string)
     begin
       const Line = Format('%s: %s', [LevelNames[Level], Message]);

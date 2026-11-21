@@ -14,6 +14,7 @@ uses
   Pdf4D.Common.Matrix,
   Pdf4D.Graphics.Shading,
   Pdf4D.Render.Renderer.Interfaces,
+  Pdf4D.Render.Shading.Context,
   Pdf4D.Render.Shading.Triangle;
 
 const
@@ -117,7 +118,7 @@ type
   public
     // PointCount is 12 for the type 6 and 16 for the type 7
     constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
-                       const PointCount: Integer);
+                       const PointCount: Integer; const Budget: TPdfShadingBudget = nil);
   end;
 
   TPdfType6ShadingContext = class(TPdfPatchMeshesShadingContext)
@@ -125,7 +126,8 @@ type
     function MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch; override;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
+                       const Budget: TPdfShadingBudget = nil);
   end;
 
   TPdfType7ShadingContext = class(TPdfPatchMeshesShadingContext)
@@ -133,7 +135,8 @@ type
     function MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch; override;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
+                       const Budget: TPdfShadingBudget = nil);
   end;
 
 implementation
@@ -482,9 +485,9 @@ end;
 { TPdfPatchMeshesShadingContext }
 
 constructor TPdfPatchMeshesShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                                 const Cancel: IPdfCancelToken; const PointCount: Integer);
+                                                 const Cancel: IPdfCancelToken; const PointCount: Integer; const Budget: TPdfShadingBudget);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel, Budget);
   FPointCount := PointCount;
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
@@ -635,9 +638,9 @@ end;
 { TPdfType6ShadingContext }
 
 constructor TPdfType6ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                           const Cancel: IPdfCancelToken);
+                                           const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 begin
-  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, CoonsPointCount);
+  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, CoonsPointCount, Budget);
 end;
 
 function TPdfType6ShadingContext.MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch;
@@ -648,9 +651,9 @@ end;
 { TPdfType7ShadingContext }
 
 constructor TPdfType7ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                           const Cancel: IPdfCancelToken);
+                                           const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 begin
-  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, TensorPointCount);
+  inherited Create(Shading, ShadingToDevice, DeviceArea, Cancel, TensorPointCount, Budget);
 end;
 
 function TPdfType7ShadingContext.MakePatch(const Points: TArray<TPdfPatchPoint>; const Colors: TPdfPatchColors): TPdfPatch;

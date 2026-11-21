@@ -162,6 +162,7 @@ type
     FArea: TRect;
     FPixels: TArray<Integer>;
     FCancel: IPdfCancelToken;
+    FBudget: TPdfShadingBudget;
     FElementCount: Integer;
     FTriangleCount: Integer;
     FWork: Int64;
@@ -177,9 +178,10 @@ type
 
   protected
     constructor InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                               const Cancel: IPdfCancelToken);
+                               const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 
-    // Counts Units of work. False when the shading has to stop: it is cancelled, or has done more than MaxMeshWork (a warning, once).
+    // Counts Units of work. False when the shading has to stop: it is cancelled, or has done more than MaxMeshWork or used up the budget
+    // of the page (a warning, once).
     function Charge(const Units: Int64): Boolean;
     // The work is over: the reading of the rest of the data is skipped
     property IsStopped: Boolean read FIsStopped;
@@ -210,7 +212,8 @@ type
     function TryExtendTriangle(const Flag: Integer; const Vertex: TPdfMeshVertex): Boolean;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
+                       const Budget: TPdfShadingBudget = nil);
   end;
 
   // Type 5: a lattice of vertices in rows, two triangles to a cell
@@ -223,7 +226,8 @@ type
     function TryDrawRows(const Upper, Lower: TArray<TPdfMeshVertex>): Boolean;
 
   public
-    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken);
+    constructor Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect; const Cancel: IPdfCancelToken;
+                       const Budget: TPdfShadingBudget = nil);
   end;
 
 implementation
@@ -687,11 +691,12 @@ end;
 { TPdfGouraudShadingContext }
 
 constructor TPdfGouraudShadingContext.InitializeMesh(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                                     const Cancel: IPdfCancelToken);
+                                                     const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 begin
   inherited Initialize(Shading, ShadingToDevice);
   FArea := DeviceArea;
   FCancel := Cancel;
+  FBudget := Budget;
   SetLength(FPixels, Int64(DeviceArea.Width) * DeviceArea.Height);
 end;
 
@@ -734,6 +739,11 @@ begin
   begin
     FIsStopped := True;
     Shading.Warn('The mesh shading exceeds the work limit of %d steps; the rest is skipped', [MaxMeshWork]);
+  end
+  else if Assigned(FBudget) and (not FBudget.TryCharge(Units)) then
+  begin
+    FIsStopped := True;
+    FBudget.Report(Shading);
   end
   else if (FWork div CancelInterval) <> FWorkChecked then
   begin
@@ -908,9 +918,9 @@ end;
 { TPdfType4ShadingContext }
 
 constructor TPdfType4ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                           const Cancel: IPdfCancelToken);
+                                           const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel, Budget);
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
     try
@@ -1016,9 +1026,9 @@ end;
 { TPdfType5ShadingContext }
 
 constructor TPdfType5ShadingContext.Create(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
-                                           const Cancel: IPdfCancelToken);
+                                           const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget);
 begin
-  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel);
+  inherited InitializeMesh(Shading, ShadingToDevice, DeviceArea, Cancel, Budget);
   if TPdfMeshReader.TryOpen(Shading, ShadingToDevice, FReader) then
   begin
     try
