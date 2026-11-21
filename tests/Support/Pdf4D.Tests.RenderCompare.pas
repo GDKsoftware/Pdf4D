@@ -59,7 +59,7 @@ type
     // An edge pixel differs when a channel differs by more than this (Marlin and Skia coverage differ at the edge of a glyph by that
     // much; a missing or misplaced shape differs by far more). Measured, the share of differing edge pixels of the worst page: 36.6% at
     // 16, 15.7% at 32, 5.7% at 64, 4.7% at 70, 3.2% at 80, 2.5% at 96 and 1.8% at 224. 80 is where the worst page drops under the next
-    // page of a different kind (clip.pdf at 150 DPI, 1.96%, and the glyph pages); 70 would also pass but leaves 4.7% for one page ...
+    // page of a different kind (clip.pdf, 2.6% at 72 DPI and 1.96% at 150 DPI, and the glyph pages); 70 would also pass but leaves 4.7% for one page ...
     EdgeTolerance = 80;
     // ... and a page needs at most this share of its edge pixels to differ. Worst compared pages at 80: PDFBOX-3053-reduced.pdf 3.23%
     // (glyph edges), generated/render/clip.pdf 2.6%, shadings.pdf at 150 DPI 2.4%; the 99th percentile is 1.35%. The limit is 8% above

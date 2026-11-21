@@ -160,8 +160,8 @@ type
 const
   GraphicsSeed = 8642;
   {$IFDEF DEBUG}
-  // A Debug build renders about three times slower than a Release build (see DebugRenderMutationsPerFile in Pdf4D.Tests.Fuzz)
-  GraphicsStreamCount = 600;
+  // A Debug build renders about three times slower than a Release build (TFuzzSettings in Pdf4D.Tests.Fuzz holds both Debug counts)
+  GraphicsStreamCount = TFuzzSettings.DebugRenderGraphicsStreams;
   {$ELSE}
   GraphicsStreamCount = 2000;
   {$ENDIF}

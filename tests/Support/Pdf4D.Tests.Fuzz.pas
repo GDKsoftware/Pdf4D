@@ -108,6 +108,13 @@ type
   // Seed and size of the fuzz runs. The environment variables PDF4D_FUZZ_SEED (added to every seed) and PDF4D_FUZZ_SCALE
   // (multiplies the number of cases) make a larger sweep with other seeds possible without a change of the code.
   TFuzzSettings = record
+  public const
+    // A Debug build renders about three times slower than a Release build; its render runs use fewer cases so that the whole test
+    // program stays under 20 minutes per platform. Both Debug counts are here (docs/building.md names them): the mutations per file
+    // of the mutated corpus and the generated graphics streams.
+    DebugRenderMutationsPerFile = 6;
+    DebugRenderGraphicsStreams = 600;
+  public
     class function SeedOffset: Integer; static;
     class function Scale(const Count: Integer): Integer; static;
     // The time one run may take, in seconds: PDF4D_FUZZ_SECONDS, 10 by default
@@ -189,9 +196,6 @@ const
   Seed = 1234;
   FileCount = 50;
   MutationsPerFile = 20;
-  // A Debug build renders about three times slower than a Release build; its render runs use fewer mutations per file so that the
-  // whole test program stays under 20 minutes per platform
-  DebugRenderMutationsPerFile = 6;
   MaxMutationSeconds = 10;
   MaxOverwriteBytes = 64;
   MaxDuplicatedBytes = 4096;
@@ -1240,7 +1244,7 @@ begin
       {$IFDEF DEBUG}
       if Work = TFuzzWork.Render then
       begin
-        MutationCount := DebugRenderMutationsPerFile;
+        MutationCount := TFuzzSettings.DebugRenderMutationsPerFile;
       end;
       {$ENDIF}
       for var Index := 0 to TFuzzSettings.Scale(MutationCount) - 1 do

@@ -7,7 +7,7 @@
 # A producer that is not installed is skipped with a warning. The invoices contain invented data only. The script checks every PDF for
 # the user name and the machine name (the producers may put them in /Info, in the XMP packet or in a link) and fails when it finds one.
 # It writes the manifest rows of the PDFs it made; run tools/oracle/generate-golden.ps1 and generate-render.ps1 afterwards.
-param([string]$OutputFolder = '')
+param([string]$OutputFolder = '', [string]$RsVars = '')
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '..\corpus\manifest-lib.ps1')
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -15,6 +15,8 @@ if (-not $OutputFolder) { $OutputFolder = Join-Path $repoRoot 'tests\corpus\gene
 New-Item -ItemType Directory -Force $OutputFolder | Out-Null
 $html = Join-Path $PSScriptRoot 'invoice.html'
 $made = [ordered]@{}
+# The document is CC0; the fonts that Edge and Word embed (subsets of Arial) are not
+$arialNote = '; CC0 covers the document, the embedded Arial subsets stay under the licence of the font'
 
 function Add-Made([string]$Name, [string]$Producer, [string]$Notes) {
     $made[$Name] = [pscustomobject]@{ Producer = $Producer; Notes = $Notes }
@@ -68,12 +70,19 @@ if ($edge) {
     Remove-Item $profile -Recurse -Force -ErrorAction SilentlyContinue
     Wait-ForFile $target
     $version = (Get-Item $edge).VersionInfo.ProductVersion
-    Add-Made 'edge-print.pdf' "Microsoft Edge $version (--print-to-pdf)" 'invoice.html printed by headless Edge, A4'
+    Add-Made 'edge-print.pdf' "Microsoft Edge $version (--print-to-pdf)" ('invoice.html printed by headless Edge, A4' + $arialNote)
 } else { Write-Warning 'Microsoft Edge not found: edge-print.pdf skipped' }
 
-# 2. Delphi program with Skia
-$rsvars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
-if (Test-Path $rsvars) {
+# 2. Delphi program with Skia. rsvars.bat comes from -RsVars, from the BDS environment variable (set in a RAD Studio command prompt) or
+# from the newest RAD Studio under Program Files (x86)
+$rsvars = $RsVars
+if (-not $rsvars -and $env:BDS) { $rsvars = Join-Path $env:BDS 'bin\rsvars.bat' }
+if (-not $rsvars) {
+    $rsvars = Get-ChildItem "${env:ProgramFiles(x86)}\Embarcadero\Studio\*\bin\rsvars.bat" -ErrorAction SilentlyContinue |
+        Sort-Object { [version](Split-Path -Leaf (Split-Path -Parent (Split-Path -Parent $_.FullName))) } -Descending |
+        Select-Object -First 1 -ExpandProperty FullName
+}
+if ($rsvars -and (Test-Path $rsvars)) {
     $project = Join-Path $PSScriptRoot 'Pdf4D.InvoiceGen.dproj'
     & cmd /c "call `"$rsvars`" && msbuild `"$project`" /t:Build /p:Config=Release /p:Platform=Win64 /v:minimal" | Out-Host
     if ($LASTEXITCODE -ne 0) { throw 'Build of Pdf4D.InvoiceGen failed' }
@@ -83,7 +92,8 @@ if (Test-Path $rsvars) {
     $target = Join-Path $OutputFolder 'skia-draw.pdf'
     & (Join-Path $binary 'Pdf4D.InvoiceGen.exe') $target (Join-Path $repoRoot 'tests\fonts\LiberationSans-Regular.ttf')
     if ($LASTEXITCODE -ne 0) { throw 'Pdf4D.InvoiceGen failed' }
-    Add-Made 'skia-draw.pdf' 'Skia/PDF through System.Skia TSkDocument.MakePDF (RAD Studio 13)' 'drawn by tools/invoices/Pdf4D.InvoiceGen.dpr, LiberationSans-Regular, A4'
+    $studioName = switch (Split-Path -Leaf $bds) { '37.0' { 'RAD Studio 13' } '23.0' { 'RAD Studio 12' } default { "RAD Studio BDS $(Split-Path -Leaf $bds)" } }
+    Add-Made 'skia-draw.pdf' "Skia/PDF through System.Skia TSkDocument.MakePDF ($studioName)" 'drawn by tools/invoices/Pdf4D.InvoiceGen.dpr, LiberationSans-Regular, A4'
 } else { Write-Warning 'RAD Studio not found: skia-draw.pdf skipped' }
 
 # 3 and 4. Word through COM, in a process of its own (word-convert.ps1) that is ended after two minutes
@@ -97,15 +107,16 @@ if ($wordPath) {
     $versionFile = Join-Path ([IO.Path]::GetTempPath()) ('pdf4d-word-' + [Guid]::NewGuid().ToString('N') + '.txt')
     $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$(Join-Path $PSScriptRoot 'word-convert.ps1')`"", '-Html', "`"$html`"", '-ExportPath', "`"$exportTarget`"")
     if ($printTarget) { $arguments += @('-PrintPath', "`"$printTarget`"") }
+    $wordBefore = @(Get-Process WINWORD -ErrorAction SilentlyContinue | ForEach-Object { $_.Id })
     $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -PassThru -WindowStyle Hidden -RedirectStandardOutput $versionFile
     if (-not $p.WaitForExit(120000)) { try { $p.Kill() } catch { } }
-    # Whatever happened, no Word is left behind that this script started
-    Get-Process WINWORD -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -ge $p.StartTime } | Stop-Process -Force
+    # Whatever happened, no Word is left behind that this script started; a Word that ran before the helper started is not touched
+    Get-Process WINWORD -ErrorAction SilentlyContinue | Where-Object { $wordBefore -notcontains $_.Id } | Stop-Process -Force
     $wordVersion = (Get-Content $versionFile -ErrorAction SilentlyContinue | Select-Object -First 1)
     Remove-Item $versionFile -ErrorAction SilentlyContinue
-    if (Test-Path $exportTarget) { Wait-ForFile $exportTarget; Add-Made 'word-export.pdf' "Microsoft Word $wordVersion (ExportAsFixedFormat)" 'invoice.html opened in Word and exported as PDF, A4' } else { Write-Warning 'Word did not write word-export.pdf' }
+    if (Test-Path $exportTarget) { Wait-ForFile $exportTarget; Add-Made 'word-export.pdf' "Microsoft Word $wordVersion (ExportAsFixedFormat)" ('invoice.html opened in Word and exported as PDF, A4' + $arialNote) } else { Write-Warning 'Word did not write word-export.pdf' }
     if ($printTarget) {
-        if (Test-Path $printTarget) { Wait-ForFile $printTarget; Add-Made 'word-print.pdf' "Microsoft Print to PDF (Windows) from Microsoft Word $wordVersion" 'invoice.html opened in Word and printed to the Microsoft Print to PDF printer with PrintToFile' } else { Write-Warning 'Word did not write word-print.pdf' }
+        if (Test-Path $printTarget) { Wait-ForFile $printTarget; Add-Made 'word-print.pdf' "Microsoft Print to PDF (Windows) from Microsoft Word $wordVersion" ('invoice.html opened in Word and printed to the Microsoft Print to PDF printer with PrintToFile' + $arialNote) } else { Write-Warning 'Word did not write word-print.pdf' }
     }
 } else { Write-Warning 'Microsoft Word not found: word-export.pdf and word-print.pdf skipped' }
 
@@ -139,7 +150,11 @@ foreach ($name in $made.Keys) {
         }
     }
 }
-if ($problems) { $problems | ForEach-Object { Write-Warning $_ }; throw 'Personal data in a generated invoice: strip it from the producer settings' }
+if ($problems) {
+    # The files with personal data must not stay in the corpus folder, where a later commit would pick them up
+    foreach ($name in $made.Keys) { Remove-Item (Join-Path $OutputFolder $name) -ErrorAction SilentlyContinue }
+    $problems | ForEach-Object { Write-Warning $_ }
+    throw 'Personal data in a generated invoice: strip it from the producer settings' }
 
 $rows = Read-Manifest
 foreach ($k in @($rows.Keys)) { if ($k.StartsWith('generated/invoices/')) { $rows.Remove($k) } }
