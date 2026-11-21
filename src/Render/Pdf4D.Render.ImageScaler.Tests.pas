@@ -51,12 +51,26 @@ type
 
     [Test]
     procedure TestInvalidSizeRaises;
+
+    [Test]
+    procedure TestStraightColourOfEveryPremultipliedPixel;
+
+    [Test]
+    procedure TestScalingStaysNearTheCostOfReadingThePixels;
   end;
 
 implementation
 
 uses
+  System.Diagnostics,
+  System.Math,
   Pdf4D.Render.ImageScaler;
+
+const
+  // The pixels of the bitmap that the cost of the scaling is measured on, and how many times the cost of reading them it may reach
+  CostEdge = 3000;
+  CostTargetEdge = 30;
+  MaxCostFactor = 40;
 
 { TImageScalerTests }
 
@@ -192,6 +206,72 @@ begin
       TPdfImageScaler.ScaleSmooth(Source, 0, 1).Free;
     end,
     EArgumentOutOfRangeException);
+end;
+
+// One pixel of every premultiplied value is scaled to its own size, which gives the value that the calculation of the straight colour
+// in Double gives: the colour half up, then premultiplied again with Round
+procedure TImageScalerTests.TestStraightColourOfEveryPremultipliedPixel;
+begin
+  const Source = Track(TPdfBitmap.Create(1, 1));
+  for var Alpha := 1 to 255 do
+  begin
+    for var Premultiplied := 0 to Alpha do
+    begin
+      const Pixel = Source.ScanLine(0);
+      Pixel[0] := Premultiplied;
+      Pixel[1] := Premultiplied;
+      Pixel[2] := Premultiplied;
+      Pixel[3] := Alpha;
+
+      const Scaled = TPdfImageScaler.ScaleSmooth(Source, 1, 1);
+      try
+        const Straight = Min(Trunc((Double(Premultiplied) * 255) / Alpha + 0.5), 255);
+        const Expected = Round(Straight * Alpha / 255);
+        Assert.AreEqual<Integer>(Expected, Scaled.ScanLine(0)[0],Format('Premultiplied %d of alpha %d', [Premultiplied, Alpha]));
+      finally
+        Scaled.Free;
+      end;
+    end;
+  end;
+end;
+
+// A page can hold images of tens of millions of pixels that are averaged down; the cost of that must stay a small multiple of the cost
+// of reading the pixels, for pixels that are opaque and for pixels that are not. (Converting a Double to an integer for every pixel
+// made it a hundred times that on Linux64.)
+procedure TImageScalerTests.TestScalingStaysNearTheCostOfReadingThePixels;
+begin
+  const Source = Track(TPdfBitmap.Create(CostEdge, CostEdge));
+  for var Alpha in [255, 200] do
+  begin
+    for var Y := 0 to CostEdge - 1 do
+    begin
+      const Row = Source.ScanLine(Y);
+      for var X := 0 to CostEdge * 4 - 1 do
+      begin
+        Row[X] := Byte(Alpha * (X mod 4 div 3) + (X * 7 + Y) mod Alpha * (1 - X mod 4 div 3));
+      end;
+    end;
+
+    var Sum: Int64 := 0;
+    var Watch := TStopwatch.StartNew;
+    for var Y := 0 to CostEdge - 1 do
+    begin
+      const Row = Source.ScanLine(Y);
+      for var X := 0 to CostEdge * 4 - 1 do
+      begin
+        Sum := Sum + Row[X];
+      end;
+    end;
+    const ReadMilliseconds = Max(Watch.ElapsedMilliseconds, 1);
+
+    Watch := TStopwatch.StartNew;
+    Track(TPdfImageScaler.ScaleSmooth(Source, CostTargetEdge, CostTargetEdge));
+    const ScaleMilliseconds = Watch.ElapsedMilliseconds;
+
+    Assert.IsTrue(ScaleMilliseconds <= ReadMilliseconds * MaxCostFactor,
+                  Format('Scaling %d x %d pixels of alpha %d took %d ms, reading them %d ms (sum %d)',
+                         [CostEdge, CostEdge, Alpha, ScaleMilliseconds, ReadMilliseconds, Sum]));
+  end;
 end;
 
 end.

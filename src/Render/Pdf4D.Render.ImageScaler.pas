@@ -102,8 +102,9 @@ end;
 
 class function TPdfImageScaler.StraightChannel(const Premultiplied, Alpha: Integer): Integer;
 begin
-  const Straight: Double = (Double(Premultiplied) * MaxChannel) / Alpha;
-  Result := Min(Trunc(Straight + 0.5), MaxChannel);
+  // Floor(Premultiplied * 255 / Alpha + 0.5) in whole numbers: the quotient is exact or at least 1 / (2 * Alpha) away from a half, so
+  // this gives what the Double calculation gives, without the conversion of a Double that is slow on Linux64
+  Result := Min((Premultiplied * (2 * MaxChannel) + Alpha) div (2 * Alpha), MaxChannel);
 end;
 
 class procedure TPdfImageScaler.ScalePixel(const Source: TPdfBitmap; const CoverX, CoverY: TAxisCover; const Target: PByte);
@@ -126,9 +127,18 @@ begin
         Continue;
       end;
 
-      // Straight colour of the premultiplied source pixel
       const AlphaWeight: Single = Alpha * Weight;
       SumAlpha := SumAlpha + AlphaWeight;
+      if Alpha = MaxChannel then
+      begin
+        // An opaque pixel is its own straight colour; most pixels of an image are, so they do not need the division
+        SumRed := SumRed + Pixel[0] * AlphaWeight;
+        SumGreen := SumGreen + Pixel[1] * AlphaWeight;
+        SumBlue := SumBlue + Pixel[2] * AlphaWeight;
+        Continue;
+      end;
+
+      // Straight colour of the premultiplied source pixel
       SumRed := SumRed + StraightChannel(Pixel[0], Alpha) * AlphaWeight;
       SumGreen := SumGreen + StraightChannel(Pixel[1], Alpha) * AlphaWeight;
       SumBlue := SumBlue + StraightChannel(Pixel[2], Alpha) * AlphaWeight;
