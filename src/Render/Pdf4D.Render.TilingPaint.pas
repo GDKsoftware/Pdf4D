@@ -57,6 +57,7 @@ type
     FCellScaleY: Single;
 
     class function Ceiling(const Value: Double): Integer; static;
+    class function IsFiniteNumber(const Value: Single): Boolean; static;
     class function IsUsable(const Value: Single): Boolean; static;
     class procedure ClampEdge(const Host: IPdfTilingHost; const Pattern: TPDTilingPattern; var Width, Height: Single); static;
     procedure SizeRaster(const Width, Height, EdgeLimit: Single; const ScaleX, ScaleY: Single);
@@ -113,6 +114,8 @@ type
         InitialMatrix: TPdfMatrix;
         Paint: TPdfPaint;
         Cell: TPdfBitmap;
+        // The paint could not be made: the cell stays out of the paint until the cache drops this entry
+        IsFailed: Boolean;
 
         destructor Destroy; override;
         function Matches(const Stream: TObject; const CandidateSpace: TPDColorSpace; const CandidateComponents: TArray<Single>;
@@ -130,6 +133,7 @@ type
     function TryFind(const Stream: TObject; const ColorSpace: TPDColorSpace; const Color: TPDColor; const Xform: TPdfMatrix; out Cached: TCachedPaint): Boolean;
     procedure Add(const Stream: TObject; const ColorSpace: TPDColorSpace; const Color: TPDColor; const Xform: TPdfMatrix; const Paint: TPdfPaint;
                   const Cell: TPdfBitmap);
+    procedure AddFailure(const Stream: TObject; const ColorSpace: TPDColorSpace; const Color: TPDColor; const Xform: TPdfMatrix);
     procedure MakeRoomFor(const Pixels: Int64);
     function CachedPixels: Int64;
     function IsTooManyCells(const Geometry: TPdfTilingGeometry; const Xform: TPdfMatrix; const Area: TRect): Boolean;
@@ -159,6 +163,7 @@ const
   ZeroStepWarning = '/%s is 0, using pattern /BBox %s';
   SurfaceWarning = 'Pattern surface larger than %d x %d, will be clipped (width %g, height %g, XStep %g, YStep %g)';
   BoxMissingWarning = 'Pattern /BBox is missing, nothing is painted';
+  BoxNotFiniteWarning = 'Pattern /BBox has no finite coordinates, nothing is painted';
   UnusableStepWarning = 'The pattern step (%g, %g) gives a cell without a usable size, nothing is painted';
   TooManyCellsWarning = 'The pattern would fill more than %d cells in the area that is painted, nothing is painted';
   CellFailedWarning = 'The cell of a pattern cannot be made, nothing is painted: %s';
@@ -172,9 +177,14 @@ begin
   Result := Trunc(Min(Scaled / CeilingScale, Double(High(Integer))));
 end;
 
+class function TPdfTilingGeometry.IsFiniteNumber(const Value: Single): Boolean;
+begin
+  Result := (not (IsNan(Value) or IsInfinite(Value)));
+end;
+
 class function TPdfTilingGeometry.IsUsable(const Value: Single): Boolean;
 begin
-  Result := (not (IsNan(Value) or IsInfinite(Value) or (Value = 0)));
+  Result := (IsFiniteNumber(Value) and (Value <> 0));
 end;
 
 // PDFBOX-3653: a surface larger than MAXEDGE x MAXEDGE is clipped to that size per edge
@@ -230,6 +240,15 @@ begin
   if not Pattern.TryGetBBox(Geometry.FBox) then
   begin
     Host.LogWarning(BoxMissingWarning, []);
+    Exit(False);
+  end;
+
+  const IsFiniteBox = (IsFiniteNumber(Geometry.FBox.LowerLeftX) and IsFiniteNumber(Geometry.FBox.LowerLeftY) and
+                       IsFiniteNumber(Geometry.FBox.UpperRightX) and IsFiniteNumber(Geometry.FBox.UpperRightY) and
+                       IsFiniteNumber(Geometry.FBox.Width) and IsFiniteNumber(Geometry.FBox.Height));
+  if not IsFiniteBox then
+  begin
+    Host.LogWarning(BoxNotFiniteWarning, []);
     Exit(False);
   end;
 
@@ -426,7 +445,11 @@ end;
 
 function TPdfTilingPaintFactory.TCachedPaint.Pixels: Int64;
 begin
-  Result := Int64(Cell.Width) * Cell.Height;
+  Result := 0;
+  if Assigned(Cell) then
+  begin
+    Result := Int64(Cell.Width) * Cell.Height;
+  end;
 end;
 
 { TPdfTilingPaintFactory }
@@ -477,10 +500,21 @@ begin
   end;
 end;
 
+procedure TPdfTilingPaintFactory.AddFailure(const Stream: TObject; const ColorSpace: TPDColorSpace; const Color: TPDColor; const Xform: TPdfMatrix);
+begin
+  Add(Stream, ColorSpace, Color, Xform, Default(TPdfPaint), nil);
+  FPaints.Last.IsFailed := True;
+end;
+
 procedure TPdfTilingPaintFactory.Add(const Stream: TObject; const ColorSpace: TPDColorSpace; const Color: TPDColor; const Xform: TPdfMatrix;
                                      const Paint: TPdfPaint; const Cell: TPdfBitmap);
 begin
-  MakeRoomFor(Int64(Cell.Width) * Cell.Height);
+  var Pixels: Int64 := 0;
+  if Assigned(Cell) then
+  begin
+    Pixels := Int64(Cell.Width) * Cell.Height;
+  end;
+  MakeRoomFor(Pixels);
 
   const Cached = TCachedPaint.Create;
   Cached.Stream := Stream;
@@ -510,12 +544,13 @@ begin
   if TryFind(Pattern.Stream, ColorSpace, Color, Xform, Cached) then
   begin
     Paint := Cached.Paint;
-    Exit(True);
+    Exit(not Cached.IsFailed);
   end;
 
   var Geometry: TPdfTilingGeometry;
   if not TPdfTilingGeometry.TryCreate(FHost, Pattern, Xform, Geometry) then
   begin
+    AddFailure(Pattern.Stream, ColorSpace, Color, Xform);
     Exit(False);
   end;
 
@@ -527,6 +562,7 @@ begin
   var Cell: TPdfBitmap;
   if not TPdfTilingPaint.TryCreateFromGeometry(FHost, Geometry, Pattern, ColorSpace, Color, Xform, Paint, Cell) then
   begin
+    AddFailure(Pattern.Stream, ColorSpace, Color, Xform);
     Exit(False);
   end;
 

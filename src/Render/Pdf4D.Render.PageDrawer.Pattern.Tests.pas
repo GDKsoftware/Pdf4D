@@ -34,6 +34,7 @@ type
     procedure Render(const PageContent: string; const Patterns: array of TTilingSource; const ExtraResources: string = '');
     function CallsOfKind(const Calls: TArray<TRecordedCall>; const Kind: TRecordedCallKind): TArray<TRecordedCall>;
     function CellFills: TArray<TRecordedCall>;
+    function CountLogLines(const Fragment: string): Integer;
 
   public
     [Setup]
@@ -61,6 +62,12 @@ type
     procedure TestMissingPatternPaintsNothing;
 
     [Test]
+    procedure TestPatternWithInfiniteBoxPaintsNothingAndWarnsOnce;
+
+    [Test]
+    procedure TestUncoloredPatternWithoutUnderlyingSpaceDrawsNothingQuietly;
+
+    [Test]
     procedure TestPatternAsTextFillColor;
   end;
 
@@ -74,6 +81,8 @@ uses
 const
   UncoloredSpace = '/ColorSpace << /CsU [/Pattern /DeviceRGB] >>';
   Dot = '0 0 5 5 re f';
+  // The largest Single: the parser saturates there, and the width of such a box is infinite
+  HugeNumber = '340282346638528860000000000000000000000';
 
 { TPageDrawerPatternTests }
 
@@ -124,6 +133,18 @@ function TPageDrawerPatternTests.CellFills: TArray<TRecordedCall>;
 begin
   Assert.IsTrue(FDevice.LayerCount > 0, 'a cell was made');
   Result := CallsOfKind(FDevice.Layers[0].Calls.ToArray, TRecordedCallKind.Fill);
+end;
+
+function TPageDrawerPatternTests.CountLogLines(const Fragment: string): Integer;
+begin
+  Result := 0;
+  for var Line in FDocuments.LogLines do
+  begin
+    if Line.Contains(Fragment) then
+    begin
+      Inc(Result);
+    end;
+  end;
 end;
 
 procedure TPageDrawerPatternTests.TestUncoloredPatternUsesTheColorOfTheOperator;
@@ -187,6 +208,25 @@ begin
   Render('/Pattern cs /P9 scn 0 0 100 100 re f', [TTilingSource.Square(1, '10', Dot)]);
 
   Assert.AreEqual<Integer>(0, Length(CallsOfKind(FDevice.Calls.ToArray, TRecordedCallKind.Fill)));
+end;
+
+procedure TPageDrawerPatternTests.TestPatternWithInfiniteBoxPaintsNothingAndWarnsOnce;
+begin
+  Render('/Pattern cs /P1 scn 0 0 100 100 re f 0 0 50 50 re f',
+         [TTilingSource.Create('/PaintType 1 /TilingType 1 /BBox [-' + HugeNumber + ' 0 ' + HugeNumber + ' 10] /XStep 10 /YStep 10 /Resources << >>', Dot)]);
+
+  Assert.AreEqual<Integer>(0, Length(CallsOfKind(FDevice.Calls.ToArray, TRecordedCallKind.Fill)));
+  Assert.AreEqual<Integer>(0, FDevice.LayerCount);
+  Assert.AreEqual<Integer>(1, FDocuments.LogLines.Count, string.Join('|', FDocuments.LogLines.ToArray));
+end;
+
+procedure TPageDrawerPatternTests.TestUncoloredPatternWithoutUnderlyingSpaceDrawsNothingQuietly;
+begin
+  Render('/Pattern cs 1 0 0 /P1 scn 0 0 100 100 re f', [TTilingSource.Square(2, '10', Dot)]);
+
+  Assert.AreEqual<Integer>(0, Length(CallsOfKind(FDevice.Calls.ToArray, TRecordedCallKind.Fill)));
+  Assert.AreEqual<Integer>(1, FDocuments.LogLines.Count, string.Join('|', FDocuments.LogLines.ToArray));
+  Assert.AreEqual<Integer>(0, CountLogLines('Error'));
 end;
 
 procedure TPageDrawerPatternTests.TestPatternAsTextFillColor;

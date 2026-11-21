@@ -280,6 +280,7 @@ const
   WidthTolerance = 0.0001;
   MaximumLoggedMissingGlyphs = 1024;
   MaximumLoggedTilingWarnings = 256;
+  UncoloredWithoutSpaceWarning = 'An uncoloured pattern needs a colour space for its colour (/Pattern with an underlying space), nothing is painted';
   // PDFRenderer.imageDownscalingOptimizationThreshold: an image that is drawn at less than this scale is averaged down first
   ImageDownscalingThreshold = 0.5;
   CodeShift = 48;
@@ -1000,6 +1001,11 @@ begin
   if Pattern.PaintType <> PaintTypeColored then
   begin
     ColorSpace := UnderlyingColorSpace(Color);
+    if not Assigned(ColorSpace) then
+    begin
+      LogTilingWarning(UncoloredWithoutSpaceWarning, []);
+      Exit;
+    end;
     CellColor := TPDColor.Create(ColorSpace, Color.Components);
   end;
 
