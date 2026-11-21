@@ -29,6 +29,8 @@ type
   private
     class function CoverOfAxis(const SourceSize, TargetSize, TargetIndex: Integer): TAxisCover; static;
     class function CoversOfAxis(const SourceSize, TargetSize: Integer): TArray<TAxisCover>; static;
+    // The straight value of a premultiplied channel, rounded half up (the straight values of the source are whole numbers in Java)
+    class function StraightChannel(const Premultiplied, Alpha: Integer): Integer; static;
     class procedure ScalePixel(const Source: TPdfBitmap; const CoverX, CoverY: TAxisCover; const Target: PByte); static;
 
   public
@@ -78,8 +80,8 @@ end;
 // The target pixel spans [Index * SourceSize / TargetSize, (Index + 1) * SourceSize / TargetSize) on the source axis
 class function TPdfImageScaler.CoverOfAxis(const SourceSize, TargetSize, TargetIndex: Integer): TAxisCover;
 begin
-  const Start = (TargetIndex * Int64(SourceSize)) / TargetSize;
-  const Finish = ((TargetIndex + 1) * Int64(SourceSize)) / TargetSize;
+  const Start: Double = (TargetIndex * Int64(SourceSize)) / TargetSize;
+  const Finish: Double = ((TargetIndex + 1) * Int64(SourceSize)) / TargetSize;
   Result.First := Trunc(Start);
   var Last := Trunc(Finish);
   if Last = Finish then
@@ -96,6 +98,12 @@ begin
     Result.Weights[Index - Result.First] := Weight;
     Result.Total := Result.Total + Weight;
   end;
+end;
+
+class function TPdfImageScaler.StraightChannel(const Premultiplied, Alpha: Integer): Integer;
+begin
+  const Straight: Double = (Double(Premultiplied) * MaxChannel) / Alpha;
+  Result := Min(Trunc(Straight + 0.5), MaxChannel);
 end;
 
 class procedure TPdfImageScaler.ScalePixel(const Source: TPdfBitmap; const CoverX, CoverY: TAxisCover; const Target: PByte);
@@ -121,9 +129,9 @@ begin
       // Straight colour of the premultiplied source pixel
       const AlphaWeight: Single = Alpha * Weight;
       SumAlpha := SumAlpha + AlphaWeight;
-      SumRed := SumRed + Round(Pixel[0] * MaxChannel / Alpha) * AlphaWeight;
-      SumGreen := SumGreen + Round(Pixel[1] * MaxChannel / Alpha) * AlphaWeight;
-      SumBlue := SumBlue + Round(Pixel[2] * MaxChannel / Alpha) * AlphaWeight;
+      SumRed := SumRed + StraightChannel(Pixel[0], Alpha) * AlphaWeight;
+      SumGreen := SumGreen + StraightChannel(Pixel[1], Alpha) * AlphaWeight;
+      SumBlue := SumBlue + StraightChannel(Pixel[2], Alpha) * AlphaWeight;
     end;
   end;
 
