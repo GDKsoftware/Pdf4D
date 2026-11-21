@@ -44,6 +44,10 @@ type
     [Test]
     procedure TestFlatFractionThreshold;
 
+    // The distribution of the differences is what the tolerances are tuned on
+    [Test]
+    procedure TestDifferencesAreCountedPerValue;
+
     [Test]
     procedure TestSizeMismatchIsDifference;
 
@@ -89,6 +93,31 @@ begin
   Bitmap.SetPixel(X, Y, TPdfDeviceColor.Create(Value, Value, Value));
 end;
 
+procedure TRenderCompareTests.TestDifferencesAreCountedPerValue;
+begin
+  const Expected = Filled(10, 10, GrayBase);
+  const Actual = Filled(10, 10, GrayBase);
+  try
+    for var X := 0 to 3 do
+    begin
+      SetGray(Actual, X, 0, GrayBase + 5);
+    end;
+    SetGray(Actual, 0, 9, GrayBase - 40);
+    SetGray(Actual, 1, 9, GrayBase - 40);
+
+    const Comparison = TRenderCompare.Compare(Actual, Expected);
+
+    Assert.AreEqual(Int64(94), Comparison.FlatDifferences[0]);
+    Assert.AreEqual(Int64(4), Comparison.FlatDifferences[5]);
+    Assert.AreEqual(Int64(2), Comparison.FlatDifferences[40]);
+    Assert.AreEqual(Int64(0), Comparison.EdgeDifferences[5]);
+    Assert.AreEqual(Int64(0), Comparison.EdgeDifferences[0]);
+  finally
+    Actual.Free;
+    Expected.Free;
+  end;
+end;
+
 procedure TRenderCompareTests.TestIdenticalImagesAreEqual;
 begin
   const Actual = Filled(20, 10, GrayBase);
@@ -121,11 +150,11 @@ end;
 procedure TRenderCompareTests.TestFlatAreaNeedsATightMatch;
 begin
   const Expected = Filled(100, 100, GrayBase);
-  const Close = Filled(100, 100, GrayBase + 16);
-  const Further = Filled(100, 100, GrayBase + 17);
+  const Close = Filled(100, 100, GrayBase + 8);
+  const Further = Filled(100, 100, GrayBase + 9);
   try
-    Assert.IsTrue(TRenderCompare.Compare(Close, Expected).IsEqual, 'a difference of 16 in a flat area is within the tolerance');
-    Assert.IsFalse(TRenderCompare.Compare(Further, Expected).IsEqual, 'a difference of 17 in a flat area is not');
+    Assert.IsTrue(TRenderCompare.Compare(Close, Expected).IsEqual, 'a difference of 8 in a flat area is within the tolerance');
+    Assert.IsFalse(TRenderCompare.Compare(Further, Expected).IsEqual, 'a difference of 9 in a flat area is not');
   finally
     Expected.Free;
     Close.Free;
@@ -199,12 +228,12 @@ begin
   end;
 end;
 
-// The share of flat pixels that may differ is 0.1%: 10 of 10000, not 11
+// The share of flat pixels that may differ is 0.02%: 10 of 50000, not 11
 procedure TRenderCompareTests.TestFlatFractionThreshold;
 begin
-  const Expected = Filled(100, 100, GrayBase);
-  const TenDifferent = Filled(100, 100, GrayBase);
-  const ElevenDifferent = Filled(100, 100, GrayBase);
+  const Expected = Filled(500, 100, GrayBase);
+  const TenDifferent = Filled(500, 100, GrayBase);
+  const ElevenDifferent = Filled(500, 100, GrayBase);
   try
     for var X := 0 to 9 do
     begin
@@ -213,8 +242,8 @@ begin
     end;
     SetGray(ElevenDifferent, 10, 0, 255);
 
-    Assert.IsTrue(TRenderCompare.Compare(TenDifferent, Expected).IsEqual, '10 of 10000 flat pixels is the allowed share');
-    Assert.IsFalse(TRenderCompare.Compare(ElevenDifferent, Expected).IsEqual, '11 of 10000 flat pixels is more');
+    Assert.IsTrue(TRenderCompare.Compare(TenDifferent, Expected).IsEqual, '10 of 50000 flat pixels is the allowed share');
+    Assert.IsFalse(TRenderCompare.Compare(ElevenDifferent, Expected).IsEqual, '11 of 50000 flat pixels is more');
   finally
     Expected.Free;
     TenDifferent.Free;

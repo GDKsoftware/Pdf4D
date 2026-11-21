@@ -50,9 +50,11 @@ type
     class function RenderFolder: string; static;
     class function ReferenceFolder(const Dpi: Integer): string; static;
     class function ListedPages(const RenderListing: string): TArray<Integer>; static;
+    class function HistogramText(const Counts: array of Int64): string; static;
     class function OutputName(const RelativePath: string; const Page: Integer; const Dpi: Integer): string; static;
     class procedure LogComparison(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Comparison: TRenderComparison); static;
     class function CropOf(const Source: TPdfBitmap; const Region: TRect): TPdfBitmap; static;
+    class procedure LogRegion(const RelativePath: string; const Page: Integer; const Region, Crop: TPdfBitmap; const Compared: Int64); static;
     class procedure SaveRegionOutput(const RelativePath: string; const Page: Integer; const Region, Full: TPdfBitmap); static;
     class procedure SaveOutput(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Actual, Expected: TPdfBitmap); static;
     class function Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument; const Dpi: Integer; const ListedPages: TArray<Integer>): TArray<string>; static;
@@ -119,6 +121,7 @@ uses
 const
   ProviderName = 'Pdf4DRenderCorpus';
   OutputEnvironmentVariable = 'PDF4D_RENDER_OUTPUT';
+  FilterEnvironmentVariable = 'PDF4D_RENDER_FILTER';
   ReferenceDpi = 72;
   SelectionDpi = 150;
   SelectionFileName = 'selection.txt';
@@ -140,11 +143,13 @@ const
   //    the nearest neighbour (generated/render/images.pdf puts 4 x 4 images on whole points at 50 points: every 12.5 points a pixel
   //    centre is on a boundary), the rounding of the matrix decides which texel it takes, and the matrix has other rounding errors
   //    on another translation. That moves whole columns of pixels (1.2% of the region); no other file has it.
-  // What is left is held to a tolerance of 16 and 0.1% of the pixels, and nothing else.
-  RegionTolerance = 16;
+  // What is left is held to a tolerance of 8 and 0.06% of the pixels, and nothing else. Measured on the five regions (PDF4D_RENDER_OUTPUT
+  // gets region.txt), pixels that differ by more than 8: paths.pdf 19 of 36864 (0.052%), clip.pdf 3, text-modes.pdf 0, survey.pdf 0 and
+  // images.pdf 455 (1.23%, the nearest tie). At 4 paths.pdf has 25 (0.068%) and over 0.06%.
+  RegionTolerance = 8;
   RegionBorder = 4;
-  MaxRegionDifferentFraction = 0.001;
-  MaxRegionNearestTieFraction = 0.015;
+  MaxRegionDifferentFraction = 0.0006;
+  MaxRegionNearestTieFraction = 0.0135;
   NearestTieFile = 'generated/render/images.pdf';
   BytesPerPixel = 4;
 
@@ -152,7 +157,27 @@ const
 
 constructor TRenderCorpusCaseProvider.Create;
 begin
-  FFiles := TCorpus.Files;
+  // PDF4D_RENDER_FILTER (substrings of corpus paths, separated by semicolons) limits the run to the matching files, for looking at one
+  // difference without the whole corpus
+  const Filter = GetEnvironmentVariable(FilterEnvironmentVariable);
+  if Filter = '' then
+  begin
+    FFiles := TCorpus.Files;
+    Exit;
+  end;
+
+  FFiles := nil;
+  for var RelativePath in TCorpus.Files do
+  begin
+    for var Part in Filter.Split([';']) do
+    begin
+      if (Part <> '') and RelativePath.Contains(Part) then
+      begin
+        FFiles := FFiles + [RelativePath];
+        Break;
+      end;
+    end;
+  end;
 end;
 
 function TRenderCorpusCaseProvider.GetCaseCount(const MethodName: string): Integer;
@@ -246,8 +271,23 @@ begin
   end;
 end;
 
+// The values of a histogram that have pixels, as value:count separated by spaces
+class function TRenderGoldenTests.HistogramText(const Counts: array of Int64): string;
+begin
+  Result := '';
+  for var Value := 0 to High(Counts) do
+  begin
+    if Counts[Value] > 0 then
+    begin
+      Result := Result + Format('%d:%d ', [Value, Counts[Value]]);
+    end;
+  end;
+  Result := Result.Trim;
+end;
+
 // With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: file, page, share of different pixels, largest
-// difference, whether the sizes are equal, share of the flat pixels that differ, share of the edge pixels that differ
+// difference, whether the sizes are equal, share of the flat pixels that differ, share of the edge pixels that differ;
+// distribution.txt has the flat pixels and the histogram of their differences, and the same for the edge pixels, for tuning the tolerances
 class procedure TRenderGoldenTests.LogComparison(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Comparison: TRenderComparison);
 begin
   const Folder = GetEnvironmentVariable(OutputEnvironmentVariable);
@@ -256,6 +296,8 @@ begin
     TDirectory.CreateDirectory(Folder);
     TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.DifferentFraction, Comparison.MaxDifference,
                                                                                                BoolToStr(Comparison.HasSameSize, True), Comparison.DifferentFlatFraction, Comparison.DifferentEdgeFraction, sLineBreak]));
+    TFile.AppendAllText(TPath.Combine(Folder, 'distribution.txt'), Format('%s;%d;%d;%s;%d;%s%s', [IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.FlatPixels,
+                                                                                                    HistogramText(Comparison.FlatDifferences), Comparison.EdgePixels, HistogramText(Comparison.EdgeDifferences), sLineBreak]));
   end;
 end;
 
@@ -266,6 +308,24 @@ begin
   begin
     Move((Source.ScanLine(Y + Region.Top) + Region.Left * BytesPerPixel)^, Result.ScanLine(Y)^, Region.Width * BytesPerPixel);
   end;
+end;
+
+// With PDF4D_RENDER_OUTPUT set, region.txt gets the share of the pixels of the region that differ from the crop for a range of tolerances
+class procedure TRenderGoldenTests.LogRegion(const RelativePath: string; const Page: Integer; const Region, Crop: TPdfBitmap; const Compared: Int64);
+begin
+  const Folder = GetEnvironmentVariable(OutputEnvironmentVariable);
+  if Folder = '' then
+  begin
+    Exit;
+  end;
+
+  var Line := Format('%s;%d;%d', [RelativePath, Page, Compared]);
+  for var Tolerance in [0, 1, 2, 4, 8, 16, 32] do
+  begin
+    Line := Line + Format(';%d:%d', [Tolerance, TRenderCompare.CountAbove(Region, Crop, Tolerance, RegionBorder)]);
+  end;
+  TDirectory.CreateDirectory(Folder);
+  TFile.AppendAllText(TPath.Combine(Folder, 'region.txt'), Line + sLineBreak);
 end;
 
 class procedure TRenderGoldenTests.SaveRegionOutput(const RelativePath: string; const Page: Integer; const Region, Full: TPdfBitmap);
@@ -565,6 +625,7 @@ begin
     Crop := CropOf(Full, Params.Region);
     const Compared = Int64(Region.Width - 2 * RegionBorder) * (Region.Height - 2 * RegionBorder);
     const Different = TRenderCompare.CountAbove(Region, Crop, RegionTolerance, RegionBorder);
+    LogRegion(RelativePath, Page, Region, Crop, Compared);
     var Allowed := MaxRegionDifferentFraction;
     if RelativePath = NearestTieFile then
     begin

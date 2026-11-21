@@ -35,7 +35,8 @@ uses
   Pdf4D.Tests.RenderSoftMasks.Tests in 'Acceptance\Pdf4D.Tests.RenderSoftMasks.Tests.pas',
   Pdf4D.Tests.RenderTiling.Tests in 'Acceptance\Pdf4D.Tests.RenderTiling.Tests.pas',
   Pdf4D.Tests.Fuzz in '..\Support\Pdf4D.Tests.Fuzz.pas',
-  Pdf4D.Tests.RenderRobustness.Tests in 'Acceptance\Pdf4D.Tests.RenderRobustness.Tests.pas';
+  Pdf4D.Tests.RenderRobustness.Tests in 'Acceptance\Pdf4D.Tests.RenderRobustness.Tests.pas',
+  Pdf4D.Tests.RenderPerformance.Tests in 'Acceptance\Pdf4D.Tests.RenderPerformance.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

@@ -23,6 +23,9 @@ type
     DifferentEdgePixels: Int64;
     // The largest difference of one channel over the whole bitmap
     MaxDifference: Integer;
+    // How many flat and how many edge pixels have the largest difference of a channel that is the index (0..255), whatever the tolerance
+    FlatDifferences: array[0..255] of Int64;
+    EdgeDifferences: array[0..255] of Int64;
 
     function DifferentPixels: Int64;
     function DifferentFraction: Double;
@@ -40,23 +43,27 @@ type
   // Compares a render with a reference image of PDFBox under the rules of docs/golden-format.md ("Render reference files"). The
   // reference decides what a pixel is: in a flat area the two renders must agree closely, because a wrong colour or a missing shape
   // shows there; at an edge the coverage of the rasterizers (Marlin of Java2D, Skia) differs, so the tolerance is wide and the
-  // share that may differ is measured against the edge pixels. All numbers are here, and Task 29 tunes them.
+  // share that may differ is measured against the edge pixels. All numbers are here; docs/golden-format.md has the distribution they were taken from.
   TRenderCompare = record
   public const
     // A pixel is an edge pixel when, in the 3 x 3 pixels around it in the reference, one channel differs by more than this
     FlatRange = 8;
-    // A flat pixel differs when a channel differs by more than this ...
-    FlatTolerance = 16;
-    // ... and a page needs at most this share of its flat pixels to differ
-    MaxFlatDifferentFraction: Double = 0.001;
+    // A flat pixel differs when a channel differs by more than this. Measured on the 631 compared pages (612 at 72 DPI, 19 at 150 DPI): at
+    // 5 the worst page has 0.31% differing flat pixels (JPEG and ICC conversion differ by up to 6 levels), at 6 it is 0.015%, at 8 it is
+    // 0.0099%. 8 is taken, not 6, so that a platform whose floating point rounds one level the other way does not fall off the cliff
+    // between 5 and 6.
+    FlatTolerance = 8;
+    // ... and a page needs at most this share of its flat pixels to differ. The worst compared page has 0.0099% (survey.pdf at 150 DPI,
+    // the seams of the Indexed images); the next 0.0026%
+    MaxFlatDifferentFraction: Double = 0.0002;
     // An edge pixel differs when a channel differs by more than this (Marlin and Skia coverage differ at the edge of a glyph by that
-    // much; a missing or misplaced shape differs by far more) ...
-    EdgeTolerance = 96;
-    // ... and a page needs at most this share of its edge pixels to differ. Measured on the corpus: the pages without a known
-    // difference stay under 5.6%; the most are generated/render/clip.pdf (5.5%) and text-modes.pdf page 2 (5.2%), where a hard clip
-    // follows a line that passes exactly through pixel centres and Skia and Java2D break the tie differently. Pages with a missing
-    // annotation or form field are at 10% and more.
-    MaxEdgeDifferentFraction: Double = 0.06;
+    // much; a missing or misplaced shape differs by far more). Measured: the share of differing edge pixels of the worst page falls from
+    // 36.6% at 16 to 5.7% at 64 and is 5.30% from 75 to 224, so what is left beyond 80 are shapes that sit elsewhere, not coverage ...
+    EdgeTolerance = 80;
+    // ... and a page needs at most this share of its edge pixels to differ. Worst compared pages: PDFBOX-6207.pdf 5.30%, PDFBOX-3053-reduced
+    // 3.2%, generated/render/clip.pdf at 150 DPI 3.8%; the 90th percentile is 0.40%. Pages with a missing annotation or form field are at
+    // 10% and more.
+    MaxEdgeDifferentFraction: Double = 0.055;
 
   strict private
     class function ChannelDifference(const Actual, Expected: PByte): Integer; static;
@@ -304,10 +311,12 @@ begin
         if IsEdge[X] then
         begin
           Inc(Result.EdgePixels);
+          Inc(Result.EdgeDifferences[Difference]);
         end
         else
         begin
           Inc(Result.FlatPixels);
+          Inc(Result.FlatDifferences[Difference]);
         end;
         if IsPixelDifferent(Difference, IsEdge[X]) then
         begin
