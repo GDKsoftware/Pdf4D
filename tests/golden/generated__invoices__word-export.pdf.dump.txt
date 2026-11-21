@@ -1,0 +1,170 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595.32 841.92] crop=[0 0 595.32 841.92] rotate=0 label=
+info CreationDate: 2026-11-21T03:15:26+01:00
+info Creator: Microsoft® Word voor Microsoft 365
+info ModDate: 2026-11-21T03:15:26+01:00
+info Producer: Microsoft® Word voor Microsoft 365
+xmp: 3017
+object 1 0: <</Lang <6e6c> /MarkInfo <</Marked true>> /Metadata 160 0 R /Pages 2 0 R /StructTreeRoot 11 0 R /Type /Catalog /ViewerPreferences 161 0 R>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 4 0 R /Group <</CS /DeviceRGB /S /Transparency /Type /Group>> /MediaBox [0 0 595.32 841.92] /Parent 2 0 R /Resources <</ExtGState <</GS7 7 0 R /GS8 8 0 R>> /Font <</F1 5 0 R /F2 9 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /StructParents 0 /Tabs /S /Type /Page>>
+object 4 0: <</Filter /FlateDecode /Length 5038>> stream sha256=8549e566ab14ae1168addeddd93c800c028fc3660e0507a646feeac088812b05
+object 5 0: <</BaseFont /BCDEEE+Arial-BoldMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 6 0 R /LastChar 121 /Name /F1 /Subtype /TrueType /Type /Font /Widths 156 0 R>>
+object 6 0: <</Ascent 905 /AvgWidth 479 /CapHeight 728 /Descent -210 /Flags 32 /FontBBox [-628 -210 2000 728] /FontFile2 157 0 R /FontName /BCDEEE+Arial-BoldMT /FontWeight 700 /ItalicAngle 0 /Leading 33 /MaxWidth 2628 /StemV 47 /Type /FontDescriptor /XHeight 250>>
+object 7 0: <</BM /Normal /Type /ExtGState /ca 1>>
+object 8 0: <</BM /Normal /CA 1 /Type /ExtGState>>
+object 9 0: <</BaseFont /BCDFEE+ArialMT /Encoding /WinAnsiEncoding /FirstChar 32 /FontDescriptor 10 0 R /LastChar 121 /Name /F2 /Subtype /TrueType /Type /Font /Widths 158 0 R>>
+object 10 0: <</Ascent 905 /AvgWidth 441 /CapHeight 728 /Descent -210 /Flags 32 /FontBBox [-665 -210 2000 728] /FontFile2 159 0 R /FontName /BCDFEE+ArialMT /FontWeight 400 /ItalicAngle 0 /Leading 33 /MaxWidth 2665 /StemV 44 /Type /FontDescriptor /XHeight 250>>
+object 11 0: <</K [15 0 R] /ParentTree 13 0 R /ParentTreeNextKey 1 /RoleMap 12 0 R /Type /StructTreeRoot>>
+object 12 0: <</Annotation /Sect /Artifact /Sect /Chart /Sect /Chartsheet /Part /CommentAnchor /Span /Diagram /Figure /Dialogsheet /Part /Endnote /Note /Footer /Sect /Footnote /Note /Header /Sect /InlineShape /Sect /Macrosheet /Part /Notes /Sect /Slide /Sect /Textbox /Sect /Title /H1 /Workbook /Document /Worksheet /Part>>
+object 13 0: <</Nums [0 17 0 R]>>
+object 14 0: <</Names []>>
+object 15 0: <</K [16 0 R 19 0 R 20 0 R 42 0 R 43 0 R 45 0 R 47 0 R 49 0 R 129 0 R 131 0 R 149 0 R 151 0 R 153 0 R] /P 11 0 R /S /Document /Type /StructElem>>
+object 16 0: <</K [0] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 17 0: [16 0 R 19 0 R 24 0 R 26 0 R 29 0 R 31 0 R 34 0 R 36 0 R 39 0 R 41 0 R 42 0 R 44 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 46 0 R 48 0 R 53 0 R 53 0 R 55 0 R 55 0 R 57 0 R 57 0 R 59 0 R 59 0 R 61 0 R 61 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 76 0 R 76 0 R 78 0 R 78 0 R 80 0 R 80 0 R 82 0 R 82 0 R 84 0 R 84 0 R 87 0 R 89 0 R 91 0 R 93 0 R 95 0 R 98 0 R 98 0 R 100 0 R 100 0 R 102 0 R 102 0 R 104 0 R 104 0 R 106 0 R 106 0 R 109 0 R 111 0 R 113 0 R 115 0 R 117 0 R 120 0 R 120 0 R 122 0 R 122 0 R 124 0 R 124 0 R 126 0 R 126 0 R 128 0 R 128 0 R 130 0 R 135 0 R 137 0 R 141 0 R 143 0 R 146 0 R 148 0 R 150 0 R 152 0 R 152 0 R 152 0 R 152 0 R 152 0 R 152 0 R 154 0 R 154 0 R 154 0 R 154 0 R 154 0 R 154 0 R]
+object 19 0: <</K [1] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 20 0: <</K [21 0 R] /P 15 0 R /S /Table /Type /StructElem>>
+object 21 0: <</K [22 0 R 27 0 R 32 0 R 37 0 R] /P 20 0 R /Pg 3 0 R /S /TBody /Type /StructElem>>
+object 22 0: <</K [23 0 R 25 0 R] /P 21 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 23 0: <</K [24 0 R] /P 22 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 24 0: <</K [2] /P 23 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 25 0: <</K [26 0 R] /P 22 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 26 0: <</K [3] /P 25 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 27 0: <</K [28 0 R 30 0 R] /P 21 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 28 0: <</K [29 0 R] /P 27 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 29 0: <</K [4] /P 28 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 30 0: <</K [31 0 R] /P 27 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 31 0: <</K [5] /P 30 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 32 0: <</K [33 0 R 35 0 R] /P 21 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 33 0: <</K [34 0 R] /P 32 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 34 0: <</K [6] /P 33 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 35 0: <</K [36 0 R] /P 32 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 36 0: <</K [7] /P 35 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 37 0: <</K [38 0 R 40 0 R] /P 21 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 38 0: <</K [39 0 R] /P 37 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 39 0: <</K [8] /P 38 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 40 0: <</K [41 0 R] /P 37 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 41 0: <</K [9] /P 40 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 42 0: <</K [10] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 43 0: <</K [44 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 44 0: <</K [11] /Lang <656e> /P 43 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 45 0: <</K [46 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 46 0: <</K [12 13 14 15 16 17 18 19 20 21] /Lang <656e> /P 45 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 47 0: <</K [48 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 48 0: <</K [22] /Lang <656e> /P 47 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 49 0: <</K [50 0 R 62 0 R] /P 15 0 R /S /Table /Type /StructElem>>
+object 50 0: <</K [51 0 R] /P 49 0 R /S /THead /Type /StructElem>>
+object 51 0: <</K [52 0 R 54 0 R 56 0 R 58 0 R 60 0 R] /P 50 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 52 0: <</K [53 0 R] /P 51 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 53 0: <</K [23 24] /P 52 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 54 0: <</K [55 0 R] /P 51 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 55 0: <</K [25 26] /P 54 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 56 0: <</K [57 0 R] /P 51 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 57 0: <</K [27 28] /P 56 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 58 0: <</K [59 0 R] /P 51 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 59 0: <</K [29 30] /P 58 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 60 0: <</K [61 0 R] /P 51 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 61 0: <</K [31 32] /P 60 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 62 0: <</K [63 0 R 74 0 R 85 0 R 96 0 R 107 0 R 118 0 R] /P 49 0 R /Pg 3 0 R /S /TBody /Type /StructElem>>
+object 63 0: <</K [64 0 R 66 0 R 68 0 R 70 0 R 72 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 64 0: <</K [65 0 R] /P 63 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 65 0: <</K [33] /P 64 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 66 0: <</K [67 0 R] /P 63 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 67 0: <</K [34] /P 66 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 68 0: <</K [69 0 R] /P 63 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 69 0: <</K [35] /P 68 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 70 0: <</K [71 0 R] /P 63 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 71 0: <</K [36] /P 70 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 72 0: <</K [73 0 R] /P 63 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 73 0: <</K [37] /P 72 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 74 0: <</K [75 0 R 77 0 R 79 0 R 81 0 R 83 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 75 0: <</K [76 0 R] /P 74 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 76 0: <</K [38 39] /P 75 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 77 0: <</K [78 0 R] /P 74 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 78 0: <</K [40 41] /P 77 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 79 0: <</K [80 0 R] /P 74 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 80 0: <</K [42 43] /P 79 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 81 0: <</K [82 0 R] /P 74 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 82 0: <</K [44 45] /P 81 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 83 0: <</K [84 0 R] /P 74 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 84 0: <</K [46 47] /P 83 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 85 0: <</K [86 0 R 88 0 R 90 0 R 92 0 R 94 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 86 0: <</K [87 0 R] /P 85 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 87 0: <</K [48] /P 86 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 88 0: <</K [89 0 R] /P 85 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 89 0: <</K [49] /P 88 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 90 0: <</K [91 0 R] /P 85 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 91 0: <</K [50] /P 90 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 92 0: <</K [93 0 R] /P 85 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 93 0: <</K [51] /P 92 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 94 0: <</K [95 0 R] /P 85 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 95 0: <</K [52] /P 94 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 96 0: <</K [97 0 R 99 0 R 101 0 R 103 0 R 105 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 97 0: <</K [98 0 R] /P 96 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 98 0: <</K [53 54] /P 97 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 99 0: <</K [100 0 R] /P 96 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 100 0: <</K [55 56] /P 99 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 101 0: <</K [102 0 R] /P 96 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 102 0: <</K [57 58] /P 101 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 103 0: <</K [104 0 R] /P 96 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 104 0: <</K [59 60] /P 103 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 105 0: <</K [106 0 R] /P 96 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 106 0: <</K [61 62] /P 105 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 107 0: <</K [108 0 R 110 0 R 112 0 R 114 0 R 116 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 108 0: <</K [109 0 R] /P 107 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 109 0: <</K [63] /P 108 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 110 0: <</K [111 0 R] /P 107 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 111 0: <</K [64] /P 110 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 112 0: <</K [113 0 R] /P 107 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 113 0: <</K [65] /P 112 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 114 0: <</K [115 0 R] /P 107 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 115 0: <</K [66] /P 114 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 116 0: <</K [117 0 R] /P 107 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 117 0: <</K [67] /P 116 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 118 0: <</K [119 0 R 121 0 R 123 0 R 125 0 R 127 0 R] /P 62 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 119 0: <</K [120 0 R] /P 118 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 120 0: <</K [68 69] /P 119 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 121 0: <</K [122 0 R] /P 118 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 122 0: <</K [70 71] /P 121 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 123 0: <</K [124 0 R] /P 118 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 124 0: <</K [72 73] /P 123 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 125 0: <</K [126 0 R] /P 118 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 126 0: <</K [74 75] /P 125 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 127 0: <</K [128 0 R] /P 118 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 128 0: <</K [76 77] /P 127 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 129 0: <</K [130 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 130 0: <</K [78] /Lang <656e> /P 129 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 131 0: <</K [132 0 R 138 0 R] /P 15 0 R /S /Table /Type /StructElem>>
+object 132 0: <</K [133 0 R] /P 131 0 R /S /THead /Type /StructElem>>
+object 133 0: <</K [134 0 R 136 0 R] /P 132 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 134 0: <</K [135 0 R] /P 133 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 135 0: <</K [79] /P 134 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 136 0: <</K [137 0 R] /P 133 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 137 0: <</K [80] /P 136 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 138 0: <</K [139 0 R 144 0 R] /P 131 0 R /Pg 3 0 R /S /TBody /Type /StructElem>>
+object 139 0: <</K [140 0 R 142 0 R] /P 138 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 140 0: <</K [141 0 R] /P 139 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 141 0: <</K [81] /P 140 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 142 0: <</K [143 0 R] /P 139 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 143 0: <</K [82] /P 142 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 144 0: <</K [145 0 R 147 0 R] /P 138 0 R /Pg 3 0 R /S /TR /Type /StructElem>>
+object 145 0: <</K [146 0 R] /P 144 0 R /Pg 3 0 R /S /TH /Type /StructElem>>
+object 146 0: <</K [83] /P 145 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 147 0: <</K [148 0 R] /P 144 0 R /Pg 3 0 R /S /TD /Type /StructElem>>
+object 148 0: <</K [84] /P 147 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 149 0: <</K [150 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 150 0: <</K [85] /Lang <656e> /P 149 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 151 0: <</K [152 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 152 0: <</K [86 87 88 89 90 91] /Lang <656e> /P 151 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 153 0: <</K [154 0 R] /P 15 0 R /Pg 3 0 R /S /P /Type /StructElem>>
+object 154 0: <</K [92 93 94 95 96 97] /Lang <656e> /P 153 0 R /Pg 3 0 R /S /Span /Type /StructElem>>
+object 155 0: <</CreationDate <443a32303236313132313033313532362b303127303027> /Creator <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200076006f006f00720020004d006900630072006f0073006f006600740020003300360035> /ModDate <443a32303236313132313033313532362b303127303027> /Producer <feff004d006900630072006f0073006f0066007400ae00200057006f0072006400200076006f006f00720020004d006900630072006f0073006f006600740020003300360035>>>
+object 156 0: [278 0 0 0 0 0 0 0 333 333 0 0 0 333 0 0 556 556 556 556 556 0 0 556 0 0 0 0 0 0 0 0 0 722 722 722 722 667 0 0 722 278 0 0 611 0 722 778 0 778 722 0 611 722 667 0 0 0 0 0 0 0 0 0 0 556 611 556 611 556 0 611 0 278 0 0 278 889 611 611 611 0 389 556 333 611 0 0 0 556]
+object 157 0: <</Filter /FlateDecode /Length 28120 /Length1 73696>> stream sha256=6f6f0a933934ac7c664d6773bae60df05e4b06f7a5c3945f9c27e1b80e293a82
+object 158 0: [278 0 0 0 0 889 0 0 0 0 0 0 278 333 278 0 556 556 556 556 556 556 556 556 556 556 278 0 0 0 0 0 0 667 667 722 722 667 611 778 0 278 0 0 556 833 722 778 667 0 0 667 611 0 667 0 0 0 0 0 0 0 0 0 0 556 556 500 556 556 278 556 556 222 222 0 222 833 556 556 556 556 333 500 278 556 500 722 500 500]
+object 159 0: <</Filter /FlateDecode /Length 42375 /Length1 99476>> stream sha256=e8189a6c6c1e07ac0bbfcb9ebd96092f7da87af453521362b5d10d7bdd22872e
+object 160 0: <</Length 3017 /Subtype /XML /Type /Metadata>> stream sha256=2d59c43de9a3795b43e8d1ca4f063e10ab69a26b5fa672d0a55b15fdd72498a7
+object 161 0: <</DisplayDocTitle true>>

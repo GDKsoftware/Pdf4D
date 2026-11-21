@@ -1,0 +1,72 @@
+version: 1.4
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 595 842] crop=[0 0 595 842] rotate=0 label=
+info CreationDate: 2031-03-14T00:00:00+01:00
+info Creator: Pdf4D.InvoiceGen
+info ModDate: 2031-03-14T00:00:00+01:00
+info Producer: Skia/PDF
+info Title: Invoice INV-2031-0417
+xmp: none
+object 1 0: <</CreationDate <443a32303331303331343030303030302b303127303027> /Creator <50646634442e496e766f69636547656e> /ModDate <443a32303331303331343030303030302b303127303027> /Producer <536b69612f504446> /Title <496e766f69636520494e562d323033312d30343137>>>
+object 2 0: <</Contents 8 0 R /MediaBox [0 0 595 842] /Parent 9 0 R /Resources <</ExtGState <</G3 3 0 R /G6 6 0 R /G7 7 0 R>> /Font <</F4 4 0 R /F5 5 0 R>> /ProcSet [/PDF /Text /ImageB /ImageC /ImageI]>> /Tabs /S /Type /Page>>
+object 3 0: <</BM /Normal /ca 1>>
+object 4 0: <</CIDToGIDMap /Identity /CharProcs <</g0 11 0 R /g10 16 0 R /g11 17 0 R /g13 18 0 R /g14 19 0 R /g15 20 0 R /g16 21 0 R /g17 22 0 R /g1A 23 0 R /g24 24 0 R /g25 25 0 R /g26 26 0 R /g27 27 0 R /g28 28 0 R /g2B 29 0 R /g2C 30 0 R /g2F 31 0 R /g3 12 0 R /g31 32 0 R /g32 33 0 R /g34 34 0 R /g35 35 0 R /g37 36 0 R /g38 37 0 R /g39 38 0 R /g44 39 0 R /g45 40 0 R /g46 41 0 R /g47 42 0 R /g48 43 0 R /g4A 44 0 R /g4C 45 0 R /g4F 46 0 R /g50 47 0 R /g51 48 0 R /g52 49 0 R /g53 50 0 R /g55 51 0 R /g56 52 0 R /g57 53 0 R /g58 54 0 R /g5C 55 0 R /gB 13 0 R /gC 14 0 R /gF 15 0 R>> /Encoding <</Differences [0 /g0 /g0 /g0 /g3 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /gB /gC /g0 /g0 /gF /g10 /g11 /g0 /g13 /g14 /g15 /g16 /g17 /g0 /g0 /g1A /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g24 /g25 /g26 /g27 /g28 /g0 /g0 /g2B /g2C /g0 /g0 /g2F /g0 /g31 /g32 /g0 /g34 /g35 /g0 /g37 /g38 /g39 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g0 /g44 /g45 /g46 /g47 /g48 /g0 /g4A /g0 /g4C /g0 /g0 /g4F /g50 /g51 /g52 /g53 /g0 /g55 /g56 /g57 /g58 /g0 /g0 /g0 /g5C] /Type /Encoding>> /FirstChar 0 /FontBBox [-60 457 1603 -1516] /FontDescriptor 57 0 R /FontMatrix [0.0005 0 0 -0.0005 0 0] /LastChar 92 /Subtype /Type3 /ToUnicode 56 0 R /Type /Font /Widths [1536 0 0 569 0 0 0 0 0 0 0 682 682 0 0 569 682 569 0 1139 1139 1139 1139 1139 0 0 1139 0 0 0 0 0 0 0 0 0 1366 1366 1479 1479 1366 0 0 1479 569 0 0 1139 0 1479 1593 0 1593 1479 0 1251 1479 1366 0 0 0 0 0 0 0 0 0 0 1139 1139 1024 1139 1139 0 1139 0 455 0 0 455 1706 1139 1139 1139 0 682 1024 569 1139 0 0 0 1024]>>
+object 5 0: <</BaseFont /AAAAAA+LiberationSans /DescendantFonts [60 0 R] /Encoding /Identity-H /Subtype /Type0 /ToUnicode 61 0 R /Type /Font>>
+object 6 0: <</BM /Normal /CA 1 /LC 0 /LJ 0 /LW 0.5 /ML 4 /SA true /ca 1>>
+object 7 0: <</BM /Normal /CA 1 /LC 0 /LJ 0 /LW 1.5 /ML 4 /SA true /ca 1>>
+object 8 0: <</Filter /FlateDecode /Length 1945>> stream sha256=ab1b2fbe9fe523784fcb873c654eb3556c391c86beab90a5814d4f2ccca76ddc
+object 9 0: <</Count 1 /Kids [2 0 R] /Type /Pages>>
+object 10 0: <</Pages 9 0 R /Type /Catalog /ViewerPreferences <</DisplayDocTitle true /Type /ViewerPreferences>>>>
+object 11 0: <</Filter /FlateDecode /Length 188>> stream sha256=2e919fc5d6614983988f5d0603a432358ed75a7d341ec69263ef8440f87721ba
+object 12 0: <</Length 17>> stream sha256=a8b33e3c06a7fc7dde28b87c7ddc625ace104580ba94824a03d21e03d127aa80
+object 13 0: <</Filter /FlateDecode /Length 771>> stream sha256=99bed1767f06e9d97ecb72370c51b9494b7973694cda7605eeb62cb1ecdc7823
+object 14 0: <</Filter /FlateDecode /Length 755>> stream sha256=8e103855d858730cbfdd552b2dc6bcc8d02a6f0c750fb94ecc3c25140aecae8d
+object 15 0: <</Filter /FlateDecode /Length 382>> stream sha256=d3a25d3e520e9396140357f4a9980c9146d82c89c86807c9253e174a4fc769d7
+object 16 0: <</Length 47>> stream sha256=b11eee69b5451b2946d51040e7a058ed4228f7937321ce179cf81b2ee9fef38c
+object 17 0: <</Length 47>> stream sha256=0768e8365622ef2587109d1b793751f8d5efa8a225c298f63fc030fc6af97f60
+object 18 0: <</Filter /FlateDecode /Length 1471>> stream sha256=22317152f07f6b3ac52ca96ca520ea5e17fe0d92fcb017b79025f85695bbc7b6
+object 19 0: <</Filter /FlateDecode /Length 260>> stream sha256=98043c372b01f71581efe48ee7bcbdb9b92e254f10d5a967104bdeef9151ce9f
+object 20 0: <</Filter /FlateDecode /Length 1694>> stream sha256=43e8a178349da65c5a93a69c94216248217c39bae5c1572775407f01d717df9d
+object 21 0: <</Filter /FlateDecode /Length 2043>> stream sha256=67a5b9575211bdc344fa14e19063164ba2466339031ddcdb75cf2ed1c44ec736
+object 22 0: <</Filter /FlateDecode /Length 574>> stream sha256=b847ca1b6c8dd079a05cabb2479a375ea1fd994d50383e580ebebc663efcd662
+object 23 0: <</Filter /FlateDecode /Length 589>> stream sha256=937f4ade24fc4a4ca6ea8f2201aa3e65a5f1994342c56a6356875809f5f0b396
+object 24 0: <</Filter /FlateDecode /Length 631>> stream sha256=ca553039f694dd051262ad9805991baa7f071f667d264c58698eccc1df750ac4
+object 25 0: <</Filter /FlateDecode /Length 1362>> stream sha256=e4b4ab03d0d14a986833efbf036078b8d2dd0370864765d1eff29fbce1d03e52
+object 26 0: <</Filter /FlateDecode /Length 1455>> stream sha256=d661a3376b6c8305b7025168200bdb6ed6a0f284b29b125a86bd73ae6a7c24a0
+object 27 0: <</Filter /FlateDecode /Length 876>> stream sha256=ef486226be118270db82c9f39c6d75b83e44f48dd25013fa0cce3f29805dabde
+object 28 0: <</Filter /FlateDecode /Length 213>> stream sha256=3843263eb20de918ed1f86e9180f3c0c70986715685ee2a44c23cfc0190e46ba
+object 29 0: <</Filter /FlateDecode /Length 211>> stream sha256=f822638f715df2e1dfb2f0d644e92ccd4ec7aab7cd0be15e1be87e4b2dc9a3c9
+object 30 0: <</Length 50>> stream sha256=4af6a119953b8e2e892573847fb488db2b7a57a51cd3c78d97095a3649ae03bc
+object 31 0: <</Filter /FlateDecode /Length 138>> stream sha256=4ced02193d946b646a34f13d855299c85ff52cc4b35aa5744e0ba809402dfb5b
+object 32 0: <</Filter /FlateDecode /Length 400>> stream sha256=ad75deab250c928c3d62c7f51d0e199431df51e2261d6f4565f55fc485244c8c
+object 33 0: <</Filter /FlateDecode /Length 1399>> stream sha256=f4a1f06f34056274d4dd655f70543e524ad167a279f6805a472b9a931b9caeda
+object 34 0: <</Filter /FlateDecode /Length 1924>> stream sha256=5efbc8ec2f7ef36130fd2123586c11492753490b9e8b7f3df839a4d5678e2446
+object 35 0: <</Filter /FlateDecode /Length 901>> stream sha256=3afafb8959ac1ae8aee4b7b7a7957952619ed37e5943faa29407688b96c47976
+object 36 0: <</Filter /FlateDecode /Length 170>> stream sha256=3fdfce04a1c473ceb5a93351d792dc9928da121906460d6757e9c0add9fbbdf3
+object 37 0: <</Filter /FlateDecode /Length 859>> stream sha256=7a427e588fc26d9d7e7e79c1ef3af6b1394ac887282488685f6d8946119deac7
+object 38 0: <</Filter /FlateDecode /Length 309>> stream sha256=110e4ee5bfda11592a3c37618bf89add524c5b46e43a678c6a246ef32eef762d
+object 39 0: <</Filter /FlateDecode /Length 2422>> stream sha256=ec7d85261729b71abe8f93d4555fbb152b8d5c166f6b9310be6284ffa3a68a70
+object 40 0: <</Filter /FlateDecode /Length 1755>> stream sha256=b6c6967502b4957f390d6d7a79a90496d6a86ecaef035b974eb9a071c4b7e671
+object 41 0: <</Filter /FlateDecode /Length 1397>> stream sha256=3e40b9ad09640992836e11f7dd8ba2ceb466995ff0c15ea8d0ecb364b78ebdb2
+object 42 0: <</Filter /FlateDecode /Length 1710>> stream sha256=4196a80bb8d9c13aba8da86c307891b653fc3e0198b067c7ec6eabbf93f92927
+object 43 0: <</Filter /FlateDecode /Length 1344>> stream sha256=e691a8fd3a17868998d4adb7f021d923d8e60a9c0bd9e79f0741fae2c73cc7fc
+object 44 0: <</Filter /FlateDecode /Length 2495>> stream sha256=873a9a5717bb496700fc07b5659f5770bcd8b73726615c17b2bf08d7284c0273
+object 45 0: <</Filter /FlateDecode /Length 166>> stream sha256=f080418b77807705e4dfdfa042af9d93f5399673cc2faef5c124b9a0678bc037
+object 46 0: <</Length 50>> stream sha256=42fa2bbe37bcf1d262c08ea85b4b02cdf7b29d0c39a6b07c558e3c5cf2ec6da2
+object 47 0: <</Filter /FlateDecode /Length 1693>> stream sha256=18c90dc2a3c11e7c42dd2c570119d479598dd3dce708ed4bae94d67a2a265d74
+object 48 0: <</Filter /FlateDecode /Length 1152>> stream sha256=b429a7f881e575b9dceea69aa617023acc7d20d0c0697fff36f022636079960b
+object 49 0: <</Filter /FlateDecode /Length 1146>> stream sha256=04dde1fcd3b30091949af26ef35f9b1029480ce315fcd0608f2c177640792980
+object 50 0: <</Filter /FlateDecode /Length 2075>> stream sha256=7fb97d2d5f138ebd21cfe660a128096a01eb5e316a27edfec6dab3357019036a
+object 51 0: <</Filter /FlateDecode /Length 857>> stream sha256=74f444dea420d863e95c25a87927850f960804d628e76ceb5666daaf6c86476a
+object 52 0: <</Filter /FlateDecode /Length 2394>> stream sha256=cc2a7f6fb853db4002317bf313451198e49363e9670cf685353ed246562d814c
+object 53 0: <</Filter /FlateDecode /Length 666>> stream sha256=bbabccd5ae9f84c0854cd5b1ae17bd8b91bc425b4799a1733dbb79e07398764a
+object 54 0: <</Filter /FlateDecode /Length 1142>> stream sha256=9ae457a2caed0fbfceb8d6f8fa66d1fb47469753d41ca8f38d2331246ab07327
+object 55 0: <</Filter /FlateDecode /Length 934>> stream sha256=dab12b3f162b0fb6147687631debb2a39b3825f46a1f5b0c3d34c63142a09b71
+object 56 0: <</Filter /FlateDecode /Length 352>> stream sha256=c624063a1643ea4978a19ba628d75710201205f0dbd7b88e4864eb311bff8dcb
+object 57 0: <</CapHeight 1409 /Flags 4 /FontFamily <4c696265726174696f6e2053616e73> /FontName /AAAAAA+LiberationSans /FontStretch /Normal /FontWeight 400 /ItalicAngle 0 /StemV 94 /Type /FontDescriptor /XHeight 1082>>
+object 58 0: <</Filter /FlateDecode /Length 11163 /Length1 16984>> stream sha256=498337fc6c338745c09258ca812dded82ad9672fb6ef0ee3cf8976ee027c311d
+object 59 0: <</Ascent 905.2734 /CapHeight 687.9883 /Descent 211.9141 /Flags 4 /FontBBox [-543.9453 -303.2227 1301.7578 979.9805] /FontFile2 58 0 R /FontName /AAAAAA+LiberationSans /ItalicAngle 0 /StemV 45.8984 /Type /FontDescriptor>>
+object 60 0: <</BaseFont /AAAAAA+LiberationSans /CIDSystemInfo <</Ordering <4964656e74697479> /Registry <41646f6265> /Supplement 0>> /CIDToGIDMap /Identity /DW 500 /FontDescriptor 59 0 R /Subtype /CIDFontType2 /Type /Font /W [0 [750 0 0 277.832] 8 [889.1602] 15 [277.832 333.0078 277.832] 19 28 556.1523 29 [277.832] 36 37 666.9922 38 39 722.168 40 [666.9922 610.8398 777.832 0 277.832 0 0 556.1523 833.0078 722.168 777.832 666.9922 0 0 666.9922 610.8398 0 666.9922] 68 69 556.1523 71 72 556.1523 73 [277.832 556.1523 556.1523] 76 79 222.168 80 [833.0078] 81 84 556.1523 85 [333.0078] 87 [277.832 556.1523] 90 [722.168]]>>
+object 61 0: <</Filter /FlateDecode /Length 311>> stream sha256=4f338882b0c6438feaa8cc72686afddfec97ce1a73d3f0ffce5a0e513e872235

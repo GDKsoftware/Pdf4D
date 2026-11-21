@@ -12,3 +12,12 @@ generated/render/rotated.pdf;2
 pdfbox/input/rendering/survey.pdf;1
 pdfbox/input/rendering/source.pdf;1
 pdfbox/input/rendering/test-landscape2.pdf;1
+generated/render/softmask.pdf;1
+generated/render/colors-special.pdf;1
+generated/render/ccitt.pdf;1
+pdfbox/input/rendering/tiger-as-form-xobject.pdf;1
+pdfbox/input/rendering/4PP-Highlighting.pdf;1
+generated/invoices/edge-print.pdf;1
+generated/invoices/skia-draw.pdf;1
+generated/invoices/word-export.pdf;1
+generated/invoices/word-print.pdf;1

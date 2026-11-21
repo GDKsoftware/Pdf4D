@@ -1,0 +1,2 @@
+# page <n> [<platform>] # <reason>
+page 1 # 150 DPI only (72 DPI equals): the top edges of the stroked squares are one pixel off. Java2D normalizes a stroke centre to floor(x) + 0.5 in device pixels from a double matrix whose translation is scale * page height (833.33330154 at 150 DPI); the Single device matrix of TPdfMatrix has 833.33331299, so a centre at 25.0000105 instead of 24.9999990 pixels moves to pixel 25 instead of 24 (Task 29: carry the device matrix of the page in double precision, or rule it a deviation)

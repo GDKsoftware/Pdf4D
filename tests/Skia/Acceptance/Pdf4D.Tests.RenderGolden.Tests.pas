@@ -21,6 +21,12 @@ uses
   Pdf4D.Tests.RenderCompare;
 
 type
+  // A line of selection.txt: a corpus file and one of its pages
+  TSelectedPage = record
+    RelativePath: string;
+    Page: Integer;
+  end;
+
   TRenderCorpusCaseProvider = class(TTestDataProvider)
   strict private
     FFiles: TArray<string>;
@@ -44,15 +50,18 @@ type
     class function RenderFolder: string; static;
     class function ReferenceFolder(const Dpi: Integer): string; static;
     class function ListedPages(const RenderListing: string): TArray<Integer>; static;
-    class function OutputName(const RelativePath: string; const Page: Integer): string; static;
-    class procedure LogComparison(const RelativePath: string; const Page: Integer; const Comparison: TRenderComparison); static;
+    class function OutputName(const RelativePath: string; const Page: Integer; const Dpi: Integer): string; static;
+    class procedure LogComparison(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Comparison: TRenderComparison); static;
     class function CropOf(const Source: TPdfBitmap; const Region: TRect): TPdfBitmap; static;
     class procedure SaveRegionOutput(const RelativePath: string; const Page: Integer; const Region, Full: TPdfBitmap); static;
-    class procedure SaveOutput(const RelativePath: string; const Page: Integer; const Actual, Expected: TPdfBitmap); static;
-    class function Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument; const ListedPages: TArray<Integer>): TArray<string>; static;
+    class procedure SaveOutput(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Actual, Expected: TPdfBitmap); static;
+    class function Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument; const Dpi: Integer; const ListedPages: TArray<Integer>): TArray<string>; static;
+    class function KnownDifferencesPath(const RelativePath: string; const Dpi: Integer): string; static;
+    class function SelectedPages(const SelectionPath: string): TArray<TSelectedPage>; static;
+    class function FileDifference(const RelativePath: string; const Dpi: Integer; const Pages: TArray<Integer>): TArray<string>; static;
     class function PageLineCount(const RenderListing: string): Integer; static;
     class function HasNoReference(const RenderListing: string): Boolean; static;
-    class function PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Expected: TPdfBitmap): string; static;
+    class function PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Dpi: Integer; const Expected: TPdfBitmap): string; static;
 
   public
     [Setup]
@@ -69,6 +78,12 @@ type
     // listing cannot make a file pass unseen
     [Test]
     procedure TestFilesWithoutReferenceAreListed;
+
+    // The pages of tests/reference/render/150/selection.txt (fine details: thin lines, small text, patterns, the invoices), rendered at
+    // 150 DPI, must equal the render of PDFBox under the same rules. The selection, the listings and the images must agree: a missing
+    // reference, a missing listing or an image without a selection line fails.
+    [Test]
+    procedure TestSelection150Dpi;
 
     // The viewer renders regions of a page; a region must equal the same crop of the whole page
     [Test]
@@ -105,6 +120,9 @@ const
   ProviderName = 'Pdf4DRenderCorpus';
   OutputEnvironmentVariable = 'PDF4D_RENDER_OUTPUT';
   ReferenceDpi = 72;
+  SelectionDpi = 150;
+  SelectionFileName = 'selection.txt';
+  PngExtension = '.png';
   MaxReportedDifferences = 10;
   // tools/oracle/generate-render.ps1 renders pages 1 to min(pages, 50) of a file
   MaxRenderedPages = 50;
@@ -219,20 +237,24 @@ begin
   end;
 end;
 
-class function TRenderGoldenTests.OutputName(const RelativePath: string; const Page: Integer): string;
+class function TRenderGoldenTests.OutputName(const RelativePath: string; const Page: Integer; const Dpi: Integer): string;
 begin
   Result := Format('%s.p%.3d', [TCorpus.GoldenName(RelativePath), Page]);
+  if Dpi <> ReferenceDpi then
+  begin
+    Result := Result + Format('.%ddpi', [Dpi]);
+  end;
 end;
 
 // With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: file, page, share of different pixels, largest
 // difference, whether the sizes are equal, share of the flat pixels that differ, share of the edge pixels that differ
-class procedure TRenderGoldenTests.LogComparison(const RelativePath: string; const Page: Integer; const Comparison: TRenderComparison);
+class procedure TRenderGoldenTests.LogComparison(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Comparison: TRenderComparison);
 begin
   const Folder = GetEnvironmentVariable(OutputEnvironmentVariable);
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [RelativePath, Page, Comparison.DifferentFraction, Comparison.MaxDifference,
+    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.DifferentFraction, Comparison.MaxDifference,
                                                                                                BoolToStr(Comparison.HasSameSize, True), Comparison.DifferentFlatFraction, Comparison.DifferentEdgeFraction, sLineBreak]));
   end;
 end;
@@ -252,13 +274,13 @@ begin
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TPng.Write(Region, TPath.Combine(Folder, OutputName(RelativePath, Page) + '.region.png'));
-    TPng.Write(Full, TPath.Combine(Folder, OutputName(RelativePath, Page) + '.full.png'));
+    TPng.Write(Region, TPath.Combine(Folder, OutputName(RelativePath, Page, ReferenceDpi) + '.region.png'));
+    TPng.Write(Full, TPath.Combine(Folder, OutputName(RelativePath, Page, ReferenceDpi) + '.full.png'));
   end;
 end;
 
 // For looking at a difference: the render and an image of the differences go to the folder in PDF4D_RENDER_OUTPUT
-class procedure TRenderGoldenTests.SaveOutput(const RelativePath: string; const Page: Integer; const Actual, Expected: TPdfBitmap);
+class procedure TRenderGoldenTests.SaveOutput(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Actual, Expected: TPdfBitmap);
 begin
   const Folder = GetEnvironmentVariable(OutputEnvironmentVariable);
   if Folder = '' then
@@ -267,41 +289,56 @@ begin
   end;
 
   TDirectory.CreateDirectory(Folder);
-  const Name = OutputName(RelativePath, Page);
+  const Name = OutputName(RelativePath, Page, Dpi);
   TPng.Write(Actual, TPath.Combine(Folder, Name + '.png'));
   TRenderCompare.WriteDifference(Actual, Expected, TPath.Combine(Folder, Name + '.diff.png'));
 end;
 
 // Empty when the page equals its reference, otherwise what differs
-class function TRenderGoldenTests.PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Expected: TPdfBitmap): string;
+class function TRenderGoldenTests.PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Dpi: Integer; const Expected: TPdfBitmap): string;
 begin
   var Actual: TPdfBitmap := nil;
   try
     const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TReferenceBackends.Create);
-    Renderer.RenderToBitmap(Page - 1, TPdfRenderParams.FromDpi(ReferenceDpi), Actual);
+    Renderer.RenderToBitmap(Page - 1, TPdfRenderParams.FromDpi(Dpi), Actual);
 
     const Comparison = TRenderCompare.Compare(Actual, Expected);
-    LogComparison(RelativePath, Page, Comparison);
+    LogComparison(RelativePath, Page, Dpi, Comparison);
     if Comparison.IsEqual then
     begin
       Exit('');
     end;
 
-    SaveOutput(RelativePath, Page, Actual, Expected);
+    SaveOutput(RelativePath, Page, Dpi, Actual, Expected);
     Result := Format('page %d: %s', [Page, Comparison.Describe]);
   finally
     Actual.Free;
   end;
 end;
 
+// The known differences of the 72 DPI renders are in <name>.render-known-differences.txt, those of another DPI in
+// <name>.render-<dpi>dpi-known-differences.txt: a page that is only different at 150 DPI must not hide its 72 DPI comparison
+class function TRenderGoldenTests.KnownDifferencesPath(const RelativePath: string; const Dpi: Integer): string;
+begin
+  if Dpi = ReferenceDpi then
+  begin
+    Result := TCorpus.GoldenName(RelativePath) + '.render-known-differences.txt';
+  end
+  else
+  begin
+    Result := Format('%s.render-%ddpi-known-differences.txt', [TCorpus.GoldenName(RelativePath), Dpi]);
+  end;
+  Result := TPath.Combine(RenderFolder, Result);
+end;
+
 // The reference of a listed page must be there and be a PNG, also for a file that is pending: nothing is compared without it, and
 // that is a failure, not a difference. An exception of the render is a difference of a file that is not pending; in a pending file
 // only a feature that is not supported yet (the one that made it pending) may raise, anything else fails the test.
-class function TRenderGoldenTests.Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument;
+class function TRenderGoldenTests.Differences(const RelativePath: string; const IsPending: Boolean; const Document: IPdfDocument; const Dpi: Integer;
                                                const ListedPages: TArray<Integer>): TArray<string>;
 begin
   Result := nil;
-  const Known = TTextGoldenComparer.LoadKnownDifferences(TPath.Combine(RenderFolder, TCorpus.GoldenName(RelativePath) + '.render-known-differences.txt'));
+  const Known = TTextGoldenComparer.LoadKnownDifferences(KnownDifferencesPath(RelativePath, Dpi));
   for var Page in ListedPages do
   begin
     if TRenderCompare.IsKnownDifference(Known, Page, TTextGoldenComparer.CurrentPlatform) then
@@ -309,13 +346,13 @@ begin
       Continue;
     end;
 
-    const PngPath = TPath.Combine(ReferenceFolder(ReferenceDpi), OutputName(RelativePath, Page) + '.png');
+    const PngPath = TPath.Combine(ReferenceFolder(Dpi), Format('%s.p%.3d', [TCorpus.GoldenName(RelativePath), Page]) + PngExtension);
     Assert.IsTrue(TFile.Exists(PngPath), Format('%s page %d: the reference image %s is missing', [RelativePath, Page, PngPath]));
     const Expected = TPng.Read(PngPath);
     try
       var Difference: string;
       try
-        Difference := PageDifference(RelativePath, Document, Page, Expected);
+        Difference := PageDifference(RelativePath, Document, Page, Dpi, Expected);
       except
         on Failure: Exception do
         begin
@@ -382,7 +419,7 @@ begin
   Assert.AreEqual<Integer>(Min(Document.PageCount, MaxRenderedPages), PageLineCount(Listing), Format('%s: the render listing has another number of pages than the file', [RelativePath]));
 
   const IsPending = MatchStr(RelativePath, TRenderCompare.PendingFiles(TPath.Combine(RenderFolder, 'pending.txt')));
-  const Found = Differences(RelativePath, IsPending, Document, Pages);
+  const Found = Differences(RelativePath, IsPending, Document, ReferenceDpi, Pages);
   const Verdict = TRenderCompare.Judge(IsPending, Found);
   if IsPending and (Length(Found) > 0) then
   begin
@@ -393,6 +430,117 @@ begin
     const Reported = Copy(Found, 0, MaxReportedDifferences);
     Assert.Fail(Format('%s: %d pages differ from PDFBox, the first %d:%s%s%s',
                        [RelativePath, Length(Found), Length(Reported), sLineBreak, string.Join(sLineBreak, Reported), Verdict.Message]));
+  end;
+end;
+
+// The lines "<corpus file>;<page>" of selection.txt; # starts a comment
+class function TRenderGoldenTests.SelectedPages(const SelectionPath: string): TArray<TSelectedPage>;
+begin
+  Result := nil;
+  for var Line in TFile.ReadAllLines(SelectionPath, TEncoding.UTF8) do
+  begin
+    const Trimmed = Line.Trim;
+    if (Trimmed = '') or Trimmed.StartsWith('#') then
+    begin
+      Continue;
+    end;
+
+    const Columns = Trimmed.Split([';']);
+    Assert.AreEqual<Integer>(2, Length(Columns), Format('selection.txt: the line "%s" is not "<corpus file>;<page>"', [Trimmed]));
+    var Item: TSelectedPage;
+    Item.RelativePath := Columns[0].Trim;
+    Item.Page := StrToInt(Columns[1].Trim);
+    Result := Result + [Item];
+  end;
+end;
+
+// The differences of the selected pages of one file at the given DPI: empty when every page equals its reference or is a known difference
+class function TRenderGoldenTests.FileDifference(const RelativePath: string; const Dpi: Integer; const Pages: TArray<Integer>): TArray<string>;
+begin
+  const ListingPath = TPath.Combine(ReferenceFolder(Dpi), TCorpus.GoldenName(RelativePath) + '.render.txt');
+  Assert.IsTrue(TFile.Exists(ListingPath), Format('%s: the render listing %s is missing', [RelativePath, ListingPath]));
+  const Listed = ListedPages(TFile.ReadAllText(ListingPath, TEncoding.UTF8));
+  for var Page in Pages do
+  begin
+    var IsListed := False;
+    for var ListedPage in Listed do
+    begin
+      IsListed := IsListed or (ListedPage = Page);
+    end;
+    Assert.IsTrue(IsListed, Format('%s: page %d is not rendered in the %d DPI listing', [RelativePath, Page, Dpi]));
+  end;
+
+  var Options := TPdfLoadOptions.Default;
+  Options.Password := TCorpus.PasswordFor(RelativePath);
+  const Document: IPdfDocument = TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
+  const IsPending = MatchStr(RelativePath, TRenderCompare.PendingFiles(TPath.Combine(RenderFolder, 'pending.txt')));
+  const Found = Differences(RelativePath, IsPending, Document, Dpi, Pages);
+  const Verdict = TRenderCompare.Judge(IsPending, Found);
+  Result := nil;
+  if Verdict.IsFailure then
+  begin
+    Result := Found;
+    if Length(Result) = 0 then
+    begin
+      Result := [Verdict.Message];
+    end;
+  end;
+end;
+
+procedure TRenderGoldenTests.TestSelection150Dpi;
+begin
+  Assert.IsTrue(Length(TCorpus.Files) > 0, 'The corpus was not found: set PDF4D_CORPUS or run the test program below the tests folder');
+
+  const SelectionPath = TPath.Combine(ReferenceFolder(SelectionDpi), SelectionFileName);
+  Assert.IsTrue(TFile.Exists(SelectionPath), Format('%s is missing', [SelectionPath]));
+  const Selected = SelectedPages(SelectionPath);
+  Assert.IsTrue(Length(Selected) > 0, 'selection.txt selects no page');
+
+  // Every reference image of the folder belongs to a selection line
+  var Expected: TArray<string> := nil;
+  for var Item in Selected do
+  begin
+    Assert.IsTrue(MatchStr(Item.RelativePath, TCorpus.Files), Format('selection.txt: %s is not in the corpus', [Item.RelativePath]));
+    Expected := Expected + [Format('%s.p%.3d%s', [TCorpus.GoldenName(Item.RelativePath), Item.Page, PngExtension])];
+  end;
+  var Orphans: TArray<string> := nil;
+  for var ImagePath in TDirectory.GetFiles(ReferenceFolder(SelectionDpi), '*' + PngExtension) do
+  begin
+    if not MatchStr(TPath.GetFileName(ImagePath), Expected) then
+    begin
+      Orphans := Orphans + [TPath.GetFileName(ImagePath)];
+    end;
+  end;
+  Assert.AreEqual<Integer>(0, Length(Orphans), Format('Reference images without a line in selection.txt: %s', [string.Join(', ', Orphans)]));
+
+  var Failures: TArray<string> := nil;
+  var Done: TArray<string> := nil;
+  for var Item in Selected do
+  begin
+    if MatchStr(Item.RelativePath, Done) then
+    begin
+      Continue;
+    end;
+    Done := Done + [Item.RelativePath];
+
+    var Pages: TArray<Integer> := nil;
+    for var Other in Selected do
+    begin
+      if Other.RelativePath = Item.RelativePath then
+      begin
+        Pages := Pages + [Other.Page];
+      end;
+    end;
+    for var Difference in FileDifference(Item.RelativePath, SelectionDpi, Pages) do
+    begin
+      Failures := Failures + [Format('%s: %s', [Item.RelativePath, Difference])];
+    end;
+  end;
+
+  if Length(Failures) > 0 then
+  begin
+    const Reported = Copy(Failures, 0, MaxReportedDifferences);
+    Assert.Fail(Format('%d selected pages differ from PDFBox at %d DPI, the first %d:%s%s', [Length(Failures), SelectionDpi, Length(Reported), sLineBreak, string.Join(sLineBreak, Reported)]));
   end;
 end;
 
