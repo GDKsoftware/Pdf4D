@@ -16,7 +16,7 @@ New-Item -ItemType Directory -Force $OutputFolder | Out-Null
 $html = Join-Path $PSScriptRoot 'invoice.html'
 $made = [ordered]@{}
 # The document is CC0; the fonts that Edge and Word embed (subsets of Arial) are not
-$arialNote = '; CC0 covers the document, the embedded Arial subsets stay under the licence of the font'
+$arialNote = ', CC0 covers the document, the embedded Arial subsets stay under the licence of the font'
 
 function Add-Made([string]$Name, [string]$Producer, [string]$Notes) {
     $made[$Name] = [pscustomobject]@{ Producer = $Producer; Notes = $Notes }

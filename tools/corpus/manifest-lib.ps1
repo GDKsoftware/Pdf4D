@@ -20,8 +20,8 @@ function Write-Manifest($rows) {
     foreach ($k in ($rows.Keys | Sort-Object { $_ }  -CaseSensitive)) {
         $r = $rows[$k]
         $clean = { param($s) if ($null -eq $s) { '' } else { ($s -replace '[;\r\n]', ',') } }
-        # The notes are the last column (Read-Manifest splits into four), so they may keep ';'
-        $notes = if ($null -eq $r.notes) { '' } else { $r.notes -replace '[\r\n]', ',' }
+        # No field may hold the separator, the notes included: a row has exactly four fields
+        $notes = if ($null -eq $r.notes) { '' } else { $r.notes -replace '[;\r\n]', ',' }
         $out.Add(('{0};{1};{2};{3}' -f (& $clean $r.file), (& $clean $r.source_url), (& $clean $r.license), $notes))
     }
     New-Item -ItemType Directory -Force (Split-Path $script:ManifestPath) | Out-Null
