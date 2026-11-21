@@ -8,6 +8,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Types,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path;
 
@@ -18,10 +19,17 @@ type
   // one whole pixel and half of the next. The control points of a curve move with the end points on either side of them.
   TPdfStrokeNormalizer = record
   strict private
+    type
+      TDevicePoint = record
+        X: Double;
+        Y: Double;
+      end;
+
     class function Centered(const Value: Double): Double; static;
+    class function DevicePoint(const Point: TPointF; const ToDevice: TPdfMatrix): TDevicePoint; static;
     class function IsInvertible(const ToDevice: TPdfMatrix): Boolean; static;
     class function Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix; static;
-    class procedure Rebuild(const Device, Target: TPdfPath); static;
+    class procedure Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const Target: TPdfPath); static;
 
   public
     // A new path in the space of Path that the caller frees: Path with the end points of its segments moved to the pixel centres of the
@@ -45,6 +53,12 @@ begin
   Result := Floor(Value) + PixelCentre;
 end;
 
+class function TPdfStrokeNormalizer.DevicePoint(const Point: TPointF; const ToDevice: TPdfMatrix): TDevicePoint;
+begin
+  Result.X := Double(ToDevice.ScaleX) * Point.X + Double(ToDevice.ShearX) * Point.Y + ToDevice.TranslateX;
+  Result.Y := Double(ToDevice.ShearY) * Point.X + Double(ToDevice.ScaleY) * Point.Y + ToDevice.TranslateY;
+end;
+
 class function TPdfStrokeNormalizer.IsInvertible(const ToDevice: TPdfMatrix): Boolean;
 begin
   const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
@@ -59,19 +73,13 @@ begin
   end;
 
   const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
-  const Device = Path.Clone;
+  Result := TPdfPath.Create;
   try
-    Device.Transform(ToDevice);
-    Result := TPdfPath.Create;
-    try
-      Rebuild(Device, Result);
-      Result.Transform(Inverse(ToDevice, Determinant));
-    except
-      Result.Free;
-      raise;
-    end;
-  finally
-    Device.Free;
+    Rebuild(Path, ToDevice, Result);
+    Result.Transform(Inverse(ToDevice, Determinant));
+  except
+    Result.Free;
+    raise;
   end;
 end;
 
@@ -90,25 +98,28 @@ begin
                               -(InverseB * Matrix.TranslateX + InverseD * Matrix.TranslateY));
 end;
 
-// The path of the device is copied segment by segment; the adjustment of the end point that came before moves the first control point
-class procedure TPdfStrokeNormalizer.Rebuild(const Device, Target: TPdfPath);
+// The path is copied segment by segment in the device space; the adjustment of the end point that came before moves the first control
+// point. The points of the device are worked out in double precision, as Java2D does (floats in, a double transform): a point that lies
+// just below a pixel boundary in double precision (12 points at 150 DPI is 24.999999 pixels) must not round up to the boundary in single
+// precision, because the boundary decides the pixel the point moves to.
+class procedure TPdfStrokeNormalizer.Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const Target: TPdfPath);
 begin
   var PointIndex := 0;
   var CurrentX := 0.0;
   var CurrentY := 0.0;
   var StartX := 0.0;
   var StartY := 0.0;
-  for var VerbIndex := 0 to Device.VerbCount - 1 do
+  for var VerbIndex := 0 to Source.VerbCount - 1 do
   begin
-    case Device.Verb(VerbIndex) of
+    case Source.Verb(VerbIndex) of
       TPdfPathVerb.MoveTo,
       TPdfPathVerb.LineTo:
         begin
-          const End1 = Device.Point(PointIndex);
+          const End1 = DevicePoint(Source.Point(PointIndex), ToDevice);
           Inc(PointIndex);
           const NewX = Centered(End1.X);
           const NewY = Centered(End1.Y);
-          if Device.Verb(VerbIndex) = TPdfPathVerb.MoveTo then
+          if Source.Verb(VerbIndex) = TPdfPathVerb.MoveTo then
           begin
             Target.MoveTo(NewX, NewY);
             StartX := NewX - End1.X;
@@ -123,8 +134,8 @@ begin
         end;
       TPdfPathVerb.QuadTo:
         begin
-          const Control = Device.Point(PointIndex);
-          const End2 = Device.Point(PointIndex + 1);
+          const Control = DevicePoint(Source.Point(PointIndex), ToDevice);
+          const End2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice);
           Inc(PointIndex, 2);
           const NewX = Centered(End2.X);
           const NewY = Centered(End2.Y);
@@ -134,9 +145,9 @@ begin
         end;
       TPdfPathVerb.CubicTo:
         begin
-          const Control1 = Device.Point(PointIndex);
-          const Control2 = Device.Point(PointIndex + 1);
-          const End3 = Device.Point(PointIndex + 2);
+          const Control1 = DevicePoint(Source.Point(PointIndex), ToDevice);
+          const Control2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice);
+          const End3 = DevicePoint(Source.Point(PointIndex + 2), ToDevice);
           Inc(PointIndex, 3);
           const NewX = Centered(End3.X);
           const NewY = Centered(End3.Y);
@@ -151,7 +162,7 @@ begin
           CurrentY := StartY;
         end;
     else
-      raise EInvalidOpException.CreateFmt('Unsupported path verb: %d', [Ord(Device.Verb(VerbIndex))]);
+      raise EInvalidOpException.CreateFmt('Unsupported path verb: %d', [Ord(Source.Verb(VerbIndex))]);
     end;
   end;
 end;

@@ -34,6 +34,11 @@ type
     [Test]
     procedure TestPathIsNormalizedInDeviceSpace;
 
+    // 12 points at 150 DPI (a scale of 150 / 72 as a Single) is 24.999999 pixels: Java2D transforms in double precision, so the point is in
+    // pixel 24 and moves to 24.5; in single precision it would round up to 25.0 and move to 25.5
+    [Test]
+    procedure TestDevicePointJustBelowAPixelBoundaryStaysBelow;
+
     [Test]
     procedure TestCubicControlPointsMoveWithTheEndPoints;
 
@@ -113,6 +118,24 @@ begin
     try
       // y: device 300, to 300.5, path y 99.5
       AssertPoint(Normalized, 0, 5.25, 99.5);
+    finally
+      Normalized.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestDevicePointJustBelowAPixelBoundaryStaysBelow;
+begin
+  const Scale: Single = 150 / 72;
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(12, 12);
+
+    const Normalized = TPdfStrokeNormalizer.Normalize(Path, TPdfMatrix.Create(Scale, 0, 0, Scale, 0, 0));
+    try
+      AssertPoint(Normalized, 0, 24.5 / Scale, 24.5 / Scale);
     finally
       Normalized.Free;
     end;
