@@ -306,8 +306,8 @@ end;
 procedure TRenderCompareTests.TestPendingFileNotCounted;
 begin
   const FileName = TPath.Combine(TPath.GetTempPath, 'pdf4d-pending-test.txt');
-  TFile.WriteAllText(FileName, '# comment' + sLineBreak + 'generated/render/shadings.pdf # Task 20: shadings' + sLineBreak + sLineBreak +
-                               'generated/render/patterns.pdf # Task 22: tiling patterns' + sLineBreak, TEncoding.UTF8);
+  TFile.WriteAllText(FileName, '# comment' + sLineBreak + 'generated/render/shadings.pdf # shadings' + sLineBreak + sLineBreak +
+                               'generated/render/patterns.pdf # tiling patterns' + sLineBreak, TEncoding.UTF8);
   try
     const Pending = TRenderCompare.PendingFiles(FileName);
     const Verdict = TRenderCompare.Judge(True, ['page 1: 40.000% of the pixels differ']);

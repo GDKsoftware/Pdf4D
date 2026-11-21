@@ -64,7 +64,7 @@ const
   RunsPerInvoice = 5;
   // 96 DPI is the scale 4 / 3 of the 72 points of an inch
   ViewerScale: Single = 4 / 3;
-  // Measured on the invoices of the corpus in a Release build on Win64 (docs/assumptions.md has the figures): the medians are 10 to
+  // Measured on the invoices of the corpus in a Release build on Win64: the medians are 10 to
   // 33 ms. The threshold is three times the slowest, so a slower machine or a busy build server passes, and it still catches a renderer
   // that has become an order of magnitude slower.
   MaxMedianMilliseconds = 100;

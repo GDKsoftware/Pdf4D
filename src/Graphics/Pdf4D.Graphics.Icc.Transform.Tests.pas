@@ -73,7 +73,7 @@ uses
 
 const
   // The difference to Java that the tests accept per channel: Java's colour management (Little CMS) works with 16 bits
-  // integers and an optimised table where this code uses floating point. The measured maximum (0.05 / 255) is in docs/assumptions.md.
+  // integers and an optimised table where this code uses floating point. The measured maximum is 0.05 / 255.
   MaxDifferenceToJava = 0.25 / 255.0;
 
   // The D50 white of the PCS

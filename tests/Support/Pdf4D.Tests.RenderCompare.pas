@@ -80,7 +80,7 @@ type
 
     // The entries "page <n> [<platform>] # <reason>" of a render-known-differences file say that a page is skipped, on one platform or on all
     class function IsKnownDifference(const Entries: TArray<string>; const Page: Integer; const PlatformName: string): Boolean; static;
-    // The files of a pending.txt ("<corpus file> # Task <n>: <subject>"); a missing file gives none
+    // The files of a pending.txt ("<corpus file> # <subject>"); a missing file gives none
     class function PendingFiles(const FileName: string): TArray<string>; static;
     // The result for one file: Differences describe the pages that differ and are not known differences
     class function Judge(const IsPending: Boolean; const Differences: TArray<string>): TRenderVerdict; static;

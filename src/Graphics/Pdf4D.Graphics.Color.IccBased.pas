@@ -5,7 +5,7 @@
 // Pdf4D.Graphics.Icc.Transform where PDFBox uses the Java colour management. A profile that cannot be used makes the space fall
 // back to its alternate (PDICCBased.fallbackToAlternateColorSpace). PDFBox patches the class of a profile to "display"
 // (ensureDisplayProfile) because the Java colour management only converts the colours of display profiles; the transform here reads
-// no profile class, so that patch has nothing to do (docs/assumptions.md).
+// no profile class, so that patch has nothing to do.
 unit Pdf4D.Graphics.Color.IccBased;
 
 {$EXCESSPRECISION OFF}
