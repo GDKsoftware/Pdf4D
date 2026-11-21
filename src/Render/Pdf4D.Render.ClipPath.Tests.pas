@@ -7,6 +7,7 @@ unit Pdf4D.Render.ClipPath.Tests;
 interface
 
 uses
+  System.Types,
   DUnitX.TestFramework,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
@@ -34,6 +35,15 @@ type
 
     [Test]
     procedure TestSharedParentSurvivesReleaseOfItsChild;
+
+    [Test]
+    procedure TestDepthCountsThePathsOfTheChain;
+
+    [Test]
+    procedure TestBoundsAreTheIntersectionOfTheChain;
+
+    [Test]
+    procedure TestFlattenedChainIsTheRectangleOfItsBounds;
   end;
 
 implementation
@@ -48,6 +58,50 @@ begin
   Path.LineTo(10, 10);
   Path.ClosePath;
   Result := TPdfClipPath.Create(Parent, Path, TPdfMatrix.Identity, FillRule);
+end;
+
+procedure TPdfClipPathTests.TestDepthCountsThePathsOfTheChain;
+begin
+  const First = NewClip(nil, TPdfFillRule.NonZero);
+  const Second = NewClip(First, TPdfFillRule.NonZero);
+
+  Assert.AreEqual(1, First.Depth);
+  Assert.AreEqual(2, Second.Depth);
+  Assert.AreEqual(3, NewClip(Second, TPdfFillRule.NonZero).Depth);
+end;
+
+function RectangleClip(const Parent: IPdfClipPath; const Left, Top, Right, Bottom: Single; const Transform: TPdfMatrix): IPdfClipPath;
+begin
+  const Path = TPdfPath.Create;
+  Path.MoveTo(Left, Top);
+  Path.LineTo(Right, Top);
+  Path.LineTo(Right, Bottom);
+  Path.LineTo(Left, Bottom);
+  Path.ClosePath;
+  Result := TPdfClipPath.Create(Parent, Path, Transform, TPdfFillRule.NonZero);
+end;
+
+procedure TPdfClipPathTests.TestBoundsAreTheIntersectionOfTheChain;
+begin
+  const First = RectangleClip(nil, 0, 0, 10, 10, TPdfMatrix.Identity);
+  const Second = RectangleClip(First, 2, 3, 20, 20, TPdfMatrix.Identity);
+  const Moved = RectangleClip(Second, 0, 0, 4, 4, TPdfMatrix.GetTranslateInstance(5, 5));
+
+  Assert.IsTrue(First.Bounds = TRectF.Create(0, 0, 10, 10));
+  Assert.IsTrue(Second.Bounds = TRectF.Create(2, 3, 10, 10));
+  Assert.IsTrue(Moved.Bounds = TRectF.Create(5, 5, 9, 9));
+end;
+
+procedure TPdfClipPathTests.TestFlattenedChainIsTheRectangleOfItsBounds;
+begin
+  const First = RectangleClip(nil, 0, 0, 10, 10, TPdfMatrix.Identity);
+  const Second = RectangleClip(First, 2, 3, 20, 20, TPdfMatrix.Identity);
+
+  const Flat = TPdfClipPath.Flattened(Second);
+
+  Assert.AreEqual(1, Flat.Depth);
+  Assert.IsNull(Flat.Parent);
+  Assert.IsTrue(Flat.Bounds = TRectF.Create(2, 3, 10, 10));
 end;
 
 procedure TPdfClipPathTests.TestClipChainKeepsParents;

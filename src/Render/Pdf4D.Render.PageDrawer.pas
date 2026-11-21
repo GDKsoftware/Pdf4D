@@ -94,6 +94,11 @@ type
     FHasLoggedGroupDepth: Boolean;
     FSoftMaskDepth: Integer;
     FHasLoggedSoftMaskDepth: Boolean;
+    FHasLoggedClipDepth: Boolean;
+    // The last clip chain that was moved into the pixels of a group layer, with the offset it was moved by: the groups of one clip share it
+    FTranslatedSource: IPdfClipPath;
+    FTranslatedOffset: TPoint;
+    FTranslatedResult: IPdfClipPath;
     // The last soft mask that was made, for the state, matrix and device size it was made for; nil for a soft mask that draws nothing
     FCachedMaskSource: IPdfSoftMask;
     FCachedMaskMatrix: TPdfMatrix;
@@ -110,7 +115,7 @@ type
     // The patterns whose cells are being drawn, inside each other
     FPatternDepth: Integer;
     FHasLoggedPatternDepth: Boolean;
-    // The work that all mesh shadings of the page share
+    // The work that all shadings of the page share
     FShadingBudget: TPdfShadingBudget;
     // The warnings of the tiling paint that are in the log, so that a pattern that is used on every glyph gives one line
     FLoggedTilingWarnings: TDictionary<string, Boolean>;
@@ -189,6 +194,8 @@ type
     function GroupShift(const Area: TRectF): Single;
     function IntersectedWithClips(const Area: TRectF): TRectF;
     class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath; static;
+    function SharedTranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath;
+    procedure IntersectStateClip(const Path: TPdfPath; const FillRule: TPdfFillRule);
     class function HasBlendMode(const Form: TPDFormXObject; const Done: TList<TCosStream>): Boolean; static;
     class function HasBlendModeState(const Resources: TCosDictionary): Boolean; static;
     class function HasBlendModeChild(const Resources: TCosDictionary; const Done: TList<TCosStream>): Boolean; static;
@@ -378,6 +385,7 @@ begin
   FLoggedTilingWarnings := TDictionary<string, Boolean>.Create;
   FTilingPaints := TPdfTilingPaintFactory.Create(TPdfPageDrawerTilingHost.Create(Self));
   FShadingBudget := TPdfShadingBudget.Create(Params.Options.MaxShadingWork);
+  Page.Context.BeginFunctionWork(Params.Options.MaxPostScriptWork);
 
   var Properties: TPDOptionalContentProperties := nil;
   if not Renderer.TryGetOptionalContentProperties(Properties) then
@@ -642,7 +650,7 @@ begin
                       (not (IsNan(Bounds.Right) or IsInfinite(Bounds.Right) or IsNan(Bounds.Bottom) or IsInfinite(Bounds.Bottom))));
     if IsFinite then
     begin
-      RenderState.IntersectClip(Path, FPageToDevice, TPdfFillRule.NonZero);
+      IntersectStateClip(Path, TPdfFillRule.NonZero);
       FLastClip := nil;
     end
     else
@@ -963,7 +971,7 @@ end;
 procedure TPdfPageDrawer.PaintShadingArea(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const Area: TRect;
                                           const Action: TPdfPaintAction);
 begin
-  if (Shading is TPDShadingMesh) and FShadingBudget.IsExhausted then
+  if FShadingBudget.IsExhausted then
   begin
     FShadingBudget.Report(Shading);
     Exit;
@@ -1541,7 +1549,7 @@ begin
   begin
     const Adjusted = AdjustedClip(FLinePath);
     try
-      RenderState.IntersectClip(Adjusted, FPageToDevice, FillRule);
+      IntersectStateClip(Adjusted, FillRule);
     finally
       if Adjusted <> FLinePath then
       begin
@@ -1614,7 +1622,7 @@ begin
   try
     if RenderState.TextState.RenderingMode.IsClip and (not FTextClip.IsEmpty) then
     begin
-      RenderState.IntersectClip(FTextClip, FPageToDevice, TPdfFillRule.NonZero);
+      IntersectStateClip(FTextClip, TPdfFillRule.NonZero);
       FLastClip := nil;
     end;
   finally
@@ -1995,18 +2003,38 @@ end;
 function TPdfPageDrawer.IntersectedWithClips(const Area: TRectF): TRectF;
 begin
   Result := Area;
-  var Link := RenderState.Clip;
-  while Assigned(Link) and (not Result.IsEmpty) do
+  const Clip = RenderState.Clip;
+  if Assigned(Clip) then
   begin
-    const Shape = Link.Path.Clone;
-    try
-      Shape.Transform(Link.Transform);
-      Result := TRectF.Intersect(Result, Shape.Bounds);
-    finally
-      Shape.Free;
-    end;
-    Link := Link.Parent;
+    Result := TRectF.Intersect(Result, Clip.Bounds);
   end;
+end;
+
+// The clip of the state gets one more path. A chain beyond MaxClipDepth is replaced by the rectangle of its bounds: every clip change on
+// the device and every group walks over the chain, so an unbounded chain makes a page quadratic.
+procedure TPdfPageDrawer.IntersectStateClip(const Path: TPdfPath; const FillRule: TPdfFillRule);
+begin
+  const MaxDepth = FParams.Options.MaxClipDepth;
+  if RenderState.IntersectClip(Path, FPageToDevice, FillRule, MaxDepth) and (not FHasLoggedClipDepth) then
+  begin
+    FHasLoggedClipDepth := True;
+    LogWarning('The clip of the page chains more than %d clip paths; from there on it is the rectangle around them', [Max(MaxDepth, 1)]);
+  end;
+end;
+
+function TPdfPageDrawer.SharedTranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath;
+begin
+  const Offset = TPoint.Create(OffsetX, OffsetY);
+  const IsShared = (Assigned(Clip) and (Clip = FTranslatedSource) and (Offset = FTranslatedOffset));
+  if IsShared then
+  begin
+    Exit(FTranslatedResult);
+  end;
+
+  Result := TranslatedClip(Clip, OffsetX, OffsetY);
+  FTranslatedSource := Clip;
+  FTranslatedOffset := Offset;
+  FTranslatedResult := Result;
 end;
 
 // PageDrawer.showTransparencyGroupOnGraphics draws the image of a group with its top at the top of the box, while TransparencyGroup
@@ -2285,7 +2313,7 @@ begin
     State.Clip := nil;
     if not IsSoftMask then
     begin
-      State.Clip := TranslatedClip(RenderState.Clip, -Bounds.Left, -Bounds.Top);
+      State.Clip := SharedTranslatedClip(RenderState.Clip, -Bounds.Left, -Bounds.Top);
     end;
     State.CurrentTransformationMatrix := Ctm;
     State.SoftMask := nil;

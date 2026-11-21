@@ -7,6 +7,7 @@ unit Pdf4D.Render.ClipPath;
 interface
 
 uses
+  System.Types,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Render.Device.Interfaces;
@@ -19,6 +20,8 @@ type
     FPath: TPdfPath;
     FTransform: TPdfMatrix;
     FFillRule: TPdfFillRule;
+    FDepth: Integer;
+    FBounds: TRectF;
 
     procedure ReleaseParents;
 
@@ -31,9 +34,19 @@ type
     function Path: TPdfPath;
     function Transform: TPdfMatrix;
     function FillRule: TPdfFillRule;
+    function Depth: Integer;
+    function Bounds: TRectF;
+
+    // A chain of one path: the rectangle of the bounds of Source, in device pixels. It stands in for a chain that has become too long,
+    // and clips to what that chain would clip to at most (the shapes of its paths are lost). A bounds that is not finite gives an
+    // empty rectangle.
+    class function Flattened(const Source: IPdfClipPath): IPdfClipPath; static;
   end;
 
 implementation
+
+uses
+  System.Math;
 
 { TPdfClipPath }
 
@@ -44,6 +57,45 @@ begin
   FPath := Path;
   FTransform := Transform;
   FFillRule := FillRule;
+  FDepth := 1;
+
+  const Shape = Path.Clone;
+  try
+    Shape.Transform(Transform);
+    FBounds := Shape.Bounds;
+  finally
+    Shape.Free;
+  end;
+
+  if Assigned(Parent) then
+  begin
+    FDepth := Parent.Depth + 1;
+    FBounds := TRectF.Intersect(Parent.Bounds, FBounds);
+  end;
+end;
+
+class function TPdfClipPath.Flattened(const Source: IPdfClipPath): IPdfClipPath;
+begin
+  var Box := Source.Bounds;
+  const IsFinite = ((not (IsNan(Box.Left) or IsInfinite(Box.Left) or IsNan(Box.Top) or IsInfinite(Box.Top))) and
+                    (not (IsNan(Box.Right) or IsInfinite(Box.Right) or IsNan(Box.Bottom) or IsInfinite(Box.Bottom))));
+  if not IsFinite then
+  begin
+    Box := TRectF.Create(0, 0, 0, 0);
+  end;
+
+  const Rectangle = TPdfPath.Create;
+  try
+    Rectangle.MoveTo(Box.Left, Box.Top);
+    Rectangle.LineTo(Box.Right, Box.Top);
+    Rectangle.LineTo(Box.Right, Box.Bottom);
+    Rectangle.LineTo(Box.Left, Box.Bottom);
+    Rectangle.ClosePath;
+  except
+    Rectangle.Free;
+    raise;
+  end;
+  Result := TPdfClipPath.Create(nil, Rectangle, TPdfMatrix.Identity, TPdfFillRule.NonZero);
 end;
 
 destructor TPdfClipPath.Destroy;
@@ -93,6 +145,16 @@ end;
 function TPdfClipPath.FillRule: TPdfFillRule;
 begin
   Result := FFillRule;
+end;
+
+function TPdfClipPath.Depth: Integer;
+begin
+  Result := FDepth;
+end;
+
+function TPdfClipPath.Bounds: TRectF;
+begin
+  Result := FBounds;
 end;
 
 end.

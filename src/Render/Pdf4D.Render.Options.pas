@@ -21,6 +21,10 @@ const
   DefaultMaxTileEdge                     = 3000;
   // The work of all mesh shadings of one page together, in the units that MaxMeshWork counts for one shading
   DefaultMaxShadingWork: Int64           = 400000000;
+  // Paths in the chain of clips of one page, forms and groups; more are replaced by the rectangle of their bounds
+  DefaultMaxClipDepth                    = 1000;
+  // Instructions of all type 4 functions of one page together (about ten seconds of work)
+  DefaultMaxPostScriptWork: Int64        = 500000000;
 
 type
   {$SCOPEDENUMS ON}
@@ -47,9 +51,18 @@ type
     MaxTileEdge: Integer;
     // Annotations drawn per page; the rest is skipped with a warning
     MaxAnnotations: Integer;
-    // What all mesh shadings of one page may do together (steps of a line, pixels tested against a triangle, triangles, and a fixed
-    // amount per shading that is painted); when it is spent, further mesh shadings of the page are skipped with a warning
+    // What all shadings of one page may do together (their pixels, steps of a line, pixels tested against a triangle, triangles, and a fixed
+    // amount per shading that is painted); when it is spent, further shadings of the page are skipped with a warning
     MaxShadingWork: Int64;
+    // How many clipping paths (W and W*, the clips of forms and groups) the clip of one page may chain. A longer chain makes every clip
+    // change and every shading or group walk over all of it; beyond the limit the chain is replaced by the rectangle of its bounds
+    // (the shapes of the paths are lost) and the page logs one warning.
+    MaxClipDepth: Integer;
+    // The instructions that all type 4 (PostScript calculator) functions of one page may execute together: shadings run one for every
+    // pixel, and DeviceN and Separation images for every colour that is not in the cache of the colour space. When the budget is spent
+    // the page logs one warning and the functions give the start of their range (a shading is then a flat colour, an image keeps its
+    // tint).
+    MaxPostScriptWork: Int64;
 
     // Export, opaque white background, anti-aliasing on, annotations on, and the limits above
     class function Default: TPdfRenderOptions; static;
@@ -78,6 +91,8 @@ begin
   Result.MaxTileEdge := DefaultMaxTileEdge;
   Result.MaxAnnotations := DefaultMaxAnnotations;
   Result.MaxShadingWork := DefaultMaxShadingWork;
+  Result.MaxClipDepth := DefaultMaxClipDepth;
+  Result.MaxPostScriptWork := DefaultMaxPostScriptWork;
 end;
 
 end.

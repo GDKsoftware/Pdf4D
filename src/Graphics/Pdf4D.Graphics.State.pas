@@ -56,13 +56,16 @@ type
     function Clone: TPDGraphicsState; override;
 
     // Makes the intersection of the current clip and Path (in the space that PathToDevice maps to device pixels) the new clip. The path
-    // is copied, so the caller keeps it.
-    procedure IntersectClip(const Path: TPdfPath; const PathToDevice: TPdfMatrix; const FillRule: TPdfFillRule);
+    // is copied, so the caller keeps it. A chain that would become longer than MaxDepth paths (at least 1) is replaced by the rectangle of
+    // its bounds, which keeps the work of every clip change bounded; the result says that this happened.
+    function IntersectClip(const Path: TPdfPath; const PathToDevice: TPdfMatrix; const FillRule: TPdfFillRule;
+                           const MaxDepth: Integer = High(Integer)): Boolean;
   end;
 
 implementation
 
 uses
+  System.Math,
   Pdf4D.Graphics.Color.Device,
   Pdf4D.Render.ClipPath;
 
@@ -117,9 +120,15 @@ begin
   Result := Copy;
 end;
 
-procedure TPdfRenderGraphicsState.IntersectClip(const Path: TPdfPath; const PathToDevice: TPdfMatrix; const FillRule: TPdfFillRule);
+function TPdfRenderGraphicsState.IntersectClip(const Path: TPdfPath; const PathToDevice: TPdfMatrix; const FillRule: TPdfFillRule;
+                                               const MaxDepth: Integer): Boolean;
 begin
   Clip := TPdfClipPath.Create(Clip, Path.Clone, PathToDevice, FillRule);
+  Result := (Clip.Depth > Max(MaxDepth, 1));
+  if Result then
+  begin
+    Clip := TPdfClipPath.Flattened(Clip);
+  end;
 end;
 
 end.

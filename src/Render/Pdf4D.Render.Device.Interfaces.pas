@@ -75,6 +75,11 @@ type
     // Path space to device pixels
     function Transform: TPdfMatrix;
     function FillRule: TPdfFillRule;
+    // The number of paths in the chain, this one included: 1 for the first path
+    function Depth: Integer;
+    // The device bounds of the intersection of the chain: the paths are cut with the bounds of all paths before them, so a chain of
+    // rectangles gives the exact intersection and another shape a larger area
+    function Bounds: TRectF;
   end;
 
   IPdfRasterDevice = interface;

@@ -30,8 +30,13 @@ type
     // The save level of the canvas without any clip
     FBaseLevel: Integer;
     FClip: IPdfClipPath;
+    // The paths of the chain that the canvas has applied, from the root, and the save level of the canvas before each of them
+    FApplied: TArray<IPdfClipPath>;
+    FAppliedLevels: TArray<Integer>;
+    FAppliedCount: Integer;
 
     procedure CreateSurface;
+    function IsApplied(const Link: IPdfClipPath): Boolean;
     procedure ApplyClip(const Clip: IPdfClipPath);
     procedure ClipChain(const Clip: IPdfClipPath);
     procedure ResetCanvasClip;
@@ -223,7 +228,9 @@ begin
   end;
 end;
 
-// When the clip cannot be applied the device has no clip, on the canvas and in FClip, so the next SetClip starts from a known state
+// The canvas holds the chain that was applied last, one save level per path. A new chain keeps the paths it has in common with it (from
+// the root) and applies only the others, so a long chain costs one path per change and not the whole chain each time. When the clip
+// cannot be applied the device has no clip, on the canvas and in FClip, so the next SetClip starts from a known state.
 procedure TPdfSkiaDevice.ApplyClip(const Clip: IPdfClipPath);
 begin
   FClip := nil;
@@ -231,8 +238,6 @@ begin
     TPdfFloatGuard.Run(
       procedure
       begin
-        FCanvas.RestoreToCount(FBaseLevel);
-        FCanvas.Save;
         ClipChain(Clip);
       end);
   except
@@ -245,6 +250,9 @@ end;
 
 procedure TPdfSkiaDevice.ResetCanvasClip;
 begin
+  FAppliedCount := 0;
+  FApplied := nil;
+  FAppliedLevels := nil;
   TPdfFloatGuard.Run(
     procedure
     begin
@@ -253,31 +261,63 @@ begin
     end);
 end;
 
+function TPdfSkiaDevice.IsApplied(const Link: IPdfClipPath): Boolean;
+begin
+  const Depth = Link.Depth;
+  Result := ((Depth <= FAppliedCount) and (FApplied[Depth - 1] = Link));
+end;
+
 // From the root to the leaf: every path narrows the clip of the paths before it. Iterative, because a file can chain very many clips.
 procedure TPdfSkiaDevice.ClipChain(const Clip: IPdfClipPath);
 begin
-  var Count := 0;
+  // The paths of the new chain that the canvas does not have yet; Link ends at the deepest path that it has
+  var Missing := 0;
   var Link := Clip;
-  while Assigned(Link) do
+  while Assigned(Link) and (not IsApplied(Link)) do
   begin
-    Inc(Count);
+    Inc(Missing);
     Link := Link.Parent;
   end;
 
-  var Chain: TArray<IPdfClipPath>;
-  SetLength(Chain, Count);
+  var Pending: TArray<IPdfClipPath>;
+  SetLength(Pending, Missing);
   Link := Clip;
-  for var Index := Count - 1 downto 0 do
+  for var Index := Missing - 1 downto 0 do
   begin
-    Chain[Index] := Link;
+    Pending[Index] := Link;
     Link := Link.Parent;
   end;
 
-  for var Item in Chain do
+  var KeptCount := 0;
+  if Assigned(Link) then
+  begin
+    KeptCount := Link.Depth;
+  end;
+
+  if KeptCount < FAppliedCount then
+  begin
+    FCanvas.RestoreToCount(FAppliedLevels[KeptCount]);
+    for var Index := KeptCount to FAppliedCount - 1 do
+    begin
+      FApplied[Index] := nil;
+    end;
+    FAppliedCount := KeptCount;
+  end;
+
+  if FAppliedCount + Missing > Length(FApplied) then
+  begin
+    SetLength(FApplied, FAppliedCount + Missing);
+    SetLength(FAppliedLevels, FAppliedCount + Missing);
+  end;
+
+  for var Item in Pending do
   begin
     // Java2D moves the vertices of a clip before it takes the pixels, so the path goes to the canvas in device pixels
     const Snapped = TPdfStrokeNormalizer.SnapForClip(Item.Path, Item.Transform);
     try
+      FAppliedLevels[FAppliedCount] := FCanvas.Save;
+      FApplied[FAppliedCount] := Item;
+      Inc(FAppliedCount);
       FCanvas.SetMatrix(TMatrix.Identity);
       FCanvas.ClipPath(TPdfSkiaConvert.Path(Snapped, Item.FillRule), TSkClipOp.Intersect, False);
     finally

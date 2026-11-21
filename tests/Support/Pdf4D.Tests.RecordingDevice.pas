@@ -217,11 +217,9 @@ end;
 function TRecordingDevice.ClipDepthOf(const Clip: IPdfClipPath): Integer;
 begin
   Result := 0;
-  var Link := Clip;
-  while Assigned(Link) do
+  if Assigned(Clip) then
   begin
-    Inc(Result);
-    Link := Link.Parent;
+    Result := Clip.Depth;
   end;
 end;
 

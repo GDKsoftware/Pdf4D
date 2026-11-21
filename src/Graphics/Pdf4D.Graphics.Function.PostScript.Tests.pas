@@ -39,6 +39,9 @@ type
     procedure TearDown;
 
     [Test]
+    procedure TestType4InstructionsOfAPageAreBudgeted;
+
+    [Test]
     procedure TestType4DupMul;
 
     [Test]
@@ -467,6 +470,31 @@ begin
 
   Run('{ ' + Repeated('1 pop ', MaxPostScriptOperations) + '}', [], Outcome);
   Assert.AreEqual(Ord(TPsOutcome.OperationLimit), Ord(Outcome));
+end;
+
+// The context counts the instructions of all type 4 functions: when the budget is spent the function gives the start of its range
+procedure TPostScriptFunctionTests.TestType4InstructionsOfAPageAreBudgeted;
+begin
+  const Function_ = NewFunction('{ pop 0.75 }', '0 1', '0 1');
+  try
+    Assert.AreEqual<Single>(0.75, Function_.Eval([0.5])[0], 'no budget is started: no limit');
+
+    FBuilder.Context.BeginFunctionWork(40);
+    Assert.AreEqual<Single>(0.75, Function_.Eval([0.5])[0]);
+    Assert.IsFalse(FBuilder.Context.IsFunctionWorkExhausted);
+    for var Index := 1 to 10 do
+    begin
+      Function_.Eval([0.5]);
+    end;
+
+    Assert.IsTrue(FBuilder.Context.IsFunctionWorkExhausted);
+    Assert.AreEqual<Single>(0, Function_.Eval([0.5])[0], 'the start of the range');
+
+    FBuilder.Context.BeginFunctionWork(40);
+    Assert.AreEqual<Single>(0.75, Function_.Eval([0.5])[0], 'a new page starts a new budget');
+  finally
+    Function_.Free;
+  end;
 end;
 
 procedure TPostScriptFunctionTests.TestProgramKeepsIntegersAndReals;

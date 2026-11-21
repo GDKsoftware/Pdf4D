@@ -117,7 +117,14 @@ type
     function Type3Chain: TTestPdfBuilder;
     function TilingPage(const Content: string): TTestPdfBuilder;
     function FanOutForms(const FormCount: Integer): TTestPdfBuilder;
-    function MeshShadingPage(const FillCount: Integer): TTestPdfBuilder;
+    function MeshShadingPage(const FillCount: Integer; const Prefix: string = ''): TTestPdfBuilder;
+    // A function shading (type 1, 2 or 3) with a type 4 function of 2 * Padding + 4 instructions or more, in a shading pattern that
+    // FillCount fills of the whole page use
+    function FunctionShadingPage(const ShadingType, FillCount, Padding: Integer): TTestPdfBuilder;
+    // An image of 128 x 128 pixels in a DeviceN space with two colorants whose tint transform is a type 4 function of 2 * Padding + 4
+    // instructions: its 16384 colours do not fit the cache of the colour space
+    function DeviceNImagePage(const Padding: Integer): TTestPdfBuilder;
+    class function Repeated(const Text: string; const Count: Integer): string; static;
     function AnnotationPage(const AnnotationCount: Integer): TTestPdfBuilder;
     class function CompressedBytes(const Data: TBytes): TBytes; static;
 
@@ -160,6 +167,24 @@ type
 
     [Test]
     procedure TestShadingWorkLimitIsConfigurable;
+
+    [Test]
+    procedure TestLongClipChainDoesNotMakeTheRenderQuadratic;
+
+    [Test]
+    procedure TestClipDepthLimitIsConfigurable;
+
+    [Test]
+    procedure TestFunctionShadingsAreChargedToTheShadingBudget;
+
+    [Test]
+    procedure TestPostScriptWorkIsBoundedForShadings;
+
+    [Test]
+    procedure TestPostScriptWorkIsBoundedForDeviceNImages;
+
+    [Test]
+    procedure TestPostScriptWorkLimitIsConfigurable;
   end;
 
 implementation
@@ -587,10 +612,11 @@ begin
 end;
 
 // One small compressed type 4 shading in a shading pattern, which paints FillCount rectangles
-function TRenderLimitTests.MeshShadingPage(const FillCount: Integer): TTestPdfBuilder;
+function TRenderLimitTests.MeshShadingPage(const FillCount: Integer; const Prefix: string): TTestPdfBuilder;
 begin
   const Content = TStringBuilder.Create;
   try
+    Content.Append(Prefix);
     Content.Append('/Pattern cs /P1 scn');
     for var Index := 1 to FillCount do
     begin
@@ -607,6 +633,77 @@ begin
                           0, 0, 255, 0, 0, 255];
     Result.AddStreamObject(7, '/ShadingType 4 /ColorSpace /DeviceRGB /BitsPerCoordinate 8 /BitsPerComponent 8 /BitsPerFlag 8 ' +
                               '/Decode [0 255 0 255 0 1 0 1 0 1] /Filter /FlateDecode', CompressedBytes(Mesh));
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TRenderLimitTests.Repeated(const Text: string; const Count: Integer): string;
+begin
+  Result := '';
+  for var Index := 1 to Count do
+  begin
+    Result := Result + Text;
+  end;
+end;
+
+function TRenderLimitTests.FunctionShadingPage(const ShadingType, FillCount, Padding: Integer): TTestPdfBuilder;
+begin
+  const Fills = TStringBuilder.Create;
+  try
+    Fills.Append('/Pattern cs /P1 scn');
+    for var Index := 1 to FillCount do
+    begin
+      Fills.Append(' 0 0 200 200 re f');
+    end;
+    Result := TGraphicsDocuments.NewBuilder(TEncoding.ASCII.GetBytes(Fills.ToString), '/Pattern << /P1 << /PatternType 2 /Shading 7 0 R >> >>');
+  finally
+    Fills.Free;
+  end;
+
+  try
+    var Domain := '[0 1]';
+    var Code := '{ dup dup ' + Repeated('0 add ', Padding) + '}';
+    var Body := '<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [0 0 200 0] /Function 8 0 R /Extend [true true] >>';
+    if ShadingType = 1 then
+    begin
+      Domain := '[0 1 0 1]';
+      Code := '{ 2 copy add 2 div ' + Repeated('0 add ', Padding) + '}';
+      Body := '<< /ShadingType 1 /ColorSpace /DeviceRGB /Function 8 0 R /Domain [0 1 0 1] /Matrix [200 0 0 200 0 0] >>';
+    end
+    else if ShadingType = 3 then
+    begin
+      Body := '<< /ShadingType 3 /ColorSpace /DeviceRGB /Coords [100 100 0 100 100 100] /Function 8 0 R /Extend [true true] >>';
+    end;
+    Result.AddObject(7, Body);
+    Result.AddStreamObject(8, Format('/FunctionType 4 /Domain %s /Range [0 1 0 1 0 1]', [Domain]), TEncoding.ASCII.GetBytes(Code));
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function TRenderLimitTests.DeviceNImagePage(const Padding: Integer): TTestPdfBuilder;
+begin
+  Result := TGraphicsDocuments.NewBuilder(TEncoding.ASCII.GetBytes('q 200 0 0 200 0 0 cm /Im1 Do Q'), '/XObject << /Im1 9 0 R >>');
+  try
+    const Code = '{ 2 copy add 2 div ' + Repeated('0 add ', Padding) + '}';
+    Result.AddStreamObject(8, '/FunctionType 4 /Domain [0 1 0 1] /Range [0 1 0 1 0 1]', TEncoding.ASCII.GetBytes(Code));
+
+    const Side = 128;
+    var Samples: TBytes;
+    SetLength(Samples, Side * Side * 2);
+    for var Y := 0 to Side - 1 do
+    begin
+      for var X := 0 to Side - 1 do
+      begin
+        Samples[(Y * Side + X) * 2] := Byte(X * 2);
+        Samples[(Y * Side + X) * 2 + 1] := Byte(Y * 2);
+      end;
+    end;
+    Result.AddStreamObject(9, Format('/Type /XObject /Subtype /Image /Width %d /Height %d /BitsPerComponent 8 ' +
+                                     '/ColorSpace [/DeviceN [/A /B] /DeviceRGB 8 0 R]', [Side, Side]), Samples);
   except
     Result.Free;
     raise;
@@ -829,7 +926,7 @@ begin
   Assert.IsTrue(Watch.ElapsedMilliseconds < TimeLimitMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
   Assert.IsTrue(FillCount > 0, 'the first fills are painted');
   Assert.IsTrue(FillCount < PaintedFills, Format('%d of %d fills are painted', [FillCount, PaintedFills]));
-  Assert.AreEqual<Integer>(1, CountLogLines('mesh shadings of the page'), string.Join(' / ', FDocuments.LogLines.ToArray));
+  Assert.AreEqual<Integer>(1, CountLogLines('The shadings of the page'), string.Join(' / ', FDocuments.LogLines.ToArray));
 end;
 
 procedure TRenderLimitTests.TestShadingWorkLimitIsConfigurable;
@@ -843,9 +940,146 @@ begin
   end;
 
   Assert.AreEqual<Integer>(PaintedFills, FillCount, 'the default budget does not touch an ordinary page');
-  Assert.AreEqual<Integer>(0, CountLogLines('mesh shadings of the page'));
+  Assert.AreEqual<Integer>(0, CountLogLines('The shadings of the page'));
   Assert.IsTrue(DefaultMaxShadingWork > 0);
   Assert.AreEqual(DefaultMaxShadingWork, TPdfRenderOptions.Default.MaxShadingWork);
+end;
+
+// A hostile page: 100,000 clips, each of them a link in the chain, and then fills that use the whole chain (a shading fill cuts its
+// area with every link). Walking the chain for each fill would take 10^7 steps and more.
+procedure TRenderLimitTests.TestLongClipChainDoesNotMakeTheRenderQuadratic;
+begin
+  const ClipCount = 100000;
+  const PaintedFills = 500;
+  const Clips = TStringBuilder.Create;
+  var Builder: TTestPdfBuilder;
+  try
+    for var Index := 1 to ClipCount do
+    begin
+      Clips.Append('0 0 1 1 re W n ');
+    end;
+    Builder := MeshShadingPage(PaintedFills, Clips.ToString);
+  finally
+    Clips.Free;
+  end;
+
+  const Watch = TStopwatch.StartNew;
+  try
+    RenderBuilder(Builder, TPdfRenderOptions.Default, TPdfLoadOptions.Default);
+  finally
+    Builder.Free;
+  end;
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < TimeLimitMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  Assert.AreEqual<Integer>(PaintedFills, FillCount, 'the fills are painted');
+  Assert.AreEqual<Integer>(1, CountLogLines('clip paths'), string.Join(' / ', FDocuments.LogLines.ToArray));
+end;
+
+// The shadings of the types 1 to 3 paint every pixel of their area, so their area counts against the budget of the page like that of a
+// mesh shading: 20 fills of 40,000 pixels with a budget for 100,000
+procedure TRenderLimitTests.TestFunctionShadingsAreChargedToTheShadingBudget;
+begin
+  const PaintedFills = 20;
+  for var ShadingType := 1 to 3 do
+  begin
+    var Options := TPdfRenderOptions.Default;
+    Options.MaxShadingWork := 100000;
+    const Builder = FunctionShadingPage(ShadingType, PaintedFills, 0);
+    try
+      RenderBuilder(Builder, Options, TPdfLoadOptions.Default);
+    finally
+      Builder.Free;
+    end;
+
+    const Name = Format('Shading type %d', [ShadingType]);
+    Assert.IsTrue(FillCount > 0, Name + ': the first fills are painted');
+    Assert.IsTrue(FillCount < PaintedFills, Format('%s: %d of %d fills are painted', [Name, FillCount, PaintedFills]));
+    Assert.AreEqual<Integer>(1, CountLogLines('The shadings of the page'), Name + ': ' + string.Join(' / ', FDocuments.LogLines.ToArray));
+    TearDown;
+    Setup;
+  end;
+end;
+
+// 5 fills of 40,000 pixels with a function of 400 instructions: 80 million instructions without a budget, and the budget is 2 million
+procedure TRenderLimitTests.TestPostScriptWorkIsBoundedForShadings;
+begin
+  var Options := TPdfRenderOptions.Default;
+  Options.MaxPostScriptWork := 2000000;
+  const Builder = FunctionShadingPage(1, 5, 200);
+  const Watch = TStopwatch.StartNew;
+  try
+    RenderBuilder(Builder, Options, TPdfLoadOptions.Default);
+  finally
+    Builder.Free;
+  end;
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < TimeLimitMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  Assert.AreEqual<Integer>(1, CountLogLines('type 4 functions of the page'), string.Join(' / ', FDocuments.LogLines.ToArray));
+end;
+
+// 16384 colours that miss the cache of the colour space, each with a function of 400 instructions, against a budget of 1 million
+procedure TRenderLimitTests.TestPostScriptWorkIsBoundedForDeviceNImages;
+begin
+  var Options := TPdfRenderOptions.Default;
+  Options.MaxPostScriptWork := 1000000;
+  const Builder = DeviceNImagePage(200);
+  const Watch = TStopwatch.StartNew;
+  try
+    RenderBuilder(Builder, Options, TPdfLoadOptions.Default);
+  finally
+    Builder.Free;
+  end;
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < TimeLimitMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  Assert.AreEqual<Integer>(1, CountLogLines('type 4 functions of the page'), string.Join(' / ', FDocuments.LogLines.ToArray));
+end;
+
+procedure TRenderLimitTests.TestPostScriptWorkLimitIsConfigurable;
+begin
+  const Builder = FunctionShadingPage(1, 3, 20);
+  try
+    RenderBuilder(Builder, TPdfRenderOptions.Default, TPdfLoadOptions.Default);
+  finally
+    Builder.Free;
+  end;
+
+  Assert.AreEqual<Integer>(3, FillCount, 'the default budget does not touch an ordinary page');
+  Assert.AreEqual<Integer>(0, CountLogLines('type 4 functions of the page'));
+  Assert.IsTrue(DefaultMaxPostScriptWork > 0);
+  Assert.AreEqual(DefaultMaxPostScriptWork, TPdfRenderOptions.Default.MaxPostScriptWork);
+end;
+
+// With a limit of 5 paths the chain of the 20 clips of the page is cut back to a rectangle again and again, and the page logs it once
+procedure TRenderLimitTests.TestClipDepthLimitIsConfigurable;
+begin
+  const ClipCount = 20;
+  const Clips = TStringBuilder.Create;
+  try
+    for var Index := 1 to ClipCount do
+    begin
+      Clips.Append('0 0 100 100 re W n ');
+    end;
+    Clips.Append('0 0 1 1 re f');
+
+    var Options := TPdfRenderOptions.Default;
+    Options.MaxClipDepth := 5;
+    const Builder = TGraphicsDocuments.NewBuilder(TEncoding.ASCII.GetBytes(Clips.ToString), '');
+    try
+      RenderBuilder(Builder, Options, TPdfLoadOptions.Default);
+    finally
+      Builder.Free;
+    end;
+  finally
+    Clips.Free;
+  end;
+
+  Assert.AreEqual<Integer>(1, CountLogLines('clip paths'), string.Join(' / ', FDocuments.LogLines.ToArray));
+  Assert.AreEqual<Integer>(1, FillCount);
+  for var Call in FDevice.Calls do
+  begin
+    Assert.IsTrue(Call.ClipDepth <= 5, Format('The clip chain has %d paths', [Call.ClipDepth]));
+  end;
+  Assert.AreEqual(DefaultMaxClipDepth, TPdfRenderOptions.Default.MaxClipDepth);
 end;
 
 end.

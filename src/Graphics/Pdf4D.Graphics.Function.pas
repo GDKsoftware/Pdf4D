@@ -215,6 +215,8 @@ const
   TypeExponential = 2;
   TypeStitching = 3;
   TypePostScript = 4;
+  // What a run costs besides its instructions, so that even a program without any is not free
+  CallWork = 8;
   // Past this a stride exceeds every table that can be read, so the exact value does not matter
   MaxStride = 1 shl 30;
   // A function without N in PDFBox: getFloat gives -1
@@ -918,8 +920,20 @@ end;
 
 function TPDFunctionType4.Calculate(const Input: TArray<Single>): TArray<Single>;
 begin
+  // The instructions of all type 4 functions of a page are bounded (the budget of the context): a shading or an image can run a
+  // function for every pixel
+  const HasContext = Assigned(Context);
+  if HasContext and Context.IsFunctionWorkExhausted then
+  begin
+    Exit(OutputsFrom(nil));
+  end;
+
   var Outcome: TPsOutcome;
   const Stack = FProgram.Run(ClipToDomain(Input), Outcome);
+  if HasContext then
+  begin
+    Context.ChargeFunctionWork(Int64(FProgram.Operations) + CallWork);
+  end;
   if Outcome <> TPsOutcome.Completed then
   begin
     WarnAboutOutcome(Outcome);

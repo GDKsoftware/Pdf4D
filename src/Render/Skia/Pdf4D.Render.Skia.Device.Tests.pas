@@ -10,6 +10,7 @@ uses
   System.SysUtils,
   System.Types,
   System.Math,
+  System.Diagnostics,
   System.Skia,
   DUnitX.TestFramework,
   Pdf4D.Common.Matrix,
@@ -129,6 +130,12 @@ type
 
     [Test]
     procedure TestSetClipNilRemovesClip;
+
+    [Test]
+    procedure TestSwitchingBetweenBranchesOfAClipChain;
+
+    [Test]
+    procedure TestLongClipChainIsAppliedPathByPath;
 
     [Test]
     procedure TestDrawBitmapNearest;
@@ -704,6 +711,47 @@ begin
   FillWholeDevice(Red, NoAntiAlias);
 
   AssertPixel(9, 9, TPdfDeviceColor.Create(255, 0, 0));
+end;
+
+// The device keeps the paths that it has applied and applies only the others: a clip on another branch of the same chain, a parent and a
+// deeper clip all have to give the intersection of their own chain
+procedure TPdfSkiaDeviceTests.TestSwitchingBetweenBranchesOfAClipChain;
+begin
+  const Root = NewClip(nil, 0, 0, 10, 10);
+  const Left = NewClip(Root, 0, 0, 5, 10);
+  const Right = NewClip(Root, 5, 0, 10, 10);
+  const UpperLeft = NewClip(Left, 0, 0, 5, 5);
+  const Blue = TPdfDeviceColor.Create(0, 0, 255);
+  const Green = TPdfDeviceColor.Create(0, 255, 0);
+
+  FDevice.SetClip(UpperLeft);
+  FillWholeDevice(Red, NoAntiAlias);
+  FDevice.SetClip(Right);
+  FillWholeDevice(TPdfPaint.Solid(Blue), NoAntiAlias);
+  FDevice.SetClip(Left);
+  FillRect(0, 5, 10, 10, TPdfPaint.Solid(Green), NoAntiAlias);
+
+  AssertPixel(2, 2, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(7, 2, Blue);
+  AssertPixel(7, 7, Blue);
+  AssertPixel(2, 7, Green);
+end;
+
+// 3000 paths, and the clip changes to every one of them: applying the whole chain at each change would be 4.5 million paths
+procedure TPdfSkiaDeviceTests.TestLongClipChainIsAppliedPathByPath;
+begin
+  const PathCount = 3000;
+  var Clip: IPdfClipPath := nil;
+  const Watch = TStopwatch.StartNew;
+  for var Index := 1 to PathCount do
+  begin
+    Clip := NewClip(Clip, Index * 0.001, 0, 10, 10);
+    FDevice.SetClip(Clip);
+  end;
+  FillWholeDevice(Red, NoAntiAlias);
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  AssertPixel(8, 5, TPdfDeviceColor.Create(255, 0, 0));
 end;
 
 procedure TPdfSkiaDeviceTests.TestDrawBitmapNearest;

@@ -138,6 +138,9 @@ type
     // operator (a stack underflow, a value of the wrong type, an unknown operator), at a stack of
     // MaxPostScriptStackSize values and after MaxPostScriptOperations instructions; Outcome says which.
     function Run(const Input: TArray<Single>; out Outcome: TPsOutcome): TArray<TPsValue>;
+
+    // The instructions that the last run executed (the one that stopped it included)
+    property Operations: Integer read FOperations;
   end;
 
 implementation

@@ -18,8 +18,8 @@ uses
   Pdf4D.Render.Renderer.Interfaces;
 
 type
-  // The work that all mesh shadings of one page may do together. Every mesh shading is built again for every paint that uses it, so a
-  // small shading that many fills use costs as much as the fills together; the budget bounds that. Not thread safe, like a context.
+  // The work that all shadings of one page may do together. Every shading is built again for every paint that uses it, so a small
+  // shading that many fills use costs as much as the fills together; the budget bounds that. Not thread safe, like a context.
   TPdfShadingBudget = class
   private
     FRemaining: Int64;
@@ -92,8 +92,10 @@ type
                                  const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget): TPdfShadingContext; static;
     class function CreateMeshContext(const Shading: TPDShadingMesh; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
                                      const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget): TPdfShadingContext; static;
-    // A mesh shading costs its pixels and a fixed amount for reading its data; False when the budget cannot pay that
-    class function TryPayForMesh(const Shading: TPDShading; const DeviceArea: TRect; const Budget: TPdfShadingBudget): Boolean; static;
+    // A shading costs its pixels, and a mesh shading also a fixed amount for reading its data (FixedWork); False when the budget cannot
+    // pay that
+    class function TryPayForArea(const Shading: TPDShading; const DeviceArea: TRect; const Budget: TPdfShadingBudget;
+                                 const FixedWork: Int64): Boolean; static;
     class procedure PaintRows(const Context: TPdfShadingContext; const DeviceArea: TRect; const Cancel: IPdfCancelToken; const Bitmap: TPdfBitmap); static;
 
   public
@@ -101,7 +103,7 @@ type
     // elsewhere. ShadingToDevice is the CTM (or the pattern matrix after the initial matrix) with the transform of the page. The cancel
     // token is asked before every row; a cancelled run gives the rows it has made. A mesh shading (the types 4 to 7) paints its triangles and
     // patches; one without usable data gives a transparent bitmap. Raises EArgumentOutOfRangeException when DeviceArea is empty or too large for a bitmap. Cancel may be nil. The caller owns
-    // the result. The budget (may be nil: no page limit) is shared by the mesh shadings of one page; one that cannot be paid for, or that
+    // the result. The budget (may be nil: no page limit) is shared by the shadings of one page; one that cannot be paid for, or that
     // spends the rest, is skipped with a warning.
     class function Rasterize(const Shading: TPDShading; const ShadingToDevice: TPdfMatrix; const DeviceArea: TRect;
                              const Cancel: IPdfCancelToken; const Budget: TPdfShadingBudget = nil): TPdfBitmap; static;
@@ -127,7 +129,7 @@ const
   BytesPerPixel = 4;
   // What reading the data of a mesh shading costs besides its pixels: the decoding of a compressed stream is the same for every paint
   MeshReadWork = 4096;
-  BudgetWarning = 'The mesh shadings of the page exceed the work limit of the page; the rest of them are skipped';
+  BudgetWarning = 'The shadings of the page exceed the work limit of the page; the rest of them are skipped';
 
 { TPdfShadingBudget }
 
@@ -256,29 +258,39 @@ begin
   Result := nil;
   if Shading is TPDShadingType1 then
   begin
-    Result := TPdfFunctionShadingContext.Create(TPDShadingType1(Shading), ShadingToDevice);
+    if TryPayForArea(Shading, DeviceArea, Budget, 0) then
+    begin
+      Result := TPdfFunctionShadingContext.Create(TPDShadingType1(Shading), ShadingToDevice);
+    end;
   end
   else if Shading is TPDShadingType2 then
   begin
-    Result := TPdfAxialShadingContext.Create(TPDShadingType2(Shading), ShadingToDevice, DeviceArea);
+    if TryPayForArea(Shading, DeviceArea, Budget, 0) then
+    begin
+      Result := TPdfAxialShadingContext.Create(TPDShadingType2(Shading), ShadingToDevice, DeviceArea);
+    end;
   end
   else if Shading is TPDShadingType3 then
   begin
-    Result := TPdfRadialShadingContext.Create(TPDShadingType3(Shading), ShadingToDevice, DeviceArea);
+    if TryPayForArea(Shading, DeviceArea, Budget, 0) then
+    begin
+      Result := TPdfRadialShadingContext.Create(TPDShadingType3(Shading), ShadingToDevice, DeviceArea);
+    end;
   end
   else if Shading is TPDShadingMesh then
   begin
-    if TryPayForMesh(Shading, DeviceArea, Budget) then
+    if TryPayForArea(Shading, DeviceArea, Budget, MeshReadWork) then
     begin
       Result := CreateMeshContext(TPDShadingMesh(Shading), ShadingToDevice, DeviceArea, Cancel, Budget);
     end;
   end;
 end;
 
-class function TPdfShadingRasterizer.TryPayForMesh(const Shading: TPDShading; const DeviceArea: TRect; const Budget: TPdfShadingBudget): Boolean;
+class function TPdfShadingRasterizer.TryPayForArea(const Shading: TPDShading; const DeviceArea: TRect; const Budget: TPdfShadingBudget;
+                                                   const FixedWork: Int64): Boolean;
 begin
   Result := True;
-  if Assigned(Budget) and (not Budget.TryCharge(Int64(DeviceArea.Width) * DeviceArea.Height + MeshReadWork)) then
+  if Assigned(Budget) and (not Budget.TryCharge(Int64(DeviceArea.Width) * DeviceArea.Height + FixedWork)) then
   begin
     Budget.Report(Shading);
     Result := False;
