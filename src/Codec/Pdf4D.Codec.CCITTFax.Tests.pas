@@ -21,6 +21,7 @@ type
     class function PackBits(const BitText: string): TBytes; static;
     class function ParametersOf(const K, Columns, Rows: Integer; const BlackIs1: Boolean = True): TCCITTFaxParameters; static;
     class function ExpectedPicture: TBytes; static;
+    class function RepeatedScanStream: TBytes; static;
     class function ImageData(const ImageName: string; out Parameters: TCCITTFaxParameters): TBytes; static;
 
     function DecodeRaw(const Data: TBytes; const Parameters: TCCITTFaxParameters; const MaxPixels: Int64 = 100000000): TBytes;
@@ -61,6 +62,9 @@ type
 
     [Test]
     procedure TestGarbageCCITTDoesNotHang;
+
+    [Test]
+    procedure TestRepeatedReferenceScansStayWithinTheWorkBudget;
 
     [Test]
     procedure TestRowsLimitedByMaxPixels;
@@ -120,6 +124,15 @@ const
   GarbageRows = 4096;
   GarbageColumns = 1728;
   GarbageLimitMilliseconds = 2000;
+  ScanColumns = 51203;
+  ScanDensePairs = 25600;
+  ScanCycles = 25600;
+  ScanLimitMilliseconds = 150;
+  WhiteOne = '000111';
+  BlackOne = '010';
+  PassMode = '0001';
+  WhiteMakeup2560 = '000000011111';
+  ScanMakeups = 20;
   MinimumCorpusImages = 6;
   CorpusFiles: array[0..5] of string = (
     'generated/render/ccitt.pdf',
@@ -377,6 +390,50 @@ begin
   AssertGarbageIsHarmless(-1);
   AssertGarbageIsHarmless(0);
   AssertGarbageIsHarmless(1);
+end;
+
+// Row 1: a reference row of dense changes. Row 2: a jump past all of them in white, then pass mode, which misses the search through the
+// whole reference row and falls back to its first change, again and again
+class function TCCITTFaxTests.RepeatedScanStream: TBytes;
+begin
+  const Bits = TStringBuilder.Create;
+  try
+    for var Pair := 1 to ScanDensePairs do
+    begin
+      Bits.Append(HorizontalMode).Append(WhiteOne).Append(BlackOne);
+    end;
+    Bits.Append(HorizontalMode).Append(WhiteTwo).Append(BlackOne);
+
+    Bits.Append(HorizontalMode);
+    for var Makeup := 1 to ScanMakeups do
+    begin
+      Bits.Append(WhiteMakeup2560);
+    end;
+    Bits.Append(WhiteTwo).Append(BlackZero);
+    for var Cycle := 1 to ScanCycles do
+    begin
+      Bits.Append(PassMode).Append(HorizontalMode);
+      for var Makeup := 1 to ScanMakeups do
+      begin
+        Bits.Append(WhiteMakeup2560);
+      end;
+      Bits.Append(WhiteOne).Append(BlackZero);
+    end;
+    Result := PackBits(Bits.ToString);
+  finally
+    Bits.Free;
+  end;
+end;
+
+procedure TCCITTFaxTests.TestRepeatedReferenceScansStayWithinTheWorkBudget;
+begin
+  const Data = RepeatedScanStream;
+  const Stopwatch = TStopwatch.StartNew;
+
+  const Actual = DecodeRaw(Data, ParametersOf(-1, ScanColumns, 4));
+
+  Assert.AreEqual<Integer>(((ScanColumns + 7) div 8) * 4, Length(Actual));
+  Assert.IsTrue(Stopwatch.ElapsedMilliseconds < ScanLimitMilliseconds, Format('Decoding took %d ms', [Stopwatch.ElapsedMilliseconds]));
 end;
 
 procedure TCCITTFaxTests.TestRowsLimitedByMaxPixels;

@@ -117,6 +117,7 @@ type
     FReferenceCount: Integer;
     FCurrentCount: Integer;
     FLastChangingElement: Integer;
+    FScanBudget: Int64;
     FWhiteTree: TCcittTree;
     FBlackTree: TCcittTree;
     FEolTree: TCcittTree;
@@ -166,6 +167,9 @@ const
   MakeupRunStart = 64;
   // A run total stays far below the range of an Integer, however many make-up codes a damaged stream strings together
   MaxRunTotal = MaxInt div 2;
+  // A well-formed row searches the reference row about once; the budget stops crafted rows that make the search repeat
+  ScanStepsPerColumn = 8;
+  ScanStepsPerRow = 1024;
 
   BlackCodes: array[0..103] of TCcittCode = (
     (Bits: 2; Code: $2; Run: 3), (Bits: 2; Code: $3; Run: 2), (Bits: 3; Code: $2; Run: 1), (Bits: 3; Code: $3; Run: 4),
@@ -230,6 +234,7 @@ resourcestring
   CcittEndOfData = 'Unexpected end of Huffman RLE stream';
   CcittUnknownCode = 'Unknown code in Huffman RLE stream';
   CcittTooManyChanges = 'Malformed CCITT stream';
+  CcittTooMuchWork = 'CCITT row needs too much work to decode';
   CcittDamaged = 'The CCITT data is damaged after %d of %d rows (%s); the rest of the image is white';
 
 { TCCITTFaxParameters }
@@ -627,6 +632,11 @@ begin
   var Index := Start;
   while Index < FReferenceCount do
   begin
+    Dec(FScanBudget);
+    if FScanBudget < 0 then
+    begin
+      raise EPdfParseException.Create(CcittTooMuchWork);
+    end;
     if ReferencePosition < FReferenceRow[Index] then
     begin
       FLastChangingElement := Index;
@@ -694,6 +704,7 @@ end;
 
 procedure TCcittRowDecoder.DecodeRow;
 begin
+  FScanBudget := ScanStepsPerColumn * (Int64(FColumns) + 2) + ScanStepsPerRow;
   case FCompression of
     TCcittCompression.ModifiedHuffman : DecodeRowType2;
     TCcittCompression.Group3          : DecodeRowType4;
