@@ -1,6 +1,6 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Tests of the port of java.awt.image.AreaAveragingScaleFilter; the expected values follow from the algorithm of the JDK (the weights
+// Tests of the area-averaging scaler; the expected values follow from the algorithm (the weights
 // are the areas that the destination pixel covers of each source pixel)
 unit Pdf4D.Render.ImageScaler.Tests;
 

@@ -1,7 +1,9 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Port of: java.awt.image.AreaAveragingScaleFilter (OpenJDK 21), the filter behind Image.getScaledInstance(w, h, SCALE_SMOOTH) that
-// PageDrawer.drawBufferedImage of PDFBox 3.0.8 uses to scale an image down before it draws it
+// Independent implementation of area-averaging image scaling, following the public documentation of Image.SCALE_SMOOTH and
+// AreaAveragingScaleFilter (each pixel of the result is the average of the source pixels that it covers, weighted by the covered
+// area, with the colour weighted by the alpha). PageDrawer.drawBufferedImage of PDFBox 3.0.8 scales an image down this way
+// (Image.getScaledInstance) before it draws it.
 unit Pdf4D.Render.ImageScaler;
 
 {$EXCESSPRECISION OFF}
@@ -10,256 +12,37 @@ interface
 
 uses
   System.SysUtils,
+  System.Math,
   Pdf4D.Render.Bitmap;
 
 type
   TPdfImageScaler = record
+  private
+    type
+      // The source pixels that one destination pixel covers along one axis, and how much of each it covers
+      TAxisCover = record
+        First: Integer;
+        Weights: TArray<Single>;
+        Total: Single;
+      end;
+
+  private
+    class function CoverOfAxis(const SourceSize, TargetSize, TargetIndex: Integer): TAxisCover; static;
+    class function CoversOfAxis(const SourceSize, TargetSize: Integer): TArray<TAxisCover>; static;
+    class procedure ScalePixel(const Source: TPdfBitmap; const CoverX, CoverY: TAxisCover; const Target: PByte); static;
+
+  public
     // A new bitmap of Width x Height pixels in which every pixel is the average of the source pixels that it covers, weighted by the
-    // area that it covers of each (the alpha weighs the colour). The source and the result are premultiplied; the computation is the
-    // one of the JDK, on the straight values, in single precision. Raises EArgumentOutOfRangeException for a size that
+    // area that it covers of each (the alpha weighs the colour). The source and the result are premultiplied; the averaging is done
+    // on the straight values, in single precision. Raises EArgumentOutOfRangeException for a size that
     // TPdfBitmap.CheckSize does not allow.
     class function ScaleSmooth(const Source: TPdfBitmap; const Width, Height: Integer): TPdfBitmap; static;
   end;
 
 implementation
 
-uses
-  System.Math;
-
 const
-  ChannelMax = 255;
-  BytesPerPixel = 4;
-  Half = 0.5;
-
-type
-  // The state of AreaAveragingScaleFilter while the rows of the source are delivered from the top to the bottom
-  TAreaAveraging = class
-  private
-    FSource: TPdfBitmap;
-    FTarget: TPdfBitmap;
-    FSourceWidth: Integer;
-    FSourceHeight: Integer;
-    FDestWidth: Integer;
-    FDestHeight: Integer;
-    FReds: TArray<Single>;
-    FGreens: TArray<Single>;
-    FBlues: TArray<Single>;
-    FAlphas: TArray<Single>;
-    FSavedY: Integer;
-    FSavedYRemainder: Integer;
-
-    procedure ClearAccumulators;
-    class function RoundHalfUp(const Value: Single): Integer; static;
-    class function ClampChannel(const Value: Integer): Integer; static;
-    procedure WriteRow(const Row: Integer);
-    procedure AccumulateRow(const Y: Integer);
-
-  public
-    constructor Create(const Source, Target: TPdfBitmap);
-
-    procedure Run;
-  end;
-
-{ TAreaAveraging }
-
-constructor TAreaAveraging.Create(const Source, Target: TPdfBitmap);
-begin
-  inherited Create;
-  FSource := Source;
-  FTarget := Target;
-  FSourceWidth := Source.Width;
-  FSourceHeight := Source.Height;
-  FDestWidth := Target.Width;
-  FDestHeight := Target.Height;
-  SetLength(FReds, FDestWidth);
-  SetLength(FGreens, FDestWidth);
-  SetLength(FBlues, FDestWidth);
-  SetLength(FAlphas, FDestWidth);
-end;
-
-procedure TAreaAveraging.ClearAccumulators;
-begin
-  for var Index := 0 to FDestWidth - 1 do
-  begin
-    FAlphas[Index] := 0;
-    FReds[Index] := 0;
-    FGreens[Index] := 0;
-    FBlues[Index] := 0;
-  end;
-end;
-
-// Math.round(float) of Java
-class function TAreaAveraging.RoundHalfUp(const Value: Single): Integer;
-begin
-  if IsNan(Value) then
-  begin
-    Exit(0);
-  end;
-  const Shifted = Double(Value) + Half;
-  if Shifted >= Double(High(Integer)) then
-  begin
-    Exit(High(Integer));
-  end;
-  if Shifted <= Double(Low(Integer)) then
-  begin
-    Exit(Low(Integer));
-  end;
-  Result := Floor(Shifted);
-end;
-
-class function TAreaAveraging.ClampChannel(const Value: Integer): Integer;
-begin
-  Result := EnsureRange(Value, 0, ChannelMax);
-end;
-
-// calcRow and the delivery of the finished row: the accumulated values become straight colour, stored premultiplied
-procedure TAreaAveraging.WriteRow(const Row: Integer);
-begin
-  if Row >= FDestHeight then
-  begin
-    Exit;
-  end;
-
-  const OriginalMultiplier = Single(FSourceWidth) * FSourceHeight;
-  const Target = FTarget.ScanLine(Row);
-  for var X := 0 to FDestWidth - 1 do
-  begin
-    var Multiplier := OriginalMultiplier;
-    var Alpha := RoundHalfUp(FAlphas[X] / Multiplier);
-    if Alpha <= 0 then
-    begin
-      Alpha := 0;
-    end
-    else if Alpha >= ChannelMax then
-    begin
-      Alpha := ChannelMax;
-    end
-    else
-    begin
-      // un-premultiply: dividing by the multiplier and by the alpha in one step
-      Multiplier := FAlphas[X] / ChannelMax;
-    end;
-    const Red = ClampChannel(RoundHalfUp(FReds[X] / Multiplier));
-    const Green = ClampChannel(RoundHalfUp(FGreens[X] / Multiplier));
-    const Blue = ClampChannel(RoundHalfUp(FBlues[X] / Multiplier));
-
-    Target[X * BytesPerPixel] := Byte((Red * Alpha + 127) div ChannelMax);
-    Target[X * BytesPerPixel + 1] := Byte((Green * Alpha + 127) div ChannelMax);
-    Target[X * BytesPerPixel + 2] := Byte((Blue * Alpha + 127) div ChannelMax);
-    Target[X * BytesPerPixel + 3] := Byte(Alpha);
-  end;
-end;
-
-// accumPixels for the row Y of the source (the filter is given one row at a time)
-procedure TAreaAveraging.AccumulateRow(const Y: Integer);
-begin
-  const Row = FSource.ScanLine(Y);
-  var SourceY := Y;
-  var SourceYRemainder := FDestHeight;
-  var DestY := 0;
-  var DestYRemainder := 0;
-  if SourceY <> 0 then
-  begin
-    DestY := FSavedY;
-    DestYRemainder := FSavedYRemainder;
-  end;
-
-  while SourceY < Y + 1 do
-  begin
-    if DestYRemainder = 0 then
-    begin
-      ClearAccumulators;
-      DestYRemainder := FSourceHeight;
-    end;
-    const AmountY = Min(SourceYRemainder, DestYRemainder);
-
-    var SourceX := 0;
-    var DestX := 0;
-    var SourceXRemainder := 0;
-    var DestXRemainder := FSourceWidth;
-    var Alpha: Single := 0;
-    var Red: Single := 0;
-    var Green: Single := 0;
-    var Blue: Single := 0;
-    while SourceX < FSourceWidth do
-    begin
-      if SourceXRemainder = 0 then
-      begin
-        SourceXRemainder := FDestWidth;
-        // The source is premultiplied; the filter works on the straight values and premultiplies in float
-        const Offset = SourceX * BytesPerPixel;
-        const AlphaByte = Row[Offset + 3];
-        var StraightRed := 0;
-        var StraightGreen := 0;
-        var StraightBlue := 0;
-        if AlphaByte <> 0 then
-        begin
-          StraightRed := Min((Row[Offset] * ChannelMax + AlphaByte div 2) div AlphaByte, ChannelMax);
-          StraightGreen := Min((Row[Offset + 1] * ChannelMax + AlphaByte div 2) div AlphaByte, ChannelMax);
-          StraightBlue := Min((Row[Offset + 2] * ChannelMax + AlphaByte div 2) div AlphaByte, ChannelMax);
-        end;
-        Alpha := AlphaByte;
-        Red := StraightRed;
-        Green := StraightGreen;
-        Blue := StraightBlue;
-        if Alpha <> ChannelMax then
-        begin
-          const AlphaScale: Single = Alpha / ChannelMax;
-          Red := Red * AlphaScale;
-          Green := Green * AlphaScale;
-          Blue := Blue * AlphaScale;
-        end;
-      end;
-
-      const AmountX = Min(SourceXRemainder, DestXRemainder);
-      const Multiplier = Single(AmountX) * AmountY;
-      FAlphas[DestX] := FAlphas[DestX] + Multiplier * Alpha;
-      FReds[DestX] := FReds[DestX] + Multiplier * Red;
-      FGreens[DestX] := FGreens[DestX] + Multiplier * Green;
-      FBlues[DestX] := FBlues[DestX] + Multiplier * Blue;
-      Dec(SourceXRemainder, AmountX);
-      if SourceXRemainder = 0 then
-      begin
-        Inc(SourceX);
-      end;
-      Dec(DestXRemainder, AmountX);
-      if DestXRemainder = 0 then
-      begin
-        Inc(DestX);
-        DestXRemainder := FSourceWidth;
-      end;
-    end;
-
-    Dec(DestYRemainder, AmountY);
-    if DestYRemainder = 0 then
-    begin
-      repeat
-        WriteRow(DestY);
-        Inc(DestY);
-        Dec(SourceYRemainder, AmountY);
-      until not ((SourceYRemainder >= AmountY) and (AmountY = FSourceHeight));
-    end
-    else
-    begin
-      Dec(SourceYRemainder, AmountY);
-    end;
-    if SourceYRemainder = 0 then
-    begin
-      SourceYRemainder := FDestHeight;
-      Inc(SourceY);
-    end;
-  end;
-  FSavedYRemainder := DestYRemainder;
-  FSavedY := DestY;
-end;
-
-procedure TAreaAveraging.Run;
-begin
-  for var Y := 0 to FSourceHeight - 1 do
-  begin
-    AccumulateRow(Y);
-  end;
-end;
+  MaxChannel = 255;
 
 { TPdfImageScaler }
 
@@ -267,16 +50,97 @@ class function TPdfImageScaler.ScaleSmooth(const Source: TPdfBitmap; const Width
 begin
   Result := TPdfBitmap.Create(Width, Height);
   try
-    const Scaler = TAreaAveraging.Create(Source, Result);
-    try
-      Scaler.Run;
-    finally
-      Scaler.Free;
+    const CoversX = CoversOfAxis(Source.Width, Width);
+    const CoversY = CoversOfAxis(Source.Height, Height);
+    for var Y := 0 to Height - 1 do
+    begin
+      const Row = Result.ScanLine(Y);
+      for var X := 0 to Width - 1 do
+      begin
+        ScalePixel(Source, CoversX[X], CoversY[Y], Row + X * 4);
+      end;
     end;
   except
     Result.Free;
     raise;
   end;
+end;
+
+class function TPdfImageScaler.CoversOfAxis(const SourceSize, TargetSize: Integer): TArray<TAxisCover>;
+begin
+  SetLength(Result, TargetSize);
+  for var Index := 0 to TargetSize - 1 do
+  begin
+    Result[Index] := CoverOfAxis(SourceSize, TargetSize, Index);
+  end;
+end;
+
+// The target pixel spans [Index * SourceSize / TargetSize, (Index + 1) * SourceSize / TargetSize) on the source axis
+class function TPdfImageScaler.CoverOfAxis(const SourceSize, TargetSize, TargetIndex: Integer): TAxisCover;
+begin
+  const Start = (TargetIndex * Int64(SourceSize)) / TargetSize;
+  const Finish = ((TargetIndex + 1) * Int64(SourceSize)) / TargetSize;
+  Result.First := Trunc(Start);
+  var Last := Trunc(Finish);
+  if Last = Finish then
+  begin
+    Dec(Last);
+  end;
+  Last := Min(Last, SourceSize - 1);
+
+  SetLength(Result.Weights, Last - Result.First + 1);
+  Result.Total := 0;
+  for var Index := Result.First to Last do
+  begin
+    const Weight: Single = Min(Finish, Double(Index + 1)) - Max(Start, Double(Index));
+    Result.Weights[Index - Result.First] := Weight;
+    Result.Total := Result.Total + Weight;
+  end;
+end;
+
+class procedure TPdfImageScaler.ScalePixel(const Source: TPdfBitmap; const CoverX, CoverY: TAxisCover; const Target: PByte);
+begin
+  var SumAlpha: Single := 0;
+  var SumRed: Single := 0;
+  var SumGreen: Single := 0;
+  var SumBlue: Single := 0;
+
+  for var RowIndex := 0 to High(CoverY.Weights) do
+  begin
+    const Row = Source.ScanLine(CoverY.First + RowIndex);
+    for var ColumnIndex := 0 to High(CoverX.Weights) do
+    begin
+      const Weight: Single = CoverX.Weights[ColumnIndex] * CoverY.Weights[RowIndex];
+      const Pixel = Row + (CoverX.First + ColumnIndex) * 4;
+      const Alpha = Pixel[3];
+      if Alpha = 0 then
+      begin
+        Continue;
+      end;
+
+      // Straight colour of the premultiplied source pixel
+      const AlphaWeight: Single = Alpha * Weight;
+      SumAlpha := SumAlpha + AlphaWeight;
+      SumRed := SumRed + Round(Pixel[0] * MaxChannel / Alpha) * AlphaWeight;
+      SumGreen := SumGreen + Round(Pixel[1] * MaxChannel / Alpha) * AlphaWeight;
+      SumBlue := SumBlue + Round(Pixel[2] * MaxChannel / Alpha) * AlphaWeight;
+    end;
+  end;
+
+  if SumAlpha = 0 then
+  begin
+    Exit;
+  end;
+
+  const TotalWeight: Single = CoverX.Total * CoverY.Total;
+  const Alpha = Min(Trunc(SumAlpha / TotalWeight + 0.5), MaxChannel);
+  const Red = Min(Trunc(SumRed / SumAlpha + 0.5), MaxChannel);
+  const Green = Min(Trunc(SumGreen / SumAlpha + 0.5), MaxChannel);
+  const Blue = Min(Trunc(SumBlue / SumAlpha + 0.5), MaxChannel);
+  Target[0] := Round(Red * Alpha / MaxChannel);
+  Target[1] := Round(Green * Alpha / MaxChannel);
+  Target[2] := Round(Blue * Alpha / MaxChannel);
+  Target[3] := Alpha;
 end;
 
 end.
