@@ -156,6 +156,7 @@ uses
   Pdf4D.Render.TilingPaint in '..\src\Render\Pdf4D.Render.TilingPaint.pas',
   Pdf4D.Tests.GraphicsDocuments in 'Support\Pdf4D.Tests.GraphicsDocuments.pas',
   Pdf4D.Render.PageDrawer.Paths.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas',
+  Pdf4D.Render.PageDrawer.Residual.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Residual.Tests.pas',
   Pdf4D.Render.PageDrawer.Text.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Text.Tests.pas',
   Pdf4D.Render.PageDrawer.Images.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Images.Tests.pas',
   Pdf4D.Render.PageDrawer.Groups.Tests in '..\src\Render\Pdf4D.Render.PageDrawer.Groups.Tests.pas',

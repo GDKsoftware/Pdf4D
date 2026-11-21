@@ -90,6 +90,15 @@ type
     [Test]
     procedure TestFillRectWithoutAntiAlias;
 
+    // Java2D puts the edge of a rectangle that is filled without anti-aliasing at ceil(x) (measured on the 1296 squares of the QR code of
+    // PDFBOX-6207: 61 of 19044 pixels differ with ceil, 1479 with the clip rule, 2766 with the nearest boundary)
+    [Test]
+    procedure TestFillWithoutAntiAliasFollowsJava2D;
+
+    // With another scale than 1 the edge is at floor(x + 0.25), as for a clip
+    [Test]
+    procedure TestFillWithoutAntiAliasAtAnotherScaleFollowsTheClipRule;
+
     [Test]
     procedure TestHalfAlphaIsPremultiplied;
 
@@ -519,6 +528,35 @@ begin
   AssertPixel(5, 5, TPdfDeviceColor.Create(255, 0, 0));
   AssertTransparent(1, 1);
   AssertTransparent(8, 8);
+end;
+
+procedure TPdfSkiaDeviceTests.TestFillWithoutAntiAliasFollowsJava2D;
+begin
+  // 2.2 acts as 3 and 7.2 as 8: the pixels 3 to 7; the nearest boundaries would be 2 and 7
+  FillRect(2.2, 2.2, 7.2, 7.2, Red, NoAntiAlias);
+
+  AssertPixel(3, 3, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(7, 7, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(2, 5);
+  AssertTransparent(8, 5);
+  AssertTransparent(5, 8);
+  AssertTransparent(5, 2);
+end;
+
+procedure TPdfSkiaDeviceTests.TestFillWithoutAntiAliasAtAnotherScaleFollowsTheClipRule;
+begin
+  const Path = NewRectPath(1.1, 1.1, 3.6, 3.6);
+  try
+    // Device 2.2 to 7.2: floor(2.45) = 2 and floor(7.45) = 7, the pixels 2 to 6 (ceil would give 3 to 7)
+    FDevice.FillPath(Path, TPdfMatrix.GetScaleInstance(2, 2), TPdfFillRule.NonZero, Red, NoAntiAlias);
+  finally
+    Path.Free;
+  end;
+
+  AssertPixel(2, 2, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(6, 6, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(1, 5);
+  AssertTransparent(7, 5);
 end;
 
 procedure TPdfSkiaDeviceTests.TestHalfAlphaIsPremultiplied;

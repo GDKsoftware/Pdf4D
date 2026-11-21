@@ -2254,8 +2254,10 @@ begin
   const SavedTextClip = FTextClip;
   FDevice := GroupDevice;
   FPageToDevice := SavedMatrix.Multiply(TPdfMatrix.GetTranslateInstance(-Bounds.Left, -Bounds.Top));
-  FTranslationResidualX := Double(SavedMatrix.TranslateX) + SavedResidualX - Bounds.Left - Double(FPageToDevice.TranslateX);
-  FTranslationResidualY := Double(SavedMatrix.TranslateY) + SavedResidualY - Bounds.Top - Double(FPageToDevice.TranslateY);
+  // PDFBox draws a group in a space that has the scale only (TransparencyGroup), without the translation of the page, so the double
+  // translation of the page matrix has no meaning inside a group
+  FTranslationResidualX := 0;
+  FTranslationResidualY := 0;
   FLinePath := TPdfPath.Create;
   FTextClip := TPdfPath.Create;
   FLastClip := nil;

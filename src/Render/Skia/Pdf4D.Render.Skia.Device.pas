@@ -114,7 +114,20 @@ end;
 procedure TPdfSkiaDevice.FillPath(const Path: TPdfPath; const Transform: TPdfMatrix; const FillRule: TPdfFillRule; const Paint: TPdfPaint;
                                   const Composite: TPdfComposite);
 begin
-  DrawPath(Path, FillRule, Transform, Paint, Composite, Default(TPdfStrokeStyle), False);
+  if Composite.AntiAlias then
+  begin
+    DrawPath(Path, FillRule, Transform, Paint, Composite, Default(TPdfStrokeStyle), False);
+    Exit;
+  end;
+
+  // PDFBox fills rectangles without anti-aliasing, and the edges of such a fill lie at ceil(x) in the reference images, where Skia would
+  // take the nearest pixel boundary: a QR code of small squares differs by a pixel at the edge of every module
+  const Snapped = TPdfStrokeNormalizer.SnapForFill(Path, Transform);
+  try
+    DrawPath(Snapped, FillRule, TPdfMatrix.Identity, Paint, Composite, Default(TPdfStrokeStyle), False);
+  finally
+    Snapped.Free;
+  end;
 end;
 
 procedure TPdfSkiaDevice.StrokePath(const Path: TPdfPath; const Transform: TPdfMatrix; const Stroke: TPdfStrokeStyle; const Paint: TPdfPaint;

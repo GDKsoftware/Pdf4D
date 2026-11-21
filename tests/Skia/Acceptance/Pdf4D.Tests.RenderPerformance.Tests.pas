@@ -15,7 +15,8 @@ uses
 type
   // Spec section 8: a page renders "within a fraction of a second". The first page of every generated invoice is rendered at 96 DPI
   // (scale 4/3) with Skia, five times, and the median must stay under the threshold. Only a Release build on Win64 is measured: a
-  // Debug build is several times slower and Win32 and Linux64 are not the platform that the figure is for.
+  // Debug build (the Debug configuration defines DEBUG) is several times slower and Win32 and Linux64 are not the platform that the
+  // figure is for. Elsewhere the test passes without measuring: DUnitX has no way to ignore a test at run time.
   [TestFixture]
   TRenderPerformanceTests = class
   strict private
@@ -67,7 +68,7 @@ const
   // 33 ms. The threshold is three times the slowest, so a slower machine or a busy build server passes, and it still catches a renderer
   // that has become an order of magnitude slower.
   MaxMedianMilliseconds = 100;
-    {$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   IsMeasured = False;
   {$ELSEIF Defined(WIN64)}
   IsMeasured = True;

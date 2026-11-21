@@ -227,6 +227,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.GraphicsDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Residual.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Text.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Images.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Groups.Tests.pas"/>

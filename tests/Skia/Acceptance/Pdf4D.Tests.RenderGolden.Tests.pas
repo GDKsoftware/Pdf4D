@@ -122,6 +122,7 @@ const
   ProviderName = 'Pdf4DRenderCorpus';
   OutputEnvironmentVariable = 'PDF4D_RENDER_OUTPUT';
   FilterEnvironmentVariable = 'PDF4D_RENDER_FILTER';
+  SaveAllEnvironmentVariable = 'PDF4D_RENDER_SAVE_ALL';
   ReferenceDpi = 72;
   SelectionDpi = 150;
   SelectionFileName = 'selection.txt';
@@ -366,6 +367,11 @@ begin
     LogComparison(RelativePath, Page, Dpi, Comparison);
     if Comparison.IsEqual then
     begin
+      // PDF4D_RENDER_SAVE_ALL=1 also writes the pages that are equal, for looking at the largest differences within the limits
+      if GetEnvironmentVariable(SaveAllEnvironmentVariable) <> '' then
+      begin
+        SaveOutput(RelativePath, Page, Dpi, Actual, Expected);
+      end;
       Exit('');
     end;
 

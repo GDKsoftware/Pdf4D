@@ -69,6 +69,22 @@ type
     [TestCase('Negative', '-0.3,-0.75')]
     procedure TestClipVertexMovesToFloorPlusQuarter(const Value, Expected: Single);
 
+    // The fill without anti-aliasing: the edge of a rectangle is at ceil(x); the result is in device pixels
+    [Test]
+    [TestCase('Below', '10.2,11')]
+    [TestCase('Above', '10.9,11')]
+    [TestCase('Integer', '10,10')]
+    [TestCase('HairAboveWhole', '10.0005,10')]
+    [TestCase('Negative', '-0.3,0')]
+    procedure TestFillVertexMovesToCeil(const Value, Expected: Single);
+
+    [Test]
+    procedure TestFillPathIsSnappedInDeviceSpace;
+
+    // Another scale than 1 (150 DPI): the edge is at floor(x + 0.25), as for a clip
+    [Test]
+    procedure TestFillWithAnotherScaleFollowsTheClipRule;
+
     [Test]
     procedure TestClipPathIsSnappedInDeviceSpaceAndReturnedThere;
 
@@ -109,6 +125,63 @@ begin
   end;
 end;
 
+procedure TStrokeNormalizerTests.TestFillVertexMovesToCeil(const Value, Expected: Single);
+begin
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(Value, Value);
+
+    const Snapped = TPdfStrokeNormalizer.SnapForFill(Path, TPdfMatrix.Identity);
+    try
+      AssertPoint(Snapped, 0, Expected, Expected);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestFillPathIsSnappedInDeviceSpace;
+begin
+  const Path = TPdfPath.Create;
+  try
+    // Device x = x + 1: 5.1 is 6.1 and becomes 7; y = 400 - y: 100 is 300 and stays 300
+    Path.MoveTo(5.1, 100);
+    Path.LineTo(6.4, 99);
+
+    const Snapped = TPdfStrokeNormalizer.SnapForFill(Path, TPdfMatrix.Create(1, 0, 0, -1, 1, 400));
+    try
+      AssertPoint(Snapped, 0, 7, 300);
+      AssertPoint(Snapped, 1, 8, 301);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestFillWithAnotherScaleFollowsTheClipRule;
+begin
+  const Path = TPdfPath.Create;
+  try
+    // Device = 2 * x: 5.1 is 10.2 and becomes 10.25 (ceil would be 11); 7.4 is 14.8 and becomes 15.25
+    Path.MoveTo(5.1, 5.1);
+    Path.LineTo(7.4, 7.4);
+
+    const Snapped = TPdfStrokeNormalizer.SnapForFill(Path, TPdfMatrix.Create(2, 0, 0, 2, 0, 0));
+    try
+      AssertPoint(Snapped, 0, 10.25, 10.25);
+      AssertPoint(Snapped, 1, 15.25, 15.25);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
 procedure TStrokeNormalizerTests.TestClipPathIsSnappedInDeviceSpaceAndReturnedThere;
 begin
   const Path = TPdfPath.Create;
@@ -137,7 +210,7 @@ begin
     Path.MoveTo(0.5, 0.5);
     Path.CubicTo(2, 2, 3, 3, 4.9, 4.9);
 
-    // The first end point moves by -0.25 + 0.25 - 0.5 = 0 (0.5 becomes 0.25: -0.25); the last by 5.25 - 4.9 = 0.35
+    // The first end point moves by -0.25 (0.5 becomes 0.25) and the last by +0.35 (4.9 becomes 5.25); the control points follow
     const Snapped = TPdfStrokeNormalizer.SnapForClip(Path, TPdfMatrix.Identity);
     try
       AssertPoint(Snapped, 0, 0.25, 0.25);

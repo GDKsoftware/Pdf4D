@@ -28,7 +28,9 @@ type
 
     class function Centered(const Value: Double): Double; static;
     class function ClipEdge(const Value: Double): Double; static;
+    class function FillEdge(const Value: Double): Double; static;
     class function DevicePoint(const Point: TPointF; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double): TDevicePoint; static;
+    class function IsUnitScale(const ToDevice: TPdfMatrix): Boolean; static;
     class function IsInvertible(const ToDevice: TPdfMatrix): Boolean; static;
     class function Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix; static;
     class procedure Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
@@ -41,10 +43,18 @@ type
     // The matrix of the device has a Single translation; the exact (double) translation is that plus ResidualX and ResidualY. Java2D
     // works with the double, and a point that lies just below a pixel boundary must not be put on it by the rounding of the Single.
     class function Normalize(const Path: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double): TPdfPath; overload; static;
-    // A new path in device pixels that the caller frees, for a clip that is not anti-aliased. Java2D sets such a clip with the vertices of
-    // the shape (ShapeSpanIterator with adjust) moved to floor(x + 0.25) + 0.25 and then takes the pixels whose centre is inside, so an
-    // edge acts as if it lay at floor(x + 0.25); Skia would put it at the nearest pixel boundary.
+    // A new path in device pixels that the caller frees, for a clip that is not anti-aliased. In the reference images of PDFBox an edge of
+    // such a clip acts as if it lay at floor(x + 0.25), which is what moving the vertices to floor(x + 0.25) + 0.25 and taking the pixels
+    // whose centre is inside gives (as ShapeSpanIterator does, from memory); Skia would put it at the nearest pixel boundary.
     class function SnapForClip(const Path: TPdfPath; const ToDevice: TPdfMatrix): TPdfPath; static;
+    // A new path in device pixels that the caller frees, for a fill without anti-aliasing (PDFBox fills rectangles that way, as Acrobat
+    // does). Two regimes are seen in the reference images, and the mechanism that separates them in Java2D is not known:
+    //  - with a device matrix whose scale is 1 (72 DPI) the edge of a rectangle lies at ceil(x): the 1296 squares of the QR code of
+    //    PDFBOX-6207 differ from the reference in 61 of 19044 pixels with ceil, in 1479 with floor(x + 0.25), in 2766 with the nearest
+    //    boundary;
+    //  - with another scale (150 DPI) it lies at floor(x + 0.25), the rule of the clip: the 30 strips of generated/render/colors-device.pdf
+    //    agree on all their edges.
+    class function SnapForFill(const Path: TPdfPath; const ToDevice: TPdfMatrix): TPdfPath; static;
   end;
 
 implementation
@@ -55,6 +65,9 @@ uses
 const
   PixelCentre = 0.5;
   ClipBias = 0.25;
+  // A device value a hair above a whole number (the Single translation of a page matrix gives 0.00001 for the top edge of a page) is that
+  // number, as in the double arithmetic of Java2D
+  FillBias = 0.001;
   MinDeterminant = 1E-12;
 
 { TPdfStrokeNormalizer }
@@ -67,6 +80,34 @@ end;
 class function TPdfStrokeNormalizer.ClipEdge(const Value: Double): Double;
 begin
   Result := Floor(Value + ClipBias) + ClipBias;
+end;
+
+class function TPdfStrokeNormalizer.FillEdge(const Value: Double): Double;
+begin
+  Result := Ceil(Value - FillBias);
+end;
+
+class function TPdfStrokeNormalizer.IsUnitScale(const ToDevice: TPdfMatrix): Boolean;
+begin
+  Result := (Abs(ToDevice.ScaleX) = 1) and (Abs(ToDevice.ScaleY) = 1) and (ToDevice.ShearX = 0) and (ToDevice.ShearY = 0);
+end;
+
+class function TPdfStrokeNormalizer.SnapForFill(const Path: TPdfPath; const ToDevice: TPdfMatrix): TPdfPath;
+begin
+  Result := TPdfPath.Create;
+  try
+    if IsUnitScale(ToDevice) then
+    begin
+      Rebuild(Path, ToDevice, 0, 0, Result, FillEdge);
+    end
+    else
+    begin
+      Rebuild(Path, ToDevice, 0, 0, Result, ClipEdge);
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
 end;
 
 class function TPdfStrokeNormalizer.SnapForClip(const Path: TPdfPath; const ToDevice: TPdfMatrix): TPdfPath;
