@@ -4,6 +4,8 @@
 // file. pdf.js forked the code from https://github.com/notmasteryet/jpgjs.
 // Port of: src/core/jpg.js (JpegImage, decodeScan, quantizeAndInverse, buildComponentData, getData) of pdf.js, release tag v6.5.438
 // (tools/fetch-pdfjs-src.ps1). The deviations from jpg.js are listed in docs/porting.md.
+// Contains an adaptation of the fancy upsampling of jdsample.c (h2v1_fancy_upsample, h2v2_fancy_upsample) of the Independent JPEG
+// Group's libjpeg; this software is based in part on the work of the Independent JPEG Group (see the NOTICE file).
 unit Pdf4D.Codec.Jpeg;
 
 {$EXCESSPRECISION OFF}
@@ -332,9 +334,10 @@ const
   EndOfImageProbableLines = 5;
 
   MaxScans = 1000;
-  // A progressive file has a few tens of scans at most, and each walks over some of the blocks of the frame; a scan that needs no data
-  // (an end-of-band run over empty blocks) still costs a visit per block, so the visits over all scans are bounded
-  MaxBlockVisitsPerBlock = 32;
+  // A legal progressive file can have a scan for each of the 64 coefficients of a component, with the DC scans and their refinements on top,
+  // and each scan walks over some of the blocks of the frame; a scan that needs no data (an end-of-band run over empty blocks) still
+  // costs a visit per block, so the visits over all scans are bounded
+  MaxBlockVisitsPerBlock = 128;
   MaxComponents = 4;
   MaxSamplingFactor = 4;
   ComponentsOfColor = 3;
@@ -1564,7 +1567,7 @@ begin
   begin
     Inc(BlocksPerMcu, Component.H * Component.V);
   end;
-  FBlockBudget := McusPerLine * McusPerColumn * BlocksPerMcu * MaxBlockVisitsPerBlock;
+  FBlockBudget := Int64(McusPerLine) * McusPerColumn * BlocksPerMcu * MaxBlockVisitsPerBlock;
 end;
 
 procedure TJpegDecoder.ReadHuffmanTables;

@@ -34,6 +34,7 @@ type
     class function Header(const MarkerCode: Word; const Payload: array of Byte): TBytes; static;
     class function Frame(const Height, Width: Word; const Components: array of Byte): TBytes; static;
     class function EmptyRefinementFile(const ScanCount: Integer): TBytes; static;
+    class function SingleCoefficientScansFile(const AcScanCount: Integer): TBytes; static;
     class function Difference(const Image: TPDImageXObject; const PngPath: string): TImageDifference; static;
     class function IsDctImage(const Stream: TCosStream): Boolean; static;
 
@@ -136,6 +137,9 @@ type
 
     [Test]
     procedure TestAFewRepeatedScansStayWithinTheWorkBudget;
+
+    [Test]
+    procedure TestProgressiveFileWithAScanPerCoefficientIsDecoded;
   end;
 
 implementation
@@ -730,6 +734,37 @@ begin
     Result := Result + Scan;
   end;
   Result := Result + Marker(Eoi);
+end;
+
+// A legal progressive file of 64 x 64 pixels: the DC scan and one scan for each of the 63 AC coefficients, so that every block is
+// visited 64 times. Each AC scan takes two bytes: one code for an end-of-band run over all blocks.
+class function TJpegImageTests.SingleCoefficientScansFile(const AcScanCount: Integer): TBytes;
+begin
+  const FrameSide = 64;
+  var QuantizationPayload: TBytes := [0];
+  for var Index := 1 to 64 do
+  begin
+    QuantizationPayload := QuantizationPayload + [1];
+  end;
+  const DcTable: TBytes = [$00, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const AcTable: TBytes = [$10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $E0];
+  const DcData: TBytes = [0, 0, 0, 0, 0, 0, 0, 0];
+  const RunData: TBytes = [0, 0];
+
+  Result := Join([Marker(Soi), Header(Dqt, QuantizationPayload), Header(Sof2, [8, Hi(FrameSide), Lo(FrameSide), Hi(FrameSide), Lo(FrameSide), 1, 1, $11, 0]),
+                  Header(Dht, DcTable), Header(Dht, AcTable), Header(Sos, [1, 1, $00, 0, 0, $00]), DcData]);
+  for var Coefficient := 1 to AcScanCount do
+  begin
+    Result := Result + Join([Header(Sos, [1, 1, $00, Coefficient, Coefficient, $00]), RunData]);
+  end;
+  Result := Result + Marker(Eoi);
+end;
+
+procedure TJpegImageTests.TestProgressiveFileWithAScanPerCoefficientIsDecoded;
+begin
+  const AllCoefficients = 63;
+
+  Decode(SingleCoefficientScansFile(AllCoefficients)).Free;
 end;
 
 procedure TJpegImageTests.TestEmptyRefinementScansAreBoundedByAWorkBudget;
