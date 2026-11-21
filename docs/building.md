@@ -29,15 +29,16 @@ The package lists its units in the `contains` clause, and nothing else is on its
 
 The Delphi compiler builds Linux64 packages (the linker writes `bplPdf4D.so`), so Linux64 builds the package like the other platforms. The tests do not link the package: they compile the units from the search path, which keeps the test program free of a package dependency.
 
-The three packages and what they contain:
+The packages and what they contain:
 
 | Package | `requires` | Contents |
 |---|---|---|
 | `Pdf4D.dpk` | `rtl` | the core: everything under `src` except the folders below |
 | `Pdf4D.Render.dpk` | `rtl, Pdf4D` | `src\Graphics`, `src\Codec`, `src\Render` (without `Skia`) and `src\Resources\Pdf4D.Resources.Icc.*` |
 | `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
+| `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
 
-All three build for Win32, Win64 and Linux64. `build.ps1` also checks the layers: a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`, and only units under `src\Render\Skia` may use `System.Skia`; it fails on a violation.
+All four build for Win32, Win64 and Linux64. `build.ps1` also checks the layers: a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`, and only units under `src\Render\Skia` may use `System.Skia`; it fails on a violation.
 
 ## The two test projects
 

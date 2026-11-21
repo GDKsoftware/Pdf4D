@@ -24,7 +24,7 @@ $TestProjects = @(
     @{ Name = 'Pdf4D.Tests'; Folder = 'tests'; NeedsSkia = $false },
     @{ Name = 'Pdf4D.Skia.Tests'; Folder = 'tests\Skia'; NeedsSkia = $true }
 )
-$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
@@ -78,11 +78,18 @@ function Test-NoInitializationSections {
     }
 }
 
-# Layer boundaries: the core (everything under src except Graphics, Codec, Render and the ICC resources) uses no unit of those
-# folders, and only units under src\Render\Skia use System.Skia. Comment lines are skipped.
+# Layer boundaries. Comment lines are skipped.
+# - The core (everything under src except Graphics, Codec, Render, Viewer, Vcl and the ICC resources) uses no unit of those folders.
+# - The core and the renderer use no unit from src\Viewer.
+# - src\Viewer uses only System.* and Pdf4D.* units, none of the VCL, FMX, Skia or the VCL and FMX components.
+# - Only src\Vcl uses Vcl.* and Winapi.*, and src\Vcl uses no FMX.*.
+# - Only src\Render\Skia and src\Vcl\Skia use System.Skia or Pdf4D.Render.Skia.
 function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$ExcludedFolders) {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
     $excluded = $ExcludedFolders | ForEach-Object { (Join-Path $sourceFolder $_) + [IO.Path]::DirectorySeparatorChar }
+    if (-not (Test-Path -LiteralPath $Folder)) {
+        return
+    }
     Get-ChildItem -Path $Folder -Include '*.pas', '*.inc' -Recurse |
         Where-Object { $file = $_.FullName; -not ($excluded | Where-Object { $file.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }) } |
         Select-String -Pattern $Pattern |
@@ -91,16 +98,21 @@ function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$Exclud
 
 function Test-LayerBoundaries {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
-    $layerFolders = 'Graphics', 'Codec', 'Render'
+    $layerFolders = 'Graphics', 'Codec', 'Render', 'Viewer', 'Vcl', 'FMX'
+    $notNamespacePrefix = '(?<![\w.])'
 
-    $coreViolations = Get-UsesViolations $sourceFolder '\bPdf4D\.(Render|Graphics|Codec)\.\w|\bPdf4D\.Resources\.Icc\b' $layerFolders |
+    $coreViolations = Get-UsesViolations $sourceFolder '\bPdf4D\.(Render|Graphics|Codec|Viewer|Vcl|FMX)\.\w|\bPdf4D\.Resources\.Icc\b' $layerFolders |
         Where-Object { $_.Path -notmatch 'Pdf4D\.Resources\.Icc' }
-    $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b' @('Render\Skia')
+    $viewerUsers = Get-UsesViolations $sourceFolder '\bPdf4D\.Viewer\.\w' @('Viewer', 'Vcl', 'FMX')
+    $viewerViolations = Get-UsesViolations (Join-Path $sourceFolder 'Viewer') "${notNamespacePrefix}(Vcl|Winapi|FMX|Skia)\.\w|\bPdf4D\.(Vcl|FMX)\b" @()
+    $vclViolations = Get-UsesViolations $sourceFolder "${notNamespacePrefix}(Vcl|Winapi)\.\w" @('Vcl')
+    $fmxInVclViolations = Get-UsesViolations (Join-Path $sourceFolder 'Vcl') "${notNamespacePrefix}FMX\.\w|\bPdf4D\.FMX\b" @()
+    $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b|\bPdf4D\.Render\.Skia\b' @('Render\Skia', 'Vcl\Skia')
 
-    $violations = @($coreViolations) + @($skiaViolations)
+    $violations = @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) + @($skiaViolations)
     if ($violations) {
         $violations | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
-        throw 'Layer boundary violated: the core must not use src\Graphics, src\Codec, src\Render or the ICC resources, and only src\Render\Skia may use System.Skia'
+        throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\Render\Skia and src\Vcl\Skia use System.Skia or Pdf4D.Render.Skia'
     }
 }
 

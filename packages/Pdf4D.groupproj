@@ -9,6 +9,9 @@
         <Projects Include="Pdf4D.Render.dproj">
             <Dependencies>Pdf4D.dproj</Dependencies>
         </Projects>
+        <Projects Include="Pdf4D.Viewer.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj</Dependencies>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -44,14 +47,23 @@
     <Target Name="Pdf4D.Render.Skia:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make">
         <MSBuild Projects="Pdf4D.Render.Skia.dproj" Targets="Make"/>
     </Target>
+    <Target Name="Pdf4D.Viewer" DependsOnTargets="Pdf4D;Pdf4D.Render">
+        <MSBuild Projects="Pdf4D.Viewer.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Viewer:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean">
+        <MSBuild Projects="Pdf4D.Viewer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Viewer:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make">
+        <MSBuild Projects="Pdf4D.Viewer.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia"/>
+        <CallTarget Targets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean"/>
+        <CallTarget Targets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make"/>
+        <CallTarget Targets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

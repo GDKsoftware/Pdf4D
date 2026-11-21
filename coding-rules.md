@@ -15,11 +15,11 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 ## Additions
 
 - Language level: Delphi 12. No Delphi 13-only syntax, such as the ternary `if` expression.
-- Only `System.*` units in the library. No `Winapi.*`, `Vcl.*`, `FMX.*` or inline assembler.
+- Only `System.*` units in the library: the core, `Pdf4D.Render` and `Pdf4D.Viewer`. No `Winapi.*`, `Vcl.*`, `FMX.*` or inline assembler there. Exception: `src\Vcl` may use `Vcl.*` and `Winapi.*` (overrides: only `System.*` units), because it holds the VCL components; it does not use `FMX.*`. Events of components are `procedure of object` without `var` parameters.
 - Every unit that ports PDFBox code names the PDFBox source files and the PDFBox version in its header.
 - Zero hints and zero warnings on all platforms.
 - Test hooks (`TPDFontFactory.CreatorOverride`, the setter of `TCMap.MappingLimit`) exist only when `PDF4D_TESTS` is defined. The define is set in `tests/Pdf4D.Tests.dproj` only, so library code never sees the hooks.
-- Layers of the renderer: the core (everything under `src` except `Graphics`, `Codec`, `Render` and `Resources\Pdf4D.Resources.Icc.*`) uses no unit from those folders, and only units under `src\Render\Skia` use `System.Skia`. `build.ps1` checks both rules and fails on a violation.
+- Layers of the renderer: the core (everything under `src` except `Graphics`, `Codec`, `Render` and `Resources\Pdf4D.Resources.Icc.*`) uses no unit from those folders, and only units under `src\Render\Skia` and `src\Vcl\Skia` use `System.Skia` or `Pdf4D.Render.Skia`. `src\Viewer` uses only `System.*` and `Pdf4D.*` units of the core and `Pdf4D.Render`, and the core and `src\Render` use no unit from `src\Viewer`. `build.ps1` checks these rules and fails on a violation.
 - The renderer draws through `IPdfGraphicsDevice` and `IPdfRenderBackend` only; it never calls a backend library directly.
 - Code that computes with floating point in the renderer and the Skia device runs inside `TPdfFloatGuard` (Skia masks all floating point exceptions of the process when it loads, Delphi raises on them) and uses `Single` with `{$EXCESSPRECISION OFF}`, as the text code does.
 - A Skia call that is not in the list of `docs\building.md` ("Skia API of the backend") gets a line in the Delphi 12 checklist there.

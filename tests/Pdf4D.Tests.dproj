@@ -49,7 +49,7 @@
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Define>PDF4D_TESTS;$(DCC_Define)</DCC_Define>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Content;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;..\src\Resources;..\src\Text;..\src\FontBox;..\src\Font;..\src\Render;..\src\Graphics;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\src\Common;..\src\IO;..\src\Cos;..\src\Parser;..\src\Content;..\src\Filter;..\src\Crypto;..\src\Encryption;..\src\Model;..\src\Api;..\src\Resources;..\src\Text;..\src\FontBox;..\src\Font;..\src\Render;..\src\Viewer;..\src\Graphics;ThirdParty\DEC\Source;Support;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>Pdf4D_Tests</SanitizedProjectName>
         <DCC_Hints>true</DCC_Hints>
         <DCC_Warnings>true</DCC_Warnings>
@@ -253,6 +253,10 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Annotations.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Limits.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Types.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewTransform.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>
