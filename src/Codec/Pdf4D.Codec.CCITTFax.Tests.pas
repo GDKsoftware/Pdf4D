@@ -127,7 +127,8 @@ const
   ScanColumns = 51203;
   ScanDensePairs = 25600;
   ScanCycles = 25600;
-  ScanLimitMilliseconds = 150;
+  // A secondary guard only: the budget itself is asserted through the warning
+  ScanLimitMilliseconds = 5000;
   WhiteOne = '000111';
   BlackOne = '010';
   PassMode = '0001';
@@ -433,6 +434,12 @@ begin
   const Actual = DecodeRaw(Data, ParametersOf(-1, ScanColumns, 4));
 
   Assert.AreEqual<Integer>(((ScanColumns + 7) div 8) * 4, Length(Actual));
+  var IsBudgetReported := False;
+  for var Line in FLines do
+  begin
+    IsBudgetReported := (IsBudgetReported or Line.Contains('too much work'));
+  end;
+  Assert.IsTrue(IsBudgetReported, 'the work budget stops the row');
   Assert.IsTrue(Stopwatch.ElapsedMilliseconds < ScanLimitMilliseconds, Format('Decoding took %d ms', [Stopwatch.ElapsedMilliseconds]));
 end;
 
