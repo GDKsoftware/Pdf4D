@@ -76,3 +76,12 @@ notmasteryet, https://github.com/notmasteryet/jpgjs.
 Includes a port of CCITTFaxDecoderStream of TwelveMonkeys ImageIO (as taken over by Apache PDFBox 3.0.8), in
 src/Codec/Pdf4D.Codec.CCITTFax.pas. Copyright (c) 2012, Harald Kuhr. Licensed under the BSD 3-Clause License, see
 licenses/TwelveMonkeys-BSD.txt.
+
+Includes a port of java.awt.image.AreaAveragingScaleFilter of OpenJDK 21 (the filter behind Image.getScaledInstance with
+SCALE_SMOOTH, which Apache PDFBox 3.0.8 uses to scale an image down), in src/Render/Pdf4D.Render.ImageScaler.pas.
+Copyright (c) Oracle and/or its affiliates. OpenJDK is licensed under the GNU General Public License, version 2, with the
+Classpath exception.
+
+Pdf4D does not include Skia. The Skia backend (src/Render/Skia) uses System.Skia (Skia4Delphi) that ships with RAD Studio, and
+needs sk4d.dll or libsk4d.so, which the application brings. Skia is licensed under the BSD 3-Clause License, Skia4Delphi under
+the MIT License.

@@ -23,11 +23,28 @@ For each platform the script first builds the packages (`packages\Pdf4D.dproj`, 
 
 ## Packages
 
-`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec` and `Render` (and `src\Resources\Pdf4D.Resources.Icc.*`), which later phases put in their own packages. `packages\Pdf4D.groupproj` holds the package; the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
+`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec` and `Render` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other two packages. `packages\Pdf4D.groupproj` holds the three packages (see below); the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
 
 The package lists its units in the `contains` clause, and nothing else is on its search path, so a unit that is missing there stops the build with F2613 (and an implicit import would show as W1033, which `build.ps1` also treats as a failure). When you add a unit under `src`, add it to `packages\Pdf4D.dpk` and `packages\Pdf4D.dproj` as well as to the test project.
 
 The Delphi compiler builds Linux64 packages (the linker writes `bplPdf4D.so`), so Linux64 builds the package like the other platforms. The tests do not link the package: they compile the units from the search path, which keeps the test program free of a package dependency.
+
+The three packages and what they contain:
+
+| Package | `requires` | Contents |
+|---|---|---|
+| `Pdf4D.dpk` | `rtl` | the core: everything under `src` except the folders below |
+| `Pdf4D.Render.dpk` | `rtl, Pdf4D` | `src\Graphics`, `src\Codec`, `src\Render` (without `Skia`) and `src\Resources\Pdf4D.Resources.Icc.*` |
+| `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
+
+All three build for Win32, Win64 and Linux64. `build.ps1` also checks the layers: a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`, and only units under `src\Render\Skia` may use `System.Skia`; it fails on a violation.
+
+## The two test projects
+
+- `tests\Pdf4D.Tests.dproj` tests the core and the renderer without Skia, with a device that records calls. Its folder has no Skia library, so it proves that the core and the renderer do not need one.
+- `tests\Skia\Pdf4D.Skia.Tests.dproj` tests the Skia backend, compares the renders with the PDFBox reference images and runs the fuzz through the renderer (see "The Skia backend").
+
+`./build.ps1 -Suite Pdf4D.Tests` or `-Suite Pdf4D.Skia.Tests` runs one of them.
 
 ## Linux via WSL
 
@@ -53,7 +70,7 @@ Tests that read corpus files look for a `corpus` folder with a `manifest.csv`, s
 
 ## Fuzz sweeps
 
-The fuzz runs are `Pdf4D.Tests.Robustness.Tests` (mutated corpus files and mutated decoder input: JPEG, CCITT, ICC profile, PostScript function, Type 1 and CFF charstrings, `glyf` table), `Pdf4D.Tests.TextRobustness.Tests` (generated content streams, font programs, hostile documents) in the core test project, and `Pdf4D.Tests.RenderRobustness.Tests` in the Skia test project (every page of the mutated corpus and of 2000 generated graphics streams rendered at 36 DPI with the Skia backend, and hostile image, recursion and geometry documents). The work and the mutation machinery are in `tests\Support\Pdf4D.Tests.Fuzz.pas`. Every run happens on a worker thread with a time limit and may only succeed or end in an `EPdfException`. The seeds and sizes in the code are fixed. For a larger sweep with other seeds, set these environment variables and run one fixture (the test programs take DUnitX options such as `-r:`):
+The fuzz runs are `Pdf4D.Tests.Robustness.Tests` (mutated corpus files and mutated decoder input: JPEG, CCITT, ICC profile, PostScript function, Type 1 and CFF charstrings, `glyf` table), `Pdf4D.Tests.TextRobustness.Tests` (generated content streams, font programs, hostile documents) in the core test project, and `Pdf4D.Tests.RenderRobustness.Tests` in the Skia test project (every page of the mutated corpus and of 2000 generated graphics streams rendered at 36 DPI with the Skia backend, and hostile image, recursion and geometry documents). The work and the mutation machinery are in `tests\Support\Pdf4D.Tests.Fuzz.pas`. Every run happens on a worker thread with a time limit and may only succeed or end in an `EPdfException`. The seeds and sizes in the code are fixed. A Debug build renders about three times slower than a Release build, so the render runs of a Debug build are smaller: 6 mutations per corpus file instead of 20, and 600 generated graphics streams instead of 2000 (both counts are constants of `TFuzzSettings` in `tests\Support\Pdf4D.Tests.Fuzz.pas`). For a larger sweep with other seeds, set these environment variables and run one fixture (the test programs take DUnitX options such as `-r:`):
 
 | Variable | Meaning |
 |---|---|
@@ -73,15 +90,29 @@ A run that hits the time limit keeps its thread, so the process can crash when i
 
 ## Test fonts
 
-`tests\Fonts` holds the fonts that the font tests load (two TrueType fonts, two CFF OpenType fonts and two Type 1 `.pfb` fonts), with `manifest.csv` (file, source, licence, notes) and, per font, a `<font>.widths.txt` with the PDFBox 3.0.8 widths and Unicode values that the tests compare with. The widths files are generated by `tools\oracle\generate-font-widths.ps1`; fetch missing fonts with `tools\corpusetch-fonts.ps1`. The text goldens use an empty font provider, so they do not depend on the fonts installed on the machine.
+`tests\Fonts` holds the fonts that the font tests load (two TrueType fonts, two CFF OpenType fonts and two Type 1 `.pfb` fonts), with `manifest.csv` (file, source, licence, notes) and, per font, a `<font>.widths.txt` with the PDFBox 3.0.8 widths and Unicode values that the tests compare with. The widths files are generated by `tools\oracle\generate-font-widths.ps1`; fetch missing fonts with `tools\corpus\fetch-fonts.ps1`. The text goldens use an empty font provider, so they do not depend on the fonts installed on the machine.
 
 ## Oracle modes
 
 The golden files in `tests\golden` are written by the PDFBox 3.0.8 oracle. `tools\oracle\generate-golden.ps1` takes `-Mode Dump` (the structure dump, `*.dump.txt`), `-Mode Text` (the text dump, `*.text.txt`), `-Mode Positions` (the line positions, `*.positions.txt`) or `-Mode All` (the default, all three), and `-Filter` for part of the corpus. Without a filter the script first removes the files of the chosen modes. The formats are in `golden-format.md`. The comparison of the text goldens counts sections that are only equal after white space is ignored; set `PDF4D_TEXT_LENIENT_REPORT` to a file name to get one line per such section.
 
+The other oracle modes (`Pdf4DOracle.java`) and the scripts that run them, all with the pinned JDK of `tools\oracle\fetch-jdk.ps1`:
+
+| Script | Oracle mode | Writes |
+|---|---|---|
+| `generate-colors.ps1` | `--color-batch` | `tests\reference\color`: `DeviceCMYK` and the ICC profiles of `tests\icc` through `ICC_ColorSpace.toRGB` |
+| `generate-color-spaces.ps1` | `--color-pdf-batch` | `tests\reference\color-spaces`: the colour spaces of `colorspaces.pdf` |
+| `generate-functions.ps1` | `--function` | `tests\reference\functions`: PDF functions of `tools\oracle\function-specs` |
+| `generate-images.ps1` | `images` | `tests\reference\images`: `PDImageXObject.getImage()` of the images of the selected pages |
+| `generate-font-widths.ps1` | `--font-widths`, `--glyph-paths`, `--pdf-glyph-paths` | `tests\fonts`: widths, Unicode values and glyph paths of the test fonts |
+| `generate-render.ps1` | `render` | `tests\reference\render`: the pages as `PDFRenderer` draws them (next section) |
+| `generate-render-tests.ps1` | `make-render-tests` | `tests\corpus\generated\render`: the synthetic render test files (with `make-render-pdfs.py`, `make-render-tests.py` and `make-jpeg-tests.py`) |
+
+Run `generate-golden.ps1 -Mode All -Filter <path>` for every new corpus file as well; the formats are in `golden-format.md`. `tools\fetch-pdfjs-src.ps1` downloads the `jpg.js` of pdf.js (the tag is pinned in the script) into `tools\pdfjs-src`, which is ignored by git; the JPEG decoder is ported from it, and the file is only needed to review that port.
+
 ## Render reference images
 
-`tools\oracle\generate-render.ps1 -Dpi 72` writes the PDFBox renders of every corpus page to `tests\reference\render\72` (about 45 MB, in plain git) and `-Dpi 150` those of `tests\reference\render\150\selection.txt`; `tools\oracle\generate-render-tests.ps1` writes the synthetic render test files. `PDF4D_RENDER_OUTPUT` names a folder where `Pdf4D.Skia.Tests` writes the Pdf4D render and a difference image of every page that differs from its reference. The format and the comparison are in `golden-format.md`.
+`tools\oracle\generate-render.ps1 -Dpi 72` writes the PDFBox renders of every corpus page to `tests\reference\render\72` (about 45 MB, in plain git) and `-Dpi 150` those of `tests\reference\render\150\selection.txt`; `tools\oracle\generate-render-tests.ps1` writes the synthetic render test files. `PDF4D_RENDER_OUTPUT` names a folder where `Pdf4D.Skia.Tests` writes the Pdf4D render and a difference image of every page that differs from its reference, and the files `summary.txt`, `distribution.txt`, `region.txt` and `performance.txt`; `PDF4D_RENDER_FILTER` (substrings of corpus paths, separated by semicolons) limits the comparison to the matching files. The format and the comparison are in `golden-format.md`.
 
 ## Invoice PDFs
 
@@ -111,7 +142,17 @@ The Skia tests are a separate project, `tests\Skia\Pdf4D.Skia.Tests.dproj` (outp
 - `System.Skia` masks all floating point exceptions of the process when it starts, so the test program sets the Delphi default mask again before the tests. The device itself runs every Skia call inside `TPdfFloatGuard`, which gives the mask back as it found it.
 - On Linux64 `SafeLoadLibrary('libsk4d.so')` does not search the folder of the program. `build.ps1` starts the Skia tests with `LD_LIBRARY_PATH` set to the output folder, and first runs `ldd` on `libsk4d.so` in WSL. A dependency that is not found stops the script with the missing libraries and an `apt` hint, like the check for `libz.so`.
 
-### Delphi 12
+## Delphi 12
+
+Pdf4D needs Delphi 12 or newer, but every build and test so far was done with Delphi 13. Do this checklist on the first machine with Delphi 12 and write down what differs; new differences are noted, not fixed in the same step.
+
+1. Open `packages\Pdf4D.groupproj` and build all three packages (`Pdf4D`, `Pdf4D.Render`, `Pdf4D.Render.Skia`) for Win32 and Win64, without hints or warnings (`build.ps1` is written for Delphi 13 and calls `rsvars.bat` of Studio 37.0; point it at Studio 23.0 or build in the IDE).
+2. Check that the Skia package is called `Skia.Package.RTL` in Delphi 12, as `Pdf4D.Render.Skia.dpk` requires.
+3. Build and run `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj`, the second one with the `sk4d.dll` of Delphi 12 (`Redist\win64\sk4d.dll` of that installation, next to the test program).
+4. Run the reference tests (the render comparison with the PDFBox images, `TRenderGoldenTests`) on Win64 and compare the number of pages that differ with Delphi 13 (612 of 617 pages equal at 72 DPI, 19 of 22 at 150 DPI). The Skia version is another one, so pages can differ at the edges; note the new differences and do not fix them in this step.
+5. For every `System.Skia` API that the backend uses outside the list of the next section, check that it exists in Delphi 12 (the lines below say which ones those are and what the replacement is).
+
+### Skia API of the backend
 
 The Skia code only uses `System.Skia` API that Delphi 12 and 13 share, and it has not been compiled with Delphi 12. Every use of something outside this list gets a line below.
 
@@ -124,7 +165,7 @@ Also used, outside that list:
 
 - Blend modes use `ISkPaint.Blender` with `TSkBlender.MakeMode(TSkBlendMode)`, not a `BlendMode` property: Delphi 13 has no `ISkPaint.BlendMode`. Check on the first Delphi 12 build that `Blender` and `TSkBlender.MakeMode` exist there (Skia4Delphi 6 has them); if not, `ISkPaint.BlendMode` is the replacement.
 - Soft masks and layers: `ISkCanvas.SaveLayer(Bounds, Paint)`, `ISkCanvas.DrawImage(Image, X, Y, Sampling, Paint)`, `TSkBlendMode.DestIn`, `TSkBlendMode.Hue`, `Saturation`, `Color`, `Luminosity` (the four non-separable modes), `System.Skia` only.
-- `TSkImageInfo.Create(Width, Height, ColorType, AlphaType)` and the enums `TSkColorType`, `TSkAlphaType`, `TSkPaintStyle`, `TSkStrokeCap`, `TSkStrokeJoin`, `TSkPathFillType`, `TSkClipOp`, `TSkFilterMode`, `TSkMipmapMode`: the types that the listed calls take. All of them exist in Delphi 12.
+- `TSkImageInfo.Create(Width, Height, ColorType, AlphaType)` and the enums `TSkColorType`, `TSkAlphaType`, `TSkPaintStyle`, `TSkStrokeCap`, `TSkStrokeJoin`, `TSkPathFillType`, `TSkClipOp`, `TSkFilterMode`, `TSkMipmapMode`: the types that the listed calls take. They are expected to exist in Delphi 12 (step 5 of the checklist).
 - `TMatrix` from `System.Math.Vectors` as the matrix type of `SetMatrix` and `MakeShader`.
 - The package `Skia.Package.RTL` in the `requires` clause of `Pdf4D.Render.Skia.dpk`. The Skia package has had this name since Delphi 12; check it when the first Delphi 12 build is made.
 - `TSkSurface.MakeRaster` with `TSkColorType.RGBA8888` and `TSkAlphaType.Premul` is assumed to give the byte order R, G, B, A on every platform; `TestToBitmapIsPremultipliedRgba` checks it.

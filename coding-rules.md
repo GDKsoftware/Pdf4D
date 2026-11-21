@@ -19,3 +19,8 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 - Every unit that ports PDFBox code names the PDFBox source files and the PDFBox version in its header.
 - Zero hints and zero warnings on all platforms.
 - Test hooks (`TPDFontFactory.CreatorOverride`, the setter of `TCMap.MappingLimit`) exist only when `PDF4D_TESTS` is defined. The define is set in `tests/Pdf4D.Tests.dproj` only, so library code never sees the hooks.
+- Layers of the renderer: the core (everything under `src` except `Graphics`, `Codec`, `Render` and `Resources\Pdf4D.Resources.Icc.*`) uses no unit from those folders, and only units under `src\Render\Skia` use `System.Skia`. `build.ps1` checks both rules and fails on a violation.
+- The renderer draws through `IPdfGraphicsDevice` and `IPdfRenderBackend` only; it never calls a backend library directly.
+- Code that computes with floating point in the renderer and the Skia device runs inside `TPdfFloatGuard` (Skia masks all floating point exceptions of the process when it loads, Delphi raises on them) and uses `Single` with `{$EXCESSPRECISION OFF}`, as the text code does.
+- A Skia call that is not in the list of `docs\building.md` ("Skia API of the backend") gets a line in the Delphi 12 checklist there.
+- `Graphics`, `Codec` and `Render` follow exception 2 only for the objects that mirror the PDFBox object graph (the colour spaces and the page drawer); the device interface, the renderer and the bitmap use interfaces.
