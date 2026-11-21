@@ -58,7 +58,7 @@ Taken from the `// Port of:` header of every unit. Where a class is ported in pa
 | `pdmodel.graphics.form` | `PDFormXObject` (the read side), `PDTransparencyGroup` (as `IsTransparencyGroup`) |
 | `pdmodel.graphics.state` | `PDGraphicsState` (without colour, clipping and line style), `PDTextState`, `RenderingMode`, `PDExtendedGraphicsState` (`/Font` only) |
 | `text` | `PDFTextStripper` (pages, articles, actual text, sorting, paragraphs, bookmarks), `LegacyPDFStreamEngine`, `TextPosition`, `TextPositionComparator`, and the tables of the stripper as data |
-| `util` | `Matrix` (as far as text extraction uses it), `Vector`, `IterativeMergeSort`, and `java.util.TimSort` of OpenJDK 21 (the sort behind `Collections.sort`) |
+| `util` | `Matrix` (as far as text extraction uses it), `Vector`, `IterativeMergeSort`, and an independent implementation of the stable merge sort behind `Collections.sort` (`Pdf4D.Text.TimSort`) |
 | `fontbox` | `FontBoxFont` |
 | `fontbox.afm` | `AFMParser`, `FontMetrics`, `CharMetric`, `KernPair`, `Ligature` |
 | `fontbox.cff` | `CFFParser`, `CFFOperator`, `CFFFont`, `CFFType1Font`, `CFFCIDFont`, `CFFCharset` (with the Type 1, CID, ISOAdobe, Expert and ExpertSubset charsets), `CFFEncoding` (with the standard and expert encodings), `CFFStandardString`, `FDSelect`, `DataInput`, `Type1CharStringParser`, `Type2CharStringParser`, `Type1FontUtil` |
@@ -107,7 +107,7 @@ Taken from the `// Port of:` header of every unit. The units of the first four r
 | `fontbox.cff` (paths) | `Type1CharString` and `Type2CharString` (the path part, including `seac` and the flex operators; `Pdf4D.FontBox.CharStringPath`), the readers of the charstrings (`Pdf4D.FontBox.CharStringReaders`) |
 | `filter` | `CCITTFaxFilter` and `CCITTFaxDecoderStream` (`Pdf4D.Codec.CCITTFax`, see below); `DCTFilter` for what the JPEG decoder hands on |
 | pdf.js, not PDFBox | `src/core/jpg.js`, release tag `v6.5.438` (`Pdf4D.Codec.Jpeg`, see below) |
-| Java, not PDFBox | `java.awt.image.AreaAveragingScaleFilter` of OpenJDK 21 (`Pdf4D.Render.ImageScaler`, the smooth scaling of `PDImageXObject.scaleImage` and of the downscaling optimization of `PageDrawer.drawBufferedImage`) |
+| Java, not PDFBox | an independent implementation of area-averaging scaling, the documented behaviour of `Image.SCALE_SMOOTH` (`Pdf4D.Render.ImageScaler`, the smooth scaling of `PDImageXObject.scaleImage` and of the downscaling optimization of `PageDrawer.drawBufferedImage`) |
 
 Not ported from `pdmodel.graphics`: overprint, rendering intents other than the one Java uses for `toRGB`, `PDFRenderer.setSubsamplingAllowed` and `setImageDownscalingOptimizationThreshold` as options, and the handlers that construct appearances.
 
