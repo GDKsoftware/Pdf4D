@@ -6,6 +6,13 @@
 // MIN_GALLOP 7, merge_lo and merge_hi), the corrected merge-collapse rule of JDK-8072909 / JDK-8203864 (de Gouw et al., "OpenJDK's
 // java.utils.Collection.sort() is broken", 2015) and the documented constants and behaviour of the Java variant (MIN_MERGE 32,
 // IllegalArgumentException for a comparison that violates its contract).
+//
+// The algorithm (published by Tim Peters in listsort.txt) and the constants that Java documents (MIN_MERGE, the initial gallop
+// threshold) are reproduced on purpose and exactly: PDFBox gives the same text order as Pdf4D only when the comparison function is called
+// for the same pairs in the same order and direction, because the comparison of text positions is not transitive and its result then
+// depends on that sequence. The code is written from that description; where Java and listsort.txt leave a choice of expression
+// (how the run-win counters are tested, how the gallop bounds and the threshold are kept) it is written in the form of this unit,
+// which does not change the sequence of comparisons.
 unit Pdf4D.Text.TimSort;
 
 interface
@@ -51,11 +58,15 @@ type
     procedure CollapseAllRuns;
     procedure MergeRunPair(const Index: Integer);
     procedure LoadScratch(const Start, Count: Integer);
+    function IsInFront(const Key, Item, Cut: Integer): Boolean;
+    function GallopPosition(const Key: Integer; const Source: TArray<Integer>; const Start, Count, Hint, Cut: Integer): Integer;
     function GallopBefore(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
     function GallopAfter(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
     procedure MergeFromLeft(const Start1, Count1, Start2, Count2: Integer);
     procedure MergeFromRight(const Start1, Count1, Start2, Count2: Integer);
     procedure MoveBlock(const Source: TArray<Integer>; const SourceStart: Integer; const Target: TArray<Integer>; const TargetStart, Count: Integer);
+    procedure FinishMergeFromLeft(const Left, LeftCount, Right, RightCount, Dest: Integer);
+    procedure FinishMergeFromRight(const Left, LeftCount, RightCount, Dest: Integer);
     procedure StoreGallopThreshold(const Value: Integer);
 
   public
@@ -374,6 +385,31 @@ begin
   MoveBlock(FItems, Start, FScratch, 0, Count);
 end;
 
+// What is left when one side of MergeFromLeft is spent: the items of the second run that remain (they stand in the array from Right)
+// move up to Dest, and the items of the first run that remain (in the scratch from Left) follow them. A first run that is used up
+// while the second still has items means that the comparison was not consistent.
+procedure TTimSort.FinishMergeFromLeft(const Left, LeftCount, Right, RightCount, Dest: Integer);
+begin
+  if LeftCount = 0 then
+  begin
+    RaiseContractViolation;
+  end;
+  MoveBlock(FItems, Right, FItems, Dest, RightCount);
+  MoveBlock(FScratch, Left, FItems, Dest + RightCount, LeftCount);
+end;
+
+// The mirror image: the items of the first run that remain (standing in the array up to Left) move down so that they end at Dest, and
+// the items of the second run that remain (the scratch from 0) end just before them
+procedure TTimSort.FinishMergeFromRight(const Left, LeftCount, RightCount, Dest: Integer);
+begin
+  if RightCount = 0 then
+  begin
+    RaiseContractViolation;
+  end;
+  MoveBlock(FItems, Left - LeftCount + 1, FItems, Dest - LeftCount + 1, LeftCount);
+  MoveBlock(FScratch, 0, FItems, Dest - LeftCount - RightCount + 1, RightCount);
+end;
+
 procedure TTimSort.MoveBlock(const Source: TArray<Integer>; const SourceStart: Integer; const Target: TArray<Integer>; const TargetStart, Count: Integer);
 begin
   if Count > 0 then
@@ -387,115 +423,70 @@ begin
   FGallopThreshold := Max(Value, 1);
 end;
 
-// Where Key goes in Source[Start..Start+Count-1], before the items that equal it: the number of items that are less than Key.
-// The search gallops from Hint with steps 1, 3, 7, ... and ends with a binary search.
-function TTimSort.GallopBefore(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+// True when Item stays in front of Key (see GallopPosition)
+function TTimSort.IsInFront(const Key, Item, Cut: Integer): Boolean;
 begin
-  var Below := 0;
-  var Above := 1;
-  if FComparison(Key, Source[Start + Hint]) > 0 then
-  begin
-    const Limit = Count - Hint;
-    while (Above < Limit) and (FComparison(Key, Source[Start + Hint + Above]) > 0) do
-    begin
-      Below := Above;
-      Above := Above * 2 + 1;
-      if Above <= 0 then
-      begin
-        Above := Limit;
-      end;
-    end;
-    Above := Min(Above, Limit);
-    Inc(Below, Hint);
-    Inc(Above, Hint);
-  end
-  else
-  begin
-    const Limit = Hint + 1;
-    while (Above < Limit) and (FComparison(Key, Source[Start + Hint - Above]) <= 0) do
-    begin
-      Below := Above;
-      Above := Above * 2 + 1;
-      if Above <= 0 then
-      begin
-        Above := Limit;
-      end;
-    end;
-    Above := Min(Above, Limit);
-    const OldBelow = Below;
-    Below := Hint - Above;
-    Above := Hint - OldBelow;
-  end;
-
-  Inc(Below);
-  while Below < Above do
-  begin
-    const Middle = Below + ((Above - Below) shr 1);
-    if FComparison(Key, Source[Start + Middle]) > 0 then
-    begin
-      Below := Middle + 1;
-    end
-    else
-    begin
-      Above := Middle;
-    end;
-  end;
-  Result := Above;
+  Result := (FComparison(Key, Item) > Cut);
 end;
 
-// Where Key goes in Source[Start..Start+Count-1], after the items that equal it: the number of items that are not greater than Key
-function TTimSort.GallopAfter(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+// The insertion point of Key in the sorted Source[Start..Start+Count-1]: the number of items that stay in front of it. An item stays
+// in front when Comparison(Key, item) > Cut. With Cut 0 that are the items that are less than Key (Key goes before the items that equal
+// it); with Cut -1 the items that are not greater than Key (Key goes after them).
+// The search starts at the item Hint and probes at distances 1, 3, 7, ... from it in the direction of the answer until it has passed
+// the answer, and then bisects between the last two probes.
+function TTimSort.GallopPosition(const Key: Integer; const Source: TArray<Integer>; const Start, Count, Hint, Cut: Integer): Integer;
 begin
-  var Below := 0;
-  var Above := 1;
-  if FComparison(Key, Source[Start + Hint]) < 0 then
+  // The answer lies in (Known, Closing]: Known is in front of Key or is -1, Closing is not in front of it or is Count
+  var Known: Integer;
+  var Closing: Integer;
+  var Step: Int64 := 1;
+  if IsInFront(Key, Source[Start + Hint], Cut) then
   begin
-    const Limit = Hint + 1;
-    while (Above < Limit) and (FComparison(Key, Source[Start + Hint - Above]) < 0) do
+    Known := Hint;
+    while (Hint + Step < Count) and IsInFront(Key, Source[Start + Hint + Integer(Step)], Cut) do
     begin
-      Below := Above;
-      Above := Above * 2 + 1;
-      if Above <= 0 then
-      begin
-        Above := Limit;
-      end;
+      Known := Hint + Integer(Step);
+      Step := Step * 2 + 1;
     end;
-    Above := Min(Above, Limit);
-    const OldBelow = Below;
-    Below := Hint - Above;
-    Above := Hint - OldBelow;
+    Closing := Integer(Min(Int64(Hint) + Step, Int64(Count)));
   end
   else
   begin
-    const Limit = Count - Hint;
-    while (Above < Limit) and (FComparison(Key, Source[Start + Hint + Above]) >= 0) do
+    Closing := Hint;
+    while (Hint - Step >= 0) and (not IsInFront(Key, Source[Start + Hint - Integer(Step)], Cut)) do
     begin
-      Below := Above;
-      Above := Above * 2 + 1;
-      if Above <= 0 then
-      begin
-        Above := Limit;
-      end;
+      Closing := Hint - Integer(Step);
+      Step := Step * 2 + 1;
     end;
-    Above := Min(Above, Limit);
-    Inc(Below, Hint);
-    Inc(Above, Hint);
+    Known := Integer(Max(Int64(Hint) - Step, Int64(-1)));
   end;
 
-  Inc(Below);
-  while Below < Above do
+  var First := Known + 1;
+  while First < Closing do
   begin
-    const Middle = Below + ((Above - Below) shr 1);
-    if FComparison(Key, Source[Start + Middle]) < 0 then
+    const Middle = First + ((Closing - First) shr 1);
+    if IsInFront(Key, Source[Start + Middle], Cut) then
     begin
-      Above := Middle;
+      First := Middle + 1;
     end
     else
     begin
-      Below := Middle + 1;
+      Closing := Middle;
     end;
   end;
-  Result := Above;
+  Result := Closing;
+end;
+
+// Where Key goes before the items that equal it: the number of items that are less than Key
+function TTimSort.GallopBefore(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+begin
+  Result := GallopPosition(Key, Source, Start, Count, Hint, 0);
+end;
+
+// Where Key goes after the items that equal it: the number of items that are not greater than Key
+function TTimSort.GallopAfter(const Key: Integer; const Start, Count, Hint: Integer; const Source: TArray<Integer>): Integer;
+begin
+  Result := GallopPosition(Key, Source, Start, Count, Hint, -1);
 end;
 
 // Merges two adjacent runs of which the first is not longer than the second: the first is copied aside and the merge
@@ -515,15 +506,9 @@ begin
   Inc(Dest);
   Inc(Right);
   Dec(RightCount);
-  if RightCount = 0 then
+  if (RightCount = 0) or (LeftCount = 1) then
   begin
-    MoveBlock(FScratch, Left, FItems, Dest, LeftCount);
-    Exit;
-  end;
-  if LeftCount = 1 then
-  begin
-    MoveBlock(FItems, Right, FItems, Dest, RightCount);
-    FItems[Dest + RightCount] := FScratch[Left];
+    FinishMergeFromLeft(Left, LeftCount, Right, RightCount, Dest);
     Exit;
   end;
 
@@ -563,11 +548,12 @@ begin
           Break;
         end;
       end;
-    until (LeftWins or RightWins) >= Threshold;
+    until Max(LeftWins, RightWins) >= Threshold;
 
     // Galloping, until neither search finds a block of at least the initial threshold
     if not Finished then
     begin
+      var Rounds := 0;
       repeat
         LeftWins := GallopAfter(FItems[Right], Left, LeftCount, 0, FScratch);
         if LeftWins <> 0 then
@@ -616,9 +602,11 @@ begin
           Finished := True;
           Break;
         end;
-        Dec(Threshold);
+        Inc(Rounds);
       until (LeftWins < InitialGallopThreshold) and (RightWins < InitialGallopThreshold);
 
+      // Every round of galloping lowers the number of wins in a row after which the next steps gallop; leaving the galloping costs two
+      Dec(Threshold, Rounds);
       if not Finished then
       begin
         Threshold := Max(Threshold, 0) + 2;
@@ -626,20 +614,7 @@ begin
     end;
   end;
   StoreGallopThreshold(Threshold);
-
-  if LeftCount = 1 then
-  begin
-    MoveBlock(FItems, Right, FItems, Dest, RightCount);
-    FItems[Dest + RightCount] := FScratch[Left];
-  end
-  else if LeftCount = 0 then
-  begin
-    RaiseContractViolation;
-  end
-  else
-  begin
-    MoveBlock(FScratch, Left, FItems, Dest, LeftCount);
-  end;
+  FinishMergeFromLeft(Left, LeftCount, Right, RightCount, Dest);
 end;
 
 // The mirror image of MergeFromLeft for a first run that is longer than the second: the second is copied aside and the merge
@@ -659,17 +634,9 @@ begin
   Dec(Dest);
   Dec(Left);
   Dec(LeftCount);
-  if LeftCount = 0 then
+  if (LeftCount = 0) or (RightCount = 1) then
   begin
-    MoveBlock(FScratch, 0, FItems, Dest - (RightCount - 1), RightCount);
-    Exit;
-  end;
-  if RightCount = 1 then
-  begin
-    Dec(Dest, LeftCount);
-    Dec(Left, LeftCount);
-    MoveBlock(FItems, Left + 1, FItems, Dest + 1, LeftCount);
-    FItems[Dest] := FScratch[Right];
+    FinishMergeFromRight(Left, LeftCount, RightCount, Dest);
     Exit;
   end;
 
@@ -708,10 +675,11 @@ begin
           Break;
         end;
       end;
-    until (LeftWins or RightWins) >= Threshold;
+    until Max(LeftWins, RightWins) >= Threshold;
 
     if not Finished then
     begin
+      var Rounds := 0;
       repeat
         LeftWins := LeftCount - GallopAfter(FScratch[Right], Start1, LeftCount, LeftCount - 1, FItems);
         if LeftWins <> 0 then
@@ -760,9 +728,11 @@ begin
           Finished := True;
           Break;
         end;
-        Dec(Threshold);
+        Inc(Rounds);
       until (LeftWins < InitialGallopThreshold) and (RightWins < InitialGallopThreshold);
 
+      // Every round of galloping lowers the number of wins in a row after which the next steps gallop; leaving the galloping costs two
+      Dec(Threshold, Rounds);
       if not Finished then
       begin
         Threshold := Max(Threshold, 0) + 2;
@@ -770,22 +740,7 @@ begin
     end;
   end;
   StoreGallopThreshold(Threshold);
-
-  if RightCount = 1 then
-  begin
-    Dec(Dest, LeftCount);
-    Dec(Left, LeftCount);
-    MoveBlock(FItems, Left + 1, FItems, Dest + 1, LeftCount);
-    FItems[Dest] := FScratch[Right];
-  end
-  else if RightCount = 0 then
-  begin
-    RaiseContractViolation;
-  end
-  else
-  begin
-    MoveBlock(FScratch, 0, FItems, Dest - (RightCount - 1), RightCount);
-  end;
+  FinishMergeFromRight(Left, LeftCount, RightCount, Dest);
 end;
 
 end.
