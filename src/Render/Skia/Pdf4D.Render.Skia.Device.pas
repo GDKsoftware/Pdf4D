@@ -72,7 +72,8 @@ implementation
 
 uses
   Pdf4D.Common.FloatGuard,
-  Pdf4D.Render.Skia.Convert;
+  Pdf4D.Render.Skia.Convert,
+  Pdf4D.Render.StrokeNormalizer;
 
 const
   MaxChannel = 255;
@@ -261,8 +262,14 @@ begin
 
   for var Item in Chain do
   begin
-    FCanvas.SetMatrix(TPdfSkiaConvert.Matrix(Item.Transform));
-    FCanvas.ClipPath(TPdfSkiaConvert.Path(Item.Path, Item.FillRule), TSkClipOp.Intersect, False);
+    // Java2D moves the vertices of a clip before it takes the pixels, so the path goes to the canvas in device pixels
+    const Snapped = TPdfStrokeNormalizer.SnapForClip(Item.Path, Item.Transform);
+    try
+      FCanvas.SetMatrix(TMatrix.Identity);
+      FCanvas.ClipPath(TPdfSkiaConvert.Path(Snapped, Item.FillRule), TSkClipOp.Intersect, False);
+    finally
+      Snapped.Free;
+    end;
   end;
 end;
 

@@ -1,2 +1,0 @@
-# page <n> [<platform>] # <reason>
-page 1 # 150 DPI only (72 DPI equals): edges of shapes are one pixel off at the scale 150/72. The same rounding as in generated/render/colors-device.pdf (Single device matrix against the double matrix of PDFBox) is the likely cause but is not isolated for this page (Task 29: find the cause per page, fix it or rule it a deviation)

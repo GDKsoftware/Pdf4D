@@ -39,6 +39,11 @@ type
     [Test]
     procedure TestDevicePointJustBelowAPixelBoundaryStaysBelow;
 
+    // The translation of the page matrix is a double in Java2D and a Single here; what the Single lost is passed as a residual, so that
+    // a point at 24.999999 pixels is not rounded up to the pixel boundary by the matrix
+    [Test]
+    procedure TestTranslationResidualDecidesThePixel;
+
     [Test]
     procedure TestCubicControlPointsMoveWithTheEndPoints;
 
@@ -53,6 +58,22 @@ type
 
     [Test]
     procedure TestSourceIsNotChanged;
+
+    // The clip of Java2D: a vertex at device x moves to floor(x + 0.25) + 0.25 and pixels are taken by their centre, so an edge acts as if
+    // it lay at floor(x + 0.25). The result is in device pixels.
+    [Test]
+    [TestCase('Below', '10.2,10.25')]
+    [TestCase('JustBelowThreshold', '10.7,10.25')]
+    [TestCase('AtThreshold', '10.75,11.25')]
+    [TestCase('Above', '10.9,11.25')]
+    [TestCase('Negative', '-0.3,-0.75')]
+    procedure TestClipVertexMovesToFloorPlusQuarter(const Value, Expected: Single);
+
+    [Test]
+    procedure TestClipPathIsSnappedInDeviceSpaceAndReturnedThere;
+
+    [Test]
+    procedure TestClipCurveControlPointsMoveWithTheEndPoints;
   end;
 
 implementation
@@ -69,6 +90,66 @@ begin
 
   Assert.AreEqual(ExpectedX, Point.X, Tolerance, 'x of point ' + IntToStr(Index));
   Assert.AreEqual(ExpectedY, Point.Y, Tolerance, 'y of point ' + IntToStr(Index));
+end;
+
+procedure TStrokeNormalizerTests.TestClipVertexMovesToFloorPlusQuarter(const Value, Expected: Single);
+begin
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(Value, Value);
+
+    const Snapped = TPdfStrokeNormalizer.SnapForClip(Path, TPdfMatrix.Identity);
+    try
+      AssertPoint(Snapped, 0, Expected, Expected);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestClipPathIsSnappedInDeviceSpaceAndReturnedThere;
+begin
+  const Path = TPdfPath.Create;
+  try
+    // Device x = 2 * x + 1: 5.1 is 11.2 and becomes 11.25; y = 400 - y: 100 is 300 and becomes 300.25
+    Path.MoveTo(5.1, 100);
+    Path.LineTo(6.4, 99);
+
+    const Snapped = TPdfStrokeNormalizer.SnapForClip(Path, TPdfMatrix.Create(2, 0, 0, -1, 1, 400));
+    try
+      AssertPoint(Snapped, 0, 11.25, 300.25);
+      // 6.4 is 13.8 and becomes 14.25; 99 is 301 and becomes 301.25
+      AssertPoint(Snapped, 1, 14.25, 301.25);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestClipCurveControlPointsMoveWithTheEndPoints;
+begin
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(0.5, 0.5);
+    Path.CubicTo(2, 2, 3, 3, 4.9, 4.9);
+
+    // The first end point moves by -0.25 + 0.25 - 0.5 = 0 (0.5 becomes 0.25: -0.25); the last by 5.25 - 4.9 = 0.35
+    const Snapped = TPdfStrokeNormalizer.SnapForClip(Path, TPdfMatrix.Identity);
+    try
+      AssertPoint(Snapped, 0, 0.25, 0.25);
+      AssertPoint(Snapped, 1, 1.75, 1.75);
+      AssertPoint(Snapped, 2, 3.35, 3.35);
+      AssertPoint(Snapped, 3, 5.25, 5.25);
+    finally
+      Snapped.Free;
+    end;
+  finally
+    Path.Free;
+  end;
 end;
 
 procedure TStrokeNormalizerTests.TestLineEndsMoveToPixelCentres;
@@ -138,6 +219,27 @@ begin
       AssertPoint(Normalized, 0, 24.5 / Scale, 24.5 / Scale);
     finally
       Normalized.Free;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestTranslationResidualDecidesThePixel;
+begin
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(0, 0);
+
+    // The matrix has 25 as its translation, the exact one is 25 - 0.000001
+    const Plain = TPdfStrokeNormalizer.Normalize(Path, TPdfMatrix.Create(1, 0, 0, 1, 25, 25));
+    const Exact = TPdfStrokeNormalizer.Normalize(Path, TPdfMatrix.Create(1, 0, 0, 1, 25, 25), -0.000001, -0.000001);
+    try
+      AssertPoint(Plain, 0, 0.5, 0.5);
+      AssertPoint(Exact, 0, -0.5, -0.5);
+    finally
+      Plain.Free;
+      Exact.Free;
     end;
   finally
     Path.Free;

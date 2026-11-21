@@ -52,6 +52,13 @@ type
 
     [Test]
     procedure TestHugeScaleGivesFiniteMatrixAndLimitedSize;
+
+    // PDFBox keeps the translation of the page matrix in double precision: the Single translation and the residual make up that value
+    [Test]
+    procedure TestTranslationResidualHoldsWhatTheSingleLost;
+
+    [Test]
+    procedure TestTranslationResidualIsZeroWhenTheSingleIsExact;
   end;
 
 implementation
@@ -84,6 +91,26 @@ end;
 procedure TPdfPageTransformTests.AssertMapping(const Transform: TPdfPageTransform; const PageX, PageY, DeviceX, DeviceY: Single);
 begin
   AssertPoint(DeviceX, DeviceY, Transform.PageToDevice.TransformPoint(PageX, PageY));
+end;
+
+procedure TPdfPageTransformTests.TestTranslationResidualHoldsWhatTheSingleLost;
+begin
+  const Scale: Single = 150 / 72;
+  const Transform = TPdfPageTransform.Create(Box(0, 0, 400, 400), 0, Scale);
+
+  // The y translation is the height times the scale: 833.33330154 in double precision
+  const Exact: Double = Double(400) * Double(Scale);
+  Assert.AreEqual(Exact, Double(Transform.PageToDevice.TranslateY) + Transform.TranslationResidualY, 1E-12);
+  Assert.IsTrue(Transform.TranslationResidualY <> 0, 'the Single of 833.33330154 is not exact');
+  Assert.AreEqual(Double(0), Transform.TranslationResidualX, 1E-12);
+end;
+
+procedure TPdfPageTransformTests.TestTranslationResidualIsZeroWhenTheSingleIsExact;
+begin
+  const Transform = TPdfPageTransform.Create(Box(0, 0, 612, 792), 0, 1);
+
+  Assert.AreEqual(Double(0), Transform.TranslationResidualX, 1E-12);
+  Assert.AreEqual(Double(0), Transform.TranslationResidualY, 1E-12);
 end;
 
 procedure TPdfPageTransformTests.TestLetterAtScaleOne;

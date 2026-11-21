@@ -1,2 +1,0 @@
-# page <n> [<platform>] # <reason>
-page 1 # Task 29: Java2D cuts the clip of the appearance /BBox at the pixel boundary floor(edge + 0.25), Skia at the nearest one, so a 1 pixel border line that lies on the edge of the box is clipped away (the bottom border of the two lower fields) in PDFBox and is drawn here; the remaining differences are glyph anti-aliasing noise, which is over MaxFlatDifferentFraction because the page has so little ink

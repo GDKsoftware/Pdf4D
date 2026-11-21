@@ -111,6 +111,10 @@ type
     [Test]
     procedure TestClipIsNotAntiAliased;
 
+    // Java2D puts a clip edge at floor(x + 0.25), where Skia alone would take the nearest pixel boundary
+    [Test]
+    procedure TestClipEdgeFollowsJava2D;
+
     [Test]
     procedure TestClipChainIntersects;
 
@@ -623,6 +627,21 @@ begin
   Assert.IsFalse(HasPartialAlpha, 'The clip edge must not produce partial alpha');
   Assert.AreEqual(255, Integer(FSnapshot.GetPixel(5, 5).A));
   Assert.AreEqual(0, Integer(FSnapshot.GetPixel(1, 1).A));
+end;
+
+procedure TPdfSkiaDeviceTests.TestClipEdgeFollowsJava2D;
+begin
+  // The left edge 2.6 acts as 2 (floor(2.85)), the right edge 7.6 as 7 (floor(7.85)); the nearest boundaries would be 3 and 8
+  FDevice.SetClip(NewClip(nil, 2.6, 2.6, 7.6, 7.6));
+
+  FillWholeDevice(Red, NoAntiAlias);
+
+  AssertPixel(2, 2, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(6, 6, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(1, 5);
+  AssertTransparent(7, 5);
+  AssertTransparent(5, 7);
+  AssertTransparent(5, 1);
 end;
 
 procedure TPdfSkiaDeviceTests.TestClipChainIntersects;

@@ -75,6 +75,9 @@ type
     FParams: TPdfRenderParams;
     // xform of PageDrawer, with the offset of the region: page space to device pixels
     FPageToDevice: TPdfMatrix;
+    // What the Single translation of FPageToDevice lacks of the double one that PDFBox has; only the stroke normalization needs it
+    FTranslationResidualX: Double;
+    FTranslationResidualY: Double;
     // Of the matrix of the page without the offset of the region, as xformScalingFactorX
     FScalingFactorX: Single;
     FScalingFactorY: Single;
@@ -388,6 +391,8 @@ begin
   // The device shows the region: its pixel (0, 0) is the top left pixel of the region
   FPageToDevice := TPdfMatrix.Create(Whole.ScaleX, Whole.ShearY, Whole.ShearX, Whole.ScaleY, Whole.TranslateX - Params.Region.Left,
                                      Whole.TranslateY - Params.Region.Top);
+  FTranslationResidualX := Double(Whole.TranslateX) + Transform.TranslationResidualX - Params.Region.Left - Double(FPageToDevice.TranslateX);
+  FTranslationResidualY := Double(Whole.TranslateY) + Transform.TranslationResidualY - Params.Region.Top - Double(FPageToDevice.TranslateY);
   FScalingFactorX := Abs(Whole.ScalingFactorX);
   FScalingFactorY := Abs(Whole.ScalingFactorY);
 end;
@@ -1047,11 +1052,15 @@ begin
 
   const SavedDevice = FDevice;
   const SavedMatrix = FPageToDevice;
+  const SavedResidualX = FTranslationResidualX;
+  const SavedResidualY = FTranslationResidualY;
   const SavedLinePath = FLinePath;
   const SavedTextClip = FTextClip;
   const SavedLastClip = FLastClip;
   FDevice := Layer;
   FPageToDevice := LayerTransform;
+  FTranslationResidualX := 0;
+  FTranslationResidualY := 0;
   FLinePath := TPdfPath.Create;
   FTextClip := TPdfPath.Create;
   FLastClip := nil;
@@ -1066,6 +1075,8 @@ begin
     FLinePath := SavedLinePath;
     FDevice := SavedDevice;
     FPageToDevice := SavedMatrix;
+    FTranslationResidualX := SavedResidualX;
+    FTranslationResidualY := SavedResidualY;
     FLastClip := SavedLastClip;
   end;
 end;
@@ -1357,7 +1368,7 @@ end;
 // Java2D normalizes the geometry of a stroke, see TPdfStrokeNormalizer
 procedure TPdfPageDrawer.DrawStroke(const Path: TPdfPath; const Stroke: TPdfStrokeStyle; const Paint: TPdfPaint);
 begin
-  const Normalized = TPdfStrokeNormalizer.Normalize(Path, FPageToDevice);
+  const Normalized = TPdfStrokeNormalizer.Normalize(Path, FPageToDevice, FTranslationResidualX, FTranslationResidualY);
   try
     FDevice.StrokePath(Normalized, FPageToDevice, Stroke, Paint, StrokingComposite);
   finally
@@ -2237,10 +2248,14 @@ procedure TPdfPageDrawer.RunGroupContent(const Form: TPDFormXObject; const Group
 begin
   const SavedDevice = FDevice;
   const SavedMatrix = FPageToDevice;
+  const SavedResidualX = FTranslationResidualX;
+  const SavedResidualY = FTranslationResidualY;
   const SavedLinePath = FLinePath;
   const SavedTextClip = FTextClip;
   FDevice := GroupDevice;
   FPageToDevice := SavedMatrix.Multiply(TPdfMatrix.GetTranslateInstance(-Bounds.Left, -Bounds.Top));
+  FTranslationResidualX := Double(SavedMatrix.TranslateX) + SavedResidualX - Bounds.Left - Double(FPageToDevice.TranslateX);
+  FTranslationResidualY := Double(SavedMatrix.TranslateY) + SavedResidualY - Bounds.Top - Double(FPageToDevice.TranslateY);
   FLinePath := TPdfPath.Create;
   FTextClip := TPdfPath.Create;
   FLastClip := nil;
@@ -2253,6 +2268,8 @@ begin
     FLinePath := SavedLinePath;
     FDevice := SavedDevice;
     FPageToDevice := SavedMatrix;
+    FTranslationResidualX := SavedResidualX;
+    FTranslationResidualY := SavedResidualY;
     FLastClip := nil;
   end;
 end;

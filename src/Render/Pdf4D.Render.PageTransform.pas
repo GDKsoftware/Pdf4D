@@ -21,6 +21,10 @@ type
     Size: TSize;
     // Page user space (points, origin lower left, no rotation, absolute) to pixels of the whole page
     PageToDevice: TPdfMatrix;
+    // PDFBox works with a double matrix, whose translation is not a Single (the height of the page times the scale): the translation of
+    // PageToDevice plus these is that double value, as far as it is finite. Zero when the Single holds the value.
+    TranslationResidualX: Double;
+    TranslationResidualY: Double;
 
     // Rotation is a multiple of 90, negative values and values beyond 360 included; anything else raises EArgumentException.
     // A scale that makes the page larger than the range of Integer gives the largest size; the matrix stays finite.
@@ -65,6 +69,17 @@ begin
     Exit(0);
   end;
   Result := Single(Min(Max(Value, -LargestMatrixValue), LargestMatrixValue));
+end;
+
+// What the Single leaves of the exact value; nothing when the value does not fit a Single
+function ResidualOf(const Exact: Double; const Rounded: Single): Double;
+begin
+  const IsExactFinite = (not IsNan(Exact)) and (Abs(Exact) <= LargestMatrixValue);
+  if not IsExactFinite then
+  begin
+    Exit(0);
+  end;
+  Result := Exact - Double(Rounded);
 end;
 
 { TPdfPageTransform }
@@ -139,8 +154,12 @@ begin
   end;
 
   const Factor: Double = Scale;
+  Result.TranslationResidualX := 0;
+  Result.TranslationResidualY := 0;
   Result.PageToDevice := TPdfMatrix.Create(ClampToMatrixValue(A * Factor), ClampToMatrixValue(B * Factor), ClampToMatrixValue(C * Factor),
                                            ClampToMatrixValue(D * Factor), ClampToMatrixValue(E * Factor), ClampToMatrixValue(F * Factor));
+  Result.TranslationResidualX := ResidualOf(E * Factor, Result.PageToDevice.TranslateX);
+  Result.TranslationResidualY := ResidualOf(F * Factor, Result.PageToDevice.TranslateY);
 end;
 
 function TPdfPageTransform.DeviceToPage(const Point: TPointF): TPointF;
