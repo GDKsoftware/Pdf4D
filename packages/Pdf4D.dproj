@@ -227,6 +227,8 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Outline.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.OutlineItem.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Annotation.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.OptionalContent.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageLabels.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Rectangle.pas"/>

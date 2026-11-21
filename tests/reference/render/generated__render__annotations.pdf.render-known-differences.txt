@@ -1,0 +1,4 @@
+# page <n> [<platform>] # <reason>
+page 1 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (Task 25, the plan's Kernbeslissing on annotations)
+page 2 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (Task 25, the plan's Kernbeslissing on annotations)
+page 3 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (Task 25, the plan's Kernbeslissing on annotations)

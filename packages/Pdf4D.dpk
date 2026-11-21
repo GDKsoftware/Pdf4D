@@ -178,6 +178,8 @@ contains
   Pdf4D.Model.Outline in '..\src\Model\Pdf4D.Model.Outline.pas',
   Pdf4D.Model.OutlineItem in '..\src\Model\Pdf4D.Model.OutlineItem.pas',
   Pdf4D.Model.Page in '..\src\Model\Pdf4D.Model.Page.pas',
+  Pdf4D.Model.Annotation in '..\src\Model\Pdf4D.Model.Annotation.pas',
+  Pdf4D.Model.OptionalContent in '..\src\Model\Pdf4D.Model.OptionalContent.pas',
   Pdf4D.Model.PageLabels in '..\src\Model\Pdf4D.Model.PageLabels.pas',
   Pdf4D.Model.PageTree in '..\src\Model\Pdf4D.Model.PageTree.pas',
   Pdf4D.Model.Rectangle in '..\src\Model\Pdf4D.Model.Rectangle.pas',

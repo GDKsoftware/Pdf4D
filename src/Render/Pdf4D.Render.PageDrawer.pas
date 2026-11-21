@@ -10,6 +10,9 @@
 // getPaint with drawTilingPattern (the cell is made by Pdf4D.Render.TilingPaint, which ports TilingPaint and TilingPaintFactory).
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/contentstream/PDFStreamEngine.java (3.0.8), transformWidth, clipToRect, showGlyph,
 // showType3Glyph and processTilingPattern
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/rendering/PageDrawer.java (3.0.8), the optional content and annotation part: the nested count of
+// hidden marked content (beginMarkedContentSequence, endMarkedContentSequence, isContentRendered), /OC of images and forms, showAnnotation and
+// shouldSkipAnnotation, and the annotation loop of drawPage; the decisions about optional content are made by Pdf4D.Render.OptionalContent
 unit Pdf4D.Render.PageDrawer;
 
 {$EXCESSPRECISION OFF}
@@ -31,13 +34,16 @@ uses
   Pdf4D.Graphics.Pattern,
   Pdf4D.Graphics.Shading,
   Pdf4D.Graphics.SoftMask,
+  Pdf4D.Model.Annotation,
   Pdf4D.Model.FormXObject,
+  Pdf4D.Model.OptionalContent,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.GraphicsEngine,
   Pdf4D.Render.GroupDevice,
+  Pdf4D.Render.OptionalContent,
   Pdf4D.Render.Renderer,
   Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Render.TilingPaint;
@@ -102,7 +108,19 @@ type
     FHasLoggedPatternDepth: Boolean;
     // The warnings of the tiling paint that are in the log, so that a pattern that is used on every glyph gives one line
     FLoggedTilingWarnings: TDictionary<string, Boolean>;
+    FVisibility: TPdfOptionalContentVisibility;
+    // PageDrawer.nestedHiddenOCGCount: the depth of the marked-content sequences inside the first one that is hidden, 0 when content is shown
+    FHiddenDepth: Integer;
+    // While the annotation of a rotated page is drawn against the rotation (NoRotate), FPageToDevice holds that rotation
+    FIsAnnotationTurned: Boolean;
 
+    function IsContentRendered: Boolean;
+    function IsFormHidden(const Form: TPDFormXObject): Boolean;
+    function IsImageHidden(const Image: TPDImage): Boolean;
+    function ShouldSkipAnnotation(const Annotation: TPDAnnotation): Boolean;
+    procedure ShowTurnedAnnotation(const Annotation: TPDAnnotation);
+    procedure DrawAnnotations;
+    function TryShowAnnotation(const Annotation: TPDAnnotation): Boolean;
     function TransformWidth(const Width: Single): Single;
     function PlainNonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
     function NonStrokingComposite(const IsAntiAliased: Boolean): TPdfComposite;
@@ -181,6 +199,7 @@ type
     function CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState; override;
     function StopRequested: Boolean; override;
     procedure ClipToRect(const Rect: TPdfRectangle); override;
+    function CreateAnnotationGraphicsState: TPDGraphicsState; override;
 
   public
     // Device is drawn on without being cleared. The region of Params must be valid already, the renderer checks the arguments.
@@ -218,6 +237,10 @@ type
     procedure ShadingFill(const ShadingName: string); override;
     procedure DrawImage(const Image: TPDImage); override;
     procedure ShowTransparencyGroup(const Form: TPDFormXObject); override;
+    procedure ShowForm(const Form: TPDFormXObject); override;
+    procedure ShowAnnotation(const Annotation: TPDAnnotation); override;
+    procedure BeginMarkedContentSequence(const Tag: string; const Properties: TCosDictionary); override;
+    procedure EndMarkedContentSequence; override;
 
     property Renderer: TPdfRenderer read FRenderer;
     property Page: TPDPage read FPage;
@@ -261,6 +284,11 @@ const
   ImageDownscalingThreshold = 0.5;
   CodeShift = 48;
   CodeMask = $FFFF;
+  // A page turns by quarters; the rotation of a turned annotation is exact for those, as AffineTransform.rotate is
+  QuarterTurn = 90;
+  QuarterTurnCount = 4;
+  QuarterCosine: array[0..QuarterTurnCount - 1] of Single = (1, 0, -1, 0);
+  QuarterSine: array[0..QuarterTurnCount - 1] of Single = (0, 1, 0, -1);
 
 // processSoftMask: the text matrices are new, and the colours are the initial colour of DeviceGray (black) for stroking and not stroking
 procedure StartWithBlackDeviceGray(const State: TPdfRenderGraphicsState);
@@ -344,6 +372,13 @@ begin
   FLoggedTilingWarnings := TDictionary<string, Boolean>.Create;
   FTilingPaints := TPdfTilingPaintFactory.Create(TPdfPageDrawerTilingHost.Create(Self));
 
+  var Properties: TPDOptionalContentProperties := nil;
+  if not Renderer.TryGetOptionalContentProperties(Properties) then
+  begin
+    Properties := nil;
+  end;
+  FVisibility := TPdfOptionalContentVisibility.Create(Properties, Params.Options.Destination, Page.Context.Log);
+
   const Transform = TPdfPageTransform.Create(Page.CropBox, Page.Rotation + Params.ExtraRotation, Params.Scale);
   const Whole = Transform.PageToDevice;
   // The device shows the region: its pixel (0, 0) is the top left pixel of the region
@@ -355,6 +390,7 @@ end;
 
 destructor TPdfPageDrawer.Destroy;
 begin
+  FVisibility.Free;
   FTilingPaints.Free;
   FLoggedTilingWarnings.Free;
   FTilingPatterns.Free;
@@ -370,6 +406,178 @@ end;
 procedure TPdfPageDrawer.DrawPage;
 begin
   ProcessPage(FPage);
+  if FParams.Options.RenderAnnotations and (not StopRequested) then
+  begin
+    DrawAnnotations;
+  end;
+end;
+
+// Where PDFBox raises, the annotation is skipped and the next one drawn; a budget that is used up or a stop ends the annotations
+function TPdfPageDrawer.TryShowAnnotation(const Annotation: TPDAnnotation): Boolean;
+begin
+  Result := True;
+  try
+    ShowAnnotation(Annotation);
+  except
+    on Failure: EPdfLimitExceededException do
+    begin
+      if not StopRequested then
+      begin
+        LogError('The annotations are not drawn any further: %s', [Failure.Message]);
+      end;
+      Result := False;
+    end;
+    on Failure: EPdfException do
+    begin
+      LogError('An annotation is skipped: %s', [Failure.Message]);
+    end;
+    on Failure: Exception do
+    begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        raise;
+      end;
+      LogError('An annotation is skipped: %s: %s', [Failure.ClassName, Failure.Message]);
+    end;
+  end;
+end;
+
+procedure TPdfPageDrawer.DrawAnnotations;
+begin
+  const Count = FPage.AnnotationCount;
+  if Count > DefaultMaxAnnotations then
+  begin
+    LogWarning('The page has %d annotations, only the first %d are drawn', [Count, DefaultMaxAnnotations]);
+  end;
+
+  const Annotations = FPage.Annotations(DefaultMaxAnnotations);
+  try
+    for var Annotation in Annotations do
+    begin
+      if not TryShowAnnotation(Annotation) then
+      begin
+        Break;
+      end;
+    end;
+  finally
+    Annotations.Free;
+  end;
+end;
+
+function TPdfPageDrawer.ShouldSkipAnnotation(const Annotation: TPDAnnotation): Boolean;
+begin
+  const Destination = FParams.Options.Destination;
+  const IsNotPrinted = ((Destination = TPdfRenderDestination.Print) and (not Annotation.IsPrinted));
+  const IsNotViewed = ((Destination in [TPdfRenderDestination.View, TPdfRenderDestination.Export]) and Annotation.IsNoView);
+  // The invisible flag only counts for a type of annotation that is not one of the standard types (and has no handler)
+  const IsInvisibleUnknown = (Annotation.IsInvisible and (not Annotation.IsKnownType));
+  var OptionalContent: TCosDictionary;
+  const IsHiddenContent = (Annotation.TryGetOptionalContent(OptionalContent) and FVisibility.IsHidden(OptionalContent));
+  Result := (IsNotPrinted or IsNotViewed or Annotation.IsHidden or IsInvisibleUnknown or IsHiddenContent);
+end;
+
+// PDFBOX-4744 avoids the appearances with transparency groups of a turned annotation by constructing a new appearance, which is not ported
+procedure TPdfPageDrawer.ShowAnnotation(const Annotation: TPDAnnotation);
+begin
+  FLastClip := nil;
+  if ShouldSkipAnnotation(Annotation) then
+  begin
+    Exit;
+  end;
+
+  const IsTurned = (Annotation.IsNoRotate and (FPage.Rotation <> 0) and Annotation.HasRect);
+  if IsTurned then
+  begin
+    ShowTurnedAnnotation(Annotation);
+  end
+  else
+  begin
+    inherited ShowAnnotation(Annotation);
+  end;
+end;
+
+// NoRotate: the upper left corner of the annotation stays at the same point in the page and the annotation pivots around it, against
+// the rotation of the page. Graphics2D.rotate does that with the transform of the device, so clips made meanwhile turn with it.
+procedure TPdfPageDrawer.ShowTurnedAnnotation(const Annotation: TPDAnnotation);
+begin
+  const Rect = Annotation.Rect;
+  const Quarter = (FPage.Rotation div QuarterTurn) mod QuarterTurnCount;
+  const Turn = TPdfMatrix.Create(QuarterCosine[Quarter], QuarterSine[Quarter], -QuarterSine[Quarter], QuarterCosine[Quarter], 0, 0);
+  var Local := TPdfMatrix.GetTranslateInstance(-Rect.LowerLeftX, -Rect.UpperRightY);
+  Local := Local.Multiply(Turn).Multiply(TPdfMatrix.GetTranslateInstance(Rect.LowerLeftX, Rect.UpperRightY));
+
+  const SavedPageToDevice = FPageToDevice;
+  FPageToDevice := Local.Multiply(SavedPageToDevice);
+  FIsAnnotationTurned := True;
+  FLastClip := nil;
+  try
+    inherited ShowAnnotation(Annotation);
+  finally
+    FIsAnnotationTurned := False;
+    FPageToDevice := SavedPageToDevice;
+    FLastClip := nil;
+  end;
+end;
+
+function TPdfPageDrawer.CreateAnnotationGraphicsState: TPDGraphicsState;
+begin
+  if FIsAnnotationTurned then
+  begin
+    // The clip of the page is made again, with the turned matrix
+    Result := CreateInitialGraphicsState(FPage);
+  end
+  else
+  begin
+    Result := inherited CreateAnnotationGraphicsState;
+  end;
+end;
+
+function TPdfPageDrawer.IsContentRendered: Boolean;
+begin
+  Result := (FHiddenDepth <= 0);
+end;
+
+function TPdfPageDrawer.IsFormHidden(const Form: TPDFormXObject): Boolean;
+begin
+  var OptionalContent: TCosDictionary;
+  Result := (Form.TryGetOptionalContent(OptionalContent) and FVisibility.IsHidden(OptionalContent));
+end;
+
+function TPdfPageDrawer.IsImageHidden(const Image: TPDImage): Boolean;
+begin
+  var OptionalContent: TCosDictionary;
+  Result := ((Image is TPDImageXObject) and TPDImageXObject(Image).TryGetOptionalContent(OptionalContent) and FVisibility.IsHidden(OptionalContent));
+end;
+
+procedure TPdfPageDrawer.BeginMarkedContentSequence(const Tag: string; const Properties: TCosDictionary);
+begin
+  if FHiddenDepth > 0 then
+  begin
+    Inc(FHiddenDepth);
+    Exit;
+  end;
+
+  if Assigned(Properties) and FVisibility.IsHidden(Properties) then
+  begin
+    FHiddenDepth := 1;
+  end;
+end;
+
+procedure TPdfPageDrawer.EndMarkedContentSequence;
+begin
+  if FHiddenDepth > 0 then
+  begin
+    Dec(FHiddenDepth);
+  end;
+end;
+
+procedure TPdfPageDrawer.ShowForm(const Form: TPDFormXObject);
+begin
+  if IsFormHidden(Form) or (not IsContentRendered) then
+  begin
+    Exit;
+  end;
+  inherited ShowForm(Form);
 end;
 
 // PDGraphicsState(PDRectangle) makes the crop box the first clipping path
@@ -1105,7 +1313,7 @@ end;
 
 procedure TPdfPageDrawer.PaintFill(const Path: TPdfPath; const FillRule: TPdfFillRule);
 begin
-  if Path.IsEmpty or IsPoint(Path) then
+  if (not IsContentRendered) or Path.IsEmpty or IsPoint(Path) then
   begin
     Exit;
   end;
@@ -1121,7 +1329,7 @@ end;
 procedure TPdfPageDrawer.PaintStroke(const Path: TPdfPath);
 begin
   var Stroke: TPdfStrokeStyle;
-  if (not HasSegments(Path)) or (not TryBuildStroke(Stroke)) then
+  if (not IsContentRendered) or (not HasSegments(Path)) or (not TryBuildStroke(Stroke)) then
   begin
     Exit;
   end;
@@ -1172,6 +1380,11 @@ end;
 // the box, or without one the clip; the clip of the device cuts the box where PDFBox intersects the two Areas.
 procedure TPdfPageDrawer.ShadingFill(const ShadingName: string);
 begin
+  if not IsContentRendered then
+  begin
+    Exit;
+  end;
+
   var Value: TCosBase;
   if not Resources.TryGetShading(ShadingName, Value) then
   begin
@@ -1455,13 +1668,14 @@ begin
   end;
 
   const Mode = RenderState.TextState.RenderingMode;
-  if Mode.IsFill and (not GlyphPath.IsEmpty) then
+  const IsRendered = IsContentRendered;
+  if IsRendered and Mode.IsFill and (not GlyphPath.IsEmpty) then
   begin
     FillWithColor(GlyphPath, TPdfFillRule.NonZero, RenderState.NonStrokingColor, True);
   end;
 
   var Stroke: TPdfStrokeStyle;
-  if Mode.IsStroke and HasSegments(GlyphPath) and TryBuildStroke(Stroke) then
+  if IsRendered and Mode.IsStroke and HasSegments(GlyphPath) and TryBuildStroke(Stroke) then
   begin
     StrokeWithColor(GlyphPath, Stroke, RenderState.StrokingColor);
   end;
@@ -1690,6 +1904,11 @@ end;
 
 procedure TPdfPageDrawer.DrawImage(const Image: TPDImage);
 begin
+  if IsImageHidden(Image) or (not IsContentRendered) then
+  begin
+    Exit;
+  end;
+
   if Image.IsStencil then
   begin
     DrawStencil(Image);
@@ -1713,6 +1932,11 @@ end;
 // showTransparencyGroup, with the depth limit of the options
 procedure TPdfPageDrawer.ShowTransparencyGroup(const Form: TPDFormXObject);
 begin
+  if IsFormHidden(Form) or (not IsContentRendered) then
+  begin
+    Exit;
+  end;
+
   if FGroupDepth >= Max(FParams.Options.MaxTransparencyGroupDepth, 1) then
   begin
     if not FHasLoggedGroupDepth then

@@ -121,6 +121,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.State.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Options.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.OptionalContent.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageTransform.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.pas"/>

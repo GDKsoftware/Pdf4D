@@ -13,6 +13,7 @@ uses
   System.Types,
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Model.Document,
+  Pdf4D.Model.OptionalContent,
   Pdf4D.Model.Page,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
@@ -47,6 +48,8 @@ type
     destructor Destroy; override;
 
     function Backend: IPdfRenderBackend;
+    // The optional content configuration of the document (PDFRenderer.isGroupEnabled asks it); False when there is none
+    function TryGetOptionalContentProperties(out Properties: TPDOptionalContentProperties): Boolean;
     function PageTransform(const PageIndex: Integer; const Scale: Single; const ExtraRotation: Integer = 0): TPdfPageTransform;
     function RenderPage(const PageIndex: Integer; const Device: IPdfGraphicsDevice; const Params: TPdfRenderParams): TPdfRenderStatus;
     function RenderToBitmap(const PageIndex: Integer; const Params: TPdfRenderParams; out Bitmap: TPdfBitmap): TPdfRenderStatus;
@@ -106,6 +109,11 @@ end;
 function TPdfRenderer.Backend: IPdfRenderBackend;
 begin
   Result := FBackend;
+end;
+
+function TPdfRenderer.TryGetOptionalContentProperties(out Properties: TPDOptionalContentProperties): Boolean;
+begin
+  Result := FModel.Catalog.TryGetOptionalContentProperties(Properties);
 end;
 
 class procedure TPdfRenderer.CheckScaleAndRotation(const Scale: Single; const ExtraRotation: Integer);

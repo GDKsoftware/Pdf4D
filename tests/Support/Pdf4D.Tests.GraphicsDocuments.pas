@@ -18,6 +18,7 @@ type
   private
     FStreams: TObjectList<TBytesStream>;
     FLogLines: TList<string>;
+    FAllLogLines: TList<string>;
 
   public
     const PageSize = 200;
@@ -36,6 +37,8 @@ type
 
     // The warnings and errors that the documents opened by this object logged, as 'Warning: text'
     property LogLines: TList<string> read FLogLines;
+    // Every line that the documents logged, debug lines included, as 'Debug: text'
+    property AllLogLines: TList<string> read FAllLogLines;
   end;
 
 implementation
@@ -57,10 +60,12 @@ begin
   inherited Create;
   FStreams := TObjectList<TBytesStream>.Create(True);
   FLogLines := TList<string>.Create;
+  FAllLogLines := TList<string>.Create;
 end;
 
 destructor TGraphicsDocuments.Destroy;
 begin
+  FAllLogLines.Free;
   FLogLines.Free;
   FStreams.Free;
   inherited;
@@ -100,9 +105,11 @@ begin
   var Options := TPdfLoadOptions.Default;
   Options.OnLog := procedure(const Level: TPdfLogLevel; const Message: string)
     begin
+      const Line = Format('%s: %s', [LevelNames[Level], Message]);
+      FAllLogLines.Add(Line);
       if Level >= TPdfLogLevel.Warning then
       begin
-        FLogLines.Add(Format('%s: %s', [LevelNames[Level], Message]));
+        FLogLines.Add(Line);
       end;
     end;
   Result := TPdfDocument.Load(Stream, Options);

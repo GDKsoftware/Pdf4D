@@ -42,6 +42,8 @@ type
     function HasEmptyResources: Boolean;
     // /Group << /S /Transparency >>
     function IsTransparencyGroup: Boolean;
+    // PDFormXObject.getOptionalContent: /OC when it is a dictionary
+    function TryGetOptionalContent(out Value: TCosDictionary): Boolean;
     // PDTransparencyGroup.isIsolated, isKnockout and getColorSpace. False when the form has no /Group dictionary.
     function TryGetGroup(out Group: TPDTransparencyGroupAttributes): Boolean;
 
@@ -107,6 +109,15 @@ function TPDFormXObject.HasEmptyResources: Boolean;
 begin
   var Resources: TCosDictionary;
   Result := (FStream.ContainsKey(TCosNames.Resources) and not TryGetResources(Resources));
+end;
+
+function TPDFormXObject.TryGetOptionalContent(out Value: TCosDictionary): Boolean;
+begin
+  Result := FStream.TryGetCosDictionary(TCosNames.OC, Value);
+  if not Result then
+  begin
+    Value := nil;
+  end;
 end;
 
 function TPDFormXObject.IsTransparencyGroup: Boolean;

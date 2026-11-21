@@ -8,7 +8,9 @@ interface
 
 uses
   System.SysUtils,
+  System.Generics.Collections,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Model.Annotation,
   Pdf4D.Model.DocumentContext,
   Pdf4D.Model.Rectangle,
   Pdf4D.Model.Resources;
@@ -21,6 +23,12 @@ type
     Rectangle: TPdfRectangle;
   end;
 
+const
+  // The most annotations of a page that Annotations gives: a page has a few hundred at most, and an array of millions of references is
+  // no annotation list
+  DefaultMaxAnnotations = 10000;
+
+type
   // A page of the page tree, which owns it. It holds the page dictionary and does not own that.
   TPDPage = class
   private
@@ -65,6 +73,13 @@ type
     // Only the first MaxCount entries are read, so that a huge array costs no more than the limit
     function ThreadBeads(const MaxCount: Integer): TArray<TPDThreadBead>;
 
+    // The number of entries of /Annots, 0 when there is no array
+    function AnnotationCount: Integer;
+    // Port of PDPage.getAnnotations: the entries of /Annots that are dictionaries, in order, at most MaxCount of the entries (the
+    // others are not looked at). An entry that is no dictionary is left out, where PDFBox logs an error. The caller owns the list and the
+    // annotations in it.
+    function Annotations(const MaxCount: Integer = DefaultMaxAnnotations): TObjectList<TPDAnnotation>;
+
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
   end;
@@ -73,7 +88,6 @@ implementation
 
 uses
   System.Math,
-  System.Generics.Collections,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.Number,
@@ -259,6 +273,43 @@ begin
     begin
       Result[Index].Rectangle := TPdfRectangle.FromCosArray(Rectangle);
     end;
+  end;
+end;
+
+function TPDPage.AnnotationCount: Integer;
+begin
+  var Items: TCosArray;
+  if FDictionary.TryGetCosArray(TCosNames.Annots, Items) then
+  begin
+    Result := Items.Count;
+  end
+  else
+  begin
+    Result := 0;
+  end;
+end;
+
+function TPDPage.Annotations(const MaxCount: Integer): TObjectList<TPDAnnotation>;
+begin
+  Result := TObjectList<TPDAnnotation>.Create(True);
+  try
+    var Items: TCosArray;
+    if not FDictionary.TryGetCosArray(TCosNames.Annots, Items) then
+    begin
+      Exit;
+    end;
+
+    for var Index := 0 to Min(Items.Count, Max(MaxCount, 0)) - 1 do
+    begin
+      const Item = Items.GetObject(Index);
+      if Item is TCosDictionary then
+      begin
+        Result.Add(TPDAnnotation.Create(TCosDictionary(Item)));
+      end;
+    end;
+  except
+    Result.Free;
+    raise;
   end;
 end;
 

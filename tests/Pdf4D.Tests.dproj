@@ -223,6 +223,7 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.ImageScaler.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.OptionalContent.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.GraphicsDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Paths.Tests.pas"/>
@@ -247,6 +248,8 @@
         <DCCReference Include="Support\Pdf4D.Tests.PatternDocuments.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.TilingPaint.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Pattern.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.OptionalContent.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Pdf4D.Render.PageDrawer.Annotations.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Renderer.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
@@ -347,6 +350,8 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentContext.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Annotation.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.OptionalContent.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.MarkedContent.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.DocumentInformation.pas"/>
@@ -355,6 +360,8 @@
         <DCCReference Include="..\src\Model\Pdf4D.Model.Tests.Support.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.PageTree.Tests.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Page.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.Annotation.Tests.pas"/>
+        <DCCReference Include="..\src\Model\Pdf4D.Model.OptionalContent.Tests.pas"/>
         <DCCReference Include="..\src\Content\Pdf4D.Content.GraphicsState.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.Resources.pas"/>
         <DCCReference Include="..\src\Model\Pdf4D.Model.FormXObject.pas"/>

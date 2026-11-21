@@ -108,6 +108,8 @@ type
     destructor Destroy; override;
 
     function HasMaskOrSMask: Boolean; override;
+    // PDImageXObject.getOptionalContent: /OC when it is a dictionary
+    function TryGetOptionalContent(out Value: TCosDictionary): Boolean;
     function TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; override;
   end;
 
@@ -652,6 +654,15 @@ end;
 function TPDImageXObject.HasMaskOrSMask: Boolean;
 begin
   Result := (Parameters.ContainsKey(TCosNames.Mask) or Parameters.ContainsKey(TCosNames.SMask));
+end;
+
+function TPDImageXObject.TryGetOptionalContent(out Value: TCosDictionary): Boolean;
+begin
+  Result := Parameters.TryGetCosDictionary(TCosNames.OC, Value);
+  if not Result then
+  begin
+    Value := nil;
+  end;
 end;
 
 // extractMatte

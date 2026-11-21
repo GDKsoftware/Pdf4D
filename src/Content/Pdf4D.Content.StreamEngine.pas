@@ -20,6 +20,7 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.PdfArray,
   Pdf4D.Font.Base,
+  Pdf4D.Model.Annotation,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle,
@@ -139,6 +140,7 @@ type
 
     function IsVerticalFont(const Font: TPDFont): Boolean;
     function GetTextMatrixOrRaise: TPdfMatrix;
+    class function TryGetAnnotationMatrix(const Rect, BBox: TPdfRectangle; const Matrix: TPdfMatrix; out Mapping: TPdfMatrix): Boolean; static;
 
   protected
     // Called by ProcessPage after the page is set up, inside the floating point guard. A subclass prepares what it reads from
@@ -147,6 +149,8 @@ type
     // The graphics state at the bottom of the stack of a page, made by ProcessPage. A subclass with a state of its own
     // returns it here; it overrides TPDGraphicsState.Clone as well.
     function CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState; virtual;
+    // The state that the appearance of an annotation starts with, which the engine then owns: a copy of the current state by default
+    function CreateAnnotationGraphicsState: TPDGraphicsState; virtual;
     // Asked after every operator and before every content stream. True ends the page like a used up budget does, but
     // without a line in the log.
     function StopRequested: Boolean; virtual;
@@ -175,6 +179,12 @@ type
 
     procedure ShowTransparencyGroup(const Form: TPDFormXObject); virtual;
     procedure ShowForm(const Form: TPDFormXObject); virtual;
+    // PDFStreamEngine.showAnnotation: processes the normal appearance of Annotation. An annotation without /AP /N is skipped with a line
+    // in the log: PDFBox constructs an appearance for some of those (constructAppearances), which is not ported.
+    procedure ShowAnnotation(const Annotation: TPDAnnotation); virtual;
+    // PDFStreamEngine.processAnnotation: runs Appearance with the matrix that maps its box (after its /Matrix) on /Rect of the annotation as
+    // CTM, clipped to its /BBox. Nothing happens when the rectangle or the box is missing or has no area.
+    procedure ProcessAnnotation(const Annotation: TPDAnnotation; const Appearance: TCosStream);
 
     // Runs Content with Resources (nil: those of the running stream) on the recursion guard, the budgets and the cache of
     // decoded form content that a form uses. Level is left to the caller, as in PDFBox where the Do operator keeps it.
@@ -227,6 +237,7 @@ type
 
     procedure LogWarning(const Fmt: string; const Args: array of const);
     procedure LogError(const Fmt: string; const Args: array of const);
+    procedure LogDebug(const Fmt: string; const Args: array of const);
 
     // The resources of the stream that is being run (not owned)
     property Resources: TPDResources read FResources;
@@ -313,6 +324,14 @@ begin
   end;
 end;
 
+procedure TPdfStreamEngine.LogDebug(const Fmt: string; const Args: array of const);
+begin
+  if Assigned(FCurrentPage) and Assigned(FCurrentPage.Context.Log) then
+  begin
+    FCurrentPage.Context.Log.Debug(Fmt, Args);
+  end;
+end;
+
 procedure TPdfStreamEngine.InitPage(const Page: TPDPage);
 begin
   if not Assigned(Page) then
@@ -379,6 +398,11 @@ begin
   finally
     TPdfFloatGuard.Leave(PreviousMask);
   end;
+end;
+
+function TPdfStreamEngine.CreateAnnotationGraphicsState: TPDGraphicsState;
+begin
+  Result := GraphicsState.Clone;
 end;
 
 procedure TPdfStreamEngine.PrepareEngineForPage(const Page: TPDPage);
@@ -592,6 +616,86 @@ begin
     raise EArgumentNilException.Create('InitialState');
   end;
   ProcessForm(Form, InitialState);
+end;
+
+procedure TPdfStreamEngine.ShowAnnotation(const Annotation: TPDAnnotation);
+begin
+  RequireCurrentPage;
+  var Appearance: TCosStream;
+  if Annotation.TryGetNormalAppearance(Appearance) then
+  begin
+    ProcessAnnotation(Annotation, Appearance);
+  end
+  else
+  begin
+    LogDebug('Annotation %s has no normal appearance stream, it is skipped (appearances are not constructed)', [Annotation.SubType]);
+  end;
+end;
+
+// The transformed box is the bounds of the four corners of the BBox after the matrix. The mapping scales and moves it onto the rectangle
+// (a), and the matrix of the appearance goes first: only that order works for rotated pages (PDFBOX-3083).
+class function TPdfStreamEngine.TryGetAnnotationMatrix(const Rect, BBox: TPdfRectangle; const Matrix: TPdfMatrix; out Mapping: TPdfMatrix): Boolean;
+begin
+  const LowerLeft = Matrix.TransformPoint(BBox.LowerLeftX, BBox.LowerLeftY);
+  const LowerRight = Matrix.TransformPoint(BBox.UpperRightX, BBox.LowerLeftY);
+  const UpperRight = Matrix.TransformPoint(BBox.UpperRightX, BBox.UpperRightY);
+  const UpperLeft = Matrix.TransformPoint(BBox.LowerLeftX, BBox.UpperRightY);
+  const MinX = Min(Min(LowerLeft.X, LowerRight.X), Min(UpperRight.X, UpperLeft.X));
+  const MaxX = Max(Max(LowerLeft.X, LowerRight.X), Max(UpperRight.X, UpperLeft.X));
+  const MinY = Min(Min(LowerLeft.Y, LowerRight.Y), Min(UpperRight.Y, UpperLeft.Y));
+  const MaxY = Max(Max(LowerLeft.Y, LowerRight.Y), Max(UpperRight.Y, UpperLeft.Y));
+  const BoxWidth = MaxX - MinX;
+  const BoxHeight = MaxY - MinY;
+
+  // PDFBOX-6095: a transformed box without area is not valid
+  const HasArea = ((BoxWidth > 0) and (BoxHeight > 0));
+  Mapping := TPdfMatrix.Identity;
+  if not HasArea then
+  begin
+    Exit(False);
+  end;
+
+  var Alignment := TPdfMatrix.GetTranslateInstance(Rect.LowerLeftX, Rect.LowerLeftY);
+  Alignment.Scale(Single(Double(Rect.Width) / Double(BoxWidth)), Single(Double(Rect.Height) / Double(BoxHeight)));
+  Alignment.Translate(-MinX, -MinY);
+  Mapping := TPdfMatrix.Concatenate(Alignment, Matrix);
+  Result := True;
+end;
+
+procedure TPdfStreamEngine.ProcessAnnotation(const Annotation: TPDAnnotation; const Appearance: TCosStream);
+begin
+  RequireCurrentPage;
+  const Form = TPDFormXObject.Create(Appearance);
+  try
+    var BBox: TPdfRectangle;
+    // PDFBOX-4783: zero-sized rectangles are not valid
+    const HasBoxes = (Annotation.HasRect and Form.TryGetBBox(BBox));
+    if not HasBoxes then
+    begin
+      Exit;
+    end;
+
+    const Rect = Annotation.Rect;
+    const HasArea = ((Rect.Width > 0) and (Rect.Height > 0) and (BBox.Width > 0) and (BBox.Height > 0));
+    var Mapping: TPdfMatrix;
+    if not (HasArea and TryGetAnnotationMatrix(Rect, BBox, Form.Matrix, Mapping)) then
+    begin
+      Exit;
+    end;
+
+    var Resources: TCosDictionary;
+    if not Form.TryGetResources(Resources) then
+    begin
+      Resources := nil;
+    end;
+
+    // The CTM is the mapping itself, not the CTM of the page times it; RunStream concatenates the identity matrix to it
+    const State = CreateAnnotationGraphicsState;
+    State.CurrentTransformationMatrix := Mapping;
+    RunStream(Appearance, Resources, Form.HasEmptyResources, State, TPdfMatrix.Identity, True, BBox);
+  finally
+    Form.Free;
+  end;
 end;
 
 procedure TPdfStreamEngine.RequireCurrentPage;
