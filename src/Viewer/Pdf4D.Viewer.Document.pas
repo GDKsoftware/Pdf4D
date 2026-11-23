@@ -105,7 +105,6 @@ type
   protected
     procedure Notification(Component: TComponent; Operation: TOperation); override;
 
-    property FileName: string read FFileName write FFileName;
     property Password: string read FPassword write FPassword;
     property Backend: TPdf4DRenderBackend read FBackend write SetBackend;
     // False: printing and copying follow the permissions of the document
@@ -164,6 +163,8 @@ type
     procedure OpenWithSession(const Session: IPdfViewerSession);
     {$ENDIF}
 
+    // The file that Open opens; empty for a document from a stream
+    property FileName: string read FFileName write FFileName;
     // The 0-based cursor, clamped to the pages; 0 while Closed
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage;
     // Owned; cleared on Close
@@ -817,36 +818,42 @@ begin
   const Snapshot = FLinks.ToArray;
   var FirstFailure: TObject := nil;
 
-  for var Link in Snapshot do
-  begin
-    // A handler that closed or reopened the document made this change old news; a link that was freed meanwhile gets nothing
-    if Serial <> FSerial then
+  try
+    for var Link in Snapshot do
     begin
-      Break;
-    end;
-
-    if not FLinks.Contains(Link) then
-    begin
-      Continue;
-    end;
-
-    // A link that fails does not keep the change from the links after it. The first failure goes to the caller once they have all heard
-    // it; a further one goes to the log.
-    try
-      Link.Notify(Change);
-    except
-      on E: Exception do
+      // A handler that closed or reopened the document made this change old news; a link that was freed meanwhile gets nothing
+      if Serial <> FSerial then
       begin
-        if Assigned(FirstFailure) then
+        Break;
+      end;
+
+      if not FLinks.Contains(Link) then
+      begin
+        Continue;
+      end;
+
+      // A link that fails does not keep the change from the links after it. The first failure goes to the caller once they have all heard
+      // it; a further one goes to the log.
+      try
+        Link.Notify(Change);
+      except
+        on E: Exception do
         begin
-          Log(TPdfLogLevel.Error, E.Message);
-        end
-        else
-        begin
-          FirstFailure := AcquireExceptionObject;
+          if Assigned(FirstFailure) then
+          begin
+            Log(TPdfLogLevel.Error, E.Message);
+          end
+          else
+          begin
+            FirstFailure := AcquireExceptionObject;
+          end;
         end;
       end;
     end;
+  except
+    // OnLog of the application raised: its exception goes on, and the kept one must not leak
+    FirstFailure.Free;
+    raise;
   end;
 
   if Assigned(FirstFailure) then

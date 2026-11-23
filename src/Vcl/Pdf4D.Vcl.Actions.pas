@@ -113,9 +113,9 @@ type
   protected
     function Command: TPdfViewerCommand; override;
     procedure Perform(const View: TPdf4DPageView); override;
-    function HandleShortCut: Boolean; override;
   public
     constructor Create(Owner: TComponent); override;
+    function HandleShortCut: Boolean; override;
   end;
 
   // An action on a document. It is disabled while Document is nil or not open.

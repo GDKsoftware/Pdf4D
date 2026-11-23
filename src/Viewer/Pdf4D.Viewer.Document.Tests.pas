@@ -11,6 +11,7 @@ uses
   System.SysUtils,
   DUnitX.TestFramework,
   Pdf4D.Common.Quad,
+  Pdf4D.Common.Defines,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.PageText,
   Pdf4D.Viewer.Document,
@@ -36,6 +37,7 @@ type
     procedure HandleOpenedCounts(Sender: TObject);
     procedure HandleClosedCounts(Sender: TObject);
     procedure HandleChangeRaises(const Change: TPdfDocumentChange);
+    procedure HandleLogRaises(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
 
   public
     [Setup]
@@ -53,6 +55,8 @@ type
     procedure TestLinksGetChanges;
     [Test]
     procedure TestFailingLinkDoesNotSilenceTheOthers;
+    [Test]
+    procedure TestFailingLogHandlerDoesNotLeakTheFirstFailure;
     [Test]
     procedure TestFreedLinkGetsNothing;
     [Test]
@@ -102,7 +106,6 @@ implementation
 uses
   System.Types,
   System.Generics.Collections,
-  Pdf4D.Common.Defines,
   Pdf4D.Api.DocumentHandle,
   Pdf4D.Viewer.Session,
   Pdf4D.Viewer.ResourceStrings,
@@ -277,6 +280,11 @@ begin
   raise EPdfViewerException.Create(LinkFailure);
 end;
 
+procedure TPdf4DCustomDocumentTests.HandleLogRaises(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
+begin
+  raise EInvalidOpException.Create('Raised by the log handler');
+end;
+
 // The links after a link that raises still hear the change, and the exception still reaches the caller
 procedure TPdf4DCustomDocumentTests.TestFailingLinkDoesNotSilenceTheOthers;
 begin
@@ -304,6 +312,32 @@ begin
   finally
     Second.Free;
     Failing.Free;
+  end;
+end;
+
+// The log handler of the application raises while the second failure is logged: that exception goes on, and the first one is freed
+// (the leak check of the test program fails otherwise)
+procedure TPdf4DCustomDocumentTests.TestFailingLogHandlerDoesNotLeakTheFirstFailure;
+begin
+  OpenInvoice;
+  FBench.Document.OnLog := HandleLogRaises;
+  const First = TPdfDocumentLink.Create(HandleChangeRaises);
+  const Second = TPdfDocumentLink.Create(HandleChangeRaises);
+  try
+    First.Document := FBench.Document;
+    Second.Document := FBench.Document;
+
+    Assert.WillRaiseWithMessage(
+      procedure
+      begin
+        FBench.Document.CurrentPage := 1;
+      end,
+      EInvalidOpException,
+      'Raised by the log handler');
+  finally
+    Second.Free;
+    First.Free;
+    FBench.Document.OnLog := nil;
   end;
 end;
 

@@ -15,7 +15,8 @@ uses
   Vcl.StdCtrls,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
-  Pdf4D.Viewer.Print;
+  Pdf4D.Viewer.Print,
+  Pdf4D.Viewer.Session;
 
 const
   MaxPrintCopies = 999;
@@ -112,6 +113,8 @@ type
     FJob: TPdfPrintJob;
     FProgressForm: TPdf4DPrintProgressForm;
     FIsFreeWhenDone: Boolean;
+    // Switched off when the dialog is destroyed: a queued free of the dialog finds out that its owner was faster
+    FLifetime: ISessionAlive;
 {$IFDEF PDF4D_TESTS}
     class var FModalRunner: TFunc<TPdf4DPrintDialogForm, TModalResult>;
 {$ENDIF}
@@ -191,9 +194,6 @@ uses
   Pdf4D.Vcl.Print;
 
 type
-  // Gives access to the protected file name of the document
-  TDocumentCracker = class(TPdf4DCustomDocument);
-
   // The forms of the dialog are built in logical pixels (96 per inch) and then scaled to the monitor, as a form from a .dfm is
   TFormScaling = class
   public
@@ -583,6 +583,7 @@ end;
 constructor TPdf4DPrintDialog.Create(Owner: TComponent);
 begin
   inherited Create(Owner);
+  FLifetime := TSessionAlive.Create;
   FSettings := TPdfPrintSettings.Default;
   FShowProgress := True;
   FMaxBandPixels := DefaultMaxBandPixels;
@@ -590,6 +591,10 @@ end;
 
 destructor TPdf4DPrintDialog.Destroy;
 begin
+  if Assigned(FLifetime) then
+  begin
+    FLifetime.Kill;
+  end;
   // The job is cancelled by its destructor, without a callback
   FreeAndNil(FJob);
   FreeAndNil(FProgressForm);
@@ -739,7 +744,7 @@ begin
   var Prepared := Settings;
   if Prepared.Title = '' then
   begin
-    Prepared.Title := TPath.GetFileName(TDocumentCracker(FDocument).FileName);
+    Prepared.Title := TPath.GetFileName(FDocument.FileName);
   end;
 
   // The job raises for a document that may not be printed and for a range that is not in the document
@@ -806,10 +811,15 @@ begin
   if FIsFreeWhenDone then
   begin
     const Dialog = Self;
+    const Lifetime = FLifetime;
     System.Classes.TThread.ForceQueue(nil,
       procedure
       begin
-        Dialog.Free;
+        // The owner of the dialog (the application) may have freed it by now
+        if Lifetime.IsAlive then
+        begin
+          Dialog.Free;
+        end;
       end);
   end;
 
