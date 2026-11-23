@@ -178,11 +178,17 @@ type
     function WantOf(const PageIndex: Integer; const AreaInPage: TRect; const Priority: TPdfJobPriority): TPageWant;
     function VisibleWant(const PageIndex: Integer): TPageWant;
     function PrefetchWant(const PageIndex: Integer; const IsBelow: Boolean): TPageWant;
+    procedure CollectWants(const VisiblePages: TArray<Integer>; const Wants: TList<TPageWant>);
+    procedure RequestWants(const Wants: TList<TPageWant>; const Priority: TPdfJobPriority);
     procedure CancelUnneeded(const Wants: TList<TPageWant>; const VisiblePages: TArray<Integer>);
+    procedure CancelUnneededTiles(const Wants: TList<TPageWant>);
+    procedure CancelUnneededTexts(const VisiblePages: TArray<Integer>);
+    function IsRequestNeeded(const Request: TTileRequest; const Needed: TDictionary<TPdfTileKey, Boolean>): Boolean;
     class function IsPageIn(const Pages: TArray<Integer>; const PageIndex: Integer): Boolean; static;
     procedure CancelTileRequest(const Request: TTileRequest);
     procedure CancelAllRequests;
     procedure RequestMissingTiles(const Want: TPageWant);
+    procedure StartTileRequest(const Want: TPageWant; const Missing: TList<TPoint>; const Keys: TList<TPdfTileKey>);
     function TileDoneEvent(const Request: TTileRequest): TPdfTileDoneEvent;
     procedure HandleTile(const Request: TTileRequest; const Tile: TPoint; const Outcome: TPdfRenderResult);
     procedure StoreTile(const Key: TPdfTileKey; const Outcome: TPdfRenderResult);
@@ -194,6 +200,8 @@ type
     procedure PaintPage(const Painter: IPdfViewPainter; const Placement: TPlacement; const ClipRect: TRect);
     procedure PaintTile(const Painter: IPdfViewPainter; const Placement: TPlacement; const Column, Row: Integer);
     procedure PaintFallback(const Painter: IPdfViewPainter; const Placement: TPlacement; const TileRect: TRect);
+    procedure PaintFallbackTile(const Painter: IPdfViewPainter; const Placement: TPlacement; const Layer: TTileLayer; const OldTile: TPoint;
+                                const Source: TRect; const Ratio: TPointF);
     class function IsUsableLayer(const Layer: TTileLayer; const Transform: TPdfViewTransform): Boolean; static;
     function TryGetFallbackLayer(const PageIndex: Integer; const Transform: TPdfViewTransform; out Layer: TTileLayer): Boolean;
     procedure PaintSearchHits(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
@@ -205,6 +213,12 @@ type
     procedure PaintOverlay(const Painter: IPdfViewPainter; const Placement: TPlacement; const Overlay: TPdfOverlay);
     procedure PaintEllipseOverlay(const Painter: IPdfViewPainter; const Placement: TPlacement; const Overlay: TPdfOverlay);
     class function OffsetPoints(const Points: TArray<TPointF>; const Origin: TPointF): TArray<TPointF>; static;
+    // The corners of the quad in viewport pixels
+    class function ViewPolygonOf(const Placement: TPlacement; const Quad: TPdfQuad): TArray<TPointF>; static;
+    // The points of all quads of a page in viewport pixels
+    class function ViewPointsOf(const Placement: TPlacement; const Quads: TArray<TPdfQuad>): TArray<TPointF>; static;
+    // False without points
+    class function TryGetBoundsOf(const Points: TArray<TPointF>; out Bounds: TRectF): Boolean; static;
 
     function ScaledPixels(const LogicalPixels: Single): Single;
     function TryGetViewBounds(const PageIndex: Integer; const Quads: TArray<TPdfQuad>; out Bounds: TRectF): Boolean;
@@ -218,7 +232,7 @@ type
     procedure SetSelection(const Selection: TPdfTextSelection);
     procedure BeginPress(const Point: TPointF);
     procedure UpdateDrag(const Point: TPointF);
-    function FocusWordAt(const Point: TPointF): Integer;
+    function TryGetFocusWord(const Point: TPointF; out WordIndex: Integer): Boolean;
     procedure FinishClick(const Point: TPointF);
     procedure SelectSegment(const PageIndex: Integer; const Segment: TPdfTextFragment);
     procedure RaiseLinkClick(const Link: TPdfLink);
@@ -319,6 +333,8 @@ const
   ClickTolerance = 4;
   WheelNotch = 120;
   WheelLinesPerNotch = 3;
+  // The scale of a tile layer is pixels per point, so its size is that of a page at 72 pixels per inch
+  LayerPixelsPerInch = 72;
 
 { TPdfPageViewController }
 
@@ -510,8 +526,10 @@ begin
     Exit;
   end;
 
+  const ContentRect = ViewportContentRect;
+  const MostVisible = FLayout.MostVisiblePage(ContentRect);
   const IsOurOwnChange = (FPageSyncLock > 0);
-  const IsAlreadyThere = (Document.CurrentPage = FLayout.MostVisiblePage(ViewportContentRect));
+  const IsAlreadyThere = (Document.CurrentPage = MostVisible);
   if IsOurOwnChange or IsAlreadyThere then
   begin
     Exit;
@@ -536,7 +554,8 @@ begin
   Result := 0;
   if Assigned(FLayout) then
   begin
-    Result := Max(0, (FViewport.cx - FLayout.ContentSize.cx) div 2);
+    const Content = FLayout.ContentSize;
+    Result := Max(0, (FViewport.cx - Content.cx) div 2);
   end;
 end;
 
@@ -580,11 +599,13 @@ begin
   end;
 
   const Content = ViewportToContent(ViewportPoint);
+  const ContentPoint = TPoint.Create(Floor(Content.X), Floor(Content.Y));
   var PageIndex: Integer;
-  const IsOnPage = FLayout.TryFindPageAt(TPoint.Create(Floor(Content.X), Floor(Content.Y)), PageIndex);
+  const IsOnPage = FLayout.TryFindPageAt(ContentPoint, PageIndex);
   if not IsOnPage then
   begin
-    PageIndex := FLayout.MostVisiblePage(ViewportContentRect);
+    const ContentRect = ViewportContentRect;
+    PageIndex := FLayout.MostVisiblePage(ContentRect);
   end;
 
   var Rect: TRect;
@@ -596,7 +617,10 @@ begin
   Result.IsValid := True;
   Result.PageIndex := PageIndex;
   Result.ViewportPoint := ViewportPoint;
-  Result.PdfPoint := FLayout.Transform(PageIndex).ViewToPage(TPointF.Create(Content.X - Rect.Left, Content.Y - Rect.Top));
+
+  const Transform = FLayout.Transform(PageIndex);
+  const OnPage = TPointF.Create(Content.X - Rect.Left, Content.Y - Rect.Top);
+  Result.PdfPoint := Transform.ViewToPage(OnPage);
 end;
 
 procedure TPdfPageViewController.RestoreAnchor(const Anchor: TAnchor);
@@ -607,11 +631,14 @@ begin
     Exit;
   end;
 
-  const View = FLayout.Transform(Anchor.PageIndex).PageToView(Anchor.PdfPoint);
+  const Transform = FLayout.Transform(Anchor.PageIndex);
+  const View = Transform.PageToView(Anchor.PdfPoint);
   const ScrollX = Rect.Left + View.X + CenteringOffset - Anchor.ViewportPoint.X;
   const ScrollY = Rect.Top + View.Y - Anchor.ViewportPoint.Y;
-  FScroll.X := Round(EnsureRange(ScrollX, -MaxScrollValue, MaxScrollValue));
-  FScroll.Y := Round(EnsureRange(ScrollY, -MaxScrollValue, MaxScrollValue));
+  const LimitedX = EnsureRange(ScrollX, -MaxScrollValue, MaxScrollValue);
+  const LimitedY = EnsureRange(ScrollY, -MaxScrollValue, MaxScrollValue);
+  FScroll.X := Round(LimitedX);
+  FScroll.Y := Round(LimitedY);
 end;
 
 // The one place that changes the layout: zoom, rotation, mode, pixels per inch and viewport size all come here
@@ -728,7 +755,8 @@ begin
     Exit;
   end;
 
-  const MostVisible = FLayout.MostVisiblePage(ViewportContentRect);
+  const ContentRect = ViewportContentRect;
+  const MostVisible = FLayout.MostVisiblePage(ContentRect);
   if MostVisible = Document.CurrentPage then
   begin
     Exit;
@@ -810,12 +838,14 @@ end;
 
 procedure TPdfPageViewController.ZoomIn;
 begin
-  ZoomToFactor(NextZoomStep(True), ViewportCenter);
+  const Step = NextZoomStep(True);
+  ZoomToFactor(Step, ViewportCenter);
 end;
 
 procedure TPdfPageViewController.ZoomOut;
 begin
-  ZoomToFactor(NextZoomStep(False), ViewportCenter);
+  const Step = NextZoomStep(False);
+  ZoomToFactor(Step, ViewportCenter);
 end;
 
 procedure TPdfPageViewController.ZoomAt(const Zoom: Single; const ViewportPoint: TPointF);
@@ -905,12 +935,14 @@ begin
   end;
 
   const Content = ViewportToContent(Point);
+  const ContentPoint = TPoint.Create(Floor(Content.X), Floor(Content.Y));
   var Rect: TRect;
-  const IsOnPage = FLayout.TryFindPageAt(TPoint.Create(Floor(Content.X), Floor(Content.Y)), PageIndex) and
-                   FLayout.TryGetPageRect(PageIndex, Rect);
+  const IsOnPage = FLayout.TryFindPageAt(ContentPoint, PageIndex) and FLayout.TryGetPageRect(PageIndex, Rect);
   if IsOnPage then
   begin
-    PagePoint := FLayout.Transform(PageIndex).ViewToPage(TPointF.Create(Content.X - Rect.Left, Content.Y - Rect.Top));
+    const Transform = FLayout.Transform(PageIndex);
+    const OnPage = TPointF.Create(Content.X - Rect.Left, Content.Y - Rect.Top);
+    PagePoint := Transform.ViewToPage(OnPage);
     Result := True;
   end;
 end;
@@ -922,7 +954,8 @@ begin
   Result := PageRectInViewport(PageIndex, PageRect);
   if Result then
   begin
-    const InPage = FLayout.Transform(PageIndex).PageToView(PagePoint);
+    const Transform = FLayout.Transform(PageIndex);
+    const InPage = Transform.PageToView(PagePoint);
     Point := TPointF.Create(PageRect.Left + InPage.X, PageRect.Top + InPage.Y);
   end;
 end;
@@ -950,34 +983,19 @@ end;
 // The bounds of the quads in viewport pixels
 function TPdfPageViewController.TryGetViewBounds(const PageIndex: Integer; const Quads: TArray<TPdfQuad>; out Bounds: TRectF): Boolean;
 begin
-  Result := False;
   Bounds := TRectF.Empty;
   var PageRect: TRect;
   if not PageRectInViewport(PageIndex, PageRect) then
   begin
-    Exit;
+    Exit(False);
   end;
 
-  const Transform = FLayout.Transform(PageIndex);
-  const Origin = TPointF.Create(PageRect.Left, PageRect.Top);
-  for var Quad in Quads do
-  begin
-    for var Point in OffsetPoints(Transform.QuadToView(Quad), Origin) do
-    begin
-      if Result then
-      begin
-        Bounds.Left := Min(Bounds.Left, Point.X);
-        Bounds.Top := Min(Bounds.Top, Point.Y);
-        Bounds.Right := Max(Bounds.Right, Point.X);
-        Bounds.Bottom := Max(Bounds.Bottom, Point.Y);
-      end
-      else
-      begin
-        Bounds := TRectF.Create(Point, Point);
-        Result := True;
-      end;
-    end;
-  end;
+  var Placement: TPlacement;
+  Placement.PageIndex := PageIndex;
+  Placement.Origin := TPointF.Create(PageRect.Left, PageRect.Top);
+  Placement.Transform := FLayout.Transform(PageIndex);
+  const Points = ViewPointsOf(Placement, Quads);
+  Result := TryGetBoundsOf(Points, Bounds);
 end;
 
 procedure TPdfPageViewController.InvalidateQuads(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
@@ -988,8 +1006,13 @@ begin
     var Bounds: TRectF;
     if TryGetViewBounds(PageIndex, [Quad], Bounds) then
     begin
-      const Area = TRect.Create(Floor(Bounds.Left) - Margin, Floor(Bounds.Top) - Margin, Ceil(Bounds.Right) + Margin, Ceil(Bounds.Bottom) + Margin);
-      const Visible = TRect.Intersect(Area, TRect.Create(0, 0, FViewport.cx, FViewport.cy));
+      const Left = Floor(Bounds.Left) - Margin;
+      const Top = Floor(Bounds.Top) - Margin;
+      const Right = Ceil(Bounds.Right) + Margin;
+      const Bottom = Ceil(Bounds.Bottom) + Margin;
+      const Area = TRect.Create(Left, Top, Right, Bottom);
+      const ViewportRect = TRect.Create(0, 0, FViewport.cx, FViewport.cy);
+      const Visible = TRect.Intersect(Area, ViewportRect);
       if not Visible.IsEmpty then
       begin
         FHost.Invalidate(Visible);
@@ -1229,9 +1252,11 @@ end;
 procedure TPdfPageViewController.ZoomByWheel(const WheelDelta: Integer; const Point: TPointF);
 begin
   const Notches = Max(1, Abs(WheelDelta) div WheelNotch);
+  const IsUpwards = (WheelDelta > 0);
   for var Notch := 1 to Notches do
   begin
-    ZoomAt(NextZoomStep(WheelDelta > 0), Point);
+    const Step = NextZoomStep(IsUpwards);
+    ZoomAt(Step, Point);
   end;
 end;
 
@@ -1260,7 +1285,7 @@ begin
     TPdfViewerKey.Home:
       ScrollTo(TPoint.Create(FScroll.X, 0));
     TPdfViewerKey.End_:
-      ScrollTo(TPoint.Create(FScroll.X, FLayout.ContentSize.cy));
+      ScrollTo(TPoint.Create(FScroll.X, ContentSize.cy));
     TPdfViewerKey.ZoomIn:
       ZoomIn;
     TPdfViewerKey.ZoomOut:
@@ -1314,7 +1339,9 @@ begin
   if not IsInView then
   begin
     const Center = Bounds.CenterPoint;
-    ScrollTo(TPoint.Create(FScroll.X + Round(Center.X - FViewport.cx / 2), FScroll.Y + Round(Center.Y - FViewport.cy / 2)));
+    const DeltaX = Round(Center.X - FViewport.cx / 2);
+    const DeltaY = Round(Center.Y - FViewport.cy / 2);
+    ScrollBy(DeltaX, DeltaY);
   end;
 end;
 
@@ -1343,7 +1370,9 @@ procedure TPdfPageViewController.UpdateDrag(const Point: TPointF);
 begin
   if not FIsDragging then
   begin
-    if Point.Distance(FDownPoint) <= ScaledPixels(ClickTolerance) then
+    const Distance = Point.Distance(FDownPoint);
+    const Tolerance = ScaledPixels(ClickTolerance);
+    if Distance <= Tolerance then
     begin
       Exit;
     end;
@@ -1357,23 +1386,24 @@ begin
     Exit;
   end;
 
-  const Focus = FocusWordAt(Point);
-  if Focus >= 0 then
+  var Focus: Integer;
+  if TryGetFocusWord(Point, Focus) then
   begin
-    SetSelection(FAnchorText.Select(FAnchorWord, Focus, TPdfSelectionKind.Drag));
+    const Selection = FAnchorText.Select(FAnchorWord, Focus, TPdfSelectionKind.Drag);
+    SetSelection(Selection);
   end;
 end;
 
 // The word nearest to the point on the page of the anchor. A point beyond the top of the page gives its first word and one beyond the
 // bottom its last word, where top and bottom are those of the page itself: with a rotated page or view they are not the top and bottom
 // of the screen.
-function TPdfPageViewController.FocusWordAt(const Point: TPointF): Integer;
+function TPdfPageViewController.TryGetFocusWord(const Point: TPointF; out WordIndex: Integer): Boolean;
 begin
-  Result := -1;
+  WordIndex := 0;
   var PageRect: TRect;
   if not PageRectInViewport(FAnchorPage, PageRect) then
   begin
-    Exit;
+    Exit(False);
   end;
 
   const Transform = FLayout.Transform(FAnchorPage);
@@ -1381,21 +1411,24 @@ begin
   const OnPage = TPointF.Create(Point.X - PageRect.Left, Point.Y - PageRect.Top);
 
   const PdfPoint = Transform.ViewToPage(OnPage);
-  if PdfPoint.Y > PageBox.UpperRightY then
+  const IsAboveThePage = (PdfPoint.Y > PageBox.UpperRightY);
+  if IsAboveThePage then
   begin
-    Exit(0);
+    Exit(True);
   end;
-  if PdfPoint.Y < PageBox.LowerLeftY then
+
+  const IsBelowThePage = (PdfPoint.Y < PageBox.LowerLeftY);
+  if IsBelowThePage then
   begin
-    Exit(Length(FAnchorText.Words) - 1);
+    const Words = FAnchorText.Words;
+    WordIndex := Length(Words) - 1;
+    Exit(True);
   end;
 
   // Beyond a side of the page, the word nearest to the edge
   const OnEdge = TPointF.Create(EnsureRange(OnPage.X, 0, PageRect.Width), EnsureRange(OnPage.Y, 0, PageRect.Height));
-  if not FAnchorText.TryFindNearestWord(Transform.ViewToPage(OnEdge), Result) then
-  begin
-    Result := -1;
-  end;
+  const PdfEdgePoint = Transform.ViewToPage(OnEdge);
+  Result := FAnchorText.TryFindNearestWord(PdfEdgePoint, WordIndex);
 end;
 
 procedure TPdfPageViewController.FinishClick(const Point: TPointF);
@@ -1463,50 +1496,58 @@ begin
     Exit;
   end;
 
-  const VisiblePages = FLayout.VisiblePages(ViewportContentRect);
+  const ContentRect = ViewportContentRect;
+  const VisiblePages = FLayout.VisiblePages(ContentRect);
   const Wants = TList<TPageWant>.Create;
   try
-    for var PageIndex in VisiblePages do
-    begin
-      Wants.Add(VisibleWant(PageIndex));
-    end;
-
-    const HasVisiblePages = (Length(VisiblePages) > 0);
-    if HasVisiblePages and (FScrollMode = TPdfScrollMode.Continuous) then
-    begin
-      const PageBefore = VisiblePages[0] - 1;
-      const PageAfter = VisiblePages[High(VisiblePages)] + 1;
-      if PageBefore >= 0 then
-      begin
-        Wants.Add(PrefetchWant(PageBefore, False));
-      end;
-      if PageAfter < Length(FPages) then
-      begin
-        Wants.Add(PrefetchWant(PageAfter, True));
-      end;
-    end;
-
+    CollectWants(VisiblePages, Wants);
     CancelUnneeded(Wants, VisiblePages);
-
-    for var Want in Wants do
-    begin
-      if Want.Priority = TPdfJobPriority.Visible then
-      begin
-        RequestMissingTiles(Want);
-      end;
-    end;
-
+    RequestWants(Wants, TPdfJobPriority.Visible);
     RequestPageTexts(VisiblePages);
-
-    for var Want in Wants do
-    begin
-      if Want.Priority = TPdfJobPriority.Prefetch then
-      begin
-        RequestMissingTiles(Want);
-      end;
-    end;
+    RequestWants(Wants, TPdfJobPriority.Prefetch);
   finally
     Wants.Free;
+  end;
+end;
+
+// The visible pages, and in continuous mode the part of the page before and after them that lies one viewport height away
+procedure TPdfPageViewController.CollectWants(const VisiblePages: TArray<Integer>; const Wants: TList<TPageWant>);
+begin
+  for var PageIndex in VisiblePages do
+  begin
+    const Want = VisibleWant(PageIndex);
+    Wants.Add(Want);
+  end;
+
+  const HasVisiblePages = (Length(VisiblePages) > 0);
+  const IsPrefetching = HasVisiblePages and (FScrollMode = TPdfScrollMode.Continuous);
+  if not IsPrefetching then
+  begin
+    Exit;
+  end;
+
+  const PageBefore = VisiblePages[0] - 1;
+  const PageAfter = VisiblePages[High(VisiblePages)] + 1;
+  if PageBefore >= 0 then
+  begin
+    const Want = PrefetchWant(PageBefore, False);
+    Wants.Add(Want);
+  end;
+  if PageAfter < Length(FPages) then
+  begin
+    const Want = PrefetchWant(PageAfter, True);
+    Wants.Add(Want);
+  end;
+end;
+
+procedure TPdfPageViewController.RequestWants(const Wants: TList<TPageWant>; const Priority: TPdfJobPriority);
+begin
+  for var Want in Wants do
+  begin
+    if Want.Priority = Priority then
+    begin
+      RequestMissingTiles(Want);
+    end;
   end;
 end;
 
@@ -1526,7 +1567,8 @@ begin
   var Area := TRect.Empty;
   if FLayout.TryGetPageRect(PageIndex, Rect) then
   begin
-    Area := TRect.Intersect(ViewportContentRect, Rect);
+    const ContentRect = ViewportContentRect;
+    Area := TRect.Intersect(ContentRect, Rect);
     Area.Offset(-Rect.Left, -Rect.Top);
   end;
   Result := WantOf(PageIndex, Area, TPdfJobPriority.Visible);
@@ -1554,32 +1596,27 @@ end;
 
 procedure TPdfPageViewController.CancelUnneeded(const Wants: TList<TPageWant>; const VisiblePages: TArray<Integer>);
 begin
+  CancelUnneededTiles(Wants);
+  CancelUnneededTexts(VisiblePages);
+end;
+
+procedure TPdfPageViewController.CancelUnneededTiles(const Wants: TList<TPageWant>);
+begin
   const Needed = TDictionary<TPdfTileKey, Boolean>.Create;
   try
     for var Want in Wants do
     begin
       for var Tile in Want.Tiles do
       begin
-        Needed.AddOrSetValue(TPdfTileKey.Create(Want.PageIndex, Want.Rotation, Want.Scale, Tile.X, Tile.Y), True);
+        const Key = TPdfTileKey.Create(Want.PageIndex, Want.Rotation, Want.Scale, Tile.X, Tile.Y);
+        Needed.AddOrSetValue(Key, True);
       end;
     end;
 
     for var Index := FTileRequests.Count - 1 downto 0 do
     begin
       const Request = FTileRequests[Index];
-      var IsNeeded := False;
-      for var Key in Request.Keys do
-      begin
-        var Pending: TTileRequest;
-        const IsPending = FPendingTiles.TryGetValue(Key, Pending) and (Pending = Request);
-        if IsPending and Needed.ContainsKey(Key) then
-        begin
-          IsNeeded := True;
-          Break;
-        end;
-      end;
-
-      if not IsNeeded then
+      if not IsRequestNeeded(Request, Needed) then
       begin
         CancelTileRequest(Request);
       end;
@@ -1587,12 +1624,31 @@ begin
   finally
     Needed.Free;
   end;
+end;
 
+// A request is needed while one of its tiles is still pending for it and is wanted
+function TPdfPageViewController.IsRequestNeeded(const Request: TTileRequest; const Needed: TDictionary<TPdfTileKey, Boolean>): Boolean;
+begin
+  for var Key in Request.Keys do
+  begin
+    var Pending: TTileRequest;
+    const IsPending = FPendingTiles.TryGetValue(Key, Pending) and (Pending = Request);
+    if IsPending and Needed.ContainsKey(Key) then
+    begin
+      Exit(True);
+    end;
+  end;
+  Result := False;
+end;
+
+procedure TPdfPageViewController.CancelUnneededTexts(const VisiblePages: TArray<Integer>);
+begin
   for var Page in FTextRequests.Keys.ToArray do
   begin
     if not IsPageIn(VisiblePages, Page) then
     begin
-      FTextRequests[Page].Cancel;
+      const TextRequest = FTextRequests[Page];
+      TextRequest.Cancel;
       FTextRequests.Remove(Page);
     end;
   end;
@@ -1612,7 +1668,8 @@ end;
 
 procedure TPdfPageViewController.CancelTileRequest(const Request: TTileRequest);
 begin
-  Request.Request.Cancel;
+  const SessionRequest = Request.Request;
+  SessionRequest.Cancel;
   for var Key in Request.Keys do
   begin
     var Pending: TTileRequest;
@@ -1629,7 +1686,8 @@ procedure TPdfPageViewController.CancelAllRequests;
 begin
   for var Request in FTileRequests do
   begin
-    Request.Request.Cancel;
+    const SessionRequest = Request.Request;
+    SessionRequest.Cancel;
   end;
   FTileRequests.Clear;
   FPendingTiles.Clear;
@@ -1657,33 +1715,39 @@ begin
       end;
     end;
 
-    if Missing.Count = 0 then
+    if Missing.Count > 0 then
     begin
-      Exit;
-    end;
-
-    const Request = TTileRequest.Create;
-    try
-      Request.PageIndex := Want.PageIndex;
-      Request.Rotation := Want.Rotation;
-      Request.Scale := Want.Scale;
-      Request.Keys := Keys.ToArray;
-      Request.Remaining := Keys.Count;
-      Request.Request := Document.Session.RequestTiles(Want.PageIndex, Want.Scale, Want.Rotation, Missing.ToArray, Want.Priority,
-                                                       TileDoneEvent(Request));
-    except
-      Request.Free;
-      raise;
-    end;
-
-    FTileRequests.Add(Request);
-    for var Key in Request.Keys do
-    begin
-      FPendingTiles.Add(Key, Request);
+      StartTileRequest(Want, Missing, Keys);
     end;
   finally
     Keys.Free;
     Missing.Free;
+  end;
+end;
+
+procedure TPdfPageViewController.StartTileRequest(const Want: TPageWant; const Missing: TList<TPoint>; const Keys: TList<TPdfTileKey>);
+begin
+  const Request = TTileRequest.Create;
+  try
+    Request.PageIndex := Want.PageIndex;
+    Request.Rotation := Want.Rotation;
+    Request.Scale := Want.Scale;
+    Request.Keys := Keys.ToArray;
+    Request.Remaining := Keys.Count;
+
+    const Session = Document.Session;
+    const Tiles = Missing.ToArray;
+    const OnTile = TileDoneEvent(Request);
+    Request.Request := Session.RequestTiles(Want.PageIndex, Want.Scale, Want.Rotation, Tiles, Want.Priority, OnTile);
+  except
+    Request.Free;
+    raise;
+  end;
+
+  FTileRequests.Add(Request);
+  for var Key in Request.Keys do
+  begin
+    FPendingTiles.Add(Key, Request);
   end;
 end;
 
@@ -1782,11 +1846,12 @@ begin
     if not IsKnown then
     begin
       const Page = PageIndex;
-      FTextRequests.Add(Page, Document.RequestPageText(Page, TPdfJobPriority.PageText,
+      const TextRequest = Document.RequestPageText(Page, TPdfJobPriority.PageText,
         procedure(const Text: IPdfPageText)
         begin
           FTextRequests.Remove(Page);
-        end));
+        end);
+      FTextRequests.Add(Page, TextRequest);
     end;
   end;
 end;
@@ -1812,7 +1877,8 @@ end;
 
 procedure TPdfPageViewController.Paint(const Painter: IPdfViewPainter; const ClipRect: TRect);
 begin
-  Painter.FillRect(TRectF.Create(ClipRect), FBackgroundColor);
+  const Background = TRectF.Create(ClipRect);
+  Painter.FillRect(Background, FBackgroundColor);
   if not Assigned(FLayout) then
   begin
     Exit;
@@ -1820,7 +1886,8 @@ begin
 
   var ContentClip := ClipRect;
   ContentClip.Offset(FScroll.X - CenteringOffset, FScroll.Y);
-  const Placements = PlacementsOf(FLayout.VisiblePages(ContentClip));
+  const VisiblePages = FLayout.VisiblePages(ContentClip);
+  const Placements = PlacementsOf(VisiblePages);
 
   for var Placement in Placements do
   begin
@@ -1865,9 +1932,11 @@ begin
     Exit;
   end;
 
+  const FrameWidth = ScaledPixels(OverlayFrameWidth);
   for var Quad in FHoverSegment.Quads do
   begin
-    Painter.FramePolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), FHoverColor, ScaledPixels(OverlayFrameWidth));
+    const Polygon = ViewPolygonOf(Placement, Quad);
+    Painter.FramePolygon(Polygon, FHoverColor, FrameWidth);
   end;
 end;
 
@@ -1882,10 +1951,12 @@ begin
     Exit;
   end;
 
-  Painter.FillRect(TRectF.Create(Visible), PageColor);
+  const PaperRect = TRectF.Create(Visible);
+  Painter.FillRect(PaperRect, PageColor);
 
   Visible.Offset(-PageRect.Left, -PageRect.Top);
-  for var Tile in TPdfTileGrid.TilesIn(Size, Visible) do
+  const Tiles = TPdfTileGrid.TilesIn(Size, Visible);
+  for var Tile in Tiles do
   begin
     PaintTile(Painter, Placement, Tile.X, Tile.Y);
   end;
@@ -1905,7 +1976,8 @@ begin
 
   const Dest = TRectF.Create(Placement.Origin.X + TileRect.Left, Placement.Origin.Y + TileRect.Top, Placement.Origin.X + TileRect.Right,
                              Placement.Origin.Y + TileRect.Bottom);
-  Painter.DrawImage(Image, TRect.Create(0, 0, Image.Width, Image.Height), Dest);
+  const Source = TRect.Create(0, 0, Image.Width, Image.Height);
+  Painter.DrawImage(Image, Source, Dest);
 end;
 
 // What a tile shows until it arrives: the tiles of the scale that the page showed before, scaled to this one
@@ -1917,35 +1989,44 @@ begin
     Exit;
   end;
 
-  const OldSize = TPdfViewTransform.Create(FPages[Placement.PageIndex], Layer.Rotation, Layer.Scale, 72).Size;
+  const OldTransform = TPdfViewTransform.Create(FPages[Placement.PageIndex], Layer.Rotation, Layer.Scale, LayerPixelsPerInch);
+  const OldSize = OldTransform.Size;
   const NewSize = Placement.Transform.Size;
-  const RatioX = OldSize.cx / NewSize.cx;
-  const RatioY = OldSize.cy / NewSize.cy;
-  const Source = TRect.Create(Floor(TileRect.Left * RatioX), Floor(TileRect.Top * RatioY), Ceil(TileRect.Right * RatioX),
-                              Ceil(TileRect.Bottom * RatioY));
+  const Ratio = TPointF.Create(OldSize.cx / NewSize.cx, OldSize.cy / NewSize.cy);
+  const Source = TRect.Create(Floor(TileRect.Left * Ratio.X), Floor(TileRect.Top * Ratio.Y), Ceil(TileRect.Right * Ratio.X),
+                              Ceil(TileRect.Bottom * Ratio.Y));
 
-  for var OldTile in TPdfTileGrid.TilesIn(OldSize, Source) do
+  const OldTiles = TPdfTileGrid.TilesIn(OldSize, Source);
+  for var OldTile in OldTiles do
   begin
-    var Image: IPdfViewImage;
-    const Key = TPdfTileKey.Create(Placement.PageIndex, Layer.Rotation, Layer.Scale, OldTile.X, OldTile.Y);
-    if not FTiles.TryGet(Key, Image) then
-    begin
-      Continue;
-    end;
-
-    const OldTileRect = TPdfTileGrid.TileRect(OldSize, OldTile.X, OldTile.Y);
-    const Part = TRect.Intersect(OldTileRect, Source);
-    if Part.IsEmpty then
-    begin
-      Continue;
-    end;
-
-    const ImagePart = TRect.Create(Part.Left - OldTileRect.Left, Part.Top - OldTileRect.Top, Part.Right - OldTileRect.Left,
-                                   Part.Bottom - OldTileRect.Top);
-    const Dest = TRectF.Create(Placement.Origin.X + Part.Left / RatioX, Placement.Origin.Y + Part.Top / RatioY,
-                               Placement.Origin.X + Part.Right / RatioX, Placement.Origin.Y + Part.Bottom / RatioY);
-    Painter.DrawImage(Image, ImagePart, Dest);
+    PaintFallbackTile(Painter, Placement, Layer, OldTile, Source, Ratio);
   end;
+end;
+
+// The part of a tile of the old layer that lies in Source, drawn at the place it has in the page now
+procedure TPdfPageViewController.PaintFallbackTile(const Painter: IPdfViewPainter; const Placement: TPlacement; const Layer: TTileLayer;
+                                                   const OldTile: TPoint; const Source: TRect; const Ratio: TPointF);
+begin
+  const Key = TPdfTileKey.Create(Placement.PageIndex, Layer.Rotation, Layer.Scale, OldTile.X, OldTile.Y);
+  var Image: IPdfViewImage;
+  if not FTiles.TryGet(Key, Image) then
+  begin
+    Exit;
+  end;
+
+  const OldTransform = TPdfViewTransform.Create(FPages[Placement.PageIndex], Layer.Rotation, Layer.Scale, LayerPixelsPerInch);
+  const OldTileRect = TPdfTileGrid.TileRect(OldTransform.Size, OldTile.X, OldTile.Y);
+  const Part = TRect.Intersect(OldTileRect, Source);
+  if Part.IsEmpty then
+  begin
+    Exit;
+  end;
+
+  const ImagePart = TRect.Create(Part.Left - OldTileRect.Left, Part.Top - OldTileRect.Top, Part.Right - OldTileRect.Left,
+                                 Part.Bottom - OldTileRect.Top);
+  const Dest = TRectF.Create(Placement.Origin.X + Part.Left / Ratio.X, Placement.Origin.Y + Part.Top / Ratio.Y,
+                             Placement.Origin.X + Part.Right / Ratio.X, Placement.Origin.Y + Part.Bottom / Ratio.Y);
+  Painter.DrawImage(Image, ImagePart, Dest);
 end;
 
 class function TPdfPageViewController.IsUsableLayer(const Layer: TTileLayer; const Transform: TPdfViewTransform): Boolean;
@@ -1993,19 +2074,17 @@ begin
     CurrentIndex := -1;
   end;
 
-  const FirstPage = Placements[0].PageIndex;
   for var Index := 0 to High(Hits) do
   begin
-    const Slot = Hits[Index].PageIndex - FirstPage;
-    const IsVisible = (Slot >= 0) and (Slot < Length(Placements));
-    if IsVisible then
+    var Placement: TPlacement;
+    if TryFindPlacement(Placements, Hits[Index].PageIndex, Placement) then
     begin
       var Color := FSearchHitColor;
       if Index = CurrentIndex then
       begin
         Color := FCurrentSearchHitColor;
       end;
-      PaintQuads(Painter, Placements[Slot], Hits[Index].Quads, Color);
+      PaintQuads(Painter, Placement, Hits[Index].Quads, Color);
     end;
   end;
 end;
@@ -2015,7 +2094,8 @@ procedure TPdfPageViewController.PaintQuads(const Painter: IPdfViewPainter; cons
 begin
   for var Quad in Quads do
   begin
-    Painter.FillPolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), Color);
+    const Polygon = ViewPolygonOf(Placement, Quad);
+    Painter.FillPolygon(Polygon, Color);
   end;
 end;
 
@@ -2023,7 +2103,8 @@ procedure TPdfPageViewController.PaintOverlays(const Painter: IPdfViewPainter; c
 begin
   for var Placement in Placements do
   begin
-    for var Overlay in Document.Overlays.OnPage(Placement.PageIndex) do
+    const Overlays = Document.Overlays.OnPage(Placement.PageIndex);
+    for var Overlay in Overlays do
     begin
       PaintOverlay(Painter, Placement, Overlay);
     end;
@@ -2036,9 +2117,13 @@ begin
     TPdfOverlayStyle.Fill:
       PaintQuads(Painter, Placement, Overlay.Quads, Overlay.Color);
     TPdfOverlayStyle.Frame:
-      for var Quad in Overlay.Quads do
       begin
-        Painter.FramePolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), Overlay.Color, ScaledPixels(OverlayFrameWidth));
+        const FrameWidth = ScaledPixels(OverlayFrameWidth);
+        for var Quad in Overlay.Quads do
+        begin
+          const Polygon = ViewPolygonOf(Placement, Quad);
+          Painter.FramePolygon(Polygon, Overlay.Color, FrameWidth);
+        end;
       end;
     TPdfOverlayStyle.Ellipse:
       PaintEllipseOverlay(Painter, Placement, Overlay);
@@ -2050,28 +2135,9 @@ end;
 // One ellipse around all quads: the bounding rectangle, enlarged so that the ellipse passes through its corners
 procedure TPdfPageViewController.PaintEllipseOverlay(const Painter: IPdfViewPainter; const Placement: TPlacement; const Overlay: TPdfOverlay);
 begin
-  var Bounds := TRectF.Empty;
-  var IsFirst := True;
-  for var Quad in Overlay.Quads do
-  begin
-    for var Point in OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin) do
-    begin
-      if IsFirst then
-      begin
-        Bounds := TRectF.Create(Point, Point);
-        IsFirst := False;
-      end
-      else
-      begin
-        Bounds.Left := Min(Bounds.Left, Point.X);
-        Bounds.Top := Min(Bounds.Top, Point.Y);
-        Bounds.Right := Max(Bounds.Right, Point.X);
-        Bounds.Bottom := Max(Bounds.Bottom, Point.Y);
-      end;
-    end;
-  end;
-
-  if IsFirst then
+  var Bounds: TRectF;
+  const Points = ViewPointsOf(Placement, Overlay.Quads);
+  if not TryGetBoundsOf(Points, Bounds) then
   begin
     Exit;
   end;
@@ -2079,7 +2145,8 @@ begin
   const Center = TPointF.Create((Bounds.Left + Bounds.Right) / 2, (Bounds.Top + Bounds.Bottom) / 2);
   const HalfWidth = (Bounds.Right - Bounds.Left) / 2 * EllipseEnlargement;
   const HalfHeight = (Bounds.Bottom - Bounds.Top) / 2 * EllipseEnlargement;
-  Painter.FillEllipse(TRectF.Create(Center.X - HalfWidth, Center.Y - HalfHeight, Center.X + HalfWidth, Center.Y + HalfHeight), Overlay.Color);
+  const EllipseRect = TRectF.Create(Center.X - HalfWidth, Center.Y - HalfHeight, Center.X + HalfWidth, Center.Y + HalfHeight);
+  Painter.FillEllipse(EllipseRect, Overlay.Color);
 end;
 
 class function TPdfPageViewController.OffsetPoints(const Points: TArray<TPointF>; const Origin: TPointF): TArray<TPointF>;
@@ -2088,6 +2155,41 @@ begin
   for var Index := 0 to High(Points) do
   begin
     Result[Index] := TPointF.Create(Points[Index].X + Origin.X, Points[Index].Y + Origin.Y);
+  end;
+end;
+
+class function TPdfPageViewController.ViewPolygonOf(const Placement: TPlacement; const Quad: TPdfQuad): TArray<TPointF>;
+begin
+  const Corners = Placement.Transform.QuadToView(Quad);
+  Result := OffsetPoints(Corners, Placement.Origin);
+end;
+
+class function TPdfPageViewController.ViewPointsOf(const Placement: TPlacement; const Quads: TArray<TPdfQuad>): TArray<TPointF>;
+begin
+  Result := nil;
+  for var Quad in Quads do
+  begin
+    const Polygon = ViewPolygonOf(Placement, Quad);
+    Result := Result + Polygon;
+  end;
+end;
+
+class function TPdfPageViewController.TryGetBoundsOf(const Points: TArray<TPointF>; out Bounds: TRectF): Boolean;
+begin
+  Bounds := TRectF.Empty;
+  Result := (Length(Points) > 0);
+  if not Result then
+  begin
+    Exit;
+  end;
+
+  Bounds := TRectF.Create(Points[0], Points[0]);
+  for var Point in Points do
+  begin
+    Bounds.Left := Min(Bounds.Left, Point.X);
+    Bounds.Top := Min(Bounds.Top, Point.Y);
+    Bounds.Right := Max(Bounds.Right, Point.X);
+    Bounds.Bottom := Max(Bounds.Bottom, Point.Y);
   end;
 end;
 
