@@ -1456,9 +1456,10 @@ end;
 
 procedure TPdfViewerSession.ReplaceWorker;
 begin
+  // The generation first: Free waits for the thread and the dispatcher can run a queued report of the old worker meanwhile
+  Inc(FWorkerGeneration);
   FWorker.Free;
   WriteWorkerNotes;
-  Inc(FWorkerGeneration);
   CreateWorker;
 end;
 
@@ -1485,6 +1486,11 @@ begin
           Notes.Add(Format(SWorkerAbandonFailed, [Message]));
         TPdfWorkerReportKind.EndProcedureFailed:
           Notes.Add(Format(SWorkerEndFailed, [Message]));
+      else
+        begin
+          // A kind that this session does not know has nothing to act on
+          Exit;
+        end;
       end;
     end;
 end;

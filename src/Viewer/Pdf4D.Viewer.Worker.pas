@@ -16,8 +16,10 @@ uses
   Pdf4D.Viewer.Types;
 
 type
+{$SCOPEDENUMS ON}
   // What a worker tells its owner, on the worker thread, about something that it cannot handle itself
   TPdfWorkerReportKind = (JobFatal, AbandonFailed, EndProcedureFailed);
+{$SCOPEDENUMS OFF}
 
   TPdfWorkerReportEvent = reference to procedure(const Kind: TPdfWorkerReportKind; const Message: string);
 
@@ -347,28 +349,40 @@ end;
 
 procedure TPdfDocumentWorker.Execute;
 begin
-  while not IsStopped do
-  begin
-    const Job = TakeNext;
-    if not Assigned(Job) then
-    begin
-      Break;
-    end;
-
+  // The end procedure releases the document on this thread, so it runs even when a report callback raises out of the loop
+  try
     try
-      Run(Job);
-    finally
-      TMonitor.Enter(FLock);
-      try
-        FRunning := nil;
-      finally
-        TMonitor.Exit(FLock);
+      while not IsStopped do
+      begin
+        const Job = TakeNext;
+        if not Assigned(Job) then
+        begin
+          Break;
+        end;
+
+        try
+          Run(Job);
+        finally
+          TMonitor.Enter(FLock);
+          try
+            FRunning := nil;
+          finally
+            TMonitor.Exit(FLock);
+          end;
+          Job.Free;
+        end;
       end;
-      Job.Free;
+    finally
+      RunEndProc;
+    end;
+  except
+    on Exception do
+    begin
+      // Only OnReport can get here, and it is the one that was to hear about failures: nobody is left to tell. The thread ends, and the
+      // exception does not stay behind in the thread object.
+      Exit;
     end;
   end;
-
-  RunEndProc;
 end;
 
 procedure TPdfDocumentWorker.RunEndProc;

@@ -991,26 +991,27 @@ begin
   var TileFailed := True;
 
   // The dispatcher does not run until all are queued, so the session is still open: some are queued behind the fatal one, others come after
-  FSession.RequestPageText(0, TPdfJobPriority.Visible,
+  const FirstText = FSession.RequestPageText(0, TPdfJobPriority.Visible,
     procedure(const PageText: IPdfPageText)
     begin
       Inc(TextCalls);
       TextWasEmpty := (TextWasEmpty and PageText.IsEmpty);
     end);
-  FSession.RequestPageText(1, TPdfJobPriority.PageText,
+  const SecondText = FSession.RequestPageText(1, TPdfJobPriority.PageText,
     procedure(const PageText: IPdfPageText)
     begin
       Inc(TextCalls);
       TextWasEmpty := (TextWasEmpty and PageText.IsEmpty);
     end);
-  FSession.Search('Factuur', False, nil,
+  const SearchRequest = FSession.Search('Factuur', False, nil,
     procedure(const Completed: Boolean)
     begin
       Inc(SearchDone);
       SearchCompleted := Completed;
     end);
   const Size = TPdfViewTransform.Create(FSession.Pages[0], 0, 1, 72).Size;
-  FSession.RequestTiles(0, 1, 0, TPdfTileGrid.TilesIn(Size, TRect.Create(0, 0, Size.cx, Size.cy)), TPdfJobPriority.Prefetch,
+  const Tiles = TPdfTileGrid.TilesIn(Size, TRect.Create(0, 0, Size.cx, Size.cy));
+  const TilesRequest = FSession.RequestTiles(0, 1, 0, Tiles, TPdfJobPriority.Prefetch,
     procedure(const Tile: TPoint; const Outcome: TPdfRenderResult)
     begin
       Inc(TileEvents);
@@ -1023,10 +1024,19 @@ begin
       Result := (TextCalls = 2) and (SearchDone = 1) and (TileEvents > 0);
     end,
     'the failures of the abandoned requests');
+  // Whatever is still queued runs now: nothing may arrive twice
+  FDispatcher.RunPending;
 
+  Assert.AreEqual(2, TextCalls);
+  Assert.AreEqual(1, SearchDone);
+  Assert.AreEqual(Integer(Length(Tiles)), TileEvents);
   Assert.IsTrue(TextWasEmpty);
   Assert.IsFalse(SearchCompleted);
   Assert.IsTrue(TileFailed);
+  Assert.IsTrue(FirstText.IsDone);
+  Assert.IsTrue(SecondText.IsDone);
+  Assert.IsTrue(SearchRequest.IsDone);
+  Assert.IsTrue(TilesRequest.IsDone);
 end;
 
 procedure TPdfViewerSessionTests.TestFatalFailureFailsTheSessionAndOpenStartsAgain;
@@ -1147,7 +1157,8 @@ begin
   const Events = TList<TTileEvent>.Create;
   try
     const Request = RequestAllTiles(0, 1, Events);
-    // The result is in the dispatcher queue when the request is cancelled, so only the check inside the posted procedure can stop it
+    // Pins that no callback runs after Cancel, Close or Destroy for a result that is already queued. The check inside the posted procedure
+    // itself is pinned by TestOpenResultInTheQueueDoesNotReopenAClosedSession.
     WaitForPostedResult;
     Request.Cancel;
     FDispatcher.RunPending;

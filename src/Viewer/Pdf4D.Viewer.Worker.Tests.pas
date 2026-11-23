@@ -149,6 +149,8 @@ type
     procedure TestFailureInEndProcIsReported;
     [Test]
     procedure TestFailureInAbandonIsReported;
+    [Test]
+    procedure TestEndProcRunsWhenTheReportRaises;
   end;
 
   [TestFixture]
@@ -619,6 +621,29 @@ begin
 
   Assert.AreEqual(Ord(TPdfWorkerReportKind.AbandonFailed), Ord(Kind));
   Assert.AreEqual('Raised in Abandon', Message);
+end;
+
+procedure TPdfDocumentWorkerTests.TestEndProcRunsWhenTheReportRaises;
+begin
+  var EndCalls := 0;
+  const Worker = TPdfDocumentWorker.Create(
+    procedure
+    begin
+      Inc(EndCalls);
+    end,
+    procedure(const ReportKind: TPdfWorkerReportKind; const ReportMessage: string)
+    begin
+      raise EInvalidOpException.Create('Raised by the report callback');
+    end);
+  try
+    Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+    Assert.IsTrue(FLog.WaitForFreed(1, WaitMs));
+  finally
+    // Stop waits for the thread, so the end procedure has run
+    Worker.Free;
+  end;
+
+  Assert.AreEqual(1, EndCalls);
 end;
 
 procedure TPdfDocumentWorkerTests.TestEndProcRunsOnTheWorkerThreadAfterStop;
