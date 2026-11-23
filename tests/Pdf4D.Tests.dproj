@@ -265,6 +265,8 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Cache.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageText.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageText.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.TextMatcher.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.TextMatcher.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>

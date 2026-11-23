@@ -194,6 +194,8 @@ uses
   Pdf4D.Viewer.Cache.Tests in '..\src\Viewer\Pdf4D.Viewer.Cache.Tests.pas',
   Pdf4D.Viewer.PageText in '..\src\Viewer\Pdf4D.Viewer.PageText.pas',
   Pdf4D.Viewer.PageText.Tests in '..\src\Viewer\Pdf4D.Viewer.PageText.Tests.pas',
+  Pdf4D.Viewer.TextMatcher in '..\src\Viewer\Pdf4D.Viewer.TextMatcher.pas',
+  Pdf4D.Viewer.TextMatcher.Tests in '..\src\Viewer\Pdf4D.Viewer.TextMatcher.Tests.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Tests.Functions in 'Support\Pdf4D.Tests.Functions.pas',
