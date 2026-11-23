@@ -333,7 +333,8 @@ begin
   if IsOutsideLines then
   begin
     Result := Length(FLines) + OrphanBounds.Count;
-    OrphanBounds.Add(BoundsOf(Fragment.Quads));
+    const Bounds = BoundsOf(Fragment.Quads);
+    OrphanBounds.Add(Bounds);
   end;
 end;
 
