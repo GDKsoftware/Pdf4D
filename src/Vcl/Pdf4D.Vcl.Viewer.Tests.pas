@@ -89,6 +89,12 @@ type
 
     [Test]
     procedure TestViewerStreamsToDfm;
+
+    [Test]
+    procedure TestOpenDocumentBeforeTheViewerHasAParent;
+
+    [Test]
+    procedure TestOpenedWhileTheViewerHasNoWindow;
   end;
 
 implementation
@@ -520,6 +526,42 @@ begin
     end;
   finally
     Source.Free;
+  end;
+end;
+
+procedure TPdf4DViewerTests.TestOpenDocumentBeforeTheViewerHasAParent;
+begin
+  OpenData(TViewerDocuments.Outlined);
+  const Viewer = TPdf4DViewer.Create(nil);
+  try
+    Viewer.Document := FHost.Document;
+    Viewer.Parent := FHost.Form;
+    FHost.Pump(1);
+    Viewer.OutlineView.HandleNeeded;
+
+    Assert.AreEqual(3, Viewer.OutlineView.Items.Count, 'the outline is shown');
+    Assert.IsTrue(Viewer.TabSheetBookmarks.TabVisible, 'the bookmarks tab is there');
+  finally
+    Viewer.Free;
+  end;
+end;
+
+// A form that is made but not shown yet opens a document: the parts of its viewer hear Opened without a window
+procedure TPdf4DViewerTests.TestOpenedWhileTheViewerHasNoWindow;
+begin
+  FViewer.Document := nil;
+  const Viewer = TPdf4DViewer.Create(nil);
+  try
+    Viewer.Document := FHost.Document;
+    OpenData(TViewerDocuments.Outlined);
+    FHost.Pump(1);
+
+    Viewer.Parent := FHost.Form;
+    FHost.Pump(1);
+    Viewer.OutlineView.HandleNeeded;
+    Assert.AreEqual(3, Viewer.OutlineView.Items.Count, 'the outline is shown once the viewer has a window');
+  finally
+    Viewer.Free;
   end;
 end;
 

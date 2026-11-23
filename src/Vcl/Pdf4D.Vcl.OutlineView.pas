@@ -21,15 +21,21 @@ type
     FLink: TPdfDocumentLink;
     FEntries: TArray<TPdfOutlineEntry>;
     FIsFilling: Boolean;
+    // The document was open while the view had no window; CreateWnd fills it
+    FIsFillPending: Boolean;
 
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
+    // Fills the tree now when it can have a window, else when it gets one
+    procedure RequestFill;
+    function CanHaveWindow: Boolean;
     procedure Fill;
     procedure Clear;
     procedure NavigateToSelected;
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure CreateWnd; override;
     procedure Change(Node: TTreeNode); override;
     procedure Click; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
@@ -69,7 +75,9 @@ implementation
 
 uses
   System.Math,
-  Winapi.Windows;
+  Winapi.Windows,
+  Vcl.Controls,
+  Vcl.Forms;
 
 { TPdf4DOutlineView }
 
@@ -124,7 +132,7 @@ begin
   const IsOpen = Assigned(Value) and (Value.State = TPdfDocumentState.Open);
   if IsOpen then
   begin
-    Fill;
+    RequestFill;
   end;
 end;
 
@@ -132,7 +140,7 @@ procedure TPdf4DOutlineView.HandleDocumentChange(const Change: TPdfDocumentChang
 begin
   case Change of
     TPdfDocumentChange.Opened:
-      Fill;
+      RequestFill;
     TPdfDocumentChange.Opening,
     TPdfDocumentChange.OpenFailed,
     TPdfDocumentChange.Closed:
@@ -147,8 +155,47 @@ begin
   end;
 end;
 
+procedure TPdf4DOutlineView.CreateWnd;
+begin
+  inherited;
+  if FIsFillPending and Assigned(FDocument) and (FDocument.State = TPdfDocumentState.Open) then
+  begin
+    Fill;
+  end;
+end;
+
+// A tree view adds its nodes through its window, which needs a parent chain that ends in a form or a parent window
+function TPdf4DOutlineView.CanHaveWindow: Boolean;
+begin
+  if HandleAllocated then
+  begin
+    Exit(True);
+  end;
+
+  var Top: TWinControl := Self;
+  while Assigned(Top.Parent) do
+  begin
+    Top := Top.Parent;
+  end;
+  Result := (Top is TCustomForm) or (Top.ParentWindow <> 0);
+end;
+
+procedure TPdf4DOutlineView.RequestFill;
+begin
+  if CanHaveWindow then
+  begin
+    Fill;
+  end
+  else
+  begin
+    Clear;
+    FIsFillPending := True;
+  end;
+end;
+
 procedure TPdf4DOutlineView.Clear;
 begin
+  FIsFillPending := False;
   FIsFilling := True;
   try
     Items.Clear;

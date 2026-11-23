@@ -35,12 +35,19 @@ type
 
     [Test]
     procedure TestDocumentThatIsOpenAlreadyFillsTheView;
+
+    [Test]
+    procedure TestOpenDocumentBeforeTheViewHasAParent;
+
+    [Test]
+    procedure TestOpenedWhileTheViewHasNoParent;
   end;
 
 implementation
 
 uses
   Winapi.Windows,
+  Pdf4D.Vcl.OutlineView,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -113,6 +120,42 @@ begin
   FHost.OutlineView.Document := FHost.Document;
 
   Assert.AreEqual(ItemCount, FHost.OutlineView.Items.Count, 'the items of the open document are shown at once');
+end;
+
+// A tree view adds nodes through its window, and a control without a parent has none: the view fills when it gets one
+procedure TPdf4DOutlineViewTests.TestOpenDocumentBeforeTheViewHasAParent;
+begin
+  Assert.IsTrue(FHost.Open(TViewerDocuments.Outlined), 'the document opens: ' + FHost.OpenErrorMessage);
+  const View = TPdf4DOutlineView.Create(nil);
+  try
+    View.Document := FHost.Document;
+    Assert.AreEqual(0, View.Items.Count, 'nothing without a window');
+
+    View.Parent := FHost.Form;
+    View.HandleNeeded;
+
+    Assert.AreEqual(ItemCount, View.Items.Count, 'the items come with the window');
+  finally
+    View.Free;
+  end;
+end;
+
+procedure TPdf4DOutlineViewTests.TestOpenedWhileTheViewHasNoParent;
+begin
+  const View = TPdf4DOutlineView.Create(nil);
+  try
+    View.Document := FHost.Document;
+
+    Assert.IsTrue(FHost.Open(TViewerDocuments.Outlined), 'the document opens: ' + FHost.OpenErrorMessage);
+    FHost.Pump(1);
+    Assert.AreEqual(ItemCount, FHost.OutlineView.Items.Count, 'the view with a parent is filled');
+
+    View.Parent := FHost.Form;
+    View.HandleNeeded;
+    Assert.AreEqual(ItemCount, View.Items.Count, 'the view without a parent is filled when it gets one');
+  finally
+    View.Free;
+  end;
 end;
 
 end.
