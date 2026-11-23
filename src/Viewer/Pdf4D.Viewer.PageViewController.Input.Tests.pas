@@ -18,6 +18,7 @@ uses
   Pdf4D.Viewer.PageText,
   Pdf4D.Viewer.Session,
   Pdf4D.Viewer.PageViewController,
+  Pdf4D.Viewer.ViewTransform,
   Pdf4D.Viewer.Painter.Interfaces,
   Pdf4D.Tests.TestDocument,
   Pdf4D.Tests.FakeSession,
@@ -44,7 +45,10 @@ type
     procedure HandleLinkClick(Sender: TObject; const Link: TPdfLink);
 
     // Opens PageCount Letter pages in a viewport of 832 x 600 at 96 PPI and zoom 1
-    procedure Start(const PageCount: Integer);
+    procedure Start(const PageCount: Integer); overload;
+    procedure Start(const PageCount, PageRotation: Integer); overload;
+    // A point of the page as the viewer shows it, for a page that is centred in the viewport and starts one gap from its top
+    class function RotatedViewPoint(const PdfX, PdfY: Single; const PageRotation, ViewRotation: Integer; const Zoom: Single): TPointF; static;
     function TextOf(const Data: TBytes; const PageIndex: Integer): IPdfPageText;
     procedure DeliverText(const PageIndex: Integer; const PageText: IPdfPageText);
     procedure DeliverInvoiceText;
@@ -87,6 +91,12 @@ type
     procedure TestDragAcrossLinesAndBeyondPage;
     [Test]
     procedure TestDragOnScannedPageSelectsNothing;
+    [Test]
+    procedure TestDragBeyondPageOnRotatedView;
+    [Test]
+    procedure TestDragBeyondPageOfARotatedPage;
+    [Test]
+    procedure TestDragBeyondTheSideOfAPageThatIsTurnedSideways;
     [Test]
     procedure TestClickOnLinkRaisesLinkAndNavigates;
     [Test]
@@ -174,12 +184,17 @@ end;
 
 procedure TPdfPageViewControllerInputTests.Start(const PageCount: Integer);
 begin
+  Start(PageCount, 0);
+end;
+
+procedure TPdfPageViewControllerInputTests.Start(const PageCount, PageRotation: Integer);
+begin
   var Pages: TArray<TPdfPageInfo>;
   SetLength(Pages, PageCount);
   for var Index := 0 to PageCount - 1 do
   begin
     Pages[Index].CropBox := TPdfRectangle.Letter;
-    Pages[Index].Rotation := 0;
+    Pages[Index].Rotation := PageRotation;
     Pages[Index].Label_ := '';
   end;
 
@@ -223,6 +238,19 @@ end;
 procedure TPdfPageViewControllerInputTests.DeliverInvoiceText;
 begin
   DeliverText(0, TextOf(TViewerDocuments.Invoice, 0));
+end;
+
+class function TPdfPageViewControllerInputTests.RotatedViewPoint(const PdfX, PdfY: Single; const PageRotation, ViewRotation: Integer;
+                                                                 const Zoom: Single): TPointF;
+begin
+  var Page: TPdfPageInfo;
+  Page.CropBox := TPdfRectangle.Letter;
+  Page.Rotation := PageRotation;
+  const Transform = TPdfViewTransform.Create(Page, ViewRotation, Zoom, 96);
+
+  const Left = Max(Gap, (ViewportWidth - Transform.Size.cx) div 2);
+  const OnPage = Transform.PageToView(TPointF.Create(PdfX, PdfY));
+  Result := TPointF.Create(Left + OnPage.X, Gap + OnPage.Y);
 end;
 
 class function TPdfPageViewControllerInputTests.ViewPoint(const PdfX, PdfY: Single): TPointF;
@@ -471,6 +499,66 @@ begin
   Assert.AreEqual(1, Integer(FSelections.Count));
   Assert.AreEqual(Expected.Text, FSelections[0].Text, 'the focus is clamped to the last word of the page');
   Assert.IsTrue(Pos(sLineBreak, FSelections[0].Text) > 0, 'it spans lines');
+end;
+
+procedure TPdfPageViewControllerInputTests.TestDragBeyondPageOnRotatedView;
+begin
+  Start(2);
+  FController.ViewRotation := 180;
+  // A new rotation keeps the same part of the page in view: the helper counts from the top of the content
+  FController.ScrollTo(TPoint.Zero);
+  DeliverInvoiceText;
+
+  // Turned upside down, the bottom of the screen is the top of the page
+  const Down = RotatedViewPoint(110, 703, 0, 180, 1);
+  FController.MouseDown(Down);
+  FController.MouseMove(TPointF.Create(300, Gap + PageHeight + 40));
+  FController.MouseUp(TPointF.Create(300, Gap + PageHeight + 40));
+
+  const PageText = TextOf(TViewerDocuments.Invoice, 0);
+  var Anchor: Integer;
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create(110, 703), Anchor) or PageText.TryFindNearestWord(TPointF.Create(110, 703), Anchor));
+  Assert.AreEqual(1, Integer(FSelections.Count));
+  Assert.AreEqual(PageText.Select(Anchor, 0, TPdfSelectionKind.Drag).Text, FSelections[0].Text, 'the focus is the first word of the page');
+end;
+
+procedure TPdfPageViewControllerInputTests.TestDragBeyondPageOfARotatedPage;
+begin
+  Start(2, 180);
+  DeliverInvoiceText;
+
+  const Down = RotatedViewPoint(110, 703, 180, 0, 1);
+  FController.MouseDown(Down);
+  FController.MouseMove(TPointF.Create(300, Gap + PageHeight + 40));
+  FController.MouseUp(TPointF.Create(300, Gap + PageHeight + 40));
+
+  const PageText = TextOf(TViewerDocuments.Invoice, 0);
+  var Anchor: Integer;
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create(110, 703), Anchor) or PageText.TryFindNearestWord(TPointF.Create(110, 703), Anchor));
+  Assert.AreEqual(1, Integer(FSelections.Count));
+  Assert.AreEqual(PageText.Select(Anchor, 0, TPdfSelectionKind.Drag).Text, FSelections[0].Text, 'the focus is the first word of the page');
+end;
+
+procedure TPdfPageViewControllerInputTests.TestDragBeyondTheSideOfAPageThatIsTurnedSideways;
+begin
+  Start(2);
+  FController.Zoom := 0.5;
+  FController.ViewRotation := 90;
+  FController.ScrollTo(TPoint.Zero);
+  DeliverInvoiceText;
+
+  // Turned a quarter, the right of the screen is the top of the page: the pointer lies beyond it, level with the right of the page
+  const Down = RotatedViewPoint(110, 703, 0, 90, 0.5);
+  const Beyond = RotatedViewPoint(500, 900, 0, 90, 0.5);
+  FController.MouseDown(Down);
+  FController.MouseMove(Beyond);
+  FController.MouseUp(Beyond);
+
+  const PageText = TextOf(TViewerDocuments.Invoice, 0);
+  var Anchor: Integer;
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create(110, 703), Anchor) or PageText.TryFindNearestWord(TPointF.Create(110, 703), Anchor));
+  Assert.AreEqual(1, Integer(FSelections.Count));
+  Assert.AreEqual(PageText.Select(Anchor, 0, TPdfSelectionKind.Drag).Text, FSelections[0].Text, 'the focus is the first word of the page');
 end;
 
 procedure TPdfPageViewControllerInputTests.TestDragOnScannedPageSelectsNothing;

@@ -1358,7 +1358,9 @@ begin
   end;
 end;
 
-// The word nearest to the point on the page of the anchor; a point above or below that page gives its first or last word
+// The word nearest to the point on the page of the anchor. A point beyond the top of the page gives its first word and one beyond the
+// bottom its last word, where top and bottom are those of the page itself: with a rotated page or view they are not the top and bottom
+// of the screen.
 function TPdfPageViewController.FocusWordAt(const Point: TPointF): Integer;
 begin
   Result := -1;
@@ -1368,17 +1370,23 @@ begin
     Exit;
   end;
 
-  if Point.Y > PageRect.Bottom then
-  begin
-    Exit(Length(FAnchorText.Words) - 1);
-  end;
-  if Point.Y < PageRect.Top then
+  const Transform = FLayout.Transform(FAnchorPage);
+  const PageBox = FPages[FAnchorPage].CropBox;
+  const OnPage = TPointF.Create(Point.X - PageRect.Left, Point.Y - PageRect.Top);
+
+  const PdfPoint = Transform.ViewToPage(OnPage);
+  if PdfPoint.Y > PageBox.UpperRightY then
   begin
     Exit(0);
   end;
+  if PdfPoint.Y < PageBox.LowerLeftY then
+  begin
+    Exit(Length(FAnchorText.Words) - 1);
+  end;
 
-  const PagePoint = FLayout.Transform(FAnchorPage).ViewToPage(TPointF.Create(Point.X - PageRect.Left, Point.Y - PageRect.Top));
-  if not FAnchorText.TryFindNearestWord(PagePoint, Result) then
+  // Beyond a side of the page, the word nearest to the edge
+  const OnEdge = TPointF.Create(EnsureRange(OnPage.X, 0, PageRect.Width), EnsureRange(OnPage.Y, 0, PageRect.Height));
+  if not FAnchorText.TryFindNearestWord(Transform.ViewToPage(OnEdge), Result) then
   begin
     Result := -1;
   end;
@@ -2024,8 +2032,7 @@ begin
     TPdfOverlayStyle.Frame:
       for var Quad in Overlay.Quads do
       begin
-        Painter.FramePolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), Overlay.Color,
-                             OverlayFrameWidth * FPixelsPerInch / LogicalPixelsPerInch);
+        Painter.FramePolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), Overlay.Color, ScaledPixels(OverlayFrameWidth));
       end;
     TPdfOverlayStyle.Ellipse:
       PaintEllipseOverlay(Painter, Placement, Overlay);
