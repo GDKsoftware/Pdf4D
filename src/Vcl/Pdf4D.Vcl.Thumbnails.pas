@@ -16,7 +16,8 @@ uses
   Pdf4D.Render.Bitmap,
   Pdf4D.Viewer.Document,
   Pdf4D.Viewer.Painter.Interfaces,
-  Pdf4D.Viewer.ThumbnailsController;
+  Pdf4D.Viewer.ThumbnailsController,
+  Pdf4D.Vcl.ViewSupport;
 
 const
   DefaultSelectedTColor: TColor = $00FF901E;
@@ -25,13 +26,11 @@ type
   // Shows the pages of a document as small pictures in a column, and marks the current page. A thin shell around
   // TPdfThumbnailsController: it turns window messages into calls on the controller and the calls of the controller into a scroll bar
   // and painting.
-  TPdf4DThumbnails = class(TCustomControl, IPdfViewHost)
+  TPdf4DThumbnails = class(TPdfVclViewControl, IPdfViewHost)
   private
     FController: TPdfThumbnailsController;
     FDocument: TPdf4DCustomDocument;
     FSelectedColor: TColor;
-    // The pixels per inch that the last change of scale gave; 0 until there was one
-    FScalePixelsPerInch: Integer;
     FIsUpdatingScrollBar: Boolean;
     FScrollBarDirty: Boolean;
 
@@ -40,13 +39,10 @@ type
     procedure SetThumbnailWidth(const Value: Integer);
     procedure SetSelectedColor(const Value: TColor);
 
-    function PixelsPerInch: Integer;
-    procedure UpdateViewport;
     procedure UpdateScrollBar;
     procedure HandleScroll(const ScrollCode: Integer);
 
     // IPdfViewHost
-    procedure HostInvalidate(const Rect: TRect);
     procedure HostScrollStateChanged;
     procedure HostCursorChanged;
     function HostCreateImage(const Bitmap: TPdfBitmap): IPdfViewImage;
@@ -64,7 +60,7 @@ type
     procedure Loaded; override;
     procedure Paint; override;
     procedure Resize; override;
-    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
+    procedure UpdateViewport; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint): Boolean; override;
 
@@ -95,8 +91,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
   Vcl.Forms,
-  Pdf4D.Vcl.Painter,
-  Pdf4D.Vcl.ViewSupport;
+  Pdf4D.Vcl.Painter;
 
 const
   InitialWidth = 150;
@@ -183,20 +178,6 @@ begin
   Invalidate;
 end;
 
-// The scale that the window has now: what the last change of scale gave, else what the window reports
-function TPdf4DThumbnails.PixelsPerInch: Integer;
-begin
-  Result := FScalePixelsPerInch;
-  if Result <= 0 then
-  begin
-    Result := CurrentPPI;
-  end;
-  if Result <= 0 then
-  begin
-    Result := LogicalPixelsPerInch;
-  end;
-end;
-
 procedure TPdf4DThumbnails.UpdateViewport;
 begin
   FController.SetViewport(TSize.Create(ClientWidth, ClientHeight), PixelsPerInch);
@@ -217,18 +198,6 @@ end;
 
 procedure TPdf4DThumbnails.Resize;
 begin
-  inherited;
-  UpdateViewport;
-end;
-
-procedure TPdf4DThumbnails.ChangeScale(M, D: Integer; isDpiChange: Boolean);
-begin
-  if isDpiChange then
-  begin
-    // Before the size changes, so that the viewport gets the new size together with the new scale
-    FScalePixelsPerInch := M;
-  end;
-
   inherited;
   UpdateViewport;
 end;
@@ -303,15 +272,6 @@ begin
 end;
 
 { IPdfViewHost }
-
-procedure TPdf4DThumbnails.HostInvalidate(const Rect: TRect);
-begin
-  if HandleAllocated then
-  begin
-    var Area := Rect;
-    InvalidateRect(Handle, @Area, False);
-  end;
-end;
 
 procedure TPdf4DThumbnails.HostScrollStateChanged;
 begin

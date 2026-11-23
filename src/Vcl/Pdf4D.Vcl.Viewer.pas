@@ -81,7 +81,7 @@ type
     procedure CreateSearchBar;
     procedure CreateSidePanel;
     procedure CreatePageView;
-    procedure CreateSearchAction;
+    procedure CreateActions;
     procedure BuildTabs;
     procedure ApplyOptions;
     function ToolbarButtons: TPdf4DToolbarButtons;
@@ -197,7 +197,7 @@ begin
   FToolbar.PageView := FPageView;
   FToolbar.SearchBar := FSearchBar;
   FToolbar.PrintDialog := FPrintDialog;
-  CreateSearchAction;
+  CreateActions;
 end;
 
 procedure TPdf4DViewer.CreateToolbar;
@@ -283,7 +283,7 @@ end;
 
 // The toolbar has actions of its own that know no shortcut keys, because they are in no action list: these make Ctrl+F and Ctrl+P work
 // while the focus is inside the viewer, so that two viewers on a form do not both react
-procedure TPdf4DViewer.CreateSearchAction;
+procedure TPdf4DViewer.CreateActions;
 begin
   FActions := TActionList.Create(Self);
   FSearchAction := TPdf4DSearchAction.Create(Self);

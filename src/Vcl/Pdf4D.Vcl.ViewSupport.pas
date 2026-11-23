@@ -7,11 +7,29 @@ unit Pdf4D.Vcl.ViewSupport;
 interface
 
 uses
+  System.Types,
   System.UITypes,
   Winapi.Windows,
+  Vcl.Controls,
   Vcl.Graphics;
 
 type
+  // The window that the page view and the thumbnails have in common: the scale that the window has now, and the invalidation of the host
+  // of a controller
+  TPdfVclViewControl = class(TCustomControl)
+  private
+    // The pixels per inch that the last change of scale gave; 0 until there was one
+    FScalePixelsPerInch: Integer;
+
+  protected
+    // What the last change of scale gave, else what the window reports
+    function PixelsPerInch: Integer;
+    // Gives the controller its viewport and scale
+    procedure UpdateViewport; virtual; abstract;
+    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
+    procedure HostInvalidate(const Rect: TRect);
+  end;
+
   // What the page view and the thumbnails share of their window: the colors for the controller and the scroll bars
   TPdfVclViewSupport = class
   public
@@ -29,9 +47,46 @@ uses
   System.Math;
 
 const
+  LogicalPixelsPerInch = 96;
   AlphaShift = 24;
   RedShift = 16;
   GreenShift = 8;
+
+{ TPdfVclViewControl }
+
+function TPdfVclViewControl.PixelsPerInch: Integer;
+begin
+  Result := FScalePixelsPerInch;
+  if Result <= 0 then
+  begin
+    Result := CurrentPPI;
+  end;
+  if Result <= 0 then
+  begin
+    Result := LogicalPixelsPerInch;
+  end;
+end;
+
+procedure TPdfVclViewControl.ChangeScale(M, D: Integer; isDpiChange: Boolean);
+begin
+  if isDpiChange then
+  begin
+    // Before the size changes, so that the viewport gets the new size together with the new scale
+    FScalePixelsPerInch := M;
+  end;
+
+  inherited;
+  UpdateViewport;
+end;
+
+procedure TPdfVclViewControl.HostInvalidate(const Rect: TRect);
+begin
+  if HandleAllocated then
+  begin
+    var Area := Rect;
+    InvalidateRect(Handle, @Area, False);
+  end;
+end;
 
 { TPdfVclViewSupport }
 

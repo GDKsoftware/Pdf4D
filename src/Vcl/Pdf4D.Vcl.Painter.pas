@@ -46,7 +46,8 @@ type
   TPdfVclPainter = class(TInterfacedObject, IPdfViewPainter)
   private
     FCanvas: TCanvas;
-    // One for all the shapes of a paint, made when the first one is drawn
+    // One for all the shapes of a paint, made when the first one is drawn. It reads the clip and the transform of the DC when it is made, so
+    // the DC must keep them for as long as the painter lives (the canvas of a paint does).
     FGraphics: TGPGraphics;
     FGraphicsDc: HDC;
 
@@ -75,7 +76,8 @@ uses
   Winapi.GDIPAPI;
 
 type
-  // GDI+ must be started once per process and stopped at the end. The painters are used on the UI thread only.
+  // GDI+ must be started once per process and stopped at the end. Winapi.GDIPOBJ does that itself in its initialization section, but not
+  // when it is part of a library (IsLibrary), as it is in the Pdf4D.Vcl package; hence this class. The painters are used on the UI thread only.
   TPdfGdiPlus = class
   private
     class var FToken: ULONG_PTR;

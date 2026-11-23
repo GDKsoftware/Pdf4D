@@ -189,6 +189,7 @@ type
     FFocusScope: TWinControl;
 
     procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
+    procedure SetFocusScope(const Value: TWinControl);
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -199,9 +200,8 @@ type
     constructor Create(Owner: TComponent); override;
     function HandleShortCut: Boolean; override;
 
-    // When set, the shortcut works only while the focus is inside this control. It must live as long as the action, as the viewer that
-    // owns its actions does.
-    property FocusScope: TWinControl read FFocusScope write FFocusScope;
+    // When set, the shortcut works only while the focus is inside this control
+    property FocusScope: TWinControl read FFocusScope write SetFocusScope;
 
   published
     property PrintDialog: TPdf4DPrintDialog read FPrintDialog write SetPrintDialog;
@@ -214,6 +214,7 @@ type
     FFocusScope: TWinControl;
 
     procedure SetSearchBar(const Value: TPdf4DSearchBar);
+    procedure SetFocusScope(const Value: TWinControl);
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -224,9 +225,8 @@ type
     function Update: Boolean; override;
     function HandleShortCut: Boolean; override;
 
-    // When set, the shortcut works only while the focus is inside this control. It must live as long as the action, as the viewer that
-    // owns its actions does.
-    property FocusScope: TWinControl read FFocusScope write FFocusScope;
+    // When set, the shortcut works only while the focus is inside this control
+    property FocusScope: TWinControl read FFocusScope write SetFocusScope;
 
   published
     property SearchBar: TPdf4DSearchBar read FSearchBar write SetSearchBar;
@@ -695,12 +695,41 @@ begin
   Hint := Format(SActionHintWithKey, [SActionPrint, ShortCutToText(ShortCut)]);
 end;
 
+procedure TPdf4DPrintAction.SetFocusScope(const Value: TWinControl);
+begin
+  if Value = FFocusScope then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FFocusScope) then
+  begin
+    FFocusScope.RemoveFreeNotification(Self);
+  end;
+
+  FFocusScope := Value;
+
+  if Assigned(FFocusScope) then
+  begin
+    FFocusScope.FreeNotification(Self);
+  end;
+end;
+
 procedure TPdf4DPrintAction.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
-  if (Operation = TOperation.opRemove) and (AComponent = FPrintDialog) then
+  if Operation <> TOperation.opRemove then
+  begin
+    Exit;
+  end;
+
+  if AComponent = FPrintDialog then
   begin
     FPrintDialog := nil;
+  end;
+  if AComponent = FFocusScope then
+  begin
+    FFocusScope := nil;
   end;
 end;
 
@@ -783,12 +812,41 @@ begin
   Hint := Format(SActionHintWithKey, [SActionSearch, ShortCutToText(ShortCut)]);
 end;
 
+procedure TPdf4DSearchAction.SetFocusScope(const Value: TWinControl);
+begin
+  if Value = FFocusScope then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FFocusScope) then
+  begin
+    FFocusScope.RemoveFreeNotification(Self);
+  end;
+
+  FFocusScope := Value;
+
+  if Assigned(FFocusScope) then
+  begin
+    FFocusScope.FreeNotification(Self);
+  end;
+end;
+
 procedure TPdf4DSearchAction.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
-  if (Operation = TOperation.opRemove) and (AComponent = FSearchBar) then
+  if Operation <> TOperation.opRemove then
+  begin
+    Exit;
+  end;
+
+  if AComponent = FSearchBar then
   begin
     FSearchBar := nil;
+  end;
+  if AComponent = FFocusScope then
+  begin
+    FFocusScope := nil;
   end;
 end;
 

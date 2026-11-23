@@ -21,7 +21,8 @@ uses
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
   Pdf4D.Viewer.Painter.Interfaces,
-  Pdf4D.Viewer.PageViewController;
+  Pdf4D.Viewer.PageViewController,
+  Pdf4D.Vcl.ViewSupport;
 
 const
   DefaultHoverTColor: TColor = $00FF901E;
@@ -32,7 +33,7 @@ const
 type
   // Shows the pages of a document in a window. A thin shell around TPdfPageViewController: it turns window messages into calls on the
   // controller and the calls of the controller into scroll bars, cursors and painting.
-  TPdf4DPageView = class(TCustomControl, IPdfViewHost)
+  TPdf4DPageView = class(TPdfVclViewControl, IPdfViewHost)
   private
     FController: TPdfPageViewController;
     FDocument: TPdf4DCustomDocument;
@@ -45,8 +46,6 @@ type
     FOnLinkClick: TPdfLinkClickEvent;
     FOnZoomChanged: TNotifyEvent;
     FZoomListeners: TList<TNotifyEvent>;
-    // The pixels per inch that the last change of scale gave; 0 until there was one
-    FScalePixelsPerInch: Integer;
     FIsUpdatingScrollBars: Boolean;
     FScrollBarsDirty: Boolean;
 
@@ -72,8 +71,6 @@ type
     procedure SetSelectionOpacity(const Value: Byte);
 
     procedure ApplyColors;
-    function PixelsPerInch: Integer;
-    procedure UpdateViewport;
     procedure UpdateScrollBars;
     procedure HandleScroll(const Bar: Integer; const ScrollCode: Integer);
     function HandleKey(const Key: Word; const Shift: TShiftState): Boolean;
@@ -85,7 +82,6 @@ type
     procedure HandleZoomChanged(Sender: TObject);
 
     // IPdfViewHost
-    procedure HostInvalidate(const Rect: TRect);
     procedure HostScrollStateChanged;
     procedure HostCursorChanged;
     function HostCreateImage(const Bitmap: TPdfBitmap): IPdfViewImage;
@@ -108,7 +104,7 @@ type
     procedure Loaded; override;
     procedure Paint; override;
     procedure Resize; override;
-    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
+    procedure UpdateViewport; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -179,8 +175,7 @@ uses
   Vcl.Forms,
   Pdf4D.Common.Defines,
   Pdf4D.Viewer.ResourceStrings,
-  Pdf4D.Vcl.Painter,
-  Pdf4D.Vcl.ViewSupport;
+  Pdf4D.Vcl.Painter;
 
 const
   InitialSize = 200;
@@ -371,20 +366,6 @@ begin
   Invalidate;
 end;
 
-// The scale that the window has now: what the last change of scale gave, else what the window reports
-function TPdf4DPageView.PixelsPerInch: Integer;
-begin
-  Result := FScalePixelsPerInch;
-  if Result <= 0 then
-  begin
-    Result := CurrentPPI;
-  end;
-  if Result <= 0 then
-  begin
-    Result := LogicalPixelsPerInch;
-  end;
-end;
-
 procedure TPdf4DPageView.UpdateViewport;
 begin
   FController.SetViewport(TSize.Create(ClientWidth, ClientHeight), PixelsPerInch);
@@ -405,18 +386,6 @@ end;
 
 procedure TPdf4DPageView.Resize;
 begin
-  inherited;
-  UpdateViewport;
-end;
-
-procedure TPdf4DPageView.ChangeScale(M, D: Integer; isDpiChange: Boolean);
-begin
-  if isDpiChange then
-  begin
-    // Before the size changes, so that the viewport gets the new size together with the new scale
-    FScalePixelsPerInch := M;
-  end;
-
   inherited;
   UpdateViewport;
 end;
@@ -500,15 +469,6 @@ begin
 end;
 
 { IPdfViewHost }
-
-procedure TPdf4DPageView.HostInvalidate(const Rect: TRect);
-begin
-  if HandleAllocated then
-  begin
-    var Area := Rect;
-    InvalidateRect(Handle, @Area, False);
-  end;
-end;
 
 procedure TPdf4DPageView.HostScrollStateChanged;
 begin
