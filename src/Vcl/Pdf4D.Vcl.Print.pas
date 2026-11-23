@@ -134,6 +134,8 @@ begin
   Result := TPointF.Create(GetDeviceCaps(FPrinter.Handle, LOGPIXELSX), GetDeviceCaps(FPrinter.Handle, LOGPIXELSY));
 end;
 
+// The copies are made by the printer driver. A driver that cannot make copies (no DM_COPIES) ignores them and prints one; the pages are
+// not sent again for it.
 procedure TPdfVclPrinterTarget.BeginDocument(const Title: string; const Copies: Integer);
 begin
   FPrinter.Title := Title;

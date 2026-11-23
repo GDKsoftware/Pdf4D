@@ -176,6 +176,8 @@ uses
   Winapi.Windows,
   Vcl.Clipbrd,
   Vcl.Forms,
+  Pdf4D.Common.Defines,
+  Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Vcl.Painter;
 
 const
@@ -808,9 +810,20 @@ begin
   end;
 
   var Selection: TPdfTextSelection;
-  if FController.TryGetSelection(Selection) then
+  if not FController.TryGetSelection(Selection) then
   begin
+    Exit;
+  end;
+
+  // Another program can hold the clipboard: the copy fails with a beep and a line in the log, not with an error for the user
+  try
     WriteClipboardText(Selection.Text);
+  except
+    on E: EClipboardException do
+    begin
+      FDocument.Log(TPdfLogLevel.Warning, Format(SCopyFailed, [E.Message]));
+      System.SysUtils.Beep;
+    end;
   end;
 end;
 

@@ -118,10 +118,11 @@ type
   published
     property Document: TPdf4DCustomDocument read FDocument write SetDocument;
     property Options: TPdf4DViewerOptions read FOptions write SetOptions default [Low(TPdf4DViewerOption)..High(TPdf4DViewerOption)];
-    // Logical pixels
+    // Pixels of the viewer, as Width is: a form from a .dfm scales it with the rest, a value set in code is not scaled
     property SidePanelWidth: Integer read GetSidePanelWidth write SetSidePanelWidth default 180;
     // True: a document that needs a password asks for it, at most three times
     property AskPassword: Boolean read FAskPassword write FAskPassword default True;
+    // The events of the page view; their Sender is the page view
     property OnTextSelected: TPdfTextSelectedEvent read GetOnTextSelected write SetOnTextSelected;
     property OnHoverChanged: TPdfHoverChangedEvent read GetOnHoverChanged write SetOnHoverChanged;
     property OnLinkClick: TPdfLinkClickEvent read GetOnLinkClick write SetOnLinkClick;
@@ -158,6 +159,8 @@ begin
   inherited Create(Owner);
   FOptions := [Low(TPdf4DViewerOption)..High(TPdf4DViewerOption)];
   FAskPassword := True;
+  // The parts are its only controls: a designer does not drop others into it
+  ControlStyle := ControlStyle - [csAcceptsControls, csSetCaption];
   BevelOuter := TBevelCut.bvNone;
   ShowCaption := False;
   Caption := '';

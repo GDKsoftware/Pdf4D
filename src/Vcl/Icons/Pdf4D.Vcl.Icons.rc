@@ -1,0 +1,15 @@
+// The icons of the toolbar, 16 by 16 pixels with alpha. Compile with brcc32 Pdf4D.Vcl.Icons.rc (or the resource compiler of the IDE) into
+// Pdf4D.Vcl.Icons.res; the toolbar loads them by these names and scales them to the resolution of the monitor.
+PDF4D_ICON_FIRST RCDATA "First.png"
+PDF4D_ICON_PRIOR RCDATA "Prior.png"
+PDF4D_ICON_NEXT RCDATA "Next.png"
+PDF4D_ICON_LAST RCDATA "Last.png"
+PDF4D_ICON_ZOOMIN RCDATA "ZoomIn.png"
+PDF4D_ICON_ZOOMOUT RCDATA "ZoomOut.png"
+PDF4D_ICON_FITWIDTH RCDATA "FitWidth.png"
+PDF4D_ICON_FITPAGE RCDATA "FitPage.png"
+PDF4D_ICON_ROTATECLOCKWISE RCDATA "RotateClockwise.png"
+PDF4D_ICON_ROTATECOUNTERCLOCKWISE RCDATA "RotateCounterclockwise.png"
+PDF4D_ICON_SEARCH RCDATA "Search.png"
+PDF4D_ICON_PRINT RCDATA "Print.png"
+PDF4D_ICON_COPY RCDATA "Copy.png"

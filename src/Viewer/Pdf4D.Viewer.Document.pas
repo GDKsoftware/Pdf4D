@@ -91,7 +91,6 @@ type
     procedure HandleOpenFailed(const Outcome: TPdfOpenResult);
     // The worker of the open document stopped after a fatal error; the session has logged it
     procedure HandleSessionFatal(const Message: string);
-    procedure Log(const Level: TPdfLogLevel; const Message: string);
     procedure Notify(const Change: TPdfDocumentChange);
     procedure OverlaysChanged;
     procedure CheckOpen;
@@ -129,6 +128,8 @@ type
     // Copies Stream from its position to its end; the stream is not used afterwards
     procedure Open(const Stream: TStream); overload;
     procedure Close;
+    // Calls OnLog; also for the views of the document, which have no log of their own
+    procedure Log(const Level: TPdfLogLevel; const Message: string);
     function State: TPdfDocumentState;
     // Nil while Closed
     function Session: IPdfViewerSession;

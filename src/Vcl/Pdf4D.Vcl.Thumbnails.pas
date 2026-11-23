@@ -57,6 +57,7 @@ type
     function IPdfViewHost.CreateImage = HostCreateImage;
 
     procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -125,6 +126,7 @@ begin
   FSelectedColor := DefaultSelectedTColor;
   FController := TPdfThumbnailsController.Create(Self);
   FController.SelectedColor := ToAlphaColor(FSelectedColor);
+  FController.BackgroundColor := ToAlphaColor(Color);
 end;
 
 destructor TPdf4DThumbnails.Destroy;
@@ -336,6 +338,16 @@ procedure TPdf4DThumbnails.WMVScroll(var Message: TWMVScroll);
 begin
   HandleScroll(Message.ScrollCode);
   Message.Result := 0;
+end;
+
+// The constructor sets the color before the controller exists
+procedure TPdf4DThumbnails.CMColorChanged(var Message: TMessage);
+begin
+  inherited;
+  if Assigned(FController) then
+  begin
+    FController.BackgroundColor := ToAlphaColor(Color);
+  end;
 end;
 
 { IPdfViewHost }

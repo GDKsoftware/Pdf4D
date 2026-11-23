@@ -14,6 +14,7 @@ uses
   System.Generics.Collections,
   Vcl.Graphics,
   DUnitX.TestFramework,
+  Pdf4D.Common.Defines,
   Pdf4D.Common.Quad,
   Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Viewer.Types,
@@ -22,6 +23,12 @@ uses
   Pdf4D.Tests.VclHost;
 
 type
+  // A page view whose clipboard is held by another program
+  TBusyClipboardPageView = class(TPdf4DPageView)
+  protected
+    procedure WriteClipboardText(const Text: string); override;
+  end;
+
   TPixel = record
     R, G, B: Byte;
   end;
@@ -32,9 +39,11 @@ type
     FHost: TVclTestHost;
     FSelections: TList<TPdfTextSelection>;
     FHoverTexts: TList<string>;
+    FLogLines: TList<string>;
 
     procedure HandleTextSelected(Sender: TObject; const Selection: TPdfTextSelection);
     procedure HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
+    procedure HandleLog(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
 
     // Opens the data and waits until the first page is painted with its text known
     procedure OpenAndSettle(const Data: TBytes);
@@ -94,6 +103,9 @@ type
 
     [Test]
     procedure TestFreeTellsZoomListenersWhileTheyAreRegistered;
+
+    [Test]
+    procedure TestBusyClipboardIsLoggedNotRaised;
   end;
 
 implementation
@@ -129,6 +141,14 @@ const
   ScrollAway = 20000;
   QuietPeriodMs = 500;
   BackgroundGray = 224;
+  BusyClipboard = 'the clipboard is busy';
+
+{ TBusyClipboardPageView }
+
+procedure TBusyClipboardPageView.WriteClipboardText(const Text: string);
+begin
+  raise EClipboardException.Create(BusyClipboard);
+end;
 
 { TPdf4DPageViewTests }
 
@@ -136,6 +156,7 @@ procedure TPdf4DPageViewTests.Setup;
 begin
   FSelections := TList<TPdfTextSelection>.Create;
   FHoverTexts := TList<string>.Create;
+  FLogLines := TList<string>.Create;
   FHost := TVclTestHost.Create(ViewWidth, ViewHeight);
   FHost.PageView.OnTextSelected := HandleTextSelected;
   FHost.PageView.OnHoverChanged := HandleHoverChanged;
@@ -145,6 +166,7 @@ procedure TPdf4DPageViewTests.TearDown;
 begin
   FreeAndNil(FHost);
   FHoverTexts.Free;
+  FLogLines.Free;
   FSelections.Free;
 end;
 
@@ -556,6 +578,34 @@ begin
   finally
     Probe.Free;
   end;
+end;
+
+procedure TPdf4DPageViewTests.HandleLog(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
+begin
+  FLogLines.Add(Message);
+end;
+
+procedure TPdf4DPageViewTests.TestBusyClipboardIsLoggedNotRaised;
+begin
+  OpenAndSettle(TViewerDocuments.Invoice);
+  FHost.Document.OnLog := HandleLog;
+  const View = TBusyClipboardPageView.Create(FHost.Form);
+  View.Parent := FHost.Form;
+  View.Document := FHost.Document;
+  Assert.IsTrue(FHost.WaitForPageText(0));
+  Assert.IsTrue(View.Controller.KeyDown(TPdfViewerKey.SelectAll), 'all text is selected');
+
+  View.CopyToClipboard;
+
+  var Lines := 0;
+  for var Line in FLogLines do
+  begin
+    if Line.Contains(BusyClipboard) then
+    begin
+      Inc(Lines);
+    end;
+  end;
+  Assert.AreEqual(1, Lines, 'the failure is in the log once');
 end;
 
 end.

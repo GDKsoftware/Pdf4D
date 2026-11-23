@@ -25,6 +25,7 @@ resourcestring
   SPrintAlreadyRunning = 'A print job is running already.';
   SPrintNeedsDocument = 'Printing needs a document.';
   SPrintNotAllowed = 'The document does not allow printing.';
+  SCopyFailed = 'The selected text could not be copied: %s';
   SPrintDialogCaption = 'Print';
   SPrintPrinterLabel = 'Printer';
   SPrintProperties = 'Properties...';

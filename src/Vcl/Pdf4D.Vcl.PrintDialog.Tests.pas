@@ -83,6 +83,9 @@ type
 
     [Test]
     procedure TestProgressWindowScalesToTheMonitor;
+
+    [Test]
+    procedure TestPrintActionGivesItsDocumentToTheDialog;
   end;
 
 implementation
@@ -96,6 +99,8 @@ uses
   Pdf4D.Viewer.Print,
   Pdf4D.Vcl.Actions,
   Pdf4D.Vcl.PrintDialog,
+  Pdf4D.Vcl.Document,
+  Pdf4D.Render.Skia.Backend,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -504,6 +509,47 @@ begin
   finally
     Form.Free;
   end;
+end;
+
+// The action gives its document to a dialog without one, and follows its document when it changes; a document that the application gave
+// the dialog stays
+procedure TPdf4DPrintDialogTests.TestPrintActionGivesItsDocumentToTheDialog;
+begin
+  TPdf4DPrintDialog.ModalRunner :=
+    function(Form: TPdf4DPrintDialogForm): TModalResult
+    begin
+      Result := mrCancel;
+    end;
+
+  Assert.IsTrue(FHost.Open(TViewerDocuments.Invoice), 'the document opens');
+  const Second = TPdf4DDocument.Create(FHost.Form);
+  Second.RenderBackend := TPdfSkiaBackend.Create;
+  const Stream = TBytesStream.Create(TViewerDocuments.Pages(3, 612, 792, 0));
+  try
+    Second.Open(Stream);
+  finally
+    Stream.Free;
+  end;
+  Assert.IsTrue(FHost.WaitUntil(
+    function: Boolean
+    begin
+      Result := (Second.State = TPdfDocumentState.Open);
+    end), 'the second document opens');
+
+  const Dialog = TPdf4DPrintDialog.Create(FHost.Form);
+  const Action = TPdf4DPrintAction.Create(FHost.Form);
+  Action.PrintDialog := Dialog;
+  Action.Document := FHost.Document;
+  Action.Execute;
+  Assert.AreSame(FHost.Document, Dialog.Document, 'the document of the action');
+
+  Action.Document := Second;
+  Action.Execute;
+  Assert.AreSame(Second, Dialog.Document, 'the new document of the action');
+
+  Dialog.Document := FHost.Document;
+  Action.Execute;
+  Assert.AreSame(FHost.Document, Dialog.Document, 'the document that the application chose');
 end;
 
 end.

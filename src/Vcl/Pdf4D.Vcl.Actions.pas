@@ -182,6 +182,8 @@ type
   TPdf4DPrintAction = class(TPdf4DDocumentAction)
   private
     FPrintDialog: TPdf4DPrintDialog;
+    // The document that the action gave FPrintDialog; it is compared, never used
+    FGivenDocument: TPdf4DCustomDocument;
 
     procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
 
@@ -699,19 +701,23 @@ end;
 
 procedure TPdf4DPrintAction.Perform(const Document: TPdf4DCustomDocument);
 begin
-  // A dialog of the application keeps the choices of the user for the next time; its document is the one of the action unless it has one
+  // A dialog of the application keeps the choices of the user for the next time. It prints the document of the action, unless the
+  // application gave it another one.
   if Assigned(FPrintDialog) then
   begin
-    if not Assigned(FPrintDialog.Document) then
+    const IsOurs = (not Assigned(FPrintDialog.Document)) or (FPrintDialog.Document = FGivenDocument);
+    if IsOurs then
     begin
       FPrintDialog.Document := Document;
+      FGivenDocument := Document;
     end;
     FPrintDialog.Execute;
     Exit;
   end;
 
-  // The dialog of the action lives until its job is over, which is after this returns
-  const Dialog = TPdf4DPrintDialog.Create(nil);
+  // The dialog of the action lives until its job is over, which is after this returns. The application owns it as well, so that a job
+  // that still runs when the application ends does not leak.
+  const Dialog = TPdf4DPrintDialog.Create(Application);
   var IsPrinting := False;
   try
     Dialog.Document := Document;

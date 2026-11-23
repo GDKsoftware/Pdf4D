@@ -32,12 +32,16 @@ type
 
     [Test]
     procedure TestThumbnailsFollowCurrentPage;
+
+    [Test]
+    procedure TestColorIsTheBackground;
   end;
 
 implementation
 
 uses
   System.Math,
+  System.UITypes,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -49,6 +53,7 @@ const
   SecondThumbnailRow = 250;
   FrameBlue: TVclPixel = (R: 30; G: 144; B: 255);
   FrameTolerance = 40;
+  BackgroundRed: TColor = $000000FF;
 
 { TPdf4DThumbnailsTests }
 
@@ -114,6 +119,22 @@ begin
   try
     Assert.AreEqual(0, CountFramePixels(Bitmap, 0, FirstCellBottom - 1), 'the first thumbnail lost the frame');
     Assert.IsTrue(CountFramePixels(Bitmap, FirstCellBottom, Bitmap.Height) > 0, 'the second thumbnail has the frame');
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TPdf4DThumbnailsTests.TestColorIsTheBackground;
+begin
+  FHost.Thumbnails.Color := BackgroundRed;
+  FHost.Pump(1);
+
+  const Bitmap = FHost.SnapshotOf(FHost.Thumbnails);
+  try
+    const Pixel = TVclTestHost.PixelAt(Bitmap, 1, 1);
+    Assert.AreEqual(255, Integer(Pixel.R), 'red');
+    Assert.AreEqual(0, Integer(Pixel.G), 'no green');
+    Assert.AreEqual(0, Integer(Pixel.B), 'no blue');
   finally
     Bitmap.Free;
   end;

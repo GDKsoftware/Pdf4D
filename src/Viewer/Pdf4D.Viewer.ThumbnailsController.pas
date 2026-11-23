@@ -23,6 +23,7 @@ const
   // Logical pixels
   DefaultThumbnailWidth = 120;
   DefaultSelectedColor: TAlphaColor = $FF1E90FF;
+  DefaultThumbnailsBackgroundColor: TAlphaColor = $FFE0E0E0;
 
 type
   // Shows the pages of a document as small pictures in one column, each with its page label, and marks the current page. It renders
@@ -53,6 +54,7 @@ type
     FThumbnailWidth: Integer;
     FCacheBytes: Int64;
     FSelectedColor: TAlphaColor;
+    FBackgroundColor: TAlphaColor;
     FImages: TPdfLruCache<TPdfTileKey, IPdfViewImage>;
     FPending: TDictionary<Integer, IPdfViewerRequest>;
     FFailed: TDictionary<Integer, Boolean>;
@@ -64,6 +66,7 @@ type
     procedure SetThumbnailWidth(const Value: Integer);
     procedure SetCacheBytes(const Value: Int64);
     procedure SetSelectedColor(const Value: TAlphaColor);
+    procedure SetBackgroundColor(const Value: TAlphaColor);
 
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
     procedure AttachOpenDocument;
@@ -129,6 +132,8 @@ type
     property CacheBytes: Int64 read FCacheBytes write SetCacheBytes;
     // The frame around the thumbnail of the current page
     property SelectedColor: TAlphaColor read FSelectedColor write SetSelectedColor;
+    // Around and between the thumbnails
+    property BackgroundColor: TAlphaColor read FBackgroundColor write SetBackgroundColor;
   end;
 
 implementation
@@ -144,7 +149,6 @@ const
   Spacing = 8;
   FrameWidth = 2;
   BytesPerPixel = 4;
-  BackgroundColor: TAlphaColor = $FFE0E0E0;
   PageColor: TAlphaColor = $FFFFFFFF;
   LabelColor: TAlphaColor = $FF202020;
   // A thumbnail is at most this many times as high as it is wide: a tall page gets a narrower one
@@ -167,6 +171,7 @@ begin
   FThumbnailWidth := DefaultThumbnailWidth;
   FCacheBytes := DefaultThumbnailCacheBytes;
   FSelectedColor := DefaultSelectedColor;
+  FBackgroundColor := DefaultThumbnailsBackgroundColor;
   FImages := TPdfLruCache<TPdfTileKey, IPdfViewImage>.Create(FCacheBytes);
   FPending := TDictionary<Integer, IPdfViewerRequest>.Create;
   FFailed := TDictionary<Integer, Boolean>.Create;
@@ -228,6 +233,17 @@ begin
   FCacheBytes := Value;
   // What one thumbnail may take depends on it
   Relayout(True);
+end;
+
+procedure TPdfThumbnailsController.SetBackgroundColor(const Value: TAlphaColor);
+begin
+  if Value = FBackgroundColor then
+  begin
+    Exit;
+  end;
+
+  FBackgroundColor := Value;
+  InvalidateViewport;
 end;
 
 procedure TPdfThumbnailsController.SetSelectedColor(const Value: TAlphaColor);
@@ -746,7 +762,7 @@ end;
 
 procedure TPdfThumbnailsController.Paint(const Painter: IPdfViewPainter; const ClipRect: TRect);
 begin
-  Painter.FillRect(TRectF.Create(ClipRect), BackgroundColor);
+  Painter.FillRect(TRectF.Create(ClipRect), FBackgroundColor);
   if not FIsAttached then
   begin
     Exit;

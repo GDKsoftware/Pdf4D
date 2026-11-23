@@ -95,6 +95,9 @@ type
 
     [Test]
     procedure TestOpenedWhileTheViewerHasNoWindow;
+
+    [Test]
+    procedure TestViewerTakesNoOtherControls;
   end;
 
 implementation
@@ -563,6 +566,12 @@ begin
   finally
     Viewer.Free;
   end;
+end;
+
+procedure TPdf4DViewerTests.TestViewerTakesNoOtherControls;
+begin
+  Assert.IsFalse(csAcceptsControls in FViewer.ControlStyle, 'a designer drops no controls into the viewer');
+  Assert.IsFalse(csSetCaption in FViewer.ControlStyle, 'the viewer has no caption of its name');
 end;
 
 end.
