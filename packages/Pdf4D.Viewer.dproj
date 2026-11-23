@@ -94,6 +94,8 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Cache.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageText.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.TextMatcher.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Dispatcher.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Worker.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

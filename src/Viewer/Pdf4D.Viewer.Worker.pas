@@ -1,0 +1,269 @@
+// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+unit Pdf4D.Viewer.Worker;
+
+{$EXCESSPRECISION OFF}
+
+interface
+
+uses
+  System.Classes,
+  System.SysUtils,
+  System.SyncObjs,
+  System.Generics.Collections,
+  Pdf4D.Render.Renderer.Interfaces,
+  Pdf4D.Render.CancelToken,
+  Pdf4D.Viewer.Types;
+
+type
+  // One unit of work for the worker thread. The job owns its cancel token; the worker passes it to Execute.
+  TPdfWorkerJob = class abstract
+  private
+    FPriority: TPdfJobPriority;
+    FCancel: TPdfCancelToken;
+    FCancelIntf: IPdfCancelToken;
+
+  public
+    constructor Create(const Priority: TPdfJobPriority);
+
+    // Runs on the worker thread
+    procedure Execute(const Cancel: IPdfCancelToken); virtual; abstract;
+
+    property Priority: TPdfJobPriority read FPriority;
+    // Thread safe
+    property Cancel: TPdfCancelToken read FCancel;
+  end;
+
+  // The one thread of a document. Jobs run one at a time, the most urgent first and first in first out within one priority.
+  // An exception in a job is swallowed, except a fatal one (see TPdfFailure.IsFatal): after that the worker only frees jobs.
+  TPdfDocumentWorker = class(TThread)
+  private
+    FLock: TObject;
+    FWake: TEvent;
+    FQueue: TList<TPdfWorkerJob>;
+    FRunning: TPdfWorkerJob;
+    FFailed: Boolean;
+    FStopped: Boolean;
+
+    // Waits for a job and takes it out of the queue; nil when the thread must end
+    function TakeNext: TPdfWorkerJob;
+    function IndexOfMostUrgent: Integer;
+    procedure Run(const Job: TPdfWorkerJob);
+
+  protected
+    procedure Execute; override;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    // Takes ownership of Job; from any thread. After Stop the job is freed unexecuted.
+    procedure Enqueue(const Job: TPdfWorkerJob);
+    // Cancels the running job and every job in the queue
+    procedure CancelAll;
+    // Cancels all, ends the thread and waits for it; jobs that have not started are freed unexecuted
+    procedure Stop;
+  end;
+
+implementation
+
+uses
+  Pdf4D.Common.Defines;
+
+{ TPdfWorkerJob }
+
+constructor TPdfWorkerJob.Create(const Priority: TPdfJobPriority);
+begin
+  inherited Create;
+  FPriority := Priority;
+  FCancel := TPdfCancelToken.Create;
+  // The interface reference owns the token
+  FCancelIntf := FCancel;
+end;
+
+{ TPdfDocumentWorker }
+
+constructor TPdfDocumentWorker.Create;
+begin
+  // Everything the thread uses exists before it starts
+  FLock := TObject.Create;
+  FWake := TEvent.Create(nil, True, False, '');
+  FQueue := TList<TPdfWorkerJob>.Create;
+  inherited Create(False);
+end;
+
+destructor TPdfDocumentWorker.Destroy;
+begin
+  Stop;
+  FQueue.Free;
+  FWake.Free;
+  FLock.Free;
+  inherited;
+end;
+
+procedure TPdfDocumentWorker.Enqueue(const Job: TPdfWorkerJob);
+begin
+  var Accepted: Boolean;
+
+  TMonitor.Enter(FLock);
+  try
+    Accepted := (not FStopped);
+    if Accepted then
+    begin
+      FQueue.Add(Job);
+    end;
+  finally
+    TMonitor.Exit(FLock);
+  end;
+
+  if Accepted then
+  begin
+    FWake.SetEvent;
+  end
+  else
+  begin
+    Job.Free;
+  end;
+end;
+
+procedure TPdfDocumentWorker.CancelAll;
+begin
+  TMonitor.Enter(FLock);
+  try
+    for var Job in FQueue do
+    begin
+      Job.Cancel.Cancel;
+    end;
+
+    if Assigned(FRunning) then
+    begin
+      FRunning.Cancel.Cancel;
+    end;
+  finally
+    TMonitor.Exit(FLock);
+  end;
+end;
+
+procedure TPdfDocumentWorker.Stop;
+begin
+  var Pending: TArray<TPdfWorkerJob>;
+
+  TMonitor.Enter(FLock);
+  try
+    FStopped := True;
+  finally
+    TMonitor.Exit(FLock);
+  end;
+
+  CancelAll;
+  Terminate;
+  FWake.SetEvent;
+  WaitFor;
+
+  // The thread has ended, so nothing else touches the queue
+  TMonitor.Enter(FLock);
+  try
+    Pending := FQueue.ToArray;
+    FQueue.Clear;
+  finally
+    TMonitor.Exit(FLock);
+  end;
+
+  for var Job in Pending do
+  begin
+    Job.Free;
+  end;
+end;
+
+function TPdfDocumentWorker.IndexOfMostUrgent: Integer;
+begin
+  Result := -1;
+
+  for var Index := 0 to FQueue.Count - 1 do
+  begin
+    // Strictly lower only: a job that was queued earlier wins a tie
+    const IsMoreUrgent = ((Result < 0) or (Ord(FQueue[Index].Priority) < Ord(FQueue[Result].Priority)));
+    if IsMoreUrgent then
+    begin
+      Result := Index;
+    end;
+  end;
+end;
+
+function TPdfDocumentWorker.TakeNext: TPdfWorkerJob;
+begin
+  Result := nil;
+
+  while (not Terminated) and (not Assigned(Result)) do
+  begin
+    TMonitor.Enter(FLock);
+    try
+      const Index = IndexOfMostUrgent;
+      if Index >= 0 then
+      begin
+        Result := FQueue[Index];
+        FQueue.Delete(Index);
+        FRunning := Result;
+      end
+      else
+      begin
+        // Reset under the lock that Enqueue adds under: a job that arrives after this check sets the event again
+        FWake.ResetEvent;
+      end;
+    finally
+      TMonitor.Exit(FLock);
+    end;
+
+    if not Assigned(Result) then
+    begin
+      FWake.WaitFor(INFINITE);
+    end;
+  end;
+end;
+
+procedure TPdfDocumentWorker.Run(const Job: TPdfWorkerJob);
+begin
+  const MustSkip = (FFailed or Terminated or Job.Cancel.IsCancelled);
+  if MustSkip then
+  begin
+    Exit;
+  end;
+
+  try
+    Job.Execute(Job.Cancel);
+  except
+    on Failure: Exception do
+    begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        FFailed := True;
+      end;
+    end;
+  end;
+end;
+
+procedure TPdfDocumentWorker.Execute;
+begin
+  while not Terminated do
+  begin
+    const Job = TakeNext;
+    if not Assigned(Job) then
+    begin
+      Break;
+    end;
+
+    try
+      Run(Job);
+    finally
+      TMonitor.Enter(FLock);
+      try
+        FRunning := nil;
+      finally
+        TMonitor.Exit(FLock);
+      end;
+      Job.Free;
+    end;
+  end;
+end;
+
+end.
