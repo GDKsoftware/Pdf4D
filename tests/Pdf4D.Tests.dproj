@@ -259,6 +259,10 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewTransform.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewLayout.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewLayout.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Tiles.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Tiles.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Cache.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Cache.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>

@@ -21,6 +21,10 @@ const
   MaxPageEdgePixels = 100000;
   // Logical pixels (at 96 dpi) between pages and around them
   PageGap = 8;
+  DefaultTileCacheBytes: Int64 = 128 * 1024 * 1024;
+  DefaultThumbnailCacheBytes: Int64 = 32 * 1024 * 1024;
+  // Pages per document
+  DefaultPageTextCacheCount = 64;
 
 type
   {$SCOPEDENUMS ON}

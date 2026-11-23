@@ -90,6 +90,8 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewLayout.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Tiles.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Cache.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
