@@ -301,7 +301,6 @@ uses
   System.Math;
 
 const
-  ZoomSteps: array[0..11] of Single = (0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8);
   // Two steps are the same when they differ less than this
   ZoomStepTolerance = 0.0001;
   PageColor: TAlphaColor = $FFFFFFFF;
@@ -828,8 +827,9 @@ function TPdfPageViewController.NextZoomStep(const Upwards: Boolean): Single;
 begin
   if Upwards then
   begin
-    for var Step in ZoomSteps do
+    for var Percentage in PdfZoomSteps do
     begin
+      const Step: Single = Percentage / PercentPerFactor;
       if Step > FZoom + ZoomStepTolerance then
       begin
         Exit(Step);
@@ -838,11 +838,12 @@ begin
     Exit(MaxZoom);
   end;
 
-  for var Index := High(ZoomSteps) downto Low(ZoomSteps) do
+  for var Index := High(PdfZoomSteps) downto Low(PdfZoomSteps) do
   begin
-    if ZoomSteps[Index] < FZoom - ZoomStepTolerance then
+    const Step: Single = PdfZoomSteps[Index] / PercentPerFactor;
+    if Step < FZoom - ZoomStepTolerance then
     begin
-      Exit(ZoomSteps[Index]);
+      Exit(Step);
     end;
   end;
   Result := MinZoom;

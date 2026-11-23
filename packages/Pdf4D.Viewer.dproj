@@ -104,6 +104,9 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Print.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Commands.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.SearchBarModel.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PasswordRetry.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

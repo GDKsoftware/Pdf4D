@@ -78,8 +78,6 @@ type
     FComboZoom: TComboBox;
 
     class function IconResourceName(const Icon: TToolbarIcon): string; static;
-    // The position of the percentage in the zoom steps, or -1
-    class function IndexOfPercentage(const Percentage: Integer): Integer; static;
     class procedure DrawIcon(const Png: TPngImage; const Bitmap: Vcl.Graphics.TBitmap); static;
     class function PremultipliedAt(const Png: TPngImage; const X, Y, Channel: Integer): Integer; static;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
@@ -165,6 +163,7 @@ uses
   System.SysUtils,
   System.Types,
   Winapi.Windows,
+  Pdf4D.Viewer.Commands,
   Pdf4D.Viewer.ResourceStrings;
 
 const
@@ -179,12 +178,6 @@ const
   AlphaChannel = 3;
   EnterKey = #13;
   EscapeKey = #27;
-  FirstZoomItems = 2;
-  ZoomItemFitWidth = 0;
-  ZoomItemFitPage = 1;
-  // The same steps as the zoom commands of the page view
-  ZoomPercentages: array[0..11] of Integer = (10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 600, 800);
-  PercentSign = '%';
 
 { TPdf4DToolbar }
 
@@ -194,18 +187,6 @@ const
                                           'ROTATECLOCKWISE', 'ROTATECOUNTERCLOCKWISE', 'SEARCH', 'PRINT', 'COPY');
 begin
   Result := IconResourcePrefix + Names[Icon];
-end;
-
-class function TPdf4DToolbar.IndexOfPercentage(const Percentage: Integer): Integer;
-begin
-  Result := -1;
-  for var Index := Low(ZoomPercentages) to High(ZoomPercentages) do
-  begin
-    if ZoomPercentages[Index] = Percentage then
-    begin
-      Exit(Index);
-    end;
-  end;
 end;
 
 constructor TPdf4DToolbar.Create(Owner: TComponent);
@@ -668,12 +649,7 @@ begin
   FComboZoom.Style := csDropDown;
   FComboZoom.Hint := SZoomHint;
   FComboZoom.ShowHint := True;
-  FComboZoom.Items.Add(SZoomFitWidth);
-  FComboZoom.Items.Add(SZoomFitPage);
-  for var Percentage in ZoomPercentages do
-  begin
-    FComboZoom.Items.Add(Percentage.ToString + PercentSign);
-  end;
+  FComboZoom.Items.AddStrings(TPdfZoomText.Items);
   FComboZoom.OnSelect := HandleZoomSelect;
   FComboZoom.OnKeyPress := HandleZoomKeyPress;
 
@@ -737,18 +713,9 @@ begin
     Exit;
   end;
 
-  const IsOpen = Assigned(FDocument) and (FDocument.State = TPdfDocumentState.Open);
-  FEditPage.Enabled := IsOpen;
-  if IsOpen then
-  begin
-    FEditPage.Text := (FDocument.CurrentPage + 1).ToString;
-    FLabelPages.Caption := Format(SPageCountOf, [FDocument.PageCount]);
-  end
-  else
-  begin
-    FEditPage.Text := '';
-    FLabelPages.Caption := Format(SPageCountOf, [0]);
-  end;
+  FEditPage.Enabled := TPdfViewerCommands.IsOpen(FDocument);
+  FEditPage.Text := TPdfViewerCommands.PageNumberText(FDocument);
+  FLabelPages.Caption := TPdfViewerCommands.PageCountText(FDocument);
 end;
 
 procedure TPdf4DToolbar.UpdateZoom;
@@ -759,7 +726,7 @@ begin
   end;
 
   const HasView = Assigned(FPageView);
-  FComboZoom.Enabled := HasView and Assigned(FPageView.Document) and (FPageView.Document.State = TPdfDocumentState.Open);
+  FComboZoom.Enabled := HasView and TPdfViewerCommands.IsOpen(FPageView.Document);
   if not HasView then
   begin
     FComboZoom.ItemIndex := -1;
@@ -767,27 +734,9 @@ begin
     Exit;
   end;
 
-  case FPageView.ZoomMode of
-    TPdfZoomMode.FitWidth:
-      FComboZoom.ItemIndex := ZoomItemFitWidth;
-    TPdfZoomMode.FitPage:
-      FComboZoom.ItemIndex := ZoomItemFitPage;
-  else
-    begin
-      const Percentage = Round(FPageView.Zoom * 100);
-      const Step = IndexOfPercentage(Percentage);
-      // A zoom between the steps has no item
-      if Step >= 0 then
-      begin
-        FComboZoom.ItemIndex := FirstZoomItems + Step;
-      end
-      else
-      begin
-        FComboZoom.ItemIndex := -1;
-      end;
-      FComboZoom.Text := Percentage.ToString + PercentSign;
-    end;
-  end;
+  // A zoom between the steps has no item, only its text
+  FComboZoom.ItemIndex := TPdfZoomText.IndexOf(FPageView.ZoomMode, FPageView.Zoom);
+  FComboZoom.Text := TPdfZoomText.Format(FPageView.ZoomMode, FPageView.Zoom);
 end;
 
 { Page number }
@@ -815,18 +764,7 @@ end;
 
 procedure TPdf4DToolbar.CommitPageNumber;
 begin
-  var Number := 0;
-  var IsPage := Assigned(FDocument) and (FDocument.State = TPdfDocumentState.Open);
-  if IsPage then
-  begin
-    IsPage := TryStrToInt(Trim(FEditPage.Text), Number) and InRange(Number, 1, FDocument.PageCount);
-  end;
-
-  if IsPage then
-  begin
-    FDocument.CurrentPage := Number - 1;
-  end;
-
+  TPdfViewerCommands.TryGoToPageNumber(FDocument, FEditPage.Text);
   // A valid number shows as it is written in the field; what is not a page of the document goes back to the current page
   UpdatePageNumber;
 end;
@@ -859,25 +797,16 @@ end;
 
 procedure TPdf4DToolbar.ApplyZoomText(const Text: string);
 begin
-  var Percentage: Double;
-  const Trimmed = Text.Trim.TrimRight([PercentSign]).Trim;
-  if not Assigned(FPageView) then
+  var Mode: TPdfZoomMode;
+  var Zoom: Single;
+  const IsValid = Assigned(FPageView) and TPdfZoomText.TryParse(Text, Mode, Zoom);
+  if IsValid and (Mode = TPdfZoomMode.Factor) then
   begin
-    UpdateZoom;
-    Exit;
-  end;
-
-  if SameText(Text.Trim, SZoomFitWidth) then
-  begin
-    FPageView.ZoomMode := TPdfZoomMode.FitWidth;
+    FPageView.Zoom := Zoom;
   end
-  else if SameText(Text.Trim, SZoomFitPage) then
+  else if IsValid then
   begin
-    FPageView.ZoomMode := TPdfZoomMode.FitPage;
-  end
-  else if TryStrToFloat(Trimmed, Percentage) and (Percentage > 0) then
-  begin
-    FPageView.Zoom := Percentage / 100;
+    FPageView.ZoomMode := Mode;
   end;
 
   // The page view tells a change of zoom or of its mode, but not a text that was not valid

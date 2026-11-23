@@ -127,6 +127,10 @@ type
     procedure Open; overload;
     // Copies Stream from its position to its end; the stream is not used afterwards
     procedure Open(const Stream: TStream); overload;
+    // Whether there is a file to open again: a document from a stream is gone once it is closed or has failed
+    function CanReopen: Boolean;
+    // Opens the file again with another password, as the question for a password does. Raises EInvalidOpException when CanReopen is False.
+    procedure Reopen(const Password: string);
     procedure Close;
     // Calls OnLog; also for the views of the document, which have no log of their own
     procedure Log(const Level: TPdfLogLevel; const Message: string);
@@ -326,6 +330,22 @@ begin
   begin
     OpenSession.Open(FFileName, FPassword, OpenDoneEvent());
   end;
+end;
+
+function TPdf4DCustomDocument.CanReopen: Boolean;
+begin
+  Result := (FFileName <> '');
+end;
+
+procedure TPdf4DCustomDocument.Reopen(const Password: string);
+begin
+  if not CanReopen then
+  begin
+    raise EInvalidOpException.Create(SDocumentHasNoFile);
+  end;
+
+  FPassword := Password;
+  Open;
 end;
 
 procedure TPdf4DCustomDocument.Open(const Stream: TStream);

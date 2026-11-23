@@ -11,6 +11,7 @@ resourcestring
   SOverlayNoQuads = 'An overlay needs at least one quad.';
   SOverlayQuadNotFinite = 'The quads of an overlay must have finite coordinates.';
   SDocumentNotOpen = 'The document is not open.';
+  SDocumentHasNoFile = 'The document has no file to open again.';
   SNoStream = 'Open needs a stream.';
   SWorkerStopped = 'The document worker stopped after a fatal error.';
   SWorkerFatal = 'The document worker stopped after a fatal error: %s';

@@ -12,30 +12,26 @@ uses
   Vcl.ExtCtrls,
   Vcl.StdCtrls,
   Vcl.Buttons,
-  Pdf4D.Viewer.Types,
-  Pdf4D.Viewer.Document;
+  Pdf4D.Viewer.Document,
+  Pdf4D.Viewer.SearchBarModel;
 
 type
   // A query field with buttons to step through the hits, and the number of the current hit. Enter searches, or goes to the next hit
-  // when the query did not change; Shift+Enter goes to the previous hit; Escape clears the search.
+  // when the query did not change; Shift+Enter goes to the previous hit; Escape clears the search. A shell around TPdfSearchBarModel.
   TPdf4DSearchBar = class(TCustomPanel)
   private
     FDocument: TPdf4DCustomDocument;
-    FLink: TPdfDocumentLink;
+    FModel: TPdfSearchBarModel;
     FEditQuery: TEdit;
     FButtonPrior: TSpeedButton;
     FButtonNext: TSpeedButton;
     FCheckBoxMatchCase: TCheckBox;
     FLabelResult: TLabel;
-    // What the last search looked for; a search was done when FHasSearched
-    FHasSearched: Boolean;
-    FLastQuery: string;
-    FLastMatchCase: Boolean;
 
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure CreateControls;
     function NewButton(const Caption, Hint: string; const Left: Integer): TSpeedButton;
-    procedure HandleDocumentChange(const Change: TPdfDocumentChange);
+    procedure HandleModelChanged(Sender: TObject);
 
     procedure HandleQueryKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure HandleQueryKeyPress(Sender: TObject; var Key: Char);
@@ -43,10 +39,6 @@ type
     procedure HandleNextClick(Sender: TObject);
     procedure HandleMatchCaseClick(Sender: TObject);
 
-    function CanSearch: Boolean;
-    function IsSameSearch: Boolean;
-    procedure StartSearch;
-    // Goes to the next or previous hit of the search of the query, or starts that search
     procedure Advance(const IsForward: Boolean);
     procedure ClearSearch;
     procedure UpdateResult;
@@ -76,7 +68,6 @@ type
 implementation
 
 uses
-  System.Math,
   System.SysUtils,
   Winapi.Windows,
   Pdf4D.Viewer.ResourceStrings;
@@ -107,13 +98,14 @@ begin
   Height := BarHeight;
   Width := EditLeft + EditWidth + Gap + 2 * (ButtonWidth + Gap) + CheckBoxWidth + Gap + ResultWidth;
 
-  FLink := TPdfDocumentLink.Create(HandleDocumentChange);
   CreateControls;
+  FModel := TPdfSearchBarModel.Create;
+  FModel.OnChanged := HandleModelChanged;
 end;
 
 destructor TPdf4DSearchBar.Destroy;
 begin
-  FLink.Free;
+  FModel.Free;
   inherited;
 end;
 
@@ -175,7 +167,7 @@ begin
   if (Operation = TOperation.opRemove) and (AComponent = FDocument) then
   begin
     FDocument := nil;
-    FLink.Document := nil;
+    FModel.Document := nil;
     ClearSearch;
   end;
 end;
@@ -193,123 +185,34 @@ begin
   end;
 
   FDocument := Value;
-  FHasSearched := False;
 
   if Assigned(FDocument) then
   begin
     FDocument.FreeNotification(Self);
   end;
 
-  FLink.Document := Value;
-  UpdateResult;
+  FModel.Document := Value;
 end;
 
-procedure TPdf4DSearchBar.HandleDocumentChange(const Change: TPdfDocumentChange);
+procedure TPdf4DSearchBar.HandleModelChanged(Sender: TObject);
 begin
-  case Change of
-    TPdfDocumentChange.Opening,
-    TPdfDocumentChange.Opened,
-    TPdfDocumentChange.OpenFailed,
-    TPdfDocumentChange.Closed:
-      begin
-        // The search belongs to the document that was open
-        FHasSearched := False;
-        UpdateResult;
-      end;
-    TPdfDocumentChange.SearchResults,
-    TPdfDocumentChange.CurrentSearchHit:
-      UpdateResult;
-    TPdfDocumentChange.CurrentPage,
-    TPdfDocumentChange.Overlays:
-      begin
-        // Not of interest
-      end;
-  end;
-end;
-
-function TPdf4DSearchBar.CanSearch: Boolean;
-begin
-  Result := Assigned(FDocument) and (FDocument.State = TPdfDocumentState.Open);
-end;
-
-function TPdf4DSearchBar.IsSameSearch: Boolean;
-begin
-  Result := FHasSearched and (FEditQuery.Text = FLastQuery) and (FCheckBoxMatchCase.Checked = FLastMatchCase);
-end;
-
-procedure TPdf4DSearchBar.StartSearch;
-begin
-  FHasSearched := True;
-  FLastQuery := FEditQuery.Text;
-  FLastMatchCase := FCheckBoxMatchCase.Checked;
-  FDocument.Search(FLastQuery, FLastMatchCase);
   UpdateResult;
 end;
 
 procedure TPdf4DSearchBar.Advance(const IsForward: Boolean);
 begin
-  if not CanSearch then
-  begin
-    Exit;
-  end;
-
-  if FEditQuery.Text = '' then
-  begin
-    ClearSearch;
-  end
-  else if IsSameSearch then
-  begin
-    if IsForward then
-    begin
-      FDocument.NextSearchHit;
-    end
-    else
-    begin
-      FDocument.PriorSearchHit;
-    end;
-  end
-  else
-  begin
-    StartSearch;
-  end;
+  FModel.Advance(FEditQuery.Text, FCheckBoxMatchCase.Checked, IsForward);
 end;
 
 procedure TPdf4DSearchBar.ClearSearch;
 begin
   FEditQuery.Clear;
-  FHasSearched := False;
-  FLastQuery := '';
-  if Assigned(FDocument) then
-  begin
-    // An empty query takes the hits away and stops a search that is running
-    FDocument.Search('', False);
-  end;
-  UpdateResult;
+  FModel.Clear;
 end;
 
 procedure TPdf4DSearchBar.UpdateResult;
 begin
-  var Text := '';
-  if Assigned(FDocument) and FHasSearched then
-  begin
-    const Count = Length(FDocument.SearchHits);
-    if Count > 0 then
-    begin
-      var Index: Integer;
-      var Hit: TPdfSearchHit;
-      FDocument.TryGetCurrentSearchHit(Index, Hit);
-      Text := Format(SSearchResultCount, [Max(Index, 0) + 1, Count]);
-    end
-    else if FDocument.IsSearching then
-    begin
-      Text := SSearching;
-    end
-    else
-    begin
-      Text := SSearchNoResults;
-    end;
-  end;
-  FLabelResult.Caption := Text;
+  FLabelResult.Caption := FModel.ResultText;
 end;
 
 procedure TPdf4DSearchBar.FocusQuery;
@@ -360,10 +263,7 @@ end;
 
 procedure TPdf4DSearchBar.HandleMatchCaseClick(Sender: TObject);
 begin
-  if CanSearch and FHasSearched and (FEditQuery.Text <> '') then
-  begin
-    StartSearch;
-  end;
+  FModel.MatchCaseChanged(FEditQuery.Text, FCheckBoxMatchCase.Checked);
 end;
 
 end.

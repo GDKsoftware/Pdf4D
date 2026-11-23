@@ -17,6 +17,7 @@ uses
   Vcl.ExtCtrls,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
+  Pdf4D.Viewer.PasswordRetry,
   Pdf4D.Vcl.PageView,
   Pdf4D.Vcl.Thumbnails,
   Pdf4D.Vcl.OutlineView,
@@ -40,10 +41,8 @@ type
   private
     FDocument: TPdf4DCustomDocument;
     FOptions: TPdf4DViewerOptions;
-    FAskPassword: Boolean;
-    FPasswordAttempts: Integer;
-    FIsReopening: Boolean;
     FLink: TPdfDocumentLink;
+    FPasswordRetry: TPdfPasswordRetry;
     FToolbar: TPdf4DToolbar;
     FSearchBar: TPdf4DSearchBar;
     FSidePanel: TPanel;
@@ -63,6 +62,8 @@ type
 
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure SetOptions(const Value: TPdf4DViewerOptions);
+    function GetAskPassword: Boolean;
+    procedure SetAskPassword(const Value: Boolean);
     function GetSidePanelWidth: Integer;
     procedure SetSidePanelWidth(const Value: Integer);
     function GetOnTextSelected: TPdfTextSelectedEvent;
@@ -84,8 +85,6 @@ type
     function HasOutline: Boolean;
     procedure UpdateSidePanel;
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
-    function CanAskPassword: Boolean;
-    procedure RequestPassword;
     function TryQueryPassword(out Password: string): Boolean;
 
   protected
@@ -121,7 +120,7 @@ type
     // Pixels of the viewer, as Width is: a form from a .dfm scales it with the rest, a value set in code is not scaled
     property SidePanelWidth: Integer read GetSidePanelWidth write SetSidePanelWidth default 180;
     // True: a document that needs a password asks for it, at most three times
-    property AskPassword: Boolean read FAskPassword write FAskPassword default True;
+    property AskPassword: Boolean read GetAskPassword write SetAskPassword default True;
     // The events of the page view; their Sender is the page view
     property OnTextSelected: TPdfTextSelectedEvent read GetOnTextSelected write SetOnTextSelected;
     property OnHoverChanged: TPdfHoverChangedEvent read GetOnHoverChanged write SetOnHoverChanged;
@@ -138,17 +137,12 @@ uses
   Vcl.Dialogs,
   Pdf4D.Viewer.ResourceStrings;
 
-type
-  // The file name and the password of a document are for the owner of the document, and the viewer sets them to open it again
-  TDocumentAccess = class(TPdf4DCustomDocument);
-
 const
   DefaultSidePanelWidth = 180;
   SplitterWidth = 5;
   MinSidePanelWidth = 80;
   // Under the toolbar, whatever else is on top
   SearchBarTop = 10000;
-  MaxPasswordAttempts = 3;
   // A prompt that starts with this makes InputQuery mask what is typed
   PasswordMask = #31;
 
@@ -158,7 +152,7 @@ constructor TPdf4DViewer.Create(Owner: TComponent);
 begin
   inherited Create(Owner);
   FOptions := [Low(TPdf4DViewerOption)..High(TPdf4DViewerOption)];
-  FAskPassword := True;
+
   // The parts are its only controls: a designer does not drop others into it
   ControlStyle := ControlStyle - [csAcceptsControls, csSetCaption];
   BevelOuter := TBevelCut.bvNone;
@@ -168,11 +162,18 @@ begin
   Height := 480;
 
   FLink := TPdfDocumentLink.Create(HandleDocumentChange);
+  // The question of the retry runs inside the OpenFailed notification of the document
+  FPasswordRetry := TPdfPasswordRetry.Create(
+    function(out Password: string): Boolean
+    begin
+      Result := TryQueryPassword(Password);
+    end);
   CreateParts;
 end;
 
 destructor TPdf4DViewer.Destroy;
 begin
+  FPasswordRetry.Free;
   FLink.Free;
   inherited;
 end;
@@ -402,13 +403,14 @@ begin
   end;
 
   FLink.Document := Value;
+  // Before the parts: an attempt that fails for want of the password is retried before they hear of it
+  FPasswordRetry.Document := Value;
   FPageView.Document := Value;
   FToolbar.Document := Value;
   FThumbnails.Document := Value;
   FOutlineView.Document := Value;
   FSearchBar.Document := Value;
   FPrintDialog.Document := Value;
-  FPasswordAttempts := 0;
   UpdateSidePanel;
   FSearchAction.Update;
 end;
@@ -420,6 +422,7 @@ begin
   begin
     FDocument := nil;
     FLink.Document := nil;
+    FPasswordRetry.Document := nil;
   end;
 end;
 
@@ -439,38 +442,24 @@ end;
 procedure TPdf4DViewer.HandleDocumentChange(const Change: TPdfDocumentChange);
 begin
   case Change of
-    TPdfDocumentChange.Opening:
-      begin
-        if not FIsReopening then
-        begin
-          FPasswordAttempts := 0;
-        end;
-      end;
-    TPdfDocumentChange.Opened:
-      FPasswordAttempts := 0;
-  end;
-
-  case Change of
     TPdfDocumentChange.Opening, TPdfDocumentChange.Opened, TPdfDocumentChange.OpenFailed, TPdfDocumentChange.Closed:
       begin
         UpdateSidePanel;
         FSearchAction.Update;
       end;
   end;
-
-  if (Change = TPdfDocumentChange.OpenFailed) and CanAskPassword then
-  begin
-    RequestPassword;
-  end;
 end;
 
 { Password }
 
-// A document that was opened from a stream is gone once it has failed, so only a file can be opened again
-function TPdf4DViewer.CanAskPassword: Boolean;
+function TPdf4DViewer.GetAskPassword: Boolean;
 begin
-  Result := FAskPassword and Assigned(FDocument) and (FDocument.OpenErrorKind = TPdfOpenErrorKind.InvalidPassword) and
-            (FPasswordAttempts < MaxPasswordAttempts) and (not TDocumentAccess(FDocument).FileName.IsEmpty);
+  Result := FPasswordRetry.IsEnabled;
+end;
+
+procedure TPdf4DViewer.SetAskPassword(const Value: Boolean);
+begin
+  FPasswordRetry.IsEnabled := Value;
 end;
 
 function TPdf4DViewer.TryQueryPassword(out Password: string): Boolean;
@@ -483,28 +472,6 @@ begin
 {$ENDIF}
   Password := '';
   Result := InputQuery(SPasswordCaption, PasswordMask + SPasswordPrompt, Password);
-end;
-
-procedure TPdf4DViewer.RequestPassword;
-begin
-  Inc(FPasswordAttempts);
-
-  var Password: string;
-  if not TryQueryPassword(Password) then
-  begin
-    // The user does not want to open it: no more questions, and the failure stands
-    FPasswordAttempts := MaxPasswordAttempts;
-    Exit;
-  end;
-
-  // The failure of this attempt is not told to the owner of the document: this open takes its place
-  TDocumentAccess(FDocument).Password := Password;
-  FIsReopening := True;
-  try
-    FDocument.Open;
-  finally
-    FIsReopening := False;
-  end;
 end;
 
 { Events of the page view }

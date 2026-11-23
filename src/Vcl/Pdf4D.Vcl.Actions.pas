@@ -10,13 +10,15 @@ uses
   System.Classes,
   Vcl.ActnList,
   Pdf4D.Viewer.Document,
+  Pdf4D.Viewer.Commands,
   Pdf4D.Vcl.PageView,
   Pdf4D.Vcl.SearchBar,
   Pdf4D.Vcl.PrintDialog;
 
 type
   // An action on a page view: the one of PageView, or the page view that has the focus when PageView is nil. Enabled follows the
-  // document of that page view when the action is updated. An OnExecute handler takes the place of the standard behavior.
+  // document of that page view when the action is updated. An OnExecute handler takes the place of the standard behavior. When the
+  // command applies and what it does is in TPdfViewerCommands.
   TPdf4DPageViewAction = class(TCustomAction)
   private
     FPageView: TPdf4DPageView;
@@ -31,10 +33,11 @@ type
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    // The standard behavior of the action
-    procedure Perform(const View: TPdf4DPageView); virtual; abstract;
-    // Whether the action applies to the page view in its current state
-    function IsApplicable(const View: TPdf4DPageView): Boolean; virtual;
+    function Command: TPdfViewerCommand; virtual; abstract;
+    // The standard behavior of the action: the command on the page view
+    procedure Perform(const View: TPdf4DPageView); virtual;
+    // Whether the command applies to the page view in its current state
+    function IsApplicable(const View: TPdf4DPageView): Boolean;
     // A hook to set more of the state than Enabled, such as Checked
     procedure ApplyState(const View: TPdf4DPageView); virtual;
 
@@ -62,21 +65,21 @@ type
 
   TPdf4DZoomInAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DZoomOutAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DZoomFitWidthAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
     procedure ApplyState(const View: TPdf4DPageView); override;
   public
     constructor Create(Owner: TComponent); override;
@@ -84,7 +87,7 @@ type
 
   TPdf4DZoomFitPageAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
     procedure ApplyState(const View: TPdf4DPageView); override;
   public
     constructor Create(Owner: TComponent); override;
@@ -92,14 +95,14 @@ type
 
   TPdf4DRotateClockwiseAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DRotateCounterclockwiseAction = class(TPdf4DPageViewAction)
   protected
-    procedure Perform(const View: TPdf4DPageView); override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
@@ -108,8 +111,8 @@ type
   // the page view has the focus, so that Ctrl+C in an edit of the form copies the text of the edit.
   TPdf4DCopyAction = class(TPdf4DPageViewAction)
   protected
+    function Command: TPdfViewerCommand; override;
     procedure Perform(const View: TPdf4DPageView); override;
-    function IsApplicable(const View: TPdf4DPageView): Boolean; override;
     function HandleShortCut: Boolean; override;
   public
     constructor Create(Owner: TComponent); override;
@@ -125,8 +128,10 @@ type
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    procedure Perform(const Document: TPdf4DCustomDocument); virtual; abstract;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; virtual;
+    function Command: TPdfViewerCommand; virtual; abstract;
+    // The standard behavior of the action: the command on the document
+    procedure Perform(const Document: TPdf4DCustomDocument); virtual;
+    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
 
   public
     function Execute: Boolean; override;
@@ -147,32 +152,28 @@ type
 
   TPdf4DFirstPageAction = class(TPdf4DDocumentAction)
   protected
-    procedure Perform(const Document: TPdf4DCustomDocument); override;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DPriorPageAction = class(TPdf4DDocumentAction)
   protected
-    procedure Perform(const Document: TPdf4DCustomDocument); override;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DNextPageAction = class(TPdf4DDocumentAction)
   protected
-    procedure Perform(const Document: TPdf4DCustomDocument); override;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
 
   TPdf4DLastPageAction = class(TPdf4DDocumentAction)
   protected
-    procedure Perform(const Document: TPdf4DCustomDocument); override;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
+    function Command: TPdfViewerCommand; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
@@ -189,8 +190,8 @@ type
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function Command: TPdfViewerCommand; override;
     procedure Perform(const Document: TPdf4DCustomDocument); override;
-    function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
 
   public
     constructor Create(Owner: TComponent); override;
@@ -235,7 +236,6 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Menus,
-  Pdf4D.Viewer.Types,
   Pdf4D.Viewer.ResourceStrings;
 
 const
@@ -357,7 +357,16 @@ end;
 
 function TPdf4DPageViewAction.IsApplicable(const View: TPdf4DPageView): Boolean;
 begin
-  Result := Assigned(View.Document) and (View.Document.State = TPdfDocumentState.Open);
+  Result := TPdfViewerCommands.CanExecute(Command, View.Document, View.Controller);
+end;
+
+procedure TPdf4DPageViewAction.Perform(const View: TPdf4DPageView);
+begin
+  // An OnUpdate of the application may enable the action where the command does not apply
+  if IsApplicable(View) then
+  begin
+    TPdfViewerCommands.Execute(Command, View.Document, View.Controller);
+  end;
 end;
 
 procedure TPdf4DPageViewAction.ApplyState(const View: TPdf4DPageView);
@@ -367,7 +376,11 @@ end;
 
 function TPdf4DPageViewAction.Execute: Boolean;
 begin
-if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
+  if not TActionGate.MayRun(Self) then
+  begin
+    Exit(False);
+  end;
+
   const View = ResolveView;
   if Assigned(OnExecute) or (not Assigned(View)) then
   begin
@@ -407,9 +420,9 @@ begin
   Hint := Format(SActionHintWithKey, [SActionZoomIn, ShortCutToText(ShortCut)]);
 end;
 
-procedure TPdf4DZoomInAction.Perform(const View: TPdf4DPageView);
+function TPdf4DZoomInAction.Command: TPdfViewerCommand;
 begin
-  View.ZoomIn;
+  Result := TPdfViewerCommand.ZoomIn;
 end;
 
 { TPdf4DZoomOutAction }
@@ -422,9 +435,9 @@ begin
   Hint := Format(SActionHintWithKey, [SActionZoomOut, ShortCutToText(ShortCut)]);
 end;
 
-procedure TPdf4DZoomOutAction.Perform(const View: TPdf4DPageView);
+function TPdf4DZoomOutAction.Command: TPdfViewerCommand;
 begin
-  View.ZoomOut;
+  Result := TPdfViewerCommand.ZoomOut;
 end;
 
 { TPdf4DZoomFitWidthAction }
@@ -436,14 +449,14 @@ begin
   Hint := SActionFitWidthHint;
 end;
 
-procedure TPdf4DZoomFitWidthAction.Perform(const View: TPdf4DPageView);
+function TPdf4DZoomFitWidthAction.Command: TPdfViewerCommand;
 begin
-  View.ZoomMode := TPdfZoomMode.FitWidth;
+  Result := TPdfViewerCommand.ZoomFitWidth;
 end;
 
 procedure TPdf4DZoomFitWidthAction.ApplyState(const View: TPdf4DPageView);
 begin
-  Checked := (View.ZoomMode = TPdfZoomMode.FitWidth);
+  Checked := TPdfViewerCommands.IsChecked(Command, View.Controller);
 end;
 
 { TPdf4DZoomFitPageAction }
@@ -455,14 +468,14 @@ begin
   Hint := SActionFitPageHint;
 end;
 
-procedure TPdf4DZoomFitPageAction.Perform(const View: TPdf4DPageView);
+function TPdf4DZoomFitPageAction.Command: TPdfViewerCommand;
 begin
-  View.ZoomMode := TPdfZoomMode.FitPage;
+  Result := TPdfViewerCommand.ZoomFitPage;
 end;
 
 procedure TPdf4DZoomFitPageAction.ApplyState(const View: TPdf4DPageView);
 begin
-  Checked := (View.ZoomMode = TPdfZoomMode.FitPage);
+  Checked := TPdfViewerCommands.IsChecked(Command, View.Controller);
 end;
 
 { TPdf4DRotateClockwiseAction }
@@ -474,9 +487,9 @@ begin
   Hint := SActionRotateClockwise;
 end;
 
-procedure TPdf4DRotateClockwiseAction.Perform(const View: TPdf4DPageView);
+function TPdf4DRotateClockwiseAction.Command: TPdfViewerCommand;
 begin
-  View.RotateClockwise;
+  Result := TPdfViewerCommand.RotateClockwise;
 end;
 
 { TPdf4DRotateCounterclockwiseAction }
@@ -488,9 +501,9 @@ begin
   Hint := SActionRotateCounterclockwise;
 end;
 
-procedure TPdf4DRotateCounterclockwiseAction.Perform(const View: TPdf4DPageView);
+function TPdf4DRotateCounterclockwiseAction.Command: TPdfViewerCommand;
 begin
-  View.RotateCounterclockwise;
+  Result := TPdfViewerCommand.RotateCounterclockwise;
 end;
 
 { TPdf4DCopyAction }
@@ -503,6 +516,11 @@ begin
   Hint := Format(SActionHintWithKey, [SActionCopy, ShortCutToText(ShortCut)]);
 end;
 
+function TPdf4DCopyAction.Command: TPdfViewerCommand;
+begin
+  Result := TPdfViewerCommand.Copy;
+end;
+
 procedure TPdf4DCopyAction.Perform(const View: TPdf4DPageView);
 begin
   View.CopyToClipboard;
@@ -513,16 +531,6 @@ begin
   const View = ResolveView;
   const HasFocus = Assigned(View) and View.Focused;
   Result := HasFocus and (inherited HandleShortCut);
-end;
-
-function TPdf4DCopyAction.IsApplicable(const View: TPdf4DPageView): Boolean;
-begin
-  Result := inherited IsApplicable(View) and View.Document.CanCopy;
-  if Result then
-  begin
-    var Selection: TPdfTextSelection;
-    Result := View.TryGetSelection(Selection);
-  end;
 end;
 
 { TPdf4DDocumentAction }
@@ -558,12 +566,24 @@ end;
 
 function TPdf4DDocumentAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
 begin
-  Result := (Document.State = TPdfDocumentState.Open);
+  Result := TPdfViewerCommands.CanExecute(Command, Document, nil);
+end;
+
+procedure TPdf4DDocumentAction.Perform(const Document: TPdf4DCustomDocument);
+begin
+  if IsApplicable(Document) then
+  begin
+    TPdfViewerCommands.Execute(Command, Document, nil);
+  end;
 end;
 
 function TPdf4DDocumentAction.Execute: Boolean;
 begin
-if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
+  if not TActionGate.MayRun(Self) then
+  begin
+    Exit(False);
+  end;
+
   if Assigned(OnExecute) or (not Assigned(FDocument)) then
   begin
     Exit(inherited Execute);
@@ -580,7 +600,7 @@ begin
     Exit(inherited Update);
   end;
 
-  Enabled := Assigned(FDocument) and IsApplicable(FDocument);
+  Enabled := IsApplicable(FDocument);
   Result := True;
 end;
 
@@ -593,14 +613,9 @@ begin
   Hint := SActionFirstPage;
 end;
 
-procedure TPdf4DFirstPageAction.Perform(const Document: TPdf4DCustomDocument);
+function TPdf4DFirstPageAction.Command: TPdfViewerCommand;
 begin
-  Document.CurrentPage := 0;
-end;
-
-function TPdf4DFirstPageAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
-begin
-  Result := inherited IsApplicable(Document) and (Document.CurrentPage > 0);
+  Result := TPdfViewerCommand.FirstPage;
 end;
 
 { TPdf4DPriorPageAction }
@@ -612,14 +627,9 @@ begin
   Hint := Format(SActionHintWithKey, [SActionPriorPage, ShortCutToText(Vcl.Menus.ShortCut(PriorKey, []))]);
 end;
 
-procedure TPdf4DPriorPageAction.Perform(const Document: TPdf4DCustomDocument);
+function TPdf4DPriorPageAction.Command: TPdfViewerCommand;
 begin
-  Document.CurrentPage := Document.CurrentPage - 1;
-end;
-
-function TPdf4DPriorPageAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
-begin
-  Result := inherited IsApplicable(Document) and (Document.CurrentPage > 0);
+  Result := TPdfViewerCommand.PriorPage;
 end;
 
 { TPdf4DNextPageAction }
@@ -631,14 +641,9 @@ begin
   Hint := Format(SActionHintWithKey, [SActionNextPage, ShortCutToText(Vcl.Menus.ShortCut(NextKey, []))]);
 end;
 
-procedure TPdf4DNextPageAction.Perform(const Document: TPdf4DCustomDocument);
+function TPdf4DNextPageAction.Command: TPdfViewerCommand;
 begin
-  Document.CurrentPage := Document.CurrentPage + 1;
-end;
-
-function TPdf4DNextPageAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
-begin
-  Result := inherited IsApplicable(Document) and (Document.CurrentPage < Document.PageCount - 1);
+  Result := TPdfViewerCommand.NextPage;
 end;
 
 { TPdf4DLastPageAction }
@@ -650,14 +655,9 @@ begin
   Hint := SActionLastPage;
 end;
 
-procedure TPdf4DLastPageAction.Perform(const Document: TPdf4DCustomDocument);
+function TPdf4DLastPageAction.Command: TPdfViewerCommand;
 begin
-  Document.CurrentPage := Document.PageCount - 1;
-end;
-
-function TPdf4DLastPageAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
-begin
-  Result := inherited IsApplicable(Document) and (Document.CurrentPage < Document.PageCount - 1);
+  Result := TPdfViewerCommand.LastPage;
 end;
 
 { TPdf4DPrintAction }
@@ -699,6 +699,11 @@ begin
   end;
 end;
 
+function TPdf4DPrintAction.Command: TPdfViewerCommand;
+begin
+  Result := TPdfViewerCommand.Print;
+end;
+
 procedure TPdf4DPrintAction.Perform(const Document: TPdf4DCustomDocument);
 begin
   // A dialog of the application keeps the choices of the user for the next time. It prints the document of the action, unless the
@@ -735,11 +740,6 @@ begin
       Dialog.Free;
     end;
   end;
-end;
-
-function TPdf4DPrintAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
-begin
-  Result := inherited IsApplicable(Document) and Document.CanPrint;
 end;
 
 { TPdf4DSearchAction }
@@ -784,7 +784,11 @@ end;
 
 function TPdf4DSearchAction.Execute: Boolean;
 begin
-if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
+  if not TActionGate.MayRun(Self) then
+  begin
+    Exit(False);
+  end;
+
   if Assigned(OnExecute) or (not Assigned(FSearchBar)) then
   begin
     Exit(inherited Execute);
@@ -802,7 +806,7 @@ begin
     Exit(inherited Update);
   end;
 
-  Enabled := Assigned(FSearchBar) and Assigned(FSearchBar.Document) and (FSearchBar.Document.State = TPdfDocumentState.Open);
+  Enabled := Assigned(FSearchBar) and TPdfViewerCommands.CanExecute(TPdfViewerCommand.Search, FSearchBar.Document, nil);
   Result := True;
 end;
 

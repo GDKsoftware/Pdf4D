@@ -18,6 +18,9 @@ uses
 const
   MinZoom: Single = 0.1;
   MaxZoom: Single = 8;
+  // The steps of ZoomIn and ZoomOut, and the percentages of a zoom list
+  PdfZoomSteps: array[0..11] of Integer = (10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 600, 800);
+  PercentPerFactor = 100;
   // The largest side of a page in pixels; a zoom that would make a page larger is clamped
   MaxPageEdgePixels = 100000;
   // Logical pixels (at 96 dpi) between pages and around them
