@@ -81,12 +81,43 @@ type
 
     [Test]
     procedure TestPageWithoutAnnotations;
+
+    [Test]
+    procedure TestDestinationOfDestEntry;
+
+    [Test]
+    procedure TestDestinationOfGoToAction;
+
+    [Test]
+    procedure TestDestinationIsMissingForOtherActions;
+
+    [Test]
+    procedure TestUriOfUriAction;
+
+    [Test]
+    procedure TestUriIsMissingForOtherActions;
+
+    [Test]
+    procedure TestHasAction;
+
+    [Test]
+    [TestCase('Missing', ',0')]
+    [TestCase('Empty', '/QuadPoints [],0')]
+    [TestCase('One quad', '/QuadPoints [0 1 2 3 4 5 6 7],8')]
+    [TestCase('Two quads', '/QuadPoints [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15],16')]
+    [TestCase('Seven numbers', '/QuadPoints [0 1 2 3 4 5 6],0')]
+    [TestCase('Nine numbers', '/QuadPoints [0 1 2 3 4 5 6 7 8],0')]
+    [TestCase('Not an array', '/QuadPoints 5,0')]
+    procedure TestQuadPointsCount(const Entries: string; const Expected: Integer);
   end;
 
 implementation
 
 uses
+  Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.PdfArray,
+  Pdf4D.Cos.PdfString,
   Pdf4D.Model.Rectangle,
   Pdf4D.Tests.PdfBuilder;
 
@@ -372,6 +403,100 @@ begin
     finally
       Annotations.Free;
     end;
+  end;
+end;
+
+procedure TAnnotationTests.TestDestinationOfDestEntry;
+begin
+  const Annotation = OnlyAnnotation('/Subtype /Link /Dest (chapter)', []);
+  try
+    var Destination: TCosBase;
+    Assert.IsTrue(Annotation.TryGetDestination(Destination));
+    Assert.IsTrue(Destination is TCosString);
+  finally
+    Annotation.Free;
+  end;
+end;
+
+procedure TAnnotationTests.TestDestinationOfGoToAction;
+begin
+  const Annotation = OnlyAnnotation('/Subtype /Link /A << /S /GoTo /D [3 0 R /Fit] >>', []);
+  try
+    var Destination: TCosBase;
+    Assert.IsTrue(Annotation.TryGetDestination(Destination));
+    Assert.IsTrue(Destination is TCosArray);
+  finally
+    Annotation.Free;
+  end;
+end;
+
+procedure TAnnotationTests.TestDestinationIsMissingForOtherActions;
+begin
+  for var Entries in ['/Subtype /Link', '/Subtype /Link /A << /S /URI /URI (x) /D [3 0 R /Fit] >>', '/Subtype /Link /A << /S /GoTo >>'] do
+  begin
+    const Annotation = OnlyAnnotation(Entries, []);
+    try
+      var Destination: TCosBase;
+      Assert.IsFalse(Annotation.TryGetDestination(Destination), Entries);
+      Assert.IsNull(Destination);
+    finally
+      Annotation.Free;
+    end;
+  end;
+end;
+
+procedure TAnnotationTests.TestUriOfUriAction;
+begin
+  const Annotation = OnlyAnnotation('/Subtype /Link /A << /S /URI /URI (https://example.com/) >>', []);
+  try
+    var Uri: string;
+    Assert.IsTrue(Annotation.TryGetUri(Uri));
+    Assert.AreEqual('https://example.com/', Uri);
+  finally
+    Annotation.Free;
+  end;
+end;
+
+procedure TAnnotationTests.TestUriIsMissingForOtherActions;
+begin
+  for var Entries in ['/Subtype /Link', '/Subtype /Link /A << /S /Launch /URI (x) >>', '/Subtype /Link /A << /S /URI >>'] do
+  begin
+    const Annotation = OnlyAnnotation(Entries, []);
+    try
+      var Uri: string;
+      Assert.IsFalse(Annotation.TryGetUri(Uri), Entries);
+      Assert.AreEqual('', Uri);
+    finally
+      Annotation.Free;
+    end;
+  end;
+end;
+
+procedure TAnnotationTests.TestHasAction;
+begin
+  // Each OnlyAnnotation opens a new document, which ends the previous one
+  const WithAction = OnlyAnnotation('/Subtype /Link /A << /S /Launch >>', []);
+  try
+    Assert.IsTrue(WithAction.HasAction);
+  finally
+    WithAction.Free;
+  end;
+
+  const WithoutAction = OnlyAnnotation('/Subtype /Link /A 5', []);
+  try
+    Assert.IsFalse(WithoutAction.HasAction);
+  finally
+    WithoutAction.Free;
+  end;
+end;
+
+procedure TAnnotationTests.TestQuadPointsCount(const Entries: string; const Expected: Integer);
+begin
+  const Annotation = OnlyAnnotation('/Subtype /Link ' + Entries, []);
+  try
+    Assert.AreEqual<Integer>(Expected, Length(Annotation.QuadPoints));
+  finally
+    Annotation.Free;
   end;
 end;
 

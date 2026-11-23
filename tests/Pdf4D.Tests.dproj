@@ -316,6 +316,7 @@
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type0.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Factory.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextDocuments.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.ViewerDocuments.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.GlyphPath.Tests.pas"/>
         <DCCReference Include="..\src\Font\Pdf4D.Font.Type1C.Tests.pas"/>
@@ -424,6 +425,7 @@
         <DCCReference Include="..\src\Api\Pdf4D.Api.Document.Tests.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.Text.Tests.pas"/>
         <DCCReference Include="..\src\Api\Pdf4D.Api.TextLayout.Tests.pas"/>
+        <DCCReference Include="..\src\Api\Pdf4D.Api.Links.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Corpus.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.StructureDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Golden.pas"/>

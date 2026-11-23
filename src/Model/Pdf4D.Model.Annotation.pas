@@ -3,6 +3,8 @@
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/interactive/annotation/PDAnnotation.java (3.0.8), the read side: createAnnotation
 // (as IsKnownType), getRectangle, the flags, getOptionalContent and getNormalAppearanceStream
+// Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/interactive/annotation/PDAnnotationLink.java (3.0.8), getDestination, getAction and
+// getQuadPoints
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/interactive/annotation/PDAppearanceDictionary.java (3.0.8), getNormalAppearance
 // Port of: pdfbox/src/main/java/org/apache/pdfbox/pdmodel/interactive/annotation/PDAppearanceEntry.java (3.0.8), isSubDictionary and getSubDictionary
 unit Pdf4D.Model.Annotation;
@@ -11,6 +13,7 @@ interface
 
 uses
   System.SysUtils,
+  Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Rectangle;
 
@@ -30,6 +33,7 @@ type
 
     function HasFlag(const Flag: Integer): Boolean;
     function TryGetNormalAppearanceEntry(out Entry: TCosDictionary): Boolean;
+    function TryGetActionOfType(const ActionType: string; out Action: TCosDictionary): Boolean;
 
   public
     // The annotation does not own Dictionary
@@ -55,6 +59,14 @@ type
     function TryGetNormalAppearance(out Appearance: TCosStream): Boolean;
     // /OC when it is a dictionary
     function TryGetOptionalContent(out Value: TCosDictionary): Boolean;
+    // Link annotations. The destination is /Dest, or /D of an /A with /S /GoTo; it is the raw value (an array, a name or a string).
+    function TryGetDestination(out Destination: TCosBase): Boolean;
+    // The /URI of an /A with /S /URI
+    function TryGetUri(out Uri: string): Boolean;
+    // Whether /A is a dictionary, whatever its type
+    function HasAction: Boolean;
+    // The numbers of /QuadPoints; empty when there are none or their count is no multiple of 8
+    function QuadPoints: TArray<Single>;
 
     property CosObject: TCosDictionary read FDictionary;
   end;
@@ -62,7 +74,6 @@ type
 implementation
 
 uses
-  Pdf4D.Cos.Base,
   Pdf4D.Cos.Name,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.Number,
@@ -72,6 +83,7 @@ const
   KnownSubTypes: array[0..18] of string = ('FileAttachment', 'Line', 'Link', 'Popup', 'Stamp', 'Square', 'Circle', 'Polygon', 'PolyLine', 'Ink', 'Text',
                                            'Highlight', 'Underline', 'StrikeOut', 'Squiggly', 'Widget', 'FreeText', 'Caret', 'Sound');
   RectangleValueCount = 4;
+  QuadValueCount = 8;
 
 { TPDAnnotation }
 
@@ -196,6 +208,61 @@ begin
   if not Result then
   begin
     Value := nil;
+  end;
+end;
+
+function TPDAnnotation.TryGetActionOfType(const ActionType: string; out Action: TCosDictionary): Boolean;
+begin
+  Result := (FDictionary.TryGetCosDictionary(TCosNames.A, Action) and (Action.GetNameAsString(TCosNames.S, '') = ActionType));
+  if not Result then
+  begin
+    Action := nil;
+  end;
+end;
+
+function TPDAnnotation.TryGetDestination(out Destination: TCosBase): Boolean;
+begin
+  if FDictionary.TryGetDictionaryObject(TCosNames.Dest, Destination) then
+  begin
+    Exit(True);
+  end;
+
+  var Action: TCosDictionary;
+  Result := (TryGetActionOfType(TCosNames.GoTo_, Action) and Action.TryGetDictionaryObject(TCosNames.D, Destination));
+  if not Result then
+  begin
+    Destination := nil;
+  end;
+end;
+
+function TPDAnnotation.TryGetUri(out Uri: string): Boolean;
+begin
+  var Action: TCosDictionary;
+  Result := (TryGetActionOfType(TCosNames.URI, Action) and Action.TryGetString(TCosNames.URI, Uri));
+  if not Result then
+  begin
+    Uri := '';
+  end;
+end;
+
+function TPDAnnotation.HasAction: Boolean;
+begin
+  var Action: TCosDictionary;
+  Result := FDictionary.TryGetCosDictionary(TCosNames.A, Action);
+end;
+
+function TPDAnnotation.QuadPoints: TArray<Single>;
+begin
+  var Values: TCosArray;
+  const HasValues = FDictionary.TryGetCosArray(TCosNames.QuadPoints, Values);
+  const IsComplete = (HasValues and (Values.Count > 0) and ((Values.Count mod QuadValueCount) = 0));
+  if IsComplete then
+  begin
+    Result := Values.ToFloatArray;
+  end
+  else
+  begin
+    Result := nil;
   end;
 end;
 

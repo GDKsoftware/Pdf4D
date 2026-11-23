@@ -12,6 +12,7 @@ uses
   Pdf4D.Common.Defines,
   Pdf4D.Common.Quad,
   Pdf4D.Model.Rectangle,
+  Pdf4D.Api.Page.Interfaces,
   Pdf4D.Api.TextLayout.Interfaces;
 
 const
@@ -93,6 +94,7 @@ type
 
   TPdfTextSelectedEvent = procedure(Sender: TObject; const Selection: TPdfTextSelection) of object;
   TPdfHoverChangedEvent = procedure(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment) of object;
+  TPdfLinkClickEvent = procedure(Sender: TObject; const Link: TPdfLink) of object;
   TPdfOpenErrorEvent = procedure(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string) of object;
   TPdfLogNotifyEvent = procedure(Sender: TObject; const Level: TPdfLogLevel; const Message: string) of object;
   TPdfPrintFailedEvent = procedure(Sender: TObject; const Message: string) of object;

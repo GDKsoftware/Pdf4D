@@ -37,6 +37,7 @@ type
     function ExtractTextWithPositions: IPdfPositionedText;
     function TextLayout: IPdfTextLayout; overload;
     function TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout; overload;
+    function Links: TArray<TPdfLink>;
     function CosObject: TCosDictionary;
   end;
 
@@ -139,6 +140,11 @@ begin
   finally
     Positioned.Free;
   end;
+end;
+
+function TPdfPage.Links: TArray<TPdfLink>;
+begin
+  Result := FHandle.ReadLinks(FPage, FIndex);
 end;
 
 function TPdfPage.CosObject: TCosDictionary;

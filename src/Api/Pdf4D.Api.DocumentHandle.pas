@@ -9,10 +9,15 @@ uses
   System.Classes,
   Pdf4D.Api.GuardedWriter,
   Pdf4D.Api.Outline.Interfaces,
+  Pdf4D.Api.Page.Interfaces,
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Log,
+  Pdf4D.Common.Quad,
+  Pdf4D.Model.Annotation,
   Pdf4D.Model.Document,
   Pdf4D.Model.OutlineItem,
+  Pdf4D.Model.Page,
+  Pdf4D.Model.Rectangle,
   Pdf4D.Text.PositionedText,
   Pdf4D.Text.Stripper;
 
@@ -27,6 +32,8 @@ type
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
     // The caller owns the result
     function ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
+    // The links of a page (PageIndex is its position in the page tree), see IPdfPage.Links
+    function ReadLinks(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
   end;
 
   // Owns the document and, when the document was loaded from a file, the stream
@@ -51,6 +58,13 @@ type
     procedure WriteTextInStripper(const Writer: TTextWriter; const Options: TPdfTextOptions);
     function ExtractPositionedInStripper(const Options: TPdfTextOptions): TPdfPositionedText;
     procedure ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
+    function ReadLinksOfPage(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
+    function TryBuildLink(const Annotation: TPDAnnotation; const PageIndex: Integer; out Link: TPdfLink): Boolean;
+    function TryBuildTarget(const Annotation: TPDAnnotation; const PageIndex: Integer; var Link: TPdfLink): Boolean;
+    function TryResolveTarget(const Annotation: TPDAnnotation; out TargetPageIndex: Integer): Boolean;
+    class function QuadsOf(const Annotation: TPDAnnotation): TArray<TPdfQuad>; static;
+    class function QuadsOfPoints(const Points: TArray<Single>): TArray<TPdfQuad>; static;
+    class function QuadOfRect(const Rect: TPdfRectangle): TPdfQuad; static;
 
   public
     // OwnedStream may be nil. Both are freed with the handle, the document first.
@@ -62,6 +76,7 @@ type
     function PageLabel(const Index: Integer): string;
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
     function ExtractPositioned(const Options: TPdfTextOptions): TPdfPositionedText;
+    function ReadLinks(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
 
 {$IFDEF PDF4D_TESTS}
     // For tests only, compiled when PDF4D_TESTS is defined: runs when a stripper is set up, inside the code that translates failures.
@@ -73,11 +88,18 @@ type
 implementation
 
 uses
+  System.Types,
+  System.Generics.Collections,
   Pdf4D.Api.OutlineItem,
   Pdf4D.Common.Defines,
+  Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.PageLabels,
   Pdf4D.Text.PositionStripper;
+
+const
+  LinkSubType = 'Link';
+  QuadPointCount = 8;
 
 { TPdfDocumentHandle }
 
@@ -231,6 +253,145 @@ begin
       raise;
     end;
   end;
+end;
+
+function TPdfDocumentHandle.ReadLinks(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
+begin
+  try
+    Result := ReadLinksOfPage(Page, PageIndex);
+  except
+    on Failure: EPdfException do
+    begin
+      raise;
+    end;
+    on Failure: Exception do
+    begin
+      if TPdfFailure.IsInputFailure(Failure) then
+      begin
+        raise EPdfParseException.CreateFmt('The links cannot be read: %s', [Failure.Message]);
+      end;
+      raise;
+    end;
+  end;
+end;
+
+function TPdfDocumentHandle.ReadLinksOfPage(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
+begin
+  const Links = TList<TPdfLink>.Create;
+  try
+    const Annotations = Page.Annotations;
+    try
+      for var Annotation in Annotations do
+      begin
+        var Link: TPdfLink;
+        const IsLink = ((Annotation.SubType = LinkSubType) and TryBuildLink(Annotation, PageIndex, Link));
+        if IsLink then
+        begin
+          Links.Add(Link);
+        end;
+      end;
+    finally
+      Annotations.Free;
+    end;
+    Result := Links.ToArray;
+  finally
+    Links.Free;
+  end;
+end;
+
+function TPdfDocumentHandle.TryBuildLink(const Annotation: TPDAnnotation; const PageIndex: Integer; out Link: TPdfLink): Boolean;
+begin
+  Link := Default(TPdfLink);
+  Link.PageIndex := PageIndex;
+
+  if not Annotation.HasRect then
+  begin
+    Log.Warning('A link on page %d is skipped: it has no valid /Rect', [PageIndex + 1]);
+    Exit(False);
+  end;
+  Link.Quads := QuadsOf(Annotation);
+
+  var Destination: TCosBase;
+  if Annotation.TryGetDestination(Destination) then
+  begin
+    Exit(TryBuildTarget(Annotation, PageIndex, Link));
+  end;
+
+  if Annotation.TryGetUri(Link.Uri) then
+  begin
+    Link.Kind := TPdfLinkKind.Uri;
+    Exit(True);
+  end;
+
+  Link.Kind := TPdfLinkKind.Other;
+  Result := Annotation.HasAction;
+  if not Result then
+  begin
+    Log.Warning('A link on page %d is skipped: it has no destination and no action', [PageIndex + 1]);
+  end;
+end;
+
+function TPdfDocumentHandle.TryBuildTarget(const Annotation: TPDAnnotation; const PageIndex: Integer; var Link: TPdfLink): Boolean;
+begin
+  var TargetPageIndex: Integer;
+  Result := TryResolveTarget(Annotation, TargetPageIndex);
+  if Result then
+  begin
+    Link.Kind := TPdfLinkKind.GoTo;
+    Link.TargetPageIndex := TargetPageIndex;
+  end
+  else
+  begin
+    Log.Warning('A link on page %d is skipped: its destination is no page of the document', [PageIndex + 1]);
+  end;
+end;
+
+function TPdfDocumentHandle.TryResolveTarget(const Annotation: TPDAnnotation; out TargetPageIndex: Integer): Boolean;
+begin
+  var Destination: TCosBase;
+  Result := (Annotation.TryGetDestination(Destination) and
+             FDocument.Catalog.DestinationResolver.TryResolvePageIndex(Destination, TargetPageIndex));
+end;
+
+// QuadPoints that are no whole number of quads, or hold a value that is not finite, are no reason to lose the link: the /Rect is used
+class function TPdfDocumentHandle.QuadsOf(const Annotation: TPDAnnotation): TArray<TPdfQuad>;
+begin
+  Result := QuadsOfPoints(Annotation.QuadPoints);
+
+  var AreAllFinite := (Length(Result) > 0);
+  for var Quad in Result do
+  begin
+    AreAllFinite := (AreAllFinite and Quad.IsFinite);
+  end;
+
+  if not AreAllFinite then
+  begin
+    Result := [QuadOfRect(Annotation.Rect)];
+  end;
+end;
+
+// The points in the files of real viewers run top left, top right, bottom left, bottom right, not counterclockwise as the specification
+// says; a quad of the text layout starts at the bottom left
+class function TPdfDocumentHandle.QuadsOfPoints(const Points: TArray<Single>): TArray<TPdfQuad>;
+begin
+  SetLength(Result, Length(Points) div QuadPointCount);
+  for var Index := 0 to High(Result) do
+  begin
+    const Start = Index * QuadPointCount;
+    const TopLeft = TPointF.Create(Points[Start], Points[Start + 1]);
+    const TopRight = TPointF.Create(Points[Start + 2], Points[Start + 3]);
+    const BottomLeft = TPointF.Create(Points[Start + 4], Points[Start + 5]);
+    const BottomRight = TPointF.Create(Points[Start + 6], Points[Start + 7]);
+    Result[Index] := TPdfQuad.Create(BottomLeft, BottomRight, TopRight, TopLeft);
+  end;
+end;
+
+class function TPdfDocumentHandle.QuadOfRect(const Rect: TPdfRectangle): TPdfQuad;
+begin
+  Result := TPdfQuad.Create(TPointF.Create(Rect.LowerLeftX, Rect.LowerLeftY),
+                            TPointF.Create(Rect.UpperRightX, Rect.LowerLeftY),
+                            TPointF.Create(Rect.UpperRightX, Rect.UpperRightY),
+                            TPointF.Create(Rect.LowerLeftX, Rect.UpperRightY));
 end;
 
 class function TPdfDocumentHandle.TranslatedFailure(const Failure: Exception): Exception;
