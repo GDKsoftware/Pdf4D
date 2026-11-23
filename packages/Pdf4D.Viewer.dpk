@@ -53,6 +53,7 @@ contains
   Pdf4D.Viewer.Overlay in '..\src\Viewer\Pdf4D.Viewer.Overlay.pas',
   Pdf4D.Viewer.Document in '..\src\Viewer\Pdf4D.Viewer.Document.pas',
   Pdf4D.Viewer.Painter.Interfaces in '..\src\Viewer\Pdf4D.Viewer.Painter.Interfaces.pas',
-  Pdf4D.Viewer.PageViewController in '..\src\Viewer\Pdf4D.Viewer.PageViewController.pas';
+  Pdf4D.Viewer.PageViewController in '..\src\Viewer\Pdf4D.Viewer.PageViewController.pas',
+  Pdf4D.Viewer.ThumbnailsController in '..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas';
 
 end.
