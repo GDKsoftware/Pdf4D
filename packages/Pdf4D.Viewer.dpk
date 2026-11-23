@@ -27,7 +27,7 @@ package Pdf4D.Viewer;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Pdf4D viewer core: types, transforms and layout'}
+{$DESCRIPTION 'Pdf4D viewer core: session and worker, document, page view and thumbnails controllers, search, print planning and layout'}
 {$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}

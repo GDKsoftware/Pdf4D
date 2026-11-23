@@ -109,6 +109,9 @@ type
 
     [Test]
     procedure TestBusyClipboardIsLoggedNotRaised;
+
+    [Test]
+    procedure TestDesignTimeShowsAPlaceholder;
   end;
 
 implementation
@@ -146,6 +149,13 @@ const
   QuietPeriodMs = 500;
   BackgroundGray = 224;
   BusyClipboard = 'the clipboard is busy';
+  DesignGray = 240;
+  DesignInkContrast = 60;
+  ClassNameBand = 20;
+
+type
+  // Opens the protected state of a component: a test hook for the design state
+  TDesignAccess = class(TComponent);
 
 { TBusyClipboardPageView }
 
@@ -628,6 +638,35 @@ begin
     end;
   end;
   Assert.AreEqual(1, Lines, 'the failure is in the log once');
+end;
+
+// The form designer shows a grey field with the name of the class, without a document, tiles or a worker
+procedure TPdf4DPageViewTests.TestDesignTimeShowsAPlaceholder;
+begin
+  OpenAndSettle(TViewerDocuments.Invoice);
+  TDesignAccess(FHost.PageView).SetDesigning(True);
+  FHost.PageView.Invalidate;
+
+  const Bitmap = FHost.Snapshot;
+  try
+    Assert.AreEqual(DesignGray, Integer(PixelAt(Bitmap, 1, 1).R), 'the background is the placeholder grey');
+    Assert.AreEqual(DesignGray, Integer(PixelAt(Bitmap, ViewWidth - 2, ViewHeight - 2).G), 'all over the control');
+
+    var Ink := 0;
+    for var Y := ViewHeight div 2 - ClassNameBand to ViewHeight div 2 + ClassNameBand do
+    begin
+      for var X := 0 to ViewWidth - 1 do
+      begin
+        if PixelAt(Bitmap, X, Y).R < DesignGray - DesignInkContrast then
+        begin
+          Inc(Ink);
+        end;
+      end;
+    end;
+    Assert.IsTrue(Ink > 0, 'the class name is drawn in the middle');
+  finally
+    Bitmap.Free;
+  end;
 end;
 
 end.

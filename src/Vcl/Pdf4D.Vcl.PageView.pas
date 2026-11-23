@@ -71,6 +71,7 @@ type
     procedure SetSelectionOpacity(const Value: Byte);
 
     procedure ApplyColors;
+    procedure PaintDesignPlaceholder;
     procedure UpdateScrollBars;
     procedure HandleScroll(const Bar: Integer; const ScrollCode: Integer);
     function HandleKey(const Key: Word; const Shift: TShiftState): Boolean;
@@ -179,6 +180,7 @@ uses
 
 const
   InitialSize = 200;
+  DesignBackgroundColor = $00F0F0F0;
   LogicalPixelsPerInch = 96;
   // Logical pixels
   LineScrollStep = 40;
@@ -390,8 +392,28 @@ begin
   UpdateViewport;
 end;
 
+// The form designer shows a grey field with the name of the class: nothing is loaded or rendered in the IDE
+procedure TPdf4DPageView.PaintDesignPlaceholder;
+begin
+  Canvas.Brush.Color := DesignBackgroundColor;
+  Canvas.FillRect(ClientRect);
+
+  Canvas.Font.Assign(Font);
+  Canvas.Font.Color := clGrayText;
+  Canvas.Brush.Style := bsClear;
+  var TextBounds := ClientRect;
+  var Text := ClassName;
+  Canvas.TextRect(TextBounds, Text, [tfCenter, tfVerticalCenter, tfSingleLine]);
+end;
+
 procedure TPdf4DPageView.Paint;
 begin
+  if csDesigning in ComponentState then
+  begin
+    PaintDesignPlaceholder;
+    Exit;
+  end;
+
   Canvas.Font.Assign(Font);
   const Painter: IPdfViewPainter = TPdfVclPainter.Create(Canvas);
   var Clip := Canvas.ClipRect;
