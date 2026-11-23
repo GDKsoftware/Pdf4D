@@ -11,6 +11,7 @@ __recovery/
 *.dsk
 *.res
 !src/Resources/*.res
+!src/Vcl/Icons/*.res
 *.~*
 Win32/
 Win64/

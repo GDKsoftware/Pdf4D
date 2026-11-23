@@ -28,6 +28,25 @@ resourcestring
   SSearchMatchCase = 'Match case';
   SSearchPriorHint = 'Previous result';
   SSearchNextHint = 'Next result';
+  SActionHintWithKey = '%s (%s)';
+  SActionZoomIn = 'Zoom in';
+  SActionZoomOut = 'Zoom out';
+  SActionFitWidthHint = 'Fit the page to the width of the window';
+  SActionFitPageHint = 'Fit the whole page in the window';
+  SActionRotateClockwise = 'Rotate clockwise';
+  SActionRotateCounterclockwise = 'Rotate counterclockwise';
+  SActionCopy = 'Copy';
+  SActionFirstPage = 'First page';
+  SActionPriorPage = 'Previous page';
+  SActionNextPage = 'Next page';
+  SActionLastPage = 'Last page';
+  SActionPrint = 'Print';
+  SActionSearch = 'Search';
+  SZoomFitWidth = 'Fit width';
+  SZoomFitPage = 'Fit page';
+  SZoomHint = 'Zoom';
+  SPageNumberHint = 'Page number';
+  SPageCountOf = ' / %d';
 
 implementation
 

@@ -8,6 +8,7 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.Types,
   System.UITypes,
   Winapi.Messages,
@@ -43,6 +44,7 @@ type
     FOnHoverChanged: TPdfHoverChangedEvent;
     FOnLinkClick: TPdfLinkClickEvent;
     FOnZoomChanged: TNotifyEvent;
+    FZoomListeners: TList<TNotifyEvent>;
     // The pixels per inch that the last change of scale gave; 0 until there was one
     FScalePixelsPerInch: Integer;
     FIsUpdatingScrollBars: Boolean;
@@ -126,6 +128,9 @@ type
     procedure ScrollIntoView(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
     // The selected text; nothing without a selection or when the document does not allow copying
     procedure CopyToClipboard;
+    // Several parties can follow the zoom, where OnZoomChanged is for the owner of the page view alone
+    procedure AddZoomListener(const Listener: TNotifyEvent);
+    procedure RemoveZoomListener(const Listener: TNotifyEvent);
     function TryGetSelection(out Selection: TPdfTextSelection): Boolean;
 
     // Owned
@@ -198,6 +203,7 @@ begin
   FSelectionColor := DefaultSelectionTColor;
   FSelectionOpacity := DefaultSelectionOpacity;
 
+  FZoomListeners := TList<TNotifyEvent>.Create;
   FController := TPdfPageViewController.Create(Self);
   FController.OnTextSelected := HandleTextSelected;
   FController.OnHoverChanged := HandleHoverChanged;
@@ -214,6 +220,7 @@ begin
   FOnZoomChanged := nil;
   SetDocument(nil);
   FController.Free;
+  FZoomListeners.Free;
   inherited;
 end;
 
@@ -602,6 +609,25 @@ begin
   begin
     FOnZoomChanged(Self);
   end;
+
+  // A listener may remove itself while it is told
+  for var Index := FZoomListeners.Count - 1 downto 0 do
+  begin
+    if Index < FZoomListeners.Count then
+    begin
+      FZoomListeners[Index](Self);
+    end;
+  end;
+end;
+
+procedure TPdf4DPageView.AddZoomListener(const Listener: TNotifyEvent);
+begin
+  FZoomListeners.Add(Listener);
+end;
+
+procedure TPdf4DPageView.RemoveZoomListener(const Listener: TNotifyEvent);
+begin
+  FZoomListeners.Remove(Listener);
 end;
 
 { Input }

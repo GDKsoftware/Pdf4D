@@ -21,7 +21,8 @@ uses
   Pdf4D.Vcl.PageView,
   Pdf4D.Vcl.Thumbnails,
   Pdf4D.Vcl.OutlineView,
-  Pdf4D.Vcl.SearchBar;
+  Pdf4D.Vcl.SearchBar,
+  Pdf4D.Vcl.Toolbar;
 
 type
   TVclPixel = record
@@ -54,6 +55,7 @@ type
     FThumbnails: TPdf4DThumbnails;
     FOutlineView: TPdf4DOutlineView;
     FSearchBar: TPdf4DSearchBar;
+    FToolbar: TPdf4DToolbar;
     FOpenErrorMessage: string;
 
     procedure HandleOpenError(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string);
@@ -96,6 +98,10 @@ type
     function AddThumbnails(const Width: Integer): TPdf4DThumbnails;
     function AddOutlineView(const Width: Integer): TPdf4DOutlineView;
     function AddSearchBar: TPdf4DSearchBar;
+    // A toolbar at the top, linked to the document, the page view and the search bar if there is one
+    function AddToolbar: TPdf4DToolbar;
+    // The client pixels of the middle of an occurrence of a word of the page text; the page must be laid out
+    function CenterOfWord(const PageIndex: Integer; const Text: string; const Occurrence: Integer = 0): TPoint;
 
     // What the page view paints; the caller owns the bitmap
     function Snapshot: Vcl.Graphics.TBitmap;
@@ -112,6 +118,7 @@ type
     property Thumbnails: TPdf4DThumbnails read FThumbnails;
     property OutlineView: TPdf4DOutlineView read FOutlineView;
     property SearchBar: TPdf4DSearchBar read FSearchBar;
+    property Toolbar: TPdf4DToolbar read FToolbar;
   end;
 
   // Documents that only the tests of the VCL components need
@@ -389,6 +396,53 @@ begin
   FSearchBar.Document := FDocument;
   Pump(1);
   Result := FSearchBar;
+end;
+
+function TVclTestHost.AddToolbar: TPdf4DToolbar;
+begin
+  FToolbar := TPdf4DToolbar.Create(FForm);
+  FToolbar.Parent := FForm;
+  FToolbar.Align := TAlign.alTop;
+  FToolbar.Document := FDocument;
+  FToolbar.PageView := FPageView;
+  FToolbar.SearchBar := FSearchBar;
+  Pump(1);
+  Result := FToolbar;
+end;
+
+function TVclTestHost.CenterOfWord(const PageIndex: Integer; const Text: string; const Occurrence: Integer): TPoint;
+begin
+  var PageText: IPdfPageText;
+  if not FDocument.TryGetPageText(PageIndex, PageText) then
+  begin
+    raise EArgumentException.CreateFmt('The text of page %d is not known', [PageIndex]);
+  end;
+
+  var Seen := 0;
+  for var Word in PageText.Words do
+  begin
+    if (Word.Text = Text) and (Seen < Occurrence) then
+    begin
+      Inc(Seen);
+    end
+    else if Word.Text = Text then
+    begin
+      var Sum := TPoint.Zero;
+      var Count := 0;
+      for var Quad in Word.Quads do
+      begin
+        for var Corner in [Quad.P1, Quad.P2, Quad.P3, Quad.P4] do
+        begin
+          const Point = PagePointToClient(PageIndex, Corner);
+          Inc(Sum.X, Point.X);
+          Inc(Sum.Y, Point.Y);
+          Inc(Count);
+        end;
+      end;
+      Exit(TPoint.Create(Sum.X div Count, Sum.Y div Count));
+    end;
+  end;
+  raise EArgumentException.CreateFmt('The word %s is not on page %d', [Text, PageIndex]);
 end;
 
 function TVclTestHost.Snapshot: Vcl.Graphics.TBitmap;

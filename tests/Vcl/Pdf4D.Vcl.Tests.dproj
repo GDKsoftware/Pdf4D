@@ -83,12 +83,16 @@
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.OutlineView.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.SearchBar.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Actions.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Toolbar.pas"/>
         <DCCReference Include="..\..\src\Vcl\Skia\Pdf4D.Vcl.Backend.Skia.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Painter.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.PageView.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.OutlineView.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.SearchBar.Tests.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Actions.Tests.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Toolbar.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

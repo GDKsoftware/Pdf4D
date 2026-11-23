@@ -20,12 +20,16 @@ uses
   Pdf4D.Vcl.Thumbnails in '..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas',
   Pdf4D.Vcl.OutlineView in '..\..\src\Vcl\Pdf4D.Vcl.OutlineView.pas',
   Pdf4D.Vcl.SearchBar in '..\..\src\Vcl\Pdf4D.Vcl.SearchBar.pas',
+  Pdf4D.Vcl.Actions in '..\..\src\Vcl\Pdf4D.Vcl.Actions.pas',
+  Pdf4D.Vcl.Toolbar in '..\..\src\Vcl\Pdf4D.Vcl.Toolbar.pas',
   Pdf4D.Vcl.Backend.Skia in '..\..\src\Vcl\Skia\Pdf4D.Vcl.Backend.Skia.pas',
   Pdf4D.Vcl.Painter.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Painter.Tests.pas',
   Pdf4D.Vcl.PageView.Tests in '..\..\src\Vcl\Pdf4D.Vcl.PageView.Tests.pas',
   Pdf4D.Vcl.Thumbnails.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.Tests.pas',
   Pdf4D.Vcl.OutlineView.Tests in '..\..\src\Vcl\Pdf4D.Vcl.OutlineView.Tests.pas',
-  Pdf4D.Vcl.SearchBar.Tests in '..\..\src\Vcl\Pdf4D.Vcl.SearchBar.Tests.pas';
+  Pdf4D.Vcl.SearchBar.Tests in '..\..\src\Vcl\Pdf4D.Vcl.SearchBar.Tests.pas',
+  Pdf4D.Vcl.Actions.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Actions.Tests.pas',
+  Pdf4D.Vcl.Toolbar.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Toolbar.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

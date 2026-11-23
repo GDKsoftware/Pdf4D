@@ -80,12 +80,15 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="vclimg.dcp"/>
         <DCCReference Include="Pdf4D.Viewer.dcp"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Document.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.PageView.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.OutlineView.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.SearchBar.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Actions.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Toolbar.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Painter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
