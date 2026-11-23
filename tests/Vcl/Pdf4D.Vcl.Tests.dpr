@@ -36,7 +36,8 @@ uses
   Pdf4D.Vcl.Toolbar.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Toolbar.Tests.pas',
   Pdf4D.Vcl.Print.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Print.Tests.pas',
   Pdf4D.Vcl.PrintDialog.Tests in '..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.Tests.pas',
-  Pdf4D.Vcl.Viewer.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Viewer.Tests.pas';
+  Pdf4D.Vcl.Viewer.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Viewer.Tests.pas',
+  Pdf4D.Vcl.Streaming.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Streaming.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

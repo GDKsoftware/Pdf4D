@@ -50,7 +50,7 @@ type
     property Font;
     property HideSelection default False;
     property Indent;
-    property ParentColor;
+    property ParentColor default False;
     property ParentFont;
     property PopupMenu;
     property ReadOnly default True;

@@ -11,6 +11,7 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 5. **Long ported methods may keep the PDFBox order** as long as they stay readable. Splitting into private methods is preferred. Overrides: method decomposition.
 6. **Inline variables and `const` stay mandatory**, as in the GDK rules.
 7. **Shared, lazily made objects go through `TPdfSharedInstance` and `TPdfSharedCache`.** A `class destructor` may free such an object. No `initialization` or `finalization` sections. Overrides: the GDK rule on singletons. Reason: thread-safe lazy publication and leak detection (an object that is filled once and freed at shutdown is no leak).
+8. **A global `procedure Register` in `Pdf4D.Vcl.Registration`.** Overrides: no global procedures. Reason: the IDE calls it by name when it loads the design-time package `dclPdf4D.Vcl`; it is the only global procedure of the library.
 
 ## Additions
 

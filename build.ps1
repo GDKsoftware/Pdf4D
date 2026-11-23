@@ -27,8 +27,9 @@ $TestProjects = @(
     @{ Name = 'Pdf4D.Vcl.Tests'; Folder = 'tests\Vcl'; NeedsSkia = $true; WindowsOnly = $true }
 )
 $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
-# The VCL packages are built for Windows only
-$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+# The VCL packages are built for Windows only; dclPdf4D.Vcl is the design-time package for the IDE (a 64-bit IDE loads the Win64 build, a
+# 32-bit IDE the Win32 build)
+$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {

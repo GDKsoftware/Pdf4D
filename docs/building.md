@@ -19,7 +19,7 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj` and `Pdf4D.Vcl.Skia.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj` and the design-time package `dclPdf4D.Vcl.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
@@ -39,8 +39,9 @@ The packages and what they contain:
 | `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
 | `Pdf4D.Vcl.dpk` | `rtl, vcl, Pdf4D.Viewer` | `src\Vcl` (`TPdf4DDocument`, `TPdf4DPageView` and the GDI and GDI+ painter) |
 | `Pdf4D.Vcl.Skia.dpk` | `rtl, Pdf4D.Vcl, Pdf4D.Render.Skia` | `src\Vcl\Skia` (the `TPdf4DSkiaBackend` component) |
+| `dclPdf4D.Vcl.dpk` | `rtl, vcl, designide, Pdf4D.Vcl, Pdf4D.Vcl.Skia` | `src\Vcl\Design` (design time only: the palette registration, the property editor of `FileName` and the palette icons) |
 
-The first four build for Win32, Win64 and Linux64; the two VCL packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
+The first four build for Win32, Win64 and Linux64; the three VCL packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
 
 ## The three test projects
 
@@ -162,6 +163,16 @@ Pdf4D needs Delphi 12 or newer, but every build and test so far was done with De
 3. Build and run `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj`, the second one with the `sk4d.dll` of Delphi 12 (`Redist\win64\sk4d.dll` of that installation, next to the test program).
 4. Run the reference tests (the render comparison with the PDFBox images, `TRenderGoldenTests`) on Win64 and compare the number of pages that differ with Delphi 13 (612 of 617 pages equal at 72 DPI, 19 of 22 at 150 DPI). The Skia version is another one, so pages can differ at the edges; note the new differences and do not fix them in this step.
 5. For every `System.Skia` API that the backend uses outside the list of the next section, check that it exists in Delphi 12 (the lines below say which ones those are and what the replacement is).
+
+### The design-time package
+
+`dclPdf4D.Vcl.dpk` is `{$DESIGNONLY}`. It registers the components on the `Pdf4D` palette page (`TPdf4DDocument`, `TPdf4DSkiaBackend`, `TPdf4DPageView`, `TPdf4DThumbnails`, `TPdf4DOutlineView`, `TPdf4DSearchBar`, `TPdf4DToolbar`, `TPdf4DViewer`, `TPdf4DPrintDialog`), the standard actions of `Pdf4D.Vcl.Actions` and a file dialog for the `FileName` of a document. The palette icons are drawn by `tools\make-palette-icons.ps1` (PNG files in `src\Vcl\Design\icons` and the linked `Pdf4D.Vcl.Palette.res`) and are placeholders. `build.ps1` builds the package but nothing in the test run loads it: the registration needs the IDE. The IDE of Delphi 13 is a 64-bit program and loads the Win64 build; a 32-bit IDE needs the Win32 build, which the project is set up for but which has not been built or installed here.
+
+Check by hand, once per Delphi version:
+
+1. Open `packages\Pdf4D.groupproj`, build everything and install `dclPdf4D.Vcl` (right-click, Install).
+2. On a new VCL form drop a `TPdf4DViewer`, a `TPdf4DDocument` and a `TPdf4DSkiaBackend` from the `Pdf4D` page, link the viewer and the backend to the document, pick a PDF in `FileName` with the dialog and run the application with `sk4d.dll` next to it.
+3. Check that the three icons appear on the palette (24 and 32 pixels), and that the actions show in the action list editor under the category `Pdf4D`.
 
 ### Skia API of the backend
 

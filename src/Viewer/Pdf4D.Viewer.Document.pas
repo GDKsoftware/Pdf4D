@@ -122,8 +122,9 @@ type
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
 
-    // Resolves the backend: RenderBackend, else Backend.CreateBackend, else TPdfViewerDefaults.CreateBackend. A failure of the document
-    // itself is not raised: the state becomes Failed, the links get OpenFailed and OnOpenError is called.
+    // Does nothing while the component is being designed. Resolves the backend: RenderBackend, else Backend.CreateBackend, else
+    // TPdfViewerDefaults.CreateBackend. A failure of the document itself is not raised: the state becomes Failed, the links get OpenFailed
+    // and OnOpenError is called.
     procedure Open; overload;
     // Copies Stream from its position to its end; the stream is not used afterwards
     procedure Open(const Stream: TStream); overload;
@@ -313,6 +314,12 @@ end;
 
 procedure TPdf4DCustomDocument.Open;
 begin
+  // The form designer shows the component only: no session and no worker
+  if csDesigning in ComponentState then
+  begin
+    Exit;
+  end;
+
   const OpenSession = BeginOpen;
   if Assigned(OpenSession) then
   begin
@@ -322,6 +329,11 @@ end;
 
 procedure TPdf4DCustomDocument.Open(const Stream: TStream);
 begin
+  if csDesigning in ComponentState then
+  begin
+    Exit;
+  end;
+
   if not Assigned(Stream) then
   begin
     raise EArgumentNilException.Create(SNoStream);

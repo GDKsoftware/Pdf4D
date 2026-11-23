@@ -12,6 +12,7 @@ __recovery/
 *.res
 !src/Resources/*.res
 !src/Vcl/Icons/*.res
+!src/Vcl/Design/icons/*.res
 *.~*
 Win32/
 Win64/
