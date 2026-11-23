@@ -14,6 +14,10 @@ uses
   Pdf4D.Viewer.Session,
   Pdf4D.Viewer.Document;
 
+const
+  // The rows that the render of a band reaches beyond it on either side
+  BandOverlapRows = 1;
+
 type
   {$SCOPEDENUMS ON}
   TPdfPrintScale = (ActualSize, Fit);
@@ -45,16 +49,27 @@ type
     RenderSize: TSize;
     // Printer pixels inside the printable area, centred
     Dest: TRect;
-    // Where the whole page lands, centred and not clipped: it lies partly outside the printable area for ActualSize on a smaller paper
+    // Where the whole page lands, centred and not clipped: it lies partly outside the printable area for ActualSize on a smaller paper.
+    // Its height is a whole multiple of RenderSize.cy (1, or the factor by which MaxDpi divides the printer resolution), so that every
+    // band lands on whole printer rows with the same stretch; for a printer with one resolution its width is the same multiple.
     FullDest: TRect;
-    // Render regions, top to bottom, together exactly RenderSize. A band has as many rows of the full width as fit in MaxBandPixels, but
-    // at least one row: when RenderSize.cx alone exceeds MaxBandPixels, a band is larger than that
+    // The bands, top to bottom, together exactly RenderSize; each is rendered as its RenderRegion. A band has as many rows of the full
+    // width as fit in MaxBandPixels, but at least one row: when RenderSize.cx alone exceeds MaxBandPixels, a band is larger than that
     Bands: TArray<TRect>;
   end;
 
   TPdfPrintPlanner = class
   private
     class function ShareOf(const Value, DestExtent, SourceExtent: Integer): Integer; static;
+    // 1 when the printer resolution is within MaxDpi, else the smallest whole number that brings it within MaxDpi
+    class function StretchFactor(const PrinterRenderDpi: Double; const MaxDpi: Integer): Integer; static;
+    // The whole pixels of a length in points at a resolution, rounded down
+    class function PixelsAt(const Points, Dpi: Double): Integer; static;
+    // The render scale whose page size is the target, or one pixel less on one side when no Single scale gives both sides
+    class function ScaleFor(const Page: TPdfPageInfo; const Rotation, TargetWidth, TargetHeight: Integer): Single; static;
+    // The smallest scale from Target / Points on that makes the side of the page Target pixels
+    class function ScaleReaching(const Page: TPdfPageInfo; const Rotation, Target: Integer; const IsHeight: Boolean): Single; static;
+    class function NextSingle(const Value: Single): Single; static;
 
   public
     // Raises EArgumentOutOfRangeException for an empty printable area, a DPI, MaxDpi or MaxBandPixels that is not above zero
@@ -62,6 +77,11 @@ type
                             const Settings: TPdfPrintSettings; const MaxBandPixels: Int64): TPdfPrintPagePlan; static;
     // The printer pixels of one band: its share of FullDest
     class function BandDest(const Plan: TPdfPrintPagePlan; const Band: TRect): TRect; static;
+    // What is rendered for a band: the band and BandOverlapRows rows above and below it, within the page. The renderer smooths the
+    // edges of a shape at the edge of a render differently, so the band takes its rows from a render that goes beyond them.
+    class function RenderRegion(const Plan: TPdfPrintPagePlan; const Band: TRect): TRect; static;
+    // The band out of the render of its region: a new bitmap, owned by the caller
+    class function CropToBand(const Render: TPdfBitmap; const Region, Band: TRect): TPdfBitmap; static;
   end;
 
   IPdfPrintTarget = interface
@@ -83,9 +103,9 @@ type
   TPdfPrintLogEvent = reference to procedure(const Message: string);
 
   // Prints a range of pages of an open document to a target, one band at a time: it asks the session for a band (priority Print), draws it
-  // on the target in the callback and then asks for the next, so that no more than one band is in memory. UI thread only. OnDone comes
-  // once, unless the job is destroyed first. Do not free the job inside OnProgress or OnDone: the job still runs code after the callback
-  // returns. Free it after the callback, for instance from a queued call.
+  // on the target in the callback and then asks for the next, so that no more than one band (its render and its rows without the overlap)
+  // is in memory. UI thread only. OnDone comes once, unless the job is destroyed first. Do not free the job inside OnProgress or OnDone:
+  // the job still runs code after the callback returns. Free it after the callback, for instance from a queued call.
   TPdfPrintJob = class
   private
     FLink: TPdfDocumentLink;
@@ -106,6 +126,8 @@ type
     FHasPage: Boolean;
     FPlan: TPdfPrintPagePlan;
     FBandIndex: Integer;
+    // What is rendered for the band FBandIndex
+    FRegion: TRect;
     FRequest: IPdfViewerRequest;
     FOnLog: TPdfPrintLogEvent;
 
@@ -150,12 +172,18 @@ implementation
 uses
   System.Math,
   Pdf4D.Viewer.ResourceStrings,
-  Pdf4D.Viewer.ViewTransform;
+  Pdf4D.Render.PageTransform;
 
 const
   PointsPerInch = 72;
   RightAngle = 90;
   FullTurn = 360;
+  // A render may be this much finer than MaxDpi, so that a factor that is a whole number but for the rounding stays one
+  MaxDpiTolerance = 0.001;
+  // What the rounding of a fit may leave below a whole pixel
+  PixelTolerance = 0.001;
+  // The steps of the smallest Single that a scale may need to reach a size
+  MaxScaleSteps = 16;
 
 { TPdfPrintSettings }
 
@@ -266,18 +294,24 @@ begin
     Factor := Min(PrintableSize.cx / NaturalX, PrintableSize.cy / NaturalY);
   end;
 
-  const DestWidth = Max(1, Round(NaturalX * Factor));
-  const DestHeight = Max(1, Round(NaturalY * Factor));
+  // The bands are rows, so the rows decide whether two bands meet without a seam: the render follows the vertical resolution of the
+  // printer. A render row is one printer row, or, when MaxDpi caps the render, the same whole number of printer rows for every band.
+  // The size of the page on the paper then follows from the render, at most Stretch - 1 pixels below the exact size.
+  const Stretch = StretchFactor(PrinterDpi.Y * Factor, Settings.MaxDpi);
+  const RenderDpi: Double = PrinterDpi.Y * Factor / Stretch;
+  const Rotation = (Page.Rotation + Result.ViewRotation) mod FullTurn;
+  const TargetWidth = PixelsAt(PageWidth, RenderDpi);
+  const TargetHeight = PixelsAt(PageHeight, RenderDpi);
+  Result.RenderScale := ScaleFor(Page, Rotation, TargetWidth, TargetHeight);
+  Result.RenderSize := TPdfPageTransform.Create(Page.CropBox, Rotation, Result.RenderScale).Size;
+
+  // A printer with another horizontal resolution stretches the rows sideways, which gives no seams between bands
+  const DestWidth = Max(1, Round(Result.RenderSize.cx * Stretch * PrinterDpi.X / PrinterDpi.Y));
+  const DestHeight = Stretch * Result.RenderSize.cy;
   const Left = Floor((PrintableSize.cx - DestWidth) / 2);
   const Top = Floor((PrintableSize.cy - DestHeight) / 2);
   Result.FullDest := TRect.Create(Left, Top, Left + DestWidth, Top + DestHeight);
   Result.Dest := TRect.Intersect(Result.FullDest, TRect.Create(0, 0, PrintableSize.cx, PrintableSize.cy));
-
-  // The render is no finer than the printer or than MaxDpi; the printer scales it to its pixels
-  const RenderDpi: Double = Min(Max(PrinterDpi.X, PrinterDpi.Y) * Factor, Settings.MaxDpi);
-  const Transform = TPdfViewTransform.Create(Page, Result.ViewRotation, RenderDpi / PointsPerInch, PointsPerInch);
-  Result.RenderScale := Transform.Scale;
-  Result.RenderSize := Transform.Size;
 
   // Rows of the full width, so that a band is one rectangle and the memory is bounded
   const RowsPerBand = Max(Int64(1), MaxBandPixels div Result.RenderSize.cx);
@@ -302,10 +336,107 @@ begin
   Result.Bottom := Full.Top + ShareOf(Band.Bottom, Full.Height, Source.cy);
 end;
 
+class function TPdfPrintPlanner.RenderRegion(const Plan: TPdfPrintPagePlan; const Band: TRect): TRect;
+begin
+  Result := Band;
+  Result.Top := Max(0, Band.Top - BandOverlapRows);
+  Result.Bottom := Min(Plan.RenderSize.cy, Band.Bottom + BandOverlapRows);
+end;
+
+class function TPdfPrintPlanner.CropToBand(const Render: TPdfBitmap; const Region, Band: TRect): TPdfBitmap;
+begin
+  const FirstRow = Band.Top - Region.Top;
+  const IsInside = (FirstRow >= 0) and (FirstRow + Band.Height <= Render.Height) and (Band.Width = Render.Width);
+  if not IsInside then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('Band rows %d to %d are not in the render of rows %d to %d',
+                                                 [Band.Top, Band.Bottom, Region.Top, Region.Bottom]);
+  end;
+
+  Result := TPdfBitmap.Create(Band.Width, Band.Height);
+  try
+    for var Row := 0 to Band.Height - 1 do
+    begin
+      Move(Render.ScanLine(FirstRow + Row)^, Result.ScanLine(Row)^, Render.Stride);
+    end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
 // The scaling is done in Int64 and Double: a page can have billions of pixels
 class function TPdfPrintPlanner.ShareOf(const Value, DestExtent, SourceExtent: Integer): Integer;
 begin
   Result := Round(Int64(Value) * DestExtent / SourceExtent);
+end;
+
+class function TPdfPrintPlanner.StretchFactor(const PrinterRenderDpi: Double; const MaxDpi: Integer): Integer;
+begin
+  const Ratio = PrinterRenderDpi / MaxDpi;
+  if Ratio <= 1 + MaxDpiTolerance then
+  begin
+    Exit(1);
+  end;
+  Result := Ceil(Ratio - MaxDpiTolerance);
+end;
+
+class function TPdfPrintPlanner.PixelsAt(const Points, Dpi: Double): Integer;
+begin
+  const Exact: Double = Points * Dpi / PointsPerInch;
+  Result := Max(1, Floor(Exact + PixelTolerance));
+end;
+
+class function TPdfPrintPlanner.ScaleFor(const Page: TPdfPageInfo; const Rotation, TargetWidth, TargetHeight: Integer): Single;
+begin
+  const WidthScale = ScaleReaching(Page, Rotation, TargetWidth, False);
+  const HeightScale = ScaleReaching(Page, Rotation, TargetHeight, True);
+  Result := Max(WidthScale, HeightScale);
+
+  const Size = TPdfPageTransform.Create(Page.CropBox, Rotation, Result).Size;
+  const IsBeyondTarget = (Size.cx > TargetWidth) or (Size.cy > TargetHeight);
+  if IsBeyondTarget then
+  begin
+    Result := Min(WidthScale, HeightScale);
+  end;
+end;
+
+// The size of a render is Floor(points * scale) in Single, which can be a pixel below what the scale stands for: the scale goes up by
+// the smallest step until the side has its pixels
+class function TPdfPrintPlanner.ScaleReaching(const Page: TPdfPageInfo; const Rotation, Target: Integer; const IsHeight: Boolean): Single;
+begin
+  const IsSideways = ((Rotation mod (2 * RightAngle)) <> 0);
+  var Points: Double := Page.CropBox.Width;
+  if IsSideways <> IsHeight then
+  begin
+    Points := Page.CropBox.Height;
+  end;
+
+  Result := Target / Points;
+  for var Step := 1 to MaxScaleSteps do
+  begin
+    const Size = TPdfPageTransform.Create(Page.CropBox, Rotation, Result).Size;
+    var Reached := Size.cx;
+    if IsHeight then
+    begin
+      Reached := Size.cy;
+    end;
+
+    if Reached >= Target then
+    begin
+      Exit;
+    end;
+    Result := NextSingle(Result);
+  end;
+end;
+
+// The next larger Single of a positive finite value
+class function TPdfPrintPlanner.NextSingle(const Value: Single): Single;
+begin
+  var Bits: Cardinal;
+  Move(Value, Bits, SizeOf(Bits));
+  Inc(Bits);
+  Move(Bits, Result, SizeOf(Result));
 end;
 
 { TPdfPrintJob }
@@ -511,7 +642,8 @@ begin
     raise EInvalidOpException.Create('The document has no session to render with');
   end;
 
-  FRequest := Session.RequestRender(FPlan.PageIndex, FPlan.RenderScale, FPlan.ViewRotation, FPlan.Bands[FBandIndex], TPdfJobPriority.Print,
+  FRegion := TPdfPrintPlanner.RenderRegion(FPlan, FPlan.Bands[FBandIndex]);
+  FRequest := Session.RequestRender(FPlan.PageIndex, FPlan.RenderScale, FPlan.ViewRotation, FRegion, TPdfJobPriority.Print,
                                     BandDoneEvent());
 end;
 
@@ -538,7 +670,13 @@ begin
   if Outcome.Succeeded then
   begin
     try
-      FTarget.DrawBand(Outcome.Bitmap, TPdfPrintPlanner.BandDest(FPlan, FPlan.Bands[FBandIndex]));
+      const Band = FPlan.Bands[FBandIndex];
+      const Rows = TPdfPrintPlanner.CropToBand(Outcome.Bitmap, FRegion, Band);
+      try
+        FTarget.DrawBand(Rows, TPdfPrintPlanner.BandDest(FPlan, Band));
+      finally
+        Rows.Free;
+      end;
     except
       on E: Exception do
       begin

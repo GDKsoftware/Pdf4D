@@ -35,7 +35,6 @@ type
     procedure OpenDocument(const Data: TBytes);
     procedure NewDialog;
     // Paper of the size of a Letter page at 2 pixels to the point, so that a page renders without rounding
-    procedure UseExactPaper;
     procedure HandlePrinted(Sender: TObject);
     procedure HandleFailed(Sender: TObject; const ErrorMessage: string);
     // Prints with the settings and waits until the job is over
@@ -103,9 +102,6 @@ const
   SmallBandPixels = 100000;
   LongDocumentPages = 20;
   PdfPointsToPixels150 = 150 / 72;
-  ExactPaperWidth = 1224;
-  ExactPaperHeight = 1584;
-  ExactDpi = 144;
   PrinterEnvironmentVariable = 'PDF4D_TEST_PRINTER';
 
 { TPdfVclPrintTests }
@@ -141,11 +137,6 @@ begin
   FDialog.OnPrintFailed := HandleFailed;
 end;
 
-procedure TPdfVclPrintTests.UseExactPaper;
-begin
-  FDialog.Printable := TSize.Create(ExactPaperWidth, ExactPaperHeight);
-  FDialog.PrinterDpi := TPointF.Create(ExactDpi, ExactDpi);
-end;
 
 procedure TPdfVclPrintTests.OpenDocument(const Data: TBytes);
 begin
@@ -249,17 +240,17 @@ begin
   end;
 end;
 
+// Letter paper at 150 dpi, the paper of the test dialog: every band is copied to its printer rows pixel for pixel, so the pages in bands
+// are the pages in one piece
 procedure TPdfVclPrintTests.TestPrintInBands;
 begin
   OpenDocument(TViewerDocuments.Invoice);
-  UseExactPaper;
   PrintAndWait(TPdfPrintRangeKind.All, TPdfPrintScale.Fit);
   const SingleBandPages = CopyPages(FDialog.Target.Pages);
   try
     Assert.AreEqual(2, FDialog.Target.DrawBandCount, 'one band per page by default');
 
     NewDialog;
-    UseExactPaper;
     FDialog.Folder := '';
     FDialog.MaxBandPixels := SmallBandPixels;
     PrintAndWait(TPdfPrintRangeKind.All, TPdfPrintScale.Fit);

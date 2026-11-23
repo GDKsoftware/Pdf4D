@@ -35,6 +35,8 @@ type
   private
     class function PageOf(const Width, Height: Single; const Rotation: Integer): TPdfPageInfo; static;
     class function SettingsOf(const Scale: TPdfPrintScale): TPdfPrintSettings; static;
+    // Every band lands on Factor times its rows, starting at Factor times its first row
+    class procedure AssertBandsStretchBy(const Plan: TPdfPrintPagePlan; const Factor: Integer); static;
 
   public
     [Test]
@@ -67,6 +69,18 @@ type
     procedure TestPixelCountsBeyondIntegerDoNotOverflow;
     [Test]
     procedure TestInvalidArgumentsRaise;
+    [Test]
+    procedure TestRenderAtPrinterResolutionIsTheDest;
+    [Test]
+    procedure TestRenderOfAnOddPageSizeIsTheDest;
+    [Test]
+    procedure TestMaxDpiUsesAWholeStretchFactor;
+    [Test]
+    procedure TestMaxDpiThatIsNoDivisorUsesTheNextWholeFactor;
+    [Test]
+    procedure TestRenderRegionReachesIntoTheNeighbours;
+    [Test]
+    procedure TestCropToBandTakesTheRowsOfTheBand;
   end;
 
   // Writes down what the job does to it
@@ -269,6 +283,19 @@ begin
   Result.Scale := Scale;
 end;
 
+class procedure TPdfPrintPlannerTests.AssertBandsStretchBy(const Plan: TPdfPrintPagePlan; const Factor: Integer);
+begin
+  Assert.AreEqual(Factor * Plan.RenderSize.cy, Plan.FullDest.Height, 'the page lands on whole printer rows');
+  for var Band in Plan.Bands do
+  begin
+    const Dest = TPdfPrintPlanner.BandDest(Plan, Band);
+    Assert.AreEqual(Plan.FullDest.Top + Factor * Band.Top, Dest.Top, 'the band starts on its own printer row');
+    Assert.AreEqual(Factor * Band.Height, Dest.Height, 'every band is stretched by the same whole factor');
+    Assert.AreEqual(Plan.FullDest.Left, Dest.Left);
+    Assert.AreEqual(Plan.FullDest.Right, Dest.Right);
+  end;
+end;
+
 procedure TPdfPrintPlannerTests.TestActualSizeLetterOn600DpiA4;
 begin
   const Plan = TPdfPrintPlanner.PlanPage(PageOf(LetterWidth, LetterHeight, 0), 3, TSize.Create(4800, 6800), TPointF.Create(600, 600),
@@ -299,7 +326,8 @@ begin
   const Plan = TPdfPrintPlanner.PlanPage(PageOf(420, 595, 0), 0, TSize.Create(4960, 7016), TPointF.Create(600, 600),
                                          SettingsOf(TPdfPrintScale.Fit), Unlimited);
 
-  Assert.IsTrue((Plan.Dest.Width = 4960) or (Plan.Dest.Height = 7016), 'one side fills the paper');
+  // MaxDpi makes every render pixel three printer pixels: the page is a whole number of them, at most two below the paper
+  Assert.IsTrue((Plan.Dest.Width >= 4960 - 2) or (Plan.Dest.Height >= 7016 - 2), 'one side fills the paper');
   Assert.IsTrue((Plan.Dest.Width <= 4960) and (Plan.Dest.Height <= 7016), 'and the other one is inside it');
   Assert.IsTrue(Plan.Dest.Width > 3500, 'the page is larger than at actual size');
   Assert.AreEqual(Plan.FullDest, Plan.Dest);
@@ -488,6 +516,108 @@ begin
     EArgumentOutOfRangeException);
 end;
 
+// At printer resolution a band is copied pixel for pixel: the render is exactly the size of the page on the paper
+procedure TPdfPrintPlannerTests.TestRenderAtPrinterResolutionIsTheDest;
+begin
+  const MaxBandPixels: Int64 = 100000;
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(LetterWidth, LetterHeight, 0), 0, TSize.Create(1275, 1650), TPointF.Create(150, 150),
+                                         SettingsOf(TPdfPrintScale.Fit), MaxBandPixels);
+
+  Assert.AreEqual(1275, Plan.RenderSize.cx);
+  Assert.AreEqual(1650, Plan.RenderSize.cy, 'not a row less through the rounding of the scale');
+  Assert.AreEqual(TRect.Create(0, 0, 1275, 1650), Plan.FullDest);
+  Assert.IsTrue(Length(Plan.Bands) > 1, 'more than one band');
+  AssertBandsStretchBy(Plan, 1);
+end;
+
+procedure TPdfPrintPlannerTests.TestRenderOfAnOddPageSizeIsTheDest;
+begin
+  // A4 on Letter paper at 150 dpi: the fit is no whole number of pixels
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(595, 842, 0), 0, TSize.Create(1275, 1650), TPointF.Create(150, 150),
+                                         SettingsOf(TPdfPrintScale.Fit), 100000);
+
+  Assert.AreEqual(Plan.RenderSize.cx, Plan.FullDest.Width);
+  Assert.AreEqual(Plan.RenderSize.cy, Plan.FullDest.Height);
+  Assert.IsTrue(Plan.FullDest.Height >= 1650 - 1, 'the page fills the height of the paper');
+  Assert.IsTrue(Plan.FullDest.Height <= 1650, 'and stays on it');
+  Assert.IsTrue(Plan.FullDest.Width <= 1275);
+  Assert.AreEqual(Plan.FullDest, Plan.Dest, 'all of it is on the paper');
+  AssertBandsStretchBy(Plan, 1);
+end;
+
+// MaxDpi 300 on a 600 dpi printer: every render pixel becomes two by two printer pixels
+procedure TPdfPrintPlannerTests.TestMaxDpiUsesAWholeStretchFactor;
+begin
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(LetterWidth, LetterHeight, 0), 0, TSize.Create(5100, 6600), TPointF.Create(600, 600),
+                                         SettingsOf(TPdfPrintScale.Fit), 1000 * 1000);
+
+  Assert.AreEqual(Double(300 / PointsPerInch), Double(Plan.RenderScale), Tolerance);
+  Assert.AreEqual(2550, Plan.RenderSize.cx);
+  Assert.AreEqual(3300, Plan.RenderSize.cy);
+  Assert.AreEqual(TRect.Create(0, 0, 5100, 6600), Plan.FullDest);
+  Assert.IsTrue(Length(Plan.Bands) > 1, 'more than one band');
+  AssertBandsStretchBy(Plan, 2);
+end;
+
+// MaxDpi 250 on a 600 dpi printer: a factor of 2.4 is no whole number, so the render is a third of the printer resolution
+procedure TPdfPrintPlannerTests.TestMaxDpiThatIsNoDivisorUsesTheNextWholeFactor;
+begin
+  var Settings := SettingsOf(TPdfPrintScale.Fit);
+  Settings.MaxDpi := 250;
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(LetterWidth, LetterHeight, 0), 0, TSize.Create(5100, 6600), TPointF.Create(600, 600),
+                                         Settings, 1000 * 1000);
+
+  Assert.AreEqual(Double(200 / PointsPerInch), Double(Plan.RenderScale), Tolerance);
+  Assert.AreEqual(3 * Plan.RenderSize.cx, Plan.FullDest.Width);
+  Assert.IsTrue(Plan.FullDest.Height >= 6600 - 2, 'at most two printer rows less than the fit');
+  Assert.IsTrue(Plan.FullDest.Height <= 6600);
+  Assert.AreEqual(Plan.FullDest, Plan.Dest, 'all of it is on the paper');
+  AssertBandsStretchBy(Plan, 3);
+end;
+
+procedure TPdfPrintPlannerTests.TestRenderRegionReachesIntoTheNeighbours;
+begin
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(LetterWidth, LetterHeight, 0), 0, TSize.Create(612, 792), TPointF.Create(72, 72),
+                                         SettingsOf(TPdfPrintScale.Fit), 612 * 100);
+
+  Assert.AreEqual(TRect.Create(0, 0, 612, 100 + BandOverlapRows), TPdfPrintPlanner.RenderRegion(Plan, Plan.Bands[0]), 'the first band');
+  Assert.AreEqual(TRect.Create(0, 100 - BandOverlapRows, 612, 200 + BandOverlapRows), TPdfPrintPlanner.RenderRegion(Plan, Plan.Bands[1]));
+  const Last = Plan.Bands[High(Plan.Bands)];
+  Assert.AreEqual(TRect.Create(0, Last.Top - BandOverlapRows, 612, 792), TPdfPrintPlanner.RenderRegion(Plan, Last), 'the last band');
+end;
+
+procedure TPdfPrintPlannerTests.TestCropToBandTakesTheRowsOfTheBand;
+begin
+  const Region = TRect.Create(0, 9, 2, 13);
+  const Band = TRect.Create(0, 10, 2, 12);
+  const Render = TPdfBitmap.Create(2, Region.Height);
+  try
+    for var Row := 0 to Render.Height - 1 do
+    begin
+      Render.SetPixel(0, Row, TPdfDeviceColor.Create(Row, 0, 0));
+    end;
+
+    const Rows = TPdfPrintPlanner.CropToBand(Render, Region, Band);
+    try
+      Assert.AreEqual(2, Rows.Width);
+      Assert.AreEqual(2, Rows.Height);
+      Assert.AreEqual(1, Integer(Rows.GetPixel(0, 0).R), 'the first row of the band');
+      Assert.AreEqual(2, Integer(Rows.GetPixel(0, 1).R), 'the last row of the band');
+    finally
+      Rows.Free;
+    end;
+
+    Assert.WillRaise(
+      procedure
+      begin
+        TPdfPrintPlanner.CropToBand(Render, Region, TRect.Create(0, 8, 2, 12)).Free;
+      end,
+      EArgumentOutOfRangeException);
+  finally
+    Render.Free;
+  end;
+end;
+
 { TRecordingPrintTarget }
 
 constructor TRecordingPrintTarget.Create(const Printable: TSize; const Dpi: TPointF);
@@ -639,13 +769,14 @@ begin
   Assert.AreEqual(Ord(TFakeRequestKind.Render), Ord(FFake.Requests[0].Kind));
   Assert.AreEqual(Ord(TPdfJobPriority.Print), Ord(FFake.Requests[0].Priority));
   Assert.AreEqual(0, FFake.Requests[0].PageIndex);
-  Assert.AreEqual(TRect.Create(0, 0, 612, 490), FFake.Requests[0].Region);
+  // The render reaches one row into the next band
+  Assert.AreEqual(TRect.Create(0, 0, 612, 491), FFake.Requests[0].Region);
   Assert.AreEqual(Double(1), Double(FFake.Requests[0].Scale), Tolerance);
   Assert.AreEqual(0, FFake.Requests[0].ViewRotation);
 
   FFake.CompleteRender(0, $FFFFFFFF);
   Assert.AreEqual(2, Integer(FFake.Requests.Count));
-  Assert.AreEqual(TRect.Create(0, 490, 612, 792), FFake.Requests[1].Region);
+  Assert.AreEqual(TRect.Create(0, 489, 612, 792), FFake.Requests[1].Region);
   FFake.CompleteRender(1, $FFFFFFFF);
   Assert.AreEqual('1/2', FProgress.CommaText);
 
