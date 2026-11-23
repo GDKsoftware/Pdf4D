@@ -1,8 +1,10 @@
 param(
     [Parameter(Mandatory)][string]$OutputFolder
 )
-# Draws the placeholder palette icons (PNG, 24 and 32 pixels) and links them as BITMAP resources into one .res file.
-# Resource names: the class name in capitals (24 x 24) and the same with _32 (32 x 32). The bottom-left pixel is the transparent colour.
+# Draws the placeholder palette icons (PNG, 16, 24 and 32 pixels) and links them as BITMAP resources into one .res file.
+# Resource names: the class name in capitals (24 x 24) and the same with 16 (16 x 16) or 32 (32 x 32), without an underscore: that is how
+# the resources of the packages of the IDE itself are named (dclstd370.bpl: TFILEOPENDIALOG, TFILEOPENDIALOG16, TFILEOPENDIALOG32).
+# The bottom-left pixel is the transparent colour.
 Add-Type -AssemblyName System.Drawing
 
 $icons = [ordered]@{
@@ -69,7 +71,7 @@ $resource = New-Object System.IO.MemoryStream
 $resource.Write([byte[]](0,0,0,0, 0x20,0,0,0, 0xFF,0xFF,0,0, 0xFF,0xFF,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0), 0, 32)
 
 foreach ($className in $icons.Keys) {
-    foreach ($size in 24, 32) {
+    foreach ($size in 16, 24, 32) {
         $bitmap = New-IconBitmap $size $icons[$className].Letters $icons[$className].Color
         $bitmap.Save((Join-Path $OutputFolder "$className$size.png"), [System.Drawing.Imaging.ImageFormat]::Png)
         $bmpStream = New-Object System.IO.MemoryStream
@@ -79,7 +81,7 @@ foreach ($className in $icons.Keys) {
         $bmpBytes = $bmpStream.ToArray()
         $dib = New-Object byte[] ($bmpBytes.Length - 14)
         [Array]::Copy($bmpBytes, 14, $dib, 0, $dib.Length)
-        $resourceName = if ($size -eq 24) { $className } else { "${className}_32" }
+        $resourceName = if ($size -eq 24) { $className } else { "$className$size" }
         $entry = Get-ResourceEntry $resourceName $dib
         $resource.Write($entry, 0, $entry.Length)
     }
