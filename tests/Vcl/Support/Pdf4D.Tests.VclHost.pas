@@ -80,7 +80,8 @@ type
 
     procedure HandleOpenError(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string);
     procedure Send(const Control: TWinControl; const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
-    procedure SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState);
+    // The result of the message
+    function SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState): NativeInt;
 
   public
     // A form of 96 PPI whose client area is ClientWidth x ClientHeight, with a document that renders with Skia
@@ -112,8 +113,9 @@ type
     procedure PressKey(const Key: Word; const Ctrl: Boolean = False);
     // The same for another control; the keys of Shift are seen as pressed
     procedure PressKeyOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState = []);
-    // The key as the message loop gives it to the form to find a shortcut among its actions: the control tells its form first
-    procedure PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
+    // The key as the message loop gives it to the form to find a shortcut among its actions: the control tells its form first. True when
+    // a shortcut took the key, so that the control does not get it.
+    function PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState): Boolean;
     // A click with the left button on another control
     procedure ClickOn(const Control: TWinControl; const X, Y: Integer);
 
@@ -408,12 +410,12 @@ begin
   SendKey(Control, WM_KEYDOWN, Key, Shift);
 end;
 
-procedure TVclTestHost.PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
+function TVclTestHost.PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState): Boolean;
 begin
-  SendKey(Control, CN_KEYDOWN, Key, Shift);
+  Result := (SendKey(Control, CN_KEYDOWN, Key, Shift) <> 0);
 end;
 
-procedure TVclTestHost.SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState);
+function TVclTestHost.SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState): NativeInt;
 begin
   var State: TKeyboardState;
   GetKeyboardState(State);
@@ -430,7 +432,7 @@ begin
   SetKeyboardState(State);
 
   try
-    Control.Perform(Message, Key, 0);
+    Result := Control.Perform(Message, Key, 0);
   finally
     SetKeyboardState(Saved);
   end;

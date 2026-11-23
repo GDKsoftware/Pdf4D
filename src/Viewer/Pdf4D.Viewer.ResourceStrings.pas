@@ -24,6 +24,7 @@ resourcestring
   SPrintStretchFailed = 'A band of the page could not be sent to the printer';
   SPrintAlreadyRunning = 'A print job is running already.';
   SPrintNeedsDocument = 'Printing needs a document.';
+  SPrintNotAllowed = 'The document does not allow printing.';
   SPrintDialogCaption = 'Print';
   SPrintPrinterLabel = 'Printer';
   SPrintProperties = 'Properties...';

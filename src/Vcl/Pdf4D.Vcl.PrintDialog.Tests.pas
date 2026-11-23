@@ -70,6 +70,9 @@ type
 
     [Test]
     procedure TestFailureIsReported;
+
+    [Test]
+    procedure TestExecuteRaisesBeforeTheDialogWhenItCannotPrint;
   end;
 
 implementation
@@ -408,6 +411,39 @@ begin
   Assert.IsTrue(FFailure <> '', 'the failure is reported');
   Assert.AreEqual(0, FPrintedCount);
   Assert.IsTrue(FDialog.Target.IsAborted, 'the document is aborted');
+end;
+
+// The user does not fill in a dialog for a document that cannot be printed now
+procedure TPdf4DPrintDialogTests.TestExecuteRaisesBeforeTheDialogWhenItCannotPrint;
+begin
+  var Shown := 0;
+  TPdf4DPrintDialog.ModalRunner :=
+    function(Form: TPdf4DPrintDialogForm): TModalResult
+    begin
+      Inc(Shown);
+      Result := mrOk;
+    end;
+
+  Assert.IsTrue(FHost.Open(TVclTestDocuments.Restricted), 'the document opens');
+  Assert.WillRaise(
+    procedure
+    begin
+      FDialog.Execute;
+    end,
+    System.SysUtils.EInvalidOpException);
+  Assert.AreEqual(0, Shown, 'no dialog for a document that may not be printed');
+
+  Assert.IsTrue(FHost.Open(TViewerDocuments.Pages(LongDocumentPages, 612, 792, 0)), 'the document opens');
+  FDialog.DrawDelayMs := PageDelayMs;
+  FDialog.Print(TPdfPrintSettings.Default);
+  Assert.WillRaise(
+    procedure
+    begin
+      FDialog.Execute;
+    end,
+    System.SysUtils.EInvalidOpException);
+  Assert.AreEqual(0, Shown, 'no dialog while a job runs');
+  // The dialog is freed with the form while its job runs
 end;
 
 end.

@@ -123,6 +123,7 @@ type
     procedure SetRangeKind(const Value: TPdfPrintRangeKind);
     function GetScale: TPdfPrintScale;
     procedure SetScale(const Value: TPdfPrintScale);
+    // Raises EInvalidOpException without a document, while a job runs, or when the document may not be printed
     procedure CheckCanPrint;
     function RunModal(const Form: TPdf4DPrintDialogForm): TModalResult;
     procedure ShowProgressForm;
@@ -142,7 +143,8 @@ type
     // A running job is cancelled without a callback
     destructor Destroy; override;
 
-    // Shows the dialog modally; when the user confirms, Settings holds the choice and the document is printed (see Print)
+    // Shows the dialog modally; when the user confirms, Settings holds the choice and the document is printed (see Print). Raises as Print
+    // does before the dialog is shown.
     function Execute: Boolean;
     // Prints without the dialog. The job runs on: this returns at once, and OnPrinted or OnPrintFailed come when it is over; a job
     // that is cancelled gives neither. Raises EInvalidOpException while a job runs, or when the document may not be printed.
@@ -629,6 +631,16 @@ begin
   begin
     raise EInvalidOpException.Create(SPrintNeedsDocument);
   end;
+
+  if Assigned(FJob) then
+  begin
+    raise EInvalidOpException.Create(SPrintAlreadyRunning);
+  end;
+
+  if not FDocument.CanPrint then
+  begin
+    raise EInvalidOpException.Create(SPrintNotAllowed);
+  end;
 end;
 
 function TPdf4DPrintDialog.CreateTarget: IPdfPrintTarget;
@@ -683,10 +695,6 @@ end;
 procedure TPdf4DPrintDialog.Print(const Settings: TPdfPrintSettings);
 begin
   CheckCanPrint;
-  if Assigned(FJob) then
-  begin
-    raise EInvalidOpException.Create(SPrintAlreadyRunning);
-  end;
 
   var Prepared := Settings;
   if Prepared.Title = '' then

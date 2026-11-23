@@ -104,11 +104,13 @@ type
     constructor Create(Owner: TComponent); override;
   end;
 
-  // Copies the selected text; enabled when there is a selection and the document allows copying
+  // Copies the selected text; enabled when there is a selection and the document allows copying. Its shortcut (Ctrl+C) works only while
+  // the page view has the focus, so that Ctrl+C in an edit of the form copies the text of the edit.
   TPdf4DCopyAction = class(TPdf4DPageViewAction)
   protected
     procedure Perform(const View: TPdf4DPageView); override;
     function IsApplicable(const View: TPdf4DPageView): Boolean; override;
+    function HandleShortCut: Boolean; override;
   public
     constructor Create(Owner: TComponent); override;
   end;
@@ -241,6 +243,27 @@ const
   PriorKey = $21;
   NextKey = $22;
 
+type
+  // What TCustomAction.Execute checks before it runs an action. A shortcut reaches Execute without these checks, and an action that does
+  // not run returns False, so that the key goes on to the control that has the focus.
+  TActionGate = class
+  public
+    class function MayRun(const Action: TCustomAction): Boolean; static;
+  end;
+
+{ TActionGate }
+
+class function TActionGate.MayRun(const Action: TCustomAction): Boolean;
+begin
+  if Action.Suspended then
+  begin
+    Exit(False);
+  end;
+
+  Action.Update;
+  Result := Action.Enabled;
+end;
+
 { TPdf4DPageViewAction }
 
 class function TPdf4DPageViewAction.FocusedPageView: TPdf4DPageView;
@@ -342,6 +365,7 @@ end;
 
 function TPdf4DPageViewAction.Execute: Boolean;
 begin
+if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
   const View = ResolveView;
   if Assigned(OnExecute) or (not Assigned(View)) then
   begin
@@ -482,6 +506,13 @@ begin
   View.CopyToClipboard;
 end;
 
+function TPdf4DCopyAction.HandleShortCut: Boolean;
+begin
+  const View = ResolveView;
+  const HasFocus = Assigned(View) and View.Focused;
+  Result := HasFocus and (inherited HandleShortCut);
+end;
+
 function TPdf4DCopyAction.IsApplicable(const View: TPdf4DPageView): Boolean;
 begin
   Result := inherited IsApplicable(View) and View.Document.CanCopy;
@@ -530,6 +561,7 @@ end;
 
 function TPdf4DDocumentAction.Execute: Boolean;
 begin
+if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
   if Assigned(OnExecute) or (not Assigned(FDocument)) then
   begin
     Exit(inherited Execute);
@@ -746,6 +778,7 @@ end;
 
 function TPdf4DSearchAction.Execute: Boolean;
 begin
+if not TActionGate.MayRun(Self) then  begin    Exit(False);  end;
   if Assigned(OnExecute) or (not Assigned(FSearchBar)) then
   begin
     Exit(inherited Execute);

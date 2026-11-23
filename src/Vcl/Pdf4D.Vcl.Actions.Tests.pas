@@ -71,16 +71,28 @@ type
 
     [Test]
     procedure TestStandardTexts;
+
+    [Test]
+    procedure TestDisabledActionsDoNotRun;
+
+    [Test]
+    procedure TestDisabledActionsLeaveTheirShortCut;
+
+    [Test]
+    procedure TestCopyShortCutBelongsToTheFocusedPageView;
   end;
 
 implementation
 
 uses
+  System.Actions,
+  System.UITypes,
   Vcl.Forms,
   Vcl.Menus,
   Winapi.Windows,
   Pdf4D.Viewer.Types,
   Pdf4D.Vcl.Document,
+  Pdf4D.Vcl.PrintDialog,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -377,6 +389,93 @@ begin
     Assert.IsNotEmpty(Action.Caption, Action.ClassName);
     Assert.IsNotEmpty(Action.Hint, Action.ClassName);
   end;
+end;
+
+procedure TPdf4DActionsTests.TestDisabledActionsDoNotRun;
+begin
+  var Shown := 0;
+  TPdf4DPrintDialog.ModalRunner :=
+    function(Form: TPdf4DPrintDialogForm): TModalResult
+    begin
+      Inc(Shown);
+      Result := mrCancel;
+    end;
+  try
+    Assert.IsTrue(FHost.Open(TVclTestDocuments.Restricted), FHost.OpenErrorMessage);
+    const Print = TPdf4DPrintAction.Create(FHost.Form);
+    Print.Document := FHost.Document;
+    const ZoomIn = TPdf4DZoomInAction.Create(FHost.Form);
+    const Copy = TPdf4DCopyAction.Create(FHost.Form);
+    Copy.PageView := FHost.PageView;
+    FHost.Document.Close;
+    const ZoomBefore = FHost.PageView.Zoom;
+
+    Assert.IsFalse(Print.Execute, 'a document that may not be printed');
+    Assert.AreEqual(0, Shown, 'no print dialog');
+    Assert.IsFalse(ZoomIn.Execute, 'no open document in the page view');
+    Assert.AreEqual(Double(ZoomBefore), Double(FHost.PageView.Zoom), Tolerance);
+    Assert.IsFalse(Copy.Execute, 'nothing is selected');
+    Assert.AreEqual<Integer>(0, FHost.PageView.CopiedTexts.Count);
+  finally
+    TPdf4DPrintDialog.ModalRunner := nil;
+  end;
+end;
+
+// In an action list of the form: a disabled action lets the key through to the control that has the focus
+procedure TPdf4DActionsTests.TestDisabledActionsLeaveTheirShortCut;
+begin
+  var Shown := 0;
+  TPdf4DPrintDialog.ModalRunner :=
+    function(Form: TPdf4DPrintDialogForm): TModalResult
+    begin
+      Inc(Shown);
+      Result := mrCancel;
+    end;
+  try
+    Assert.IsTrue(FHost.Open(TVclTestDocuments.Restricted), FHost.OpenErrorMessage);
+    const Actions = TActionList.Create(FHost.Form);
+    const Print = TPdf4DPrintAction.Create(FHost.Form);
+    Print.ActionList := Actions;
+    Print.Document := FHost.Document;
+    const Copy = TPdf4DCopyAction.Create(FHost.Form);
+    Copy.ActionList := Actions;
+    Copy.PageView := FHost.PageView;
+    const Edit = TEdit.Create(FHost.Form);
+    Edit.Parent := FHost.Form;
+    Edit.SetFocus;
+
+    Assert.IsFalse(FHost.PressShortCutOn(Edit, Ord('P'), [ssCtrl]), 'Ctrl+P goes on to the edit');
+    Assert.AreEqual(0, Shown, 'no print dialog');
+    Assert.IsFalse(FHost.PressShortCutOn(Edit, Ord('C'), [ssCtrl]), 'Ctrl+C goes on to the edit');
+  finally
+    TPdf4DPrintDialog.ModalRunner := nil;
+  end;
+end;
+
+procedure TPdf4DActionsTests.TestCopyShortCutBelongsToTheFocusedPageView;
+begin
+  OpenInvoice;
+  Assert.IsTrue(FHost.WaitForPageText(0));
+  Assert.IsTrue(FHost.WaitForVisibleTiles);
+  const Actions = TActionList.Create(FHost.Form);
+  const Copy = TPdf4DCopyAction.Create(FHost.Form);
+  Copy.ActionList := Actions;
+  Copy.PageView := FHost.PageView;
+  const Edit = TEdit.Create(FHost.Form);
+  Edit.Parent := FHost.Form;
+
+  const Center = FHost.CenterOfWord(0, InvoiceNumber, 1);
+  FHost.Click(Center.X, Center.Y);
+  Edit.SetFocus;
+  Copy.Update;
+  Assert.IsTrue(Copy.Enabled, 'a word is selected');
+
+  Assert.IsFalse(FHost.PressShortCutOn(Edit, Ord('C'), [ssCtrl]), 'Ctrl+C in the edit goes on to the edit');
+  Assert.AreEqual<Integer>(0, FHost.PageView.CopiedTexts.Count, 'the selection of the page view is not copied');
+
+  FHost.PageView.SetFocus;
+  Assert.IsTrue(FHost.PressShortCutOn(FHost.PageView, Ord('C'), [ssCtrl]), 'the action takes Ctrl+C in the page view');
+  Assert.AreEqual<Integer>(1, FHost.PageView.CopiedTexts.Count, 'copied once');
 end;
 
 end.
