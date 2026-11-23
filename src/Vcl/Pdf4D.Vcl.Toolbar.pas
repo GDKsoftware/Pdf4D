@@ -30,6 +30,11 @@ type
   // own that work on Document, PageView and SearchBar; the icons come from an image list that the toolbar makes, unless Images is set
   // to another list before the buttons are made.
   TPdf4DToolbar = class(TToolBar)
+  private type
+    // The order of the icons in the image list of the toolbar
+    TToolbarIcon = (First, Prior, Next, Last, ZoomIn, ZoomOut, FitWidth, FitPage, RotateClockwise, RotateCounterclockwise, Search, Print,
+                    Copy);
+
   private
     FDocument: TPdf4DCustomDocument;
     FPageView: TPdf4DPageView;
@@ -69,6 +74,9 @@ type
     FLabelPages: TLabel;
     FComboZoom: TComboBox;
 
+    class function IconResourceName(const Icon: TToolbarIcon): string; static;
+    // The position of the percentage in the zoom steps, or -1
+    class function IndexOfPercentage(const Percentage: Integer): Integer; static;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure SetPageView(const Value: TPdf4DPageView);
     procedure SetSearchBar(const Value: TPdf4DSearchBar);
@@ -152,10 +160,6 @@ uses
   Winapi.Windows,
   Pdf4D.Viewer.ResourceStrings;
 
-type
-  // The order of the icons in the image list of the toolbar
-  TToolbarIcon = (First, Prior, Next, Last, ZoomIn, ZoomOut, FitWidth, FitPage, RotateClockwise, RotateCounterclockwise, Search, Print, Copy);
-
 const
   IconSize = 16;
   IconResourcePrefix = 'PDF4D_ICON_';
@@ -171,7 +175,9 @@ const
   ZoomPercentages: array[0..11] of Integer = (10, 25, 50, 75, 100, 125, 150, 200, 300, 400, 600, 800);
   PercentSign = '%';
 
-function IconResourceName(const Icon: TToolbarIcon): string;
+{ TPdf4DToolbar }
+
+class function TPdf4DToolbar.IconResourceName(const Icon: TToolbarIcon): string;
 const
   Names: array[TToolbarIcon] of string = ('FIRST', 'PRIOR', 'NEXT', 'LAST', 'ZOOMIN', 'ZOOMOUT', 'FITWIDTH', 'FITPAGE',
                                           'ROTATECLOCKWISE', 'ROTATECOUNTERCLOCKWISE', 'SEARCH', 'PRINT', 'COPY');
@@ -179,7 +185,7 @@ begin
   Result := IconResourcePrefix + Names[Icon];
 end;
 
-function IndexOfPercentage(const Percentage: Integer): Integer;
+class function TPdf4DToolbar.IndexOfPercentage(const Percentage: Integer): Integer;
 begin
   Result := -1;
   for var Index := Low(ZoomPercentages) to High(ZoomPercentages) do
@@ -190,8 +196,6 @@ begin
     end;
   end;
 end;
-
-{ TPdf4DToolbar }
 
 constructor TPdf4DToolbar.Create(Owner: TComponent);
 begin

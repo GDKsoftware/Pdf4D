@@ -21,6 +21,8 @@ type
   private
     FPageView: TPdf4DPageView;
 
+    // The page view that has the focus in the active form, or nil
+    class function FocusedPageView: TPdf4DPageView; static;
     procedure SetPageView(const Value: TPdf4DPageView);
     // The page view to act on, or nil when there is none
     function ResolveView: TPdf4DPageView;
@@ -239,7 +241,9 @@ const
   PriorKey = $21;
   NextKey = $22;
 
-function FocusedPageView: TPdf4DPageView;
+{ TPdf4DPageViewAction }
+
+class function TPdf4DPageViewAction.FocusedPageView: TPdf4DPageView;
 begin
   Result := nil;
   const ActiveForm = Screen.ActiveCustomForm;
@@ -248,8 +252,6 @@ begin
     Result := TPdf4DPageView(ActiveForm.ActiveControl);
   end;
 end;
-
-{ TPdf4DPageViewAction }
 
 constructor TPdf4DPageViewAction.Create(Owner: TComponent);
 begin
