@@ -741,7 +741,7 @@ end;
 
 procedure TSessionJob.LogFailure(const Failure: Exception);
 begin
-  FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format(SSessionJobFailed, [Describe, Failure.Message]));
+  FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format(SSessionJobFailed, [Describe, Failure.Message, Failure.ClassName]));
 end;
 
 function TSessionJob.Document: IPdfDocument;

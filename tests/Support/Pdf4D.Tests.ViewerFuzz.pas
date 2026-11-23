@@ -51,7 +51,10 @@ const
   HitColumns = 5;
   HitRows = 4;
   SearchQuery = 'a';
-  MillisecondsPerSecond = 1000;
+  // The inner wait is shorter than the time limit of the run, so that the probe ends with a message of its own before the watchdog
+  InnerMillisecondsPerSecond = 800;
+  FailureClassPrefix = 'EPdf';
+  JobFailedMarker = ' failed: ';
 
 type
   TViewerFuzzRun = class
@@ -62,6 +65,8 @@ type
     FRequests: TList<IPdfViewerRequest>;
     FIsOpenDone: Boolean;
     FIsOpened: Boolean;
+    // What the session reported that is no PDF failure: a fatal error of the worker, or a job that failed with another exception
+    FFailures: TStringList;
 
     procedure RunUntil(const Condition: TFunc<Boolean>);
     procedure Open(const Bytes: TBytes; const Password: string);
@@ -70,6 +75,11 @@ type
     procedure RequestTextAndHitTest(const PageIndex: Integer);
     procedure RequestSearch;
     function AreRequestsDone: Boolean;
+    procedure HandleLog(const Level: TPdfLogLevel; const Message: string);
+    procedure HandleFatal(const Message: string);
+    // Raises when the session reported a failure that is not a PDF failure
+    procedure CheckFailures;
+    class function ExceptionClassOf(const Message: string): string; static;
     class procedure HitTest(const PageText: IPdfPageText; const Page: TPdfPageInfo); static;
 
   public
@@ -87,8 +97,9 @@ begin
   FDispatcher := TManualDispatcher.Create;
   FDispatcherReference := FDispatcher;
   FRequests := TList<IPdfViewerRequest>.Create;
+  FFailures := TStringList.Create;
   const Backend: IPdfRenderBackend = TRecordingBackend.Create;
-  FSession := TPdfViewerSession.Create(Backend, FDispatcherReference, nil);
+  FSession := TPdfViewerSession.Create(Backend, FDispatcherReference, HandleLog, HandleFatal);
 end;
 
 destructor TViewerFuzzRun.Destroy;
@@ -99,6 +110,7 @@ begin
     Request.Cancel;
   end;
   FSession := nil;
+  FFailures.Free;
   FRequests.Free;
   FDispatcherReference := nil;
   inherited;
@@ -106,9 +118,50 @@ end;
 
 procedure TViewerFuzzRun.RunUntil(const Condition: TFunc<Boolean>);
 begin
-  if not FDispatcher.RunUntil(Condition, TFuzzSettings.TimeLimitSeconds * MillisecondsPerSecond) then
+  if not FDispatcher.RunUntil(Condition, TFuzzSettings.TimeLimitSeconds * InnerMillisecondsPerSecond) then
   begin
     raise EInvalidOpException.Create('The viewer session did not answer in time');
+  end;
+end;
+
+class function TViewerFuzzRun.ExceptionClassOf(const Message: string): string;
+begin
+  Result := '';
+  const IsJobFailure = Message.Contains(JobFailedMarker) and Message.EndsWith(')');
+  if IsJobFailure then
+  begin
+    const Start = Message.LastIndexOf('(');
+    Result := Message.Substring(Start + 1, Message.Length - Start - 2);
+  end;
+end;
+
+procedure TViewerFuzzRun.HandleLog(const Level: TPdfLogLevel; const Message: string);
+begin
+  if Level <> TPdfLogLevel.Error then
+  begin
+    Exit;
+  end;
+
+  const FailureClass = ExceptionClassOf(Message);
+  const IsOtherFailure = (FailureClass <> '') and (not FailureClass.StartsWith(FailureClassPrefix));
+  if IsOtherFailure then
+  begin
+    FFailures.Add(Message);
+  end;
+end;
+
+procedure TViewerFuzzRun.HandleFatal(const Message: string);
+begin
+  FFailures.Add('Fatal: ' + Message);
+end;
+
+procedure TViewerFuzzRun.CheckFailures;
+begin
+  // What the last jobs logged is still in the queue
+  FDispatcher.RunPending;
+  if FFailures.Count > 0 then
+  begin
+    raise EInvalidOpException.CreateFmt('The viewer session reported %d failures that are no PDF failure, the first: %s', [FFailures.Count, FFailures[0]]);
   end;
 end;
 
@@ -203,6 +256,7 @@ begin
   Open(Bytes, Password);
   if not FIsOpened then
   begin
+    CheckFailures;
     Exit;
   end;
 
@@ -213,6 +267,7 @@ begin
   RequestSearch;
 
   RunUntil(AreRequestsDone);
+  CheckFailures;
 end;
 
 { TViewerFuzzProbe }

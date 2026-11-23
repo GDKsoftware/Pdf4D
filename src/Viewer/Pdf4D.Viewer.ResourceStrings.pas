@@ -24,7 +24,7 @@ resourcestring
   SWorkerMoreReportFailures = '%s (and %d more failures of the report callback)';
 
   // Session
-  SSessionJobFailed = '%s failed: %s';
+  SSessionJobFailed = '%s failed: %s (%s)';
   SSessionOpening = 'Opening the document';
   SSessionReleasing = 'Releasing the document';
   SSessionRenderingPage = 'Rendering page %d';

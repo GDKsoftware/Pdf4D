@@ -16,6 +16,7 @@ type
   TRobustnessTests = class
   strict private
     class function GlyphTableMutation(const Font: TBytes; const Offset, Size, Index: Integer): TBytes; static;
+    class procedure AssertProbeResultWhenLoadRaises(const FailureClass: ExceptClass; const IsAccepted: Boolean); static;
     class procedure RunMutatedInput(const Campaign: TFuzzCampaign; const What: string; const Source: TBytes; const Work: TFuzzWork;
                                     const Seed: Integer); static;
 
@@ -39,6 +40,14 @@ type
     // within their maximum
     [Test]
     procedure TestCachesStayWithinBudget;
+    // The viewer fuzz fails on an access violation and on another exception that is not a PDF exception on the worker, in the load of the
+    // document (hooked in) as well as after it
+    [Test]
+    procedure TestViewerProbeFailsOnAnAccessViolationOfTheWorker;
+    [Test]
+    procedure TestViewerProbeFailsOnAnotherExceptionOfTheWorker;
+    [Test]
+    procedure TestViewerProbeAcceptsAPdfExceptionOfTheWorker;
   end;
 
 implementation
@@ -48,6 +57,7 @@ uses
   System.Types,
   System.UITypes,
   System.Generics.Collections,
+  Pdf4D.Common.Defines,
   Pdf4D.Model.Rectangle,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Session,
@@ -57,6 +67,7 @@ uses
   Pdf4D.Viewer.Painter.Interfaces,
   Pdf4D.Tests.TestFonts,
   Pdf4D.Tests.TestDocument,
+  Pdf4D.Tests.ViewerDocuments,
   Pdf4D.Tests.FakeSession,
   Pdf4D.Tests.RecordingPainter,
   Pdf4D.Tests.ViewerFuzz;
@@ -184,6 +195,51 @@ begin
   finally
     TFuzzViewing.Probe := nil;
   end;
+end;
+
+class procedure TRobustnessTests.AssertProbeResultWhenLoadRaises(const FailureClass: ExceptClass; const IsAccepted: Boolean);
+begin
+  PdfSessionDocumentHook :=
+    procedure(const IsRelease: Boolean; const ThreadId: TThreadID)
+    begin
+      if not IsRelease then
+      begin
+        raise FailureClass.Create('Injected by the test');
+      end;
+    end;
+  try
+    const Data = TViewerDocuments.Invoice;
+    if IsAccepted then
+    begin
+      TViewerFuzzProbe.Run(Data, '');
+    end
+    else
+    begin
+      Assert.WillRaise(
+        procedure
+        begin
+          TViewerFuzzProbe.Run(Data, '');
+        end,
+        EInvalidOpException);
+    end;
+  finally
+    PdfSessionDocumentHook := nil;
+  end;
+end;
+
+procedure TRobustnessTests.TestViewerProbeFailsOnAnAccessViolationOfTheWorker;
+begin
+  AssertProbeResultWhenLoadRaises(EAccessViolation, False);
+end;
+
+procedure TRobustnessTests.TestViewerProbeFailsOnAnotherExceptionOfTheWorker;
+begin
+  AssertProbeResultWhenLoadRaises(EListError, False);
+end;
+
+procedure TRobustnessTests.TestViewerProbeAcceptsAPdfExceptionOfTheWorker;
+begin
+  AssertProbeResultWhenLoadRaises(EPdfParseException, True);
 end;
 
 procedure TRobustnessTests.TestCachesStayWithinBudget;
