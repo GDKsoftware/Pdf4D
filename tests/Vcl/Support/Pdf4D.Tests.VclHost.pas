@@ -3,6 +3,7 @@
 unit Pdf4D.Tests.VclHost;
 
 {$EXCESSPRECISION OFF}
+{$POINTERMATH ON}
 
 interface
 
@@ -11,13 +12,22 @@ uses
   System.Types,
   System.SysUtils,
   System.Generics.Collections,
+  System.UITypes,
+  Vcl.Controls,
   Vcl.Forms,
   Vcl.Graphics,
   Pdf4D.Viewer.Types,
   Pdf4D.Vcl.Document,
-  Pdf4D.Vcl.PageView;
+  Pdf4D.Vcl.PageView,
+  Pdf4D.Vcl.Thumbnails,
+  Pdf4D.Vcl.OutlineView,
+  Pdf4D.Vcl.SearchBar;
 
 type
+  TVclPixel = record
+    R, G, B: Byte;
+  end;
+
   // The page view of the tests: it remembers what was copied and does not fail when the session does not give access to the
   // clipboard of the window system
   TTestPageView = class(TPdf4DPageView)
@@ -41,10 +51,13 @@ type
     FForm: TForm;
     FDocument: TPdf4DDocument;
     FPageView: TTestPageView;
+    FThumbnails: TPdf4DThumbnails;
+    FOutlineView: TPdf4DOutlineView;
+    FSearchBar: TPdf4DSearchBar;
     FOpenErrorMessage: string;
 
     procedure HandleOpenError(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string);
-    procedure Send(const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
+    procedure Send(const Control: TWinControl; const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
 
   public
     // A form of 96 PPI whose client area is ClientWidth x ClientHeight, with a document that renders with Skia
@@ -74,15 +87,31 @@ type
     procedure Drag(const FromX, FromY, ToX, ToY: Integer);
     // A key down message; Ctrl makes the control see the Ctrl key as pressed
     procedure PressKey(const Key: Word; const Ctrl: Boolean = False);
+    // The same for another control; the keys of Shift are seen as pressed
+    procedure PressKeyOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState = []);
+    // A click with the left button on another control
+    procedure ClickOn(const Control: TWinControl; const X, Y: Integer);
+
+    // Put thumbnails, an outline view or a search bar next to the page view, linked to the document of the host
+    function AddThumbnails(const Width: Integer): TPdf4DThumbnails;
+    function AddOutlineView(const Width: Integer): TPdf4DOutlineView;
+    function AddSearchBar: TPdf4DSearchBar;
 
     // What the page view paints; the caller owns the bitmap
     function Snapshot: Vcl.Graphics.TBitmap;
+    // What any control paints
+    function SnapshotOf(const Control: TWinControl): Vcl.Graphics.TBitmap;
+    // The pixel of a bitmap of 24 bits
+    class function PixelAt(const Bitmap: Vcl.Graphics.TBitmap; const X, Y: Integer): TVclPixel; static;
     // Client pixels of a point in PDF user space of a page; the page must be laid out
     function PagePointToClient(const PageIndex: Integer; const Point: TPointF): TPoint;
 
     property Form: TForm read FForm;
     property Document: TPdf4DDocument read FDocument;
     property PageView: TTestPageView read FPageView;
+    property Thumbnails: TPdf4DThumbnails read FThumbnails;
+    property OutlineView: TPdf4DOutlineView read FOutlineView;
+    property SearchBar: TPdf4DSearchBar read FSearchBar;
   end;
 
   // Documents that only the tests of the VCL components need
@@ -97,7 +126,6 @@ implementation
 uses
   System.Diagnostics,
   System.Hash,
-  Vcl.Controls,
   Vcl.Clipbrd,
   Winapi.Windows,
   Winapi.Messages,
@@ -113,6 +141,7 @@ const
   OpenTimeoutMs = 5000;
   ClipboardProbe = 'clipboard probe';
   LogicalPixelsPerInch = 96;
+  BytesPerPixel24 = 3;
 
 { TTestPageView }
 
@@ -264,58 +293,124 @@ begin
     end);
 end;
 
-procedure TVclTestHost.Send(const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
+procedure TVclTestHost.Send(const Control: TWinControl; const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
 begin
-  FPageView.Perform(Message, WParam, MakeLong(Word(X), Word(Y)));
+  Control.Perform(Message, WParam, MakeLong(Word(X), Word(Y)));
 end;
 
 procedure TVclTestHost.MouseMove(const X, Y: Integer);
 begin
-  Send(WM_MOUSEMOVE, 0, X, Y);
+  Send(FPageView, WM_MOUSEMOVE, 0, X, Y);
 end;
 
 procedure TVclTestHost.Click(const X, Y: Integer);
 begin
-  Send(WM_MOUSEMOVE, 0, X, Y);
-  Send(WM_LBUTTONDOWN, MK_LBUTTON, X, Y);
-  Send(WM_LBUTTONUP, 0, X, Y);
+  ClickOn(FPageView, X, Y);
+end;
+
+procedure TVclTestHost.ClickOn(const Control: TWinControl; const X, Y: Integer);
+begin
+  Send(Control, WM_MOUSEMOVE, 0, X, Y);
+  Send(Control, WM_LBUTTONDOWN, MK_LBUTTON, X, Y);
+  Send(Control, WM_LBUTTONUP, 0, X, Y);
 end;
 
 procedure TVclTestHost.Drag(const FromX, FromY, ToX, ToY: Integer);
 begin
-  Send(WM_MOUSEMOVE, 0, FromX, FromY);
-  Send(WM_LBUTTONDOWN, MK_LBUTTON, FromX, FromY);
-  Send(WM_MOUSEMOVE, MK_LBUTTON, (FromX + ToX) div 2, (FromY + ToY) div 2);
-  Send(WM_MOUSEMOVE, MK_LBUTTON, ToX, ToY);
-  Send(WM_LBUTTONUP, 0, ToX, ToY);
+  Send(FPageView, WM_MOUSEMOVE, 0, FromX, FromY);
+  Send(FPageView, WM_LBUTTONDOWN, MK_LBUTTON, FromX, FromY);
+  Send(FPageView, WM_MOUSEMOVE, MK_LBUTTON, (FromX + ToX) div 2, (FromY + ToY) div 2);
+  Send(FPageView, WM_MOUSEMOVE, MK_LBUTTON, ToX, ToY);
+  Send(FPageView, WM_LBUTTONUP, 0, ToX, ToY);
 end;
 
 procedure TVclTestHost.PressKey(const Key: Word; const Ctrl: Boolean);
+begin
+  if Ctrl then
+  begin
+    PressKeyOn(FPageView, Key, [ssCtrl]);
+  end
+  else
+  begin
+    PressKeyOn(FPageView, Key);
+  end;
+end;
+
+procedure TVclTestHost.PressKeyOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
 begin
   var State: TKeyboardState;
   GetKeyboardState(State);
   var Saved := State;
 
-  if Ctrl then
+  if ssCtrl in Shift then
   begin
     State[VK_CONTROL] := $80;
-    SetKeyboardState(State);
   end;
+  if ssShift in Shift then
+  begin
+    State[VK_SHIFT] := $80;
+  end;
+  SetKeyboardState(State);
 
   try
-    FPageView.Perform(WM_KEYDOWN, Key, 0);
+    Control.Perform(WM_KEYDOWN, Key, 0);
   finally
     SetKeyboardState(Saved);
   end;
 end;
 
+function TVclTestHost.AddThumbnails(const Width: Integer): TPdf4DThumbnails;
+begin
+  FThumbnails := TPdf4DThumbnails.Create(FForm);
+  FThumbnails.Parent := FForm;
+  FThumbnails.Align := TAlign.alLeft;
+  FThumbnails.Width := Width;
+  FThumbnails.Document := FDocument;
+  Pump(1);
+  Result := FThumbnails;
+end;
+
+function TVclTestHost.AddOutlineView(const Width: Integer): TPdf4DOutlineView;
+begin
+  FOutlineView := TPdf4DOutlineView.Create(FForm);
+  FOutlineView.Parent := FForm;
+  FOutlineView.Align := TAlign.alRight;
+  FOutlineView.Width := Width;
+  FOutlineView.Document := FDocument;
+  Pump(1);
+  Result := FOutlineView;
+end;
+
+function TVclTestHost.AddSearchBar: TPdf4DSearchBar;
+begin
+  FSearchBar := TPdf4DSearchBar.Create(FForm);
+  FSearchBar.Parent := FForm;
+  FSearchBar.Align := TAlign.alTop;
+  FSearchBar.Document := FDocument;
+  Pump(1);
+  Result := FSearchBar;
+end;
+
 function TVclTestHost.Snapshot: Vcl.Graphics.TBitmap;
+begin
+  Result := SnapshotOf(FPageView);
+end;
+
+class function TVclTestHost.PixelAt(const Bitmap: Vcl.Graphics.TBitmap; const X, Y: Integer): TVclPixel;
+begin
+  const Line = PByte(Bitmap.ScanLine[Y]) + X * BytesPerPixel24;
+  Result.B := Line[0];
+  Result.G := Line[1];
+  Result.R := Line[2];
+end;
+
+function TVclTestHost.SnapshotOf(const Control: TWinControl): Vcl.Graphics.TBitmap;
 begin
   Result := Vcl.Graphics.TBitmap.Create;
   try
     Result.PixelFormat := pf24bit;
-    Result.SetSize(FPageView.ClientWidth, FPageView.ClientHeight);
-    FPageView.PaintTo(Result.Canvas, 0, 0);
+    Result.SetSize(Control.ClientWidth, Control.ClientHeight);
+    Control.PaintTo(Result.Canvas, 0, 0);
   except
     Result.Free;
     raise;

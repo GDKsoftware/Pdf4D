@@ -83,6 +83,9 @@
         <DCCReference Include="Pdf4D.Viewer.dcp"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Document.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.PageView.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.OutlineView.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.SearchBar.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Painter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

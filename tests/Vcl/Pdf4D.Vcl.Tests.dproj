@@ -80,9 +80,15 @@
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Painter.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Document.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.PageView.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.OutlineView.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.SearchBar.pas"/>
         <DCCReference Include="..\..\src\Vcl\Skia\Pdf4D.Vcl.Backend.Skia.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Painter.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.PageView.Tests.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.Tests.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.OutlineView.Tests.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.SearchBar.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

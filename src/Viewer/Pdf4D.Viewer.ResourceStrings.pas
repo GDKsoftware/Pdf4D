@@ -22,6 +22,12 @@ resourcestring
   SPrintBandRenderFailed = 'A band of the page could not be rendered';
   SPrintBeginFailed = 'The print document could not be begun';
   SWorkerEndFailed = 'Releasing the document when the worker ended failed: %s';
+  SSearchResultCount = '%d of %d';
+  SSearchNoResults = 'No results';
+  SSearching = 'Searching'#$2026;
+  SSearchMatchCase = 'Match case';
+  SSearchPriorHint = 'Previous result';
+  SSearchNextHint = 'Next result';
 
 implementation
 

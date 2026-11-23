@@ -27,7 +27,7 @@ package Pdf4D.Vcl;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Pdf4D VCL components: page view and document'}
+{$DESCRIPTION 'Pdf4D VCL components: page view, thumbnails, outline view, search bar and document'}
 {$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
@@ -40,6 +40,9 @@ requires
 contains
   Pdf4D.Vcl.Painter in '..\src\Vcl\Pdf4D.Vcl.Painter.pas',
   Pdf4D.Vcl.Document in '..\src\Vcl\Pdf4D.Vcl.Document.pas',
-  Pdf4D.Vcl.PageView in '..\src\Vcl\Pdf4D.Vcl.PageView.pas';
+  Pdf4D.Vcl.PageView in '..\src\Vcl\Pdf4D.Vcl.PageView.pas',
+  Pdf4D.Vcl.Thumbnails in '..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas',
+  Pdf4D.Vcl.OutlineView in '..\src\Vcl\Pdf4D.Vcl.OutlineView.pas',
+  Pdf4D.Vcl.SearchBar in '..\src\Vcl\Pdf4D.Vcl.SearchBar.pas';
 
 end.
