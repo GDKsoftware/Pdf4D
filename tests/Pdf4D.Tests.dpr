@@ -186,6 +186,8 @@ uses
   Pdf4D.Viewer.ResourceStrings in '..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas',
   Pdf4D.Viewer.ViewTransform in '..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas',
   Pdf4D.Viewer.ViewTransform.Tests in '..\src\Viewer\Pdf4D.Viewer.ViewTransform.Tests.pas',
+  Pdf4D.Viewer.ViewLayout in '..\src\Viewer\Pdf4D.Viewer.ViewLayout.pas',
+  Pdf4D.Viewer.ViewLayout.Tests in '..\src\Viewer\Pdf4D.Viewer.ViewLayout.Tests.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Tests.Functions in 'Support\Pdf4D.Tests.Functions.pas',

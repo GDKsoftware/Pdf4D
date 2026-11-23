@@ -14,6 +14,14 @@ uses
   Pdf4D.Model.Rectangle,
   Pdf4D.Api.TextLayout.Interfaces;
 
+const
+  MinZoom: Single = 0.1;
+  MaxZoom: Single = 8;
+  // The largest side of a page in pixels; a zoom that would make a page larger is clamped
+  MaxPageEdgePixels = 100000;
+  // Logical pixels (at 96 dpi) between pages and around them
+  PageGap = 8;
+
 type
   {$SCOPEDENUMS ON}
   TPdfDocumentState = (Closed, Opening, Open, Failed);

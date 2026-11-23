@@ -40,6 +40,7 @@ requires
 contains
   Pdf4D.Viewer.Types in '..\src\Viewer\Pdf4D.Viewer.Types.pas',
   Pdf4D.Viewer.ResourceStrings in '..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas',
-  Pdf4D.Viewer.ViewTransform in '..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas';
+  Pdf4D.Viewer.ViewTransform in '..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas',
+  Pdf4D.Viewer.ViewLayout in '..\src\Viewer\Pdf4D.Viewer.ViewLayout.pas';
 
 end.
