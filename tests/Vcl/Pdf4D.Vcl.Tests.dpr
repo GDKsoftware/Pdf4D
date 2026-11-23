@@ -24,6 +24,7 @@ uses
   Pdf4D.Vcl.Toolbar in '..\..\src\Vcl\Pdf4D.Vcl.Toolbar.pas',
   Pdf4D.Vcl.Print in '..\..\src\Vcl\Pdf4D.Vcl.Print.pas',
   Pdf4D.Vcl.PrintDialog in '..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.pas',
+  Pdf4D.Vcl.Viewer in '..\..\src\Vcl\Pdf4D.Vcl.Viewer.pas',
   Pdf4D.Tests.BitmapPrintTarget in 'Support\Pdf4D.Tests.BitmapPrintTarget.pas',
   Pdf4D.Vcl.Backend.Skia in '..\..\src\Vcl\Skia\Pdf4D.Vcl.Backend.Skia.pas',
   Pdf4D.Vcl.Painter.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Painter.Tests.pas',
@@ -34,7 +35,8 @@ uses
   Pdf4D.Vcl.Actions.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Actions.Tests.pas',
   Pdf4D.Vcl.Toolbar.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Toolbar.Tests.pas',
   Pdf4D.Vcl.Print.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Print.Tests.pas',
-  Pdf4D.Vcl.PrintDialog.Tests in '..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.Tests.pas';
+  Pdf4D.Vcl.PrintDialog.Tests in '..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.Tests.pas',
+  Pdf4D.Vcl.Viewer.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Viewer.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

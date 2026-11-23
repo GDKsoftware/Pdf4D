@@ -60,6 +60,7 @@ type
 
     procedure HandleOpenError(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string);
     procedure Send(const Control: TWinControl; const Message: Cardinal; const WParam: NativeUInt; const X, Y: Integer);
+    procedure SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState);
 
   public
     // A form of 96 PPI whose client area is ClientWidth x ClientHeight, with a document that renders with Skia
@@ -91,6 +92,8 @@ type
     procedure PressKey(const Key: Word; const Ctrl: Boolean = False);
     // The same for another control; the keys of Shift are seen as pressed
     procedure PressKeyOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState = []);
+    // The key as the message loop gives it to the form to find a shortcut among its actions: the control tells its form first
+    procedure PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
     // A click with the left button on another control
     procedure ClickOn(const Control: TWinControl; const X, Y: Integer);
 
@@ -345,6 +348,16 @@ end;
 
 procedure TVclTestHost.PressKeyOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
 begin
+  SendKey(Control, WM_KEYDOWN, Key, Shift);
+end;
+
+procedure TVclTestHost.PressShortCutOn(const Control: TWinControl; const Key: Word; const Shift: TShiftState);
+begin
+  SendKey(Control, CN_KEYDOWN, Key, Shift);
+end;
+
+procedure TVclTestHost.SendKey(const Control: TWinControl; const Message: Cardinal; const Key: Word; const Shift: TShiftState);
+begin
   var State: TKeyboardState;
   GetKeyboardState(State);
   var Saved := State;
@@ -360,7 +373,7 @@ begin
   SetKeyboardState(State);
 
   try
-    Control.Perform(WM_KEYDOWN, Key, 0);
+    Control.Perform(Message, Key, 0);
   finally
     SetKeyboardState(Saved);
   end;

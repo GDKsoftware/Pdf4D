@@ -286,6 +286,7 @@ begin
 
   Assert.AreEqual(Ord(TPdfDocumentState.Failed), Ord(FBench.Document.State));
   Assert.AreEqual(Ord(TPdfOpenErrorKind.InvalidPassword), Ord(FOpenErrorKind));
+  Assert.AreEqual(Ord(TPdfOpenErrorKind.InvalidPassword), Ord(FBench.Document.OpenErrorKind), 'the document tells why it failed');
   Assert.IsFalse(FOpenErrorMessage.IsEmpty);
   Assert.AreEqual('Opening,OpenFailed', FBench.Recorder.Describe);
   Assert.AreEqual(0, FBench.Document.PageCount);

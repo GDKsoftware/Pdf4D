@@ -74,6 +74,7 @@ type
     FSearching: Boolean;
     FSearchHits: TList<TPdfSearchHit>;
     FCurrentSearchHit: Integer;
+    FOpenErrorKind: TPdfOpenErrorKind;
 
     procedure SetBackend(const Value: TPdf4DRenderBackend);
     procedure SetPageTextCacheCount(const Value: Integer);
@@ -161,6 +162,8 @@ type
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage;
     // Owned; cleared on Close
     property Overlays: TPdfOverlayList read FOverlays;
+    // Why the last open failed; valid while the state is Failed, and already so when the links hear OpenFailed
+    property OpenErrorKind: TPdfOpenErrorKind read FOpenErrorKind;
     property RenderBackend: IPdfRenderBackend read FRenderBackend write FRenderBackend;
     // A TPdfQueueDispatcher by default; set before Open
     property Dispatcher: IPdfViewerDispatcher read FDispatcher write SetDispatcher;
@@ -441,6 +444,7 @@ end;
 procedure TPdf4DCustomDocument.HandleOpenFailed(const Outcome: TPdfOpenResult);
 begin
   FState := TPdfDocumentState.Failed;
+  FOpenErrorKind := Outcome.ErrorKind;
   Log(TPdfLogLevel.Error, Outcome.ErrorMessage);
 
   const Serial = FSerial;

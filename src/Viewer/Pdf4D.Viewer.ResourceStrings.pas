@@ -68,6 +68,10 @@ resourcestring
   SZoomHint = 'Zoom';
   SPageNumberHint = 'Page number';
   SPageCountOf = ' / %d';
+  SViewerTabPages = 'Pages';
+  SViewerTabBookmarks = 'Bookmarks';
+  SPasswordCaption = 'Password';
+  SPasswordPrompt = 'The document is protected. Enter its password:';
 
 implementation
 
