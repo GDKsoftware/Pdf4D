@@ -181,6 +181,11 @@ begin
   Document.Overlays.Add(0, LabelQuads, TPdfOverlayStyle.Frame, TAlphaColor(MarkAlpha shl 24 or $FF0000));
   Assert.AreEqual<Integer>(1, Length(Document.Overlays.Items), 'the overlay is there');
   PageView.ScrollIntoView(0, LabelQuads);
+  var LabelCorner: TPointF;
+  Assert.IsTrue(PageView.Controller.TryPageToViewport(0, LabelQuads[0].P1, LabelCorner), 'the page is laid out');
+  const IsInView = (LabelCorner.X >= 0) and (LabelCorner.Y >= 0) and (LabelCorner.X <= PageView.ClientWidth) and
+                   (LabelCorner.Y <= PageView.ClientHeight);
+  Assert.IsTrue(IsInView, 'the marked label is scrolled into view');
 
   // Zoom, rotate
   const ZoomBefore = PageView.Zoom;
@@ -202,7 +207,7 @@ begin
     end, WaitMs), 'the search ends');
   Assert.IsTrue(Length(Document.SearchHits) > 0, 'the search found the label');
 
-  // Print to bitmaps
+  // Print to bitmaps, with a print job of the document (the print dialog of the viewer needs a printer)
   const Target = TBitmapPrintTarget.Create(TSize.Create(PaperWidth, PaperHeight), TPointF.Create(PaperDpi, PaperDpi), '');
   const TargetReference: IPdfPrintTarget = Target;
   const Job = TPdfPrintJob.Create(Document, TargetReference, TPdfPrintSettings.Default);
