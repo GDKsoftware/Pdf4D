@@ -11,7 +11,8 @@ uses
   Vcl.ActnList,
   Pdf4D.Viewer.Document,
   Pdf4D.Vcl.PageView,
-  Pdf4D.Vcl.SearchBar;
+  Pdf4D.Vcl.SearchBar,
+  Pdf4D.Vcl.PrintDialog;
 
 type
   // An action on a page view: the one of PageView, or the page view that has the focus when PageView is nil. Enabled follows the
@@ -172,14 +173,24 @@ type
     constructor Create(Owner: TComponent); override;
   end;
 
-  // Enabled when the document may be printed. It has no behavior of its own until the print dialog is linked: the application prints
-  // from OnExecute.
+  // Enabled when the document may be printed. It shows the print dialog of PrintDialog, or a print dialog of its own when that is nil, and
+  // prints what the user chooses.
   TPdf4DPrintAction = class(TPdf4DDocumentAction)
+  private
+    FPrintDialog: TPdf4DPrintDialog;
+
+    procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
+
   protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Perform(const Document: TPdf4DCustomDocument); override;
     function IsApplicable(const Document: TPdf4DCustomDocument): Boolean; override;
+
   public
     constructor Create(Owner: TComponent); override;
+
+  published
+    property PrintDialog: TPdf4DPrintDialog read FPrintDialog write SetPrintDialog;
   end;
 
   // Shows the search bar and puts the cursor in its query field
@@ -623,9 +634,67 @@ begin
   Hint := Format(SActionHintWithKey, [SActionPrint, ShortCutToText(ShortCut)]);
 end;
 
+procedure TPdf4DPrintAction.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (Operation = TOperation.opRemove) and (AComponent = FPrintDialog) then
+  begin
+    FPrintDialog := nil;
+  end;
+end;
+
+procedure TPdf4DPrintAction.SetPrintDialog(const Value: TPdf4DPrintDialog);
+begin
+  if Value = FPrintDialog then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FPrintDialog) then
+  begin
+    FPrintDialog.RemoveFreeNotification(Self);
+  end;
+
+  FPrintDialog := Value;
+
+  if Assigned(FPrintDialog) then
+  begin
+    FPrintDialog.FreeNotification(Self);
+  end;
+end;
+
 procedure TPdf4DPrintAction.Perform(const Document: TPdf4DCustomDocument);
 begin
-  // The print dialog is linked in a later step; until then the application prints from OnExecute
+  // A dialog of the application keeps the choices of the user for the next time; its document is the one of the action unless it has one
+  if Assigned(FPrintDialog) then
+  begin
+    if not Assigned(FPrintDialog.Document) then
+    begin
+      FPrintDialog.Document := Document;
+    end;
+    FPrintDialog.Execute;
+    Exit;
+  end;
+
+  // The dialog of the action lives until its job is over, which is after this returns
+  const Dialog = TPdf4DPrintDialog.Create(nil);
+  var IsPrinting := False;
+  try
+    Dialog.Document := Document;
+    if Dialog.Execute then
+    begin
+      IsPrinting := Dialog.IsPrinting;
+    end;
+  finally
+    if IsPrinting then
+    begin
+      Dialog.FreeWhenDone := True;
+    end
+    else
+    begin
+      Dialog.Free;
+    end;
+  end;
 end;
 
 function TPdf4DPrintAction.IsApplicable(const Document: TPdf4DCustomDocument): Boolean;
