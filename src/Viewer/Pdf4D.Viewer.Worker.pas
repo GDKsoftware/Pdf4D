@@ -57,12 +57,14 @@ type
     FStopped: Boolean;
     FOnEnd: TProc;
     FOnReport: TPdfWorkerReportEvent;
+    FReportFailure: Exception;
 
     // Waits for a job and takes it out of the queue; nil when the thread must end
     function TakeNext: TPdfWorkerJob;
     function IndexOfMostUrgent: Integer;
     function IsStopped: Boolean;
     procedure Run(const Job: TPdfWorkerJob);
+    procedure RunKeepingFailure(const Job: TPdfWorkerJob);
     procedure AbandonJob(const Job: TPdfWorkerJob);
     procedure RunEndProc;
     procedure Report(const Kind: TPdfWorkerReportKind; const Message: string);
@@ -86,7 +88,7 @@ type
     procedure CancelAll;
     // Not on the worker thread. Cancels all, ends the thread and waits for it; jobs that have not started are freed unexecuted
     procedure Stop;
-    // Thread safe; true after a fatal exception in a job
+    // Thread safe; true after a fatal exception in a job. An exception that OnReport raised ends the thread and stays in FatalException
     function IsFailed: Boolean;
   end;
 
@@ -349,38 +351,56 @@ end;
 
 procedure TPdfDocumentWorker.Execute;
 begin
-  // The end procedure releases the document on this thread, so it runs even when a report callback raises out of the loop
+  // The end procedure releases the document on this thread, so it runs even when the loop raises
   try
-    try
-      while not IsStopped do
-      begin
-        const Job = TakeNext;
-        if not Assigned(Job) then
-        begin
-          Break;
-        end;
-
-        try
-          Run(Job);
-        finally
-          TMonitor.Enter(FLock);
-          try
-            FRunning := nil;
-          finally
-            TMonitor.Exit(FLock);
-          end;
-          Job.Free;
-        end;
-      end;
-    finally
-      RunEndProc;
-    end;
-  except
-    on Exception do
+    while not IsStopped do
     begin
-      // Only OnReport can get here, and it is the one that was to hear about failures: nobody is left to tell. The thread ends, and the
-      // exception does not stay behind in the thread object.
-      Exit;
+      const Job = TakeNext;
+      if not Assigned(Job) then
+      begin
+        Break;
+      end;
+
+      try
+        RunKeepingFailure(Job);
+      finally
+        TMonitor.Enter(FLock);
+        try
+          FRunning := nil;
+        finally
+          TMonitor.Exit(FLock);
+        end;
+        Job.Free;
+      end;
+    end;
+  finally
+    RunEndProc;
+  end;
+
+  // What a report callback raised is left to the owner of the thread: it stays in FatalException
+  if Assigned(FReportFailure) then
+  begin
+    const Failure = FReportFailure;
+    FReportFailure := nil;
+    raise Failure;
+  end;
+end;
+
+procedure TPdfDocumentWorker.RunKeepingFailure(const Job: TPdfWorkerJob);
+begin
+  // Only OnReport can raise out of Run. The worker keeps working, so that every queued job still gets its Abandon, and the first
+  // exception ends the thread afterwards
+  try
+    Run(Job);
+  except
+    on Failure: Exception do
+    begin
+      if Assigned(FReportFailure) then
+      begin
+        // One exception is enough to end the thread; the later ones are the same callback failing again
+        Exit;
+      end;
+      FReportFailure := Exception(AcquireExceptionObject);
     end;
   end;
 end;

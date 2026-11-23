@@ -637,7 +637,14 @@ begin
     end);
   try
     Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
-    Assert.IsTrue(FLog.WaitForFreed(1, WaitMs));
+    Worker.Enqueue(TAbandonableJob.Create(FLog, 'After'));
+    // The job behind the failing one still gets its Abandon
+    AssertExecuted(2);
+    Worker.Stop;
+
+    Assert.AreEqual('failing,After-abandoned', FLog.ExecutedNames);
+    Assert.IsTrue(Worker.FatalException is EInvalidOpException, 'The exception of the report callback must end up in FatalException');
+    Assert.AreEqual('Raised by the report callback', Exception(Worker.FatalException).Message);
   finally
     // Stop waits for the thread, so the end procedure has run
     Worker.Free;

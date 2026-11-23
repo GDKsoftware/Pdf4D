@@ -278,6 +278,8 @@ type
     function WorkerReport(const Generation: Integer): TPdfWorkerReportEvent;
     procedure HandleWorkerFatal(const Generation: Integer; const Message: string);
     procedure WriteWorkerNotes;
+    // Stops the worker and notes the exception that ended its thread, when there was one
+    procedure StopWorker;
     function NewRequest: TPdfViewerRequest;
     procedure CancelRequests;
     // Everything that belongs to the document that goes: requests, results that are on their way, and what the session shows of it
@@ -1430,6 +1432,7 @@ begin
     CancelRequests;
   end;
   // Stops the worker, which releases the document on its own thread before it ends
+  StopWorker;
   FWorker.Free;
   if Assigned(FWorkerNotes) then
   begin
@@ -1458,6 +1461,7 @@ procedure TPdfViewerSession.ReplaceWorker;
 begin
   // The generation first: Free waits for the thread and the dispatcher can run a queued report of the old worker meanwhile
   Inc(FWorkerGeneration);
+  StopWorker;
   FWorker.Free;
   WriteWorkerNotes;
   CreateWorker;
@@ -1512,6 +1516,22 @@ begin
   if Assigned(FOnFatal) then
   begin
     FOnFatal(Message);
+  end;
+end;
+
+procedure TPdfViewerSession.StopWorker;
+begin
+  if not Assigned(FWorker) then
+  begin
+    Exit;
+  end;
+
+  FWorker.Stop;
+
+  const ThreadFailure = FWorker.FatalException;
+  if ThreadFailure is Exception then
+  begin
+    FWorkerNotes.Add(Format(SWorkerThreadFailed, [Exception(ThreadFailure).Message]));
   end;
 end;
 
