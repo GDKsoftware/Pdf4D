@@ -99,6 +99,10 @@ type
     FTranslatedSource: IPdfClipPath;
     FTranslatedOffset: TPoint;
     FTranslatedResult: IPdfClipPath;
+    // How many clip paths the translated chains of the groups of this page may still copy; a page of many groups with different clips
+    // and a deep clip chain would otherwise copy the whole chain again and again
+    FTranslatedLinkBudget: Integer;
+    FHasLoggedClipCut: Boolean;
     // The last soft mask that was made, for the state, matrix and device size it was made for; nil for a soft mask that draws nothing
     FCachedMaskSource: IPdfSoftMask;
     FCachedMaskMatrix: TPdfMatrix;
@@ -193,7 +197,8 @@ type
     function TryGetGroupBounds(const Form: TPDFormXObject; const Ctm: TPdfMatrix; const UsesClips: Boolean; out Bounds: TRect; out Shift: Single): Boolean;
     function GroupShift(const Area: TRectF): Single;
     function IntersectedWithClips(const Area: TRectF): TRectF;
-    class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath; static;
+    class function TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY, MaxLinks: Integer): IPdfClipPath; static;
+    class function ChainLength(const Clip: IPdfClipPath): Integer; static;
     function SharedTranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath;
     procedure IntersectStateClip(const Path: TPdfPath; const FillRule: TPdfFillRule);
     class function HasBlendMode(const Form: TPDFormXObject; const Done: TList<TCosStream>): Boolean; static;
@@ -292,6 +297,9 @@ const
   WidthTolerance = 0.0001;
   MaximumLoggedMissingGlyphs = 1024;
   MaximumLoggedTilingWarnings = 256;
+  // The clip paths that the groups of one page may copy in all, and what a group still gets when they are used up
+  MaxTranslatedClipLinks = 50000;
+  MinTranslatedClipLinks = 1;
   UncoloredWithoutSpaceWarning = 'An uncoloured pattern needs a colour space for its colour (/Pattern with an underlying space), nothing is painted';
   // PDFRenderer.imageDownscalingOptimizationThreshold: an image that is drawn at less than this scale is averaged down first
   ImageDownscalingThreshold = 0.5;
@@ -378,6 +386,7 @@ begin
   FParams := Params;
   FLinePath := TPdfPath.Create;
   FTextClip := TPdfPath.Create;
+  FTranslatedLinkBudget := MaxTranslatedClipLinks;
   FLoggedMissingGlyphs := TDictionary<Int64, Boolean>.Create;
   FShadings := TObjectDictionary<TCosDictionary, TPDShading>.Create([doOwnsValues]);
   FShadingPatterns := TObjectDictionary<TCosDictionary, TPDShadingPattern>.Create([doOwnsValues]);
@@ -2031,7 +2040,17 @@ begin
     Exit(FTranslatedResult);
   end;
 
-  Result := TranslatedClip(Clip, OffsetX, OffsetY);
+  // A chain that does not fit in what is left is cut back to its innermost paths: the groups of a hostile page cost a bounded time
+  const Depth = ChainLength(Clip);
+  const Allowed = Max(MinTranslatedClipLinks, Min(Depth, FTranslatedLinkBudget));
+  if (Allowed < Depth) and (not FHasLoggedClipCut) then
+  begin
+    FHasLoggedClipCut := True;
+    LogWarning('The clip of a transparency group is cut back to its last %d clip paths: the groups of the page copy more than %d', [Allowed, MaxTranslatedClipLinks]);
+  end;
+  Dec(FTranslatedLinkBudget, Min(Allowed, FTranslatedLinkBudget));
+
+  Result := TranslatedClip(Clip, OffsetX, OffsetY, Allowed);
   FTranslatedSource := Clip;
   FTranslatedOffset := Offset;
   FTranslatedResult := Result;
@@ -2097,13 +2116,25 @@ begin
 end;
 
 // The clip chain in the pixels of a layer whose top left corner lies at (-OffsetX, -OffsetY) of the device
-class function TPdfPageDrawer.TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY: Integer): IPdfClipPath;
+class function TPdfPageDrawer.ChainLength(const Clip: IPdfClipPath): Integer;
+begin
+  Result := 0;
+  var Link := Clip;
+  while Assigned(Link) do
+  begin
+    Inc(Result);
+    Link := Link.Parent;
+  end;
+end;
+
+// The innermost MaxLinks paths of the chain
+class function TPdfPageDrawer.TranslatedClip(const Clip: IPdfClipPath; const OffsetX, OffsetY, MaxLinks: Integer): IPdfClipPath;
 begin
   Result := nil;
   const Chain = TList<IPdfClipPath>.Create;
   try
     var Link := Clip;
-    while Assigned(Link) do
+    while Assigned(Link) and (Chain.Count < MaxLinks) do
     begin
       Chain.Add(Link);
       Link := Link.Parent;

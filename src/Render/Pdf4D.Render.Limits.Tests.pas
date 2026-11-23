@@ -173,6 +173,8 @@ type
 
     [Test]
     procedure TestClipDepthLimitIsConfigurable;
+    [Test]
+    procedure TestGroupsWithDeepDifferentClipsCopyABoundedNumberOfClips;
 
     [Test]
     procedure TestFunctionShadingsAreChargedToTheShadingBudget;
@@ -1080,6 +1082,39 @@ begin
     Assert.IsTrue(Call.ClipDepth <= 5, Format('The clip chain has %d paths', [Call.ClipDepth]));
   end;
   Assert.AreEqual(DefaultMaxClipDepth, TPdfRenderOptions.Default.MaxClipDepth);
+end;
+
+// 100 groups, each inside its own clip on top of a chain of 900 clips: copying the whole chain for each of them would be 90000 clip paths
+// (a page of a few thousand groups with the longest chain of 1000 can keep a renderer busy for minutes). The page may copy 50000 in all
+// and logs the cut once.
+procedure TRenderLimitTests.TestGroupsWithDeepDifferentClipsCopyABoundedNumberOfClips;
+begin
+  const ChainDepth = 900;
+  const GroupCount = 100;
+  const Content = TStringBuilder.Create;
+  try
+    for var Index := 1 to ChainDepth do
+    begin
+      Content.Append('0 0 100 100 re W n ');
+    end;
+    for var Index := 1 to GroupCount do
+    begin
+      Content.AppendFormat('q 0 0 %d 100 re W n /G1 Do Q ', [50 + Index div 2]);
+    end;
+
+    const Builder = TGraphicsDocuments.NewBuilder(TEncoding.ASCII.GetBytes(Content.ToString), '/XObject << /G1 5 0 R >>');
+    try
+      Builder.AddStreamObject(5, '/Type /XObject /Subtype /Form /BBox [0 0 100 100] /Group << /S /Transparency /I true >>',
+                              TEncoding.ASCII.GetBytes('0 0 1 rg 0 0 100 100 re f'));
+      RenderBuilder(Builder, TPdfRenderOptions.Default, TPdfLoadOptions.Default);
+    finally
+      Builder.Free;
+    end;
+  finally
+    Content.Free;
+  end;
+
+  Assert.AreEqual<Integer>(1, CountLogLines('clip of a transparency group is cut back'), string.Join(' / ', FDocuments.LogLines.ToArray));
 end;
 
 end.
