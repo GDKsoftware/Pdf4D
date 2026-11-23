@@ -794,19 +794,43 @@ procedure TPdf4DCustomDocument.Notify(const Change: TPdfDocumentChange);
 begin
   const Serial = FSerial;
   const Snapshot = FLinks.ToArray;
+  var FirstFailure: TObject := nil;
 
   for var Link in Snapshot do
   begin
     // A handler that closed or reopened the document made this change old news; a link that was freed meanwhile gets nothing
     if Serial <> FSerial then
     begin
-      Exit;
+      Break;
     end;
 
-    if FLinks.Contains(Link) then
+    if not FLinks.Contains(Link) then
     begin
-      Link.Notify(Change);
+      Continue;
     end;
+
+    // A link that fails does not keep the change from the links after it. The first failure goes to the caller once they have all heard
+    // it; a further one goes to the log.
+    try
+      Link.Notify(Change);
+    except
+      on E: Exception do
+      begin
+        if Assigned(FirstFailure) then
+        begin
+          Log(TPdfLogLevel.Error, E.Message);
+        end
+        else
+        begin
+          FirstFailure := AcquireExceptionObject;
+        end;
+      end;
+    end;
+  end;
+
+  if Assigned(FirstFailure) then
+  begin
+    raise FirstFailure;
   end;
 end;
 

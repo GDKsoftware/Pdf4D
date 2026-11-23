@@ -13,6 +13,7 @@ uses
   Pdf4D.Common.Quad,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.PageText,
+  Pdf4D.Viewer.Document,
   Pdf4D.Tests.TestDocument;
 
 type
@@ -34,6 +35,7 @@ type
     procedure HandleOpenedCloses(Sender: TObject);
     procedure HandleOpenedCounts(Sender: TObject);
     procedure HandleClosedCounts(Sender: TObject);
+    procedure HandleChangeRaises(const Change: TPdfDocumentChange);
 
   public
     [Setup]
@@ -49,6 +51,8 @@ type
     procedure TestRenderBackendWinsOverComponent;
     [Test]
     procedure TestLinksGetChanges;
+    [Test]
+    procedure TestFailingLinkDoesNotSilenceTheOthers;
     [Test]
     procedure TestFreedLinkGetsNothing;
     [Test]
@@ -109,6 +113,7 @@ const
   EncryptedFile = 'generated/encrypted/aes-128-user.pdf';
   RestrictedFile = 'pdfbox/org/apache/pdfbox/encryption/PasswordSample-128bit.pdf';
   InvoiceNumber = '2024-0815';
+  LinkFailure = 'the link failed';
   ManyPages = 65;
   PageSize = 612;
   PageHeight = 792;
@@ -264,6 +269,41 @@ begin
     Assert.AreEqual('Opening,Opened,CurrentPage,Closed', Second.Describe);
   finally
     Second.Free;
+  end;
+end;
+
+procedure TPdf4DCustomDocumentTests.HandleChangeRaises(const Change: TPdfDocumentChange);
+begin
+  raise EPdfViewerException.Create(LinkFailure);
+end;
+
+// The links after a link that raises still hear the change, and the exception still reaches the caller
+procedure TPdf4DCustomDocumentTests.TestFailingLinkDoesNotSilenceTheOthers;
+begin
+  OpenInvoice;
+  const Failing = TPdfDocumentLink.Create(HandleChangeRaises);
+  const Second = TChangeRecorder.Create(FBench.Document);
+  try
+    Failing.Document := FBench.Document;
+    const Third = TChangeRecorder.Create(FBench.Document);
+    try
+      Assert.WillRaiseWithMessage(
+        procedure
+        begin
+          FBench.Document.CurrentPage := 1;
+        end,
+        EPdfViewerException,
+        LinkFailure);
+
+      Assert.AreEqual('CurrentPage', Second.Describe, 'a link before the failing one');
+      Assert.AreEqual('CurrentPage', Third.Describe, 'a link after the failing one');
+      Assert.AreEqual(1, FBench.Document.CurrentPage);
+    finally
+      Third.Free;
+    end;
+  finally
+    Second.Free;
+    Failing.Free;
   end;
 end;
 
