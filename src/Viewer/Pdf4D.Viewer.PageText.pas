@@ -8,12 +8,14 @@ interface
 
 uses
   System.Types,
+  System.Generics.Collections,
   Pdf4D.Api.Page.Interfaces,
   Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Viewer.Types;
 
 type
-  // Immutable snapshot made on the worker; safe to share between threads.
+  // Immutable snapshot made on the worker; safe to share between threads. The arrays that it returns are its own: a caller must not
+  // change them (a dynamic array is not copied on write).
   IPdfPageText = interface
     ['{B1C7E2A4-5D39-4F80-9A6B-3E2F1D7C8B05}']
     function PageIndex: Integer;
@@ -70,9 +72,8 @@ type
     procedure BuildGroups;
     procedure SortLinesByStart;
     function FindLineOf(const Start: Integer): Integer;
-    function AddOrphanGroup(const Fragment: TPdfTextFragment): Integer;
-    procedure AddWordToGroups(const WordIndex: Integer);
-    procedure AddSegmentToGroups(const SegmentIndex: Integer);
+    function GroupOf(const Fragment: TPdfTextFragment; const OrphanBounds: TList<TRectF>): Integer;
+    procedure FillMembers(const WordGroups, SegmentGroups: TArray<Integer>);
     procedure CheckWordIndex(const WordIndex: Integer);
     function BuildSelectionQuads(const First, Last: Integer): TArray<TPdfQuad>;
     function JoinSelectionText(const First, Last: Integer): string;
@@ -102,7 +103,6 @@ implementation
 uses
   System.SysUtils,
   System.Math,
-  System.Generics.Collections,
   System.Generics.Defaults,
   Pdf4D.Common.Quad;
 
@@ -143,16 +143,16 @@ end;
 
 function TPdfQuadHitTest.Contains(const Point: TPointF): Boolean;
 begin
-  const Crosses = TArray<Single>.Create(Cross(P1, P2, Point), Cross(P2, P3, Point), Cross(P3, P4, Point), Cross(P4, P1, Point));
-  var HasNegative := False;
-  var HasPositive := False;
-  for var Value in Crosses do
-  begin
-    HasNegative := HasNegative or (Value < 0);
-    HasPositive := HasPositive or (Value > 0);
-  end;
+  const First = Cross(P1, P2, Point);
+  const Second = Cross(P2, P3, Point);
+  const Third = Cross(P3, P4, Point);
+  const Fourth = Cross(P4, P1, Point);
+  const HasNegative = ((First < 0) or (Second < 0) or (Third < 0) or (Fourth < 0));
+  const HasPositive = ((First > 0) or (Second > 0) or (Third > 0) or (Fourth > 0));
 
-  Result := (IsFinite and not (HasNegative and HasPositive));
+  // A quad that has collapsed to a point or a line gives only zeros: it holds no point, it must not hold every point
+  const IsInside = ((HasNegative or HasPositive) and not (HasNegative and HasPositive));
+  Result := (IsFinite and IsInside);
 end;
 
 function TPdfQuadHitTest.DistanceTo(const Point: TPointF): Single;
@@ -248,23 +248,92 @@ begin
   Result := False;
 end;
 
+// Linear in the words and segments: the group of every one is found first, the member arrays are sized once and then filled. Growing
+// them one by one would copy them again for every word, which a page with very many words on a line cannot afford.
 procedure TPdfPageText.BuildGroups;
 begin
-  SetLength(FGroups, Length(FLines));
-  for var Index := 0 to High(FLines) do
-  begin
-    FGroups[Index].Bounds := BoundsOf(FLines[Index].Quads);
-  end;
   SortLinesByStart;
 
-  SetLength(FWordGroups, Length(FWords));
-  for var Index := 0 to High(FWords) do
-  begin
-    AddWordToGroups(Index);
+  const OrphanBounds = TList<TRectF>.Create;
+  try
+    SetLength(FWordGroups, Length(FWords));
+    for var Index := 0 to High(FWords) do
+    begin
+      FWordGroups[Index] := GroupOf(FWords[Index], OrphanBounds);
+    end;
+
+    var SegmentGroups: TArray<Integer>;
+    SetLength(SegmentGroups, Length(FSegments));
+    for var Index := 0 to High(FSegments) do
+    begin
+      SegmentGroups[Index] := GroupOf(FSegments[Index], OrphanBounds);
+    end;
+
+    SetLength(FGroups, Length(FLines) + OrphanBounds.Count);
+    for var Index := 0 to High(FLines) do
+    begin
+      FGroups[Index].Bounds := BoundsOf(FLines[Index].Quads);
+    end;
+    for var Index := 0 to OrphanBounds.Count - 1 do
+    begin
+      FGroups[Length(FLines) + Index].Bounds := OrphanBounds[Index];
+    end;
+
+    FillMembers(FWordGroups, SegmentGroups);
+  finally
+    OrphanBounds.Free;
   end;
-  for var Index := 0 to High(FSegments) do
+end;
+
+procedure TPdfPageText.FillMembers(const WordGroups, SegmentGroups: TArray<Integer>);
+begin
+  var WordCounts: TArray<Integer>;
+  var SegmentCounts: TArray<Integer>;
+  SetLength(WordCounts, Length(FGroups));
+  SetLength(SegmentCounts, Length(FGroups));
+  for var GroupIndex in WordGroups do
   begin
-    AddSegmentToGroups(Index);
+    Inc(WordCounts[GroupIndex]);
+  end;
+  for var GroupIndex in SegmentGroups do
+  begin
+    Inc(SegmentCounts[GroupIndex]);
+  end;
+
+  for var GroupIndex := 0 to High(FGroups) do
+  begin
+    SetLength(FGroups[GroupIndex].Words, WordCounts[GroupIndex]);
+    SetLength(FGroups[GroupIndex].Segments, SegmentCounts[GroupIndex]);
+  end;
+
+  // The counts now give the next free place of each group
+  SetLength(WordCounts, 0);
+  SetLength(WordCounts, Length(FGroups));
+  SetLength(SegmentCounts, 0);
+  SetLength(SegmentCounts, Length(FGroups));
+  for var WordIndex := 0 to High(WordGroups) do
+  begin
+    const GroupIndex = WordGroups[WordIndex];
+    FGroups[GroupIndex].Words[WordCounts[GroupIndex]] := WordIndex;
+    Inc(WordCounts[GroupIndex]);
+  end;
+  for var SegmentIndex := 0 to High(SegmentGroups) do
+  begin
+    const GroupIndex = SegmentGroups[SegmentIndex];
+    FGroups[GroupIndex].Segments[SegmentCounts[GroupIndex]] := SegmentIndex;
+    Inc(SegmentCounts[GroupIndex]);
+  end;
+end;
+
+// The line of the fragment, or a new group of its own after the lines, whose bounds are added to OrphanBounds
+function TPdfPageText.GroupOf(const Fragment: TPdfTextFragment; const OrphanBounds: TList<TRectF>): Integer;
+begin
+  Result := FindLineOf(Fragment.Start);
+  const IsOutsideLines = (Result < 0);
+  if IsOutsideLines then
+  begin
+    Result := Length(FLines) + OrphanBounds.Count;
+    OrphanBounds.Add(BoundsOf(Fragment.Quads));
   end;
 end;
 
@@ -310,38 +379,6 @@ begin
   Result := -1;
 end;
 
-function TPdfPageText.AddOrphanGroup(const Fragment: TPdfTextFragment): Integer;
-begin
-  Result := Length(FGroups);
-  SetLength(FGroups, Result + 1);
-  FGroups[Result].Bounds := BoundsOf(Fragment.Quads);
-end;
-
-procedure TPdfPageText.AddWordToGroups(const WordIndex: Integer);
-begin
-  var GroupIndex := FindLineOf(FWords[WordIndex].Start);
-  const IsOutsideLines = (GroupIndex < 0);
-  if IsOutsideLines then
-  begin
-    GroupIndex := AddOrphanGroup(FWords[WordIndex]);
-  end;
-
-  FGroups[GroupIndex].Words := FGroups[GroupIndex].Words + [WordIndex];
-  FWordGroups[WordIndex] := GroupIndex;
-end;
-
-procedure TPdfPageText.AddSegmentToGroups(const SegmentIndex: Integer);
-begin
-  var GroupIndex := FindLineOf(FSegments[SegmentIndex].Start);
-  const IsOutsideLines = (GroupIndex < 0);
-  if IsOutsideLines then
-  begin
-    GroupIndex := AddOrphanGroup(FSegments[SegmentIndex]);
-  end;
-
-  FGroups[GroupIndex].Segments := FGroups[GroupIndex].Segments + [SegmentIndex];
-end;
-
 procedure TPdfPageText.CheckWordIndex(const WordIndex: Integer);
 begin
   const IsInside = ((WordIndex >= 0) and (WordIndex < Length(FWords)));
@@ -383,11 +420,11 @@ end;
 
 function TPdfPageText.TryFindSegmentAt(const Point: TPointF; out Segment: TPdfTextFragment): Boolean;
 begin
-  for var Group in FGroups do
+  for var GroupIndex := 0 to High(FGroups) do
   begin
-    if ContainsPoint(Group.Bounds, Point) then
+    if ContainsPoint(FGroups[GroupIndex].Bounds, Point) then
     begin
-      for var SegmentIndex in Group.Segments do
+      for var SegmentIndex in FGroups[GroupIndex].Segments do
       begin
         if AnyQuadContains(FSegments[SegmentIndex].Quads, Point) then
         begin
@@ -404,11 +441,11 @@ end;
 
 function TPdfPageText.TryFindWordAt(const Point: TPointF; out WordIndex: Integer): Boolean;
 begin
-  for var Group in FGroups do
+  for var GroupIndex := 0 to High(FGroups) do
   begin
-    if ContainsPoint(Group.Bounds, Point) then
+    if ContainsPoint(FGroups[GroupIndex].Bounds, Point) then
     begin
-      for var Candidate in Group.Words do
+      for var Candidate in FGroups[GroupIndex].Words do
       begin
         if AnyQuadContains(FWords[Candidate].Quads, Point) then
         begin
@@ -465,23 +502,28 @@ end;
 
 function TPdfPageText.BuildSelectionQuads(const First, Last: Integer): TArray<TPdfQuad>;
 begin
-  Result := nil;
-  var LineGroup := -1;
-  for var WordIndex := First to Last do
-  begin
-    for var Quad in FWords[WordIndex].Quads do
+  const Quads = TList<TPdfQuad>.Create;
+  try
+    var LineGroup := -1;
+    for var WordIndex := First to Last do
     begin
-      const IsNewLine = (FWordGroups[WordIndex] <> LineGroup);
-      if IsNewLine then
+      for var Quad in FWords[WordIndex].Quads do
       begin
-        Result := Result + [Quad];
-        LineGroup := FWordGroups[WordIndex];
-      end
-      else
-      begin
-        Result[High(Result)] := Result[High(Result)].Extend(Quad);
+        const IsNewLine = (FWordGroups[WordIndex] <> LineGroup);
+        if IsNewLine then
+        begin
+          Quads.Add(Quad);
+          LineGroup := FWordGroups[WordIndex];
+        end
+        else
+        begin
+          Quads[Quads.Count - 1] := Quads[Quads.Count - 1].Extend(Quad);
+        end;
       end;
     end;
+    Result := Quads.ToArray;
+  finally
+    Quads.Free;
   end;
 end;
 

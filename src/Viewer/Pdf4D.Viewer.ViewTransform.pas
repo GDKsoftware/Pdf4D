@@ -21,7 +21,11 @@ type
     FViewRotation: Integer;
     FPageTransform: TPdfPageTransform;
 
+    class function LimitedPixel(const Value: Double): Single; static;
+
   public
+    // The checks of Create, for a caller that takes the same arguments without making a transform
+    class procedure ValidateArguments(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single); static;
     // Raises EArgumentException when ViewRotation is not 0, 90, 180 or 270, or when Zoom or PixelsPerInch is not above zero
     class function Create(const Page: TPdfPageInfo; const ViewRotation: Integer; const Zoom, PixelsPerInch: Single): TPdfViewTransform; static;
 
@@ -48,10 +52,12 @@ const
   PointsPerInch = 72;
   FullTurn = 360;
   RightAngle = 90;
+  // Far beyond the largest page (MaxPageEdgePixels), and far below what a Single holds
+  MaxViewPixel = 1.0E9;
 
 { TPdfViewTransform }
 
-class function TPdfViewTransform.Create(const Page: TPdfPageInfo; const ViewRotation: Integer; const Zoom, PixelsPerInch: Single): TPdfViewTransform;
+class procedure TPdfViewTransform.ValidateArguments(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single);
 begin
   const IsRightAngle = ((ViewRotation mod RightAngle) = 0);
   const IsInTurn = ((ViewRotation >= 0) and (ViewRotation < FullTurn));
@@ -60,17 +66,22 @@ begin
     raise EArgumentException.CreateFmt('View rotation %d is not 0, 90, 180 or 270', [ViewRotation]);
   end;
 
-  const IsZoomValid = (Zoom > 0) and not IsInfinite(Zoom);
+  const IsZoomValid = ((Zoom > 0) and not IsInfinite(Zoom));
   if not IsZoomValid then
   begin
     raise EArgumentException.CreateFmt('Zoom %g is not above zero', [Double(Zoom)]);
   end;
 
-  const IsPixelsPerInchValid = (PixelsPerInch > 0) and not IsInfinite(PixelsPerInch);
+  const IsPixelsPerInchValid = ((PixelsPerInch > 0) and not IsInfinite(PixelsPerInch));
   if not IsPixelsPerInchValid then
   begin
     raise EArgumentException.CreateFmt('Pixels per inch %g is not above zero', [Double(PixelsPerInch)]);
   end;
+end;
+
+class function TPdfViewTransform.Create(const Page: TPdfPageInfo; const ViewRotation: Integer; const Zoom, PixelsPerInch: Single): TPdfViewTransform;
+begin
+  ValidateArguments(ViewRotation, Zoom, PixelsPerInch);
 
   Result.FScale := Zoom * PixelsPerInch / PointsPerInch;
   Result.FViewRotation := ViewRotation;
@@ -97,8 +108,14 @@ begin
   const Matrix = FPageTransform.PageToDevice;
   const X: Double = Point.X;
   const Y: Double = Point.Y;
-  Result.X := X * Matrix.ScaleX + Y * Matrix.ShearX + Matrix.TranslateX;
-  Result.Y := X * Matrix.ShearY + Y * Matrix.ScaleY + Matrix.TranslateY;
+  Result.X := LimitedPixel(X * Matrix.ScaleX + Y * Matrix.ShearX + Matrix.TranslateX);
+  Result.Y := LimitedPixel(X * Matrix.ShearY + Y * Matrix.ScaleY + Matrix.TranslateY);
+end;
+
+// A point far outside the page is clamped, so that it fits a Single and does not turn into an infinity or an overflow; NaN stays NaN
+class function TPdfViewTransform.LimitedPixel(const Value: Double): Single;
+begin
+  Result := EnsureRange(Value, -MaxViewPixel, MaxViewPixel);
 end;
 
 function TPdfViewTransform.ViewToPage(const Point: TPointF): TPointF;

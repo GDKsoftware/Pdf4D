@@ -29,7 +29,6 @@ type
     FTops: TArray<Integer>;
     FContentSize: TSize;
 
-    class procedure ValidateArguments(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single); static;
     class function ClampToInteger(const Value: Int64): Integer; static;
 
     function EffectiveZoom(const PageIndex: Integer): Single;
@@ -40,6 +39,7 @@ type
     function PageRectOf(const PageIndex: Integer): TRect;
     function HasRect(const PageIndex: Integer): Boolean;
     function FirstPageBelow(const Y: Integer): Integer;
+    function FirstPageTopAtOrBelow(const Y: Integer): Integer;
     function VisibleHeight(const PageIndex: Integer; const Viewport: TRect): Integer;
     procedure CheckPageIndex(const PageIndex: Integer);
 
@@ -74,7 +74,6 @@ const
   PointsPerInch = 72;
   LogicalPixelsPerInch = 96;
   FullTurn = 360;
-  RightAngle = 90;
 
 { TPdfViewLayout }
 
@@ -85,27 +84,6 @@ begin
   Update(0, 1, LogicalPixelsPerInch, TPdfScrollMode.Continuous, 0);
 end;
 
-class procedure TPdfViewLayout.ValidateArguments(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single);
-begin
-  const IsRotationValid = (((ViewRotation mod RightAngle) = 0) and (ViewRotation >= 0) and (ViewRotation < FullTurn));
-  if not IsRotationValid then
-  begin
-    raise EArgumentException.CreateFmt('View rotation %d is not 0, 90, 180 or 270', [ViewRotation]);
-  end;
-
-  const IsZoomValid = ((Zoom > 0) and not IsInfinite(Zoom));
-  if not IsZoomValid then
-  begin
-    raise EArgumentException.CreateFmt('Zoom %g is not above zero', [Double(Zoom)]);
-  end;
-
-  const IsPixelsPerInchValid = ((PixelsPerInch > 0) and not IsInfinite(PixelsPerInch));
-  if not IsPixelsPerInchValid then
-  begin
-    raise EArgumentException.CreateFmt('Pixels per inch %g is not above zero', [Double(PixelsPerInch)]);
-  end;
-end;
-
 class function TPdfViewLayout.ClampToInteger(const Value: Int64): Integer;
 begin
   Result := Integer(Min(Value, Int64(MaxInt)));
@@ -114,7 +92,7 @@ end;
 procedure TPdfViewLayout.Update(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single; const Mode: TPdfScrollMode;
                                 const CurrentPage: Integer);
 begin
-  ValidateArguments(ViewRotation, Zoom, PixelsPerInch);
+  TPdfViewTransform.ValidateArguments(ViewRotation, Zoom, PixelsPerInch);
 
   FViewRotation := ViewRotation;
   FZoom := Zoom;
@@ -331,12 +309,33 @@ begin
     Exit;
   end;
 
-  var PageIndex := FirstPageBelow(Viewport.Top);
-  while (PageIndex < Length(FPages)) and (FTops[PageIndex] < Viewport.Bottom) do
+  const FirstPage = FirstPageBelow(Viewport.Top);
+  const PastLastPage = FirstPageTopAtOrBelow(Viewport.Bottom);
+  SetLength(Result, Max(0, PastLastPage - FirstPage));
+  for var Index := 0 to High(Result) do
   begin
-    Result := Result + [PageIndex];
-    Inc(PageIndex);
+    Result[Index] := FirstPage + Index;
   end;
+end;
+
+// The first page whose top lies at Y or below; the page count when there is none. Continuous mode only.
+function TPdfViewLayout.FirstPageTopAtOrBelow(const Y: Integer): Integer;
+begin
+  var First := 0;
+  var Past := Length(FPages);
+  while First < Past do
+  begin
+    const Middle = First + (Past - First) div 2;
+    if FTops[Middle] >= Y then
+    begin
+      Past := Middle;
+    end
+    else
+    begin
+      First := Middle + 1;
+    end;
+  end;
+  Result := First;
 end;
 
 function TPdfViewLayout.VisibleHeight(const PageIndex: Integer; const Viewport: TRect): Integer;
@@ -374,8 +373,8 @@ begin
 
   case Mode of
     TPdfZoomMode.Factor   : Result := FZoom;
-    TPdfZoomMode.FitWidth : Result := Max(MinZoom, Min(MaxZoom, WidthZoom));
-    TPdfZoomMode.FitPage  : Result := Max(MinZoom, Min(MaxZoom, Min(WidthZoom, HeightZoom)));
+    TPdfZoomMode.FitWidth : Result := EnsureRange(WidthZoom, MinZoom, MaxZoom);
+    TPdfZoomMode.FitPage  : Result := EnsureRange(Min(WidthZoom, HeightZoom), MinZoom, MaxZoom);
   else
     raise ENotSupportedException.CreateFmt('Unsupported zoom mode: %d', [Ord(Mode)]);
   end;

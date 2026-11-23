@@ -20,6 +20,7 @@ type
   private
     class function PageInfo(const CropBox: TPdfRectangle; const Rotation: Integer): TPdfPageInfo; static;
     class function Box(const LowerLeftX, LowerLeftY, UpperRightX, UpperRightY: Single): TPdfRectangle; static;
+    class function IsFinitePoint(const Point: TPointF): Boolean; static;
     procedure AssertPointNear(const Expected, Actual: TPointF; const Context: string);
     procedure AssertCreateRaises(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single; const Context: string);
     procedure AssertCorpusPageMatchesRenderer(const FileName: string; const ViewRotation: Integer);
@@ -45,6 +46,10 @@ type
     procedure TestQuadToViewKeepsOrder;
     [Test]
     procedure TestInvalidArgumentsRaise;
+    [Test]
+    procedure TestValidateArgumentsRaisesForTheSameValues;
+    [Test]
+    procedure TestHugePointsStayFinite;
     [Test]
     procedure TestTransformEqualsRendererForCorpus;
   end;
@@ -83,6 +88,11 @@ begin
   Result.CropBox := CropBox;
   Result.Rotation := Rotation;
   Result.Label_ := '';
+end;
+
+class function TPdfViewTransformTests.IsFinitePoint(const Point: TPointF): Boolean;
+begin
+  Result := not (Point.X.IsNan or Point.X.IsInfinity or Point.Y.IsNan or Point.Y.IsInfinity);
 end;
 
 procedure TPdfViewTransformTests.AssertPointNear(const Expected, Actual: TPointF; const Context: string);
@@ -177,6 +187,48 @@ begin
   AssertCreateRaises(0, 1, 0, 'pixels per inch 0');
 end;
 
+procedure TPdfViewTransformTests.TestValidateArgumentsRaisesForTheSameValues;
+begin
+  TPdfViewTransform.ValidateArguments(270, 8, 192);
+
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfViewTransform.ValidateArguments(45, 1, 72);
+    end,
+    EArgumentException);
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfViewTransform.ValidateArguments(0, 0, 72);
+    end,
+    EArgumentException);
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfViewTransform.ValidateArguments(0, 1, -1);
+    end,
+    EArgumentException);
+end;
+
+procedure TPdfViewTransformTests.TestHugePointsStayFinite;
+begin
+  const Transform = TPdfViewTransform.Create(PageInfo(TPdfRectangle.Letter, 0), 0, 8, 192);
+  const Corner = Transform.PageToView(TPointF.Create(3E38, -3E38));
+
+  Assert.IsTrue(IsFinitePoint(Corner), 'A point far off the page must not become an infinity');
+  Assert.IsTrue((Abs(Corner.X) <= 1E9) and (Abs(Corner.Y) <= 1E9), 'A point far off the page is clamped');
+  Assert.IsTrue(Corner.X > 0);
+  Assert.IsTrue(Corner.Y > 0);
+
+  const Corners = Transform.QuadToView(TPdfQuad.Create(TPointF.Create(-3E38, -3E38), TPointF.Create(3E38, -3E38),
+                                                       TPointF.Create(3E38, 3E38), TPointF.Create(-3E38, 3E38)));
+  for var Value in Corners do
+  begin
+    Assert.IsTrue(IsFinitePoint(Value));
+  end;
+end;
+
 procedure TPdfViewTransformTests.AssertCreateRaises(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single; const Context: string);
 begin
   const Page = PageInfo(TPdfRectangle.Letter, 0);
@@ -198,7 +250,7 @@ begin
   try
     Document := TPdfDocument.Load(TCorpus.PdfPath(FileName), Options);
   except
-    on Exception do
+    on EPdfException do
     begin
       Exit;
     end;

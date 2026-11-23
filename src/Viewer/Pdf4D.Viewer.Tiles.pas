@@ -34,7 +34,11 @@ type
 implementation
 
 uses
+  System.SysUtils,
   System.Math;
+
+const
+  MaxTileCount = MaxInt div SizeOf(TPoint);
 
 { TPdfTileKey }
 
@@ -51,10 +55,12 @@ end;
 
 class function TPdfTileGrid.TileRect(const PageSize: TSize; const Column, Row: Integer): TRect;
 begin
-  const Left = Min(Int64(Column) * PdfTileSize, Int64(PageSize.cx));
-  const Top = Min(Int64(Row) * PdfTileSize, Int64(PageSize.cy));
-  const Right = Min(Left + PdfTileSize, Int64(PageSize.cx));
-  const Bottom = Min(Top + PdfTileSize, Int64(PageSize.cy));
+  const TileLeft = Int64(Column) * PdfTileSize;
+  const TileTop = Int64(Row) * PdfTileSize;
+  const Left = EnsureRange(TileLeft, Int64(0), Int64(PageSize.cx));
+  const Top = EnsureRange(TileTop, Int64(0), Int64(PageSize.cy));
+  const Right = EnsureRange(TileLeft + PdfTileSize, Int64(0), Int64(PageSize.cx));
+  const Bottom = EnsureRange(TileTop + PdfTileSize, Int64(0), Int64(PageSize.cy));
   Result := TRect.Create(Integer(Left), Integer(Top), Integer(Right), Integer(Bottom));
 end;
 
@@ -72,7 +78,14 @@ begin
   const FirstRow = Visible.Top div PdfTileSize;
   const LastRow = (Visible.Bottom - 1) div PdfTileSize;
 
-  SetLength(Result, (LastColumn - FirstColumn + 1) * (LastRow - FirstRow + 1));
+  // Int64: a page side of 10 million pixels and more makes the product overflow an Integer
+  const TileCount = Int64(LastColumn - FirstColumn + 1) * Int64(LastRow - FirstRow + 1);
+  if TileCount > MaxTileCount then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('The area covers %d tiles, more than the %d that a list can hold', [TileCount, Int64(MaxTileCount)]);
+  end;
+
+  SetLength(Result, TileCount);
   var Index := 0;
   for var Row := FirstRow to LastRow do
   begin

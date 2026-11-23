@@ -24,6 +24,10 @@ type
     [Test]
     procedure TestTileRectInsidePageIsFullTile;
     [Test]
+    procedure TestTileRectOutsidePageIsEmpty;
+    [Test]
+    procedure TestTilesInHugeAreaRaisesInsteadOfOverflowing;
+    [Test]
     procedure TestTilesInArea;
     [Test]
     procedure TestTilesInAreaOutsidePage;
@@ -78,6 +82,28 @@ begin
   Assert.AreEqual(512, Rect.Top);
   Assert.AreEqual(512, Rect.Right);
   Assert.AreEqual(768, Rect.Bottom);
+end;
+
+procedure TPdfTileGridTests.TestTileRectOutsidePageIsEmpty;
+begin
+  const PageSize = TSize.Create(816, 1056);
+
+  Assert.IsTrue(TPdfTileGrid.TileRect(PageSize, -1, 0).IsEmpty, 'column -1');
+  Assert.IsTrue(TPdfTileGrid.TileRect(PageSize, 0, -3).IsEmpty, 'row -3');
+  Assert.IsTrue(TPdfTileGrid.TileRect(PageSize, 4, 0).IsEmpty, 'column behind the page');
+  Assert.IsTrue(TPdfTileGrid.TileRect(PageSize, 0, 5).IsEmpty, 'row behind the page');
+end;
+
+procedure TPdfTileGridTests.TestTilesInHugeAreaRaisesInsteadOfOverflowing;
+begin
+  const PageSize = TSize.Create(High(Integer), High(Integer));
+
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfTileGrid.TilesIn(PageSize, TRect.Create(0, 0, High(Integer), High(Integer)));
+    end,
+    EArgumentOutOfRangeException);
 end;
 
 procedure TPdfTileGridTests.TestTilesInArea;

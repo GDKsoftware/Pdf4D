@@ -66,6 +66,14 @@ type
     procedure TestSnapshotOutlivesDocument;
     [Test]
     procedure TestHitTestIsFastOnDensePage;
+    [Test]
+    procedure TestBuildIsFastWithManyWordsOnOneLine;
+    [Test]
+    procedure TestCollapsedWordHoldsNoPoint;
+    [Test]
+    procedure TestLastOverlappingLinkWins;
+    [Test]
+    procedure TestSelectionQuadsAreIndependentOfOrder;
   end;
 
 implementation
@@ -87,7 +95,10 @@ const
   DenseQueryCount = 1000;
   DenseSeed = 4242;
   DenseBudgetMilliseconds = 200;
+  LongLineWords = 100000;
+  LongLineBudgetMilliseconds = 1000;
   NoWord: Integer = -1;
+  NoLayoutAsked = 'The page text must not ask the layout';
 
 type
   TFakeTextLayout = class(TInterfacedObject, IPdfTextLayout)
@@ -99,6 +110,10 @@ type
 
   public
     constructor CreateDense;
+    // One line of WordCount words, each 1 wide at a pitch of 2
+    constructor CreateLongLine(const WordCount: Integer);
+    // One line of three words: a word that has collapsed to a point at x 5, then real words at 10..20 and 30..40
+    constructor CreateCollapsedWord;
 
     function PageIndex: Integer;
     function Text: string;
@@ -142,6 +157,27 @@ begin
   end;
 end;
 
+constructor TFakeTextLayout.CreateLongLine(const WordCount: Integer);
+begin
+  inherited Create;
+
+  SetLength(FWords, WordCount);
+  for var Index := 0 to WordCount - 1 do
+  begin
+    const Left = Index * 2;
+    FWords[Index] := BuildFragment(Left, 0, Left + 1, 1, Index * 2, 1);
+  end;
+  FLines := [BuildFragment(0, 0, WordCount * 2, 1, 0, WordCount * 2)];
+end;
+
+constructor TFakeTextLayout.CreateCollapsedWord;
+begin
+  inherited Create;
+
+  FWords := [BuildFragment(5, 5, 5, 5, 0, 1), BuildFragment(10, 0, 20, 10, 2, 1), BuildFragment(30, 0, 40, 10, 4, 1)];
+  FLines := [BuildFragment(0, 0, 40, 10, 0, 6)];
+end;
+
 function TFakeTextLayout.PageIndex: Integer;
 begin
   Result := 0;
@@ -169,12 +205,12 @@ end;
 
 function TFakeTextLayout.TryFindSegmentAt(const Point: TPointF; out Fragment: TPdfTextFragment): Boolean;
 begin
-  raise ENotImplemented.Create('The page text must not ask the layout');
+  raise ENotImplemented.Create(NoLayoutAsked);
 end;
 
 function TFakeTextLayout.TryFindWordAt(const Point: TPointF; out Fragment: TPdfTextFragment): Boolean;
 begin
-  raise ENotImplemented.Create('The page text must not ask the layout');
+  raise ENotImplemented.Create(NoLayoutAsked);
 end;
 
 { TPdfPageTextTests }
@@ -452,6 +488,73 @@ begin
   {$IFNDEF DEBUG}
   Assert.IsTrue(Watch.ElapsedMilliseconds < DenseBudgetMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
   {$ENDIF}
+end;
+
+procedure TPdfPageTextTests.TestBuildIsFastWithManyWordsOnOneLine;
+begin
+  const Layout: IPdfTextLayout = TFakeTextLayout.CreateLongLine(LongLineWords);
+
+  const Watch = TStopwatch.StartNew;
+  const PageText: IPdfPageText = TPdfPageText.Create(Layout, nil);
+  Watch.Stop;
+
+  Assert.AreEqual(LongLineWords, Integer(Length(PageText.Words)));
+  var WordIndex: Integer;
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create((LongLineWords - 1) * 2 + 0.5, 0.5), WordIndex));
+  Assert.AreEqual(LongLineWords - 1, WordIndex);
+  {$IFNDEF DEBUG}
+  Assert.IsTrue(Watch.ElapsedMilliseconds < LongLineBudgetMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  {$ENDIF}
+end;
+
+procedure TPdfPageTextTests.TestCollapsedWordHoldsNoPoint;
+begin
+  const Layout: IPdfTextLayout = TFakeTextLayout.CreateCollapsedWord;
+  const PageText: IPdfPageText = TPdfPageText.Create(Layout, nil);
+  var WordIndex: Integer;
+  var Segment: TPdfTextFragment;
+
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create(15, 5), WordIndex));
+  Assert.AreEqual(1, WordIndex);
+  Assert.IsTrue(PageText.TryFindWordAt(TPointF.Create(35, 5), WordIndex));
+  Assert.AreEqual(2, WordIndex);
+  Assert.IsTrue(PageText.TryFindSegmentAt(TPointF.Create(15, 5), Segment));
+  Assert.AreEqual(2, Segment.Start);
+  Assert.IsFalse(PageText.TryFindWordAt(TPointF.Create(25, 5), WordIndex), 'Between the words');
+end;
+
+procedure TPdfPageTextTests.TestLastOverlappingLinkWins;
+begin
+  const Layout: IPdfTextLayout = TFakeTextLayout.CreateCollapsedWord;
+  const Square = TPdfQuad.Create(TPointF.Create(0, 0), TPointF.Create(10, 0), TPointF.Create(10, 10), TPointF.Create(0, 10));
+  var First := Default(TPdfLink);
+  First.Uri := 'first';
+  First.Quads := [Square];
+  var Second := First;
+  Second.Uri := 'second';
+  const WithLinks: IPdfPageText = TPdfPageText.Create(Layout, [First, Second]);
+  var Link: TPdfLink;
+
+  Assert.IsTrue(WithLinks.TryFindLinkAt(TPointF.Create(5, 5), Link));
+
+  Assert.AreEqual('second', Link.Uri);
+end;
+
+procedure TPdfPageTextTests.TestSelectionQuadsAreIndependentOfOrder;
+begin
+  const PageText = InvoiceText;
+  const Last = High(PageText.Words);
+
+  const Forward = PageText.Select(1, Last, TPdfSelectionKind.Drag);
+  const Backward = PageText.Select(Last, 1, TPdfSelectionKind.Drag);
+
+  for var Index := 0 to High(Forward.Quads) do
+  begin
+    Assert.AreEqual(Double(Forward.Quads[Index].Bounds.Left), Double(Backward.Quads[Index].Bounds.Left), 0.001);
+    Assert.AreEqual(Double(Forward.Quads[Index].Bounds.Right), Double(Backward.Quads[Index].Bounds.Right), 0.001);
+    Assert.AreEqual(Double(Forward.Quads[Index].Bounds.Top), Double(Backward.Quads[Index].Bounds.Top), 0.001);
+    Assert.AreEqual(Double(Forward.Quads[Index].Bounds.Bottom), Double(Backward.Quads[Index].Bounds.Bottom), 0.001);
+  end;
 end;
 
 end.
