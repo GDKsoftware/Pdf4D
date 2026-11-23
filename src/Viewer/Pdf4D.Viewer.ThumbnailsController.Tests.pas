@@ -78,6 +78,12 @@ type
     procedure TestCacheStaysWithinBudget;
     [Test]
     procedure TestClosingTheDocumentEmptiesTheView;
+    [Test]
+    procedure TestExtremelyTallPageGetsAThumbnailThatFitsTheCache;
+    [Test]
+    procedure TestThumbnailLargerThanTheCacheIsShrunk;
+    [Test]
+    procedure TestManyTallPagesKeepAPositiveLayout;
   end;
 
 implementation
@@ -489,6 +495,64 @@ begin
 
   Assert.IsTrue(FController.CacheCost <= FController.CacheBytes);
   Assert.AreEqual(Int64(2 * 120 * 155 * 4), FController.CacheCost);
+end;
+
+procedure TPdfThumbnailsControllerTests.TestExtremelyTallPageGetsAThumbnailThatFitsTheCache;
+begin
+  var Page := LetterPage(0, '');
+  Page.CropBox := TPdfRectangle.Letter;
+  Page.CropBox.UpperRightX := 1;
+  Page.CropBox.UpperRightY := 1000;
+  StartWith([Page]);
+
+  const Requests = OpenRenderRequests;
+  Assert.AreEqual(1, Integer(Length(Requests)));
+  const Pixels = Int64(Requests[0].Region.Width) * Requests[0].Region.Height;
+  Assert.IsTrue(Pixels <= MaxTileBatchPixels, 'one render stays within the budget of a batch');
+  Assert.IsTrue(Pixels * 4 <= FController.CacheBytes, 'one thumbnail fits the cache');
+  FFake.CompleteRender(IndexOfOpenRender(0), TAlphaColors.Red);
+
+  Assert.IsTrue(FController.CacheCost > 0, 'the thumbnail is kept');
+  Assert.AreEqual(1, CountRequestsOfPage(0));
+end;
+
+procedure TPdfThumbnailsControllerTests.TestThumbnailLargerThanTheCacheIsShrunk;
+begin
+  StartWith([LetterPage(0, '')]);
+  // A Letter thumbnail of 120 x 155 takes 74400 bytes
+  FController.CacheBytes := 40 * OneKibibyte;
+
+  const Requests = OpenRenderRequests;
+  Assert.AreEqual(1, Integer(Length(Requests)));
+  FFake.CompleteRender(IndexOfOpenRender(0), TAlphaColors.Red);
+
+  Assert.IsTrue(FController.CacheCost > 0, 'the thumbnail is kept');
+  Assert.IsTrue(FController.CacheCost <= FController.CacheBytes);
+end;
+
+procedure TPdfThumbnailsControllerTests.TestManyTallPagesKeepAPositiveLayout;
+begin
+  var Page := LetterPage(0, '');
+  Page.CropBox := TPdfRectangle.Letter;
+  Page.CropBox.UpperRightX := 1;
+  Page.CropBox.UpperRightY := 14400;
+  const Pages = TList<TPdfPageInfo>.Create;
+  try
+    // 30000 thumbnails of the largest size that a page may have would add up beyond an Integer
+    for var Index := 1 to 30000 do
+    begin
+      Pages.Add(Page);
+    end;
+    StartWith(Pages.ToArray);
+  finally
+    Pages.Free;
+  end;
+
+  Assert.IsTrue(FController.ContentSize.cy > 30000 * (20 + 8));
+  FController.ScrollTo(TPoint.Create(0, FController.ContentSize.cy));
+  Assert.IsTrue(FController.ScrollPosition.Y > 0);
+  const Requests = OpenRenderRequests;
+  Assert.IsTrue(Length(Requests) > 0);
 end;
 
 procedure TPdfThumbnailsControllerTests.TestClosingTheDocumentEmptiesTheView;

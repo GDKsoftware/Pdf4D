@@ -76,7 +76,11 @@ type
     function ThumbnailPixels: Integer;
     function HasViewport: Boolean;
     function CenteringOffset: Integer;
-    class function TransformFor(const Page: TPdfPageInfo; const WidthPixels: Integer): TPdfViewTransform; static;
+    function TransformFor(const Page: TPdfPageInfo; const WidthPixels: Integer): TPdfViewTransform;
+    // Shrinks a page of an extreme shape until its thumbnail is within the height, and the pixels that one thumbnail may take
+    function LimitedTransform(const Page: TPdfPageInfo; const Transform: TPdfViewTransform; const Zoom: Single;
+                              const WidthPixels: Integer): TPdfViewTransform;
+    function MaxThumbnailPixels: Int64;
     procedure BuildLayout;
     procedure Relayout(const IsScaleChanged: Boolean);
     function ClampedScroll(const Position: TPoint): TPoint;
@@ -143,6 +147,13 @@ const
   BackgroundColor: TAlphaColor = $FFE0E0E0;
   PageColor: TAlphaColor = $FFFFFFFF;
   LabelColor: TAlphaColor = $FF202020;
+  // A thumbnail is at most this many times as high as it is wide: a tall page gets a narrower one
+  MaxHeightFactor = 4;
+  // A thumbnail that the rounding of a size left above its pixel budget is shrunk again; this many times at most
+  MaxShrinkAttempts = 4;
+  ShrinkMargin = 0.999;
+  // The layout is added up in Int64 and kept far below the largest Integer, so that a position plus a size is still an Integer
+  MaxContentPixels = High(Integer) div 4;
   // A scale that gives a page the width of exactly 1 pixel less than asked, because of the rounding down of a size, is made a little larger
   ScaleNudge = 1.000001;
 
@@ -208,8 +219,15 @@ end;
 
 procedure TPdfThumbnailsController.SetCacheBytes(const Value: Int64);
 begin
+  if Value = FCacheBytes then
+  begin
+    Exit;
+  end;
+
   FImages.MaxCost := Value;
   FCacheBytes := Value;
+  // What one thumbnail may take depends on it
+  Relayout(True);
 end;
 
 procedure TPdfThumbnailsController.SetSelectedColor(const Value: TAlphaColor);
@@ -320,9 +338,15 @@ begin
   Result := Max(0, (FViewport.cx - FContent.cx) div 2);
 end;
 
+// The most pixels of one thumbnail: it fits the cache, and one render of it respects the budget of a tile batch
+function TPdfThumbnailsController.MaxThumbnailPixels: Int64;
+begin
+  Result := Max(Int64(1), Min(MaxTileBatchPixels, FCacheBytes div BytesPerPixel));
+end;
+
 // The transform of the page at the width in pixels: the scale is a render scale (72 pixels per inch is a scale of 1), so the transform
 // and the render agree on the size
-class function TPdfThumbnailsController.TransformFor(const Page: TPdfPageInfo; const WidthPixels: Integer): TPdfViewTransform;
+function TPdfThumbnailsController.TransformFor(const Page: TPdfPageInfo; const WidthPixels: Integer): TPdfViewTransform;
 begin
   const IsSideways = ((Page.Rotation = 90) or (Page.Rotation = 270));
   var PageWidth := Page.CropBox.Width;
@@ -339,11 +363,33 @@ begin
     Result := TPdfViewTransform.Create(Page, 0, Zoom, PointsPerInch);
   end;
 
-  // A page with an extreme shape does not get a thumbnail beyond what a page may have
-  if Result.Size.cy > MaxPageEdgePixels then
+  Result := LimitedTransform(Page, Result, Zoom, WidthPixels);
+end;
+
+function TPdfThumbnailsController.LimitedTransform(const Page: TPdfPageInfo; const Transform: TPdfViewTransform; const Zoom: Single;
+                                                   const WidthPixels: Integer): TPdfViewTransform;
+begin
+  Result := Transform;
+  var LimitedZoom := Zoom;
+
+  const MaxHeight = Min(MaxPageEdgePixels, MaxHeightFactor * WidthPixels);
+  if Result.Size.cy > MaxHeight then
   begin
-    Zoom := Zoom * MaxPageEdgePixels / Result.Size.cy;
-    Result := TPdfViewTransform.Create(Page, 0, Zoom, PointsPerInch);
+    LimitedZoom := LimitedZoom * MaxHeight / Result.Size.cy;
+    Result := TPdfViewTransform.Create(Page, 0, LimitedZoom, PointsPerInch);
+  end;
+
+  const MaxPixels = MaxThumbnailPixels;
+  for var Attempt := 1 to MaxShrinkAttempts do
+  begin
+    const Pixels = Int64(Result.Size.cx) * Result.Size.cy;
+    if Pixels <= MaxPixels then
+    begin
+      Break;
+    end;
+
+    LimitedZoom := LimitedZoom * Sqrt(MaxPixels / Pixels) * ShrinkMargin;
+    Result := TPdfViewTransform.Create(Page, 0, LimitedZoom, PointsPerInch);
   end;
 end;
 
@@ -352,17 +398,17 @@ begin
   SetLength(FCells, Length(FPages));
 
   const Gap = GapPixels;
-  var Top := Gap;
+  var Top: Int64 := Gap;
   for var Index := 0 to High(FPages) do
   begin
     const Transform = TransformFor(FPages[Index], ThumbnailPixels);
-    FCells[Index].Top := Top;
+    FCells[Index].Top := Integer(Min(Top, Int64(MaxContentPixels)));
     FCells[Index].Size := Transform.Size;
     FCells[Index].Scale := Transform.Scale;
-    Top := Top + Transform.Size.cy + LabelPixels + Gap;
+    Top := Min(Top + Transform.Size.cy + LabelPixels + Gap, Int64(MaxContentPixels));
   end;
 
-  FContent := TSize.Create(ThumbnailPixels + 2 * Gap, Top);
+  FContent := TSize.Create(ThumbnailPixels + 2 * Gap, Integer(Top));
 end;
 
 // The one place that changes what the layout depends on: the document, the width of the thumbnails and the pixels per inch come here
