@@ -13,7 +13,10 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Quad,
+  Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Viewer.Types,
+  Pdf4D.Viewer.PageText,
   Pdf4D.Viewer.Cache,
   Pdf4D.Viewer.Tiles,
   Pdf4D.Viewer.ViewTransform,
@@ -110,6 +113,25 @@ type
     FCurrentSearchHitColor: TAlphaColor;
     FBackgroundColor: TAlphaColor;
     FOnZoomChanged: TNotifyEvent;
+    FHoverEnabled: Boolean;
+    FSelectionEnabled: Boolean;
+    FFollowInternalLinks: Boolean;
+    FOnTextSelected: TPdfTextSelectedEvent;
+    FOnHoverChanged: TPdfHoverChangedEvent;
+    FOnLinkClick: TPdfLinkClickEvent;
+    FHasHover: Boolean;
+    FHoverPage: Integer;
+    FHoverSegment: TPdfTextFragment;
+    FCursor: TPdfCursorKind;
+    FHasSelection: Boolean;
+    FSelection: TPdfTextSelection;
+    FIsPressed: Boolean;
+    FIsDragging: Boolean;
+    FDownPoint: TPointF;
+    // The text of the page where a press started, and the word it started at; nil when the press can select nothing
+    FAnchorText: IPdfPageText;
+    FAnchorPage: Integer;
+    FAnchorWord: Integer;
     // What the last layout was made with: failed tiles are tried again only when this changes
     FLaidOutZoom: Single;
     FLaidOutPixelsPerInch: Single;
@@ -123,6 +145,8 @@ type
     procedure SetViewRotation(const Value: Integer);
     procedure SetScrollMode(const Value: TPdfScrollMode);
     procedure SetTileCacheBytes(const Value: Int64);
+    procedure SetHoverEnabled(const Value: Boolean);
+    procedure SetSelectionEnabled(const Value: Boolean);
 
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
     procedure AttachOpenDocument;
@@ -173,10 +197,33 @@ type
     function TryGetFallbackLayer(const PageIndex: Integer; const Transform: TPdfViewTransform; out Layer: TTileLayer): Boolean;
     procedure PaintSearchHits(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
     procedure PaintQuads(const Painter: IPdfViewPainter; const Placement: TPlacement; const Quads: TArray<TPdfQuad>; const Color: TAlphaColor);
+    class function TryFindPlacement(const Placements: TArray<TPlacement>; const PageIndex: Integer; out Placement: TPlacement): Boolean; static;
+    procedure PaintSelection(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
+    procedure PaintHover(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
     procedure PaintOverlays(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
     procedure PaintOverlay(const Painter: IPdfViewPainter; const Placement: TPlacement; const Overlay: TPdfOverlay);
     procedure PaintEllipseOverlay(const Painter: IPdfViewPainter; const Placement: TPlacement; const Overlay: TPdfOverlay);
     class function OffsetPoints(const Points: TArray<TPointF>; const Origin: TPointF): TArray<TPointF>; static;
+
+    function ScaledPixels(const LogicalPixels: Single): Single;
+    function TryGetViewBounds(const PageIndex: Integer; const Quads: TArray<TPdfQuad>; out Bounds: TRectF): Boolean;
+    function TryGetTextAt(const Point: TPointF; out PageIndex: Integer; out PagePoint: TPointF; out PageText: IPdfPageText): Boolean;
+    procedure InvalidateQuads(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
+    procedure UpdateHover(const Point: TPointF);
+    procedure SetHover(const PageIndex: Integer; const Segment: TPdfTextFragment);
+    procedure ClearHover;
+    procedure UpdateCursor(const Point: TPointF);
+    procedure ChangeCursor(const Kind: TPdfCursorKind);
+    procedure SetSelection(const Selection: TPdfTextSelection);
+    procedure BeginPress(const Point: TPointF);
+    procedure UpdateDrag(const Point: TPointF);
+    function FocusWordAt(const Point: TPointF): Integer;
+    procedure FinishClick(const Point: TPointF);
+    procedure SelectSegment(const PageIndex: Integer; const Segment: TPdfTextFragment);
+    procedure RaiseLinkClick(const Link: TPdfLink);
+    procedure ResetInput;
+    procedure ZoomByWheel(const WheelDelta: Integer; const Point: TPointF);
+    procedure SelectAllOnCurrentPage;
 
   public
     constructor Create(const Host: IPdfViewHost);
@@ -188,12 +235,28 @@ type
     procedure ScrollTo(const Position: TPoint);
     procedure ScrollBy(const DeltaX, DeltaY: Integer);
     procedure GoToPage(const PageIndex: Integer);
+    // Nothing when the quads are fully in view; else centred, as far as the content allows
+    procedure ScrollIntoView(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
     procedure ZoomIn;
     procedure ZoomOut;
     // Keeps the PDF point under ViewportPoint in place
     procedure ZoomAt(const Zoom: Single; const ViewportPoint: TPointF);
     procedure RotateClockwise;
     procedure RotateCounterclockwise;
+    // Pointer input in viewport pixels. Nothing here requests anything: hover, selection and links use the page text that is cached.
+    procedure MouseMove(const Point: TPointF);
+    // Left button
+    procedure MouseDown(const Point: TPointF);
+    procedure MouseUp(const Point: TPointF);
+    procedure MouseLeave;
+    // 120 per notch
+    procedure MouseWheel(const WheelDelta: Integer; const Ctrl: Boolean; const Point: TPointF);
+    // True when handled
+    function KeyDown(const Key: TPdfViewerKey): Boolean;
+    procedure ClearSelection;
+    function TryGetSelection(out Selection: TPdfTextSelection): Boolean;
+    function TryGetHoverSegment(out Segment: TPdfTextFragment): Boolean;
+    function CursorKind: TPdfCursorKind;
     procedure Paint(const Painter: IPdfViewPainter; const ClipRect: TRect);
     function ContentSize: TSize;
     function ScrollPosition: TPoint;
@@ -211,19 +274,25 @@ type
     property ViewRotation: Integer read FViewRotation write SetViewRotation;
     property ScrollMode: TPdfScrollMode read FScrollMode write SetScrollMode;
     property TileCacheBytes: Int64 read FTileCacheBytes write SetTileCacheBytes;
+    property HoverEnabled: Boolean read FHoverEnabled write SetHoverEnabled;
+    property SelectionEnabled: Boolean read FSelectionEnabled write SetSelectionEnabled;
+    // A GoTo link sets Document.CurrentPage
+    property FollowInternalLinks: Boolean read FFollowInternalLinks write FFollowInternalLinks;
     property HoverColor: TAlphaColor read FHoverColor write FHoverColor;
     property SelectionColor: TAlphaColor read FSelectionColor write FSelectionColor;
     property SearchHitColor: TAlphaColor read FSearchHitColor write FSearchHitColor;
     property CurrentSearchHitColor: TAlphaColor read FCurrentSearchHitColor write FCurrentSearchHitColor;
     property BackgroundColor: TAlphaColor read FBackgroundColor write FBackgroundColor;
+    property OnTextSelected: TPdfTextSelectedEvent read FOnTextSelected write FOnTextSelected;
+    property OnHoverChanged: TPdfHoverChangedEvent read FOnHoverChanged write FOnHoverChanged;
+    property OnLinkClick: TPdfLinkClickEvent read FOnLinkClick write FOnLinkClick;
     property OnZoomChanged: TNotifyEvent read FOnZoomChanged write FOnZoomChanged;
   end;
 
 implementation
 
 uses
-  System.Math,
-  Pdf4D.Viewer.PageText;
+  System.Math;
 
 const
   ZoomSteps: array[0..11] of Single = (0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8);
@@ -240,6 +309,11 @@ const
   MaxScrollValue = 1.0E9;
   RightAngle = 90;
   FullTurn = 360;
+  // Logical pixels
+  KeyScrollStep = 40;
+  ClickTolerance = 4;
+  WheelNotch = 120;
+  WheelLinesPerNotch = 3;
 
 { TPdfPageViewController }
 
@@ -260,6 +334,10 @@ begin
   FSearchHitColor := DefaultSearchHitColor;
   FCurrentSearchHitColor := DefaultCurrentSearchHitColor;
   FBackgroundColor := DefaultBackgroundColor;
+  FHoverEnabled := True;
+  FSelectionEnabled := True;
+  FFollowInternalLinks := True;
+  FCursor := TPdfCursorKind.Default;
   FTiles := TPdfLruCache<TPdfTileKey, IPdfViewImage>.Create(FTileCacheBytes);
   FTileRequests := TObjectList<TTileRequest>.Create(True);
   FPendingTiles := TDictionary<TPdfTileKey, TTileRequest>.Create;
@@ -349,6 +427,24 @@ begin
   FTileCacheBytes := Value;
 end;
 
+procedure TPdfPageViewController.SetHoverEnabled(const Value: Boolean);
+begin
+  FHoverEnabled := Value;
+  if not Value then
+  begin
+    ClearHover;
+  end;
+end;
+
+procedure TPdfPageViewController.SetSelectionEnabled(const Value: Boolean);
+begin
+  FSelectionEnabled := Value;
+  if not Value then
+  begin
+    ClearSelection;
+  end;
+end;
+
 procedure TPdfPageViewController.HandleDocumentChange(const Change: TPdfDocumentChange);
 begin
   case Change of
@@ -381,6 +477,7 @@ end;
 
 procedure TPdfPageViewController.DetachDocumentState;
 begin
+  ResetInput;
   CancelAllRequests;
   FTiles.Clear;
   FFailedTiles.Clear;
@@ -808,6 +905,519 @@ begin
   end;
 end;
 
+{ Input }
+
+function TPdfPageViewController.ScaledPixels(const LogicalPixels: Single): Single;
+begin
+  Result := LogicalPixels * FPixelsPerInch / LogicalPixelsPerInch;
+end;
+
+// The page text must be in the cache already: the input methods never request anything
+function TPdfPageViewController.TryGetTextAt(const Point: TPointF; out PageIndex: Integer; out PagePoint: TPointF;
+                                             out PageText: IPdfPageText): Boolean;
+begin
+  PageText := nil;
+  Result := ViewportToPage(Point, PageIndex, PagePoint) and Document.TryGetPageText(PageIndex, PageText);
+end;
+
+// The bounds of the quads in viewport pixels
+function TPdfPageViewController.TryGetViewBounds(const PageIndex: Integer; const Quads: TArray<TPdfQuad>; out Bounds: TRectF): Boolean;
+begin
+  Result := False;
+  Bounds := TRectF.Empty;
+  var PageRect: TRect;
+  if not PageRectInViewport(PageIndex, PageRect) then
+  begin
+    Exit;
+  end;
+
+  const Transform = FLayout.Transform(PageIndex);
+  const Origin = TPointF.Create(PageRect.Left, PageRect.Top);
+  for var Quad in Quads do
+  begin
+    for var Point in OffsetPoints(Transform.QuadToView(Quad), Origin) do
+    begin
+      if Result then
+      begin
+        Bounds.Left := Min(Bounds.Left, Point.X);
+        Bounds.Top := Min(Bounds.Top, Point.Y);
+        Bounds.Right := Max(Bounds.Right, Point.X);
+        Bounds.Bottom := Max(Bounds.Bottom, Point.Y);
+      end
+      else
+      begin
+        Bounds := TRectF.Create(Point, Point);
+        Result := True;
+      end;
+    end;
+  end;
+end;
+
+procedure TPdfPageViewController.InvalidateQuads(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
+begin
+  const Margin = Ceil(ScaledPixels(OverlayFrameWidth)) + 1;
+  for var Quad in Quads do
+  begin
+    var Bounds: TRectF;
+    if TryGetViewBounds(PageIndex, [Quad], Bounds) then
+    begin
+      const Area = TRect.Create(Floor(Bounds.Left) - Margin, Floor(Bounds.Top) - Margin, Ceil(Bounds.Right) + Margin, Ceil(Bounds.Bottom) + Margin);
+      const Visible = TRect.Intersect(Area, TRect.Create(0, 0, FViewport.cx, FViewport.cy));
+      if not Visible.IsEmpty then
+      begin
+        FHost.Invalidate(Visible);
+      end;
+    end;
+  end;
+end;
+
+procedure TPdfPageViewController.UpdateHover(const Point: TPointF);
+begin
+  if not FHoverEnabled then
+  begin
+    Exit;
+  end;
+
+  var PageIndex: Integer;
+  var PagePoint: TPointF;
+  var PageText: IPdfPageText;
+  var Segment: TPdfTextFragment;
+  if TryGetTextAt(Point, PageIndex, PagePoint, PageText) and PageText.TryFindSegmentAt(PagePoint, Segment) then
+  begin
+    SetHover(PageIndex, Segment);
+  end
+  else
+  begin
+    ClearHover;
+  end;
+end;
+
+procedure TPdfPageViewController.SetHover(const PageIndex: Integer; const Segment: TPdfTextFragment);
+begin
+  const IsSame = FHasHover and (FHoverPage = PageIndex) and (FHoverSegment.Start = Segment.Start) and (FHoverSegment.Length = Segment.Length);
+  if IsSame then
+  begin
+    Exit;
+  end;
+
+  if FHasHover then
+  begin
+    InvalidateQuads(FHoverPage, FHoverSegment.Quads);
+  end;
+  FHasHover := True;
+  FHoverPage := PageIndex;
+  FHoverSegment := Segment;
+  InvalidateQuads(PageIndex, Segment.Quads);
+
+  if Assigned(FOnHoverChanged) then
+  begin
+    FOnHoverChanged(Self, True, Segment);
+  end;
+end;
+
+procedure TPdfPageViewController.ClearHover;
+begin
+  if not FHasHover then
+  begin
+    Exit;
+  end;
+
+  InvalidateQuads(FHoverPage, FHoverSegment.Quads);
+  FHasHover := False;
+  FHoverSegment := Default(TPdfTextFragment);
+
+  if Assigned(FOnHoverChanged) then
+  begin
+    FOnHoverChanged(Self, False, FHoverSegment);
+  end;
+end;
+
+procedure TPdfPageViewController.UpdateCursor(const Point: TPointF);
+begin
+  var Kind := TPdfCursorKind.Default;
+  if FIsDragging and Assigned(FAnchorText) then
+  begin
+    Kind := TPdfCursorKind.Text;
+  end
+  else
+  begin
+    var PageIndex: Integer;
+    var PagePoint: TPointF;
+    var PageText: IPdfPageText;
+    var Link: TPdfLink;
+    var Segment: TPdfTextFragment;
+    if TryGetTextAt(Point, PageIndex, PagePoint, PageText) then
+    begin
+      if PageText.TryFindLinkAt(PagePoint, Link) then
+      begin
+        Kind := TPdfCursorKind.Link;
+      end
+      else if FSelectionEnabled and PageText.TryFindSegmentAt(PagePoint, Segment) then
+      begin
+        Kind := TPdfCursorKind.Text;
+      end;
+    end;
+  end;
+  ChangeCursor(Kind);
+end;
+
+procedure TPdfPageViewController.ChangeCursor(const Kind: TPdfCursorKind);
+begin
+  if Kind = FCursor then
+  begin
+    Exit;
+  end;
+
+  FCursor := Kind;
+  FHost.CursorChanged;
+end;
+
+procedure TPdfPageViewController.SetSelection(const Selection: TPdfTextSelection);
+begin
+  if FHasSelection then
+  begin
+    InvalidateQuads(FSelection.PageIndex, FSelection.Quads);
+  end;
+  FSelection := Selection;
+  FHasSelection := True;
+  InvalidateQuads(Selection.PageIndex, Selection.Quads);
+end;
+
+procedure TPdfPageViewController.ClearSelection;
+begin
+  FAnchorText := nil;
+  if not FHasSelection then
+  begin
+    Exit;
+  end;
+
+  InvalidateQuads(FSelection.PageIndex, FSelection.Quads);
+  FHasSelection := False;
+  FSelection := Default(TPdfTextSelection);
+end;
+
+function TPdfPageViewController.TryGetSelection(out Selection: TPdfTextSelection): Boolean;
+begin
+  Selection := FSelection;
+  Result := FHasSelection;
+end;
+
+function TPdfPageViewController.TryGetHoverSegment(out Segment: TPdfTextFragment): Boolean;
+begin
+  Segment := FHoverSegment;
+  Result := FHasHover;
+end;
+
+function TPdfPageViewController.CursorKind: TPdfCursorKind;
+begin
+  Result := FCursor;
+end;
+
+procedure TPdfPageViewController.ResetInput;
+begin
+  ClearHover;
+  ClearSelection;
+  FIsPressed := False;
+  FIsDragging := False;
+  ChangeCursor(TPdfCursorKind.Default);
+end;
+
+procedure TPdfPageViewController.MouseMove(const Point: TPointF);
+begin
+  if not Assigned(FLayout) then
+  begin
+    Exit;
+  end;
+
+  if FIsPressed then
+  begin
+    UpdateDrag(Point);
+  end
+  else
+  begin
+    UpdateHover(Point);
+  end;
+  UpdateCursor(Point);
+end;
+
+procedure TPdfPageViewController.MouseDown(const Point: TPointF);
+begin
+  if Assigned(FLayout) then
+  begin
+    BeginPress(Point);
+  end;
+end;
+
+procedure TPdfPageViewController.MouseUp(const Point: TPointF);
+begin
+  if not FIsPressed then
+  begin
+    Exit;
+  end;
+  FIsPressed := False;
+
+  if not FIsDragging then
+  begin
+    FAnchorText := nil;
+    FinishClick(Point);
+    Exit;
+  end;
+
+  UpdateDrag(Point);
+  const IsSelecting = Assigned(FAnchorText) and FHasSelection;
+  const Selection = FSelection;
+  FIsDragging := False;
+  FAnchorText := nil;
+  UpdateCursor(Point);
+
+  if IsSelecting and Assigned(FOnTextSelected) then
+  begin
+    FOnTextSelected(Self, Selection);
+  end;
+end;
+
+procedure TPdfPageViewController.MouseLeave;
+begin
+  ClearHover;
+  ChangeCursor(TPdfCursorKind.Default);
+end;
+
+procedure TPdfPageViewController.MouseWheel(const WheelDelta: Integer; const Ctrl: Boolean; const Point: TPointF);
+begin
+  if (not Assigned(FLayout)) or (WheelDelta = 0) then
+  begin
+    Exit;
+  end;
+
+  if Ctrl then
+  begin
+    ZoomByWheel(WheelDelta, Point);
+    Exit;
+  end;
+
+  const Distance = WheelDelta / WheelNotch * WheelLinesPerNotch * ScaledPixels(KeyScrollStep);
+  ScrollBy(0, -Round(Distance));
+end;
+
+procedure TPdfPageViewController.ZoomByWheel(const WheelDelta: Integer; const Point: TPointF);
+begin
+  const Notches = Max(1, Abs(WheelDelta) div WheelNotch);
+  for var Notch := 1 to Notches do
+  begin
+    ZoomAt(NextZoomStep(WheelDelta > 0), Point);
+  end;
+end;
+
+function TPdfPageViewController.KeyDown(const Key: TPdfViewerKey): Boolean;
+begin
+  Result := Assigned(FLayout);
+  if not Result then
+  begin
+    Exit;
+  end;
+
+  const Step = Round(ScaledPixels(KeyScrollStep));
+  case Key of
+    TPdfViewerKey.Up:
+      ScrollBy(0, -Step);
+    TPdfViewerKey.Down:
+      ScrollBy(0, Step);
+    TPdfViewerKey.Left:
+      ScrollBy(-Step, 0);
+    TPdfViewerKey.Right:
+      ScrollBy(Step, 0);
+    TPdfViewerKey.PageUp:
+      ScrollBy(0, -Max(0, FViewport.cy - Step));
+    TPdfViewerKey.PageDown:
+      ScrollBy(0, Max(0, FViewport.cy - Step));
+    TPdfViewerKey.Home:
+      ScrollTo(TPoint.Create(FScroll.X, 0));
+    TPdfViewerKey.End_:
+      ScrollTo(TPoint.Create(FScroll.X, FLayout.ContentSize.cy));
+    TPdfViewerKey.ZoomIn:
+      ZoomIn;
+    TPdfViewerKey.ZoomOut:
+      ZoomOut;
+    TPdfViewerKey.ZoomReset:
+      Zoom := 1;
+    TPdfViewerKey.SelectAll:
+      begin
+        Result := FSelectionEnabled;
+        if Result then
+        begin
+          SelectAllOnCurrentPage;
+        end;
+      end;
+  else
+    raise ENotSupportedException.CreateFmt('Unsupported key: %d', [Ord(Key)]);
+  end;
+end;
+
+procedure TPdfPageViewController.SelectAllOnCurrentPage;
+begin
+  var PageText: IPdfPageText;
+  if Document.TryGetPageText(Document.CurrentPage, PageText) and (not PageText.IsEmpty) then
+  begin
+    SetSelection(PageText.SelectAll);
+  end;
+end;
+
+procedure TPdfPageViewController.ScrollIntoView(const PageIndex: Integer; const Quads: TArray<TPdfQuad>);
+begin
+  if not Assigned(FLayout) then
+  begin
+    Exit;
+  end;
+
+  // Only the current page has a place in this mode
+  const IsOtherPageOfSinglePage = (FScrollMode = TPdfScrollMode.SinglePage) and (PageIndex >= 0) and (PageIndex < Length(FPages)) and
+                                  (PageIndex <> Document.CurrentPage);
+  if IsOtherPageOfSinglePage then
+  begin
+    Document.CurrentPage := PageIndex;
+  end;
+
+  var Bounds: TRectF;
+  if not TryGetViewBounds(PageIndex, Quads, Bounds) then
+  begin
+    Exit;
+  end;
+
+  const IsInView = (Bounds.Left >= 0) and (Bounds.Top >= 0) and (Bounds.Right <= FViewport.cx) and (Bounds.Bottom <= FViewport.cy);
+  if not IsInView then
+  begin
+    const Center = Bounds.CenterPoint;
+    ScrollTo(TPoint.Create(FScroll.X + Round(Center.X - FViewport.cx / 2), FScroll.Y + Round(Center.Y - FViewport.cy / 2)));
+  end;
+end;
+
+// The anchor is the word at or nearest to the start of the press, found in the cached text of the page there
+procedure TPdfPageViewController.BeginPress(const Point: TPointF);
+begin
+  FIsPressed := True;
+  FIsDragging := False;
+  FDownPoint := Point;
+  FAnchorText := nil;
+
+  var PageIndex: Integer;
+  var PagePoint: TPointF;
+  var PageText: IPdfPageText;
+  var Word: Integer;
+  const IsOnText = FSelectionEnabled and TryGetTextAt(Point, PageIndex, PagePoint, PageText);
+  if IsOnText and (PageText.TryFindWordAt(PagePoint, Word) or PageText.TryFindNearestWord(PagePoint, Word)) then
+  begin
+    FAnchorText := PageText;
+    FAnchorPage := PageIndex;
+    FAnchorWord := Word;
+  end;
+end;
+
+procedure TPdfPageViewController.UpdateDrag(const Point: TPointF);
+begin
+  if not FIsDragging then
+  begin
+    if Point.Distance(FDownPoint) <= ScaledPixels(ClickTolerance) then
+    begin
+      Exit;
+    end;
+
+    FIsDragging := True;
+    ClearHover;
+  end;
+
+  if not Assigned(FAnchorText) then
+  begin
+    Exit;
+  end;
+
+  const Focus = FocusWordAt(Point);
+  if Focus >= 0 then
+  begin
+    SetSelection(FAnchorText.Select(FAnchorWord, Focus, TPdfSelectionKind.Drag));
+  end;
+end;
+
+// The word nearest to the point on the page of the anchor; a point above or below that page gives its first or last word
+function TPdfPageViewController.FocusWordAt(const Point: TPointF): Integer;
+begin
+  Result := -1;
+  var PageRect: TRect;
+  if not PageRectInViewport(FAnchorPage, PageRect) then
+  begin
+    Exit;
+  end;
+
+  if Point.Y > PageRect.Bottom then
+  begin
+    Exit(Length(FAnchorText.Words) - 1);
+  end;
+  if Point.Y < PageRect.Top then
+  begin
+    Exit(0);
+  end;
+
+  const PagePoint = FLayout.Transform(FAnchorPage).ViewToPage(TPointF.Create(Point.X - PageRect.Left, Point.Y - PageRect.Top));
+  if not FAnchorText.TryFindNearestWord(PagePoint, Result) then
+  begin
+    Result := -1;
+  end;
+end;
+
+procedure TPdfPageViewController.FinishClick(const Point: TPointF);
+begin
+  var PageIndex: Integer;
+  var PagePoint: TPointF;
+  var PageText: IPdfPageText;
+  var Link: TPdfLink;
+  var Segment: TPdfTextFragment;
+  if TryGetTextAt(Point, PageIndex, PagePoint, PageText) then
+  begin
+    if PageText.TryFindLinkAt(PagePoint, Link) then
+    begin
+      ClearSelection;
+      RaiseLinkClick(Link);
+      Exit;
+    end;
+
+    if FSelectionEnabled and PageText.TryFindSegmentAt(PagePoint, Segment) then
+    begin
+      SelectSegment(PageIndex, Segment);
+      Exit;
+    end;
+  end;
+
+  ClearSelection;
+end;
+
+procedure TPdfPageViewController.SelectSegment(const PageIndex: Integer; const Segment: TPdfTextFragment);
+begin
+  var Selection: TPdfTextSelection;
+  Selection.Kind := TPdfSelectionKind.Click;
+  Selection.PageIndex := PageIndex;
+  Selection.Text := Segment.Text;
+  Selection.Quads := Copy(Segment.Quads);
+  SetSelection(Selection);
+
+  if Assigned(FOnTextSelected) then
+  begin
+    FOnTextSelected(Self, Selection);
+  end;
+end;
+
+procedure TPdfPageViewController.RaiseLinkClick(const Link: TPdfLink);
+begin
+  if Assigned(FOnLinkClick) then
+  begin
+    FOnLinkClick(Self, Link);
+  end;
+
+  const IsFollowed = FFollowInternalLinks and (Link.Kind = TPdfLinkKind.GoTo) and Assigned(Document);
+  if IsFollowed then
+  begin
+    Document.CurrentPage := Link.TargetPageIndex;
+  end;
+end;
+
 { Requests }
 
 procedure TPdfPageViewController.RefreshRequests;
@@ -1183,7 +1793,47 @@ begin
   end;
 
   PaintSearchHits(Painter, Placements);
+  PaintSelection(Painter, Placements);
   PaintOverlays(Painter, Placements);
+  PaintHover(Painter, Placements);
+end;
+
+class function TPdfPageViewController.TryFindPlacement(const Placements: TArray<TPlacement>; const PageIndex: Integer;
+                                                       out Placement: TPlacement): Boolean;
+begin
+  Placement := Default(TPlacement);
+  for var Candidate in Placements do
+  begin
+    if Candidate.PageIndex = PageIndex then
+    begin
+      Placement := Candidate;
+      Exit(True);
+    end;
+  end;
+  Result := False;
+end;
+
+procedure TPdfPageViewController.PaintSelection(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
+begin
+  var Placement: TPlacement;
+  if FHasSelection and TryFindPlacement(Placements, FSelection.PageIndex, Placement) then
+  begin
+    PaintQuads(Painter, Placement, FSelection.Quads, FSelectionColor);
+  end;
+end;
+
+procedure TPdfPageViewController.PaintHover(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
+begin
+  var Placement: TPlacement;
+  if not (FHasHover and TryFindPlacement(Placements, FHoverPage, Placement)) then
+  begin
+    Exit;
+  end;
+
+  for var Quad in FHoverSegment.Quads do
+  begin
+    Painter.FramePolygon(OffsetPoints(Placement.Transform.QuadToView(Quad), Placement.Origin), FHoverColor, ScaledPixels(OverlayFrameWidth));
+  end;
 end;
 
 procedure TPdfPageViewController.PaintPage(const Painter: IPdfViewPainter; const Placement: TPlacement; const ClipRect: TRect);

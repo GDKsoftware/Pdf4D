@@ -213,6 +213,7 @@ uses
   Pdf4D.Viewer.PageViewController in '..\src\Viewer\Pdf4D.Viewer.PageViewController.pas',
   Pdf4D.Tests.RecordingPainter in 'Support\Pdf4D.Tests.RecordingPainter.pas',
   Pdf4D.Viewer.PageViewController.Tests in '..\src\Viewer\Pdf4D.Viewer.PageViewController.Tests.pas',
+  Pdf4D.Viewer.PageViewController.Input.Tests in '..\src\Viewer\Pdf4D.Viewer.PageViewController.Input.Tests.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Tests.Functions in 'Support\Pdf4D.Tests.Functions.pas',

@@ -284,6 +284,7 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingPainter.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.Input.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>
