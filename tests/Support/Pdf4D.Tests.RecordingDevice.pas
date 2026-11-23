@@ -9,7 +9,9 @@ interface
 uses
   System.SysUtils,
   System.Types,
+  System.SyncObjs,
   System.Generics.Collections,
+  Pdf4D.Common.Defines,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Render.Bitmap,
@@ -95,6 +97,12 @@ type
     // Keeps the device alive for LastDevice
     FLastDeviceReference: IPdfRasterDevice;
     FLastDevice: TRecordingDevice;
+    FDeviceCount: Integer;
+    FLargestPixels: Int64;
+    FCreateFailure: string;
+
+    function GetDeviceCount: Integer;
+    function GetLargestPixels: Int64;
 
   public
     function Name: string;
@@ -102,6 +110,12 @@ type
 
     // The device of the last CreateRasterDevice call (layers are no raster devices of the backend); nil before the first call
     property LastDevice: TRecordingDevice read FLastDevice;
+    // The number of CreateRasterDevice calls and the largest Width * Height among them; thread safe, for a backend that a worker uses
+    property DeviceCount: Integer read GetDeviceCount;
+    property LargestPixels: Int64 read GetLargestPixels;
+    // When it is not empty, CreateRasterDevice raises an EPdfException with this text, as a backend that fails does. Set it before the
+    // thread that renders starts its work.
+    property CreateFailure: string read FCreateFailure write FCreateFailure;
   end;
 
 implementation
@@ -280,12 +294,35 @@ begin
   Result := 'Recording';
 end;
 
+function TRecordingBackend.GetDeviceCount: Integer;
+begin
+  Result := TInterlocked.CompareExchange(FDeviceCount, 0, 0);
+end;
+
+function TRecordingBackend.GetLargestPixels: Int64;
+begin
+  Result := TInterlocked.CompareExchange(FLargestPixels, Int64(0), Int64(0));
+end;
+
 function TRecordingBackend.CreateRasterDevice(const Width, Height: Integer): IPdfRasterDevice;
 begin
+  if not FCreateFailure.IsEmpty then
+  begin
+    raise EPdfException.Create(FCreateFailure);
+  end;
+
   const Device = TRecordingDevice.Create(Width, Height);
   Result := Device;
   FLastDeviceReference := Result;
   FLastDevice := Device;
+
+  TInterlocked.Increment(FDeviceCount);
+  // Only the thread that renders calls this, so reading and then writing the maximum cannot lose an update
+  const Pixels = Int64(Width) * Height;
+  if Pixels > FLargestPixels then
+  begin
+    TInterlocked.Exchange(FLargestPixels, Pixels);
+  end;
 end;
 
 end.

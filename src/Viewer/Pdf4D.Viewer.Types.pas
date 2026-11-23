@@ -26,6 +26,8 @@ const
   DefaultThumbnailCacheBytes: Int64 = 32 * 1024 * 1024;
   // Pages per document
   DefaultPageTextCacheCount = 64;
+  // The most pixels of one render of the missing tiles of a page; a larger batch is split in bands
+  MaxTileBatchPixels: Int64 = 8 * 1024 * 1024;
 
 type
   {$SCOPEDENUMS ON}

@@ -44,17 +44,23 @@ type
     FRunning: TPdfWorkerJob;
     FFailed: Boolean;
     FStopped: Boolean;
+    FOnEnd: TProc;
 
     // Waits for a job and takes it out of the queue; nil when the thread must end
     function TakeNext: TPdfWorkerJob;
     function IndexOfMostUrgent: Integer;
+    function IsStopped: Boolean;
     procedure Run(const Job: TPdfWorkerJob);
+    procedure RunEndProc;
 
   protected
     procedure Execute; override;
 
   public
-    constructor Create;
+    constructor Create; overload;
+    // OnEnd runs on the worker thread when it ends (after Stop), also when a fatal exception put the worker in its failed state. The
+    // owner of the document releases it there, on the thread that uses it. An exception in OnEnd is swallowed.
+    constructor Create(const OnEnd: TProc); overload;
     destructor Destroy; override;
 
     // Takes ownership of Job; from any thread. After Stop the job is freed unexecuted.
@@ -85,7 +91,13 @@ end;
 
 constructor TPdfDocumentWorker.Create;
 begin
+  Create(nil);
+end;
+
+constructor TPdfDocumentWorker.Create(const OnEnd: TProc);
+begin
   // Everything the thread uses exists before it starts
+  FOnEnd := OnEnd;
   FLock := TObject.Create;
   FWake := TEvent.Create(nil, True, False, '');
   FQueue := TList<TPdfWorkerJob>.Create;
@@ -156,7 +168,7 @@ begin
   end;
 
   CancelAll;
-  Terminate;
+  // Not Terminate: a thread that is terminated before it starts never runs Execute, and with it never runs the end procedure
   FWake.SetEvent;
   WaitFor;
 
@@ -172,6 +184,16 @@ begin
   for var Job in Pending do
   begin
     Job.Free;
+  end;
+end;
+
+function TPdfDocumentWorker.IsStopped: Boolean;
+begin
+  TMonitor.Enter(FLock);
+  try
+    Result := FStopped;
+  finally
+    TMonitor.Exit(FLock);
   end;
 end;
 
@@ -194,7 +216,7 @@ function TPdfDocumentWorker.TakeNext: TPdfWorkerJob;
 begin
   Result := nil;
 
-  while (not Terminated) and (not Assigned(Result)) do
+  while (not IsStopped) and (not Assigned(Result)) do
   begin
     TMonitor.Enter(FLock);
     try
@@ -223,7 +245,7 @@ end;
 
 procedure TPdfDocumentWorker.Run(const Job: TPdfWorkerJob);
 begin
-  const MustSkip = (FFailed or Terminated or Job.Cancel.IsCancelled);
+  const MustSkip = (FFailed or IsStopped or Job.Cancel.IsCancelled);
   if MustSkip then
   begin
     Exit;
@@ -244,7 +266,7 @@ end;
 
 procedure TPdfDocumentWorker.Execute;
 begin
-  while not Terminated do
+  while not IsStopped do
   begin
     const Job = TakeNext;
     if not Assigned(Job) then
@@ -262,6 +284,25 @@ begin
         TMonitor.Exit(FLock);
       end;
       Job.Free;
+    end;
+  end;
+
+  RunEndProc;
+end;
+
+procedure TPdfDocumentWorker.RunEndProc;
+begin
+  if not Assigned(FOnEnd) then
+  begin
+    Exit;
+  end;
+
+  try
+    FOnEnd();
+  except
+    on Failure: Exception do
+    begin
+      // Nobody is left to tell: the owner of OnEnd reports what matters itself
     end;
   end;
 end;

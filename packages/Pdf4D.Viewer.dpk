@@ -47,6 +47,7 @@ contains
   Pdf4D.Viewer.PageText in '..\src\Viewer\Pdf4D.Viewer.PageText.pas',
   Pdf4D.Viewer.TextMatcher in '..\src\Viewer\Pdf4D.Viewer.TextMatcher.pas',
   Pdf4D.Viewer.Dispatcher in '..\src\Viewer\Pdf4D.Viewer.Dispatcher.pas',
-  Pdf4D.Viewer.Worker in '..\src\Viewer\Pdf4D.Viewer.Worker.pas';
+  Pdf4D.Viewer.Worker in '..\src\Viewer\Pdf4D.Viewer.Worker.pas',
+  Pdf4D.Viewer.Session in '..\src\Viewer\Pdf4D.Viewer.Session.pas';
 
 end.

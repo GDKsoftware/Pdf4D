@@ -125,6 +125,10 @@ type
     procedure TestExceptionInJobDoesNotKillWorker;
     [Test]
     procedure TestFatalExceptionStopsExecution;
+    [Test]
+    procedure TestEndProcRunsOnTheWorkerThreadAfterStop;
+    [Test]
+    procedure TestEndProcRunsAfterAFatalException;
   end;
 
   [TestFixture]
@@ -485,6 +489,50 @@ begin
   FWorker.Enqueue(TRecordingJob.Create(FLog, TPdfJobPriority.Visible, 'After3'));
   AssertFreed(5);
   Assert.AreEqual('failing', FLog.ExecutedNames);
+end;
+
+procedure TPdfDocumentWorkerTests.TestEndProcRunsOnTheWorkerThreadAfterStop;
+begin
+  var EndThread: TThreadID := 0;
+  var Calls := 0;
+  const Worker = TPdfDocumentWorker.Create(
+    procedure
+    begin
+      EndThread := TThread.CurrentThread.ThreadID;
+      Inc(Calls);
+    end);
+  try
+    Worker.Stop;
+
+    // Stop waits for the thread, so the procedure has run
+    Assert.AreEqual(1, Calls);
+    Assert.AreNotEqual(TThreadID(0), EndThread);
+    Assert.AreNotEqual(MainThreadID, EndThread);
+  finally
+    Worker.Free;
+  end;
+  Assert.AreEqual(1, Calls);
+end;
+
+procedure TPdfDocumentWorkerTests.TestEndProcRunsAfterAFatalException;
+begin
+  var Calls := 0;
+  const Worker = TPdfDocumentWorker.Create(
+    procedure
+    begin
+      Inc(Calls);
+      raise EInvalidOperation.Create('The end procedure fails');
+    end);
+  try
+    Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+    AssertFreed(1);
+    Worker.Stop;
+
+    // The failure of the end procedure does not escape the thread
+    Assert.AreEqual(1, Calls);
+  finally
+    Worker.Free;
+  end;
 end;
 
 { TPdfDispatcherTests }
