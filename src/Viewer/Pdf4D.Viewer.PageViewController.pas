@@ -1171,6 +1171,8 @@ begin
   ClearSelection;
   FIsPressed := False;
   FIsDragging := False;
+  // What was left of a notch belongs to the document that was shown
+  FWheelRemainder := 0;
   ChangeCursor(TPdfCursorKind.Default);
 end;
 

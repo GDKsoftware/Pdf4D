@@ -73,6 +73,7 @@ resourcestring
 
   // Search bar
   SSearchResultCount = '%d of %d';
+  SSearchResultCountCapped = '%d of %d+';
   SSearchNoResults = 'No results';
   SSearching = 'Searching'#$2026;
   SSearchMatchCase = 'Match case';

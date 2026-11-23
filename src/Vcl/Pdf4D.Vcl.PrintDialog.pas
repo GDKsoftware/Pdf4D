@@ -15,8 +15,7 @@ uses
   Vcl.StdCtrls,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
-  Pdf4D.Viewer.Print,
-  Pdf4D.Viewer.Session;
+  Pdf4D.Viewer.Print;
 
 const
   MaxPrintCopies = 999;

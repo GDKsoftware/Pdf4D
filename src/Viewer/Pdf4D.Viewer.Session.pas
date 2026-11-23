@@ -94,7 +94,7 @@ type
   {$ENDIF}
 
   // ---- What the session is made of. These types are public only because the session holds them; the lifetime token (IPdfLifetimeToken)
-  // lives in Pdf4D.Viewer.Types because views and dialogs use it too. Nothing else outside this unit uses them. ----
+  // lives in Pdf4D.Viewer.Types because the print dialog uses it too. Nothing else outside this unit uses them. ----
 
   TRequestCallbacks = record
     OnOpen: TPdfOpenDoneEvent;

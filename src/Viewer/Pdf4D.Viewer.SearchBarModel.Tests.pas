@@ -35,6 +35,8 @@ type
     [Test]
     procedure TestNoResults;
     [Test]
+    procedure TestACappedSearchShowsAPlus;
+    [Test]
     procedure TestEmptyQueryClears;
     [Test]
     procedure TestOtherCaseSearchesAgain;
@@ -57,6 +59,10 @@ const
   InvoiceNumber = '2024-0815';
   InvoiceNumberHits = 2;
   Missing = 'zzzz';
+  CapPages = 20;
+  CapPageSize = 612;
+  CapPageHeight = 792;
+  CapLimit = 5;
 
 { TPdfSearchBarModelTests }
 
@@ -114,6 +120,19 @@ begin
 
   FModel.Advance(InvoiceNumber, False, False);
   Assert.AreEqual(Format(SSearchResultCount, [1, InvoiceNumberHits]), FModel.ResultText, 'backwards');
+end;
+
+procedure TPdfSearchBarModelTests.TestACappedSearchShowsAPlus;
+begin
+  FBench.OpenData(TViewerDocuments.Pages(CapPages, CapPageSize, CapPageHeight, 0));
+  FModel.Document := FBench.Document;
+  FBench.Document.MaxSearchHits := CapLimit;
+
+  FModel.Advance('Page', False, True);
+  WaitForSearch;
+
+  Assert.AreEqual(Format(SSearchResultCountCapped, [1, CapLimit]), FModel.ResultText);
+  Assert.IsTrue(FModel.ResultText.EndsWith('+'));
 end;
 
 procedure TPdfSearchBarModelTests.TestNoResults;

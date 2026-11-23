@@ -98,6 +98,10 @@ type
     [Test]
     procedure TestSearchStopsAtTheHitLimit;
     [Test]
+    procedure TestAnExactFitIsNotCapped;
+    [Test]
+    procedure TestNoHitsAllowedMeansNoHits;
+    [Test]
     procedure TestNewSearchCancelsOld;
     [Test]
     procedure TestEmptyQueryClearsResults;
@@ -584,7 +588,7 @@ begin
     Watch.Stop;
     PdfSessionDocumentHook := nil;
 
-    Assert.IsTrue(Watch.ElapsedMilliseconds >= BusyMs - BusyMargin, 'freeing waited for the worker: ' + Watch.ElapsedMilliseconds.ToString + ' ms');
+    Assert.IsTrue(Watch.ElapsedMilliseconds >= BusyMs - BusyMargin, Format('freeing waited for the worker: %d ms', [Watch.ElapsedMilliseconds]));
     Assert.IsNull(FBench.Recorder.Link.Document);
     Assert.AreEqual('Opening,Closed', FBench.Recorder.Describe, 'the load never reached the document');
   finally
@@ -779,11 +783,41 @@ begin
   Assert.AreEqual(HitLimit, FBench.Document.SearchHitCount);
   Assert.IsFalse(FBench.Document.IsSearching, 'the search stopped');
   Assert.IsTrue(FLogText.Contains(Format(SSearchHitLimitReached, [HitLimit])), 'the limit is in the log: ' + FLogText);
+  Assert.IsTrue(FBench.Document.IsSearchCapped, 'the count is a lower bound');
 
   // Nothing arrives later
   FBench.Dispatcher.RunPending;
   Assert.AreEqual(HitLimit, FBench.Document.SearchHitCount);
   FBench.Document.OnLog := nil;
+end;
+
+// Exactly as many hits as the limit allows: nothing was cut off, so nothing is logged and the count is exact
+procedure TPdf4DCustomDocumentTests.TestAnExactFitIsNotCapped;
+begin
+  FBench.OpenData(TViewerDocuments.Pages(HitPages, PageSize, PageHeight, 0));
+  FBench.Document.OnLog := HandleLogRecords;
+  FBench.Document.MaxSearchHits := HitPages;
+
+  SearchAndWait('Page');
+
+  Assert.AreEqual(HitPages, FBench.Document.SearchHitCount);
+  Assert.IsFalse(FBench.Document.IsSearchCapped);
+  Assert.IsFalse(FLogText.Contains(Format(SSearchHitLimitReached, [HitPages])), 'no limit line: ' + FLogText);
+  FBench.Document.OnLog := nil;
+end;
+
+procedure TPdf4DCustomDocumentTests.TestNoHitsAllowedMeansNoHits;
+begin
+  FBench.OpenData(TViewerDocuments.Pages(HitPages, PageSize, PageHeight, 0));
+  FBench.Document.MaxSearchHits := 0;
+
+  SearchAndWait('Page');
+
+  Assert.AreEqual(0, FBench.Document.SearchHitCount);
+  Assert.IsTrue(FBench.Document.IsSearchCapped);
+
+  FBench.Document.Search('', False);
+  Assert.IsFalse(FBench.Document.IsSearchCapped, 'a new search starts uncapped');
 end;
 
 procedure TPdf4DCustomDocumentTests.TestNewSearchCancelsOld;

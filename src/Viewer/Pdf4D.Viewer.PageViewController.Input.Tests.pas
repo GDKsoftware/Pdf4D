@@ -112,6 +112,8 @@ type
     [Test]
     procedure TestCtrlWheelAccumulatesSmallDeltas;
     [Test]
+    procedure TestAChangeOfDocumentForgetsTheWheelRemainder;
+    [Test]
     procedure TestScrollIntoView;
     [Test]
     procedure TestSelectAll;
@@ -724,6 +726,29 @@ begin
   // Larger deltas still take as many steps as they hold notches
   FController.MouseWheel(2 * WheelNotch, True, Point);
   Assert.AreEqual(1.5, Double(FController.Zoom), 0.0001);
+end;
+
+procedure TPdfPageViewControllerInputTests.TestAChangeOfDocumentForgetsTheWheelRemainder;
+begin
+  Start(3);
+  const Point = TPointF.Create(300, 300);
+  const SmallDelta = WheelNotch div 8;
+
+  for var Event := 1 to 4 do
+  begin
+    FController.MouseWheel(SmallDelta, True, Point);
+  end;
+
+  // The same document again is a change of document for the controller: it starts from scratch
+  FController.Document := nil;
+  FController.Document := FDocument;
+  FController.Zoom := 1;
+  for var Event := 1 to 4 do
+  begin
+    FController.MouseWheel(SmallDelta, True, Point);
+  end;
+
+  Assert.AreEqual(1.0, Double(FController.Zoom), 0.0001, 'half a notch before and half after is not a step');
 end;
 
 procedure TPdfPageViewControllerInputTests.TestScrollIntoView;

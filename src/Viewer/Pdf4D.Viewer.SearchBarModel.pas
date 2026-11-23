@@ -42,7 +42,7 @@ type
     procedure MatchCaseChanged(const Query: string; const MatchCase: Boolean);
     // Takes the hits away and stops a search that runs
     procedure Clear;
-    // 'n of m', 'Searching...' or 'No results' after a search, else empty
+    // 'n of m' ('n of m+' when the search stopped at its limit), 'Searching...' or 'No results' after a search, else empty
     function ResultText: string;
 
     // Through an internal link; the search belongs to the document that was open, so a change of document or of its state forgets it
@@ -203,7 +203,8 @@ begin
     var Index: Integer;
     var Hit: TPdfSearchHit;
     Document.TryGetCurrentSearchHit(Index, Hit);
-    Result := Format(SSearchResultCount, [Max(Index, 0) + 1, Count]);
+    const Template = if Document.IsSearchCapped then SSearchResultCountCapped else SSearchResultCount;
+    Result := Format(Template, [Max(Index, 0) + 1, Count]);
   end
   else if Document.IsSearching then
   begin
