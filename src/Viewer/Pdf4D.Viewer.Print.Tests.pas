@@ -60,6 +60,8 @@ type
     [Test]
     procedure TestDifferentDpiXY;
     [Test]
+    procedure TestPortraitPageOnPortraitPaperWithDifferentDpiXYIsNotRotated;
+    [Test]
     procedure TestMaxDpiLimitsTheRender;
     [Test]
     procedure TestPixelCountsBeyondIntegerDoNotOverflow;
@@ -74,6 +76,9 @@ type
     FPrintable: TSize;
     FDpi: TPointF;
     FFailOnDrawBand: Boolean;
+    FFailOnBeginDocument: Boolean;
+    FFailOnAbort: Boolean;
+    FFailureMessage: string;
 
   public
     constructor Create(const Printable: TSize; const Dpi: TPointF);
@@ -89,6 +94,10 @@ type
 
     property Calls: TStringList read FLog;
     property FailOnDrawBand: Boolean read FFailOnDrawBand write FFailOnDrawBand;
+    property FailOnBeginDocument: Boolean read FFailOnBeginDocument write FFailOnBeginDocument;
+    property FailOnAbort: Boolean read FFailOnAbort write FFailOnAbort;
+    // What the failing calls raise with; empty for a driver that gives no text
+    property FailureMessage: string read FFailureMessage write FFailureMessage;
   end;
 
   [TestFixture]
@@ -124,6 +133,16 @@ type
     procedure TestRenderFailureFailsJob;
     [Test]
     procedure TestDrawFailureFailsJob;
+    [Test]
+    procedure TestBeginDocumentFailureWithoutMessageFailsJob;
+    [Test]
+    procedure TestDrawFailureWithoutMessageFailsJob;
+    [Test]
+    procedure TestAbortFailureIsReportedWithTheCancel;
+    [Test]
+    procedure TestAbortFailureIsAddedToTheFailure;
+    [Test]
+    procedure TestAbortFailureOnDestroyGoesToTheLog;
     [Test]
     procedure TestJobWithoutPrintPermissionRaises;
     [Test]
@@ -403,6 +422,17 @@ begin
   Assert.AreEqual((6000 - 3300) div 2, Plan.Dest.Top);
 end;
 
+procedure TPdfPrintPlannerTests.TestPortraitPageOnPortraitPaperWithDifferentDpiXYIsNotRotated;
+begin
+  // A4 paper at 600 by 300 dpi: 8 by 11.3 inches, which is 4800 by 3400 pixels and so looks like landscape
+  const Plan = TPdfPrintPlanner.PlanPage(PageOf(595, 842, 0), 0, TSize.Create(4800, 3400), TPointF.Create(600, 300),
+                                         SettingsOf(TPdfPrintScale.Fit), Unlimited);
+
+  Assert.AreEqual(0, Plan.ViewRotation);
+  Assert.AreEqual(4800, Plan.Dest.Width);
+  Assert.AreEqual(3396, Plan.Dest.Height);
+end;
+
 procedure TPdfPrintPlannerTests.TestMaxDpiLimitsTheRender;
 begin
   var Settings := SettingsOf(TPdfPrintScale.ActualSize);
@@ -466,6 +496,7 @@ begin
   FLog := TStringList.Create;
   FPrintable := Printable;
   FDpi := Dpi;
+  FFailureMessage := 'The printer is gone';
 end;
 
 destructor TRecordingPrintTarget.Destroy;
@@ -487,6 +518,10 @@ end;
 procedure TRecordingPrintTarget.BeginDocument(const Title: string; const Copies: Integer);
 begin
   FLog.Add(Format('BeginDocument:%s:%d', [Title, Copies]));
+  if FFailOnBeginDocument then
+  begin
+    raise EInvalidOpException.Create(FFailureMessage);
+  end;
 end;
 
 procedure TRecordingPrintTarget.BeginPage;
@@ -499,7 +534,7 @@ begin
   FLog.Add(Format('DrawBand:%dx%d@%d,%d,%d,%d', [Band.Width, Band.Height, Dest.Left, Dest.Top, Dest.Right, Dest.Bottom]));
   if FFailOnDrawBand then
   begin
-    raise EInvalidOpException.Create('The printer is gone');
+    raise EInvalidOpException.Create(FFailureMessage);
   end;
 end;
 
@@ -511,6 +546,10 @@ end;
 procedure TRecordingPrintTarget.AbortDocument;
 begin
   FLog.Add('AbortDocument');
+  if FFailOnAbort then
+  begin
+    raise EInvalidOpException.Create('The spooler did not answer');
+  end;
 end;
 
 { TPdfPrintJobTests }
@@ -679,6 +718,88 @@ begin
   Assert.AreEqual('The printer is gone', FMessage);
   Assert.AreEqual('BeginDocument::1;BeginPage;DrawBand:612x490@0,0,612,490;AbortDocument', LogText);
   Assert.AreEqual(1, Integer(FFake.Requests.Count));
+end;
+
+procedure TPdfPrintJobTests.TestBeginDocumentFailureWithoutMessageFailsJob;
+begin
+  OpenLetterPages(1, True);
+  NewJob(TPdfPrintSettings.Default);
+  FTarget.FailOnBeginDocument := True;
+  FTarget.FailureMessage := '';
+
+  StartJob;
+
+  Assert.IsFalse(FJob.IsRunning);
+  Assert.AreEqual(1, FDoneCount);
+  Assert.AreEqual(Ord(TPdfPrintStatus.Failed), Ord(FStatus));
+  Assert.AreNotEqual('', FMessage);
+  Assert.AreEqual('BeginDocument::1', LogText, 'no page is begun on a document that did not begin');
+  Assert.AreEqual(0, Integer(FFake.Requests.Count));
+end;
+
+procedure TPdfPrintJobTests.TestDrawFailureWithoutMessageFailsJob;
+begin
+  OpenLetterPages(1, True);
+  NewJob(TPdfPrintSettings.Default);
+  FTarget.FailOnDrawBand := True;
+  FTarget.FailureMessage := '';
+  StartJob;
+
+  FFake.CompleteRender(0, $FFFFFFFF);
+
+  Assert.IsFalse(FJob.IsRunning);
+  Assert.AreEqual(1, FDoneCount);
+  Assert.AreEqual(Ord(TPdfPrintStatus.Failed), Ord(FStatus));
+  Assert.AreNotEqual('', FMessage);
+  Assert.AreEqual('BeginDocument::1;BeginPage;DrawBand:612x490@0,0,612,490;AbortDocument', LogText);
+end;
+
+procedure TPdfPrintJobTests.TestAbortFailureIsReportedWithTheCancel;
+begin
+  OpenLetterPages(1, True);
+  NewJob(TPdfPrintSettings.Default);
+  FTarget.FailOnAbort := True;
+  StartJob;
+
+  FJob.Cancel;
+
+  Assert.AreEqual(1, FDoneCount);
+  Assert.AreEqual(Ord(TPdfPrintStatus.Cancelled), Ord(FStatus));
+  Assert.IsTrue(FMessage.Contains('The spooler did not answer'), FMessage);
+end;
+
+procedure TPdfPrintJobTests.TestAbortFailureIsAddedToTheFailure;
+begin
+  OpenLetterPages(1, True);
+  NewJob(TPdfPrintSettings.Default);
+  FTarget.FailOnAbort := True;
+  StartJob;
+
+  FFake.FailRender(0, 'out of memory');
+
+  Assert.AreEqual(Ord(TPdfPrintStatus.Failed), Ord(FStatus));
+  Assert.IsTrue(FMessage.StartsWith('out of memory'), FMessage);
+  Assert.IsTrue(FMessage.Contains('The spooler did not answer'), FMessage);
+end;
+
+procedure TPdfPrintJobTests.TestAbortFailureOnDestroyGoesToTheLog;
+begin
+  OpenLetterPages(1, True);
+  NewJob(TPdfPrintSettings.Default);
+  FTarget.FailOnAbort := True;
+  var Logged := '';
+  FJob.OnLog :=
+    procedure(const Message: string)
+    begin
+      Logged := Message;
+    end;
+  StartJob;
+
+  FJob.Free;
+  FJob := nil;
+
+  Assert.IsTrue(Logged.Contains('The spooler did not answer'), Logged);
+  Assert.AreEqual(0, FDoneCount, 'no callback');
 end;
 
 procedure TPdfPrintJobTests.TestJobWithoutPrintPermissionRaises;

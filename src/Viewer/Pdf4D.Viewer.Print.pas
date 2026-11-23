@@ -47,11 +47,15 @@ type
     Dest: TRect;
     // Where the whole page lands, centred and not clipped: it lies partly outside the printable area for ActualSize on a smaller paper
     FullDest: TRect;
-    // Render regions, top to bottom, together exactly RenderSize
+    // Render regions, top to bottom, together exactly RenderSize. A band has as many rows of the full width as fit in MaxBandPixels, but
+    // at least one row: when RenderSize.cx alone exceeds MaxBandPixels, a band is larger than that
     Bands: TArray<TRect>;
   end;
 
   TPdfPrintPlanner = class
+  private
+    class function ShareOf(const Value, DestExtent, SourceExtent: Integer): Integer; static;
+
   public
     // Raises EArgumentOutOfRangeException for an empty printable area, a DPI, MaxDpi or MaxBandPixels that is not above zero
     class function PlanPage(const Page: TPdfPageInfo; const PageIndex: Integer; const PrintableSize: TSize; const PrinterDpi: TPointF;
@@ -76,6 +80,7 @@ type
 
   TPdfPrintProgressEvent = reference to procedure(const Printed, Total: Integer);
   TPdfPrintDoneEvent = reference to procedure(const Status: TPdfPrintStatus; const ErrorMessage: string);
+  TPdfPrintLogEvent = reference to procedure(const Message: string);
 
   // Prints a range of pages of an open document to a target, one band at a time: it asks the session for a band (priority Print), draws it
   // on the target in the callback and then asks for the next, so that no more than one band is in memory. UI thread only. OnDone comes
@@ -101,6 +106,7 @@ type
     FPlan: TPdfPrintPagePlan;
     FBandIndex: Integer;
     FRequest: IPdfViewerRequest;
+    FOnLog: TPdfPrintLogEvent;
 
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
     // Goes on until a band is asked for or the job is over
@@ -112,7 +118,10 @@ type
     function BandDoneEvent: TPdfRenderDoneEvent;
     procedure HandleBand(const Outcome: TPdfRenderResult);
     procedure CancelRequest;
-    procedure AbortTarget;
+    class function FailureText(const Message, Fallback: string): string; static;
+    // Empty when the target aborted, else why it did not
+    function AbortTarget: string;
+    function ComposeEndMessage(const ErrorMessage, AbortFailure: string): string;
     procedure Finish(const Status: TPdfPrintStatus; const ErrorMessage: string);
 
   public
@@ -131,12 +140,15 @@ type
 
     // The most pixels of one render; DefaultMaxBandPixels. Set before Start.
     property MaxBandPixels: Int64 read FMaxBandPixels write FMaxBandPixels;
+    // Where a failure goes that has no OnDone to report to: aborting the document when the job is destroyed while it runs
+    property OnLog: TPdfPrintLogEvent read FOnLog write FOnLog;
   end;
 
 implementation
 
 uses
   System.Math,
+  Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Viewer.ViewTransform;
 
 const
@@ -230,10 +242,13 @@ begin
     raise EArgumentOutOfRangeException.CreateFmt('Page %d has no size', [PageIndex + 1]);
   end;
 
-  // A page that is turned to the orientation of the paper
+  // A page that is turned to the orientation of the paper. The paper is judged in inches: the pixels of a printer with a different
+  // resolution per axis (600 by 300 dpi) say nothing about its shape
   Result.PageIndex := PageIndex;
   Result.ViewRotation := 0;
-  if (PageWidth > PageHeight) <> (PrintableSize.cx > PrintableSize.cy) then
+  const PaperWidth: Double = PrintableSize.cx / PrinterDpi.X;
+  const PaperHeight: Double = PrintableSize.cy / PrinterDpi.Y;
+  if (PageWidth > PageHeight) <> (PaperWidth > PaperHeight) then
   begin
     Result.ViewRotation := RightAngle;
     const Turned = PageWidth;
@@ -278,19 +293,18 @@ end;
 
 class function TPdfPrintPlanner.BandDest(const Plan: TPdfPrintPagePlan; const Band: TRect): TRect;
 begin
-  // The scaling is done in Int64 and Double: a page can have billions of pixels
-  const Share =
-    function(const Value, DestExtent, SourceExtent: Integer): Integer
-    begin
-      Result := Round(Int64(Value) * DestExtent / SourceExtent);
-    end;
-
   const Full = Plan.FullDest;
   const Source = Plan.RenderSize;
-  Result.Left := Full.Left + Share(Band.Left, Full.Width, Source.cx);
-  Result.Top := Full.Top + Share(Band.Top, Full.Height, Source.cy);
-  Result.Right := Full.Left + Share(Band.Right, Full.Width, Source.cx);
-  Result.Bottom := Full.Top + Share(Band.Bottom, Full.Height, Source.cy);
+  Result.Left := Full.Left + ShareOf(Band.Left, Full.Width, Source.cx);
+  Result.Top := Full.Top + ShareOf(Band.Top, Full.Height, Source.cy);
+  Result.Right := Full.Left + ShareOf(Band.Right, Full.Width, Source.cx);
+  Result.Bottom := Full.Top + ShareOf(Band.Bottom, Full.Height, Source.cy);
+end;
+
+// The scaling is done in Int64 and Double: a page can have billions of pixels
+class function TPdfPrintPlanner.ShareOf(const Value, DestExtent, SourceExtent: Integer): Integer;
+begin
+  Result := Round(Int64(Value) * DestExtent / SourceExtent);
 end;
 
 { TPdfPrintJob }
@@ -332,7 +346,11 @@ begin
   begin
     FIsRunning := False;
     CancelRequest;
-    AbortTarget;
+    const AbortFailure = AbortTarget;
+    if (AbortFailure <> '') and Assigned(FOnLog) then
+    begin
+      FOnLog(AbortFailure);
+    end;
   end;
 
   inherited;
@@ -373,17 +391,19 @@ begin
   FOnDone := OnDone;
 
   var Failure := '';
+  var IsFailed := False;
   try
     FTarget.BeginDocument(FSettings.Title, FSettings.Copies);
     FIsDocumentBegun := True;
   except
     on E: Exception do
     begin
-      Failure := E.Message;
+      IsFailed := True;
+      Failure := FailureText(E.Message, SPrintBeginFailed);
     end;
   end;
 
-  if Failure <> '' then
+  if IsFailed then
   begin
     Finish(TPdfPrintStatus.Failed, Failure);
     Exit;
@@ -513,6 +533,7 @@ begin
   FRequest := nil;
 
   var Failure := '';
+  var IsFailed := False;
   if Outcome.Succeeded then
   begin
     try
@@ -520,20 +541,18 @@ begin
     except
       on E: Exception do
       begin
-        Failure := E.Message;
+        IsFailed := True;
+        Failure := FailureText(E.Message, SPrintBandDrawFailed);
       end;
     end;
   end
   else
   begin
-    Failure := Outcome.ErrorMessage;
-    if Failure = '' then
-    begin
-      Failure := 'A band of the page could not be rendered';
-    end;
+    IsFailed := True;
+    Failure := FailureText(Outcome.ErrorMessage, SPrintBandRenderFailed);
   end;
 
-  if Failure <> '' then
+  if IsFailed then
   begin
     Finish(TPdfPrintStatus.Failed, Failure);
   end
@@ -552,8 +571,9 @@ begin
   end;
 end;
 
-procedure TPdfPrintJob.AbortTarget;
+function TPdfPrintJob.AbortTarget: string;
 begin
+  Result := '';
   if not FIsDocumentBegun then
   begin
     Exit;
@@ -563,11 +583,37 @@ begin
   try
     FTarget.AbortDocument;
   except
-    // Aborting is the last thing done for a job that has ended already, and whoever ended it has the reason; a second failure adds nothing
-    on Exception do
+    on E: Exception do
     begin
-      Exit;
+      Result := Format(SPrintAbortFailed, [FailureText(E.Message, E.ClassName)]);
     end;
+  end;
+end;
+
+class function TPdfPrintJob.FailureText(const Message, Fallback: string): string;
+begin
+  Result := Message;
+  if Result = '' then
+  begin
+    Result := Fallback;
+  end;
+end;
+
+function TPdfPrintJob.ComposeEndMessage(const ErrorMessage, AbortFailure: string): string;
+begin
+  Result := ErrorMessage;
+  if AbortFailure = '' then
+  begin
+    Exit;
+  end;
+
+  if ErrorMessage = '' then
+  begin
+    Result := AbortFailure;
+  end
+  else
+  begin
+    Result := Format(SPrintFailedAndAbortFailed, [ErrorMessage, AbortFailure]);
   end;
 end;
 
@@ -584,14 +630,15 @@ begin
   FOnProgress := nil;
   FOnDone := nil;
   CancelRequest;
+  var AbortFailure := '';
   if Status <> TPdfPrintStatus.Completed then
   begin
-    AbortTarget;
+    AbortFailure := AbortTarget;
   end;
 
   if Assigned(OnDone) then
   begin
-    OnDone(Status, ErrorMessage);
+    OnDone(Status, ComposeEndMessage(ErrorMessage, AbortFailure));
   end;
 end;
 

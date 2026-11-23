@@ -15,6 +15,12 @@ resourcestring
   SWorkerStopped = 'The document worker stopped after a fatal error.';
   SWorkerFatal = 'The document worker stopped after a fatal error: %s';
   SWorkerAbandonFailed = 'Handing back a queued job failed: %s';
+  SWorkerThreadFailed = 'The document worker thread ended with an exception: %s';
+  SPrintAbortFailed = 'Aborting the print document failed: %s';
+  SPrintFailedAndAbortFailed = '%s (aborting the document failed: %s)';
+  SPrintBandDrawFailed = 'A band of the page could not be drawn';
+  SPrintBandRenderFailed = 'A band of the page could not be rendered';
+  SPrintBeginFailed = 'The print document could not be begun';
   SWorkerEndFailed = 'Releasing the document when the worker ended failed: %s';
 
 implementation
