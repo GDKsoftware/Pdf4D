@@ -67,6 +67,8 @@ type
     [Test]
     procedure TestZoomStepsAndClamp;
     [Test]
+    procedure TestZoomModeChangeIsAnnounced;
+    [Test]
     procedure TestRotateClockwiseRerenders;
     [Test]
     procedure TestCurrentPageFollowsScroll;
@@ -387,13 +389,27 @@ begin
   Start(3);
 
   FController.ZoomMode := TPdfZoomMode.FitWidth;
-  Assert.AreEqual(0, FZoomEvents, 'the viewport already fits');
+  Assert.AreEqual(1, FZoomEvents, 'the viewport already fits: only the mode changes');
 
   FController.SetViewport(TSize.Create(1200, ViewportHeight), 96);
 
   Assert.AreEqual((1200 - 2 * Gap) / PageWidth, Double(FController.Zoom), 0.0001);
-  Assert.AreEqual(1, FZoomEvents);
+  Assert.AreEqual(2, FZoomEvents);
   Assert.AreEqual(1200.0, Double(FController.ContentSize.cx), 2.0);
+end;
+
+// A view that follows the zoom shows the mode as well: a change of mode is told when the factor stays the same
+procedure TPdfPageViewControllerTests.TestZoomModeChangeIsAnnounced;
+begin
+  Start(3);
+  FController.ZoomMode := TPdfZoomMode.FitWidth;
+  const FitZoom = FController.Zoom;
+  FZoomEvents := 0;
+
+  FController.ZoomMode := TPdfZoomMode.Factor;
+
+  Assert.AreEqual(Double(FitZoom), Double(FController.Zoom), 'the factor stays');
+  Assert.AreEqual(1, FZoomEvents, 'the change of mode is told');
 end;
 
 procedure TPdfPageViewControllerTests.TestZoomStepsAndClamp;

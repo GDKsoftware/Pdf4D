@@ -880,7 +880,7 @@ begin
     FPageView.Zoom := Percentage / 100;
   end;
 
-  // The page view tells a change of zoom, but not a change of mode, and not a text that was not valid
+  // The page view tells a change of zoom or of its mode, but not a text that was not valid
   UpdateZoom;
 end;
 

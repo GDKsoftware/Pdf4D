@@ -137,6 +137,7 @@ type
     FLaidOutPixelsPerInch: Single;
     FLaidOutRotation: Integer;
     FNotifiedZoom: Single;
+    FNotifiedZoomMode: TPdfZoomMode;
 
     function GetDocument: TPdf4DCustomDocument;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
@@ -290,6 +291,7 @@ type
     property OnTextSelected: TPdfTextSelectedEvent read FOnTextSelected write FOnTextSelected;
     property OnHoverChanged: TPdfHoverChangedEvent read FOnHoverChanged write FOnHoverChanged;
     property OnLinkClick: TPdfLinkClickEvent read FOnLinkClick write FOnLinkClick;
+    // A change of Zoom or of ZoomMode
     property OnZoomChanged: TNotifyEvent read FOnZoomChanged write FOnZoomChanged;
   end;
 
@@ -328,6 +330,7 @@ begin
   FPixelsPerInch := LogicalPixelsPerInch;
   FZoom := 1;
   FNotifiedZoom := 1;
+  FNotifiedZoomMode := TPdfZoomMode.FitWidth;
   FLaidOutZoom := 1;
   FLaidOutPixelsPerInch := LogicalPixelsPerInch;
   FZoomMode := TPdfZoomMode.FitWidth;
@@ -651,12 +654,14 @@ end;
 
 procedure TPdfPageViewController.NotifyZoomChanged;
 begin
-  if FZoom = FNotifiedZoom then
+  const IsTold = (FZoom = FNotifiedZoom) and (FZoomMode = FNotifiedZoomMode);
+  if IsTold then
   begin
     Exit;
   end;
 
   FNotifiedZoom := FZoom;
+  FNotifiedZoomMode := FZoomMode;
   if Assigned(FOnZoomChanged) then
   begin
     FOnZoomChanged(Self);
