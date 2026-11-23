@@ -99,6 +99,8 @@ type
 
     [Test]
     procedure TestHasAction;
+    [Test]
+    procedure TestActionType;
 
     [Test]
     [TestCase('Missing', ',0')]
@@ -487,6 +489,23 @@ begin
     Assert.IsFalse(WithoutAction.HasAction);
   finally
     WithoutAction.Free;
+  end;
+end;
+
+procedure TAnnotationTests.TestActionType;
+begin
+  const GoTo_ = OnlyAnnotation('/Subtype /Link /A << /S /GoTo >>', []);
+  try
+    Assert.AreEqual('GoTo', GoTo_.ActionType);
+  finally
+    GoTo_.Free;
+  end;
+
+  const NoAction = OnlyAnnotation('/Subtype /Link /A 5', []);
+  try
+    Assert.AreEqual('', NoAction.ActionType);
+  finally
+    NoAction.Free;
   end;
 end;
 

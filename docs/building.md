@@ -19,11 +19,11 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj` and `Pdf4D.Render.Skia.dproj`), then `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`), then `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
-`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec` and `Render` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other two packages. `packages\Pdf4D.groupproj` holds the three packages (see below); the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
+`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec`, `Render` and `Viewer` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other three packages. `packages\Pdf4D.groupproj` holds the four packages (see below); the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
 
 The package lists its units in the `contains` clause, and nothing else is on its search path, so a unit that is missing there stops the build with F2613 (and an implicit import would show as W1033, which `build.ps1` also treats as a failure). When you add a unit under `src`, add it to `packages\Pdf4D.dpk` and `packages\Pdf4D.dproj` as well as to the test project.
 
@@ -38,7 +38,7 @@ The packages and what they contain:
 | `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
 | `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
 
-All four build for Win32, Win64 and Linux64. `build.ps1` also checks the layers: a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`, and only units under `src\Render\Skia` may use `System.Skia`; it fails on a violation.
+All four build for Win32, Win64 and Linux64. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
 
 ## The two test projects
 

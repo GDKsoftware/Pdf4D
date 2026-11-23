@@ -104,7 +104,7 @@ function Test-LayerBoundaries {
     $coreViolations = Get-UsesViolations $sourceFolder '\bPdf4D\.(Render|Graphics|Codec|Viewer|Vcl|FMX)\.\w|\bPdf4D\.Resources\.Icc\b' $layerFolders |
         Where-Object { $_.Path -notmatch 'Pdf4D\.Resources\.Icc' }
     $viewerUsers = Get-UsesViolations $sourceFolder '\bPdf4D\.Viewer\.\w' @('Viewer', 'Vcl', 'FMX')
-    $viewerViolations = Get-UsesViolations (Join-Path $sourceFolder 'Viewer') "${notNamespacePrefix}(Vcl|Winapi|FMX|Skia)\.\w|\bPdf4D\.(Vcl|FMX)\b" @()
+    $viewerViolations = Get-UsesViolations (Join-Path $sourceFolder 'Viewer') "${notNamespacePrefix}(Vcl|Winapi|FMX|Skia|Data|Xml|REST|Soap|Spring|IdHTTP|Indy)\.\w|\bPdf4D\.(Vcl|FMX)\b" @()
     $vclViolations = Get-UsesViolations $sourceFolder "${notNamespacePrefix}(Vcl|Winapi)\.\w" @('Vcl')
     $fmxInVclViolations = Get-UsesViolations (Join-Path $sourceFolder 'Vcl') "${notNamespacePrefix}FMX\.\w|\bPdf4D\.FMX\b" @()
     $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b|\bPdf4D\.Render\.Skia\b' @('Render\Skia', 'Vcl\Skia')

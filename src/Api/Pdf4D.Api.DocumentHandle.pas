@@ -7,12 +7,14 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  System.Types,
   Pdf4D.Api.GuardedWriter,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Log,
   Pdf4D.Common.Quad,
+  Pdf4D.Cos.Base,
   Pdf4D.Model.Annotation,
   Pdf4D.Model.Document,
   Pdf4D.Model.OutlineItem,
@@ -60,10 +62,11 @@ type
     procedure ConfigureStripper(const Stripper: TPdfTextStripper; const Options: TPdfTextOptions);
     function ReadLinksOfPage(const Page: TPDPage; const PageIndex: Integer): TArray<TPdfLink>;
     function TryBuildLink(const Annotation: TPDAnnotation; const PageIndex: Integer; out Link: TPdfLink): Boolean;
-    function TryBuildTarget(const Annotation: TPDAnnotation; const PageIndex: Integer; var Link: TPdfLink): Boolean;
-    function TryResolveTarget(const Annotation: TPDAnnotation; out TargetPageIndex: Integer): Boolean;
+    function TryResolveTarget(const Destination: TCosBase; out TargetPageIndex: Integer): Boolean;
     class function QuadsOf(const Annotation: TPDAnnotation): TArray<TPdfQuad>; static;
     class function QuadsOfPoints(const Points: TArray<Single>): TArray<TPdfQuad>; static;
+    class function LimitedPoint(const X, Y: Single): TPointF; static;
+    class function LimitedValue(const Value: Single): Single; static;
     class function QuadOfRect(const Rect: TPdfRectangle): TPdfQuad; static;
 
   public
@@ -88,18 +91,20 @@ type
 implementation
 
 uses
-  System.Types,
+  System.Math,
   System.Generics.Collections,
   Pdf4D.Api.OutlineItem,
   Pdf4D.Common.Defines,
-  Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
+  Pdf4D.Cos.Names,
   Pdf4D.Model.PageLabels,
   Pdf4D.Text.PositionStripper;
 
 const
   LinkSubType = 'Link';
   QuadPointCount = 8;
+  // The limit that /Rect values get (a Java int), so that a quad of a link is as big as its rectangle can be
+  MaxQuadValue = 2147483647;
 
 { TPdfDocumentHandle }
 
@@ -314,13 +319,32 @@ begin
   var Destination: TCosBase;
   if Annotation.TryGetDestination(Destination) then
   begin
-    Exit(TryBuildTarget(Annotation, PageIndex, Link));
+    var TargetPageIndex: Integer;
+    Result := TryResolveTarget(Destination, TargetPageIndex);
+    if Result then
+    begin
+      Link.Kind := TPdfLinkKind.GoTo;
+      Link.TargetPageIndex := TargetPageIndex;
+    end
+    else
+    begin
+      Log.Warning('A link on page %d is skipped: its destination is no page of the document', [PageIndex + 1]);
+    end;
+    Exit;
   end;
 
   if Annotation.TryGetUri(Link.Uri) then
   begin
     Link.Kind := TPdfLinkKind.Uri;
     Exit(True);
+  end;
+
+  // A GoTo without /D and a URI without a string are broken actions, not actions this viewer does not know
+  const ActionType = Annotation.ActionType;
+  if (ActionType = TCosNames.GoTo_) or (ActionType = TCosNames.URI) then
+  begin
+    Log.Warning('A link on page %d is skipped: its %s action is incomplete', [PageIndex + 1, ActionType]);
+    Exit(False);
   end;
 
   Link.Kind := TPdfLinkKind.Other;
@@ -331,26 +355,10 @@ begin
   end;
 end;
 
-function TPdfDocumentHandle.TryBuildTarget(const Annotation: TPDAnnotation; const PageIndex: Integer; var Link: TPdfLink): Boolean;
+function TPdfDocumentHandle.TryResolveTarget(const Destination: TCosBase; out TargetPageIndex: Integer): Boolean;
 begin
-  var TargetPageIndex: Integer;
-  Result := TryResolveTarget(Annotation, TargetPageIndex);
-  if Result then
-  begin
-    Link.Kind := TPdfLinkKind.GoTo;
-    Link.TargetPageIndex := TargetPageIndex;
-  end
-  else
-  begin
-    Log.Warning('A link on page %d is skipped: its destination is no page of the document', [PageIndex + 1]);
-  end;
-end;
-
-function TPdfDocumentHandle.TryResolveTarget(const Annotation: TPDAnnotation; out TargetPageIndex: Integer): Boolean;
-begin
-  var Destination: TCosBase;
-  Result := (Annotation.TryGetDestination(Destination) and
-             FDocument.Catalog.DestinationResolver.TryResolvePageIndex(Destination, TargetPageIndex));
+  const Resolver = FDocument.Catalog.DestinationResolver;
+  Result := Resolver.TryResolvePageIndex(Destination, TargetPageIndex);
 end;
 
 // QuadPoints that are no whole number of quads, or hold a value that is not finite, are no reason to lose the link: the /Rect is used
@@ -378,12 +386,28 @@ begin
   for var Index := 0 to High(Result) do
   begin
     const Start = Index * QuadPointCount;
-    const TopLeft = TPointF.Create(Points[Start], Points[Start + 1]);
-    const TopRight = TPointF.Create(Points[Start + 2], Points[Start + 3]);
-    const BottomLeft = TPointF.Create(Points[Start + 4], Points[Start + 5]);
-    const BottomRight = TPointF.Create(Points[Start + 6], Points[Start + 7]);
+    const TopLeft = LimitedPoint(Points[Start], Points[Start + 1]);
+    const TopRight = LimitedPoint(Points[Start + 2], Points[Start + 3]);
+    const BottomLeft = LimitedPoint(Points[Start + 4], Points[Start + 5]);
+    const BottomRight = LimitedPoint(Points[Start + 6], Points[Start + 7]);
     Result[Index] := TPdfQuad.Create(BottomLeft, BottomRight, TopRight, TopLeft);
   end;
+end;
+
+// A finite value beyond what /Rect allows is limited the same way; a value that is not finite stays, so that QuadsOf can see it
+class function TPdfDocumentHandle.LimitedPoint(const X, Y: Single): TPointF;
+begin
+  Result := TPointF.Create(LimitedValue(X), LimitedValue(Y));
+end;
+
+class function TPdfDocumentHandle.LimitedValue(const Value: Single): Single;
+begin
+  if Value.IsNan or Value.IsInfinity then
+  begin
+    Exit(Value);
+  end;
+
+  Result := EnsureRange(Value, -MaxQuadValue, MaxQuadValue);
 end;
 
 class function TPdfDocumentHandle.QuadOfRect(const Rect: TPdfRectangle): TPdfQuad;

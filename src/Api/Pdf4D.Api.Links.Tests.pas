@@ -57,6 +57,8 @@ type
 
     [Test]
     procedure TestBrokenLinksAreSkipped;
+    [Test]
+    procedure TestHugeQuadPointsAreLimited;
 
     [Test]
     procedure TestLinkWithoutDestinationAndAction;
@@ -235,11 +237,26 @@ begin
   const Links = LinksOf(['<< /Type /Annot /Subtype /Link /A << /S /URI /URI (x) >> >>',
                          '<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /Dest [99 0 R /Fit] >>',
                          '<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /Dest (nowhere) >>',
+                         '<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /A << /S /GoTo >> >>',
+                         '<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /A << /S /URI >> >>',
                          '<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /A << /S /URI /URI (kept) >> >>']);
 
   Assert.AreEqual<Integer>(1, Length(Links));
   Assert.AreEqual('kept', Links[0].Uri);
-  Assert.IsTrue(FLogLines.Count >= 3, 'Every skipped link goes to the log');
+  Assert.IsTrue(FLogLines.Count >= 5, 'Every skipped link goes to the log');
+end;
+
+procedure TApiLinksTests.TestHugeQuadPointsAreLimited;
+begin
+  const Links = LinksOf(['<< /Type /Annot /Subtype /Link /Rect [10 10 50 30] /A << /S /URI /URI (x) >> ' +
+                         '/QuadPoints [1e38 1e38 -1e38 1e38 1e38 -1e38 -1e38 -1e38] >>']);
+
+  Assert.AreEqual<Integer>(1, Length(Links));
+  Assert.AreEqual<Integer>(1, Length(Links[0].Quads));
+  Assert.IsTrue(Links[0].Quads[0].IsFinite);
+  const Bounds = Links[0].Quads[0].Bounds;
+  Assert.IsTrue((Abs(Bounds.Left) <= 2147483648.0) and (Abs(Bounds.Right) <= 2147483648.0));
+  Assert.IsTrue((Abs(Bounds.Top) <= 2147483648.0) and (Abs(Bounds.Bottom) <= 2147483648.0));
 end;
 
 procedure TApiLinksTests.TestLinkWithoutDestinationAndAction;

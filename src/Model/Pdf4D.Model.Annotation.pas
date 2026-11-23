@@ -65,6 +65,8 @@ type
     function TryGetUri(out Uri: string): Boolean;
     // Whether /A is a dictionary, whatever its type
     function HasAction: Boolean;
+    // The name in /S of /A, empty when /A is no dictionary or has no type
+    function ActionType: string;
     // The numbers of /QuadPoints; empty when there are none or their count is no multiple of 8
     function QuadPoints: TArray<Single>;
 
@@ -249,6 +251,19 @@ function TPDAnnotation.HasAction: Boolean;
 begin
   var Action: TCosDictionary;
   Result := FDictionary.TryGetCosDictionary(TCosNames.A, Action);
+end;
+
+function TPDAnnotation.ActionType: string;
+begin
+  var Action: TCosDictionary;
+  if FDictionary.TryGetCosDictionary(TCosNames.A, Action) then
+  begin
+    Result := Action.GetNameAsString(TCosNames.S, '');
+  end
+  else
+  begin
+    Result := '';
+  end;
 end;
 
 function TPDAnnotation.QuadPoints: TArray<Single>;
