@@ -45,13 +45,17 @@ type
     procedure TestAStreamIsNotAskedAgain;
     [Test]
     procedure TestReopenNeedsAFile;
+    [Test]
+    procedure TestAWorkerCrashDoesNotAskForAPassword;
   end;
 
 implementation
 
 uses
   System.IOUtils,
-  Pdf4D.Tests.Corpus;
+  Pdf4D.Api.DocumentHandle,
+  Pdf4D.Tests.Corpus,
+  Pdf4D.Tests.ViewerDocuments;
 
 const
   EncryptedFile = 'generated/encrypted/aes-128-user.pdf';
@@ -162,6 +166,43 @@ begin
       FBench.Document.Reopen('secret');
     end,
     EInvalidOpException);
+end;
+
+// The kind of an earlier failed open must not outlive the open that followed: a crash of the worker is no wrong password
+procedure TPdfPasswordRetryTests.TestAWorkerCrashDoesNotAskForAPassword;
+begin
+  {$IFDEF PDF4D_TESTS}
+  FAnswer := WrongPassword;
+  OpenEncryptedFile;
+  Assert.AreEqual(MaxPasswordAttempts, FQuestions, 'the wrong password was asked for');
+
+  // The file name of the first open stays, so the document could be opened again
+  FBench.OpenData(TViewerDocuments.Invoice);
+  Assert.AreEqual(Ord(TPdfDocumentState.Open), Ord(FBench.Document.State));
+
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise EAccessViolation.Create('Injected access violation');
+    end;
+  try
+    FBench.Document.RequestPageText(0, TPdfJobPriority.Visible, nil);
+    FBench.WaitUntil(
+      function: Boolean
+      begin
+        Result := (FBench.Document.State = TPdfDocumentState.Failed);
+      end,
+      'the document to fail');
+  finally
+    TPdfDocumentHandle.StripperHook := nil;
+  end;
+
+  Assert.AreEqual(Ord(TPdfOpenErrorKind.Other), Ord(FBench.Document.OpenErrorKind));
+  Assert.IsFalse(FRetry.CanAsk, 'a crash is not a reason to ask for a password');
+  Assert.AreEqual(MaxPasswordAttempts, FQuestions, 'nobody was asked again');
+  {$ELSE}
+  Assert.Pass('The hook exists in the test build only');
+  {$ENDIF}
 end;
 
 end.

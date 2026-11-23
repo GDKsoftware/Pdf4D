@@ -110,6 +110,8 @@ type
     [Test]
     procedure TestCtrlWheelZoomsAroundPoint;
     [Test]
+    procedure TestCtrlWheelAccumulatesSmallDeltas;
+    [Test]
     procedure TestScrollIntoView;
     [Test]
     procedure TestSelectAll;
@@ -689,6 +691,39 @@ begin
   Assert.IsTrue(FController.ViewportToPage(Point, PageIndex, After));
   Assert.AreEqual(Double(Before.X), Double(After.X), 1 / (1.25 * Scale96));
   Assert.AreEqual(Double(Before.Y), Double(After.Y), 1 / (1.25 * Scale96));
+end;
+
+// A touchpad or a macOS wheel sends deltas far below one notch: they add up to a step, and a change of direction starts again
+procedure TPdfPageViewControllerInputTests.TestCtrlWheelAccumulatesSmallDeltas;
+begin
+  Start(3);
+  const Point = TPointF.Create(300, 300);
+  const SmallDelta = WheelNotch div 8;
+
+  for var Event := 1 to 7 do
+  begin
+    FController.MouseWheel(SmallDelta, True, Point);
+  end;
+  Assert.AreEqual(1.0, Double(FController.Zoom), 0.0001, 'seven eighths of a notch is not a step');
+
+  FController.MouseWheel(SmallDelta, True, Point);
+  Assert.AreEqual(1.25, Double(FController.Zoom), 0.0001, 'the eighth event completes the notch');
+
+  // The other direction does not inherit what was left
+  FController.MouseWheel(SmallDelta, True, Point);
+  FController.MouseWheel(-SmallDelta, True, Point);
+  for var Event := 1 to 6 do
+  begin
+    FController.MouseWheel(-SmallDelta, True, Point);
+  end;
+  Assert.AreEqual(1.25, Double(FController.Zoom), 0.0001, 'seven events of the new direction are not enough');
+
+  FController.MouseWheel(-SmallDelta, True, Point);
+  Assert.AreEqual(1.0, Double(FController.Zoom), 0.0001);
+
+  // Larger deltas still take as many steps as they hold notches
+  FController.MouseWheel(2 * WheelNotch, True, Point);
+  Assert.AreEqual(1.5, Double(FController.Zoom), 0.0001);
 end;
 
 procedure TPdfPageViewControllerInputTests.TestScrollIntoView;

@@ -138,6 +138,8 @@ type
     FLaidOutRotation: Integer;
     FNotifiedZoom: Single;
     FNotifiedZoomMode: TPdfZoomMode;
+    // The part of a notch of the wheel that has not made a zoom step yet; the sign is the direction
+    FWheelRemainder: Integer;
 
     function GetDocument: TPdf4DCustomDocument;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
@@ -1251,8 +1253,18 @@ end;
 
 procedure TPdfPageViewController.ZoomByWheel(const WheelDelta: Integer; const Point: TPointF);
 begin
-  const Notches = Max(1, Abs(WheelDelta) div WheelNotch);
   const IsUpwards = (WheelDelta > 0);
+
+  // A wheel with fine steps (a touchpad, a macOS wheel) sends parts of a notch: they add up to one zoom step per notch, and what is
+  // left from the other direction does not count
+  if (FWheelRemainder <> 0) and ((FWheelRemainder > 0) <> IsUpwards) then
+  begin
+    FWheelRemainder := 0;
+  end;
+  Inc(FWheelRemainder, WheelDelta);
+
+  const Notches = Abs(FWheelRemainder) div WheelNotch;
+  FWheelRemainder := FWheelRemainder - Sign(FWheelRemainder) * Notches * WheelNotch;
   for var Notch := 1 to Notches do
   begin
     const Step = NextZoomStep(IsUpwards);
@@ -2061,30 +2073,24 @@ end;
 
 procedure TPdfPageViewController.PaintSearchHits(const Painter: IPdfViewPainter; const Placements: TArray<TPlacement>);
 begin
-  const Hits = Document.SearchHits;
-  if (Length(Hits) = 0) or (Length(Placements) = 0) then
+  if Document.SearchHitCount = 0 then
   begin
     Exit;
   end;
 
-  var CurrentIndex := -1;
-  var CurrentHit: TPdfSearchHit;
-  if not Document.TryGetCurrentSearchHit(CurrentIndex, CurrentHit) then
+  // Only the hits of the pages that are shown are fetched: a paint does not depend on how many hits the document has
+  for var Placement in Placements do
   begin
-    CurrentIndex := -1;
-  end;
-
-  for var Index := 0 to High(Hits) do
-  begin
-    var Placement: TPlacement;
-    if TryFindPlacement(Placements, Hits[Index].PageIndex, Placement) then
+    const Hits = Document.SearchHitsOnPage(Placement.PageIndex);
+    const CurrentPosition = Document.CurrentSearchHitOnPage(Placement.PageIndex);
+    for var Position := 0 to High(Hits) do
     begin
       var Color := FSearchHitColor;
-      if Index = CurrentIndex then
+      if Position = CurrentPosition then
       begin
         Color := FCurrentSearchHitColor;
       end;
-      PaintQuads(Painter, Placement, Hits[Index].Quads, Color);
+      PaintQuads(Painter, Placement, Hits[Position].Quads, Color);
     end;
   end;
 end;

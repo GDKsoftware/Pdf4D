@@ -114,7 +114,7 @@ type
     FProgressForm: TPdf4DPrintProgressForm;
     FIsFreeWhenDone: Boolean;
     // Switched off when the dialog is destroyed: a queued free of the dialog finds out that its owner was faster
-    FLifetime: ISessionAlive;
+    FLifetime: IPdfLifetimeToken;
 {$IFDEF PDF4D_TESTS}
     class var FModalRunner: TFunc<TPdf4DPrintDialogForm, TModalResult>;
 {$ENDIF}
@@ -584,7 +584,7 @@ end;
 constructor TPdf4DPrintDialog.Create(Owner: TComponent);
 begin
   inherited Create(Owner);
-  FLifetime := TSessionAlive.Create;
+  FLifetime := TPdfLifetimeToken.Create;
   FSettings := TPdfPrintSettings.Default;
   FShowProgress := True;
   FMaxBandPixels := DefaultMaxBandPixels;

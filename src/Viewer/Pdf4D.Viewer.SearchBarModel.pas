@@ -197,7 +197,7 @@ begin
     Exit;
   end;
 
-  const Count = Length(Document.SearchHits);
+  const Count = Document.SearchHitCount;
   if Count > 0 then
   begin
     var Index: Integer;

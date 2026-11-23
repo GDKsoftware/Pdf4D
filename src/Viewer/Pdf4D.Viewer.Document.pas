@@ -73,8 +73,13 @@ type
     FSearchRequest: IPdfViewerRequest;
     FSearching: Boolean;
     FSearchHits: TList<TPdfSearchHit>;
+    // Per page: the indexes in FSearchHits of the hits on that page, so that a paint asks for the hits of the pages it shows only
+    FSearchHitsByPage: TObjectDictionary<Integer, TList<Integer>>;
+    FMaxSearchHits: Integer;
     FCurrentSearchHit: Integer;
     FOpenErrorKind: TPdfOpenErrorKind;
+
+    procedure SetMaxSearchHits(const Value: Integer);
 
     procedure SetBackend(const Value: TPdf4DRenderBackend);
     procedure SetPageTextCacheCount(const Value: Integer);
@@ -151,7 +156,13 @@ type
     // Stops searching and keeps the hits found so far
     procedure CancelSearch;
     function IsSearching: Boolean;
+    // A copy of all hits: for the caller that wants them all. A view asks for SearchHitCount and SearchHitsOnPage instead.
     function SearchHits: TArray<TPdfSearchHit>;
+    function SearchHitCount: Integer;
+    // The hits on one page, in the order they were found; a copy of those only
+    function SearchHitsOnPage(const PageIndex: Integer): TArray<TPdfSearchHit>;
+    // The place of the current hit among SearchHitsOnPage(PageIndex); -1 when the current hit is not on that page or there is none
+    function CurrentSearchHitOnPage(const PageIndex: Integer): Integer;
     function TryGetCurrentSearchHit(out Index: Integer; out Hit: TPdfSearchHit): Boolean;
     // Wraps around; sets CurrentPage
     procedure NextSearchHit;
@@ -171,6 +182,8 @@ type
     property Overlays: TPdfOverlayList read FOverlays;
     // Why the last open failed; valid while the state is Failed, and already so when the links hear OpenFailed
     property OpenErrorKind: TPdfOpenErrorKind read FOpenErrorKind;
+    // The search keeps at most this many hits and then stops, with a line in the log; DefaultMaxSearchHits
+    property MaxSearchHits: Integer read FMaxSearchHits write SetMaxSearchHits;
     property RenderBackend: IPdfRenderBackend read FRenderBackend write FRenderBackend;
     // A TPdfQueueDispatcher by default; set before Open
     property Dispatcher: IPdfViewerDispatcher read FDispatcher write SetDispatcher;
@@ -233,6 +246,8 @@ begin
   FPageTextCacheCount := DefaultPageTextCacheCount;
   FPageTextCache := TPdfLruCache<Integer, IPdfPageText>.Create(FPageTextCacheCount);
   FSearchHits := TList<TPdfSearchHit>.Create;
+  FSearchHitsByPage := TObjectDictionary<Integer, TList<Integer>>.Create([doOwnsValues]);
+  FMaxSearchHits := DefaultMaxSearchHits;
   FCurrentSearchHit := -1;
   FDispatcher := TPdfQueueDispatcher.Create;
   FState := TPdfDocumentState.Closed;
@@ -268,6 +283,7 @@ begin
   FSessionDispatcher := nil;
   SetBackend(nil);
   FOverlays.Free;
+  FSearchHitsByPage.Free;
   FSearchHits.Free;
   FPageTextCache.Free;
   FLinks.Free;
@@ -307,6 +323,11 @@ procedure TPdf4DCustomDocument.SetPageTextCacheCount(const Value: Integer);
 begin
   FPageTextCache.MaxCost := Value;
   FPageTextCacheCount := Value;
+end;
+
+procedure TPdf4DCustomDocument.SetMaxSearchHits(const Value: Integer);
+begin
+  FMaxSearchHits := Max(0, Value);
 end;
 
 procedure TPdf4DCustomDocument.SetDispatcher(const Value: IPdfViewerDispatcher);
@@ -401,6 +422,8 @@ begin
   UseSession(ResolvedBackend);
 
   FState := TPdfDocumentState.Opening;
+  // What an earlier failure said does not hold for this open
+  FOpenErrorKind := TPdfOpenErrorKind.Other;
   Inc(FSerial);
   const Serial = FSerial;
   Notify(TPdfDocumentChange.Opening);
@@ -499,6 +522,7 @@ begin
 
   // The document cannot be used any more: what it showed goes, like on Close. The next Open starts a new worker.
   FState := TPdfDocumentState.Failed;
+  FOpenErrorKind := TPdfOpenErrorKind.Other;
   StopSearchRequest;
   FPageTextCache.Clear;
   ForgetSearchResults;
@@ -668,6 +692,37 @@ begin
   Result := FSearchHits.ToArray;
 end;
 
+function TPdf4DCustomDocument.SearchHitCount: Integer;
+begin
+  Result := FSearchHits.Count;
+end;
+
+function TPdf4DCustomDocument.SearchHitsOnPage(const PageIndex: Integer): TArray<TPdfSearchHit>;
+begin
+  Result := nil;
+
+  var Indexes: TList<Integer>;
+  if FSearchHitsByPage.TryGetValue(PageIndex, Indexes) then
+  begin
+    SetLength(Result, Indexes.Count);
+    for var Position := 0 to Indexes.Count - 1 do
+    begin
+      Result[Position] := FSearchHits[Indexes[Position]];
+    end;
+  end;
+end;
+
+function TPdf4DCustomDocument.CurrentSearchHitOnPage(const PageIndex: Integer): Integer;
+begin
+  Result := -1;
+
+  var Indexes: TList<Integer>;
+  if (FCurrentSearchHit >= 0) and FSearchHitsByPage.TryGetValue(PageIndex, Indexes) then
+  begin
+    Result := Indexes.IndexOf(FCurrentSearchHit);
+  end;
+end;
+
 function TPdf4DCustomDocument.TryGetCurrentSearchHit(out Index: Integer; out Hit: TPdfSearchHit): Boolean;
 begin
   Result := (FCurrentSearchHit >= 0) and (FCurrentSearchHit < FSearchHits.Count);
@@ -712,13 +767,27 @@ end;
 procedure TPdf4DCustomDocument.ForgetSearchResults;
 begin
   FSearchHits.Clear;
+  FSearchHitsByPage.Clear;
   FCurrentSearchHit := -1;
 end;
 
 procedure TPdf4DCustomDocument.AddSearchHits(const Hits: TArray<TPdfSearchHit>);
 begin
   const IsFirst = (FSearchHits.Count = 0) and (Length(Hits) > 0);
-  FSearchHits.AddRange(Hits);
+  const Room = Max(0, FMaxSearchHits - FSearchHits.Count);
+  const IsCapped = (Length(Hits) >= Room) and (Length(Hits) > 0);
+
+  for var Position := 0 to Min(Length(Hits), Room) - 1 do
+  begin
+    var PageHits: TList<Integer>;
+    if not FSearchHitsByPage.TryGetValue(Hits[Position].PageIndex, PageHits) then
+    begin
+      PageHits := TList<Integer>.Create;
+      FSearchHitsByPage.Add(Hits[Position].PageIndex, PageHits);
+    end;
+    PageHits.Add(FSearchHits.Count);
+    FSearchHits.Add(Hits[Position]);
+  end;
 
   const Serial = FSerial;
   Notify(TPdfDocumentChange.SearchResults);
@@ -727,6 +796,14 @@ begin
   if IsFirst and (Serial = FSerial) and (FSearchHits.Count > 0) then
   begin
     GoToSearchHit(0);
+  end;
+
+  // The limit is reached: the rest of the document is not searched. Hits that are still on their way find no room.
+  if IsCapped and (Serial = FSerial) and (FSearchHits.Count >= FMaxSearchHits) and FSearching then
+  begin
+    StopSearchRequest;
+    Log(TPdfLogLevel.Warning, Format(SSearchHitLimitReached, [FMaxSearchHits]));
+    Notify(TPdfDocumentChange.SearchResults);
   end;
 end;
 

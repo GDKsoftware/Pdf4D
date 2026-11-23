@@ -14,6 +14,7 @@ resourcestring
   SDocumentNotOpen = 'The document is not open.';
   SDocumentHasNoFile = 'The document has no file to open again.';
   SNoStream = 'Open needs a stream.';
+  SSearchHitLimitReached = 'The search stopped at its limit of %d hits.';
 
   // Worker
   SWorkerStopped = 'The document worker stopped after a fatal error.';

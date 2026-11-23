@@ -93,25 +93,8 @@ type
   TPdfSessionDocumentHook = reference to procedure(const IsRelease: Boolean; const ThreadId: TThreadID);
   {$ENDIF}
 
-  // ---- What the session is made of. These types are public only because the session holds them; nothing outside this unit uses them. ----
-
-  // Shared by a session and the jobs and results that it started: Close and Destroy switch it off, and nothing that has it off is delivered
-  ISessionAlive = interface
-    ['{0B4A7E15-9C32-4D68-8F01-5A6D3E2C9B47}']
-    function IsAlive: Boolean;
-    procedure Kill;
-  end;
-
-  TSessionAlive = class(TInterfacedObject, ISessionAlive)
-  private
-    FAlive: Integer;
-
-  public
-    constructor Create;
-    // Thread safe
-    function IsAlive: Boolean;
-    procedure Kill;
-  end;
+  // ---- What the session is made of. These types are public only because the session holds them; the lifetime token (IPdfLifetimeToken)
+  // lives in Pdf4D.Viewer.Types because views and dialogs use it too. Nothing else outside this unit uses them. ----
 
   TRequestCallbacks = record
     OnOpen: TPdfOpenDoneEvent;
@@ -202,8 +185,8 @@ type
     destructor Destroy; override;
 
     // From the worker thread; the line reaches OnLog on the UI thread, unless the session is closed by then
-    procedure Log(const Alive: ISessionAlive; const Level: TPdfLogLevel; const Message: string);
-    function LogCallback(const Alive: ISessionAlive): TPdfLogEvent;
+    procedure Log(const Alive: IPdfLifetimeToken; const Level: TPdfLogLevel; const Message: string);
+    function LogCallback(const Alive: IPdfLifetimeToken): TPdfLogEvent;
 
     property Slot: TDocumentSlot read FSlot;
     property Dispatcher: IPdfViewerDispatcher read FDispatcher;
@@ -227,7 +210,7 @@ type
   TSessionJob = class(TPdfWorkerJob)
   private
     FEnvironment: TSessionEnvironment;
-    FAlive: ISessionAlive;
+    FAlive: IPdfLifetimeToken;
     FRequest: IPdfRequestState;
 
   protected
@@ -245,11 +228,11 @@ type
     function Renderer: IPdfRenderer;
 
     property Environment: TSessionEnvironment read FEnvironment;
-    property Alive: ISessionAlive read FAlive;
+    property Alive: IPdfLifetimeToken read FAlive;
     property Request: IPdfRequestState read FRequest;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const Priority: TPdfJobPriority);
     procedure Execute(const Cancel: IPdfCancelToken); override;
     // The worker stopped after a fatal error: the request gets its failure through Fail
@@ -260,7 +243,7 @@ type
   private
     FEnvironment: TSessionEnvironment;
     FWorker: TPdfDocumentWorker;
-    FAlive: ISessionAlive;
+    FAlive: IPdfLifetimeToken;
     FState: TPdfDocumentState;
     FPages: TArray<TPdfPageInfo>;
     FOutline: TArray<TPdfOutlineEntry>;
@@ -270,7 +253,7 @@ type
     FOnLog: TPdfLogEvent;
     FOnFatal: TPdfSessionFatalEvent;
     // Lives as long as the session, where FAlive is renewed per document: what the worker reports about itself is delivered while it lives
-    FLifetime: ISessionAlive;
+    FLifetime: IPdfLifetimeToken;
     // Counts the workers: a report of a worker that was replaced is ignored
     FWorkerGeneration: Integer;
     // What a worker could report only to the log, from its own thread; written to OnLog on the UI thread
@@ -394,7 +377,7 @@ type
     function Describe: string; override;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const FileName: string; const Data: TBytes; const IsFile: Boolean; const Password: string;
                        const Apply: TOpenOutcomeProc);
     // The document of a failed worker is not touched here: the worker releases it when it ends
@@ -409,7 +392,7 @@ type
     function Describe: string; override;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState);
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState);
   end;
 
   TRenderJob = class(TSessionJob)
@@ -427,7 +410,7 @@ type
     function Describe: string; override;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const Priority: TPdfJobPriority; const PageIndex: Integer; const Scale: Single; const ViewRotation: Integer;
                        const Region: TRect);
   end;
@@ -457,7 +440,7 @@ type
     function Describe: string; override;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const Priority: TPdfJobPriority; const PageIndex: Integer; const Scale: Single; const ViewRotation: Integer;
                        const Tiles: TArray<TPoint>);
   end;
@@ -474,7 +457,7 @@ type
     function Describe: string; override;
 
   public
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const Priority: TPdfJobPriority; const PageIndex: Integer);
   end;
 
@@ -498,27 +481,9 @@ type
 
   public
     // PageCount = 0 makes a job that only completes the search
-    constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+    constructor Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                        const Query: string; const MatchCase: Boolean; const PageIndex, PageCount: Integer; const Failed: Boolean);
   end;
-
-{ TSessionAlive }
-
-constructor TSessionAlive.Create;
-begin
-  inherited Create;
-  FAlive := 1;
-end;
-
-function TSessionAlive.IsAlive: Boolean;
-begin
-  Result := (TInterlocked.CompareExchange(FAlive, 0, 0) = 1);
-end;
-
-procedure TSessionAlive.Kill;
-begin
-  TInterlocked.Exchange(FAlive, 0);
-end;
 
 { TPdfViewerRequest }
 
@@ -679,7 +644,7 @@ begin
   inherited;
 end;
 
-procedure TSessionEnvironment.Log(const Alive: ISessionAlive; const Level: TPdfLogLevel; const Message: string);
+procedure TSessionEnvironment.Log(const Alive: IPdfLifetimeToken; const Level: TPdfLogLevel; const Message: string);
 begin
   const OnLog = FOnLog;
   if (not Assigned(OnLog)) or (not Alive.IsAlive) then
@@ -697,7 +662,7 @@ begin
     end);
 end;
 
-function TSessionEnvironment.LogCallback(const Alive: ISessionAlive): TPdfLogEvent;
+function TSessionEnvironment.LogCallback(const Alive: IPdfLifetimeToken): TPdfLogEvent;
 begin
   Result :=
     procedure(const Level: TPdfLogLevel; const Message: string)
@@ -708,7 +673,7 @@ end;
 
 { TSessionJob }
 
-constructor TSessionJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TSessionJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                                const Priority: TPdfJobPriority);
 begin
   inherited Create(Priority);
@@ -784,7 +749,7 @@ end;
 
 { TOpenJob }
 
-constructor TOpenJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TOpenJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                             const FileName: string; const Data: TBytes; const IsFile: Boolean; const Password: string;
                             const Apply: TOpenOutcomeProc);
 begin
@@ -970,7 +935,7 @@ end;
 
 { TReleaseJob }
 
-constructor TReleaseJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState);
+constructor TReleaseJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState);
 begin
   inherited Create(Environment, Alive, Request, TPdfJobPriority.Open);
 end;
@@ -993,7 +958,7 @@ end;
 
 { TRenderJob }
 
-constructor TRenderJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TRenderJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                               const Priority: TPdfJobPriority; const PageIndex: Integer; const Scale: Single;
                               const ViewRotation: Integer; const Region: TRect);
 begin
@@ -1059,7 +1024,7 @@ end;
 
 { TTilesJob }
 
-constructor TTilesJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TTilesJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                              const Priority: TPdfJobPriority; const PageIndex: Integer; const Scale: Single; const ViewRotation: Integer;
                              const Tiles: TArray<TPoint>);
 begin
@@ -1247,7 +1212,7 @@ end;
 
 { TPageTextJob }
 
-constructor TPageTextJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TPageTextJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                                 const Priority: TPdfJobPriority; const PageIndex: Integer);
 begin
   inherited Create(Environment, Alive, Request, Priority);
@@ -1288,7 +1253,7 @@ end;
 
 { TSearchJob }
 
-constructor TSearchJob.Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
+constructor TSearchJob.Create(const Environment: TSessionEnvironment; const Alive: IPdfLifetimeToken; const Request: IPdfRequestState;
                               const Query: string; const MatchCase: Boolean; const PageIndex, PageCount: Integer; const Failed: Boolean);
 begin
   inherited Create(Environment, Alive, Request, TPdfJobPriority.Search);
@@ -1429,8 +1394,8 @@ begin
   FOnLog := OnLog;
   FOnFatal := OnFatal;
   FState := TPdfDocumentState.Closed;
-  FAlive := TSessionAlive.Create;
-  FLifetime := TSessionAlive.Create;
+  FAlive := TPdfLifetimeToken.Create;
+  FLifetime := TPdfLifetimeToken.Create;
   FRequests := TList<IPdfRequestState>.Create;
   FWorkerNotes := TThreadList<string>.Create;
   FEnvironment := TSessionEnvironment.Create(Backend, Dispatcher, OnLog,
@@ -1616,7 +1581,7 @@ begin
   CancelRequests;
   // What was posted for the old document finds its session closed
   FAlive.Kill;
-  FAlive := TSessionAlive.Create;
+  FAlive := TPdfLifetimeToken.Create;
   FWorker.CancelAll;
 
   FPages := nil;

@@ -29,6 +29,8 @@ const
   DefaultThumbnailCacheBytes: Int64 = 32 * 1024 * 1024;
   // Pages per document
   DefaultPageTextCacheCount = 64;
+  // Search hits per document; a search that finds more stops there
+  DefaultMaxSearchHits = 10000;
   // The most pixels of one render of the missing tiles of a page; a larger batch is split in bands
   MaxTileBatchPixels: Int64 = 8 * 1024 * 1024;
   // Printing renders at most this many dots per inch, in bands of at most this many pixels
@@ -107,6 +109,46 @@ type
   TPdfLogNotifyEvent = procedure(Sender: TObject; const Level: TPdfLogLevel; const Message: string) of object;
   TPdfPrintFailedEvent = procedure(Sender: TObject; const Message: string) of object;
 
+  // A switch that an owner turns off when it dies, and that closures it handed out check before they touch the owner. Shared by a session
+  // with the jobs and results it started, and by a dialog with the print job it frees late: nothing that finds it off is delivered.
+  IPdfLifetimeToken = interface
+    ['{0B4A7E15-9C32-4D68-8F01-5A6D3E2C9B47}']
+    function IsAlive: Boolean;
+    procedure Kill;
+  end;
+
+  TPdfLifetimeToken = class(TInterfacedObject, IPdfLifetimeToken)
+  private
+    FAlive: Integer;
+
+  public
+    constructor Create;
+    // Thread safe
+    function IsAlive: Boolean;
+    procedure Kill;
+  end;
+
 implementation
+
+uses
+  System.SyncObjs;
+
+{ TPdfLifetimeToken }
+
+constructor TPdfLifetimeToken.Create;
+begin
+  inherited Create;
+  FAlive := 1;
+end;
+
+function TPdfLifetimeToken.IsAlive: Boolean;
+begin
+  Result := (TInterlocked.CompareExchange(FAlive, 0, 0) = 1);
+end;
+
+procedure TPdfLifetimeToken.Kill;
+begin
+  TInterlocked.Exchange(FAlive, 0);
+end;
 
 end.

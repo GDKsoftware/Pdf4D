@@ -24,6 +24,7 @@ type
     FBench: TDocumentBench;
     FOpenErrorKind: TPdfOpenErrorKind;
     FOpenErrorMessage: string;
+    FLogText: string;
     FOpenedCount: Integer;
     FClosedCount: Integer;
 
@@ -38,6 +39,7 @@ type
     procedure HandleClosedCounts(Sender: TObject);
     procedure HandleChangeRaises(const Change: TPdfDocumentChange);
     procedure HandleLogRaises(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
+    procedure HandleLogRecords(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
 
   public
     [Setup]
@@ -78,6 +80,8 @@ type
     [Test]
     procedure TestFreeWhileOpening;
     [Test]
+    procedure TestFreeWaitsForAWorkerThatIsBusy;
+    [Test]
     procedure TestFreedDocumentLetsGoOfItsLinks;
     [Test]
     procedure TestPageTextCache;
@@ -87,6 +91,12 @@ type
     procedure TestSearchNavigation;
     [Test]
     procedure TestSearchHitOnLaterPageSetsCurrentPage;
+    [Test]
+    procedure TestManyHitsAreAskedForPerPage;
+    [Test]
+    procedure TestHitsOnOnePageKeepTheirPlace;
+    [Test]
+    procedure TestSearchStopsAtTheHitLimit;
     [Test]
     procedure TestNewSearchCancelsOld;
     [Test]
@@ -105,6 +115,8 @@ implementation
 
 uses
   System.Types,
+  System.SyncObjs,
+  System.Diagnostics,
   System.Generics.Collections,
   Pdf4D.Api.DocumentHandle,
   Pdf4D.Viewer.Session,
@@ -120,6 +132,11 @@ const
   ManyPages = 65;
   PageSize = 612;
   PageHeight = 792;
+  WorkerWaitMs = 20000;
+  HitPages = 200;
+  HitLimit = 10;
+  BusyMs = 300;
+  BusyMargin = 50;
 
 { TPdf4DCustomDocumentTests }
 
@@ -127,6 +144,7 @@ procedure TPdf4DCustomDocumentTests.Setup;
 begin
   FBench := TDocumentBench.Create;
   FOpenErrorMessage := '';
+  FLogText := '';
   FOpenedCount := 0;
   FClosedCount := 0;
 end;
@@ -181,6 +199,11 @@ procedure TPdf4DCustomDocumentTests.HandleOpenError(Sender: TObject; const Kind:
 begin
   FOpenErrorKind := Kind;
   FOpenErrorMessage := Message;
+end;
+
+procedure TPdf4DCustomDocumentTests.HandleLogRecords(Sender: TObject; const Level: TPdfLogLevel; const Message: string);
+begin
+  FLogText := FLogText + Message + sLineBreak;
 end;
 
 procedure TPdf4DCustomDocumentTests.HandleOpenedCloses(Sender: TObject);
@@ -386,6 +409,7 @@ begin
     'the document to fail');
 
   Assert.AreEqual(Ord(TPdfOpenErrorKind.Other), Ord(FOpenErrorKind));
+  Assert.AreEqual(Ord(TPdfOpenErrorKind.Other), Ord(FBench.Document.OpenErrorKind), 'the document tells why it failed');
   Assert.AreEqual('Injected access violation', FOpenErrorMessage);
   Assert.IsTrue(FBench.Recorder.Describe.EndsWith('OpenFailed'), FBench.Recorder.Describe);
   Assert.AreEqual(0, FBench.Document.PageCount);
@@ -521,6 +545,59 @@ begin
   Assert.IsNull(FBench.Recorder.Link.Document);
 end;
 
+// Pins what is so today: a job on the worker cannot be stopped, so freeing the document waits for it. Nothing may be called on the
+// freed document meanwhile or afterwards (the leak check of the test program and the open request catch that).
+procedure TPdf4DCustomDocumentTests.TestFreeWaitsForAWorkerThatIsBusy;
+begin
+  {$IFDEF PDF4D_TESTS}
+  const Entered = TEvent.Create(nil, True, False, '');
+  const Gate = TEvent.Create(nil, True, False, '');
+  try
+    PdfSessionDocumentHook :=
+      procedure(const IsRelease: Boolean; const ThreadId: TThreadID)
+      begin
+        if not IsRelease then
+        begin
+          Entered.SetEvent;
+          Gate.WaitFor(WorkerWaitMs);
+        end;
+      end;
+
+    const Stream = TBytesStream.Create(TViewerDocuments.Invoice);
+    try
+      FBench.Document.Open(Stream);
+    finally
+      Stream.Free;
+    end;
+    Assert.AreEqual(TWaitResult.wrSignaled, Entered.WaitFor(WorkerWaitMs), 'the worker is busy with the load');
+
+    // Lets go of the worker after a while, from another thread
+    TThread.CreateAnonymousThread(
+      procedure
+      begin
+        Sleep(BusyMs);
+        Gate.SetEvent;
+      end).Start;
+
+    const Watch = TStopwatch.StartNew;
+    FBench.FreeDocument;
+    Watch.Stop;
+    PdfSessionDocumentHook := nil;
+
+    Assert.IsTrue(Watch.ElapsedMilliseconds >= BusyMs - BusyMargin, 'freeing waited for the worker: ' + Watch.ElapsedMilliseconds.ToString + ' ms');
+    Assert.IsNull(FBench.Recorder.Link.Document);
+    Assert.AreEqual('Opening,Closed', FBench.Recorder.Describe, 'the load never reached the document');
+  finally
+    PdfSessionDocumentHook := nil;
+    Gate.SetEvent;
+    Gate.Free;
+    Entered.Free;
+  end;
+  {$ELSE}
+  Assert.Pass('The hook exists in the test build only');
+  {$ENDIF}
+end;
+
 procedure TPdf4DCustomDocumentTests.TestFreedDocumentLetsGoOfItsLinks;
 begin
   OpenInvoice;
@@ -625,6 +702,88 @@ begin
   FBench.Document.NextSearchHit;
 
   Assert.AreEqual(1, FBench.Document.CurrentPage);
+end;
+
+// A view asks for the hits of the pages it shows, not for all of them: with many hits this is what keeps a paint cheap
+procedure TPdf4DCustomDocumentTests.TestManyHitsAreAskedForPerPage;
+begin
+  FBench.OpenData(TViewerDocuments.Pages(HitPages, PageSize, PageHeight, 0));
+  Assert.AreEqual(0, FBench.Document.SearchHitCount);
+  Assert.AreEqual(0, Integer(Length(FBench.Document.SearchHitsOnPage(0))));
+  Assert.AreEqual(-1, FBench.Document.CurrentSearchHitOnPage(0));
+
+  SearchAndWait('Page');
+
+  Assert.AreEqual(HitPages, FBench.Document.SearchHitCount, 'a hit on every page');
+  Assert.AreEqual(HitPages, Integer(Length(FBench.Document.SearchHits)));
+  const OnPage = FBench.Document.SearchHitsOnPage(HitPages div 2);
+  Assert.AreEqual(1, Integer(Length(OnPage)));
+  Assert.AreEqual(HitPages div 2, OnPage[0].PageIndex);
+  Assert.AreEqual(0, Integer(Length(FBench.Document.SearchHitsOnPage(HitPages))), 'no page, no hits');
+  Assert.AreEqual(0, FBench.Document.CurrentSearchHitOnPage(0), 'the first hit is the current one');
+  Assert.AreEqual(-1, FBench.Document.CurrentSearchHitOnPage(1));
+
+  for var Step := 1 to HitPages div 2 do
+  begin
+    FBench.Document.NextSearchHit;
+  end;
+  Assert.AreEqual(0, FBench.Document.CurrentSearchHitOnPage(HitPages div 2));
+  Assert.AreEqual(-1, FBench.Document.CurrentSearchHitOnPage(0));
+
+  FBench.Document.Close;
+  Assert.AreEqual(0, FBench.Document.SearchHitCount);
+  Assert.AreEqual(0, Integer(Length(FBench.Document.SearchHitsOnPage(HitPages div 2))));
+  Assert.AreEqual(-1, FBench.Document.CurrentSearchHitOnPage(HitPages div 2));
+end;
+
+// Several hits on one page keep their order, and the current hit is found among them
+procedure TPdf4DCustomDocumentTests.TestHitsOnOnePageKeepTheirPlace;
+begin
+  OpenInvoice;
+  SearchAndWait(InvoiceNumber);
+  Assert.AreEqual(2, FBench.Document.SearchHitCount);
+
+  var Total := 0;
+  for var PageIndex := 0 to FBench.Document.PageCount - 1 do
+  begin
+    const OnPage = FBench.Document.SearchHitsOnPage(PageIndex);
+    Inc(Total, Length(OnPage));
+    for var Hit in OnPage do
+    begin
+      Assert.AreEqual(PageIndex, Hit.PageIndex);
+    end;
+  end;
+  Assert.AreEqual(2, Total, 'every hit is on a page');
+
+  var Index: Integer;
+  var Current: TPdfSearchHit;
+  for var Step := 1 to 2 do
+  begin
+    Assert.IsTrue(FBench.Document.TryGetCurrentSearchHit(Index, Current));
+    const Position = FBench.Document.CurrentSearchHitOnPage(Current.PageIndex);
+    Assert.IsTrue(Position >= 0, 'the current hit has a place on its page');
+    Assert.AreEqual(InvoiceNumber, FBench.Document.SearchHitsOnPage(Current.PageIndex)[Position].Text);
+    FBench.Document.NextSearchHit;
+  end;
+end;
+
+procedure TPdf4DCustomDocumentTests.TestSearchStopsAtTheHitLimit;
+begin
+  FBench.OpenData(TViewerDocuments.Pages(HitPages, PageSize, PageHeight, 0));
+  FBench.Document.OnLog := HandleLogRecords;
+  Assert.AreEqual(DefaultMaxSearchHits, FBench.Document.MaxSearchHits);
+  FBench.Document.MaxSearchHits := HitLimit;
+
+  SearchAndWait('Page');
+
+  Assert.AreEqual(HitLimit, FBench.Document.SearchHitCount);
+  Assert.IsFalse(FBench.Document.IsSearching, 'the search stopped');
+  Assert.IsTrue(FLogText.Contains(Format(SSearchHitLimitReached, [HitLimit])), 'the limit is in the log: ' + FLogText);
+
+  // Nothing arrives later
+  FBench.Dispatcher.RunPending;
+  Assert.AreEqual(HitLimit, FBench.Document.SearchHitCount);
+  FBench.Document.OnLog := nil;
 end;
 
 procedure TPdf4DCustomDocumentTests.TestNewSearchCancelsOld;
