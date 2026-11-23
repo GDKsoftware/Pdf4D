@@ -60,6 +60,9 @@ type
 
     [Test]
     procedure TestEmptyQueryClearsSearch;
+
+    [Test]
+    procedure TestSearchBarMadeInCodeScalesWithItsParent;
   end;
 
 implementation
@@ -67,12 +70,18 @@ implementation
 uses
   System.Math,
   Winapi.Windows,
+  Vcl.Controls,
+  Pdf4D.Vcl.SearchBar,
   Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Tests.ViewerDocuments;
 
 const
   ViewWidth = 800;
   ViewHeight = 600;
+  HighDpi = 144;
+  LogicalPixelsPerInch = 96;
+  LogicalEditWidth = 200;
+  LogicalBarHeight = 28;
   InvoiceNumber = '2024-0815';
   HitMargin = 2;
   // 40 percent of $FFD700 over white
@@ -275,6 +284,21 @@ begin
 
   Assert.AreEqual('', FHost.SearchBar.LabelResult.Caption, 'the result is gone');
   Assert.AreEqual<Integer>(0, Length(FHost.Document.SearchHits), 'the document has no hits');
+end;
+
+// The bar lays itself out in logical pixels; VCL scales a control that gets a parent of another resolution
+procedure TPdf4DSearchBarTests.TestSearchBarMadeInCodeScalesWithItsParent;
+begin
+  FHost.Form.ScaleForPPI(HighDpi);
+  const Bar = TPdf4DSearchBar.Create(nil);
+  try
+    Bar.Parent := FHost.Form;
+
+    Assert.AreEqual(MulDiv(LogicalBarHeight, HighDpi, LogicalPixelsPerInch), Bar.Height, 'the bar');
+    Assert.AreEqual(MulDiv(LogicalEditWidth, HighDpi, LogicalPixelsPerInch), Bar.EditQuery.Width, 'the query field');
+  finally
+    Bar.Free;
+  end;
 end;
 
 end.

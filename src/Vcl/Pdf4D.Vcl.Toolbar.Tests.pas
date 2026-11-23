@@ -66,6 +66,15 @@ type
 
     [Test]
     procedure TestToolbarLetsGoOfFreedComponents;
+
+    [Test]
+    procedure TestToolbarFollowsAChangeOfDpi;
+
+    [Test]
+    procedure TestToolbarMadeOnAHighDpiFormIsScaled;
+
+    [Test]
+    procedure TestToolbarRowKeepsItsOrderWithoutOverlap;
   end;
 
 implementation
@@ -74,6 +83,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Controls,
   Vcl.Forms,
+  Vcl.Graphics,
   Vcl.ImgList,
   Winapi.Messages,
   Winapi.Windows,
@@ -88,6 +98,11 @@ const
   Tolerance = 0.0001;
   IconCount = 13;
   EnterCharacter = 13;
+  HighDpi = 144;
+  LogicalPixelsPerInch = 96;
+  LogicalIconSize = 16;
+  LogicalZoomComboWidth = 96;
+  LogicalPageEditWidth = 40;
 
 { TPdf4DToolbarTests }
 
@@ -368,6 +383,64 @@ begin
   Assert.IsNull(FToolbar.PageView);
   Assert.IsNull(FToolbar.Document);
   Assert.IsFalse(FToolbar.ButtonNext.Enabled);
+end;
+
+procedure TPdf4DToolbarTests.TestToolbarFollowsAChangeOfDpi;
+begin
+  FHost.Form.ScaleForPPI(HighDpi);
+  FHost.Pump(1);
+
+  Assert.AreEqual(MulDiv(LogicalIconSize, HighDpi, LogicalPixelsPerInch), FToolbar.Images.Width, 'the icons grow with the monitor');
+  Assert.AreEqual(IconCount, FToolbar.Images.Count);
+  Assert.AreEqual(MulDiv(LogicalZoomComboWidth, HighDpi, LogicalPixelsPerInch), FToolbar.ComboZoom.Width);
+end;
+
+// A toolbar that gets its window on a form at 144 dpi builds its row at that scale
+procedure TPdf4DToolbarTests.TestToolbarMadeOnAHighDpiFormIsScaled;
+begin
+  FHost.Form.ScaleForPPI(HighDpi);
+  const Toolbar = TPdf4DToolbar.Create(FHost.Form);
+  try
+    Toolbar.Parent := FHost.Form;
+    Toolbar.Align := TAlign.alTop;
+    Toolbar.HandleNeeded;
+    FHost.Pump(1);
+
+    Assert.AreEqual(MulDiv(LogicalIconSize, HighDpi, LogicalPixelsPerInch), Toolbar.Images.Width, 'the icons');
+    Assert.AreEqual(MulDiv(LogicalZoomComboWidth, HighDpi, LogicalPixelsPerInch), Toolbar.ComboZoom.Width, 'the zoom list');
+    Assert.AreEqual(MulDiv(LogicalPageEditWidth, HighDpi, LogicalPixelsPerInch), Toolbar.EditPage.Width, 'the page number field');
+
+    const Canvas = TControlCanvas.Create;
+    try
+      Canvas.Control := Toolbar.ComboZoom;
+      Canvas.Font := Toolbar.ComboZoom.Font;
+      const ArrowWidth = MulDiv(GetSystemMetrics(SM_CXVSCROLL), HighDpi, LogicalPixelsPerInch);
+      for var Item in Toolbar.ComboZoom.Items do
+      begin
+        Assert.IsTrue(Canvas.TextWidth(Item) + ArrowWidth <= Toolbar.ComboZoom.Width, 'the zoom list shows ' + Item);
+      end;
+    finally
+      Canvas.Free;
+    end;
+  finally
+    Toolbar.Free;
+  end;
+end;
+
+procedure TPdf4DToolbarTests.TestToolbarRowKeepsItsOrderWithoutOverlap;
+begin
+  const Row: TArray<TControl> = [FToolbar.ButtonFirst, FToolbar.ButtonPrior, FToolbar.ButtonNext, FToolbar.ButtonLast, FToolbar.EditPage,
+                                 FToolbar.LabelPages, FToolbar.ButtonZoomOut, FToolbar.ComboZoom, FToolbar.ButtonZoomIn,
+                                 FToolbar.ButtonRotateCounterclockwise, FToolbar.ButtonRotateClockwise, FToolbar.ButtonSearch,
+                                 FToolbar.ButtonPrint];
+  for var Index := 1 to High(Row) do
+  begin
+    const Before = Row[Index - 1];
+    const After = Row[Index];
+    Assert.IsTrue(Before.Left + Before.Width <= After.Left,
+                  Format('%s (%d..%d) comes before %s (%d)', [Before.ClassName, Before.Left, Before.Left + Before.Width, After.ClassName,
+                                                              After.Left]));
+  end;
 end;
 
 end.

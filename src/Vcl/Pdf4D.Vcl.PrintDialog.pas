@@ -63,8 +63,9 @@ type
     ButtonOk: TButton;
     ButtonCancel: TButton;
 
-    // CurrentPage is 0-based
-    constructor CreateFor(const PageCount, CurrentPage: Integer);
+    // CurrentPage is 0-based. The form is laid out in logical pixels and scaled to PixelsPerInch, the resolution of the monitor it shows
+    // on; 0: the monitor of the active form
+    constructor CreateFor(const PageCount, CurrentPage: Integer; const PixelsPerInch: Integer = 0);
 
     procedure Load(const Settings: TPdfPrintSettings);
     // What the user has chosen. MaxDpi and Title are the defaults.
@@ -91,7 +92,8 @@ type
     ProgressBar: TProgressBar;
     ButtonCancel: TButton;
 
-    constructor CreateFor(const OnCancel: TNotifyEvent);
+    // Scaled as the print dialog is
+    constructor CreateFor(const OnCancel: TNotifyEvent; const PixelsPerInch: Integer = 0);
 
     procedure SetProgress(const Printed, Total: Integer);
     // Closes the window; safe inside one of its own events
@@ -180,6 +182,7 @@ implementation
 uses
   System.IOUtils,
   System.Math,
+  System.Types,
   System.UITypes,
   Winapi.Windows,
   Vcl.Dialogs,
@@ -191,6 +194,15 @@ type
   // Gives access to the protected file name of the document
   TDocumentCracker = class(TPdf4DCustomDocument);
 
+  // The forms of the dialog are built in logical pixels (96 per inch) and then scaled to the monitor, as a form from a .dfm is
+  TFormScaling = class
+  public
+    // Before the controls are made
+    class procedure BeginLogical(const Form: TCustomForm); static;
+    // After they are made; PixelsPerInch 0: the resolution of the active form. A form made in code does not scale its client size itself.
+    class procedure EndLogical(const Form: TCustomForm; const PixelsPerInch: Integer; const ClientSize: TSize); static;
+  end;
+
 const
   FormClientWidth = 400;
   FormClientHeight = 336;
@@ -199,12 +211,37 @@ const
   PageEditWidth = 48;
   ProgressClientWidth = 360;
   ProgressClientHeight = 110;
+  LogicalPixelsPerInch = 96;
+
+{ TFormScaling }
+
+class procedure TFormScaling.BeginLogical(const Form: TCustomForm);
+begin
+  Form.ScaleForPPI(LogicalPixelsPerInch);
+end;
+
+class procedure TFormScaling.EndLogical(const Form: TCustomForm; const PixelsPerInch: Integer; const ClientSize: TSize);
+begin
+  var Target := PixelsPerInch;
+  if (Target <= 0) and Assigned(Screen.ActiveForm) then
+  begin
+    Target := Screen.ActiveForm.CurrentPPI;
+  end;
+  if Target <= 0 then
+  begin
+    Target := Screen.PixelsPerInch;
+  end;
+  Form.ScaleForPPI(Target);
+  Form.ClientWidth := Form.ScaleValue(ClientSize.cx);
+  Form.ClientHeight := Form.ScaleValue(ClientSize.cy);
+end;
 
 { TPdf4DPrintDialogForm }
 
-constructor TPdf4DPrintDialogForm.CreateFor(const PageCount, CurrentPage: Integer);
+constructor TPdf4DPrintDialogForm.CreateFor(const PageCount, CurrentPage: Integer; const PixelsPerInch: Integer);
 begin
   inherited CreateNew(nil);
+  TFormScaling.BeginLogical(Self);
   FPageCount := PageCount;
   FCurrentPage := CurrentPage;
 
@@ -232,6 +269,7 @@ begin
     FIsLoading := False;
   end;
   UpdateState;
+  TFormScaling.EndLogical(Self, PixelsPerInch, TSize.Create(FormClientWidth, FormClientHeight));
 end;
 
 function TPdf4DPrintDialogForm.AddRadioButton(const Parent: TWinControl; const Name, Caption: string; const Top: Integer): TRadioButton;
@@ -474,9 +512,10 @@ end;
 
 { TPdf4DPrintProgressForm }
 
-constructor TPdf4DPrintProgressForm.CreateFor(const OnCancel: TNotifyEvent);
+constructor TPdf4DPrintProgressForm.CreateFor(const OnCancel: TNotifyEvent; const PixelsPerInch: Integer);
 begin
   inherited CreateNew(nil);
+  TFormScaling.BeginLogical(Self);
   FOnCancel := OnCancel;
 
   BorderStyle := bsDialog;
@@ -503,6 +542,7 @@ begin
   ButtonCancel.SetBounds((ProgressClientWidth - 75) div 2, ProgressClientHeight - 38, 75, 25);
   ButtonCancel.Caption := SPrintCancel;
   ButtonCancel.OnClick := HandleCancelClick;
+  TFormScaling.EndLogical(Self, PixelsPerInch, TSize.Create(ProgressClientWidth, ProgressClientHeight));
 end;
 
 procedure TPdf4DPrintProgressForm.SetProgress(const Printed, Total: Integer);

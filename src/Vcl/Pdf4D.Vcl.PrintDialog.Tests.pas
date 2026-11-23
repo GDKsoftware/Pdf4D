@@ -10,6 +10,8 @@ uses
   System.Classes,
   System.Types,
   System.SysUtils,
+  Vcl.Controls,
+  Vcl.Graphics,
   DUnitX.TestFramework,
   Pdf4D.Tests.VclHost,
   Pdf4D.Tests.BitmapPrintTarget;
@@ -27,6 +29,8 @@ type
     procedure HandlePrinted(Sender: TObject);
     procedure HandleFailed(Sender: TObject; const ErrorMessage: string);
     procedure WaitUntilDone;
+    // Whether the caption of the control fits in it at its font, with room for a mark of Mark logical pixels before it
+    class procedure AssertCaptionFits(const Control: TControl; const Caption: string; const Font: TFont; const Mark: Integer); static;
 
   public
     [Setup]
@@ -73,6 +77,12 @@ type
 
     [Test]
     procedure TestExecuteRaisesBeforeTheDialogWhenItCannotPrint;
+
+    [Test]
+    procedure TestDialogScalesToTheMonitor;
+
+    [Test]
+    procedure TestProgressWindowScalesToTheMonitor;
   end;
 
 implementation
@@ -81,6 +91,7 @@ uses
   System.IOUtils,
   System.UITypes,
   Vcl.Forms,
+  Winapi.Windows,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Print,
   Pdf4D.Vcl.Actions,
@@ -95,6 +106,12 @@ const
   PageDelayMs = 30;
   SlowPagesBeforeCancel = 2;
   SettleMs = 300;
+  HighDpi = 144;
+  LogicalPixelsPerInch = 96;
+  DialogClientWidth = 400;
+  ProgressClientWidth = 360;
+  // The box of a radio button and the gap to its caption
+  RadioMark = 20;
 
 { TPdf4DPrintDialogTests }
 
@@ -444,6 +461,49 @@ begin
     System.SysUtils.EInvalidOpException);
   Assert.AreEqual(0, Shown, 'no dialog while a job runs');
   // The dialog is freed with the form while its job runs
+end;
+
+class procedure TPdf4DPrintDialogTests.AssertCaptionFits(const Control: TControl; const Caption: string; const Font: TFont;
+                                                         const Mark: Integer);
+begin
+  const Bitmap = Vcl.Graphics.TBitmap.Create;
+  try
+    Bitmap.Canvas.Font := Font;
+    const Needed = Bitmap.Canvas.TextWidth(Caption) + MulDiv(Mark, HighDpi, LogicalPixelsPerInch);
+    Assert.IsTrue(Needed <= Control.Width, Format('%s fits: %d of %d', [Caption, Needed, Control.Width]));
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TPdf4DPrintDialogTests.TestDialogScalesToTheMonitor;
+begin
+  const Form = TPdf4DPrintDialogForm.CreateFor(5, 0, HighDpi);
+  try
+    Assert.AreEqual(MulDiv(DialogClientWidth, HighDpi, LogicalPixelsPerInch), Form.ClientWidth, 'the form');
+    for var Radio in [Form.RadioButtonAll, Form.RadioButtonCurrent, Form.RadioButtonPages, Form.RadioButtonFit, Form.RadioButtonActualSize] do
+    begin
+      AssertCaptionFits(Radio, Radio.Caption, Radio.Font, RadioMark);
+    end;
+    AssertCaptionFits(Form.ButtonOk, Form.ButtonOk.Caption, Form.ButtonOk.Font, 0);
+    AssertCaptionFits(Form.ButtonCancel, Form.ButtonCancel.Caption, Form.ButtonCancel.Font, 0);
+    AssertCaptionFits(Form.ButtonProperties, Form.ButtonProperties.Caption, Form.ButtonProperties.Font, 0);
+    Assert.IsTrue(Form.EditToPage.Left + Form.EditToPage.Width <= Form.ClientWidth, 'the page fields are on the form');
+  finally
+    Form.Free;
+  end;
+end;
+
+procedure TPdf4DPrintDialogTests.TestProgressWindowScalesToTheMonitor;
+begin
+  const Form = TPdf4DPrintProgressForm.CreateFor(nil, HighDpi);
+  try
+    Assert.AreEqual(MulDiv(ProgressClientWidth, HighDpi, LogicalPixelsPerInch), Form.ClientWidth, 'the window');
+    AssertCaptionFits(Form.ButtonCancel, Form.ButtonCancel.Caption, Form.ButtonCancel.Font, 0);
+    Assert.IsTrue(Form.ButtonCancel.Top + Form.ButtonCancel.Height <= Form.ClientHeight, 'the button is in the window');
+  finally
+    Form.Free;
+  end;
 end;
 
 end.

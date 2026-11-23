@@ -13,7 +13,9 @@ uses
   Vcl.ActnList,
   Vcl.ComCtrls,
   Vcl.Controls,
+  Vcl.Graphics,
   Vcl.ImgList,
+  Vcl.Imaging.pngimage,
   Vcl.StdCtrls,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
@@ -58,8 +60,9 @@ type
 
     // What the last build made
     FToolButtons: TList<TToolButton>;
-    FPlaceholders: TList<TToolButton>;
     FEmbedded: TList<TControl>;
+    // The width of each control of FEmbedded in logical pixels
+    FEmbeddedWidths: TList<Integer>;
     FButtonFirst: TToolButton;
     FButtonPrior: TToolButton;
     FButtonNext: TToolButton;
@@ -77,6 +80,8 @@ type
     class function IconResourceName(const Icon: TToolbarIcon): string; static;
     // The position of the percentage in the zoom steps, or -1
     class function IndexOfPercentage(const Percentage: Integer): Integer; static;
+    class procedure DrawIcon(const Png: TPngImage; const Bitmap: Vcl.Graphics.TBitmap); static;
+    class function PremultipliedAt(const Png: TPngImage; const X, Y, Channel: Integer): Integer; static;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure SetPageView(const Value: TPdf4DPageView);
     procedure SetSearchBar(const Value: TPdf4DSearchBar);
@@ -86,20 +91,24 @@ type
 
     procedure CreateActions;
     procedure CreateIcons;
+    procedure FillIcons(const Size: Integer);
+    // The icons follow the scale of the toolbar
+    procedure UpdateIconSize;
     // Without them the actions have no icon: an image list of the application does not have these
     procedure UseOwnIcons(const IsUsed: Boolean);
     procedure Build;
     procedure ClearButtons;
     function NewButton(const Action: TCustomAction): TToolButton;
     function NewSeparator(const Width: Integer): TToolButton;
-    procedure AddEmbedded(const Control: TControl; const Placeholder: TToolButton);
+    procedure AddEmbedded(const Control: TControl; const LogicalWidth: Integer);
+    // A control that the toolbar makes before it gets its scale is not scaled with it: the widths follow the scale of the toolbar
+    procedure ScaleEmbedded;
     procedure BuildNavigation;
     procedure BuildPageNumber;
     procedure BuildZoom;
     procedure BuildRotate;
     procedure BuildSearch;
     procedure BuildPrint;
-    procedure PlaceEmbedded;
     procedure UpdateState;
     procedure UpdatePageNumber;
     procedure UpdateZoom;
@@ -117,7 +126,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure CreateWnd; override;
     procedure Loaded; override;
-    procedure Resize; override;
+    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
 
   public
     constructor Create(Owner: TComponent); override;
@@ -155,8 +164,6 @@ uses
   System.Math,
   System.SysUtils,
   System.Types,
-  Vcl.Graphics,
-  Vcl.Imaging.pngimage,
   Winapi.Windows,
   Pdf4D.Viewer.ResourceStrings;
 
@@ -166,6 +173,10 @@ const
   PageEditWidth = 40;
   PageLabelWidth = 56;
   ZoomComboWidth = 96;
+  // The channels of a pixel of an icon: blue, green, red and alpha
+  ChannelCount = 4;
+  ColorChannels = 3;
+  AlphaChannel = 3;
   EnterKey = #13;
   EscapeKey = #27;
   FirstZoomItems = 2;
@@ -202,8 +213,8 @@ begin
   inherited Create(Owner);
   FButtons := [Low(TPdf4DToolbarButton)..High(TPdf4DToolbarButton)];
   FToolButtons := TList<TToolButton>.Create;
-  FPlaceholders := TList<TToolButton>.Create;
   FEmbedded := TList<TControl>.Create;
+  FEmbeddedWidths := TList<Integer>.Create;
   FLink := TPdfDocumentLink.Create(HandleDocumentChange);
   CreateIcons;
   CreateActions;
@@ -217,8 +228,8 @@ begin
   end;
 
   FLink.Free;
+  FEmbeddedWidths.Free;
   FEmbedded.Free;
-  FPlaceholders.Free;
   FToolButtons.Free;
   inherited;
 end;
@@ -265,10 +276,14 @@ begin
   end;
 end;
 
-procedure TPdf4DToolbar.Resize;
+procedure TPdf4DToolbar.ChangeScale(M, D: Integer; isDpiChange: Boolean);
 begin
   inherited;
-  PlaceEmbedded;
+  if isDpiChange then
+  begin
+    UpdateIconSize;
+    ScaleEmbedded;
+  end;
 end;
 
 { Properties }
@@ -397,42 +412,90 @@ procedure TPdf4DToolbar.CreateIcons;
 begin
   FIcons := TImageList.Create(Self);
   FIcons.ColorDepth := cd32Bit;
-  FIcons.Width := IconSize;
-  FIcons.Height := IconSize;
+  FillIcons(IconSize);
+end;
 
-  for var Icon := Low(TToolbarIcon) to High(TToolbarIcon) do
-  begin
-    const Png = TPngImage.Create;
-    try
-      Png.LoadFromResourceName(HInstance, IconResourceName(Icon));
-      const Bitmap = Vcl.Graphics.TBitmap.Create;
+// The icons are drawn at 16 pixels; at another scale they are resampled, so that they keep their size on the monitor
+procedure TPdf4DToolbar.FillIcons(const Size: Integer);
+begin
+  FIcons.BeginUpdate;
+  try
+    FIcons.Clear;
+    FIcons.SetSize(Size, Size);
+    for var Icon := Low(TToolbarIcon) to High(TToolbarIcon) do
+    begin
+      const Png = TPngImage.Create;
       try
-        Bitmap.PixelFormat := pf32bit;
-        Bitmap.AlphaFormat := TAlphaFormat.afDefined;
-        Bitmap.SetSize(IconSize, IconSize);
-        for var Y := 0 to IconSize - 1 do
-        begin
-          const Pixels = PRGBQuad(Bitmap.ScanLine[Y]);
-          const Colors = PByte(Png.Scanline[Y]);
-          for var X := 0 to IconSize - 1 do
-          begin
-            const Alpha = Png.AlphaScanline[Y][X];
-            // The image list wants the colors multiplied with the alpha
-            const Pixel = PRGBQuad(PByte(Pixels) + X * SizeOf(TRGBQuad));
-            Pixel.rgbBlue := (Colors[X * 3] * Alpha) div High(Byte);
-            Pixel.rgbGreen := (Colors[X * 3 + 1] * Alpha) div High(Byte);
-            Pixel.rgbRed := (Colors[X * 3 + 2] * Alpha) div High(Byte);
-            Pixel.rgbReserved := Alpha;
-          end;
+        Png.LoadFromResourceName(HInstance, IconResourceName(Icon));
+        const Bitmap = Vcl.Graphics.TBitmap.Create;
+        try
+          Bitmap.PixelFormat := pf32bit;
+          Bitmap.AlphaFormat := TAlphaFormat.afDefined;
+          Bitmap.SetSize(Size, Size);
+          DrawIcon(Png, Bitmap);
+          FIcons.Add(Bitmap, nil);
+        finally
+          Bitmap.Free;
         end;
-        FIcons.Add(Bitmap, nil);
       finally
-        Bitmap.Free;
+        Png.Free;
       end;
-    finally
-      Png.Free;
+    end;
+  finally
+    FIcons.EndUpdate;
+  end;
+end;
+
+procedure TPdf4DToolbar.UpdateIconSize;
+begin
+  const Size = ScaleValue(IconSize);
+  if FIcons.Width <> Size then
+  begin
+    FillIcons(Size);
+  end;
+end;
+
+// Bilinear, on the colors multiplied with the alpha, which is also what the image list wants
+class procedure TPdf4DToolbar.DrawIcon(const Png: TPngImage; const Bitmap: Vcl.Graphics.TBitmap);
+begin
+  const Size = Bitmap.Width;
+  for var Y := 0 to Size - 1 do
+  begin
+    const SourceY: Double = Max(0, (Y + 0.5) * IconSize / Size - 0.5);
+    const Top = Min(Trunc(SourceY), IconSize - 1);
+    const Bottom = Min(Top + 1, IconSize - 1);
+    const WeightY: Double = SourceY - Trunc(SourceY);
+    const Pixels = PRGBQuad(Bitmap.ScanLine[Y]);
+    for var X := 0 to Size - 1 do
+    begin
+      const SourceX: Double = Max(0, (X + 0.5) * IconSize / Size - 0.5);
+      const Left = Min(Trunc(SourceX), IconSize - 1);
+      const Right = Min(Left + 1, IconSize - 1);
+      const WeightX: Double = SourceX - Trunc(SourceX);
+      const Pixel = PRGBQuad(PByte(Pixels) + X * SizeOf(TRGBQuad));
+      for var Channel := 0 to ChannelCount - 1 do
+      begin
+        const Upper: Double = PremultipliedAt(Png, Left, Top, Channel) * (1 - WeightX) +
+                              PremultipliedAt(Png, Right, Top, Channel) * WeightX;
+        const Lower: Double = PremultipliedAt(Png, Left, Bottom, Channel) * (1 - WeightX) +
+                              PremultipliedAt(Png, Right, Bottom, Channel) * WeightX;
+        PByte(Pixel)[Channel] := Round(Upper * (1 - WeightY) + Lower * WeightY);
+      end;
     end;
   end;
+end;
+
+// Channel 0 to 2 are blue, green and red (the order of the PNG rows and of TRGBQuad), 3 is the alpha
+class function TPdf4DToolbar.PremultipliedAt(const Png: TPngImage; const X, Y, Channel: Integer): Integer;
+begin
+  const Alpha = Png.AlphaScanline[Y][X];
+  if Channel = AlphaChannel then
+  begin
+    Exit(Alpha);
+  end;
+
+  const Colors = PByte(Png.Scanline[Y]);
+  Result := (Colors[X * ColorChannels + Channel] * Alpha) div High(Byte);
 end;
 
 procedure TPdf4DToolbar.UseOwnIcons(const IsUsed: Boolean);
@@ -474,13 +537,13 @@ begin
     Control.Free;
   end;
   FEmbedded.Clear;
+  FEmbeddedWidths.Clear;
 
   for var Button in FToolButtons do
   begin
     Button.Free;
   end;
   FToolButtons.Clear;
-  FPlaceholders.Clear;
 end;
 
 function TPdf4DToolbar.NewButton(const Action: TCustomAction): TToolButton;
@@ -505,15 +568,31 @@ begin
   FToolButtons.Add(Result);
 end;
 
-// A control sits on the separator that keeps its room in the row; both lists run in the order of the row
-procedure TPdf4DToolbar.AddEmbedded(const Control: TControl; const Placeholder: TToolButton);
+// A toolbar gives every control a place in its row as wide as the control is when it gets its parent, and centres it there; the width is
+// in the pixels of the toolbar
+procedure TPdf4DToolbar.AddEmbedded(const Control: TControl; const LogicalWidth: Integer);
 begin
-  FEmbedded.Insert(0, Control);
-  FPlaceholders.Insert(0, Placeholder);
+  Control.Width := ScaleValue(LogicalWidth);
+  Control.Parent := Self;
+  FEmbedded.Add(Control);
+  FEmbeddedWidths.Add(LogicalWidth);
+end;
+
+procedure TPdf4DToolbar.ScaleEmbedded;
+begin
+  for var Index := 0 to FEmbedded.Count - 1 do
+  begin
+    const Width = ScaleValue(FEmbeddedWidths[Index]);
+    if FEmbedded[Index].Width <> Width then
+    begin
+      FEmbedded[Index].Width := Width;
+    end;
+  end;
 end;
 
 procedure TPdf4DToolbar.Build;
 begin
+  UpdateIconSize;
   if not Assigned(Images) then
   begin
     Images := FIcons;
@@ -553,7 +632,6 @@ begin
   end;
 
   FIsBuilt := True;
-  PlaceEmbedded;
   UpdateState;
 end;
 
@@ -568,21 +646,17 @@ end;
 procedure TPdf4DToolbar.BuildPageNumber;
 begin
   FLabelPages := TLabel.Create(Self);
-  FLabelPages.Parent := Self;
   FLabelPages.AutoSize := False;
-  FLabelPages.Width := PageLabelWidth;
   FLabelPages.Layout := TTextLayout.tlCenter;
-  AddEmbedded(FLabelPages, NewSeparator(FLabelPages.Width));
+  AddEmbedded(FLabelPages, PageLabelWidth);
 
   FEditPage := TEdit.Create(Self);
-  FEditPage.Parent := Self;
-  FEditPage.Width := PageEditWidth;
   FEditPage.Alignment := taRightJustify;
   FEditPage.Hint := SPageNumberHint;
   FEditPage.ShowHint := True;
   FEditPage.OnKeyPress := HandlePageKeyPress;
   FEditPage.OnExit := HandlePageExit;
-  AddEmbedded(FEditPage, NewSeparator(FEditPage.Width));
+  AddEmbedded(FEditPage, PageEditWidth);
 end;
 
 procedure TPdf4DToolbar.BuildZoom;
@@ -590,8 +664,7 @@ begin
   FButtonZoomIn := NewButton(FActionZoomIn);
 
   FComboZoom := TComboBox.Create(Self);
-  FComboZoom.Parent := Self;
-  FComboZoom.Width := ZoomComboWidth;
+  AddEmbedded(FComboZoom, ZoomComboWidth);
   FComboZoom.Style := csDropDown;
   FComboZoom.Hint := SZoomHint;
   FComboZoom.ShowHint := True;
@@ -603,7 +676,6 @@ begin
   end;
   FComboZoom.OnSelect := HandleZoomSelect;
   FComboZoom.OnKeyPress := HandleZoomKeyPress;
-  AddEmbedded(FComboZoom, NewSeparator(FComboZoom.Width));
 
   FButtonZoomOut := NewButton(FActionZoomOut);
 end;
@@ -623,22 +695,6 @@ end;
 procedure TPdf4DToolbar.BuildPrint;
 begin
   FButtonPrint := NewButton(FActionPrint);
-end;
-
-// The controls sit on the separators that keep their room in the row of buttons
-procedure TPdf4DToolbar.PlaceEmbedded;
-begin
-  if (not FIsBuilt) or (FEmbedded.Count <> FPlaceholders.Count) then
-  begin
-    Exit;
-  end;
-
-  for var Index := 0 to FEmbedded.Count - 1 do
-  begin
-    const Control = FEmbedded[Index];
-    const Placeholder = FPlaceholders[Index];
-    Control.SetBounds(Placeholder.Left, Placeholder.Top + (Placeholder.Height - Control.Height) div 2, Control.Width, Control.Height);
-  end;
 end;
 
 { State }
