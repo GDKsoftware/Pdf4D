@@ -354,8 +354,15 @@ end;
 procedure TPdf4DToolbarTests.TestToolbarLetsGoOfFreedComponents;
 begin
   OpenPages(2);
-  FHost.SearchBar.Free;
-  FHost.PageView.Free;
+  const Probe = TZoomListenerProbe.Create(FHost.PageView);
+  try
+    FHost.SearchBar.Free;
+    FHost.PageView.Free;
+    // The toolbar and the probe let go of the page view while it is freed: its list of listeners is still there then
+    Assert.IsTrue(Probe.ListenerCountAtRemoval >= 1, 'the zoom listeners outlive the free notifications');
+  finally
+    Probe.Free;
+  end;
   FHost.Document.Free;
   Assert.IsNull(FToolbar.SearchBar);
   Assert.IsNull(FToolbar.PageView);

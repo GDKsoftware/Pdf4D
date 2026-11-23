@@ -92,6 +92,7 @@ implementation
 
 uses
   System.Math,
+  System.SysUtils,
   Winapi.Windows,
   Vcl.Forms,
   Pdf4D.Vcl.Painter;
@@ -129,8 +130,9 @@ end;
 destructor TPdf4DThumbnails.Destroy;
 begin
   SetDocument(nil);
-  FController.Free;
+  // A message while the window goes (a resize, the mouse leaving) still reaches the controller
   inherited;
+  FreeAndNil(FController);
 end;
 
 procedure TPdf4DThumbnails.Notification(AComponent: TComponent; Operation: TOperation);

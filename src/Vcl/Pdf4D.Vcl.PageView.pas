@@ -132,6 +132,10 @@ type
     procedure AddZoomListener(const Listener: TNotifyEvent);
     procedure RemoveZoomListener(const Listener: TNotifyEvent);
     function TryGetSelection(out Selection: TPdfTextSelection): Boolean;
+{$IFDEF PDF4D_TESTS}
+    // For tests only, compiled when PDF4D_TESTS is defined
+    function ZoomListenerCount: Integer;
+{$ENDIF}
 
     // Owned
     property Controller: TPdfPageViewController read FController;
@@ -168,6 +172,7 @@ implementation
 
 uses
   System.Math,
+  System.SysUtils,
   Winapi.Windows,
   Vcl.Clipbrd,
   Vcl.Forms,
@@ -219,9 +224,11 @@ begin
   FOnLinkClick := nil;
   FOnZoomChanged := nil;
   SetDocument(nil);
-  FController.Free;
-  FZoomListeners.Free;
+  // The inherited destructor tells the components that follow this one that it goes, and a zoom listener lets go of it then: the list
+  // and the controller stay until after that
   inherited;
+  FreeAndNil(FController);
+  FreeAndNil(FZoomListeners);
 end;
 
 procedure TPdf4DPageView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -629,6 +636,13 @@ procedure TPdf4DPageView.RemoveZoomListener(const Listener: TNotifyEvent);
 begin
   FZoomListeners.Remove(Listener);
 end;
+
+{$IFDEF PDF4D_TESTS}
+function TPdf4DPageView.ZoomListenerCount: Integer;
+begin
+  Result := FZoomListeners.Count;
+end;
+{$ENDIF}
 
 { Input }
 

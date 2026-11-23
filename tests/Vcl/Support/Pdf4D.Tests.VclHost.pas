@@ -45,6 +45,26 @@ type
     property CopiedTexts: TList<string> read FCopiedTexts;
   end;
 
+  // Follows the zoom of a page view as the toolbar does, and lets go of it in the free notification. It records how many zoom listeners
+  // the page view had at that moment: the list has to be alive while the page view tells the others that it goes.
+  TZoomListenerProbe = class(TComponent)
+  private
+    FPageView: TPdf4DPageView;
+    FListenerCountAtRemoval: Integer;
+
+    procedure HandleZoomChanged(Sender: TObject);
+
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
+  public
+    constructor Create(const PageView: TPdf4DPageView); reintroduce;
+    destructor Destroy; override;
+
+    // -1 until the page view was freed
+    property ListenerCountAtRemoval: Integer read FListenerCountAtRemoval;
+  end;
+
   // A form with a document and a page view, made in the test process. Input goes through Perform, so that no desktop session tool is
   // needed, and the form is shown outside the visible desktop.
   TVclTestHost = class
@@ -177,6 +197,43 @@ begin
     begin
       // The session does not allow it; IsClipboardAvailable tells the tests
     end;
+  end;
+end;
+
+{ TZoomListenerProbe }
+
+constructor TZoomListenerProbe.Create(const PageView: TPdf4DPageView);
+begin
+  inherited Create(nil);
+  FListenerCountAtRemoval := -1;
+  FPageView := PageView;
+  FPageView.FreeNotification(Self);
+  FPageView.AddZoomListener(HandleZoomChanged);
+end;
+
+destructor TZoomListenerProbe.Destroy;
+begin
+  if Assigned(FPageView) then
+  begin
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView.RemoveFreeNotification(Self);
+  end;
+  inherited;
+end;
+
+procedure TZoomListenerProbe.HandleZoomChanged(Sender: TObject);
+begin
+  // Only the registration matters
+end;
+
+procedure TZoomListenerProbe.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (Operation = TOperation.opRemove) and (AComponent = FPageView) then
+  begin
+    FListenerCountAtRemoval := FPageView.ZoomListenerCount;
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView := nil;
   end;
 end;
 

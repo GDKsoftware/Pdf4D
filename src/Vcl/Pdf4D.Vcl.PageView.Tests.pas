@@ -91,6 +91,9 @@ type
 
     [Test]
     procedure TestNoBackendShowsError;
+
+    [Test]
+    procedure TestFreeTellsZoomListenersWhileTheyAreRegistered;
   end;
 
 implementation
@@ -539,6 +542,20 @@ begin
 
   FHost.RestoreBackend;
   Assert.IsTrue(FHost.Open(Data), 'the view is usable afterwards');
+end;
+
+// A component that follows the zoom lets go of the page view in its free notification, as the toolbar does: the list of listeners must
+// still be there then
+procedure TPdf4DPageViewTests.TestFreeTellsZoomListenersWhileTheyAreRegistered;
+begin
+  const Probe = TZoomListenerProbe.Create(FHost.PageView);
+  try
+    FHost.PageView.Free;
+
+    Assert.AreEqual(1, Probe.ListenerCountAtRemoval, 'the probe was still registered when it was told');
+  finally
+    Probe.Free;
+  end;
 end;
 
 end.
