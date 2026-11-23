@@ -30,4 +30,5 @@ tools/pdfbox-src/
 tools/corpus/failed-downloads.txt
 packages/*.a
 tests/Skia/results-*.xml
+tests/Vcl/results-*.xml
 tools/pdfjs-src/

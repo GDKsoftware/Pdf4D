@@ -19,7 +19,7 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`), then `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj` and `Pdf4D.Vcl.Skia.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
@@ -37,15 +37,25 @@ The packages and what they contain:
 | `Pdf4D.Render.dpk` | `rtl, Pdf4D` | `src\Graphics`, `src\Codec`, `src\Render` (without `Skia`) and `src\Resources\Pdf4D.Resources.Icc.*` |
 | `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
 | `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
+| `Pdf4D.Vcl.dpk` | `rtl, vcl, Pdf4D.Viewer` | `src\Vcl` (`TPdf4DDocument`, `TPdf4DPageView` and the GDI and GDI+ painter) |
+| `Pdf4D.Vcl.Skia.dpk` | `rtl, Pdf4D.Vcl, Pdf4D.Render.Skia` | `src\Vcl\Skia` (the `TPdf4DSkiaBackend` component) |
 
-All four build for Win32, Win64 and Linux64. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
+The first four build for Win32, Win64 and Linux64; the two VCL packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
 
-## The two test projects
+## The three test projects
 
 - `tests\Pdf4D.Tests.dproj` tests the core and the renderer without Skia, with a device that records calls. Its folder has no Skia library, so it proves that the core and the renderer do not need one.
 - `tests\Skia\Pdf4D.Skia.Tests.dproj` tests the Skia backend, compares the renders with the PDFBox reference images and runs the fuzz through the renderer (see "The Skia backend").
 
-`./build.ps1 -Suite Pdf4D.Tests` or `-Suite Pdf4D.Skia.Tests` runs one of them.
+- `tests\Vcl\Pdf4D.Vcl.Tests.dproj` tests the VCL components (see "The VCL tests"); Win32 and Win64 only, and it runs last.
+
+`./build.ps1 -Suite Pdf4D.Tests`, `-Suite Pdf4D.Skia.Tests` or `-Suite Pdf4D.Vcl.Tests` runs one of them.
+
+## The VCL tests
+
+`tests\Vcl\Pdf4D.Vcl.Tests.dproj` is a console program that makes VCL forms in its own process (`TVclTestHost` in `tests\Vcl\Support`): a form of 96 PPI, shown outside the visible desktop, with a `TPdf4DDocument` on Skia and a `TPdf4DPageView`. The tests send input with `Perform` (mouse messages, `WM_KEYDOWN` with the Ctrl state set through `SetKeyboardState`), pump the message queue with `CheckSynchronize` and `Application.ProcessMessages`, and read what the control paints with `PaintTo`. No desktop automation tool is involved, so the suite runs from `build.ps1`. `build.ps1` copies `sk4d.dll` next to the program, like for the Skia tests, and the program uses the same two-run leak check.
+
+The process is not marked DPI aware: `ScaleForPPI` on the form drives the `ChangeScale(M, D, isDpiChange)` of the page view, which is what a Per-Monitor v2 application gets on a move to another monitor. The clipboard tests assert on the text that the page view hands to the clipboard; they also assert on `Clipboard.AsText` when the session allows access to the clipboard of the window system (some sessions refuse it with "access denied").
 
 ## Linux via WSL
 

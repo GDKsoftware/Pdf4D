@@ -264,6 +264,10 @@ type
     function TileCacheCost: Int64;
     // PagePoint is in PDF user space
     function ViewportToPage(const Point: TPointF; out PageIndex: Integer; out PagePoint: TPointF): Boolean;
+    // The inverse of ViewportToPage for a page that is laid out; the point may lie outside the viewport
+    function TryPageToViewport(const PageIndex: Integer; const PagePoint: TPointF; out Point: TPointF): Boolean;
+    // The tiles that were asked for and have not arrived
+    function PendingTileCount: Integer;
 
     // Through an internal link; a document that is already open is shown at once
     property Document: TPdf4DCustomDocument read GetDocument write SetDocument;
@@ -903,6 +907,23 @@ begin
     PagePoint := FLayout.Transform(PageIndex).ViewToPage(TPointF.Create(Content.X - Rect.Left, Content.Y - Rect.Top));
     Result := True;
   end;
+end;
+
+function TPdfPageViewController.TryPageToViewport(const PageIndex: Integer; const PagePoint: TPointF; out Point: TPointF): Boolean;
+begin
+  Point := TPointF.Create(0, 0);
+  var PageRect: TRect;
+  Result := PageRectInViewport(PageIndex, PageRect);
+  if Result then
+  begin
+    const InPage = FLayout.Transform(PageIndex).PageToView(PagePoint);
+    Point := TPointF.Create(PageRect.Left + InPage.X, PageRect.Top + InPage.Y);
+  end;
+end;
+
+function TPdfPageViewController.PendingTileCount: Integer;
+begin
+  Result := FPendingTiles.Count;
 end;
 
 { Input }

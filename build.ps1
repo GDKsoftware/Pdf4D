@@ -9,7 +9,7 @@ param(
     [string]$LinuxSdkPath,
 
     # Build and run one test project only; the packages are always built
-    [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'All')]
+    [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'Pdf4D.Vcl.Tests', 'All')]
     [string]$Suite = 'All'
 )
 
@@ -19,12 +19,16 @@ $RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
 $WslDistro = 'Ubuntu'
 $BdsFolder = Split-Path -Parent (Split-Path -Parent $RsVars)
 
-# The tests of the core and the renderer run without Skia; the Skia tests get the Skia library next to their program
+# The tests of the core and the renderer run without Skia; the Skia tests get the Skia library next to their program. The VCL tests run
+# last, on Windows only, and need the Skia library as well.
 $TestProjects = @(
-    @{ Name = 'Pdf4D.Tests'; Folder = 'tests'; NeedsSkia = $false },
-    @{ Name = 'Pdf4D.Skia.Tests'; Folder = 'tests\Skia'; NeedsSkia = $true }
+    @{ Name = 'Pdf4D.Tests'; Folder = 'tests'; NeedsSkia = $false; WindowsOnly = $false },
+    @{ Name = 'Pdf4D.Skia.Tests'; Folder = 'tests\Skia'; NeedsSkia = $true; WindowsOnly = $false },
+    @{ Name = 'Pdf4D.Vcl.Tests'; Folder = 'tests\Vcl'; NeedsSkia = $true; WindowsOnly = $true }
 )
 $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+# The VCL packages are built for Windows only
+$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
@@ -50,7 +54,8 @@ function Invoke-MsBuild([string]$Project, [string]$TargetPlatform) {
 # A unit that the package uses but does not contain is reported as W1033 (implicitly imported); that is a forgotten unit in the
 # contains clause, and the message names it
 function Invoke-PackageBuild([string]$TargetPlatform) {
-    foreach ($packageFile in $PackageFiles) {
+    $files = if ($TargetPlatform -eq 'Linux64') { $PackageFiles } else { $PackageFiles + $WindowsPackageFiles }
+    foreach ($packageFile in $files) {
         Write-Host "=== Package $([IO.Path]::GetFileNameWithoutExtension($packageFile)) $TargetPlatform $Config ==="
         $output = Invoke-MsBuild $packageFile $TargetPlatform
 
@@ -213,6 +218,9 @@ if ($platforms -contains 'Linux64') {
 foreach ($targetPlatform in $platforms) {
     Invoke-PackageBuild $targetPlatform
     foreach ($testProject in ($TestProjects | Where-Object { $Suite -eq 'All' -or $_.Name -eq $Suite })) {
+        if ($testProject.WindowsOnly -and $targetPlatform -eq 'Linux64') {
+            continue
+        }
         Invoke-Build $testProject $targetPlatform
         Invoke-Tests $testProject $targetPlatform
     }
