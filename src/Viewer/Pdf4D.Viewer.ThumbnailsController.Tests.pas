@@ -84,6 +84,8 @@ type
     procedure TestThumbnailLargerThanTheCacheIsShrunk;
     [Test]
     procedure TestManyTallPagesKeepAPositiveLayout;
+    [Test]
+    procedure TestLayoutIsClampedBelowTheLargestInteger;
   end;
 
 implementation
@@ -553,6 +555,32 @@ begin
   Assert.IsTrue(FController.ScrollPosition.Y > 0);
   const Requests = OpenRenderRequests;
   Assert.IsTrue(Length(Requests) > 0);
+end;
+
+procedure TPdfThumbnailsControllerTests.TestLayoutIsClampedBelowTheLargestInteger;
+begin
+  var Page := LetterPage(0, '');
+  Page.CropBox := TPdfRectangle.Letter;
+  Page.CropBox.UpperRightX := 1;
+  Page.CropBox.UpperRightY := 14400;
+  const Pages = TList<TPdfPageInfo>.Create;
+  try
+    // With wide thumbnails (a cell is about 5600 px high) the sum of the cells goes far beyond the largest Integer: the cap of
+    // 4 x the width alone does not keep it below that, only the clamp of the sum does
+    for var Index := 1 to 400000 do
+    begin
+      Pages.Add(Page);
+    end;
+    StartWith(Pages.ToArray);
+  finally
+    Pages.Free;
+  end;
+  FController.CacheBytes := 256 * OneKibibyte * OneKibibyte;
+  FController.ThumbnailWidth := 1400;
+
+  Assert.AreEqual(High(Integer) div 4, Integer(FController.ContentSize.cy), 'the layout is clamped');
+  FController.ScrollTo(TPoint.Create(0, FController.ContentSize.cy));
+  Assert.IsTrue(FController.ScrollPosition.Y > 0, 'the end of the clamped layout can be scrolled to');
 end;
 
 procedure TPdfThumbnailsControllerTests.TestClosingTheDocumentEmptiesTheView;

@@ -58,6 +58,8 @@ type
     FOnEnd: TProc;
     FOnReport: TPdfWorkerReportEvent;
     FReportFailure: Exception;
+    // The later failures of the report callback; they are counted in the message of the first one
+    FDroppedReportFailures: Integer;
 
     // Waits for a job and takes it out of the queue; nil when the thread must end
     function TakeNext: TPdfWorkerJob;
@@ -95,7 +97,8 @@ type
 implementation
 
 uses
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.Viewer.ResourceStrings;
 
 { TPdfWorkerJob }
 
@@ -384,6 +387,10 @@ begin
   begin
     const Failure = FReportFailure;
     FReportFailure := nil;
+    if FDroppedReportFailures > 0 then
+    begin
+      Failure.Message := Format(SWorkerMoreReportFailures, [Failure.Message, FDroppedReportFailures]);
+    end;
     raise Failure;
   end;
 end;
@@ -399,7 +406,8 @@ begin
     begin
       if Assigned(FReportFailure) then
       begin
-        // One exception is enough to end the thread; the later ones are the same callback failing again
+        // One exception is enough to end the thread; the later ones are the same callback failing again, and are counted
+        Inc(FDroppedReportFailures);
         Exit;
       end;
       FReportFailure := Exception(AcquireExceptionObject);

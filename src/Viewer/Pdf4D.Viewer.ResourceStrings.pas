@@ -5,6 +5,7 @@ unit Pdf4D.Viewer.ResourceStrings;
 interface
 
 resourcestring
+  // Document, overlays and the render backend
   SNoRenderBackend = 'No render backend. Put a TPdf4DSkiaBackend on the form and link it to the document, or set RenderBackend.';
   SOverlayWhileNotOpen = 'An overlay can be added only while the document is open.';
   SOverlayPageOutside = 'Page %d is outside the document.';
@@ -13,10 +14,29 @@ resourcestring
   SDocumentNotOpen = 'The document is not open.';
   SDocumentHasNoFile = 'The document has no file to open again.';
   SNoStream = 'Open needs a stream.';
+
+  // Worker
   SWorkerStopped = 'The document worker stopped after a fatal error.';
   SWorkerFatal = 'The document worker stopped after a fatal error: %s';
   SWorkerAbandonFailed = 'Handing back a queued job failed: %s';
   SWorkerThreadFailed = 'The document worker thread ended with an exception: %s';
+  SWorkerEndFailed = 'Releasing the document when the worker ended failed: %s';
+  SWorkerMoreReportFailures = '%s (and %d more failures of the report callback)';
+
+  // Session
+  SSessionJobFailed = '%s failed: %s';
+  SSessionOpening = 'Opening the document';
+  SSessionReleasing = 'Releasing the document';
+  SSessionRenderingPage = 'Rendering page %d';
+  SSessionRenderingTiles = 'Rendering tiles of page %d';
+  SSessionReadingText = 'Reading the text of page %d';
+  SSessionSearchingPage = 'Searching page %d';
+  SSessionTileOutsidePage = 'The tile lies outside the page';
+  SSessionPageIndexOutside = 'Page index %d is outside the %d pages of the document';
+  SSessionScaleInvalid = 'Scale %g is not a positive number';
+  SSessionRotationInvalid = 'View rotation %d is not 0, 90, 180 or 270';
+
+  // Printing
   SPrintAbortFailed = 'Aborting the print document failed: %s';
   SPrintFailedAndAbortFailed = '%s (aborting the document failed: %s)';
   SPrintBandDrawFailed = 'A band of the page could not be drawn';
@@ -27,6 +47,9 @@ resourcestring
   SPrintNeedsDocument = 'Printing needs a document.';
   SPrintNotAllowed = 'The document does not allow printing.';
   SCopyFailed = 'The selected text could not be copied: %s';
+  SPrintFailedMessage = 'Printing failed: %s';
+
+  // Print dialog
   SPrintDialogCaption = 'Print';
   SPrintPrinterLabel = 'Printer';
   SPrintProperties = 'Properties...';
@@ -44,14 +67,16 @@ resourcestring
   SPrintProgressCaption = 'Printing';
   SPrintProgressPage = 'Printing page %d of %d';
   SPrintProgressStarting = 'Starting the print job';
-  SPrintFailedMessage = 'Printing failed: %s';
-  SWorkerEndFailed = 'Releasing the document when the worker ended failed: %s';
+
+  // Search bar
   SSearchResultCount = '%d of %d';
   SSearchNoResults = 'No results';
   SSearching = 'Searching'#$2026;
   SSearchMatchCase = 'Match case';
   SSearchPriorHint = 'Previous result';
   SSearchNextHint = 'Next result';
+
+  // Actions
   SActionHintWithKey = '%s (%s)';
   SActionZoomIn = 'Zoom in';
   SActionZoomOut = 'Zoom out';
@@ -66,11 +91,15 @@ resourcestring
   SActionLastPage = 'Last page';
   SActionPrint = 'Print';
   SActionSearch = 'Search';
+
+  // Toolbar
   SZoomFitWidth = 'Fit width';
   SZoomFitPage = 'Fit page';
   SZoomHint = 'Zoom';
   SPageNumberHint = 'Page number';
   SPageCountOf = ' / %d';
+
+  // Viewer
   SViewerTabPages = 'Pages';
   SViewerTabBookmarks = 'Bookmarks';
   SPasswordCaption = 'Password';

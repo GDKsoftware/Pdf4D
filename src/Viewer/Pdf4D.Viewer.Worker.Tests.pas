@@ -151,6 +151,8 @@ type
     procedure TestFailureInAbandonIsReported;
     [Test]
     procedure TestEndProcRunsWhenTheReportRaises;
+    [Test]
+    procedure TestLaterFailuresOfTheReportAreCounted;
   end;
 
   [TestFixture]
@@ -651,6 +653,28 @@ begin
   end;
 
   Assert.AreEqual(1, EndCalls);
+end;
+
+procedure TPdfDocumentWorkerTests.TestLaterFailuresOfTheReportAreCounted;
+begin
+  const Worker = TPdfDocumentWorker.Create(nil,
+    procedure(const ReportKind: TPdfWorkerReportKind; const ReportMessage: string)
+    begin
+      raise EInvalidOpException.Create('Raised by the report callback');
+    end);
+  try
+    // The fatal job is reported once, and the failing Abandon of the job behind it a second time
+    Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+    Worker.Enqueue(TAbandonableJob.Create(FLog, 'Bad', True));
+    AssertExecuted(2);
+    Worker.Stop;
+
+    Assert.IsTrue(Worker.FatalException is EInvalidOpException);
+    Assert.AreEqual('Raised by the report callback (and 1 more failures of the report callback)',
+                    Exception(Worker.FatalException).Message);
+  finally
+    Worker.Free;
+  end;
 end;
 
 procedure TPdfDocumentWorkerTests.TestEndProcRunsOnTheWorkerThreadAfterStop;
