@@ -16,6 +16,11 @@ uses
   Pdf4D.Viewer.Types;
 
 type
+  // What a worker tells its owner, on the worker thread, about something that it cannot handle itself
+  TPdfWorkerReportKind = (JobFatal, AbandonFailed, EndProcedureFailed);
+
+  TPdfWorkerReportEvent = reference to procedure(const Kind: TPdfWorkerReportKind; const Message: string);
+
   // One unit of work for the worker thread. The job owns its cancel token; the worker passes it to Execute.
   TPdfWorkerJob = class abstract
   private
@@ -28,6 +33,9 @@ type
 
     // Runs on the worker thread
     procedure Execute(const Cancel: IPdfCancelToken); virtual; abstract;
+    // Runs on the worker thread instead of Execute when the worker is in its failed state: tell whoever waits for the result that it
+    // will not come
+    procedure Abandon; virtual;
 
     property Priority: TPdfJobPriority read FPriority;
     // Thread safe
@@ -35,7 +43,8 @@ type
   end;
 
   // The one thread of a document. Jobs run one at a time, the most urgent first and first in first out within one priority.
-  // An exception in a job is swallowed, except a fatal one (see TPdfFailure.IsFatal): after that the worker only frees jobs.
+  // An exception in a job is swallowed, except a fatal one (see TPdfFailure.IsFatal): that is reported and puts the worker in a failed
+  // state, in which it hands every job that was queued, and every job that comes, to Abandon instead of Execute.
   TPdfDocumentWorker = class(TThread)
   private
     FLock: TObject;
@@ -45,13 +54,16 @@ type
     FFailed: Boolean;
     FStopped: Boolean;
     FOnEnd: TProc;
+    FOnReport: TPdfWorkerReportEvent;
 
     // Waits for a job and takes it out of the queue; nil when the thread must end
     function TakeNext: TPdfWorkerJob;
     function IndexOfMostUrgent: Integer;
     function IsStopped: Boolean;
     procedure Run(const Job: TPdfWorkerJob);
+    procedure AbandonJob(const Job: TPdfWorkerJob);
     procedure RunEndProc;
+    procedure Report(const Kind: TPdfWorkerReportKind; const Message: string);
 
   protected
     procedure Execute; override;
@@ -59,16 +71,21 @@ type
   public
     constructor Create; overload;
     // OnEnd runs on the worker thread when it ends (after Stop), also when a fatal exception put the worker in its failed state. The
-    // owner of the document releases it there, on the thread that uses it. An exception in OnEnd is swallowed.
+    // owner of the document releases it there, on the thread that uses it. An exception in OnEnd goes to OnReport.
     constructor Create(const OnEnd: TProc); overload;
+    // OnReport is called on the worker thread: with the message of a fatal job exception, and with the message of an exception that
+    // Abandon or OnEnd raised, because nobody else is left to hear it.
+    constructor Create(const OnEnd: TProc; const OnReport: TPdfWorkerReportEvent); overload;
     destructor Destroy; override;
 
     // Takes ownership of Job; from any thread. After Stop the job is freed unexecuted.
     procedure Enqueue(const Job: TPdfWorkerJob);
     // Cancels the running job and every job in the queue
     procedure CancelAll;
-    // Cancels all, ends the thread and waits for it; jobs that have not started are freed unexecuted
+    // Not on the worker thread. Cancels all, ends the thread and waits for it; jobs that have not started are freed unexecuted
     procedure Stop;
+    // Thread safe; true after a fatal exception in a job
+    function IsFailed: Boolean;
   end;
 
 implementation
@@ -87,17 +104,29 @@ begin
   FCancelIntf := FCancel;
 end;
 
+procedure TPdfWorkerJob.Abandon;
+begin
+  // Nobody waits for the result of a plain job
+  Exit;
+end;
+
 { TPdfDocumentWorker }
 
 constructor TPdfDocumentWorker.Create;
 begin
-  Create(nil);
+  Create(nil, nil);
 end;
 
 constructor TPdfDocumentWorker.Create(const OnEnd: TProc);
 begin
+  Create(OnEnd, nil);
+end;
+
+constructor TPdfDocumentWorker.Create(const OnEnd: TProc; const OnReport: TPdfWorkerReportEvent);
+begin
   // Everything the thread uses exists before it starts
   FOnEnd := OnEnd;
+  FOnReport := OnReport;
   FLock := TObject.Create;
   FWake := TEvent.Create(nil, True, False, '');
   FQueue := TList<TPdfWorkerJob>.Create;
@@ -158,6 +187,12 @@ end;
 
 procedure TPdfDocumentWorker.Stop;
 begin
+  // WaitFor on the own thread would wait for itself
+  if TThread.CurrentThread.ThreadID = ThreadID then
+  begin
+    raise EInvalidOpException.Create('Stop cannot run on the worker thread');
+  end;
+
   var Pending: TArray<TPdfWorkerJob>;
 
   TMonitor.Enter(FLock);
@@ -184,6 +219,16 @@ begin
   for var Job in Pending do
   begin
     Job.Free;
+  end;
+end;
+
+function TPdfDocumentWorker.IsFailed: Boolean;
+begin
+  TMonitor.Enter(FLock);
+  try
+    Result := FFailed;
+  finally
+    TMonitor.Exit(FLock);
   end;
 end;
 
@@ -243,10 +288,40 @@ begin
   end;
 end;
 
+procedure TPdfDocumentWorker.Report(const Kind: TPdfWorkerReportKind; const Message: string);
+begin
+  if Assigned(FOnReport) then
+  begin
+    FOnReport(Kind, Message);
+  end;
+end;
+
+procedure TPdfDocumentWorker.AbandonJob(const Job: TPdfWorkerJob);
+begin
+  try
+    Job.Abandon;
+  except
+    on Failure: Exception do
+    begin
+      Report(TPdfWorkerReportKind.AbandonFailed, Failure.Message);
+    end;
+  end;
+end;
+
 procedure TPdfDocumentWorker.Run(const Job: TPdfWorkerJob);
 begin
-  const MustSkip = (FFailed or IsStopped or Job.Cancel.IsCancelled);
-  if MustSkip then
+  if IsStopped then
+  begin
+    Exit;
+  end;
+
+  if IsFailed then
+  begin
+    AbandonJob(Job);
+    Exit;
+  end;
+
+  if Job.Cancel.IsCancelled then
   begin
     Exit;
   end;
@@ -258,7 +333,13 @@ begin
     begin
       if TPdfFailure.IsFatal(Failure) then
       begin
-        FFailed := True;
+        TMonitor.Enter(FLock);
+        try
+          FFailed := True;
+        finally
+          TMonitor.Exit(FLock);
+        end;
+        Report(TPdfWorkerReportKind.JobFatal, Failure.Message);
       end;
     end;
   end;
@@ -302,7 +383,7 @@ begin
   except
     on Failure: Exception do
     begin
-      // Nobody is left to tell: the owner of OnEnd reports what matters itself
+      Report(TPdfWorkerReportKind.EndProcedureFailed, Failure.Message);
     end;
   end;
 end;

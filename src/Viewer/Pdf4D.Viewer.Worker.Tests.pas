@@ -92,6 +92,18 @@ type
     procedure Execute(const Cancel: IPdfCancelToken); override;
   end;
 
+  // Records that it was abandoned; raises in Abandon when asked to
+  TAbandonableJob = class(TLoggedJob)
+  private
+    FName: string;
+    FRaiseOnAbandon: Boolean;
+
+  public
+    constructor Create(const Log: TJobLog; const Name: string; const RaiseOnAbandon: Boolean = False);
+    procedure Execute(const Cancel: IPdfCancelToken); override;
+    procedure Abandon; override;
+  end;
+
   [TestFixture]
   TPdfDocumentWorkerTests = class
   private
@@ -129,6 +141,14 @@ type
     procedure TestEndProcRunsOnTheWorkerThreadAfterStop;
     [Test]
     procedure TestEndProcRunsAfterAFatalException;
+    [Test]
+    procedure TestFatalExceptionAbandonsQueuedAndLaterJobs;
+    [Test]
+    procedure TestFatalExceptionIsReported;
+    [Test]
+    procedure TestFailureInEndProcIsReported;
+    [Test]
+    procedure TestFailureInAbandonIsReported;
   end;
 
   [TestFixture]
@@ -352,6 +372,29 @@ begin
   raise FFailureClass.Create('Raised by a test job');
 end;
 
+{ TAbandonableJob }
+
+constructor TAbandonableJob.Create(const Log: TJobLog; const Name: string; const RaiseOnAbandon: Boolean);
+begin
+  inherited Create(Log, TPdfJobPriority.Visible);
+  FName := Name;
+  FRaiseOnAbandon := RaiseOnAbandon;
+end;
+
+procedure TAbandonableJob.Execute(const Cancel: IPdfCancelToken);
+begin
+  JobLog.AddExecuted(FName + '-executed');
+end;
+
+procedure TAbandonableJob.Abandon;
+begin
+  JobLog.AddExecuted(FName + '-abandoned');
+  if FRaiseOnAbandon then
+  begin
+    raise EInvalidOpException.Create('Raised in Abandon');
+  end;
+end;
+
 { TPdfDocumentWorkerTests }
 
 procedure TPdfDocumentWorkerTests.Setup;
@@ -489,6 +532,93 @@ begin
   FWorker.Enqueue(TRecordingJob.Create(FLog, TPdfJobPriority.Visible, 'After3'));
   AssertFreed(5);
   Assert.AreEqual('failing', FLog.ExecutedNames);
+end;
+
+procedure TPdfDocumentWorkerTests.TestFatalExceptionAbandonsQueuedAndLaterJobs;
+begin
+  BlockWorker;
+  FWorker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+  FWorker.Enqueue(TAbandonableJob.Create(FLog, 'After1'));
+  FWorker.Enqueue(TAbandonableJob.Create(FLog, 'After2'));
+  FLog.Gate.SetEvent;
+
+  AssertExecuted(3);
+  FWorker.Enqueue(TAbandonableJob.Create(FLog, 'After3'));
+  AssertExecuted(4);
+  Assert.AreEqual('failing,After1-abandoned,After2-abandoned,After3-abandoned', FLog.ExecutedNames);
+  Assert.IsTrue(FWorker.IsFailed);
+end;
+
+procedure TPdfDocumentWorkerTests.TestFatalExceptionIsReported;
+begin
+  var Kind := TPdfWorkerReportKind.EndProcedureFailed;
+  var Message := '';
+  var Reports := 0;
+  const Worker = TPdfDocumentWorker.Create(nil,
+    procedure(const ReportKind: TPdfWorkerReportKind; const ReportMessage: string)
+    begin
+      Kind := ReportKind;
+      Message := ReportMessage;
+      Inc(Reports);
+    end);
+  try
+    Assert.IsFalse(Worker.IsFailed);
+    Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+    AssertExecuted(1);
+    Assert.IsTrue(FLog.WaitForFreed(1, WaitMs));
+  finally
+    Worker.Free;
+  end;
+
+  Assert.AreEqual(1, Reports);
+  Assert.AreEqual(Ord(TPdfWorkerReportKind.JobFatal), Ord(Kind));
+  Assert.AreEqual('Raised by a test job', Message);
+end;
+
+procedure TPdfDocumentWorkerTests.TestFailureInEndProcIsReported;
+begin
+  var Kind := TPdfWorkerReportKind.JobFatal;
+  var Message := '';
+  const Worker = TPdfDocumentWorker.Create(
+    procedure
+    begin
+      raise EInvalidOpException.Create('Raised in the end procedure');
+    end,
+    procedure(const ReportKind: TPdfWorkerReportKind; const ReportMessage: string)
+    begin
+      Kind := ReportKind;
+      Message := ReportMessage;
+    end);
+  Worker.Free;
+
+  Assert.AreEqual(Ord(TPdfWorkerReportKind.EndProcedureFailed), Ord(Kind));
+  Assert.AreEqual('Raised in the end procedure', Message);
+end;
+
+procedure TPdfDocumentWorkerTests.TestFailureInAbandonIsReported;
+begin
+  var Kind := TPdfWorkerReportKind.EndProcedureFailed;
+  var Message := '';
+  const Worker = TPdfDocumentWorker.Create(nil,
+    procedure(const ReportKind: TPdfWorkerReportKind; const ReportMessage: string)
+    begin
+      if ReportKind = TPdfWorkerReportKind.AbandonFailed then
+      begin
+        Kind := ReportKind;
+        Message := ReportMessage;
+      end;
+    end);
+  try
+    Worker.Enqueue(TFailingJob.Create(FLog, EAccessViolation));
+    Worker.Enqueue(TAbandonableJob.Create(FLog, 'Bad', True));
+    AssertExecuted(2);
+    Assert.IsTrue(FLog.WaitForFreed(2, WaitMs));
+  finally
+    Worker.Free;
+  end;
+
+  Assert.AreEqual(Ord(TPdfWorkerReportKind.AbandonFailed), Ord(Kind));
+  Assert.AreEqual('Raised in Abandon', Message);
 end;
 
 procedure TPdfDocumentWorkerTests.TestEndProcRunsOnTheWorkerThreadAfterStop;

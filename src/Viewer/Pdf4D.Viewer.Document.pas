@@ -88,6 +88,8 @@ type
     procedure OpenFinished(const Outcome: TPdfOpenResult);
     procedure HandleOpened;
     procedure HandleOpenFailed(const Outcome: TPdfOpenResult);
+    // The worker of the open document stopped after a fatal error; the session has logged it
+    procedure HandleSessionFatal(const Message: string);
     procedure Log(const Level: TPdfLogLevel; const Message: string);
     procedure Notify(const Change: TPdfDocumentChange);
     procedure OverlaysChanged;
@@ -388,6 +390,10 @@ begin
     procedure(const Level: TPdfLogLevel; const Message: string)
     begin
       Log(Level, Message);
+    end,
+    procedure(const Message: string)
+    begin
+      HandleSessionFatal(Message);
     end);
 end;
 
@@ -443,6 +449,28 @@ begin
   if (Serial = FSerial) and Assigned(FOnOpenError) then
   begin
     FOnOpenError(Self, Outcome.ErrorKind, Outcome.ErrorMessage);
+  end;
+end;
+
+procedure TPdf4DCustomDocument.HandleSessionFatal(const Message: string);
+begin
+  if FState <> TPdfDocumentState.Open then
+  begin
+    Exit;
+  end;
+
+  // The document cannot be used any more: what it showed goes, like on Close. The next Open starts a new worker.
+  FState := TPdfDocumentState.Failed;
+  StopSearchRequest;
+  FPageTextCache.Clear;
+  ForgetSearchResults;
+
+  const Serial = FSerial;
+  Notify(TPdfDocumentChange.OpenFailed);
+
+  if (Serial = FSerial) and Assigned(FOnOpenError) then
+  begin
+    FOnOpenError(Self, TPdfOpenErrorKind.Other, Message);
   end;
 end;
 

@@ -54,6 +54,8 @@ type
     [Test]
     procedure TestOpenErrorEvent;
     [Test]
+    procedure TestFatalFailureFailsTheDocumentAndOpenStartsAgain;
+    [Test]
     procedure TestOpenFromStreamCopiesData;
     [Test]
     procedure TestOpenFromStreamStartsAtItsPosition;
@@ -97,6 +99,7 @@ uses
   System.Types,
   System.Generics.Collections,
   Pdf4D.Common.Defines,
+  Pdf4D.Api.DocumentHandle,
   Pdf4D.Viewer.Session,
   Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Tests.Corpus,
@@ -122,6 +125,9 @@ end;
 
 procedure TPdf4DCustomDocumentTests.TearDown;
 begin
+  {$IFDEF PDF4D_TESTS}
+  TPdfDocumentHandle.StripperHook := nil;
+  {$ENDIF}
   FBench.Free;
 end;
 
@@ -283,6 +289,38 @@ begin
   Assert.IsFalse(FOpenErrorMessage.IsEmpty);
   Assert.AreEqual('Opening,OpenFailed', FBench.Recorder.Describe);
   Assert.AreEqual(0, FBench.Document.PageCount);
+end;
+
+procedure TPdf4DCustomDocumentTests.TestFatalFailureFailsTheDocumentAndOpenStartsAgain;
+begin
+  {$IFDEF PDF4D_TESTS}
+  OpenInvoice;
+  FBench.Document.OnOpenError := HandleOpenError;
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise EAccessViolation.Create('Injected access violation');
+    end;
+
+  FBench.Document.RequestPageText(0, TPdfJobPriority.Visible, nil);
+  FBench.WaitUntil(
+    function: Boolean
+    begin
+      Result := (FBench.Document.State = TPdfDocumentState.Failed);
+    end,
+    'the document to fail');
+
+  Assert.AreEqual(Ord(TPdfOpenErrorKind.Other), Ord(FOpenErrorKind));
+  Assert.AreEqual('Injected access violation', FOpenErrorMessage);
+  Assert.IsTrue(FBench.Recorder.Describe.EndsWith('OpenFailed'), FBench.Recorder.Describe);
+  Assert.AreEqual(0, FBench.Document.PageCount);
+
+  TPdfDocumentHandle.StripperHook := nil;
+  OpenInvoice;
+  RequestPageTextAndWait(0);
+  {$ELSE}
+  Assert.Pass('The hook exists in the test build only');
+  {$ENDIF}
 end;
 
 procedure TPdf4DCustomDocumentTests.TestOpenFromStreamCopiesData;

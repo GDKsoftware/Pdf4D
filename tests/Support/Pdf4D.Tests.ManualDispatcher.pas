@@ -28,6 +28,8 @@ type
 
     // Thread safe
     procedure Post(const Proc: TProc);
+    // Thread safe; what is posted and has not run
+    function PendingCount: Integer;
     // Runs what is posted now and what these procedures post meanwhile; returns the number of procedures that ran
     function RunPending: Integer;
     // Runs posted procedures until Condition is True; False when it is still False after TimeoutMs
@@ -72,6 +74,16 @@ begin
   end;
 
   FPosted.SetEvent;
+end;
+
+function TManualDispatcher.PendingCount: Integer;
+begin
+  TMonitor.Enter(FLock);
+  try
+    Result := FQueue.Count;
+  finally
+    TMonitor.Exit(FLock);
+  end;
 end;
 
 function TManualDispatcher.TakeNext(out Proc: TProc): Boolean;

@@ -56,10 +56,13 @@ type
   TPdfSearchHitsEvent = reference to procedure(const Hits: TArray<TPdfSearchHit>);
   // False when a page failed; there is no call after the request was cancelled
   TPdfSearchDoneEvent = reference to procedure(const Completed: Boolean);
+  // A fatal exception (see TPdfFailure.IsFatal) stopped the worker of an open document; on the UI thread, once
+  TPdfSessionFatalEvent = reference to procedure(const Message: string);
 
   // All the work on a document is done by the worker of its session. The callbacks run on the UI thread, through the dispatcher, and never
   // after Cancel of their request or after Close or Destroy of the session. A job that fails reports the failure (a failed result, or
-  // False for a search) and logs it; nothing vanishes silently.
+  // False for a search) and logs it; nothing vanishes silently. After a fatal exception the worker hands every request that is still
+  // queued, and every later one, its failure; the state becomes Failed and the next Open starts a new worker.
   IPdfViewerSession = interface
     ['{3F7A5C92-1E48-4B6D-A0C3-8D2E6B9F1A74}']
     // Open closes a previous document first. OnDone always comes, unless the session is closed or destroyed first.
@@ -231,6 +234,8 @@ type
     procedure Perform(const Cancel: IPdfCancelToken); virtual; abstract;
     // The job raised Failure (the base class logged it): hand the failure to whoever waits for the result. Runs on the worker thread.
     procedure Fail(const Failure: Exception); virtual; abstract;
+    // The one log line of a failure of this job; on the worker thread
+    procedure LogFailure(const Failure: Exception);
     function Describe: string; virtual; abstract;
     // Runs Proc on the UI thread, unless the request was cancelled or the session was closed before this call or before Proc runs
     procedure PostToUi(const Proc: TProc);
@@ -243,6 +248,8 @@ type
     constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
                        const Priority: TPdfJobPriority);
     procedure Execute(const Cancel: IPdfCancelToken); override;
+    // The worker stopped after a fatal error: the request gets its failure through Fail
+    procedure Abandon; override;
   end;
 
   TPdfViewerSession = class(TInterfacedObject, IPdfViewerSession)
@@ -256,7 +263,21 @@ type
     FPermissions: TPdfViewerPermissions;
     // The requests that may still deliver; the done ones are removed when a request is added
     FRequests: TList<IPdfRequestState>;
+    FOnLog: TPdfLogEvent;
+    FOnFatal: TPdfSessionFatalEvent;
+    // Lives as long as the session, where FAlive is renewed per document: what the worker reports about itself is delivered while it lives
+    FLifetime: ISessionAlive;
+    // Counts the workers: a report of a worker that was replaced is ignored
+    FWorkerGeneration: Integer;
+    // What a worker could report only to the log, from its own thread; written to OnLog on the UI thread
+    FWorkerNotes: TThreadList<string>;
 
+    procedure CreateWorker;
+    // Frees the failed worker, which releases its document on its own thread, and starts a new one
+    procedure ReplaceWorker;
+    function WorkerReport(const Generation: Integer): TPdfWorkerReportEvent;
+    procedure HandleWorkerFatal(const Generation: Integer; const Message: string);
+    procedure WriteWorkerNotes;
     function NewRequest: TPdfViewerRequest;
     procedure CancelRequests;
     // Everything that belongs to the document that goes: requests, results that are on their way, and what the session shows of it
@@ -271,7 +292,11 @@ type
   public
     // The session does all its work for the document on its own worker thread; Dispatcher delivers the results to the UI thread, and OnLog
     // gets the log lines of the document and of failed jobs there.
-    constructor Create(const Backend: IPdfRenderBackend; const Dispatcher: IPdfViewerDispatcher; const OnLog: TPdfLogEvent);
+    constructor Create(const Backend: IPdfRenderBackend; const Dispatcher: IPdfViewerDispatcher; const OnLog: TPdfLogEvent); overload;
+    // OnFatal is called when a fatal exception stopped the worker of an open document (not for a failed open: that comes through the
+    // OnDone of Open). The state is Failed by then.
+    constructor Create(const Backend: IPdfRenderBackend; const Dispatcher: IPdfViewerDispatcher; const OnLog: TPdfLogEvent;
+                       const OnFatal: TPdfSessionFatalEvent); overload;
     // Cancels everything and waits for the worker, which releases the document on its own thread
     destructor Destroy; override;
 
@@ -310,6 +335,7 @@ uses
   Pdf4D.Common.Quad,
   Pdf4D.Render.Renderer,
   Pdf4D.Viewer.TextMatcher,
+  Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Viewer.Tiles;
 
 const
@@ -354,6 +380,7 @@ type
     class function CopyPages(const Document: IPdfDocument): TArray<TPdfPageInfo>; static;
     class function FlattenOutline(const Roots: TArray<IPdfOutlineItem>): TArray<TPdfOutlineEntry>; static;
     class function EntryOf(const Item: IPdfOutlineItem; const Level: Integer): TPdfOutlineEntry; static;
+    procedure PostFailure(const Failure: Exception);
 
   protected
     procedure Perform(const Cancel: IPdfCancelToken); override;
@@ -364,6 +391,8 @@ type
     constructor Create(const Environment: TSessionEnvironment; const Alive: ISessionAlive; const Request: IPdfRequestState;
                        const FileName: string; const Data: TBytes; const IsFile: Boolean; const Password: string;
                        const Apply: TOpenOutcomeProc);
+    // The document of a failed worker is not touched here: the worker releases it when it ends
+    procedure Abandon; override;
   end;
 
   // Releases the document of the slot, on the worker
@@ -702,6 +731,21 @@ begin
     end);
 end;
 
+procedure TSessionJob.LogFailure(const Failure: Exception);
+begin
+  FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format('%s failed: %s', [Describe, Failure.Message]));
+end;
+
+procedure TSessionJob.Abandon;
+begin
+  const Failure = EPdfException.Create(SWorkerStopped);
+  try
+    Fail(Failure);
+  finally
+    Failure.Free;
+  end;
+end;
+
 procedure TSessionJob.Execute(const Cancel: IPdfCancelToken);
 begin
   try
@@ -710,7 +754,7 @@ begin
     on Failure: Exception do
     begin
       // The worker swallows what a job raises, so the job tells about it itself
-      FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format('%s failed: %s', [Describe, Failure.Message]));
+      LogFailure(Failure);
       Fail(Failure);
       if TPdfFailure.IsFatal(Failure) then
       begin
@@ -874,7 +918,21 @@ end;
 procedure TOpenJob.Fail(const Failure: Exception);
 begin
   Environment.Slot.Release;
+  PostFailure(Failure);
+end;
 
+procedure TOpenJob.Abandon;
+begin
+  const Failure = EPdfException.Create(SWorkerStopped);
+  try
+    PostFailure(Failure);
+  finally
+    Failure.Free;
+  end;
+end;
+
+procedure TOpenJob.PostFailure(const Failure: Exception);
+begin
   var Outcome: TOpenOutcome;
   Outcome.Succeeded := False;
   Outcome.ErrorKind := KindOf(Failure);
@@ -911,6 +969,7 @@ end;
 procedure TReleaseJob.Fail(const Failure: Exception);
 begin
   // Nobody waits for the release; the base class logged it
+  Exit;
 end;
 
 { TRenderJob }
@@ -1290,7 +1349,7 @@ begin
 
       // The other pages are still searched; the search ends as not completed
       FFailed := True;
-      Environment.Log(Alive, TPdfLogLevel.Error, Format('%s failed: %s', [Describe, Failure.Message]));
+      LogFailure(Failure);
     end;
   end;
 
@@ -1319,6 +1378,12 @@ end;
 
 constructor TPdfViewerSession.Create(const Backend: IPdfRenderBackend; const Dispatcher: IPdfViewerDispatcher; const OnLog: TPdfLogEvent);
 begin
+  Create(Backend, Dispatcher, OnLog, nil);
+end;
+
+constructor TPdfViewerSession.Create(const Backend: IPdfRenderBackend; const Dispatcher: IPdfViewerDispatcher; const OnLog: TPdfLogEvent;
+                                     const OnFatal: TPdfSessionFatalEvent);
+begin
   if not Assigned(Backend) then
   begin
     raise EArgumentNilException.Create('Backend');
@@ -1329,9 +1394,13 @@ begin
   end;
 
   inherited Create;
+  FOnLog := OnLog;
+  FOnFatal := OnFatal;
   FState := TPdfDocumentState.Closed;
   FAlive := TSessionAlive.Create;
+  FLifetime := TSessionAlive.Create;
   FRequests := TList<IPdfRequestState>.Create;
+  FWorkerNotes := TThreadList<string>.Create;
   FEnvironment := TSessionEnvironment.Create(Backend, Dispatcher, OnLog,
     procedure(const IsRelease: Boolean; const ThreadId: TThreadID)
     begin
@@ -1342,25 +1411,124 @@ begin
       end;
       {$ENDIF}
     end);
+  CreateWorker;
+end;
+
+destructor TPdfViewerSession.Destroy;
+begin
+  // Create raises before these exist when an argument is nil
+  if Assigned(FLifetime) then
+  begin
+    FLifetime.Kill;
+  end;
+  if Assigned(FAlive) then
+  begin
+    FAlive.Kill;
+  end;
+  if Assigned(FRequests) then
+  begin
+    CancelRequests;
+  end;
+  // Stops the worker, which releases the document on its own thread before it ends
+  FWorker.Free;
+  if Assigned(FWorkerNotes) then
+  begin
+    WriteWorkerNotes;
+  end;
+  FEnvironment.Free;
+  FWorkerNotes.Free;
+  FRequests.Free;
+  inherited;
+end;
+
+procedure TPdfViewerSession.CreateWorker;
+begin
   // The worker releases the document when it ends, also when a fatal failure stopped it from running jobs
   const Environment = FEnvironment;
   FWorker := TPdfDocumentWorker.Create(
     procedure
     begin
       Environment.Slot.Release;
-    end);
+    end,
+    WorkerReport(FWorkerGeneration));
   FEnvironment.Worker := FWorker;
 end;
 
-destructor TPdfViewerSession.Destroy;
+procedure TPdfViewerSession.ReplaceWorker;
 begin
-  FAlive.Kill;
-  CancelRequests;
-  // Stops the worker, which releases the document on its own thread before it ends
   FWorker.Free;
-  FEnvironment.Free;
-  FRequests.Free;
-  inherited;
+  WriteWorkerNotes;
+  Inc(FWorkerGeneration);
+  CreateWorker;
+end;
+
+function TPdfViewerSession.WorkerReport(const Generation: Integer): TPdfWorkerReportEvent;
+begin
+  const Notes = FWorkerNotes;
+  const Lifetime = FLifetime;
+  const Dispatcher = FEnvironment.Dispatcher;
+
+  Result :=
+    procedure(const Kind: TPdfWorkerReportKind; const Message: string)
+    begin
+      case Kind of
+        TPdfWorkerReportKind.JobFatal:
+          Dispatcher.Post(
+            procedure
+            begin
+              if Lifetime.IsAlive then
+              begin
+                HandleWorkerFatal(Generation, Message);
+              end;
+            end);
+        TPdfWorkerReportKind.AbandonFailed:
+          Notes.Add(Format(SWorkerAbandonFailed, [Message]));
+        TPdfWorkerReportKind.EndProcedureFailed:
+          Notes.Add(Format(SWorkerEndFailed, [Message]));
+      end;
+    end;
+end;
+
+procedure TPdfViewerSession.HandleWorkerFatal(const Generation: Integer; const Message: string);
+begin
+  // A worker that was replaced, and an open that is still running (its job reports the failure itself), are not for us
+  const IsCurrent = ((Generation = FWorkerGeneration) and (FState = TPdfDocumentState.Open));
+  if not IsCurrent then
+  begin
+    Exit;
+  end;
+
+  FState := TPdfDocumentState.Failed;
+  if Assigned(FOnLog) then
+  begin
+    FOnLog(TPdfLogLevel.Error, Format(SWorkerFatal, [Message]));
+  end;
+  if Assigned(FOnFatal) then
+  begin
+    FOnFatal(Message);
+  end;
+end;
+
+procedure TPdfViewerSession.WriteWorkerNotes;
+begin
+  var Lines: TArray<string>;
+  const List = FWorkerNotes.LockList;
+  try
+    Lines := List.ToArray;
+    List.Clear;
+  finally
+    FWorkerNotes.UnlockList;
+  end;
+
+  if not Assigned(FOnLog) then
+  begin
+    Exit;
+  end;
+
+  for var Line in Lines do
+  begin
+    FOnLog(TPdfLogLevel.Error, Line);
+  end;
 end;
 
 function TPdfViewerSession.NewRequest: TPdfViewerRequest;
@@ -1404,6 +1572,11 @@ procedure TPdfViewerSession.BeginOpen(const FileName: string; const Data: TBytes
                                       const OnDone: TPdfOpenDoneEvent);
 begin
   DropDocument;
+  // A worker that a fatal exception stopped is not used again
+  if FWorker.IsFailed then
+  begin
+    ReplaceWorker;
+  end;
   FState := TPdfDocumentState.Opening;
 
   const Request = NewRequest;
@@ -1495,7 +1668,7 @@ procedure TPdfViewerSession.CheckOpen;
 begin
   if FState <> TPdfDocumentState.Open then
   begin
-    raise EInvalidOpException.Create('The document is not open');
+    raise EInvalidOpException.Create(SDocumentNotOpen);
   end;
 end;
 

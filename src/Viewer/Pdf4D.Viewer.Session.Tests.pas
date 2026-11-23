@@ -40,8 +40,13 @@ type
     FBackendReference: IPdfRenderBackend;
     FSession: IPdfViewerSession;
     FLogLines: TStringList;
+    FFatalMessages: TStringList;
 
     procedure CreateSession;
+    // Waits, without running anything on the dispatcher, until the worker has posted something
+    procedure WaitForPostedResult;
+    // Makes every text extraction of the document raise an access violation, until TearDown
+    procedure FailTextExtractionFatally;
     // Opens the document and runs the dispatcher until OnDone came
     function OpenData(const Data: TBytes; const Password: string = ''): TPdfOpenResult;
     function OpenFile(const FileName, Password: string): TPdfOpenResult;
@@ -118,6 +123,26 @@ type
     procedure TestArgumentsAreChecked;
     [Test]
     procedure TestSessionOpensAgainAfterClose;
+    [Test]
+    procedure TestFatalFailureGivesEveryRequestItsFailure;
+    [Test]
+    procedure TestFatalFailureFailsTheSessionAndOpenStartsAgain;
+    [Test]
+    procedure TestFatalFailureWhileOpeningFailsTheOpen;
+    [Test]
+    procedure TestCreateWithoutBackendRaises;
+    [Test]
+    procedure TestCreateWithoutDispatcherRaises;
+    [Test]
+    procedure TestFailureWhileReleasingAtTheEndIsLogged;
+    [Test]
+    procedure TestOpenResultInTheQueueDoesNotReopenAClosedSession;
+    [Test]
+    procedure TestResultInTheQueueIsDroppedByCancel;
+    [Test]
+    procedure TestResultInTheQueueIsDroppedByClose;
+    [Test]
+    procedure TestResultInTheQueueIsDroppedByDestroy;
   end;
 
   [TestFixture]
@@ -172,6 +197,7 @@ begin
   FBackend := TRecordingBackend.Create;
   FBackendReference := FBackend;
   FLogLines := TStringList.Create;
+  FFatalMessages := TStringList.Create;
   CreateSession;
 end;
 
@@ -183,6 +209,7 @@ begin
   {$ENDIF}
   // The session first: it waits for its worker, which may still post
   FSession := nil;
+  FFatalMessages.Free;
   FLogLines.Free;
   FBackendReference := nil;
   FDispatcherReference := nil;
@@ -195,7 +222,32 @@ begin
     begin
       // The dispatcher runs this on the test thread
       FLogLines.Add(Message);
+    end,
+    procedure(const Message: string)
+    begin
+      FFatalMessages.Add(Message);
     end);
+end;
+
+procedure TPdfViewerSessionTests.WaitForPostedResult;
+begin
+  const Watch = TStopwatch.StartNew;
+  while (FDispatcher.PendingCount = 0) and (Watch.ElapsedMilliseconds < WaitMs) do
+  begin
+    TThread.Sleep(1);
+  end;
+  Assert.IsTrue(FDispatcher.PendingCount > 0, 'The worker posted nothing');
+end;
+
+procedure TPdfViewerSessionTests.FailTextExtractionFatally;
+begin
+  {$IFDEF PDF4D_TESTS}
+  TPdfDocumentHandle.StripperHook :=
+    procedure
+    begin
+      raise EAccessViolation.Create('Injected access violation');
+    end;
+  {$ENDIF}
 end;
 
 procedure TPdfViewerSessionTests.WaitUntil(const Condition: TFunc<Boolean>; const Description: string);
@@ -925,6 +977,236 @@ begin
   finally
     Events.Free;
   end;
+end;
+
+procedure TPdfViewerSessionTests.TestFatalFailureGivesEveryRequestItsFailure;
+begin
+  OpenOrFail(TViewerDocuments.Invoice);
+  FailTextExtractionFatally;
+  var TextCalls := 0;
+  var TextWasEmpty := True;
+  var SearchDone := 0;
+  var SearchCompleted := True;
+  var TileEvents := 0;
+  var TileFailed := True;
+
+  // The dispatcher does not run until all are queued, so the session is still open: some are queued behind the fatal one, others come after
+  FSession.RequestPageText(0, TPdfJobPriority.Visible,
+    procedure(const PageText: IPdfPageText)
+    begin
+      Inc(TextCalls);
+      TextWasEmpty := (TextWasEmpty and PageText.IsEmpty);
+    end);
+  FSession.RequestPageText(1, TPdfJobPriority.PageText,
+    procedure(const PageText: IPdfPageText)
+    begin
+      Inc(TextCalls);
+      TextWasEmpty := (TextWasEmpty and PageText.IsEmpty);
+    end);
+  FSession.Search('Factuur', False, nil,
+    procedure(const Completed: Boolean)
+    begin
+      Inc(SearchDone);
+      SearchCompleted := Completed;
+    end);
+  const Size = TPdfViewTransform.Create(FSession.Pages[0], 0, 1, 72).Size;
+  FSession.RequestTiles(0, 1, 0, TPdfTileGrid.TilesIn(Size, TRect.Create(0, 0, Size.cx, Size.cy)), TPdfJobPriority.Prefetch,
+    procedure(const Tile: TPoint; const Outcome: TPdfRenderResult)
+    begin
+      Inc(TileEvents);
+      TileFailed := (TileFailed and (not Outcome.Succeeded));
+    end);
+
+  WaitUntil(
+    function: Boolean
+    begin
+      Result := (TextCalls = 2) and (SearchDone = 1) and (TileEvents > 0);
+    end,
+    'the failures of the abandoned requests');
+
+  Assert.IsTrue(TextWasEmpty);
+  Assert.IsFalse(SearchCompleted);
+  Assert.IsTrue(TileFailed);
+end;
+
+procedure TPdfViewerSessionTests.TestFatalFailureFailsTheSessionAndOpenStartsAgain;
+begin
+  OpenOrFail(TViewerDocuments.Invoice);
+  FailTextExtractionFatally;
+  FSession.RequestPageText(0, TPdfJobPriority.Visible, nil);
+
+  WaitUntil(
+    function: Boolean
+    begin
+      Result := (FSession.State = TPdfDocumentState.Failed);
+    end,
+    'the session to fail');
+  Assert.AreEqual(1, Integer(FFatalMessages.Count));
+  Assert.AreEqual('Injected access violation', FFatalMessages[0]);
+  Assert.IsTrue(LogContains('fatal error'), 'The fatal error was not logged');
+  Assert.WillRaise(
+    procedure
+    begin
+      FSession.RequestPageText(0, TPdfJobPriority.Visible, nil);
+    end,
+    EInvalidOpException);
+
+  {$IFDEF PDF4D_TESTS}
+  TPdfDocumentHandle.StripperHook := nil;
+  {$ENDIF}
+  OpenOrFail(TViewerDocuments.Invoice);
+  Assert.AreEqual(Ord(TPdfDocumentState.Open), Ord(FSession.State));
+  var Text: IPdfPageText := nil;
+  FSession.RequestPageText(0, TPdfJobPriority.Visible,
+    procedure(const PageText: IPdfPageText)
+    begin
+      Text := PageText;
+    end);
+  WaitUntil(
+    function: Boolean
+    begin
+      Result := Assigned(Text);
+    end,
+    'the page text of the new worker');
+  Assert.IsFalse(Text.IsEmpty);
+  Assert.AreEqual(1, Integer(FFatalMessages.Count));
+end;
+
+procedure TPdfViewerSessionTests.TestFatalFailureWhileOpeningFailsTheOpen;
+begin
+  {$IFDEF PDF4D_TESTS}
+  PdfSessionDocumentHook :=
+    procedure(const IsRelease: Boolean; const ThreadId: TThreadID)
+    begin
+      if not IsRelease then
+      begin
+        raise EAccessViolation.Create('Injected load failure');
+      end;
+    end;
+
+  const Outcome = OpenData(TViewerDocuments.Invoice);
+
+  Assert.IsFalse(Outcome.Succeeded);
+  Assert.AreEqual(Ord(TPdfDocumentState.Failed), Ord(FSession.State));
+  FDispatcher.RunPending;
+  // The open reported it itself
+  Assert.AreEqual(0, Integer(FFatalMessages.Count));
+
+  PdfSessionDocumentHook := nil;
+  OpenOrFail(TViewerDocuments.Invoice);
+  Assert.AreEqual(Ord(TPdfDocumentState.Open), Ord(FSession.State));
+  {$ELSE}
+  Assert.Pass('The hook exists in the test build only');
+  {$ENDIF}
+end;
+
+procedure TPdfViewerSessionTests.TestCreateWithoutBackendRaises;
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfViewerSession.Create(nil, FDispatcherReference, nil);
+    end,
+    EArgumentNilException);
+end;
+
+procedure TPdfViewerSessionTests.TestCreateWithoutDispatcherRaises;
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfViewerSession.Create(FBackendReference, nil, nil);
+    end,
+    EArgumentNilException);
+end;
+
+procedure TPdfViewerSessionTests.TestFailureWhileReleasingAtTheEndIsLogged;
+begin
+  {$IFDEF PDF4D_TESTS}
+  PdfSessionDocumentHook :=
+    procedure(const IsRelease: Boolean; const ThreadId: TThreadID)
+    begin
+      if IsRelease then
+      begin
+        raise EInvalidOpException.Create('Injected release failure');
+      end;
+    end;
+  OpenOrFail(TViewerDocuments.Invoice);
+
+  FSession := nil;
+
+  Assert.IsTrue(LogContains('Injected release failure'), 'The failure of the release was not logged');
+  {$ELSE}
+  Assert.Pass('The hook exists in the test build only');
+  {$ENDIF}
+end;
+
+procedure TPdfViewerSessionTests.TestResultInTheQueueIsDroppedByCancel;
+begin
+  OpenOrFail(TViewerDocuments.Invoice);
+  const Events = TList<TTileEvent>.Create;
+  try
+    const Request = RequestAllTiles(0, 1, Events);
+    // The result is in the dispatcher queue when the request is cancelled, so only the check inside the posted procedure can stop it
+    WaitForPostedResult;
+    Request.Cancel;
+    FDispatcher.RunPending;
+
+    Assert.AreEqual(0, Integer(Events.Count));
+  finally
+    Events.Free;
+  end;
+end;
+
+procedure TPdfViewerSessionTests.TestResultInTheQueueIsDroppedByClose;
+begin
+  OpenOrFail(TViewerDocuments.Invoice);
+  const Events = TList<TTileEvent>.Create;
+  try
+    RequestAllTiles(0, 1, Events);
+    WaitForPostedResult;
+    FSession.Close;
+    FDispatcher.RunPending;
+
+    Assert.AreEqual(0, Integer(Events.Count));
+  finally
+    Events.Free;
+  end;
+end;
+
+procedure TPdfViewerSessionTests.TestResultInTheQueueIsDroppedByDestroy;
+begin
+  OpenOrFail(TViewerDocuments.Invoice);
+  const Events = TList<TTileEvent>.Create;
+  try
+    RequestAllTiles(0, 1, Events);
+    WaitForPostedResult;
+    FSession := nil;
+    FDispatcher.RunPending;
+
+    Assert.AreEqual(0, Integer(Events.Count));
+  finally
+    Events.Free;
+  end;
+end;
+
+procedure TPdfViewerSessionTests.TestOpenResultInTheQueueDoesNotReopenAClosedSession;
+begin
+  var Calls := 0;
+  FSession.Open(TViewerDocuments.Invoice, '',
+    procedure(const Outcome: TPdfOpenResult)
+    begin
+      Inc(Calls);
+    end);
+  // The result of the open is in the dispatcher queue when the session is closed: it changes the state of the session, so the check
+  // inside the posted procedure is the only thing that keeps the closed session closed
+  WaitForPostedResult;
+  FSession.Close;
+  FDispatcher.RunPending;
+
+  Assert.AreEqual(Ord(TPdfDocumentState.Closed), Ord(FSession.State));
+  Assert.AreEqual(0, FSession.PageCount);
+  Assert.AreEqual(0, Calls);
 end;
 
 procedure TPdfViewerSessionTests.TestDocumentIsReleasedOnWorker;
