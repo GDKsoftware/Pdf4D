@@ -216,6 +216,8 @@ uses
   Pdf4D.Viewer.PageViewController.Input.Tests in '..\src\Viewer\Pdf4D.Viewer.PageViewController.Input.Tests.pas',
   Pdf4D.Viewer.ThumbnailsController in '..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas',
   Pdf4D.Viewer.ThumbnailsController.Tests in '..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.Tests.pas',
+  Pdf4D.Viewer.Print in '..\src\Viewer\Pdf4D.Viewer.Print.pas',
+  Pdf4D.Viewer.Print.Tests in '..\src\Viewer\Pdf4D.Viewer.Print.Tests.pas',
   Pdf4D.Graphics.&Function.PostScript in '..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas',
   Pdf4D.Graphics.&Function in '..\src\Graphics\Pdf4D.Graphics.Function.pas',
   Pdf4D.Tests.Functions in 'Support\Pdf4D.Tests.Functions.pas',

@@ -287,6 +287,8 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.Input.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Print.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Print.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>

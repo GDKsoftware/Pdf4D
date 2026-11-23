@@ -28,6 +28,9 @@ const
   DefaultPageTextCacheCount = 64;
   // The most pixels of one render of the missing tiles of a page; a larger batch is split in bands
   MaxTileBatchPixels: Int64 = 8 * 1024 * 1024;
+  // Printing renders at most this many dots per inch, in bands of at most this many pixels
+  DefaultMaxPrintDpi = 300;
+  DefaultMaxBandPixels: Int64 = 8 * 1024 * 1024;
 
 type
   {$SCOPEDENUMS ON}

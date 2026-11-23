@@ -103,6 +103,7 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Painter.Interfaces.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Print.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
