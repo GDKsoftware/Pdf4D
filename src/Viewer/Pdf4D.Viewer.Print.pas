@@ -84,7 +84,8 @@ type
 
   // Prints a range of pages of an open document to a target, one band at a time: it asks the session for a band (priority Print), draws it
   // on the target in the callback and then asks for the next, so that no more than one band is in memory. UI thread only. OnDone comes
-  // once, unless the job is destroyed first.
+  // once, unless the job is destroyed first. Do not free the job inside OnProgress or OnDone: the job still runs code after the callback
+  // returns. Free it after the callback, for instance from a queued call.
   TPdfPrintJob = class
   private
     FLink: TPdfDocumentLink;
@@ -119,7 +120,7 @@ type
     procedure HandleBand(const Outcome: TPdfRenderResult);
     procedure CancelRequest;
     class function FailureText(const Message, Fallback: string): string; static;
-    // Empty when the target aborted, else why it did not
+    // Empty when the target aborted, else why it did not (the bare text, without a lead-in)
     function AbortTarget: string;
     function ComposeEndMessage(const ErrorMessage, AbortFailure: string): string;
     procedure Finish(const Status: TPdfPrintStatus; const ErrorMessage: string);
@@ -349,7 +350,7 @@ begin
     const AbortFailure = AbortTarget;
     if (AbortFailure <> '') and Assigned(FOnLog) then
     begin
-      FOnLog(AbortFailure);
+      FOnLog(Format(SPrintAbortFailed, [AbortFailure]));
     end;
   end;
 
@@ -442,7 +443,7 @@ begin
     end;
   end;
 
-  // Outside of the try, so that an exception of the callback is not taken for a failure of the job
+  // Outside of the try, so that an exception of OnDone is not taken for a failure of the job (OnProgress runs inside the try)
   if IsFailed then
   begin
     Finish(TPdfPrintStatus.Failed, Failure);
@@ -585,7 +586,7 @@ begin
   except
     on E: Exception do
     begin
-      Result := Format(SPrintAbortFailed, [FailureText(E.Message, E.ClassName)]);
+      Result := FailureText(E.Message, E.ClassName);
     end;
   end;
 end;
@@ -609,7 +610,7 @@ begin
 
   if ErrorMessage = '' then
   begin
-    Result := AbortFailure;
+    Result := Format(SPrintAbortFailed, [AbortFailure]);
   end
   else
   begin

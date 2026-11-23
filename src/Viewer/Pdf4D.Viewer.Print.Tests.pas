@@ -765,7 +765,7 @@ begin
 
   Assert.AreEqual(1, FDoneCount);
   Assert.AreEqual(Ord(TPdfPrintStatus.Cancelled), Ord(FStatus));
-  Assert.IsTrue(FMessage.Contains('The spooler did not answer'), FMessage);
+  Assert.AreEqual('Aborting the print document failed: The spooler did not answer', FMessage);
 end;
 
 procedure TPdfPrintJobTests.TestAbortFailureIsAddedToTheFailure;
@@ -778,8 +778,7 @@ begin
   FFake.FailRender(0, 'out of memory');
 
   Assert.AreEqual(Ord(TPdfPrintStatus.Failed), Ord(FStatus));
-  Assert.IsTrue(FMessage.StartsWith('out of memory'), FMessage);
-  Assert.IsTrue(FMessage.Contains('The spooler did not answer'), FMessage);
+  Assert.AreEqual('out of memory (aborting the document failed: The spooler did not answer)', FMessage);
 end;
 
 procedure TPdfPrintJobTests.TestAbortFailureOnDestroyGoesToTheLog;
@@ -798,7 +797,7 @@ begin
   FJob.Free;
   FJob := nil;
 
-  Assert.IsTrue(Logged.Contains('The spooler did not answer'), Logged);
+  Assert.AreEqual('Aborting the print document failed: The spooler did not answer', Logged);
   Assert.AreEqual(0, FDoneCount, 'no callback');
 end;
 

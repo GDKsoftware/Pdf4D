@@ -140,6 +140,8 @@ end;
 destructor TPdfDocumentWorker.Destroy;
 begin
   Stop;
+  // Only set when Execute did not get to raise it
+  FReportFailure.Free;
   FQueue.Free;
   FWake.Free;
   FLock.Free;
