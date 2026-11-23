@@ -280,6 +280,10 @@
         <DCCReference Include="Support\Pdf4D.Tests.TestDocument.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Document.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Overlay.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Painter.Interfaces.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.RecordingPainter.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.PageViewController.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>
