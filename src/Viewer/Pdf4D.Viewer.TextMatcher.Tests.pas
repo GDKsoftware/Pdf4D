@@ -43,6 +43,10 @@ type
     procedure TestNonBreakingSpaceAndTabCountAsWhitespace;
     [Test]
     procedure TestQueryWithoutSpaceDoesNotSpanWhitespace;
+    [Test]
+    procedure TestCaseFoldingIgnoresTurkishDottedI;
+    [Test]
+    procedure TestCaseFoldingOfNonAsciiLetters;
   end;
 
 implementation
@@ -147,6 +151,24 @@ begin
   const Matches = TPdfTextMatcher.FindAll('a b', 'ab', False);
 
   Assert.AreEqual('', Describe(Matches));
+end;
+
+procedure TPdfTextMatcherTests.TestCaseFoldingIgnoresTurkishDottedI;
+begin
+  // The fold is invariant: i and I match each other and the dotted capital I (U+0130) is a different letter, as it would be in a
+  // Turkish locale only (where i would fold to U+0130). The result must not depend on the locale of the user.
+  Assert.AreEqual('(1,1)', Describe(TPdfTextMatcher.FindAll('I', 'i', False)));
+  Assert.AreEqual('(1,1)', Describe(TPdfTextMatcher.FindAll('i', 'I', False)));
+  Assert.AreEqual('', Describe(TPdfTextMatcher.FindAll(#$0130, 'i', False)));
+  Assert.AreEqual('', Describe(TPdfTextMatcher.FindAll('i', #$0130, False)));
+  Assert.AreEqual('(1,1)', Describe(TPdfTextMatcher.FindAll(#$0130, #$0130, False)));
+end;
+
+procedure TPdfTextMatcherTests.TestCaseFoldingOfNonAsciiLetters;
+begin
+  Assert.AreEqual('(1,4)', Describe(TPdfTextMatcher.FindAll('Caf'#$00E9' bar', 'CAF'#$00C9, False)));
+  Assert.AreEqual('(1,5)', Describe(TPdfTextMatcher.FindAll(#$0394#$03B5#$03BB#$03C4#$03B1, #$03B4#$0395#$039B#$03A4#$0391, False)));
+  Assert.AreEqual('', Describe(TPdfTextMatcher.FindAll(#$00E9, #$00C9, True)));
 end;
 
 end.

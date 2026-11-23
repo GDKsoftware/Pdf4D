@@ -274,6 +274,12 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Session.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FakeSession.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Session.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Backend.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Overlay.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Document.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.TestDocument.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Document.Tests.pas"/>
+        <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Overlay.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.PostScript.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Function.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Functions.pas"/>

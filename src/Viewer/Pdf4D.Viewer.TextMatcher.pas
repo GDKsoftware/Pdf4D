@@ -17,6 +17,8 @@ type
   private
     class function IsWhitespace(const Value: Char): Boolean; static;
     class function NormalizeQuery(const Query: string): string; static;
+    // Upper case by the invariant mapping of the RTL, never by the locale of the user: a Turkish i must not become a dotted capital I
+    class function FoldCase(const Value: Char): Char; static;
     class function CharsEqual(const TextChar, QueryChar: Char; const MatchCase: Boolean): Boolean; static;
     class function TryMatchAt(const Text, Query: string; const Start: Integer; const MatchCase: Boolean; out AfterMatch: Integer): Boolean; static;
 
@@ -28,8 +30,10 @@ type
 implementation
 
 uses
-  System.SysUtils,
-  System.Character;
+  System.SysUtils;
+
+const
+  LastAsciiChar = #$007F;
 
 { TPdfTextMatcher }
 
@@ -98,6 +102,27 @@ begin
   end;
 end;
 
+class function TPdfTextMatcher.FoldCase(const Value: Char): Char;
+begin
+  if Value <= LastAsciiChar then
+  begin
+    Result := Value;
+    if CharInSet(Value, ['a'..'z']) then
+    begin
+      Result := Char(Ord(Value) - (Ord('a') - Ord('A')));
+    end;
+    Exit;
+  end;
+
+  // A mapping that does not give exactly one character leaves the character as it is
+  const Folded = string(Value).ToUpperInvariant;
+  Result := Value;
+  if Folded.Length = 1 then
+  begin
+    Result := Folded[1];
+  end;
+end;
+
 class function TPdfTextMatcher.CharsEqual(const TextChar, QueryChar: Char; const MatchCase: Boolean): Boolean;
 begin
   if MatchCase then
@@ -106,7 +131,7 @@ begin
   end
   else
   begin
-    Result := (TextChar.ToUpper = QueryChar.ToUpper);
+    Result := (FoldCase(TextChar) = FoldCase(QueryChar));
   end;
 end;
 
