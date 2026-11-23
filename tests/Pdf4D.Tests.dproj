@@ -273,6 +273,7 @@
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Worker.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Session.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FakeSession.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.ViewerFuzz.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Session.Tests.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Backend.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Overlay.pas"/>

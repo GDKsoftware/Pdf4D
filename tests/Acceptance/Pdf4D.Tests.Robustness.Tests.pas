@@ -30,13 +30,36 @@ type
     // an EPdfException, never another exception and never a hang
     [Test]
     procedure TestMutatedDecoderInputs;
+    // The mutated corpus (the seeds of the first test) goes through a viewer session: tiles at scale 0.5, the text and a hit test of every
+    // page and one search. A document that does not open or a render that fails is fine; an exception that is not a PDF exception, a
+    // hang or a leak is not.
+    [Test]
+    procedure TestMutatedCorpusInViewer;
+    // A document of 1000 pages is scrolled through and zoomed: the tile cache, the thumbnail cache and the cache of page texts stay
+    // within their maximum
+    [Test]
+    procedure TestCachesStayWithinBudget;
   end;
 
 implementation
 
 uses
   System.Math,
-  Pdf4D.Tests.TestFonts;
+  System.Types,
+  System.UITypes,
+  System.Generics.Collections,
+  Pdf4D.Model.Rectangle,
+  Pdf4D.Viewer.Types,
+  Pdf4D.Viewer.Session,
+  Pdf4D.Viewer.PageViewController,
+  Pdf4D.Viewer.ThumbnailsController,
+  Pdf4D.Viewer.PageText,
+  Pdf4D.Viewer.Painter.Interfaces,
+  Pdf4D.Tests.TestFonts,
+  Pdf4D.Tests.TestDocument,
+  Pdf4D.Tests.FakeSession,
+  Pdf4D.Tests.RecordingPainter,
+  Pdf4D.Tests.ViewerFuzz;
 
 const
   DecoderSeed = 9753;
@@ -45,6 +68,19 @@ const
   LiberationSansFile = 'LiberationSans-Regular.ttf';
   GlyphTableTag = 'glyf';
   KindNames: array[TMutationKind] of string = ('overwrite', 'truncate', 'duplicate', 'object-header');
+  BudgetPageCount = 1000;
+  BudgetScrollSteps = 150;
+  BudgetViewportWidth = 832;
+  BudgetViewportHeight = 600;
+  BudgetPixelsPerInch = 96;
+  OneMebibyte = 1024 * 1024;
+  // Small, so that the caches have to evict
+  BudgetTileCacheBytes = 4 * OneMebibyte;
+  BudgetThumbnailCacheBytes = OneMebibyte;
+  BudgetPageTextCacheCount = 20;
+  BudgetPageScrollPixels = 700;
+  BudgetThumbnailScrollPixels = 200;
+  BudgetZoomSteps = 3;
 
 { TRobustnessTests }
 
@@ -133,6 +169,94 @@ begin
     Campaign.AssertNoFailures;
   finally
     Campaign.Free;
+  end;
+end;
+
+procedure TRobustnessTests.TestMutatedCorpusInViewer;
+begin
+  TFuzzViewing.Probe :=
+    procedure(const Bytes: TBytes; const Password: string)
+    begin
+      TViewerFuzzProbe.Run(Bytes, Password);
+    end;
+  try
+    TFuzzCampaign.RunMutatedCorpus(TFuzzWork.Viewer);
+  finally
+    TFuzzViewing.Probe := nil;
+  end;
+end;
+
+procedure TRobustnessTests.TestCachesStayWithinBudget;
+begin
+  const Fake = TFakeViewerSession.Create;
+  const Session: IPdfViewerSession = Fake;
+  const Document = TTestDocument.Create(nil);
+  const PageViewHost: IPdfViewHost = TRecordingHost.Create;
+  const ThumbnailsHost: IPdfViewHost = TRecordingHost.Create;
+  var View: TPdfPageViewController := nil;
+  var Thumbnails: TPdfThumbnailsController := nil;
+  try
+    var Page: TPdfPageInfo;
+    Page.CropBox := TPdfRectangle.Letter;
+    Page.Rotation := 0;
+    Page.Label_ := '';
+    var Pages: TArray<TPdfPageInfo>;
+    SetLength(Pages, BudgetPageCount);
+    for var Index := 0 to High(Pages) do
+    begin
+      Pages[Index] := Page;
+    end;
+    var Permissions: TPdfViewerPermissions;
+    Permissions.CanPrint := True;
+    Permissions.CanCopy := True;
+    Fake.SetOpened(Pages, nil, Permissions);
+    Document.PageTextCacheCount := BudgetPageTextCacheCount;
+    Document.OpenWithSession(Session);
+
+    View := TPdfPageViewController.Create(PageViewHost);
+    View.TileCacheBytes := BudgetTileCacheBytes;
+    View.Document := Document;
+    View.SetViewport(TSize.Create(BudgetViewportWidth, BudgetViewportHeight), BudgetPixelsPerInch);
+    Thumbnails := TPdfThumbnailsController.Create(ThumbnailsHost);
+    Thumbnails.CacheBytes := BudgetThumbnailCacheBytes;
+    Thumbnails.Document := Document;
+    Thumbnails.SetViewport(TSize.Create(BudgetViewportWidth div 4, BudgetViewportHeight), BudgetPixelsPerInch);
+
+    for var Step := 1 to BudgetScrollSteps + BudgetZoomSteps do
+    begin
+      if Step <= BudgetScrollSteps then
+      begin
+        View.ScrollBy(0, BudgetPageScrollPixels);
+        Thumbnails.ScrollBy(0, BudgetThumbnailScrollPixels);
+      end
+      else
+      begin
+        View.ZoomIn;
+      end;
+      Document.RequestPageText(Document.CurrentPage, TPdfJobPriority.Visible, nil);
+      Fake.CompleteOutstanding(TAlphaColors.White);
+
+      Assert.IsTrue(View.TileCacheCost <= BudgetTileCacheBytes, Format('The tile cache holds %d bytes at step %d', [View.TileCacheCost, Step]));
+      Assert.IsTrue(Thumbnails.CacheCost <= BudgetThumbnailCacheBytes, Format('The thumbnail cache holds %d bytes at step %d', [Thumbnails.CacheCost, Step]));
+    end;
+
+    var CachedTexts := 0;
+    for var PageIndex := 0 to BudgetPageCount - 1 do
+    begin
+      var PageText: IPdfPageText;
+      if Document.TryGetPageText(PageIndex, PageText) then
+      begin
+        Inc(CachedTexts);
+      end;
+    end;
+    Assert.IsTrue(CachedTexts > 0, 'the page texts were cached');
+    Assert.IsTrue(CachedTexts <= BudgetPageTextCacheCount, Format('%d page texts are cached', [CachedTexts]));
+    Assert.IsTrue(View.TileCacheCost > 0, 'the tiles were cached');
+    Assert.IsTrue(Thumbnails.CacheCost > 0, 'the thumbnails were cached');
+  finally
+    Thumbnails.Free;
+    View.Free;
+    Document.Free;
   end;
 end;
 

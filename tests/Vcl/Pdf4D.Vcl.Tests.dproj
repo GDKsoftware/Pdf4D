@@ -100,6 +100,8 @@
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Print.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.Tests.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Viewer.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.VclViewerFlows.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.VclPerformance.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

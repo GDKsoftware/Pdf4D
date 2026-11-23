@@ -38,17 +38,27 @@ type
   // operator budget for content that makes every operator expensive, the program kinds give the bytes to one parser of a font program or CMap and ask it for widths and Unicode, FontClasses loads the
   // document and asks the PDF font /F1 for widths and Unicode of every code.
   // Render loads a document and draws its first pages at 36 DPI with the backend of TFuzzRendering, after the text layout of phase 1.
+  // Viewer opens the document in a viewer session (with the recording backend of TFuzzViewing) and asks for the tiles, the text and a
+  // search of its pages, as a viewer does.
   // The decoder kinds give the bytes to one decoder: a JPEG image, CCITT data, an ICC profile (parsed and used for a transform), the
   // program of a PostScript function (as the stream of a function of type 4), a Type 1 or a Type 2 charstring (with the subroutines of a
   // real font), and the bytes of a TrueType font whose outlines are all asked for.
   TFuzzWork = (Structure, Text, PageText, LimitedPageText, TightPageText, TrueTypeProgram, OpenTypeProgram, CffProgram, Type1Program, CMapProgram, FontClasses,
-               Render, JpegDecoder, CcittDecoder, IccProfile, PostScriptFunction, Type1CharString, CffCharString, GlyphOutlines);
+               Render, Viewer, JpegDecoder, CcittDecoder, IccProfile, PostScriptFunction, Type1CharString, CffCharString, GlyphOutlines);
 
   TFuzzBackendFactory = reference to function: IPdfRenderBackend;
 
   // The backend of the Render work. The test project that has a backend sets it before it runs the work; the work raises when it is not set.
   TFuzzRendering = record
     class var Backend: TFuzzBackendFactory;
+  end;
+
+  TFuzzViewProbe = reference to procedure(const Bytes: TBytes; const Password: string);
+
+  // What the Viewer work does. The test project that has the viewer units sets it before it runs the work; the work raises when it is not
+  // set (the Skia test project has no use for it).
+  TFuzzViewing = record
+    class var Probe: TFuzzViewProbe;
   end;
 
   // The valid inputs that the decoder fuzz mutates, read from the test files and the resources
@@ -272,6 +282,7 @@ type
     class procedure CffCharString(const Bytes: TBytes); static;
     class procedure GlyphOutlines(const Bytes: TBytes); static;
     class procedure Render(const Bytes: TBytes); static;
+    class procedure View(const Bytes: TBytes; const Password: string); static;
   end;
 
 { TFontProgramProbe }
@@ -747,6 +758,16 @@ begin
   end;
 end;
 
+class procedure TDecoderProbe.View(const Bytes: TBytes; const Password: string);
+begin
+  if not Assigned(TFuzzViewing.Probe) then
+  begin
+    raise EProgrammerNotFound.Create('TFuzzViewing.Probe is not set');
+  end;
+
+  TFuzzViewing.Probe(Bytes, Password);
+end;
+
 { TMutator }
 
 class procedure TMutator.Overwrite(var Bytes: TBytes);
@@ -907,6 +928,7 @@ begin
     TFuzzWork.CMapProgram: TFontProgramProbe.CMap(FBytes);
     TFuzzWork.FontClasses: TFontProgramProbe.FontClasses(FBytes);
     TFuzzWork.Render: TDecoderProbe.Render(FBytes);
+    TFuzzWork.Viewer: TDecoderProbe.View(FBytes, FPassword);
     TFuzzWork.JpegDecoder: TDecoderProbe.Jpeg(FBytes);
     TFuzzWork.CcittDecoder: TDecoderProbe.Ccitt(FBytes);
     TFuzzWork.IccProfile: TDecoderProbe.Icc(FBytes);

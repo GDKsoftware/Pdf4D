@@ -202,6 +202,7 @@ uses
   Pdf4D.Viewer.Worker.Tests in '..\src\Viewer\Pdf4D.Viewer.Worker.Tests.pas',
   Pdf4D.Viewer.Session in '..\src\Viewer\Pdf4D.Viewer.Session.pas',
   Pdf4D.Tests.FakeSession in 'Support\Pdf4D.Tests.FakeSession.pas',
+  Pdf4D.Tests.ViewerFuzz in 'Support\Pdf4D.Tests.ViewerFuzz.pas',
   Pdf4D.Viewer.Session.Tests in '..\src\Viewer\Pdf4D.Viewer.Session.Tests.pas',
   Pdf4D.Viewer.Backend in '..\src\Viewer\Pdf4D.Viewer.Backend.pas',
   Pdf4D.Viewer.Overlay in '..\src\Viewer\Pdf4D.Viewer.Overlay.pas',
