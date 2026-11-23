@@ -21,6 +21,9 @@
         <Projects Include="Pdf4D.Vcl.Skia.dproj">
             <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.Vcl.dproj</Dependencies>
         </Projects>
+        <Projects Include="dclPdf4D.Vcl.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.Vcl.dproj;Pdf4D.Vcl.Skia.dproj</Dependencies>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>

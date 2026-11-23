@@ -111,6 +111,17 @@ Taken from the `// Port of:` header of every unit. The units of the first four r
 
 Not ported from `pdmodel.graphics`: overprint, rendering intents other than the one Java uses for `toRGB`, `PDFRenderer.setSubsamplingAllowed` and `setImageDownscalingOptimizationThreshold` as options, and the handlers that construct appearances.
 
+## Ported PDFBox classes (M3, phase 3: the viewer)
+
+Phase 3 is mostly new code (the viewer core and the VCL components have no PDFBox counterpart). From PDFBox it takes the read side of links and the rules of printing:
+
+| PDFBox package | Classes |
+|---|---|
+| `pdmodel.interactive.annotation` (read only) | `PDAnnotationLink` (`getDestination`, `getAction`, `getQuadPoints`; in `Pdf4D.Model.Annotation` as `TryGetDestination`, `TryGetUri` and `QuadPoints` of the annotation). With the `/GoTo` and `/URI` actions this gives the links that the viewer follows. |
+| `printing` | `PDFPageable` (the page count, the page of a document as a printable unit, the orientation of a page from its `/Rotate` and size) and `PDFPrintable` (fitting a page on the paper: orientation from the aspect of the page and of the paper, `Scaling.SCALE_TO_FIT` as the `Fit` mode, `Scaling.ACTUAL_SIZE` as `ActualSize`, centring). They are the source of the print plan in `Pdf4D.Viewer.Print` (`TPdfPrintPlanner`), which is not a port: Pdf4D prints a raster in bands through a print target and does not use `java.awt.print`, so the planning follows the rules above and not the classes. |
+
+Deviations of the print plan from `PDFPrintable`: a page is rendered at the vertical resolution of the printer divided by a whole factor, capped by `MaxDpi` (default 300), and printed in bands of at most `DefaultMaxBandPixels`; the paper is judged in inches, because a printer can have a different resolution per axis; `PDFPrintable` prints vectors through Java2D and Pdf4D prints a raster. Not ported: `Scaling.SHRINK_TO_FIT` (a page is only made smaller; the `Fit` mode of the viewer also scales a small page up) and `Scaling.STRETCH_TO_FIT` (the aspect of the page is always kept), and the print dialog of Java (the VCL dialog is `TPdf4DPrintDialog`).
+
 ## Known deviations
 
 The list under "Deliberate deviations" below is the full list for M1 to M3 phase 2. For the corpus, the differences that show up in the golden comparison are in `tests/golden/*.known-differences.txt` with a reason per object, and `golden-format.md` explains how they are written.

@@ -19,11 +19,11 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj` and the design-time package `dclPdf4D.Vcl.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj` and the design-time package `dclPdf4D.Vcl.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. For Win32 and Win64 it also compiles the demo (`demos\Vcl\Pdf4DInvoiceDemo.dproj`, see "The demo") after the packages; the demo is not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
-`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec`, `Render` and `Viewer` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other three packages. `packages\Pdf4D.groupproj` holds the four packages (see below); the test projects stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
+`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec`, `Render` and `Viewer` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other three packages. `packages\Pdf4D.groupproj` holds the seven packages (see below), in build order; the test projects and the demo stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
 
 The package lists its units in the `contains` clause, and nothing else is on its search path, so a unit that is missing there stops the build with F2613 (and an implicit import would show as W1033, which `build.ps1` also treats as a failure). When you add a unit under `src`, add it to `packages\Pdf4D.dpk` and `packages\Pdf4D.dproj` as well as to the test project.
 
@@ -57,6 +57,21 @@ The first four build for Win32, Win64 and Linux64; the three VCL packages build 
 `tests\Vcl\Pdf4D.Vcl.Tests.dproj` is a console program that makes VCL forms in its own process (`TVclTestHost` in `tests\Vcl\Support`): a form of 96 PPI, shown outside the visible desktop, with a `TPdf4DDocument` on Skia and a `TPdf4DPageView`. The tests send input with `Perform` (mouse messages, `WM_KEYDOWN` with the Ctrl state set through `SetKeyboardState`), pump the message queue with `CheckSynchronize` and `Application.ProcessMessages`, and read what the control paints with `PaintTo`. No desktop automation tool is involved, so the suite runs from `build.ps1`. `build.ps1` copies `sk4d.dll` next to the program, like for the Skia tests, and the program uses the same two-run leak check.
 
 The process is not marked DPI aware: `ScaleForPPI` on the form drives the `ChangeScale(M, D, isDpiChange)` of the page view, which is what a Per-Monitor v2 application gets on a move to another monitor. The clipboard tests assert on the text that the page view hands to the clipboard; they also assert on `Clipboard.AsText` when the session allows access to the clipboard of the window system (some sessions refuse it with "access denied").
+
+The run in `build.ps1` needs no printer. Printing on a real printer is tested only when the environment variable `PDF4D_TEST_PRINTER` names an installed printer (`TestRealPrinter` in `Pdf4D.Vcl.Print.Tests`): set it before the run, for example `$env:PDF4D_TEST_PRINTER = 'Microsoft Print to PDF'`, and look at the page that comes out. Without the variable the test ends as passed without printing. The print job itself is tested against `TBitmapPrintTarget` (`tests\Vcl\Support`).
+
+## The demo
+
+`demos\Vcl\Pdf4DInvoiceDemo.dproj` is the invoice demo of the README: a form with three fields and a `TPdf4DViewer`, linked to a `TPdf4DDocument` and a `TPdf4DSkiaBackend`, with a manifest for Per-Monitor v2 (`AppDPIAwarenessMode` in the project, which makes msbuild write the manifest). It compiles the units from `src` through its search path, not through the packages, so it needs no installed package. `build.ps1` compiles it for Win32 and Win64 and does not run it. To run it, put `sk4d.dll` of the same platform next to the program (`Redist\win32` or `Redist\win64` of RAD Studio) and start it with a PDF on the command line, for example `tests\corpus\generated\invoices\skia-draw.pdf`.
+
+Checking Per-Monitor v2 by hand (needs two monitors with different scale factors, or a change of the scale in the Windows display settings while the demo runs):
+
+1. Start the demo with an invoice and set the zoom to 100 % in the toolbar. Note the size of the toolbar icons and the text of the fields.
+2. Drag the window to the other monitor (or change the scale of the monitor, Settings > System > Display). The window, the toolbar, the side panel, the fields and the page must all become larger or smaller by the ratio of the scales, the page must stay sharp (it is rendered again at the new scale, not stretched) and the current page and the zoom must not change.
+3. Click in the fields and on a word of the PDF: the marker (a translucent ellipse) must sit on the text at the new scale.
+4. Press Ctrl+P and look at the print dialog: it must have the size and fonts of the new scale (it takes the scale of the active form).
+
+What was checked in this repository without a second monitor: the manifest of the Win64 build holds `dpiAwareness` `PerMonitorV2` and the process runs with that awareness context. A throwaway program that holds the demo form sent `WM_DPICHANGED` to it at 144 and 192 DPI and back (a real message to the form, with a suggested rectangle): the panel, the toolbar and the side panel scaled by 1.5 and 2, and the content of the page view at zoom 100 % went from 809 to 1214 and 1618 pixels wide and back to 809, with the current page and the zoom unchanged. This does not replace the check above: the window itself stayed at 96 DPI, so `CurrentPPI` of the form stayed 96 (the page view takes its scale from the `ChangeScale(M, D, isDpiChange)` of the message and not from `CurrentPPI`; the print dialog does use `CurrentPPI` of the active form, and that path is only checked by hand).
 
 ## Linux via WSL
 
@@ -169,6 +184,16 @@ Pdf4D needs Delphi 12 or newer, but every build and test so far was done with De
 3. Build and run `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj`, the second one with the `sk4d.dll` of Delphi 12 (`Redist\win64\sk4d.dll` of that installation, next to the test program).
 4. Run the reference tests (the render comparison with the PDFBox images, `TRenderGoldenTests`) on Win64 and compare the number of pages that differ with Delphi 13 (612 of 617 pages equal at 72 DPI, 19 of 22 at 150 DPI). The Skia version is another one, so pages can differ at the edges; note the new differences and do not fix them in this step.
 5. For every `System.Skia` API that the backend uses outside the list of the next section, check that it exists in Delphi 12 (the lines below say which ones those are and what the replacement is).
+
+### Delphi 12: the viewer (phase 3)
+
+Do this too on the first machine with Delphi 12, and write down what differs.
+
+1. Open `packages\Pdf4D.groupproj` and build `Pdf4D.Viewer`, `Pdf4D.Vcl`, `Pdf4D.Vcl.Skia` and `dclPdf4D.Vcl` for Win32 and Win64, without hints or warnings.
+2. Install `dclPdf4D.Vcl`: all components are on the `Pdf4D` palette page with their icons, and the actions are in the action list editor under `Pdf4D`.
+3. Build `tests\Vcl\Pdf4D.Vcl.Tests.dproj` and run it with the `sk4d.dll` of Delphi 12 next to the program.
+4. Build the demo and go through the steps of the README use case (field gets the focus, marker and scroll, click fills the field), also after dragging the window to a screen with another scale (the manual check in "The demo").
+5. Check that `GroupDescendentsWith`, `ScaleForPPI` and `ChangeScale(M, D, isDpiChange)` behave in Delphi 12 as in Delphi 13: `Pdf4D.Vcl.Registration` calls `GroupDescendentsWith` for the three non-visual components (they must stream on a form without a control around them), the VCL tests use `ScaleForPPI` for the DPI tests, and the page view relies on `isDpiChange` and the new scale `M` of `ChangeScale`.
 
 ### The design-time package
 

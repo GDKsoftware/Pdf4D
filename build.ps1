@@ -30,6 +30,8 @@ $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packag
 # The VCL packages are built for Windows only; dclPdf4D.Vcl is the design-time package for the IDE (a 64-bit IDE loads the Win64 build, a
 # 32-bit IDE the Win32 build)
 $WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+# The demo applications, built for Windows only (compiled, not run)
+$DemoFiles = @('demos\Vcl\Pdf4DInvoiceDemo.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {
@@ -63,6 +65,15 @@ function Invoke-PackageBuild([string]$TargetPlatform) {
         if ($output | Where-Object { $_ -match 'W1033' }) {
             throw "A package for $TargetPlatform implicitly imports a unit that is missing from its contains clause (W1033)"
         }
+        Test-NoBuildProblems $output $TargetPlatform
+    }
+}
+
+# The demo is compiled only, for Windows; it is not run
+function Invoke-DemoBuild([string]$TargetPlatform) {
+    foreach ($demoFile in $DemoFiles) {
+        Write-Host "=== Demo $([IO.Path]::GetFileNameWithoutExtension($demoFile)) $TargetPlatform $Config ==="
+        $output = Invoke-MsBuild $demoFile $TargetPlatform
         Test-NoBuildProblems $output $TargetPlatform
     }
 }
@@ -218,6 +229,9 @@ if ($platforms -contains 'Linux64') {
 
 foreach ($targetPlatform in $platforms) {
     Invoke-PackageBuild $targetPlatform
+    if ($targetPlatform -ne 'Linux64') {
+        Invoke-DemoBuild $targetPlatform
+    }
     foreach ($testProject in ($TestProjects | Where-Object { $Suite -eq 'All' -or $_.Name -eq $Suite })) {
         if ($testProject.WindowsOnly -and $targetPlatform -eq 'Linux64') {
             continue
