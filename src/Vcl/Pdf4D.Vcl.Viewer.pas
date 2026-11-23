@@ -56,6 +56,9 @@ type
     FPrintDialog: TPdf4DPrintDialog;
     FActions: TActionList;
     FSearchAction: TPdf4DSearchAction;
+    FPrintAction: TPdf4DPrintAction;
+    // The key that the print action has while the print option is set
+    FPrintShortCut: TShortCut;
 {$IFDEF PDF4D_TESTS}
     class var FPasswordAsker: TPdf4DPasswordAsker;
 {$ENDIF}
@@ -278,14 +281,21 @@ begin
   FPageView.SetSubComponent(True);
 end;
 
-// The toolbar has actions of its own that know no shortcut keys, because they are in no action list: this one makes Ctrl+F work
-// wherever the focus is in the form
+// The toolbar has actions of its own that know no shortcut keys, because they are in no action list: these make Ctrl+F and Ctrl+P work
+// while the focus is inside the viewer, so that two viewers on a form do not both react
 procedure TPdf4DViewer.CreateSearchAction;
 begin
   FActions := TActionList.Create(Self);
   FSearchAction := TPdf4DSearchAction.Create(Self);
   FSearchAction.ActionList := FActions;
   FSearchAction.SearchBar := FSearchBar;
+  FSearchAction.FocusScope := Self;
+
+  FPrintAction := TPdf4DPrintAction.Create(Self);
+  FPrintAction.ActionList := FActions;
+  FPrintAction.PrintDialog := FPrintDialog;
+  FPrintAction.FocusScope := Self;
+  FPrintShortCut := FPrintAction.ShortCut;
 end;
 
 { Options }
@@ -324,6 +334,14 @@ begin
 
   FToolbar.Visible := TPdf4DViewerOption.Toolbar in FOptions;
   FToolbar.Buttons := ToolbarButtons;
+  if TPdf4DViewerOption.Print in FOptions then
+  begin
+    FPrintAction.ShortCut := FPrintShortCut;
+  end
+  else
+  begin
+    FPrintAction.ShortCut := 0;
+  end;
 
   if TPdf4DViewerOption.Search in FOptions then
   begin
@@ -411,6 +429,7 @@ begin
   FOutlineView.Document := Value;
   FSearchBar.Document := Value;
   FPrintDialog.Document := Value;
+  FPrintAction.Document := Value;
   UpdateSidePanel;
   FSearchAction.Update;
 end;
@@ -447,6 +466,15 @@ begin
         UpdateSidePanel;
         FSearchAction.Update;
       end;
+    TPdfDocumentChange.CurrentPage,
+    TPdfDocumentChange.Overlays,
+    TPdfDocumentChange.SearchResults,
+    TPdfDocumentChange.CurrentSearchHit:
+      begin
+        // The side panel and the search action do not follow these
+      end;
+  else
+    raise ENotSupportedException.CreateFmt('Unsupported document change: %d', [Ord(Change)]);
   end;
 end;
 

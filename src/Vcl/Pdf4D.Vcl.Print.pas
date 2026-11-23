@@ -118,7 +118,7 @@ begin
 
   if not Assigned(Printer) then
   begin
-    raise EArgumentNilException.Create('A printer target needs a printer');
+    raise EArgumentNilException.Create(SPrinterTargetNeedsPrinter);
   end;
 
   FPrinter := Printer;

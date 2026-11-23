@@ -40,7 +40,6 @@ type
     procedure SetThumbnailWidth(const Value: Integer);
     procedure SetSelectedColor(const Value: TColor);
 
-    class function ToAlphaColor(const Color: TColor): TAlphaColor; static;
     function PixelsPerInch: Integer;
     procedure UpdateViewport;
     procedure UpdateScrollBar;
@@ -96,7 +95,8 @@ uses
   System.SysUtils,
   Winapi.Windows,
   Vcl.Forms,
-  Pdf4D.Vcl.Painter;
+  Pdf4D.Vcl.Painter,
+  Pdf4D.Vcl.ViewSupport;
 
 const
   InitialWidth = 150;
@@ -108,9 +108,6 @@ const
   WheelNotch = 120;
   MaxScrollBarRounds = 4;
   AlphaOpaque = $FF;
-  AlphaShift = 24;
-  RedShift = 16;
-  GreenShift = 8;
 
 { TPdf4DThumbnails }
 
@@ -125,8 +122,8 @@ begin
 
   FSelectedColor := DefaultSelectedTColor;
   FController := TPdfThumbnailsController.Create(Self);
-  FController.SelectedColor := ToAlphaColor(FSelectedColor);
-  FController.BackgroundColor := ToAlphaColor(Color);
+  FController.SelectedColor := TPdfVclViewSupport.ToAlphaColor(FSelectedColor, AlphaOpaque);
+  FController.BackgroundColor := TPdfVclViewSupport.ToAlphaColor(Color, AlphaOpaque);
 end;
 
 destructor TPdf4DThumbnails.Destroy;
@@ -182,17 +179,8 @@ end;
 procedure TPdf4DThumbnails.SetSelectedColor(const Value: TColor);
 begin
   FSelectedColor := Value;
-  FController.SelectedColor := ToAlphaColor(Value);
+  FController.SelectedColor := TPdfVclViewSupport.ToAlphaColor(Value, AlphaOpaque);
   Invalidate;
-end;
-
-class function TPdf4DThumbnails.ToAlphaColor(const Color: TColor): TAlphaColor;
-begin
-  const Rgb = ColorToRGB(Color);
-  Result := (TAlphaColor(AlphaOpaque) shl AlphaShift) or
-            (TAlphaColor(GetRValue(Rgb)) shl RedShift) or
-            (TAlphaColor(GetGValue(Rgb)) shl GreenShift) or
-            TAlphaColor(GetBValue(Rgb));
 end;
 
 // The scale that the window has now: what the last change of scale gave, else what the window reports
@@ -281,16 +269,7 @@ begin
       FScrollBarDirty := False;
       Inc(Pass);
 
-      var Info: TScrollInfo;
-      Info := Default(TScrollInfo);
-      Info.cbSize := SizeOf(Info);
-      Info.fMask := SIF_RANGE or SIF_PAGE or SIF_POS;
-      Info.nMin := 0;
-      Info.nMax := Max(0, FController.ContentSize.cy - 1);
-      Info.nPage := Max(0, ClientHeight);
-      Info.nPos := FController.ScrollPosition.Y;
-      // Without SIF_DISABLENOSCROLL Windows hides a bar that has nothing to scroll
-      SetScrollInfo(Handle, SB_VERT, Info, True);
+      TPdfVclViewSupport.ApplyScrollBar(Handle, SB_VERT, FController.ContentSize.cy, ClientHeight, FController.ScrollPosition.Y);
     until (not FScrollBarDirty) or (Pass >= MaxScrollBarRounds);
   finally
     FIsUpdatingScrollBar := False;
@@ -299,39 +278,12 @@ end;
 
 procedure TPdf4DThumbnails.HandleScroll(const ScrollCode: Integer);
 begin
-  var Info: TScrollInfo;
-  Info := Default(TScrollInfo);
-  Info.cbSize := SizeOf(Info);
-  Info.fMask := SIF_ALL;
-  if not GetScrollInfo(Handle, SB_VERT, Info) then
-  begin
-    Exit;
-  end;
-
   const LineStep = MulDiv(LineScrollStep, PixelsPerInch, LogicalPixelsPerInch);
-  const LastPosition = Max(0, Info.nMax - Integer(Info.nPage) + 1);
-  var Target := Info.nPos;
-  case ScrollCode of
-    SB_LINEUP:
-      Dec(Target, LineStep);
-    SB_LINEDOWN:
-      Inc(Target, LineStep);
-    SB_PAGEUP:
-      Dec(Target, Integer(Info.nPage));
-    SB_PAGEDOWN:
-      Inc(Target, Integer(Info.nPage));
-    SB_THUMBTRACK, SB_THUMBPOSITION:
-      Target := Info.nTrackPos;
-    SB_TOP:
-      Target := 0;
-    SB_BOTTOM:
-      Target := LastPosition;
-  else
-    Exit;
+  var Target: Integer;
+  if TPdfVclViewSupport.TryScrollTarget(Handle, SB_VERT, ScrollCode, LineStep, Target) then
+  begin
+    FController.ScrollTo(TPoint.Create(0, Target));
   end;
-
-  Target := EnsureRange(Target, 0, LastPosition);
-  FController.ScrollTo(TPoint.Create(0, Target));
 end;
 
 procedure TPdf4DThumbnails.WMVScroll(var Message: TWMVScroll);
@@ -346,7 +298,7 @@ begin
   inherited;
   if Assigned(FController) then
   begin
-    FController.BackgroundColor := ToAlphaColor(Color);
+    FController.BackgroundColor := TPdfVclViewSupport.ToAlphaColor(Color, AlphaOpaque);
   end;
 end;
 

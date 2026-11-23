@@ -71,12 +71,10 @@ type
     procedure SetSelectionColor(const Value: TColor);
     procedure SetSelectionOpacity(const Value: Byte);
 
-    class function ToAlphaColor(const Color: TColor; const Opacity: Byte): TAlphaColor; static;
     procedure ApplyColors;
     function PixelsPerInch: Integer;
     procedure UpdateViewport;
     procedure UpdateScrollBars;
-    procedure ApplyScrollBar(const Bar: Integer; const ContentLength, ViewLength, Position: Integer);
     procedure HandleScroll(const Bar: Integer; const ScrollCode: Integer);
     function HandleKey(const Key: Word; const Shift: TShiftState): Boolean;
     class function ToViewerKey(const Key: Word; out ViewerKey: TPdfViewerKey): Boolean; static;
@@ -98,6 +96,9 @@ type
 
     procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
     procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+    procedure WMMouseHWheel(var Message: TWMMouseWheel); message WM_MOUSEHWHEEL;
+    // Scrolls sideways by a number of notches of the wheel; a positive number goes to the right
+    procedure ScrollSideways(const Notches: Single);
     procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
     procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
 
@@ -178,18 +179,17 @@ uses
   Vcl.Forms,
   Pdf4D.Common.Defines,
   Pdf4D.Viewer.ResourceStrings,
-  Pdf4D.Vcl.Painter;
+  Pdf4D.Vcl.Painter,
+  Pdf4D.Vcl.ViewSupport;
 
 const
   InitialSize = 200;
   LogicalPixelsPerInch = 96;
   // Logical pixels
   LineScrollStep = 40;
+  LinesPerWheelNotch = 3;
+  WheelNotch = 120;
   MaxScrollBarRounds = 4;
-  ColorByteMask = $FF;
-  AlphaShift = 24;
-  RedShift = 16;
-  GreenShift = 8;
   VkZero = Ord('0');
   VkLetterA = Ord('A');
   VkLetterC = Ord('C');
@@ -364,19 +364,10 @@ begin
   ApplyColors;
 end;
 
-class function TPdf4DPageView.ToAlphaColor(const Color: TColor; const Opacity: Byte): TAlphaColor;
-begin
-  const Rgb = ColorToRGB(Color);
-  Result := (TAlphaColor(Opacity) shl AlphaShift) or
-            (TAlphaColor(GetRValue(Rgb)) shl RedShift) or
-            (TAlphaColor(GetGValue(Rgb)) shl GreenShift) or
-            TAlphaColor(GetBValue(Rgb));
-end;
-
 procedure TPdf4DPageView.ApplyColors;
 begin
-  FController.HoverColor := ToAlphaColor(FHoverColor, FHoverOpacity);
-  FController.SelectionColor := ToAlphaColor(FSelectionColor, FSelectionOpacity);
+  FController.HoverColor := TPdfVclViewSupport.ToAlphaColor(FHoverColor, FHoverOpacity);
+  FController.SelectionColor := TPdfVclViewSupport.ToAlphaColor(FSelectionColor, FSelectionOpacity);
   Invalidate;
 end;
 
@@ -444,20 +435,6 @@ end;
 
 { Scroll bars }
 
-procedure TPdf4DPageView.ApplyScrollBar(const Bar: Integer; const ContentLength, ViewLength, Position: Integer);
-begin
-  var Info: TScrollInfo;
-  Info := Default(TScrollInfo);
-  Info.cbSize := SizeOf(Info);
-  Info.fMask := SIF_RANGE or SIF_PAGE or SIF_POS;
-  Info.nMin := 0;
-  Info.nMax := Max(0, ContentLength - 1);
-  Info.nPage := Max(0, ViewLength);
-  Info.nPos := Position;
-  // Without SIF_DISABLENOSCROLL Windows hides a bar that has nothing to scroll
-  SetScrollInfo(Handle, Bar, Info, True);
-end;
-
 // Showing or hiding a bar changes the client size, which resizes the viewport and asks for another update; so it repeats until the
 // bars and the viewport agree, at most a few rounds
 procedure TPdf4DPageView.UpdateScrollBars;
@@ -482,8 +459,8 @@ begin
 
       const Content = FController.ContentSize;
       const Position = FController.ScrollPosition;
-      ApplyScrollBar(SB_HORZ, Content.cx, ClientWidth, Position.X);
-      ApplyScrollBar(SB_VERT, Content.cy, ClientHeight, Position.Y);
+      TPdfVclViewSupport.ApplyScrollBar(Handle, SB_HORZ, Content.cx, ClientWidth, Position.X);
+      TPdfVclViewSupport.ApplyScrollBar(Handle, SB_VERT, Content.cy, ClientHeight, Position.Y);
     until (not FScrollBarsDirty) or (Pass >= MaxScrollBarRounds);
   finally
     FIsUpdatingScrollBars := False;
@@ -492,38 +469,13 @@ end;
 
 procedure TPdf4DPageView.HandleScroll(const Bar: Integer; const ScrollCode: Integer);
 begin
-  var Info: TScrollInfo;
-  Info := Default(TScrollInfo);
-  Info.cbSize := SizeOf(Info);
-  Info.fMask := SIF_ALL;
-  if not GetScrollInfo(Handle, Bar, Info) then
+  const LineStep = MulDiv(LineScrollStep, PixelsPerInch, LogicalPixelsPerInch);
+  var Target: Integer;
+  if not TPdfVclViewSupport.TryScrollTarget(Handle, Bar, ScrollCode, LineStep, Target) then
   begin
     Exit;
   end;
 
-  const LineStep = MulDiv(LineScrollStep, PixelsPerInch, LogicalPixelsPerInch);
-  const LastPosition = Max(0, Info.nMax - Integer(Info.nPage) + 1);
-  var Target := Info.nPos;
-  case ScrollCode of
-    SB_LINEUP:
-      Dec(Target, LineStep);
-    SB_LINEDOWN:
-      Inc(Target, LineStep);
-    SB_PAGEUP:
-      Dec(Target, Integer(Info.nPage));
-    SB_PAGEDOWN:
-      Inc(Target, Integer(Info.nPage));
-    SB_THUMBTRACK, SB_THUMBPOSITION:
-      Target := Info.nTrackPos;
-    SB_TOP:
-      Target := 0;
-    SB_BOTTOM:
-      Target := LastPosition;
-  else
-    Exit;
-  end;
-
-  Target := EnsureRange(Target, 0, LastPosition);
   const Current = FController.ScrollPosition;
   if Bar = SB_HORZ then
   begin
@@ -575,7 +527,13 @@ begin
   end;
 
   // Windows asked for the cursor before the controller knew where the pointer is: show the new one now
-  if HandleAllocated and ClientRect.Contains(ScreenToClient(Mouse.CursorPos)) then
+  if not HandleAllocated then
+  begin
+    Exit;
+  end;
+
+  const PointerAt = ScreenToClient(Mouse.CursorPos);
+  if ClientRect.Contains(PointerAt) then
   begin
     SetCursor(Screen.Cursors[Cursor]);
   end;
@@ -694,10 +652,30 @@ begin
   Result := inherited;
   if not Result then
   begin
-    const Point = ScreenToClient(MousePos);
-    FController.MouseWheel(WheelDelta, ssCtrl in Shift, TPointF.Create(Point.X, Point.Y));
+    if ssShift in Shift then
+    begin
+      // Shift and the wheel scroll sideways; the wheel up goes to the left
+      ScrollSideways(-WheelDelta / WheelNotch);
+    end
+    else
+    begin
+      const Point = ScreenToClient(MousePos);
+      FController.MouseWheel(WheelDelta, ssCtrl in Shift, TPointF.Create(Point.X, Point.Y));
+    end;
     Result := True;
   end;
+end;
+
+procedure TPdf4DPageView.ScrollSideways(const Notches: Single);
+begin
+  const LineStep = MulDiv(LineScrollStep, PixelsPerInch, LogicalPixelsPerInch);
+  FController.ScrollBy(Round(Notches * LinesPerWheelNotch * LineStep), 0);
+end;
+
+procedure TPdf4DPageView.WMMouseHWheel(var Message: TWMMouseWheel);
+begin
+  ScrollSideways(Message.WheelDelta / WheelNotch);
+  Message.Result := 1;
 end;
 
 class function TPdf4DPageView.ToViewerKey(const Key: Word; out ViewerKey: TPdfViewerKey): Boolean;

@@ -48,6 +48,8 @@ resourcestring
   SPrintNotAllowed = 'The document does not allow printing.';
   SCopyFailed = 'The selected text could not be copied: %s';
   SPrintFailedMessage = 'Printing failed: %s';
+  SPrinterTargetNeedsPrinter = 'A printer target needs a printer';
+  SPrintStatusUnsupported = 'Unsupported print status: %d';
 
   // Print dialog
   SPrintDialogCaption = 'Print';

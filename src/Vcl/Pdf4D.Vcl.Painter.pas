@@ -9,6 +9,8 @@ interface
 uses
   System.Types,
   System.UITypes,
+  Winapi.Windows,
+  Winapi.GDIPOBJ,
   Vcl.Graphics,
   Pdf4D.Render.Bitmap,
   Pdf4D.Viewer.Painter.Interfaces;
@@ -44,13 +46,18 @@ type
   TPdfVclPainter = class(TInterfacedObject, IPdfViewPainter)
   private
     FCanvas: TCanvas;
+    // One for all the shapes of a paint, made when the first one is drawn
+    FGraphics: TGPGraphics;
+    FGraphicsDc: HDC;
 
+    function ShapeGraphics: TGPGraphics;
     class function ToArgb(const Color: TAlphaColor): Cardinal; static;
     class function ToGdiColor(const Color: TAlphaColor): TColor; static;
 
   public
     // The canvas must outlive the painter
     constructor Create(const Canvas: TCanvas);
+    destructor Destroy; override;
 
     procedure FillRect(const Rect: TRectF; const Color: TAlphaColor);
     procedure DrawImage(const Image: IPdfViewImage; const Source: TRect; const Dest: TRectF);
@@ -65,9 +72,7 @@ implementation
 
 uses
   System.SysUtils,
-  Winapi.Windows,
-  Winapi.GDIPAPI,
-  Winapi.GDIPOBJ;
+  Winapi.GDIPAPI;
 
 type
   // GDI+ must be started once per process and stopped at the end. The painters are used on the UI thread only.
@@ -181,6 +186,24 @@ begin
   TPdfGdiPlus.EnsureStarted;
 end;
 
+destructor TPdfVclPainter.Destroy;
+begin
+  FGraphics.Free;
+  inherited;
+end;
+
+function TPdfVclPainter.ShapeGraphics: TGPGraphics;
+begin
+  const Dc = FCanvas.Handle;
+  if (not Assigned(FGraphics)) or (Dc <> FGraphicsDc) then
+  begin
+    FGraphics.Free;
+    FGraphics := TGPGraphics.Create(Dc);
+    FGraphicsDc := Dc;
+  end;
+  Result := FGraphics;
+end;
+
 // TAlphaColor and the ARGB of GDI+ have the same layout
 class function TPdfVclPainter.ToArgb(const Color: TAlphaColor): Cardinal;
 begin
@@ -195,7 +218,7 @@ end;
 
 procedure TPdfVclPainter.FillRect(const Rect: TRectF; const Color: TAlphaColor);
 begin
-  const Graphics = TGPGraphics.Create(FCanvas.Handle);
+  const Graphics = ShapeGraphics;
   try
     // Rectangles in whole pixels: no smoothing, so that neighbours do not show seams
     Graphics.SetSmoothingMode(SmoothingModeNone);
@@ -206,7 +229,8 @@ begin
       Brush.Free;
     end;
   finally
-    Graphics.Free;
+    // The next GDI call on the canvas must see what was drawn
+    Graphics.Flush(FlushIntentionSync);
   end;
 end;
 
@@ -261,7 +285,7 @@ begin
     GdiPoints[Index] := MakePoint(Points[Index].X, Points[Index].Y);
   end;
 
-  const Graphics = TGPGraphics.Create(FCanvas.Handle);
+  const Graphics = ShapeGraphics;
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
     const Brush = TGPSolidBrush.Create(ToArgb(Color));
@@ -271,7 +295,8 @@ begin
       Brush.Free;
     end;
   finally
-    Graphics.Free;
+    // The next GDI call on the canvas must see what was drawn
+    Graphics.Flush(FlushIntentionSync);
   end;
 end;
 
@@ -289,7 +314,7 @@ begin
     GdiPoints[Index] := MakePoint(Points[Index].X, Points[Index].Y);
   end;
 
-  const Graphics = TGPGraphics.Create(FCanvas.Handle);
+  const Graphics = ShapeGraphics;
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
     const Pen = TGPPen.Create(ToArgb(Color), Width);
@@ -300,13 +325,14 @@ begin
       Pen.Free;
     end;
   finally
-    Graphics.Free;
+    // The next GDI call on the canvas must see what was drawn
+    Graphics.Flush(FlushIntentionSync);
   end;
 end;
 
 procedure TPdfVclPainter.FillEllipse(const Rect: TRectF; const Color: TAlphaColor);
 begin
-  const Graphics = TGPGraphics.Create(FCanvas.Handle);
+  const Graphics = ShapeGraphics;
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
     const Brush = TGPSolidBrush.Create(ToArgb(Color));
@@ -316,13 +342,14 @@ begin
       Brush.Free;
     end;
   finally
-    Graphics.Free;
+    // The next GDI call on the canvas must see what was drawn
+    Graphics.Flush(FlushIntentionSync);
   end;
 end;
 
 procedure TPdfVclPainter.FrameEllipse(const Rect: TRectF; const Color: TAlphaColor; const Width: Single);
 begin
-  const Graphics = TGPGraphics.Create(FCanvas.Handle);
+  const Graphics = ShapeGraphics;
   try
     Graphics.SetSmoothingMode(SmoothingModeAntiAlias);
     const Pen = TGPPen.Create(ToArgb(Color), Width);
@@ -332,7 +359,8 @@ begin
       Pen.Free;
     end;
   finally
-    Graphics.Free;
+    // The next GDI call on the canvas must see what was drawn
+    Graphics.Flush(FlushIntentionSync);
   end;
 end;
 

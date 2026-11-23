@@ -72,6 +72,9 @@ type
     procedure TestZoomInEnlargesContent;
 
     [Test]
+    procedure TestHorizontalWheelAndShiftWheelScrollSideways;
+
+    [Test]
     procedure TestHoverDrawsFrame;
 
     [Test]
@@ -115,6 +118,7 @@ uses
   System.Diagnostics,
   Vcl.Forms,
   Vcl.Clipbrd,
+  Winapi.Messages,
   Winapi.Windows,
   Pdf4D.Viewer.PageText,
   Pdf4D.Viewer.ResourceStrings,
@@ -310,6 +314,24 @@ begin
   Assert.IsTrue(After.cx > Before.cx, 'the content is wider');
   const Style = GetWindowLong(FHost.PageView.Handle, GWL_STYLE);
   Assert.IsTrue((Style and WS_VSCROLL) <> 0, 'the vertical scroll bar is visible');
+end;
+
+procedure TPdf4DPageViewTests.TestHorizontalWheelAndShiftWheelScrollSideways;
+begin
+  OpenAndSettle(TViewerDocuments.Invoice);
+  FHost.PageView.Zoom := 4;
+  FHost.Pump(1);
+  const Start = FHost.PageView.Controller.ScrollPosition.X;
+
+  // The message of the tilt wheel: a notch to the right
+  FHost.PageView.Perform(WM_MOUSEHWHEEL, MakeWParam(0, WHEEL_DELTA), 0);
+  const Right = FHost.PageView.Controller.ScrollPosition.X;
+  Assert.IsTrue(Right > Start, 'the tilt wheel scrolls to the right');
+
+  // Shift and the wheel up: to the left
+  const Screen = FHost.PageView.ClientToScreen(TPoint.Create(10, 10));
+  FHost.PageView.Perform(WM_MOUSEWHEEL, MakeWParam(MK_SHIFT, WHEEL_DELTA), MakeLParam(Word(Screen.X), Word(Screen.Y)));
+  Assert.IsTrue(FHost.PageView.Controller.ScrollPosition.X < Right, 'shift and the wheel scroll sideways');
 end;
 
 procedure TPdf4DPageViewTests.TestHoverDrawsFrame;

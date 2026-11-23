@@ -434,7 +434,8 @@ end;
 
 function TPdf4DPrintDialogForm.TryReadNumber(const Edit: TEdit; out Value: Integer): Boolean;
 begin
-  Result := TryStrToInt(Trim(Edit.Text), Value);
+  const Text = Trim(Edit.Text);
+  Result := TryStrToInt(Text, Value);
 end;
 
 procedure TPdf4DPrintDialogForm.Load(const Settings: TPdfPrintSettings);
@@ -836,7 +837,7 @@ begin
         // The user asked for it: nothing to report
       end;
   else
-    raise ENotSupportedException.CreateFmt('Unsupported print status: %d', [Ord(Status)]);
+    raise ENotSupportedException.CreateFmt(SPrintStatusUnsupported, [Ord(Status)]);
   end;
 end;
 

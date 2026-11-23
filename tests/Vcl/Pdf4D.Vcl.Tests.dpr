@@ -15,6 +15,7 @@ uses
   Pdf4D.Tests.MemoryCheck in '..\Pdf4D.Tests.MemoryCheck.pas',
   Pdf4D.Tests.VclHost in 'Support\Pdf4D.Tests.VclHost.pas',
   Pdf4D.Vcl.Painter in '..\..\src\Vcl\Pdf4D.Vcl.Painter.pas',
+  Pdf4D.Vcl.ViewSupport in '..\..\src\Vcl\Pdf4D.Vcl.ViewSupport.pas',
   Pdf4D.Vcl.Document in '..\..\src\Vcl\Pdf4D.Vcl.Document.pas',
   Pdf4D.Vcl.PageView in '..\..\src\Vcl\Pdf4D.Vcl.PageView.pas',
   Pdf4D.Vcl.Thumbnails in '..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas',

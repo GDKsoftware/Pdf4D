@@ -93,6 +93,7 @@
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.PrintDialog.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Viewer.pas"/>
         <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.Painter.pas"/>
+        <DCCReference Include="..\src\Vcl\Pdf4D.Vcl.ViewSupport.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

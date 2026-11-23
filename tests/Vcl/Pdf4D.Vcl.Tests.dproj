@@ -78,6 +78,7 @@
         <DCCReference Include="..\Pdf4D.Tests.MemoryCheck.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.VclHost.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Painter.pas"/>
+        <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.ViewSupport.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Document.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.PageView.pas"/>
         <DCCReference Include="..\..\src\Vcl\Pdf4D.Vcl.Thumbnails.pas"/>

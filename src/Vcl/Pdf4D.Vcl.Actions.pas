@@ -9,6 +9,7 @@ interface
 uses
   System.Classes,
   Vcl.ActnList,
+  Vcl.Controls,
   Pdf4D.Viewer.Document,
   Pdf4D.Viewer.Commands,
   Pdf4D.Vcl.PageView,
@@ -185,6 +186,7 @@ type
     FPrintDialog: TPdf4DPrintDialog;
     // The document that the action gave FPrintDialog; it is compared, never used
     FGivenDocument: TPdf4DCustomDocument;
+    FFocusScope: TWinControl;
 
     procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
 
@@ -195,6 +197,11 @@ type
 
   public
     constructor Create(Owner: TComponent); override;
+    function HandleShortCut: Boolean; override;
+
+    // When set, the shortcut works only while the focus is inside this control. It must live as long as the action, as the viewer that
+    // owns its actions does.
+    property FocusScope: TWinControl read FFocusScope write FFocusScope;
 
   published
     property PrintDialog: TPdf4DPrintDialog read FPrintDialog write SetPrintDialog;
@@ -204,6 +211,7 @@ type
   TPdf4DSearchAction = class(TCustomAction)
   private
     FSearchBar: TPdf4DSearchBar;
+    FFocusScope: TWinControl;
 
     procedure SetSearchBar(const Value: TPdf4DSearchBar);
 
@@ -214,6 +222,11 @@ type
     constructor Create(Owner: TComponent); override;
     function Execute: Boolean; override;
     function Update: Boolean; override;
+    function HandleShortCut: Boolean; override;
+
+    // When set, the shortcut works only while the focus is inside this control. It must live as long as the action, as the viewer that
+    // owns its actions does.
+    property FocusScope: TWinControl read FFocusScope write FFocusScope;
 
   published
     property SearchBar: TPdf4DSearchBar read FSearchBar write SetSearchBar;
@@ -233,7 +246,6 @@ implementation
 uses
   System.SysUtils,
   System.UITypes,
-  Vcl.Controls,
   Vcl.Forms,
   Vcl.Menus,
   Pdf4D.Viewer.ResourceStrings;
@@ -251,6 +263,8 @@ type
   TActionGate = class
   public
     class function MayRun(const Action: TCustomAction): Boolean; static;
+    // True without a scope; else when the control with the focus is the scope or lies inside it
+    class function IsFocusInside(const Scope: TWinControl): Boolean; static;
   end;
 
 { TActionGate }
@@ -264,6 +278,17 @@ begin
 
   Action.Update;
   Result := Action.Enabled;
+end;
+
+class function TActionGate.IsFocusInside(const Scope: TWinControl): Boolean;
+begin
+  if not Assigned(Scope) then
+  begin
+    Exit(True);
+  end;
+
+  const Focused = Screen.ActiveControl;
+  Result := Assigned(Focused) and ((Focused = Scope) or Scope.ContainsControl(Focused));
 end;
 
 { TPdf4DPageViewAction }
@@ -699,6 +724,11 @@ begin
   end;
 end;
 
+function TPdf4DPrintAction.HandleShortCut: Boolean;
+begin
+  Result := TActionGate.IsFocusInside(FFocusScope) and (inherited HandleShortCut);
+end;
+
 function TPdf4DPrintAction.Command: TPdfViewerCommand;
 begin
   Result := TPdfViewerCommand.Print;
@@ -797,6 +827,11 @@ begin
   FSearchBar.Visible := True;
   FSearchBar.FocusQuery;
   Result := True;
+end;
+
+function TPdf4DSearchAction.HandleShortCut: Boolean;
+begin
+  Result := TActionGate.IsFocusInside(FFocusScope) and (inherited HandleShortCut);
 end;
 
 function TPdf4DSearchAction.Update: Boolean;

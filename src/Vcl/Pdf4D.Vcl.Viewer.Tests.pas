@@ -67,6 +67,9 @@ type
     procedure TestCtrlFShowsSearchBar;
 
     [Test]
+    procedure TestShortCutsBelongToTheFocusInsideTheViewer;
+
+    [Test]
     procedure TestCtrlFDoesNothingWithoutSearchOption;
 
     [Test]
@@ -104,6 +107,7 @@ implementation
 
 uses
   Vcl.Controls,
+  Vcl.StdCtrls,
   Vcl.ExtCtrls,
   Vcl.Forms,
   Winapi.Windows,
@@ -373,6 +377,7 @@ begin
   OpenData(TViewerDocuments.Invoice);
   Assert.IsFalse(FViewer.SearchBar.Visible);
 
+  FViewer.PageView.SetFocus;
   FHost.PressShortCutOn(FViewer.PageView, Ord('F'), [ssCtrl]);
   FHost.Pump(1);
 
@@ -380,11 +385,44 @@ begin
   Assert.IsTrue(FViewer.SearchBar.EditQuery.Focused, 'the cursor is in the query field');
 end;
 
+procedure TPdf4DViewerTests.TestShortCutsBelongToTheFocusInsideTheViewer;
+begin
+  OpenData(TViewerDocuments.Invoice);
+  var Runs := 0;
+  TPdf4DPrintDialog.ModalRunner :=
+    function(Form: TPdf4DPrintDialogForm): TModalResult
+    begin
+      Inc(Runs);
+      Result := mrCancel;
+    end;
+
+  const Outside = TEdit.Create(FHost.Form);
+  Outside.Parent := FHost.Form;
+  Outside.SetFocus;
+  FHost.PressShortCutOn(Outside, Ord('F'), [ssCtrl]);
+  FHost.PressShortCutOn(Outside, Ord('P'), [ssCtrl]);
+  FHost.Pump(1);
+  Assert.IsFalse(FViewer.SearchBar.Visible, 'Ctrl+F outside the viewer is not for the viewer');
+  Assert.AreEqual(0, Runs, 'Ctrl+P outside the viewer is not for the viewer');
+
+  FViewer.PageView.SetFocus;
+  FHost.PressShortCutOn(FViewer.PageView, Ord('P'), [ssCtrl]);
+  FHost.Pump(1);
+  Assert.AreEqual(1, Runs, 'Ctrl+P inside the viewer shows the print dialog');
+
+  FViewer.Options := FViewer.Options - [TPdf4DViewerOption.Print];
+  FViewer.PageView.SetFocus;
+  FHost.PressShortCutOn(FViewer.PageView, Ord('P'), [ssCtrl]);
+  FHost.Pump(1);
+  Assert.AreEqual(1, Runs, 'Ctrl+P does nothing without the print option');
+end;
+
 procedure TPdf4DViewerTests.TestCtrlFDoesNothingWithoutSearchOption;
 begin
   FViewer.Options := [TPdf4DViewerOption.Toolbar];
   OpenData(TViewerDocuments.Invoice);
 
+  FViewer.PageView.SetFocus;
   FHost.PressShortCutOn(FViewer.PageView, Ord('F'), [ssCtrl]);
   FHost.Pump(1);
 

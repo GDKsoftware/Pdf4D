@@ -75,6 +75,7 @@ implementation
 
 uses
   System.Math,
+  System.SysUtils,
   Winapi.Windows,
   Vcl.Controls,
   Vcl.Forms;
@@ -152,6 +153,8 @@ begin
       begin
         // The outline does not follow these
       end;
+  else
+    raise ENotSupportedException.CreateFmt('Unsupported document change: %d', [Ord(Change)]);
   end;
 end;
 
