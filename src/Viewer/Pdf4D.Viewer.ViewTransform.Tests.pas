@@ -51,6 +51,10 @@ type
     [Test]
     procedure TestHugePointsStayFinite;
     [Test]
+    procedure TestNotANumberStaysNotANumber;
+    [Test]
+    procedure TestPointsOnAPageOfTheLargestSizeAreNotDistorted;
+    [Test]
     procedure TestTransformEqualsRendererForCorpus;
   end;
 
@@ -58,6 +62,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Math,
   Pdf4D.Api.Document,
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Common.Defines,
@@ -217,7 +222,7 @@ begin
   const Corner = Transform.PageToView(TPointF.Create(3E38, -3E38));
 
   Assert.IsTrue(IsFinitePoint(Corner), 'A point far off the page must not become an infinity');
-  Assert.IsTrue((Abs(Corner.X) <= 1E9) and (Abs(Corner.Y) <= 1E9), 'A point far off the page is clamped');
+  Assert.IsTrue((Abs(Corner.X) <= 4E9) and (Abs(Corner.Y) <= 4E9), 'A point far off the page is clamped');
   Assert.IsTrue(Corner.X > 0);
   Assert.IsTrue(Corner.Y > 0);
 
@@ -227,6 +232,24 @@ begin
   begin
     Assert.IsTrue(IsFinitePoint(Value));
   end;
+end;
+
+procedure TPdfViewTransformTests.TestNotANumberStaysNotANumber;
+begin
+  const Transform = TPdfViewTransform.Create(PageInfo(TPdfRectangle.Letter, 0), 0, 1, 96);
+  const Corner = Transform.PageToView(TPointF.Create(NaN, 10));
+
+  Assert.IsTrue(Corner.X.IsNan, 'A point that is not a number stays so');
+end;
+
+procedure TPdfViewTransformTests.TestPointsOnAPageOfTheLargestSizeAreNotDistorted;
+begin
+  // A page of 2E9 pixels is as large as TPdfPageTransform allows; a point at its far edge lies beyond 1E9
+  const Page = PageInfo(Box(0, 0, 1.5E9, 100), 0);
+  const Transform = TPdfViewTransform.Create(Page, 0, 1, 96);
+  const Corner = Transform.PageToView(TPointF.Create(1.5E9, 0));
+
+  Assert.AreEqual(2E9, Double(Corner.X), 1E3, 'The far edge of a very wide page');
 end;
 
 procedure TPdfViewTransformTests.AssertCreateRaises(const ViewRotation: Integer; const Zoom, PixelsPerInch: Single; const Context: string);

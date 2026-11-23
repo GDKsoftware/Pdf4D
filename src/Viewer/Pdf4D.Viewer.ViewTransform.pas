@@ -52,8 +52,8 @@ const
   PointsPerInch = 72;
   FullTurn = 360;
   RightAngle = 90;
-  // Far beyond the largest page (MaxPageEdgePixels), and far below what a Single holds
-  MaxViewPixel = 1.0E9;
+  // Beyond the largest size that TPdfPageTransform allows (High(Integer), about 2.1E9 pixels), and far below what a Single holds
+  MaxViewPixel = 4.0E9;
 
 { TPdfViewTransform }
 
@@ -115,6 +115,11 @@ end;
 // A point far outside the page is clamped, so that it fits a Single and does not turn into an infinity or an overflow; NaN stays NaN
 class function TPdfViewTransform.LimitedPixel(const Value: Double): Single;
 begin
+  if IsNan(Value) then
+  begin
+    Exit(NaN);
+  end;
+
   Result := EnsureRange(Value, -MaxViewPixel, MaxViewPixel);
 end;
 

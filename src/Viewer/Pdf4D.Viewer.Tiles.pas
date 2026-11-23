@@ -85,7 +85,7 @@ begin
     raise EArgumentOutOfRangeException.CreateFmt('The area covers %d tiles, more than the %d that a list can hold', [TileCount, Int64(MaxTileCount)]);
   end;
 
-  SetLength(Result, TileCount);
+  SetLength(Result, Integer(TileCount));
   var Index := 0;
   for var Row := FirstRow to LastRow do
   begin

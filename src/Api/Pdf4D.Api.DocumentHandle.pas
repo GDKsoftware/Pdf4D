@@ -341,7 +341,8 @@ begin
 
   // A GoTo without /D and a URI without a string are broken actions, not actions this viewer does not know
   const ActionType = Annotation.ActionType;
-  if (ActionType = TCosNames.GoTo_) or (ActionType = TCosNames.URI) then
+  const IsBrokenAction = (ActionType = TCosNames.GoTo_) or (ActionType = TCosNames.URI);
+  if IsBrokenAction then
   begin
     Log.Warning('A link on page %d is skipped: its %s action is incomplete', [PageIndex + 1, ActionType]);
     Exit(False);
