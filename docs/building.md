@@ -193,17 +193,17 @@ Do this too on the first machine with Delphi 12, and write down what differs.
 2. Install `dclPdf4D.Vcl`: all components are on the `Pdf4D` palette page with their icons, and the actions are in the action list editor under `Pdf4D`.
 3. Build `tests\Vcl\Pdf4D.Vcl.Tests.dproj` and run it with the `sk4d.dll` of Delphi 12 next to the program.
 4. Build the demo and go through the steps of the README use case (field gets the focus, marker and scroll, click fills the field), also after dragging the window to a screen with another scale (the manual check in "The demo").
-5. Check that `GroupDescendentsWith`, `ScaleForPPI` and `ChangeScale(M, D, isDpiChange)` behave in Delphi 12 as in Delphi 13: `Pdf4D.Vcl.Registration` calls `GroupDescendentsWith` for the three non-visual components (they must stream on a form without a control around them), the VCL tests use `ScaleForPPI` for the DPI tests, and the page view relies on `isDpiChange` and the new scale `M` of `ChangeScale`.
+5. Check that `GroupDescendentsWith`, `ScaleForPPI` and `ChangeScale(M, D, isDpiChange)` behave in Delphi 12 as in Delphi 13: `Pdf4D.Vcl.Registration` calls `GroupDescendentsWith` for the three non-visual components (so that they show on the palette of a VCL form and not of an FMX form: check both), the VCL tests use `ScaleForPPI` for the DPI tests, and the page view relies on `isDpiChange` and the new scale `M` of `ChangeScale`.
 
 ### The design-time package
 
-`dclPdf4D.Vcl.dpk` is `{$DESIGNONLY}`. It registers the components on the `Pdf4D` palette page (`TPdf4DDocument`, `TPdf4DSkiaBackend`, `TPdf4DPageView`, `TPdf4DThumbnails`, `TPdf4DOutlineView`, `TPdf4DSearchBar`, `TPdf4DToolbar`, `TPdf4DViewer`, `TPdf4DPrintDialog`), the standard actions of `Pdf4D.Vcl.Actions` and a file dialog for the `FileName` of a document. The palette icons are drawn by `tools\make-palette-icons.ps1` (PNG files in `src\Vcl\Design\icons` and the linked `Pdf4D.Vcl.Palette.res`) and are placeholders. `build.ps1` builds the package but nothing in the test run loads it: the registration needs the IDE. The IDE of Delphi 13 is a 64-bit program and loads the Win64 build; a 32-bit IDE needs the Win32 build, which the project is set up for but which has not been built or installed here.
+`dclPdf4D.Vcl.dpk` is `{$DESIGNONLY}`. It registers the components on the `Pdf4D` palette page (`TPdf4DDocument`, `TPdf4DSkiaBackend`, `TPdf4DPageView`, `TPdf4DThumbnails`, `TPdf4DOutlineView`, `TPdf4DSearchBar`, `TPdf4DToolbar`, `TPdf4DViewer`, `TPdf4DPrintDialog`), the standard actions of `Pdf4D.Vcl.Actions` and a file dialog for the `FileName` of a document. The palette icons are drawn by `tools\make-palette-icons.ps1` (PNG files in `src\Vcl\Design\icons` and the linked `Pdf4D.Vcl.Palette.res`; the bitmaps are named after the class, `TPDF4DVIEWER` for 24 pixels and `TPDF4DVIEWER16` and `TPDF4DVIEWER32` for the other sizes, as the packages of the IDE itself name theirs) and are placeholders. `build.ps1` builds the package but nothing in the test run loads it: the registration needs the IDE. The IDE of Delphi 13 is a 64-bit program and loads the Win64 build; a 32-bit IDE needs the Win32 build, which the project is set up for but which has not been built or installed here.
 
 Check by hand, once per Delphi version:
 
 1. Open `packages\Pdf4D.groupproj`, build everything and install `dclPdf4D.Vcl` (right-click, Install).
 2. On a new VCL form drop a `TPdf4DViewer`, a `TPdf4DDocument` and a `TPdf4DSkiaBackend` from the `Pdf4D` page, link the viewer and the backend to the document, pick a PDF in `FileName` with the dialog and run the application with `sk4d.dll` next to it.
-3. Check that the three icons appear on the palette (24 and 32 pixels), and that the actions show in the action list editor under the category `Pdf4D`.
+3. Check that the three icons appear on the palette (16, 24 and 32 pixels), and that the actions show in the action list editor under the category `Pdf4D`.
 
 ### Skia API of the backend
 

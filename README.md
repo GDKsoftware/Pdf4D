@@ -154,11 +154,14 @@ Pdf4DDocument1.Open;
 // (TPdfDocument.Load); the viewer's document lives on its worker and is never used from the UI thread.
 const Text = FDocument.Page(0).ExtractTextWithPositions;
 const Match = TRegEx.Match(Text.Text, '\d{4}-\d{4}');
-for var Fragment in Text.Locate(Match.Index, Match.Length) do
+if Match.Success then
 begin
-  // The ellipse is filled: use a translucent colour to keep the text under it readable
-  Pdf4DDocument1.Overlays.Add(Fragment.PageIndex, Fragment.Quads, TPdfOverlayStyle.Ellipse, TAlphaColor($66FF0000));
-  Pdf4DViewer1.PageView.ScrollIntoView(Fragment.PageIndex, Fragment.Quads);
+  for var Fragment in Text.Locate(Match.Index, Match.Length) do
+  begin
+    // The ellipse is filled: use a translucent colour to keep the text under it readable
+    Pdf4DDocument1.Overlays.Add(Fragment.PageIndex, Fragment.Quads, TPdfOverlayStyle.Ellipse, TAlphaColor($66FF0000));
+    Pdf4DViewer1.PageView.ScrollIntoView(Fragment.PageIndex, Fragment.Quads);
+  end;
 end;
 ```
 

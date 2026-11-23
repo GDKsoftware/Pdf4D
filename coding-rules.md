@@ -24,5 +24,6 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 - The renderer draws through `IPdfGraphicsDevice` and `IPdfRenderBackend` only; it never calls a backend library directly.
 - Code that computes with floating point in the renderer and the Skia device runs inside `TPdfFloatGuard` (Skia masks all floating point exceptions of the process when it loads, Delphi raises on them) and uses `Single` with `{$EXCESSPRECISION OFF}`, as the text code does.
 - The demos under `demos` follow the same rules (zero hints and warnings, built by `build.ps1`) and use the components through their public API only: a demo has no logic of its own for the viewer.
+- The messages of `ENotSupportedException` that a `case` raises for a value that it does not know (`Unsupported document change: %d`) are programmer errors that no user sees: they stay string literals. A message that can reach a user or a log of the application is a resource string in `Pdf4D.Viewer.ResourceStrings`.
 - A Skia call that is not in the list of `docs\building.md` ("Skia API of the backend") gets a line in the Delphi 12 checklist there.
 - `Graphics`, `Codec` and `Render` follow exception 2 only for the objects that mirror the PDFBox object graph (the colour spaces and the page drawer); the device interface, the renderer and the bitmap use interfaces.
