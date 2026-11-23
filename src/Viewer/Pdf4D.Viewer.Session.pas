@@ -240,6 +240,10 @@ type
     // Runs Proc on the UI thread, unless the request was cancelled or the session was closed before this call or before Proc runs
     procedure PostToUi(const Proc: TProc);
 
+    // The document and the renderer of the slot; the worker thread only
+    function Document: IPdfDocument;
+    function Renderer: IPdfRenderer;
+
     property Environment: TSessionEnvironment read FEnvironment;
     property Alive: ISessionAlive read FAlive;
     property Request: IPdfRequestState read FRequest;
@@ -442,6 +446,8 @@ type
     class function CropBitmap(const Source: TPdfBitmap; const Area: TRect): TPdfBitmap; static;
     class function PixelsOf(const Area: TRect): Int64; static;
     procedure PostTile(const Index: Integer; const Holder: IBitmapHolder; const Message: string);
+    // Cuts Area out of Source and posts it as the tile
+    procedure PostCropped(const Index: Integer; const Source: TPdfBitmap; const Area: TRect);
     // Renders Area once and posts the tiles of Indexes; False when the render was cancelled
     function RenderBand(const Indexes: TArray<Integer>; const Area: TRect; const PageSize: TSize; const Cancel: IPdfCancelToken): Boolean;
 
@@ -735,7 +741,17 @@ end;
 
 procedure TSessionJob.LogFailure(const Failure: Exception);
 begin
-  FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format('%s failed: %s', [Describe, Failure.Message]));
+  FEnvironment.Log(FAlive, TPdfLogLevel.Error, Format(SSessionJobFailed, [Describe, Failure.Message]));
+end;
+
+function TSessionJob.Document: IPdfDocument;
+begin
+  Result := FEnvironment.Slot.Document;
+end;
+
+function TSessionJob.Renderer: IPdfRenderer;
+begin
+  Result := FEnvironment.Slot.Renderer;
 end;
 
 procedure TSessionJob.Abandon;
@@ -782,7 +798,7 @@ end;
 
 function TOpenJob.Describe: string;
 begin
-  Result := 'Opening the document';
+  Result := SSessionOpening;
 end;
 
 class function TOpenJob.KindOf(const Failure: Exception): TPdfOpenErrorKind;
@@ -899,15 +915,16 @@ begin
     Exit;
   end;
 
-  const Document = Environment.Slot.Document;
+  const OpenedDocument = Document;
+  const DocumentPermissions = OpenedDocument.Permissions;
   var Outcome: TOpenOutcome;
   Outcome.Succeeded := True;
   Outcome.ErrorKind := TPdfOpenErrorKind.Other;
   Outcome.ErrorMessage := '';
-  Outcome.Pages := CopyPages(Document);
-  Outcome.Outline := FlattenOutline(Document.Outline);
-  Outcome.Permissions.CanPrint := Document.Permissions.CanPrint;
-  Outcome.Permissions.CanCopy := Document.Permissions.CanExtractContent;
+  Outcome.Pages := CopyPages(OpenedDocument);
+  Outcome.Outline := FlattenOutline(OpenedDocument.Outline);
+  Outcome.Permissions.CanPrint := DocumentPermissions.CanPrint;
+  Outcome.Permissions.CanCopy := DocumentPermissions.CanExtractContent;
 
   const Apply = FApply;
   PostToUi(
@@ -960,7 +977,7 @@ end;
 
 function TReleaseJob.Describe: string;
 begin
-  Result := 'Releasing the document';
+  Result := SSessionReleasing;
 end;
 
 procedure TReleaseJob.Perform(const Cancel: IPdfCancelToken);
@@ -989,7 +1006,7 @@ end;
 
 function TRenderJob.Describe: string;
 begin
-  Result := Format('Rendering page %d', [FPageIndex]);
+  Result := Format(SSessionRenderingPage, [FPageIndex]);
 end;
 
 procedure TRenderJob.Deliver(const Succeeded: Boolean; const Holder: IBitmapHolder; const Message: string);
@@ -1027,10 +1044,11 @@ begin
   Params.Cancel := Cancel;
 
   var Bitmap: TPdfBitmap;
-  const Status = Environment.Slot.Renderer.RenderToBitmap(FPageIndex, Params, Bitmap);
+  const Status = Renderer.RenderToBitmap(FPageIndex, Params, Bitmap);
   if Status = TPdfRenderStatus.Completed then
   begin
-    Deliver(True, TBitmapHolder.Create(Bitmap), '');
+    const Holder: IBitmapHolder = TBitmapHolder.Create(Bitmap);
+    Deliver(True, Holder, '');
   end;
 end;
 
@@ -1055,13 +1073,12 @@ end;
 
 function TTilesJob.Describe: string;
 begin
-  Result := Format('Rendering tiles of page %d', [FPageIndex]);
+  Result := Format(SSessionRenderingTiles, [FPageIndex]);
 end;
 
 class function TTilesJob.Ordered(const Tiles: TArray<TPoint>): TArray<TPoint>;
 begin
-  Result := Copy(Tiles);
-  TArray.Sort<TPoint>(Result, TComparer<TPoint>.Construct(
+  const RowsFirst = TComparer<TPoint>.Construct(
     function(const Left, Right: TPoint): Integer
     begin
       Result := CompareValue(Left.Y, Right.Y);
@@ -1069,7 +1086,10 @@ begin
       begin
         Result := CompareValue(Left.X, Right.X);
       end;
-    end));
+    end);
+
+  Result := Copy(Tiles);
+  TArray.Sort<TPoint>(Result, RowsFirst);
 end;
 
 class function TTilesJob.PixelsOf(const Area: TRect): Int64;
@@ -1091,6 +1111,13 @@ begin
     Result.Free;
     raise;
   end;
+end;
+
+procedure TTilesJob.PostCropped(const Index: Integer; const Source: TPdfBitmap; const Area: TRect);
+begin
+  const Cropped = CropBitmap(Source, Area);
+  const Holder: IBitmapHolder = TBitmapHolder.Create(Cropped);
+  PostTile(Index, Holder, '');
 end;
 
 procedure TTilesJob.PostTile(const Index: Integer; const Holder: IBitmapHolder; const Message: string);
@@ -1139,7 +1166,7 @@ begin
   Params.Cancel := Cancel;
 
   var Bitmap: TPdfBitmap;
-  Result := (Environment.Slot.Renderer.RenderToBitmap(FPageIndex, Params, Bitmap) = TPdfRenderStatus.Completed);
+  Result := (Renderer.RenderToBitmap(FPageIndex, Params, Bitmap) = TPdfRenderStatus.Completed);
   if not Result then
   begin
     Exit;
@@ -1151,7 +1178,7 @@ begin
       const Tile = FTiles[Index];
       const Rect = TPdfTileGrid.TileRect(PageSize, Tile.X, Tile.Y);
       const Inside = TRect.Create(Rect.Left - Area.Left, Rect.Top - Area.Top, Rect.Right - Area.Left, Rect.Bottom - Area.Top);
-      PostTile(Index, TBitmapHolder.Create(CropBitmap(Bitmap, Inside)), '');
+      PostCropped(Index, Bitmap, Inside);
     end;
   finally
     Bitmap.Free;
@@ -1160,7 +1187,8 @@ end;
 
 procedure TTilesJob.Perform(const Cancel: IPdfCancelToken);
 begin
-  const PageSize = Environment.Slot.Renderer.PageTransform(FPageIndex, FScale, FViewRotation).Size;
+  const PageTransform = Renderer.PageTransform(FPageIndex, FScale, FViewRotation);
+  const PageSize = PageTransform.Size;
 
   // The tiles go in bands: a band is the bounding region of its tiles, and one render makes it
   var Band: TArray<Integer> := nil;
@@ -1175,7 +1203,7 @@ begin
     const Rect = TPdfTileGrid.TileRect(PageSize, FTiles[Index].X, FTiles[Index].Y);
     if Rect.IsEmpty then
     begin
-      PostTile(Index, nil, 'The tile lies outside the page');
+      PostTile(Index, nil, SSessionTileOutsidePage);
       Continue;
     end;
 
@@ -1228,7 +1256,7 @@ end;
 
 function TPageTextJob.Describe: string;
 begin
-  Result := Format('Reading the text of page %d', [FPageIndex]);
+  Result := Format(SSessionReadingText, [FPageIndex]);
 end;
 
 procedure TPageTextJob.Deliver(const PageText: IPdfPageText);
@@ -1249,7 +1277,7 @@ end;
 
 procedure TPageTextJob.Perform(const Cancel: IPdfCancelToken);
 begin
-  const Page = Environment.Slot.Document.Page(FPageIndex);
+  const Page = Document.Page(FPageIndex);
   Deliver(TPdfPageText.Create(Page.TextLayout, Page.Links));
 end;
 
@@ -1273,14 +1301,15 @@ end;
 
 function TSearchJob.Describe: string;
 begin
-  Result := Format('Searching page %d', [FPageIndex]);
+  Result := Format(SSessionSearchingPage, [FPageIndex]);
 end;
 
 function TSearchJob.FindHits: TArray<TPdfSearchHit>;
 begin
   Result := nil;
 
-  const Positioned = Environment.Slot.Document.Page(FPageIndex).ExtractTextWithPositions;
+  const Page = Document.Page(FPageIndex);
+  const Positioned = Page.ExtractTextWithPositions;
   const Text = Positioned.Text;
   const Matches = TPdfTextMatcher.FindAll(Text, FQuery, FMatchCase);
   SetLength(Result, Length(Matches));
@@ -1367,7 +1396,8 @@ begin
   end
   else
   begin
-    Environment.Worker.Enqueue(TSearchJob.Create(Environment, Alive, Request, FQuery, FMatchCase, FPageIndex + 1, FPageCount, FFailed));
+    const NextJob = TSearchJob.Create(Environment, Alive, Request, FQuery, FMatchCase, FPageIndex + 1, FPageCount, FFailed);
+    Environment.Worker.Enqueue(NextJob);
   end;
 end;
 
@@ -1608,12 +1638,13 @@ begin
   const Request = NewRequest;
   Request.OnOpen := OnDone;
   const State: IPdfRequestState = Request;
-  FWorker.Enqueue(TOpenJob.Create(FEnvironment, FAlive, State, FileName, Data, IsFile, Password,
+  const Job = TOpenJob.Create(FEnvironment, FAlive, State, FileName, Data, IsFile, Password,
     procedure(const Outcome: TOpenOutcome)
     begin
       // Runs on the UI thread, and only while the session is not closed
       ApplyOutcome(State, Outcome);
-    end));
+    end);
+  FWorker.Enqueue(Job);
 end;
 
 procedure TPdfViewerSession.ApplyOutcome(const Request: IPdfRequestState; const Outcome: TOpenOutcome);
@@ -1662,7 +1693,8 @@ begin
   // After the cancel of everything: this job must run
   const Request = TPdfViewerRequest.Create;
   const State: IPdfRequestState = Request;
-  FWorker.Enqueue(TReleaseJob.Create(FEnvironment, FAlive, State));
+  const Job = TReleaseJob.Create(FEnvironment, FAlive, State);
+  FWorker.Enqueue(Job);
 end;
 
 function TPdfViewerSession.State: TPdfDocumentState;
@@ -1703,7 +1735,7 @@ begin
   const IsOutside = ((PageIndex < 0) or (PageIndex >= Length(FPages)));
   if IsOutside then
   begin
-    raise EArgumentOutOfRangeException.CreateFmt('Page index %d is outside the %d pages of the document', [PageIndex, Length(FPages)]);
+    raise EArgumentOutOfRangeException.CreateFmt(SSessionPageIndexOutside, [PageIndex, Length(FPages)]);
   end;
 end;
 
@@ -1712,13 +1744,13 @@ begin
   const IsScaleValid = ((Scale > 0) and (not Scale.IsInfinity));
   if not IsScaleValid then
   begin
-    raise EArgumentOutOfRangeException.CreateFmt('Scale %g is not a positive number', [Scale]);
+    raise EArgumentOutOfRangeException.CreateFmt(SSessionScaleInvalid, [Scale]);
   end;
 
   const IsRotationValid = ((ViewRotation >= 0) and (ViewRotation <= LastRotation) and (ViewRotation mod ValidRotationStep = 0));
   if not IsRotationValid then
   begin
-    raise EArgumentException.CreateFmt('View rotation %d is not 0, 90, 180 or 270', [ViewRotation]);
+    raise EArgumentException.CreateFmt(SSessionRotationInvalid, [ViewRotation]);
   end;
 end;
 
@@ -1732,7 +1764,8 @@ begin
   const Request = NewRequest;
   Request.OnRender := OnDone;
   const State: IPdfRequestState = Request;
-  FWorker.Enqueue(TRenderJob.Create(FEnvironment, FAlive, State, Priority, PageIndex, Scale, ViewRotation, Region));
+  const Job = TRenderJob.Create(FEnvironment, FAlive, State, Priority, PageIndex, Scale, ViewRotation, Region);
+  FWorker.Enqueue(Job);
   Result := Request;
 end;
 
@@ -1755,7 +1788,8 @@ begin
 
   Request.OnTile := OnTile;
   const State: IPdfRequestState = Request;
-  FWorker.Enqueue(TTilesJob.Create(FEnvironment, FAlive, State, Priority, PageIndex, Scale, ViewRotation, Tiles));
+  const Job = TTilesJob.Create(FEnvironment, FAlive, State, Priority, PageIndex, Scale, ViewRotation, Tiles);
+  FWorker.Enqueue(Job);
 end;
 
 function TPdfViewerSession.RequestPageText(const PageIndex: Integer; const Priority: TPdfJobPriority;
@@ -1767,7 +1801,8 @@ begin
   const Request = NewRequest;
   Request.OnPageText := OnDone;
   const State: IPdfRequestState = Request;
-  FWorker.Enqueue(TPageTextJob.Create(FEnvironment, FAlive, State, Priority, PageIndex));
+  const Job = TPageTextJob.Create(FEnvironment, FAlive, State, Priority, PageIndex);
+  FWorker.Enqueue(Job);
   Result := Request;
 end;
 
@@ -1782,12 +1817,14 @@ begin
   const State: IPdfRequestState = Request;
 
   // Without a query there is nothing to find: the first job completes the search
+  const TrimmedQuery = Query.Trim;
   var PagesToSearch := Length(FPages);
-  if Query.Trim.IsEmpty then
+  if TrimmedQuery.IsEmpty then
   begin
     PagesToSearch := 0;
   end;
-  FWorker.Enqueue(TSearchJob.Create(FEnvironment, FAlive, State, Query, MatchCase, 0, PagesToSearch, False));
+  const Job = TSearchJob.Create(FEnvironment, FAlive, State, Query, MatchCase, 0, PagesToSearch, False);
+  FWorker.Enqueue(Job);
   Result := Request;
 end;
 

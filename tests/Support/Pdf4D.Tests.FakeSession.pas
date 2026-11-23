@@ -41,6 +41,10 @@ type
     FOnHits: TPdfSearchHitsEvent;
     FOnSearchDone: TPdfSearchDoneEvent;
 
+    // As the real request does: a request that is cancelled or done lets go of its callbacks, so that a closure that captured the
+    // request is not kept alive by it
+    procedure ReleaseCallbacks;
+
   public
     procedure Cancel;
     function IsDone: Boolean;
@@ -65,7 +69,8 @@ type
     FPages: TArray<TPdfPageInfo>;
     FOutline: TArray<TPdfOutlineEntry>;
     FPermissions: TPdfViewerPermissions;
-    FRequests: TObjectList<TFakeRequest>;
+    // In the order of the calls; the interfaces in FRequestReferences own the requests
+    FRequests: TList<TFakeRequest>;
     FRequestReferences: TList<IPdfViewerRequest>;
     FOnOpenDone: TPdfOpenDoneEvent;
     FOpenCount: Integer;
@@ -112,9 +117,12 @@ type
     procedure FailRender(const Index: Integer; const Message: string);
     procedure DeliverHits(const Index: Integer; const Hits: TArray<TPdfSearchHit>);
     procedure CompleteSearch(const Index: Integer; const Completed: Boolean);
+    // Completes every request that is not done, in Color (page text without words, a search without hits), also the ones that come
+    // while it does
+    procedure CompleteOutstanding(const Color: TAlphaColor);
 
-    // In the order of the calls; the session owns the requests
-    property Requests: TObjectList<TFakeRequest> read FRequests;
+    // In the order of the calls; the session keeps them alive
+    property Requests: TList<TFakeRequest> read FRequests;
     property OpenCount: Integer read FOpenCount;
     property LastFileName: string read FLastFileName;
     property LastPassword: string read FLastPassword;
@@ -132,6 +140,16 @@ procedure TFakeRequest.Cancel;
 begin
   FCancelled := True;
   FIsDone := True;
+  ReleaseCallbacks;
+end;
+
+procedure TFakeRequest.ReleaseCallbacks;
+begin
+  FOnRender := nil;
+  FOnTile := nil;
+  FOnPageText := nil;
+  FOnHits := nil;
+  FOnSearchDone := nil;
 end;
 
 function TFakeRequest.IsDone: Boolean;
@@ -145,7 +163,7 @@ constructor TFakeViewerSession.Create;
 begin
   inherited Create;
   FState := TPdfDocumentState.Closed;
-  FRequests := TObjectList<TFakeRequest>.Create(False);
+  FRequests := TList<TFakeRequest>.Create;
   FRequestReferences := TList<IPdfViewerRequest>.Create;
 end;
 
@@ -350,6 +368,8 @@ begin
     Exit;
   end;
 
+  // A callback may cancel the request, which releases its callbacks
+  const OnTile = Request.FOnTile;
   const Transform = TPdfViewTransform.Create(FPages[Request.PageIndex], Request.ViewRotation, Request.Scale, 72);
   for var Tile in Request.Tiles do
   begin
@@ -365,13 +385,14 @@ begin
       Result.Succeeded := True;
       Result.Bitmap := Bitmap;
       Result.ErrorMessage := '';
-      Request.FOnTile(Tile, Result);
+      OnTile(Tile, Result);
     finally
       Bitmap.Free;
     end;
   end;
 
   Request.FIsDone := True;
+  Request.ReleaseCallbacks;
 end;
 
 procedure TFakeViewerSession.CompleteRender(const Index: Integer; const Color: TAlphaColor);
@@ -398,8 +419,10 @@ begin
     Result.Succeeded := True;
     Result.Bitmap := Bitmap;
     Result.ErrorMessage := '';
+    const OnRender = Request.FOnRender;
     Request.FIsDone := True;
-    Request.FOnRender(Result);
+    Request.ReleaseCallbacks;
+    OnRender(Result);
   finally
     Bitmap.Free;
   end;
@@ -413,8 +436,10 @@ begin
     Exit;
   end;
 
+  const OnPageText = Request.FOnPageText;
   Request.FIsDone := True;
-  Request.FOnPageText(PageText);
+  Request.ReleaseCallbacks;
+  OnPageText(PageText);
 end;
 
 procedure TFakeViewerSession.FailRender(const Index: Integer; const Message: string);
@@ -433,22 +458,26 @@ begin
   case Request.Kind of
     TFakeRequestKind.Render:
       begin
+        const OnRender = Request.FOnRender;
         Request.FIsDone := True;
-        if Assigned(Request.FOnRender) then
+        Request.ReleaseCallbacks;
+        if Assigned(OnRender) then
         begin
-          Request.FOnRender(Result);
+          OnRender(Result);
         end;
       end;
     TFakeRequestKind.Tiles:
       begin
+        const OnTile = Request.FOnTile;
         for var Tile in Request.Tiles do
         begin
-          if (not Request.Cancelled) and Assigned(Request.FOnTile) then
+          if (not Request.Cancelled) and Assigned(OnTile) then
           begin
-            Request.FOnTile(Tile, Result);
+            OnTile(Tile, Result);
           end;
         end;
         Request.FIsDone := True;
+        Request.ReleaseCallbacks;
       end;
   else
     raise EInvalidOpException.CreateFmt('Request %d is not a render or tiles request', [Index]);
@@ -458,9 +487,10 @@ end;
 procedure TFakeViewerSession.DeliverHits(const Index: Integer; const Hits: TArray<TPdfSearchHit>);
 begin
   const Request = RequestAt(Index, TFakeRequestKind.Search);
-  if (not Request.Cancelled) and Assigned(Request.FOnHits) then
+  const OnHits = Request.FOnHits;
+  if (not Request.Cancelled) and Assigned(OnHits) then
   begin
-    Request.FOnHits(Hits);
+    OnHits(Hits);
   end;
 end;
 
@@ -472,10 +502,34 @@ begin
     Exit;
   end;
 
+  const OnDone = Request.FOnSearchDone;
   Request.FIsDone := True;
-  if Assigned(Request.FOnSearchDone) then
+  Request.ReleaseCallbacks;
+  if Assigned(OnDone) then
   begin
-    Request.FOnSearchDone(Completed);
+    OnDone(Completed);
+  end;
+end;
+
+procedure TFakeViewerSession.CompleteOutstanding(const Color: TAlphaColor);
+begin
+  // What a completed request asks for next is completed as well
+  var Index := 0;
+  while Index < FRequests.Count do
+  begin
+    const Request = FRequests[Index];
+    if not Request.IsDone then
+    begin
+      case Request.Kind of
+        TFakeRequestKind.Render: CompleteRender(Index, Color);
+        TFakeRequestKind.Tiles: CompleteTiles(Index, Color);
+        TFakeRequestKind.PageText: CompletePageText(Index, TPdfPageText.Empty(Request.PageIndex));
+        TFakeRequestKind.Search: CompleteSearch(Index, True);
+      else
+        raise EInvalidOpException.CreateFmt('Unsupported request kind: %d', [Ord(Request.Kind)]);
+      end;
+    end;
+    Inc(Index);
   end;
 end;
 
