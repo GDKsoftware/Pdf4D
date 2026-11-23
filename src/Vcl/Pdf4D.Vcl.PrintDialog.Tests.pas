@@ -100,7 +100,6 @@ uses
   Pdf4D.Vcl.Actions,
   Pdf4D.Vcl.PrintDialog,
   Pdf4D.Vcl.Document,
-  Pdf4D.Render.Skia.Backend,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -523,7 +522,7 @@ begin
 
   Assert.IsTrue(FHost.Open(TViewerDocuments.Invoice), 'the document opens');
   const Second = TPdf4DDocument.Create(FHost.Form);
-  Second.RenderBackend := TPdfSkiaBackend.Create;
+  Second.RenderBackend := TVclTestHost.NewRenderBackend;
   const Stream = TBytesStream.Create(TViewerDocuments.Pages(3, 612, 792, 0));
   try
     Second.Open(Stream);

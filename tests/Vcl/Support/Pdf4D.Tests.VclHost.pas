@@ -16,6 +16,7 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Graphics,
+  Pdf4D.Render.Device.Interfaces,
   Pdf4D.Viewer.Types,
   Pdf4D.Vcl.Document,
   Pdf4D.Vcl.PageView,
@@ -91,6 +92,8 @@ type
     // The document renders with Skia by default; without a backend Open raises EPdfViewerException
     procedure RemoveBackend;
     procedure RestoreBackend;
+    // The render backend of the tests, for a second document
+    class function NewRenderBackend: IPdfRenderBackend; static;
     // Whether the test process may use the clipboard of the window system; some sessions refuse it
     function IsClipboardAvailable: Boolean;
     // The message of the last failed open
@@ -297,6 +300,11 @@ end;
 procedure TVclTestHost.RemoveBackend;
 begin
   FDocument.RenderBackend := nil;
+end;
+
+class function TVclTestHost.NewRenderBackend: IPdfRenderBackend;
+begin
+  Result := TPdfSkiaBackend.Create;
 end;
 
 procedure TVclTestHost.RestoreBackend;
