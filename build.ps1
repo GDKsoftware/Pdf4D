@@ -28,9 +28,9 @@ $TestProjects = @(
     @{ Name = 'Pdf4D.FMX.Tests'; Folder = 'tests\FMX'; NeedsSkia = $true; WindowsOnly = $true }
 )
 $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
-# The VCL and FMX packages are built for Windows only (Win32 and Win64); dclPdf4D.Vcl is the design-time package for the IDE (a 64-bit IDE
-# loads the Win64 build, a 32-bit IDE the Win32 build)
-$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj', 'packages\Pdf4D.FMX.dproj', 'packages\Pdf4D.FMX.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+# The VCL and FMX packages are built for Windows only (Win32 and Win64); dclPdf4D.Vcl and dclPdf4D.FMX are the design-time packages for
+# the IDE (a 64-bit IDE loads the Win64 build, a 32-bit IDE the Win32 build)
+$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj', 'packages\Pdf4D.FMX.dproj', 'packages\Pdf4D.FMX.Skia.dproj', 'packages\dclPdf4D.FMX.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 # The demo applications, built for Windows only (compiled, not run)
 $DemoFiles = @('demos\Vcl\Pdf4DInvoiceDemo.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 

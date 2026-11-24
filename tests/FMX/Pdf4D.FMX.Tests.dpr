@@ -40,7 +40,8 @@ uses
   Pdf4D.FMX.Toolbar.Tests in '..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas',
   Pdf4D.FMX.Print.Tests in '..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas',
   Pdf4D.FMX.PrintDialog.Tests in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas',
-  Pdf4D.FMX.Viewer.Tests in '..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas';
+  Pdf4D.FMX.Viewer.Tests in '..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas',
+  Pdf4D.FMX.Streaming.Tests in '..\..\src\FMX\Pdf4D.FMX.Streaming.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

@@ -19,7 +19,7 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj` and `Pdf4D.FMX.Skia.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demo (`demos\Vcl\Pdf4DInvoiceDemo.dproj`, see "The demo") after the packages; the demo is not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj`, `Pdf4D.FMX.Skia.dproj` and the design-time package `dclPdf4D.FMX.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demo (`demos\Vcl\Pdf4DInvoiceDemo.dproj`, see "The demo") after the packages; the demo is not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
@@ -211,6 +211,16 @@ Check by hand, once per Delphi version:
 1. Open `packages\Pdf4D.groupproj`, build everything and install `dclPdf4D.Vcl` (right-click, Install).
 2. On a new VCL form drop a `TPdf4DViewer`, a `TPdf4DDocument` and a `TPdf4DSkiaBackend` from the `Pdf4D` page, link the viewer and the backend to the document, pick a PDF in `FileName` with the dialog and run the application with `sk4d.dll` next to it.
 3. Check that the three icons appear on the palette (16, 24 and 32 pixels), and that the actions show in the action list editor under the category `Pdf4D`.
+
+### The FMX design-time package
+
+`dclPdf4D.FMX.dpk` is `{$DESIGNONLY}` and registers the same components and actions (those of `Pdf4D.FMX.*`) on the same `Pdf4D` palette page as `dclPdf4D.Vcl`, with `GroupDescendentsWith(<non-visual class>, FMX.Controls.TControl)` for the three non-visual components, and a file dialog (`FMX.Dialogs`) for the `FileName` of a document. It links the palette bitmaps of the VCL package as a copy (`src\FMX\Design\icons\Pdf4D.FMX.Palette.res`; `tools\make-palette-icons.ps1 -FmxResourceFile` writes both). `build.ps1` builds it like `dclPdf4D.Vcl`; nothing in the test run loads it.
+
+Check by hand, once per Delphi version, with `dclPdf4D.Vcl` and `dclPdf4D.FMX` installed together:
+
+1. Install both packages: there is no name conflict message, and the IDE loads both.
+2. In a VCL project the `Pdf4D` page holds only the VCL components; in an FMX project only the FMX components. The actions show in the action list editor under `Pdf4D` in both kinds of project.
+3. On an FMX form drop a `TPdf4DViewer`, a `TPdf4DDocument` and a `TPdf4DSkiaBackend`, link them, pick a PDF in `FileName` and run the application with `sk4d.dll` next to it.
 
 ### Skia API of the backend
 

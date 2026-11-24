@@ -51,6 +51,8 @@ type
     FLink: TPdfDocumentLink;
     FIcons: TImageList;
     FIsBuilt: Boolean;
+    // Buttons was set while the toolbar was being read from a stream: the row is made once the reading is done
+    FIsBuildPending: Boolean;
     FIsUpdatingZoom: Boolean;
 
     FActionFirst: TPdf4DFirstPageAction;
@@ -240,6 +242,11 @@ end;
 procedure TPdf4DToolbar.Loaded;
 begin
   inherited;
+  if FIsBuildPending then
+  begin
+    FIsBuildPending := False;
+    Build;
+  end;
   UpdateState;
 end;
 
@@ -353,7 +360,15 @@ begin
   end;
 
   FButtons := Value;
-  Build;
+  // Freeing the buttons of the row while the stream is read would pull them away from under the reader
+  if csLoading in ComponentState then
+  begin
+    FIsBuildPending := True;
+  end
+  else
+  begin
+    Build;
+  end;
 end;
 
 { Actions and icons }

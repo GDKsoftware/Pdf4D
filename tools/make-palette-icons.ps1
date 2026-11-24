@@ -1,5 +1,7 @@
 param(
-    [Parameter(Mandatory)][string]$OutputFolder
+    [Parameter(Mandatory)][string]$OutputFolder,
+    # Optional: a second copy of the resource file, for the FMX design-time package (the layer check keeps Pdf4D.Vcl.* names out of src\FMX)
+    [string]$FmxResourceFile
 )
 # Draws the placeholder palette icons (PNG, 16, 24 and 32 pixels) and links them as BITMAP resources into one .res file.
 # Resource names: the class name in capitals (24 x 24) and the same with 16 (16 x 16) or 32 (32 x 32), without an underscore: that is how
@@ -88,3 +90,6 @@ foreach ($className in $icons.Keys) {
 }
 
 [System.IO.File]::WriteAllBytes((Join-Path $OutputFolder 'Pdf4D.Vcl.Palette.res'), $resource.ToArray())
+if ($FmxResourceFile) {
+    [System.IO.File]::WriteAllBytes($FmxResourceFile, $resource.ToArray())
+}
