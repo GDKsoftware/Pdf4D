@@ -203,7 +203,11 @@ begin
     var Index: Integer;
     var Hit: TPdfSearchHit;
     Document.TryGetCurrentSearchHit(Index, Hit);
-    const Template = if Document.IsSearchCapped then SSearchResultCountCapped else SSearchResultCount;
+    var Template := SSearchResultCount;
+    if Document.IsSearchCapped then
+    begin
+      Template := SSearchResultCountCapped;
+    end;
     Result := Format(Template, [Max(Index, 0) + 1, Count]);
   end
   else if Document.IsSearching then
