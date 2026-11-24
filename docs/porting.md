@@ -122,6 +122,10 @@ Phase 3 is mostly new code (the viewer core and the VCL components have no PDFBo
 
 Deviations of the print plan from `PDFPrintable`: a page is rendered at the vertical resolution of the printer divided by a whole factor, capped by `MaxDpi` (default 300), and printed in bands of at most `DefaultMaxBandPixels`; the paper is judged in inches, because a printer can have a different resolution per axis; `PDFPrintable` prints vectors through Java2D and Pdf4D prints a raster. Not ported: `Scaling.SHRINK_TO_FIT` (a page is only made smaller; the `Fit` mode of the viewer also scales a small page up) and `Scaling.STRETCH_TO_FIT` (the aspect of the page is always kept), and the print dialog of Java (the VCL dialog is `TPdf4DPrintDialog`).
 
+## The FMX viewer (M3, phase 4)
+
+Phase 4 takes nothing new from PDFBox: the FMX components (`src/FMX`, packages `Pdf4D.FMX`, `Pdf4D.FMX.Skia` and `dclPdf4D.FMX`) are a second shell on the viewer core of phase 3, which they use unchanged apart from the small extensions listed in `docs/assumptions.md` (rows "M3F4"). The printing of the FMX viewer follows `PDFPrintable` through the print plan of the core like the VCL viewer does. Status: complete on Win64 Release (all four test suites, the flow and the events equal to the VCL viewer, the performance limits of the VCL viewer); open until a person has done them: the checks on Delphi 12, the installation of both design-time packages together and the print test on a real printer (see `building.md`).
+
 ## Known deviations
 
 The list under "Deliberate deviations" below is the full list for M1 to M3 phase 2. For the corpus, the differences that show up in the golden comparison are in `tests/golden/*.known-differences.txt` with a reason per object, and `golden-format.md` explains how they are written.

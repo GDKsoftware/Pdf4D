@@ -16,7 +16,9 @@ Milestone M2 (text extraction) is complete: `ExtractText` on a document or a pag
 
 Milestone M3, phase 2 (rendering) is complete: `TPdfRenderer` draws a page into a bitmap through a device interface, and `TPdfSkiaBackend` implements it with Skia. Of the 617 corpus pages that PDFBox 3.0.8 renders at 72 DPI, 612 are equal to its images within the tolerances of `docs/golden-format.md` and 5 have a documented difference; at 150 DPI 19 of 22 pages are equal. Annotations without an appearance stream are not drawn (`constructAppearances` is not ported); see `docs/porting.md` for this and the other deviations. The viewer and the visual components are not part of this phase.
 
-Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components and the own rasterizer come in later phases.
+Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components follow in phase 4 and the own rasterizer in phase 5.
+
+Milestone M3, phase 4 (the FMX components) is complete: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The own rasterizer comes in phase 5.
 
 See also `coding-rules.md` and `docs/building.md`.
 
@@ -168,6 +170,41 @@ end;
 `demos\Vcl\Pdf4DInvoiceDemo.dproj` is a complete example: an invoice form on the left and the viewer on the right. A field that gets the focus is looked up in the text of the PDF and marked there, a click on a word in the PDF fills the field that has the focus. It runs Per-Monitor v2 and opens the file given on the command line (`Pdf4DInvoiceDemo.exe invoice.pdf`) or through the Open button. `tests\corpus\generated\invoices\skia-draw.pdf` is an invoice with invented data that fits the default values of the form.
 
 What the viewer does not do (yet): selection across pages, searching across a page boundary or with regular expressions, hit testing on annotations other than links, filling in forms, saving markings, screen readers and right-to-left text, vector printing (it prints raster) and a visible focus frame and keys in the thumbnails. A document that is opened from a file and needs a password gets a question for it (three tries); a document that is opened from a stream does not, because the document does not keep the data: `OnOpenError` reports `InvalidPassword` and the application sets `Password` and opens the stream again. The events that the viewer forwards (`OnTextSelected`, `OnHoverChanged`, `OnLinkClick`) have its page view as `Sender`.
+
+## Viewer (FMX)
+
+The FMX viewer has the same components, properties and behaviour as the VCL viewer (continuous or single-page scrolling, zoom and rotation, thumbnails and outline, hover and text selection, links, search, copy and printing), on the same viewer core `Pdf4D.Viewer`. It runs on Windows (Win32 and Win64); other FMX platforms and touch gestures are not part of this phase. The scale of the screen is the scale of the form: a page is rendered at the pixels of the device, so it stays sharp on a 150 % screen and after a move to another screen.
+
+| Package | Contents | Needs |
+|---|---|---|
+| `Pdf4D.FMX` | `TPdf4DDocument`, `TPdf4DPageView`, `TPdf4DThumbnails`, `TPdf4DOutlineView`, `TPdf4DSearchBar`, `TPdf4DToolbar`, `TPdf4DViewer`, `TPdf4DPrintDialog` and the standard actions | `fmx`, `Pdf4D.Viewer` |
+| `Pdf4D.FMX.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.FMX`, `Pdf4D.Render.Skia` |
+| `dclPdf4D.FMX` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.FMX`, `Pdf4D.FMX.Skia` |
+
+Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each shows its components on the `Pdf4D` page of its own kind of project. The backend is chosen like in VCL (a `TPdf4DSkiaBackend` linked to `Backend`, or `RenderBackend` in code), and `sk4d.dll` has to be next to the program. The example is that of the VCL viewer, with the colours of FMX:
+
+```delphi
+Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;
+Pdf4DViewer1.Document := Pdf4DDocument1;
+Pdf4DDocument1.FileName := 'invoice.pdf';
+Pdf4DDocument1.Open;
+
+// In OnOpened or when a field gets focus. FDocument is the application's own IPdfDocument of the same file
+// (TPdfDocument.Load); the viewer's document lives on its worker and is never used from the UI thread.
+const Text = FDocument.Page(0).ExtractTextWithPositions;
+const Match = TRegEx.Match(Text.Text, '\d{4}-\d{4}');
+if Match.Success then
+begin
+  for var Fragment in Text.Locate(Match.Index, Match.Length) do
+  begin
+    // The ellipse is filled: use a translucent colour to keep the text under it readable
+    Pdf4DDocument1.Overlays.Add(Fragment.PageIndex, Fragment.Quads, TPdfOverlayStyle.Ellipse, TAlphaColors.Red);
+    Pdf4DViewer1.PageView.ScrollIntoView(Fragment.PageIndex, Fragment.Quads);
+  end;
+end;
+```
+
+`demos\FMX\Pdf4DInvoiceDemoFmx.dproj` is the invoice demo as an FMX form.
 
 ## What the resources add
 
