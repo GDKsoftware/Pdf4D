@@ -92,6 +92,7 @@
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.PrintDialog.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Actions.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Toolbar.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.Viewer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

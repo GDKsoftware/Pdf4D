@@ -27,7 +27,7 @@ package Pdf4D.FMX;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Pdf4D FMX components: document, painter, page view, thumbnails, outline view, search bar, printing, actions and toolbar'}
+{$DESCRIPTION 'Pdf4D FMX components: document, painter, page view, thumbnails, outline view, search bar, printing, actions, toolbar and the complete viewer'}
 {$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
@@ -48,6 +48,7 @@ contains
   Pdf4D.FMX.Print in '..\src\FMX\Pdf4D.FMX.Print.pas',
   Pdf4D.FMX.PrintDialog in '..\src\FMX\Pdf4D.FMX.PrintDialog.pas',
   Pdf4D.FMX.Actions in '..\src\FMX\Pdf4D.FMX.Actions.pas',
-  Pdf4D.FMX.Toolbar in '..\src\FMX\Pdf4D.FMX.Toolbar.pas';
+  Pdf4D.FMX.Toolbar in '..\src\FMX\Pdf4D.FMX.Toolbar.pas',
+  Pdf4D.FMX.Viewer in '..\src\FMX\Pdf4D.FMX.Viewer.pas';
 
 end.

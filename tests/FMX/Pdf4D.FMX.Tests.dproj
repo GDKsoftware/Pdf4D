@@ -89,6 +89,7 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Actions.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Viewer.pas"/>
         <DCCReference Include="..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FmxHost.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.Tests.pas"/>
@@ -101,6 +102,7 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

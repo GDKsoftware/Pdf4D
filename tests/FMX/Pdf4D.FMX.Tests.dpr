@@ -27,6 +27,7 @@ uses
   Pdf4D.FMX.PrintDialog in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.pas',
   Pdf4D.FMX.Actions in '..\..\src\FMX\Pdf4D.FMX.Actions.pas',
   Pdf4D.FMX.Toolbar in '..\..\src\FMX\Pdf4D.FMX.Toolbar.pas',
+  Pdf4D.FMX.Viewer in '..\..\src\FMX\Pdf4D.FMX.Viewer.pas',
   Pdf4D.FMX.Backend.Skia in '..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas',
   Pdf4D.Tests.FmxHost.Tests in 'Support\Pdf4D.Tests.FmxHost.Tests.pas',
   Pdf4D.FMX.Painter.Tests in '..\..\src\FMX\Pdf4D.FMX.Painter.Tests.pas',
@@ -38,7 +39,8 @@ uses
   Pdf4D.FMX.Actions.Tests in '..\..\src\FMX\Pdf4D.FMX.Actions.Tests.pas',
   Pdf4D.FMX.Toolbar.Tests in '..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas',
   Pdf4D.FMX.Print.Tests in '..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas',
-  Pdf4D.FMX.PrintDialog.Tests in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas';
+  Pdf4D.FMX.PrintDialog.Tests in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas',
+  Pdf4D.FMX.Viewer.Tests in '..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
@@ -71,25 +73,33 @@ begin
   Result := TPath.Combine(TestsFolder, Format('results-%s.xml', [PlatformName]));
 end;
 
-// Brings the count of blocks that FMX keeps back to the start of a batch, by making bare windows until the batch is let go: a window adds
-// one block, except the one that completes the batch. Outstanding blocks measured before and after such a flush differ only by real leaks.
-// False when the flush cannot be trusted. Checked: a release is seen within a batch of windows; then the next batch of windows has the
-// pattern that was measured: each of the first WindowBatch - 1 windows adds exactly one block, and the window after those lets the whole
-// batch go, which brings the count back to where it was after the first release. Another size of batch, a window that adds no block or a
-// drop with another cause fail this. A deferred free of something else that happens to coincide with a window cannot be told apart.
-function FlushFmxBlocks: Boolean;
+// Makes bare windows until the count of outstanding blocks drops: a batch was let go. False when no drop comes within a batch of windows.
+function MakeWindowsUntilRelease: Boolean;
 begin
-  var IsReleased := False;
   for var Attempt := 1 to WindowBatch do
   begin
     const Before = TMemoryCheck.OutstandingBlocks;
     TForm.CreateNew(nil).Free;
     if TMemoryCheck.OutstandingBlocks < Before then
     begin
-      IsReleased := True;
-      Break;
+      Exit(True);
     end;
   end;
+  Result := False;
+end;
+
+// Brings the count of blocks that FMX keeps back to the start of a batch, by making bare windows until the batch is let go: a window adds
+// one block, except the one that completes the batch. Outstanding blocks measured before and after such a flush differ only by real leaks.
+// The first release frees the blocks that were there and can leave a part of a batch behind (the blocks of the controls and windows of a
+// test come in numbers that are not a whole batch), so the flush waits for a second release, and measures from there. False when the flush
+// cannot be trusted. Checked: a release is seen within a batch of windows, and another one within the next batch; then the next batch of
+// windows has the pattern that was measured: each of the first WindowBatch - 1 windows adds exactly one block, and the window after those
+// lets the whole batch go, which brings the count back to where it was after the second release. Another size of batch, a window that adds
+// no block or a drop with another cause fail this. A deferred free of something else that happens to coincide with a window cannot be told
+// apart.
+function FlushFmxBlocks: Boolean;
+begin
+  const IsReleased = MakeWindowsUntilRelease and MakeWindowsUntilRelease;
 
   const Settled = TMemoryCheck.OutstandingBlocks;
   var IsPatternKept := True;
