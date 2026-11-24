@@ -78,16 +78,21 @@ type
 
     [Test]
     procedure TestToolbarDoesNotTakeShortCutsOfTheForm;
+
+    [Test]
+    procedure TestToolbarButtonsFollowTheIdleUpdate;
   end;
 
 implementation
 
 uses
   System.Math,
+  System.Messaging,
   System.Types,
   System.UITypes,
   FMX.Controls,
   FMX.Graphics,
+  FMX.Types,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Commands,
   Pdf4D.Tests.ViewerDocuments,
@@ -459,6 +464,21 @@ begin
   FHost.PressKey(vkF, [ssCtrl]);
 
   Assert.IsFalse(FHost.SearchBar.Visible, 'Ctrl+F is not an action of the form');
+end;
+
+// The search bar gets its document after the toolbar was linked to it: no change of the toolbar's own document tells it, the idle update does
+procedure TPdf4DToolbarTests.TestToolbarButtonsFollowTheIdleUpdate;
+begin
+  OpenPages(1);
+  FHost.SearchBar.Document := nil;
+  FToolbar.SearchBar := nil;
+  FToolbar.SearchBar := FHost.SearchBar;
+  Assert.IsFalse(FToolbar.ButtonSearch.Enabled, 'the bar has no document');
+
+  FHost.SearchBar.Document := FHost.Document;
+  TMessageManager.DefaultManager.SendMessage(nil, TIdleMessage.Create);
+
+  Assert.IsTrue(FToolbar.ButtonSearch.Enabled, 'the idle update enables the button');
 end;
 
 end.

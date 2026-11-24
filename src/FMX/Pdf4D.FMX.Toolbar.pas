@@ -10,6 +10,7 @@ interface
 uses
   System.Classes,
   System.Generics.Collections,
+  System.Messaging,
   FMX.ActnList,
   FMX.Controls,
   FMX.ComboEdit,
@@ -53,6 +54,7 @@ type
     FIsBuilt: Boolean;
     // Buttons was set while the toolbar was being read from a stream: the row is made once the reading is done
     FIsBuildPending: Boolean;
+    FIdleId: TMessageSubscriptionId;
     FIsUpdatingZoom: Boolean;
 
     FActionFirst: TPdf4DFirstPageAction;
@@ -106,6 +108,8 @@ type
     procedure BuildSearch;
     procedure BuildPrint;
     procedure UpdateState;
+    procedure UpdateButtons;
+    procedure HandleIdle(const Sender: TObject; const Message: System.Messaging.TMessage);
     procedure UpdatePageNumber;
     procedure UpdateZoom;
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
@@ -197,6 +201,7 @@ begin
   FRow := TList<TRowItem>.Create;
   FActionButtons := TList<TSpeedButton>.Create;
   FLink := TPdfDocumentLink.Create(HandleDocumentChange);
+  FIdleId := TMessageManager.DefaultManager.SubscribeToMessage(TIdleMessage, HandleIdle);
   CreateIcons;
   CreateActions;
   Build;
@@ -209,6 +214,7 @@ begin
     FPageView.RemoveZoomListener(HandleZoomChanged);
   end;
 
+  TMessageManager.DefaultManager.Unsubscribe(TIdleMessage, FIdleId, True);
   FLink.Free;
   FActionButtons.Free;
   FRow.Free;
@@ -598,7 +604,27 @@ begin
   UpdateZoom;
 end;
 
+// The buttons run on actions that the application never updates: as the action links of VCL buttons do in the idle loop of the application,
+// the toolbar takes over the state of the actions when the application is idle. The page number and the zoom text are left alone: the
+// user may be typing in them.
+procedure TPdf4DToolbar.HandleIdle(const Sender: TObject; const Message: System.Messaging.TMessage);
+begin
+  UpdateButtons;
+end;
+
 procedure TPdf4DToolbar.UpdateState;
+begin
+  if (not FIsBuilt) or (csDestroying in ComponentState) then
+  begin
+    Exit;
+  end;
+
+  UpdateButtons;
+  UpdatePageNumber;
+  UpdateZoom;
+end;
+
+procedure TPdf4DToolbar.UpdateButtons;
 begin
   if (not FIsBuilt) or (csDestroying in ComponentState) then
   begin
@@ -620,8 +646,6 @@ begin
   begin
     Button.Enabled := TCustomAction(Button.TagObject).Enabled;
   end;
-  UpdatePageNumber;
-  UpdateZoom;
 end;
 
 procedure TPdf4DToolbar.UpdatePageNumber;
