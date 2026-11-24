@@ -53,6 +53,7 @@ type
 implementation
 
 uses
+  System.Math,
   System.SysUtils,
   System.UITypes,
   FMX.Types,
@@ -114,9 +115,10 @@ begin
         begin
           // What the band does not cover is white
           const Uncovered = FullChannel - Source[AlphaByte];
-          Target[RedTarget] := Source[RedByte] + Uncovered;
-          Target[GreenByte] := Source[GreenByte] + Uncovered;
-          Target[BlueTarget] := Source[BlueByte] + Uncovered;
+          // A band that is not properly premultiplied may reach past the full channel
+          Target[RedTarget] := Min(Source[RedByte] + Uncovered, FullChannel);
+          Target[GreenByte] := Min(Source[GreenByte] + Uncovered, FullChannel);
+          Target[BlueTarget] := Min(Source[BlueByte] + Uncovered, FullChannel);
           Target[AlphaByte] := FullChannel;
           Inc(Source, BytesPerPixel);
           Inc(Target, BytesPerPixel);
