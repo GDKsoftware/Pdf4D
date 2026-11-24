@@ -167,8 +167,10 @@ procedure TPdf4DViewerTests.TearDown;
 begin
   TPdf4DViewer.PasswordAsker := nil;
   TPdf4DPrintDialog.ModalRunner := nil;
-  // What the parts still render comes back through the queue of the main thread: let it arrive before the memory check of the program
-  FHost.WaitUntil(IsPageViewQuiet);
+  // Letting go of the document cancels the requests of the parts; what is on its way comes back through the queue of the main thread and
+  // has to arrive before the memory check of the program
+  FViewer.Document := nil;
+  Assert.IsTrue(FHost.WaitUntil(IsPageViewQuiet), 'the page view has no tiles outstanding');
   FHost.Pump(TearDownPumpMs);
   FreeAndNil(FHost);
   FOpenErrorKinds.Free;
@@ -545,7 +547,6 @@ end;
 procedure TPdf4DViewerTests.TestViewerStreamsToFmx;
 begin
   System.Classes.RegisterClass(TPdf4DViewer);
-  for var K := 1 to 1 do TForm.CreateNew(nil).Free;
 
   // As on a form of the designer: a container is the root of the stream, and the parts of the viewer are not in it. A layout is used in place
   // of a form because a form makes a window, and the memory check of the test program counts the windows that FMX keeps back.
