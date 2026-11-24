@@ -104,6 +104,8 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Streaming.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.FmxViewerFlows.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.FmxPerformance.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

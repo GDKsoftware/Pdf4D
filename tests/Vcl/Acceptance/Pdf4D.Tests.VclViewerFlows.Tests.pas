@@ -15,6 +15,7 @@ uses
   Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.PageText,
+  Pdf4D.Tests.FlowEvents,
   Pdf4D.Tests.VclHost,
   Pdf4D.Vcl.Viewer;
 
@@ -26,6 +27,8 @@ type
     FViewer: TPdf4DViewer;
     FSelectedTexts: TList<string>;
     FHoverCount: Integer;
+    FEvents: TFlowEventLog;
+    FIsRecordingHover: Boolean;
 
     procedure HandleTextSelected(Sender: TObject; const Selection: TPdfTextSelection);
     procedure HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
@@ -75,6 +78,8 @@ const
 procedure TVclViewerFlowTests.Setup;
 begin
   FSelectedTexts := TList<string>.Create;
+  FEvents := TFlowEventLog.Create;
+  FIsRecordingHover := True;
   FHoverCount := 0;
 
   FHost := TVclTestHost.Create(ViewWidth, ViewHeight);
@@ -93,17 +98,24 @@ end;
 procedure TVclViewerFlowTests.TearDown;
 begin
   FreeAndNil(FHost);
+  FEvents.Free;
   FSelectedTexts.Free;
 end;
 
 procedure TVclViewerFlowTests.HandleTextSelected(Sender: TObject; const Selection: TPdfTextSelection);
 begin
   FSelectedTexts.Add(Selection.Text);
+  FEvents.AddSelection(Selection);
 end;
 
 procedure TVclViewerFlowTests.HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
 begin
   Inc(FHoverCount);
+  // The hover after a zoom or a rotation depends on where the mouse was left; the flow records the events of its own inputs
+  if FIsRecordingHover then
+  begin
+    FEvents.AddHover(HasSegment, Segment);
+  end;
 end;
 
 function TVclViewerFlowTests.TilesArrived: Boolean;
@@ -165,6 +177,7 @@ begin
   Assert.IsTrue(FHoverCount > 0, 'the hover is reported');
   Assert.AreEqual<Integer>(1, FSelectedTexts.Count, 'one selection');
   Assert.AreEqual(InvoiceNumber, FSelectedTexts[0]);
+  FIsRecordingHover := False;
 
   // Mark the label and scroll it into view
   var PageText: IPdfPageText;
@@ -206,6 +219,7 @@ begin
       Result := not Document.IsSearching;
     end, WaitMs), 'the search ends');
   Assert.IsTrue(Length(Document.SearchHits) > 0, 'the search found the label');
+  FEvents.AddSearchHits(Document.SearchHits);
 
   // Print to bitmaps, with a print job of the document (the print dialog of the viewer needs a printer)
   const Target = TBitmapPrintTarget.Create(TSize.Create(PaperWidth, PaperHeight), TPointF.Create(PaperDpi, PaperDpi), '');
@@ -239,6 +253,16 @@ begin
   FHost.Pump(1);
   Assert.AreEqual(Ord(TPdfDocumentState.Closed), Ord(Document.State));
   Assert.AreEqual<Integer>(0, Length(Document.Overlays.Items), 'the overlay goes with the document');
+
+  // The events are the same in the FMX viewer; the first run of the flow writes the reference file
+  if FEvents.HasReference then
+  begin
+    Assert.AreEqual(FEvents.ReadReference, FEvents.Text, 'the events of the flow equal the reference file');
+  end
+  else
+  begin
+    FEvents.WriteReference;
+  end;
 end;
 
 end.
