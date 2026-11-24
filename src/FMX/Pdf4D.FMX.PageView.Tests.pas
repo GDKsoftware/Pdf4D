@@ -15,6 +15,7 @@ uses
   FMX.Graphics,
   DUnitX.TestFramework,
   Pdf4D.Common.Quad,
+  Pdf4D.Render.Bitmap,
   Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Viewer.Types,
   Pdf4D.Tests.FmxHost;
@@ -51,7 +52,9 @@ type
     function CenterOf(const Bounds: TRect): TPoint;
     procedure AssertOverlayCoversText(const Scale: Single);
     // The page at a zoom that leaves room beside it, compared with what the renderer makes of the same region
-    procedure AssertTilesEqualRenderer(const Zoom: Single);
+    procedure AssertTilesEqualRenderer(const Zoom: Single; const Image: FMX.Graphics.TBitmap; const Offset: TPoint; const ViewDevice: TSize);
+    procedure CompareWithRenderer(const Image: FMX.Graphics.TBitmap; const Expected: TPdfBitmap; const Corner: TPoint);
+    procedure AssertTilesEqualRendererInSnapshot(const Zoom: Single);
     class function IsRed(const Pixel: TAlphaColorRec): Boolean; static;
     class function IsBluish(const Pixel: TAlphaColorRec): Boolean; static;
     class function MaxChannelDifference(const Pixel: TAlphaColorRec; const Red, Green, Blue: Byte): Integer; static;
@@ -83,7 +86,15 @@ type
     [Test]
     procedure TestTilesArePixelExactAt150Percent;
     [Test]
+    procedure TestTilesAreOnWholeDevicePixelsAtAFractionalOffset;
+    [Test]
     procedure TestScaleChangeRerenders;
+    [Test]
+    procedure TestShiftWheelScrollsSideways;
+    [Test]
+    procedure TestZoomListenersAreToldUntilTheyAreRemoved;
+    [Test]
+    procedure TestFreeTellsZoomListenersWhileTheyAreRegistered;
     [Test]
     procedure TestKeysNeedFocus;
     [Test]
@@ -99,9 +110,9 @@ implementation
 uses
   System.Math,
   System.Diagnostics,
+  FMX.Controls,
   FMX.Forms,
   FMX.Types,
-  Pdf4D.Render.Bitmap,
   Pdf4D.Render.Renderer,
   Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Api.Document,
@@ -134,12 +145,15 @@ const
   PageWidth = 612;
   PageHeight = 792;
   ZoomForTiles = 0.6;
+  OffsetLeft = 1.2;
+  OffsetTop = 0.8;
   ScrollBarMargin = 24;
   PointsPerInch = 72;
   LogicalPixelsPerInch = 96;
   TileBoundaries: array[0..1] of Integer = (256, 512);
-  ZoomAtDpiScale = 0.5;
   ScrollStep = 100;
+  WideZoom = 4;
+  WheelNotch = 120;
 
 { TPixelReader }
 
@@ -484,15 +498,14 @@ begin
   AssertOverlayCoversText(HighScale);
 end;
 
-procedure TPdf4DPageViewTests.AssertTilesEqualRenderer(const Zoom: Single);
+procedure TPdf4DPageViewTests.AssertTilesEqualRenderer(const Zoom: Single; const Image: FMX.Graphics.TBitmap; const Offset: TPoint;
+                                                       const ViewDevice: TSize);
 begin
   const PixelsPerPoint = Zoom * LogicalPixelsPerInch * FHost.Scale / PointsPerInch;
   const Origin = FHost.PagePointToDevice(0, TPointF.Create(0, PageHeight));
-  const ViewWidthDevice = Round(ViewWidth * FHost.Scale);
-  const ViewHeightDevice = Round(ViewHeight * FHost.Scale);
   const BarMargin = Ceil(ScrollBarMargin * FHost.Scale);
-  const CompareWidth = Min(Round(PageWidth * PixelsPerPoint), ViewWidthDevice - Origin.X - BarMargin);
-  const CompareHeight = Min(Round(PageHeight * PixelsPerPoint), ViewHeightDevice - Origin.Y - BarMargin);
+  const CompareWidth = Min(Round(PageWidth * PixelsPerPoint), ViewDevice.cx - Origin.X - BarMargin);
+  const CompareHeight = Min(Round(PageHeight * PixelsPerPoint), ViewDevice.cy - Origin.Y - BarMargin);
   Assert.IsTrue((CompareWidth > 256 * 2) and (CompareHeight > 256), 'the region covers the tile boundaries');
 
   const Stream = TBytesStream.Create(TViewerDocuments.Invoice);
@@ -504,44 +517,55 @@ begin
     var Expected: TPdfBitmap;
     Assert.AreEqual(Ord(TPdfRenderStatus.Completed), Ord(Renderer.RenderToBitmap(0, Params, Expected)));
     try
-      const Bitmap = FHost.Snapshot;
-      try
-        const Reader = TPixelReader.Create(Bitmap);
-        try
-          var Differences := 0;
-          var DifferentColumns := TList<Integer>.Create;
-          try
-            for var Y := 0 to CompareHeight - 1 do
-            begin
-              for var X := 0 to CompareWidth - 1 do
-              begin
-                const Want = Expected.GetPixel(X, Y);
-                if MaxChannelDifference(Reader.Pixel(Origin.X + X, Origin.Y + Y), Want.R, Want.G, Want.B) > PixelTolerance then
-                begin
-                  Inc(Differences);
-                  DifferentColumns.Add(X);
-                end;
-              end;
-            end;
-            Assert.AreEqual(0, Differences, 'the tiles are drawn pixel for pixel as the renderer made them');
-            for var Boundary in TileBoundaries do
-            begin
-              Assert.IsFalse(DifferentColumns.Contains(Boundary), Format('no deviating column at x = %d', [Boundary]));
-            end;
-          finally
-            DifferentColumns.Free;
-          end;
-        finally
-          Reader.Free;
-        end;
-      finally
-        Bitmap.Free;
-      end;
+      CompareWithRenderer(Image, Expected, Offset + Origin);
     finally
       Expected.Free;
     end;
   finally
     Stream.Free;
+  end;
+end;
+
+// Where the pixels of Expected lie in Image: from Corner on. The tile boundaries must not show as a column that deviates.
+procedure TPdf4DPageViewTests.CompareWithRenderer(const Image: FMX.Graphics.TBitmap; const Expected: TPdfBitmap; const Corner: TPoint);
+begin
+  const Reader = TPixelReader.Create(Image);
+  try
+    var Differences := 0;
+    const DifferentColumns = TList<Integer>.Create;
+    try
+      for var Y := 0 to Expected.Height - 1 do
+      begin
+        for var X := 0 to Expected.Width - 1 do
+        begin
+          const Want = Expected.GetPixel(X, Y);
+          if MaxChannelDifference(Reader.Pixel(Corner.X + X, Corner.Y + Y), Want.R, Want.G, Want.B) > PixelTolerance then
+          begin
+            Inc(Differences);
+            DifferentColumns.Add(X);
+          end;
+        end;
+      end;
+      Assert.AreEqual(0, Differences, 'the tiles are drawn pixel for pixel as the renderer made them');
+      for var Boundary in TileBoundaries do
+      begin
+        Assert.IsFalse(DifferentColumns.Contains(Boundary), Format('no deviating column at x = %d', [Boundary]));
+      end;
+    finally
+      DifferentColumns.Free;
+    end;
+  finally
+    Reader.Free;
+  end;
+end;
+
+procedure TPdf4DPageViewTests.AssertTilesEqualRendererInSnapshot(const Zoom: Single);
+begin
+  const Image = FHost.Snapshot;
+  try
+    AssertTilesEqualRenderer(Zoom, Image, TPoint.Zero, TSize.Create(Round(ViewWidth * FHost.Scale), Round(ViewHeight * FHost.Scale)));
+  finally
+    Image.Free;
   end;
 end;
 
@@ -552,18 +576,40 @@ begin
   FHost.PageView.Zoom := ZoomForTiles;
   Assert.IsTrue(FHost.WaitForVisibleTiles, 'tiles at the zoom');
 
-  AssertTilesEqualRenderer(ZoomForTiles);
+  AssertTilesEqualRendererInSnapshot(ZoomForTiles);
+end;
+
+// A page view beside other controls sits at an offset that is no whole number of device pixels: the tiles must still lie on whole device
+// pixels of the screen, so the snapshot of the parent equals what the renderer made, moved by the whole pixels that the offset rounds to
+procedure TPdf4DPageViewTests.TestTilesAreOnWholeDevicePixelsAtAFractionalOffset;
+begin
+  MakeHost(HighScale);
+  OpenAndSettle(TViewerDocuments.Invoice);
+  FHost.PageView.Parent := FHost.Content;
+  FHost.PageView.Align := TAlignLayout.None;
+  FHost.PageView.SetBounds(OffsetLeft, OffsetTop, ViewWidth - 4, ViewHeight - 4);
+  FHost.PageView.Zoom := ZoomForTiles;
+  Assert.IsTrue(FHost.WaitForVisibleTiles, 'tiles at the zoom');
+  // The point of this test: the offset is not on the device grid
+  Assert.IsTrue(Abs(Frac(OffsetLeft * HighScale)) > 0.1, 'the left edge is between two device pixels');
+
+  const Image = TFmxTestHost.SnapshotOf(FHost.Content);
+  try
+    const Offset = TPoint.Create(Round(OffsetLeft * HighScale), Round(OffsetTop * HighScale));
+    const ViewDevice = TSize.Create(Round((ViewWidth - 4) * HighScale), Round((ViewHeight - 4) * HighScale));
+    AssertTilesEqualRenderer(ZoomForTiles, Image, Offset, ViewDevice);
+  finally
+    Image.Free;
+  end;
 end;
 
 procedure TPdf4DPageViewTests.TestScaleChangeRerenders;
 begin
-  OpenAndSettle(TViewerDocuments.Pages(3, PageWidth, PageHeight, 0));
-  FHost.PageView.Zoom := ZoomAtDpiScale;
-  FHost.PageView.GoToPage(1);
+  OpenAndSettle(TViewerDocuments.Invoice);
+  FHost.PageView.Zoom := ZoomForTiles;
   Assert.IsTrue(FHost.WaitForVisibleTiles, 'tiles at scale 1');
   const ContentBefore = FHost.PageView.Controller.ContentSize;
   const PageBefore = FHost.Document.CurrentPage;
-  Assert.AreEqual(1, PageBefore, 'the second page is shown');
 
   FHost.ChangeScale(HighScale);
   Assert.IsTrue(FHost.WaitForVisibleTiles, 'tiles at the new scale');
@@ -572,6 +618,59 @@ begin
   Assert.AreEqual(Double(ContentBefore.cx * HighScale), Double(ContentAfter.cx), 2.0, 'the content is 1.5 times wider');
   Assert.AreEqual(Double(ContentBefore.cy * HighScale), Double(ContentAfter.cy), 4.0, 'the content is 1.5 times taller');
   Assert.AreEqual(PageBefore, FHost.Document.CurrentPage, 'the current page stays');
+  // New tiles were asked for at the new scale: the page is as sharp as the renderer makes it, not the old tiles stretched. The page keeps its
+  // place in the view, which can be partly above it now, so the comparison starts at the top.
+  FHost.PageView.Controller.ScrollTo(TPoint.Zero);
+  Assert.IsTrue(FHost.WaitForVisibleTiles, 'tiles at the top of the page');
+  AssertTilesEqualRendererInSnapshot(ZoomForTiles);
+end;
+
+// The wheel with Shift scrolls sideways: the wheel down goes to the right, the wheel up to the left
+procedure TPdf4DPageViewTests.TestShiftWheelScrollsSideways;
+begin
+  OpenAndSettle(TViewerDocuments.Invoice);
+  FHost.PageView.Zoom := WideZoom;
+  FHost.Pump(1);
+  var Handled := False;
+
+  (FHost.PageView as IControl).MouseWheel([ssShift], -WheelNotch, Handled);
+  const Right = FHost.PageView.Controller.ScrollPosition.X;
+  Assert.IsTrue(Handled, 'the wheel is used');
+  Assert.IsTrue(Right > 0, 'the wheel down with Shift scrolls to the right');
+
+  Handled := False;
+  (FHost.PageView as IControl).MouseWheel([ssShift], WheelNotch, Handled);
+  Assert.IsTrue(FHost.PageView.Controller.ScrollPosition.X < Right, 'the wheel up with Shift scrolls to the left');
+end;
+
+procedure TPdf4DPageViewTests.TestZoomListenersAreToldUntilTheyAreRemoved;
+begin
+  OpenAndSettle(TViewerDocuments.Invoice);
+  const Probe = TZoomListenerProbe.Create(FHost.PageView);
+  try
+    FHost.PageView.ZoomIn;
+    Assert.AreEqual(1, Probe.ZoomChanges, 'a listener is told of a change of the zoom');
+
+    FHost.PageView.RemoveZoomListener(Probe.HandleZoomChangedForTest());
+    FHost.PageView.ZoomIn;
+    Assert.AreEqual(1, Probe.ZoomChanges, 'a listener that was removed hears nothing more');
+  finally
+    Probe.Free;
+  end;
+end;
+
+// A component that follows the zoom lets go of the page view in its free notification, as the toolbar does: the list of listeners must
+// still be there then
+procedure TPdf4DPageViewTests.TestFreeTellsZoomListenersWhileTheyAreRegistered;
+begin
+  const Probe = TZoomListenerProbe.Create(FHost.PageView);
+  try
+    FHost.PageView.Free;
+
+    Assert.AreEqual(1, Probe.ListenerCountAtRemoval, 'the probe was still registered when it was told');
+  finally
+    Probe.Free;
+  end;
 end;
 
 procedure TPdf4DPageViewTests.TestKeysNeedFocus;

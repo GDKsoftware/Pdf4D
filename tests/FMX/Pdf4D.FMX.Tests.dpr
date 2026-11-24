@@ -34,6 +34,7 @@ uses
 const
   ExitCodeTestsFailed = 1;
   ExitCodeMemoryLeak  = 2;
+  ExitCodeMemoryCheckUnreliable = 3;
 
   // FMX on Windows keeps small blocks for its windows and for some of its controls (a page view with its scroll bars leaves four), and lets
   // go of them all when a count of this many has built up. A bare window adds one block to that count (found with a program that only makes
@@ -63,17 +64,28 @@ end;
 
 // Brings the count of blocks that FMX keeps back to the start of a batch, by making bare windows until the batch is let go: a window adds
 // one block, except the one that completes the batch. Outstanding blocks measured before and after such a flush differ only by real leaks.
-procedure FlushFmxBlocks;
+// False when the flush cannot be trusted: no release was seen within a batch of windows (another size of batch), or a full batch of windows
+// does not bring the count back to where it started (the drop that was seen was not the release of the batch).
+function FlushFmxBlocks: Boolean;
 begin
+  var IsReleased := False;
   for var Attempt := 1 to WindowBatch do
   begin
     const Before = TMemoryCheck.OutstandingBlocks;
     TForm.CreateNew(nil).Free;
     if TMemoryCheck.OutstandingBlocks < Before then
     begin
-      Exit;
+      IsReleased := True;
+      Break;
     end;
   end;
+
+  const Settled = TMemoryCheck.OutstandingBlocks;
+  for var Window := 1 to WindowBatch do
+  begin
+    TForm.CreateNew(nil).Free;
+  end;
+  Result := IsReleased and (TMemoryCheck.OutstandingBlocks = Settled);
 end;
 
 function RunTests: Boolean;
@@ -100,16 +112,21 @@ begin
     TDUnitX.CheckCommandLine;
     // The first run initializes DUnitX's global registries, the FMX platform services and the canvas; leaks are measured on the second run.
     const WarmupPassed = RunTests;
-    FlushFmxBlocks;
+    const IsBaselineTrusted = FlushFmxBlocks;
     const Baseline = TMemoryCheck.OutstandingBlocks;
     const AllPassed = RunTests and WarmupPassed;
-    FlushFmxBlocks;
+    const IsEndTrusted = FlushFmxBlocks;
     const BlocksAdded = TMemoryCheck.OutstandingBlocks - Baseline;
     const HasLeak = (BlocksAdded <> 0);
 
     if not AllPassed then
     begin
       ExitCode := ExitCodeTestsFailed;
+    end
+    else if not (IsBaselineTrusted and IsEndTrusted) then
+    begin
+      Writeln('Memory check not reliable: FMX did not let go of its blocks in the batch of windows that was expected.');
+      ExitCode := ExitCodeMemoryCheckUnreliable;
     end
     else if HasLeak then
     begin

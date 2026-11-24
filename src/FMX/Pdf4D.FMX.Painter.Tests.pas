@@ -19,6 +19,10 @@ type
   [TestFixture]
   TPdfFmxPainterTests = class
   private
+    FTarget: FMX.Graphics.TBitmap;
+
+    // Makes a painter without a scale; the call that is expected to raise
+    procedure CreatePainterWithoutScale;
     // A white bitmap of LogicalSize logical units on the given scale, on which Draw has painted; the caller owns it
     class function PaintOnBitmap(const LogicalSize: Integer; const Scale: Single; const Draw: TProc<IPdfViewPainter>): FMX.Graphics.TBitmap; static;
     class function PixelAt(const Bitmap: FMX.Graphics.TBitmap; const X, Y: Integer): TAlphaColor; static;
@@ -398,18 +402,20 @@ end;
 
 procedure TPdfFmxPainterTests.TestScaleMustBePositive;
 begin
-  const Target = FMX.Graphics.TBitmap.Create(4, 4);
+  FTarget := FMX.Graphics.TBitmap.Create(4, 4);
   try
-    Assert.WillRaise(
-      procedure
-      begin
-        const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Target.Canvas, 0, nil);
-        Assert.IsNotNull(Painter);
-      end,
-      EArgumentOutOfRangeException);
+    Assert.WillRaise(CreatePainterWithoutScale, EArgumentOutOfRangeException);
   finally
-    Target.Free;
+    FreeAndNil(FTarget);
   end;
+end;
+
+procedure TPdfFmxPainterTests.CreatePainterWithoutScale;
+begin
+  const NoScale: Single = 0;
+  const NoFont: FMX.Graphics.TFont = nil;
+  const Painter = TPdfFmxPainter.Create(FTarget.Canvas, NoScale, NoFont);
+  Painter.Free;
 end;
 
 end.

@@ -42,6 +42,31 @@ type
     property CopiedTexts: TList<string> read FCopiedTexts;
   end;
 
+  // Follows the zoom of a page view as a toolbar does, and lets go of it in the free notification. It records how many zoom listeners the
+  // page view had at that moment: the list has to be alive while the page view tells the others that it goes.
+  TZoomListenerProbe = class(TComponent)
+  private
+    FPageView: TPdf4DPageView;
+    FListenerCountAtRemoval: Integer;
+    FZoomChanges: Integer;
+
+    procedure HandleZoomChanged(Sender: TObject);
+
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+
+  public
+    constructor Create(const PageView: TPdf4DPageView); reintroduce;
+    destructor Destroy; override;
+
+    // The listener, for a test that removes it
+    function HandleZoomChangedForTest: TNotifyEvent;
+
+    // -1 until the page view was freed
+    property ListenerCountAtRemoval: Integer read FListenerCountAtRemoval;
+    property ZoomChanges: Integer read FZoomChanges;
+  end;
+
   // A form with a document, made in the test process, on a scale that the test chooses. The form is shown outside the visible desktop.
   // What it draws is read back with Snapshot, in device pixels. Input goes through the Handle... methods of the shell, so that no desktop
   // session tool is needed.
@@ -163,6 +188,48 @@ procedure TTestPageView.WriteClipboardText(const Text: string);
 begin
   FCopiedTexts.Add(Text);
   inherited;
+end;
+
+{ TZoomListenerProbe }
+
+constructor TZoomListenerProbe.Create(const PageView: TPdf4DPageView);
+begin
+  inherited Create(nil);
+  FListenerCountAtRemoval := -1;
+  FPageView := PageView;
+  FPageView.FreeNotification(Self);
+  FPageView.AddZoomListener(HandleZoomChanged);
+end;
+
+destructor TZoomListenerProbe.Destroy;
+begin
+  if Assigned(FPageView) then
+  begin
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView.RemoveFreeNotification(Self);
+  end;
+  inherited;
+end;
+
+function TZoomListenerProbe.HandleZoomChangedForTest: TNotifyEvent;
+begin
+  Result := HandleZoomChanged;
+end;
+
+procedure TZoomListenerProbe.HandleZoomChanged(Sender: TObject);
+begin
+  Inc(FZoomChanges);
+end;
+
+procedure TZoomListenerProbe.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (Operation = TOperation.opRemove) and (AComponent = FPageView) then
+  begin
+    FListenerCountAtRemoval := FPageView.ZoomListenerCount;
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView := nil;
+  end;
 end;
 
 { TFmxTestHost }
@@ -313,6 +380,12 @@ begin
   FForm.ClientWidth := ClientWidth;
   FForm.ClientHeight := ClientHeight;
   Pump(1);
+  // A form that has no message for the new scale is found out by its next paint
+  if Assigned(FPageView) then
+  begin
+    FPageView.Repaint;
+    Pump(1);
+  end;
 end;
 
 function TFmxTestHost.WaitForVisibleTiles: Boolean;
