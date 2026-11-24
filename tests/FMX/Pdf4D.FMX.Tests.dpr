@@ -68,8 +68,10 @@ end;
 
 // Brings the count of blocks that FMX keeps back to the start of a batch, by making bare windows until the batch is let go: a window adds
 // one block, except the one that completes the batch. Outstanding blocks measured before and after such a flush differ only by real leaks.
-// False when the flush cannot be trusted: no release was seen within a batch of windows (another size of batch), or a full batch of windows
-// does not bring the count back to where it started (the drop that was seen was not the release of the batch).
+// False when the flush cannot be trusted. Checked: a release is seen within a batch of windows; then the next batch of windows has the
+// pattern that was measured: each of the first WindowBatch - 1 windows adds exactly one block, and the window after those lets the whole
+// batch go, which brings the count back to where it was after the first release. Another size of batch, a window that adds no block or a
+// drop with another cause fail this. A deferred free of something else that happens to coincide with a window cannot be told apart.
 function FlushFmxBlocks: Boolean;
 begin
   var IsReleased := False;
@@ -85,11 +87,22 @@ begin
   end;
 
   const Settled = TMemoryCheck.OutstandingBlocks;
+  var IsPatternKept := True;
   for var Window := 1 to WindowBatch do
   begin
+    const Before = TMemoryCheck.OutstandingBlocks;
     TForm.CreateNew(nil).Free;
+    const After = TMemoryCheck.OutstandingBlocks;
+    if Window < WindowBatch then
+    begin
+      IsPatternKept := IsPatternKept and (After = Before + 1);
+    end
+    else
+    begin
+      IsPatternKept := IsPatternKept and (After = Settled);
+    end;
   end;
-  Result := IsReleased and (TMemoryCheck.OutstandingBlocks = Settled);
+  Result := IsReleased and IsPatternKept;
 end;
 
 function RunTests: Boolean;
