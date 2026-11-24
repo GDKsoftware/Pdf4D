@@ -22,6 +22,8 @@ uses
   Pdf4D.FMX.Thumbnails in '..\..\src\FMX\Pdf4D.FMX.Thumbnails.pas',
   Pdf4D.FMX.OutlineView in '..\..\src\FMX\Pdf4D.FMX.OutlineView.pas',
   Pdf4D.FMX.SearchBar in '..\..\src\FMX\Pdf4D.FMX.SearchBar.pas',
+  Pdf4D.FMX.Actions in '..\..\src\FMX\Pdf4D.FMX.Actions.pas',
+  Pdf4D.FMX.Toolbar in '..\..\src\FMX\Pdf4D.FMX.Toolbar.pas',
   Pdf4D.FMX.Backend.Skia in '..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas',
   Pdf4D.Tests.FmxHost.Tests in 'Support\Pdf4D.Tests.FmxHost.Tests.pas',
   Pdf4D.FMX.Painter.Tests in '..\..\src\FMX\Pdf4D.FMX.Painter.Tests.pas',
@@ -29,7 +31,9 @@ uses
   Pdf4D.FMX.PageView.Tests in '..\..\src\FMX\Pdf4D.FMX.PageView.Tests.pas',
   Pdf4D.FMX.Thumbnails.Tests in '..\..\src\FMX\Pdf4D.FMX.Thumbnails.Tests.pas',
   Pdf4D.FMX.OutlineView.Tests in '..\..\src\FMX\Pdf4D.FMX.OutlineView.Tests.pas',
-  Pdf4D.FMX.SearchBar.Tests in '..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas';
+  Pdf4D.FMX.SearchBar.Tests in '..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas',
+  Pdf4D.FMX.Actions.Tests in '..\..\src\FMX\Pdf4D.FMX.Actions.Tests.pas',
+  Pdf4D.FMX.Toolbar.Tests in '..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

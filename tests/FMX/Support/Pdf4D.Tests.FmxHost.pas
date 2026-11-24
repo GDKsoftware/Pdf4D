@@ -24,7 +24,8 @@ uses
   Pdf4D.FMX.PageView,
   Pdf4D.FMX.Thumbnails,
   Pdf4D.FMX.OutlineView,
-  Pdf4D.FMX.SearchBar;
+  Pdf4D.FMX.SearchBar,
+  Pdf4D.FMX.Toolbar;
 
 type
   // The page view of the tests: it remembers what was copied, so that a session without a clipboard does not hide a copy
@@ -79,6 +80,7 @@ type
     FThumbnails: TPdf4DThumbnails;
     FOutlineView: TPdf4DOutlineView;
     FSearchBar: TPdf4DSearchBar;
+    FToolbar: TPdf4DToolbar;
     FScale: Single;
     FOpenErrorMessage: string;
 
@@ -104,6 +106,8 @@ type
     function AddThumbnails(const Width: Integer): TPdf4DThumbnails;
     function AddOutlineView(const Width: Integer): TPdf4DOutlineView;
     function AddSearchBar: TPdf4DSearchBar;
+    // Puts a toolbar on top of the form, linked to the document and to the page view and the search bar that the host has by then
+    function AddToolbar: TPdf4DToolbar;
     // Another scale for the form, as when it moves to another screen; the logical size of the client area stays
     procedure ChangeScale(const NewScale: Single);
     // Until the controller has no tiles outstanding
@@ -114,6 +118,8 @@ type
     function TryGetClipboardText(out Text: string): Boolean;
     // True when the session lets the process use the clipboard: what was put there can be read back
     function PutClipboardText(const Text: string): Boolean;
+    // The center of a word of a page, in logical units of the form; the page must be laid out and its text known
+    function CenterOfWord(const PageIndex: Integer; const Text: string; const Occurrence: Integer = 0): TPointF;
     // Input for the page view, in logical units
     procedure MouseMove(const Point: TPointF);
     procedure Click(const Point: TPointF);
@@ -150,6 +156,7 @@ type
     property Thumbnails: TPdf4DThumbnails read FThumbnails;
     property OutlineView: TPdf4DOutlineView read FOutlineView;
     property SearchBar: TPdf4DSearchBar read FSearchBar;
+    property Toolbar: TPdf4DToolbar read FToolbar;
   end;
 
 implementation
@@ -369,6 +376,54 @@ begin
   FSearchBar.Document := FDocument;
   Pump(1);
   Result := FSearchBar;
+end;
+
+function TFmxTestHost.AddToolbar: TPdf4DToolbar;
+begin
+  FToolbar := TPdf4DToolbar.Create(FForm);
+  FToolbar.Parent := FForm;
+  FToolbar.Align := TAlignLayout.Top;
+  FToolbar.Document := FDocument;
+  FToolbar.PageView := FPageView;
+  FToolbar.SearchBar := FSearchBar;
+  Pump(1);
+  Result := FToolbar;
+end;
+
+function TFmxTestHost.CenterOfWord(const PageIndex: Integer; const Text: string; const Occurrence: Integer): TPointF;
+begin
+  var PageText: IPdfPageText;
+  if not FDocument.TryGetPageText(PageIndex, PageText) then
+  begin
+    raise EArgumentException.CreateFmt('The text of page %d is not known', [PageIndex]);
+  end;
+
+  var Seen := 0;
+  for var Word in PageText.Words do
+  begin
+    if Word.Text <> Text then
+    begin
+      Continue;
+    end;
+
+    if Seen = Occurrence then
+    begin
+      var Sum := TPointF.Create(0, 0);
+      var Count := 0;
+      for var Quad in Word.Quads do
+      begin
+        for var Corner in [Quad.P1, Quad.P2, Quad.P3, Quad.P4] do
+        begin
+          const Device = PagePointToDevice(PageIndex, Corner);
+          Sum := Sum + TPointF.Create(Device.X, Device.Y);
+          Inc(Count);
+        end;
+      end;
+      Exit(DeviceToLocal(TPoint.Create(Round(Sum.X / Count), Round(Sum.Y / Count))));
+    end;
+    Inc(Seen);
+  end;
+  raise EArgumentException.CreateFmt('The word %s (%d) is not on page %d', [Text, Occurrence, PageIndex]);
 end;
 
 procedure TFmxTestHost.ChangeScale(const NewScale: Single);
