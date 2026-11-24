@@ -8,6 +8,7 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.Types,
   System.UITypes,
   FMX.Controls,
@@ -43,6 +44,7 @@ type
     FOnHoverChanged: TPdfHoverChangedEvent;
     FOnLinkClick: TPdfLinkClickEvent;
     FOnZoomChanged: TNotifyEvent;
+    FZoomListeners: TList<TNotifyEvent>;
 
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     function GetZoom: Single;
@@ -85,6 +87,8 @@ type
     procedure HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
     procedure HandleLinkClick(Sender: TObject; const Link: TPdfLink);
     procedure HandleZoomChanged(Sender: TObject);
+    // Scrolls sideways by a number of notches of the wheel; a positive number goes to the right
+    procedure ScrollSideways(const Notches: Single);
 
     // IPdfViewHost
     procedure HostInvalidate(const Rect: TRect);
@@ -125,6 +129,13 @@ type
     // The selected text; nothing without a selection or when the document does not allow copying
     procedure CopyToClipboard;
     function TryGetSelection(out Selection: TPdfTextSelection): Boolean;
+    // Several parties can follow the zoom, where OnZoomChanged is for the owner of the page view alone
+    procedure AddZoomListener(const Listener: TNotifyEvent);
+    procedure RemoveZoomListener(const Listener: TNotifyEvent);
+{$IFDEF PDF4D_TESTS}
+    // For tests only, compiled when PDF4D_TESTS is defined
+    function ZoomListenerCount: Integer;
+{$ENDIF}
 
     // One method per user action, so that gestures can call them later. Positions are local, in logical units.
     procedure HandleMouseMove(const LocalPoint: TPointF);
@@ -133,6 +144,8 @@ type
     procedure HandleMouseLeave;
     // 120 per notch; the wheel up is positive
     procedure HandleWheel(const WheelDelta: Integer; const Ctrl: Boolean; const LocalPoint: TPointF);
+    // Shift and the wheel: the wheel up goes to the left
+    procedure HandleSidewaysWheel(const WheelDelta: Integer);
     // True when the key was used
     function HandleKey(const Key: Word; const KeyChar: Char; const Shift: TShiftState): Boolean;
 
@@ -199,6 +212,8 @@ const
   // Logical units
   ScrollBarThickness = 16;
   LineScrollStep = 40;
+  LinesPerWheelNotch = 3;
+  WheelNotch = 120;
   MaxScrollBarRounds = 4;
   DesignBackgroundColor = $FFF0F0F0;
   DesignTextColor = $FF808080;
@@ -213,6 +228,7 @@ begin
   AutoCapture := True;
   HitTest := True;
   FFont := FMX.Graphics.TFont.Create;
+  FZoomListeners := TList<TNotifyEvent>.Create;
 
   FController := TPdfPageViewController.Create(Self);
   FController.OnTextSelected := HandleTextSelected;
@@ -230,10 +246,12 @@ begin
   FOnLinkClick := nil;
   FOnZoomChanged := nil;
   SetDocument(nil);
-  // The controller asks the host for nothing while the control is being destroyed, so it can go before the children
-  FreeAndNil(FController);
-  FreeAndNil(FFont);
+  // The inherited destructor tells the components that follow this one that it goes, and a zoom listener lets go of it then: the list
+  // and the controller stay until after that. The controller asks the host for nothing while the control is being destroyed.
   inherited;
+  FreeAndNil(FController);
+  FreeAndNil(FZoomListeners);
+  FreeAndNil(FFont);
 end;
 
 procedure TPdf4DPageView.CreateScrollBars;
@@ -468,7 +486,7 @@ begin
     UpdateViewport;
   end;
 
-  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, Scale, FFont);
+  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, Scale, FFont, PaintOrigin);
   if csDesigning in ComponentState then
   begin
     PaintDesignPlaceholder(Painter);
@@ -517,18 +535,19 @@ begin
   const Content = FController.ContentSize;
   const FullWidth = ToDeviceLength(Width);
   const FullHeight = ToDeviceLength(Height);
-  const BarWidth = ToDeviceLength(FVScrollBar.Width);
-  const BarHeight = ToDeviceLength(FHScrollBar.Height);
+  // The same sums as the viewport makes
+  const WidthWithBar = ToDeviceLength(Width - FVScrollBar.Width);
+  const HeightWithBar = ToDeviceLength(Height - FHScrollBar.Height);
 
   var NeedVertical := (Content.cy > FullHeight);
   var NeedHorizontal := (Content.cx > FullWidth);
   if NeedVertical and (not NeedHorizontal) then
   begin
-    NeedHorizontal := (Content.cx > FullWidth - BarWidth);
+    NeedHorizontal := (Content.cx > WidthWithBar);
   end
   else if NeedHorizontal and (not NeedVertical) then
   begin
-    NeedVertical := (Content.cy > FullHeight - BarHeight);
+    NeedVertical := (Content.cy > HeightWithBar);
   end;
 
   Result := (NeedVertical <> FVScrollBar.Visible) or (NeedHorizontal <> FHScrollBar.Visible);
@@ -556,7 +575,9 @@ begin
     Exit;
   end;
 
-  FController.ScrollTo(TPoint.Create(Round(FHScrollBar.Value * Scale), Round(FVScrollBar.Value * Scale)));
+  const Left = Round(FHScrollBar.Value * Scale);
+  const Top = Round(FVScrollBar.Value * Scale);
+  FController.ScrollTo(TPoint.Create(Left, Top));
 end;
 
 { IPdfViewHost }
@@ -639,7 +660,33 @@ begin
   begin
     FOnZoomChanged(Self);
   end;
+
+  // A listener may remove itself while it is told
+  for var Index := FZoomListeners.Count - 1 downto 0 do
+  begin
+    if Index < FZoomListeners.Count then
+    begin
+      FZoomListeners[Index](Self);
+    end;
+  end;
 end;
+
+procedure TPdf4DPageView.AddZoomListener(const Listener: TNotifyEvent);
+begin
+  FZoomListeners.Add(Listener);
+end;
+
+procedure TPdf4DPageView.RemoveZoomListener(const Listener: TNotifyEvent);
+begin
+  FZoomListeners.Remove(Listener);
+end;
+
+{$IFDEF PDF4D_TESTS}
+function TPdf4DPageView.ZoomListenerCount: Integer;
+begin
+  Result := FZoomListeners.Count;
+end;
+{$ENDIF}
 
 { Input }
 
@@ -684,7 +731,14 @@ begin
   inherited;
   if not Handled then
   begin
-    HandleWheel(WheelDelta, ssCtrl in Shift, MouseInLocal);
+    if ssShift in Shift then
+    begin
+      HandleSidewaysWheel(WheelDelta);
+    end
+    else
+    begin
+      HandleWheel(WheelDelta, ssCtrl in Shift, MouseInLocal);
+    end;
     Handled := True;
   end;
 end;
@@ -722,6 +776,16 @@ end;
 procedure TPdf4DPageView.HandleWheel(const WheelDelta: Integer; const Ctrl: Boolean; const LocalPoint: TPointF);
 begin
   FController.MouseWheel(WheelDelta, Ctrl, ToDevice(LocalPoint));
+end;
+
+procedure TPdf4DPageView.HandleSidewaysWheel(const WheelDelta: Integer);
+begin
+  ScrollSideways(-WheelDelta / WheelNotch);
+end;
+
+procedure TPdf4DPageView.ScrollSideways(const Notches: Single);
+begin
+  FController.ScrollBy(Round(Notches * LinesPerWheelNotch * LineScrollStep * Scale), 0);
 end;
 
 class function TPdf4DPageView.TryGetViewerKey(const Key: Word; out ViewerKey: TPdfViewerKey): Boolean;

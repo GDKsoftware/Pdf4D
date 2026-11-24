@@ -51,9 +51,13 @@ type
   private
     FCanvas: TCanvas;
     FScale: Single;
+    FOrigin: TPointF;
     FFont: TFont;
 
     function ToLogical(const Point: TPointF): TPointF; overload;
+    // The device pixel that an edge falls on: the position on the screen is rounded, not the position in the control, so that a control at
+    // a fractional offset still draws on whole device pixels. The result is relative to the control.
+    function SnapEdge(const Edge, Origin: Single): Single;
     // The edges are rounded to whole device pixels before the division, so that neighbours touch without a seam
     function ToLogicalPixels(const Rect: TRectF): TRectF;
     function ToLogicalExact(const Rect: TRectF): TRectF;
@@ -63,7 +67,10 @@ type
 
   public
     // The canvas and the font must outlive the painter. Scale is the scale of the canvas: device pixels per logical unit.
-    constructor Create(const Canvas: TCanvas; const Scale: Single; const Font: TFont);
+    constructor Create(const Canvas: TCanvas; const Scale: Single; const Font: TFont); overload;
+    // Origin is where the origin of the canvas lies on the screen, in device pixels, which is not a whole number when the control that
+    // paints sits at a fractional offset
+    constructor Create(const Canvas: TCanvas; const Scale: Single; const Font: TFont; const Origin: TPointF); overload;
 
     procedure FillRect(const Rect: TRectF; const Color: TAlphaColor);
     procedure DrawImage(const Image: IPdfViewImage; const Source: TRect; const Dest: TRectF);
@@ -184,6 +191,11 @@ end;
 
 constructor TPdfFmxPainter.Create(const Canvas: TCanvas; const Scale: Single; const Font: TFont);
 begin
+  Create(Canvas, Scale, Font, TPointF.Zero);
+end;
+
+constructor TPdfFmxPainter.Create(const Canvas: TCanvas; const Scale: Single; const Font: TFont; const Origin: TPointF);
+begin
   inherited Create;
   if not (Scale > 0) then
   begin
@@ -192,6 +204,7 @@ begin
 
   FCanvas := Canvas;
   FScale := Scale;
+  FOrigin := Origin;
   FFont := Font;
 end;
 
@@ -200,9 +213,15 @@ begin
   Result := TPointF.Create(Point.X / FScale, Point.Y / FScale);
 end;
 
+function TPdfFmxPainter.SnapEdge(const Edge, Origin: Single): Single;
+begin
+  Result := Round(Origin + Edge) - Origin;
+end;
+
 function TPdfFmxPainter.ToLogicalPixels(const Rect: TRectF): TRectF;
 begin
-  Result := TRectF.Create(Round(Rect.Left) / FScale, Round(Rect.Top) / FScale, Round(Rect.Right) / FScale, Round(Rect.Bottom) / FScale);
+  Result := TRectF.Create(SnapEdge(Rect.Left, FOrigin.X) / FScale, SnapEdge(Rect.Top, FOrigin.Y) / FScale,
+                          SnapEdge(Rect.Right, FOrigin.X) / FScale, SnapEdge(Rect.Bottom, FOrigin.Y) / FScale);
 end;
 
 function TPdfFmxPainter.ToLogicalExact(const Rect: TRectF): TRectF;
@@ -248,15 +267,17 @@ begin
   end;
 
   // The edges are rounded, not the size, so that tiles that touch stay touching
-  const Target = TRect.Create(Round(Dest.Left), Round(Dest.Top), Round(Dest.Right), Round(Dest.Bottom));
-  if Target.IsEmpty then
+  const Target = ToLogicalPixels(Dest);
+  const TargetWidth = Round(Target.Width * FScale);
+  const TargetHeight = Round(Target.Height * FScale);
+  if (TargetWidth <= 0) or (TargetHeight <= 0) then
   begin
     Exit;
   end;
 
   // A picture that is not scaled is copied pixel for pixel, without filtering
-  const IsSameSize = (Source.Width = Target.Width) and (Source.Height = Target.Height);
-  FCanvas.DrawBitmap(ImageSource.Bitmap, TRectF.Create(Source), ToLogicalExact(TRectF.Create(Target)), FullOpacity, IsSameSize);
+  const IsSameSize = (Source.Width = TargetWidth) and (Source.Height = TargetHeight);
+  FCanvas.DrawBitmap(ImageSource.Bitmap, TRectF.Create(Source), Target, FullOpacity, IsSameSize);
 end;
 
 procedure TPdfFmxPainter.FillPolygon(const Points: TArray<TPointF>; const Color: TAlphaColor);

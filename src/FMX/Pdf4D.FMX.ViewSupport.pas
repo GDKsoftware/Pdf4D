@@ -31,6 +31,9 @@ type
     procedure RefreshScale;
     // True when the form has another scale than the control last used, without a message that reached the control
     function IsScaleStale: Boolean;
+    // Where the origin of the canvas lies on the screen, in device pixels; only known while the control paints. It is not a whole number
+    // when the control sits at a fractional offset, and the painter needs it to put tiles on whole device pixels.
+    function PaintOrigin: TPointF;
     function ToDevice(const LocalPoint: TPointF): TPointF;
     function ToDeviceLength(const LocalLength: Single): Integer;
     // Gives the controller its viewport and scale; called when the scale of the form changes
@@ -56,6 +59,8 @@ implementation
 
 uses
   System.Math,
+  System.Math.Vectors,
+  FMX.Graphics,
   FMX.Forms;
 
 { TPdfFmxViewControl }
@@ -93,7 +98,12 @@ end;
 
 function TPdfFmxViewControl.IsScaleStale: Boolean;
 begin
-  Result := (CurrentScale <> FScale);
+  Result := not SameValue(CurrentScale, FScale, TEpsilon.Scale);
+end;
+
+function TPdfFmxViewControl.PaintOrigin: TPointF;
+begin
+  Result := TPointF.Create(Canvas.Matrix.m31 * FScale, Canvas.Matrix.m32 * FScale);
 end;
 
 function TPdfFmxViewControl.ToDevice(const LocalPoint: TPointF): TPointF;

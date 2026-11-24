@@ -258,7 +258,7 @@ begin
     UpdateViewport;
   end;
 
-  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, Scale, FFont);
+  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, Scale, FFont, PaintOrigin);
   // What lies under the scroll bar is not part of the viewport
   Painter.FillRect(TRectF.Create(0, 0, ToDeviceLength(Width), ToDeviceLength(Height)), FController.BackgroundColor);
   FController.Paint(Painter, TRect.Create(0, 0, FViewport.cx, FViewport.cy));
