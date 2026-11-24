@@ -88,6 +88,8 @@
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Thumbnails.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.OutlineView.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.SearchBar.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.Print.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.PrintDialog.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Actions.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Toolbar.pas"/>
         <BuildConfiguration Include="Base">

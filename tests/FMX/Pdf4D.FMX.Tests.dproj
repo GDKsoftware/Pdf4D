@@ -77,6 +77,7 @@
         </DelphiCompile>
         <DCCReference Include="..\Pdf4D.Tests.MemoryCheck.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FmxHost.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.FmxBitmapPrintTarget.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.pas"/>
@@ -84,6 +85,8 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Thumbnails.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.OutlineView.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Print.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Actions.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.pas"/>
         <DCCReference Include="..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas"/>
@@ -96,6 +99,8 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Actions.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

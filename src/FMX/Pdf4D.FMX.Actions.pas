@@ -13,7 +13,8 @@ uses
   Pdf4D.Viewer.Document,
   Pdf4D.Viewer.Commands,
   Pdf4D.FMX.PageView,
-  Pdf4D.FMX.SearchBar;
+  Pdf4D.FMX.SearchBar,
+  Pdf4D.FMX.PrintDialog;
 
 type
   // An action on a page view: the one of PageView, or the page view that has the focus when PageView is nil. Enabled follows the
@@ -180,12 +181,16 @@ type
     constructor Create(Owner: TComponent); override;
   end;
 
-  // Enabled when the document may be printed. Printing itself, with the print dialog, comes with the print units; until then an
-  // OnExecute handler is what the action runs.
+  // Enabled when the document may be printed. It shows the print dialog of PrintDialog, or a print dialog of its own when that is nil, and
+  // prints what the user chooses.
   TPdf4DPrintAction = class(TPdf4DDocumentAction)
   private
+    FPrintDialog: TPdf4DPrintDialog;
+    // The document that the action gave FPrintDialog; it is compared, never used
+    FGivenDocument: TPdf4DCustomDocument;
     FFocusScope: TControl;
 
+    procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
     procedure SetFocusScope(const Value: TControl);
 
   protected
@@ -199,6 +204,9 @@ type
 
     // When set, the shortcut works only while the focus is inside this control
     property FocusScope: TControl read FFocusScope write SetFocusScope;
+
+  published
+    property PrintDialog: TPdf4DPrintDialog read FPrintDialog write SetPrintDialog;
   end;
 
   // Shows the search bar and puts the cursor in its query field
@@ -787,9 +795,38 @@ end;
 procedure TPdf4DPrintAction.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
-  if (Operation = TOperation.opRemove) and (AComponent = FFocusScope) then
+  if Operation <> TOperation.opRemove then
+  begin
+    Exit;
+  end;
+
+  if AComponent = FPrintDialog then
+  begin
+    FPrintDialog := nil;
+  end;
+  if AComponent = FFocusScope then
   begin
     FFocusScope := nil;
+  end;
+end;
+
+procedure TPdf4DPrintAction.SetPrintDialog(const Value: TPdf4DPrintDialog);
+begin
+  if Value = FPrintDialog then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FPrintDialog) then
+  begin
+    FPrintDialog.RemoveFreeNotification(Self);
+  end;
+
+  FPrintDialog := Value;
+
+  if Assigned(FPrintDialog) then
+  begin
+    FPrintDialog.FreeNotification(Self);
   end;
 end;
 
@@ -805,7 +842,40 @@ end;
 
 procedure TPdf4DPrintAction.Perform(const Document: TPdf4DCustomDocument);
 begin
-  // The print dialog and the print job come with the print units; the framework runs this command, not TPdfViewerCommands
+  // A dialog of the application keeps the choices of the user for the next time. It prints the document of the action, unless the
+  // application gave it another one.
+  if Assigned(FPrintDialog) then
+  begin
+    const IsOurs = (not Assigned(FPrintDialog.Document)) or (FPrintDialog.Document = FGivenDocument);
+    if IsOurs then
+    begin
+      FPrintDialog.Document := Document;
+      FGivenDocument := Document;
+    end;
+    FPrintDialog.Execute;
+    Exit;
+  end;
+
+  // The dialog of the action lives until its job is over, which is after this returns. The application owns it as well, so that a job
+  // that still runs when the application ends does not leak.
+  const Dialog = TPdf4DPrintDialog.Create(Application);
+  var IsPrinting := False;
+  try
+    Dialog.Document := Document;
+    if Dialog.Execute then
+    begin
+      IsPrinting := Dialog.IsPrinting;
+    end;
+  finally
+    if IsPrinting then
+    begin
+      Dialog.FreeWhenDone := True;
+    end
+    else
+    begin
+      Dialog.Free;
+    end;
+  end;
 end;
 
 { TPdf4DSearchAction }

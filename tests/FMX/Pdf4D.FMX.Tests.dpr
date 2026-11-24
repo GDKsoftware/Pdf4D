@@ -15,6 +15,7 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Tests.MemoryCheck in '..\Pdf4D.Tests.MemoryCheck.pas',
   Pdf4D.Tests.FmxHost in 'Support\Pdf4D.Tests.FmxHost.pas',
+  Pdf4D.Tests.FmxBitmapPrintTarget in 'Support\Pdf4D.Tests.FmxBitmapPrintTarget.pas',
   Pdf4D.FMX.Painter in '..\..\src\FMX\Pdf4D.FMX.Painter.pas',
   Pdf4D.FMX.Document in '..\..\src\FMX\Pdf4D.FMX.Document.pas',
   Pdf4D.FMX.PageView in '..\..\src\FMX\Pdf4D.FMX.PageView.pas',
@@ -22,6 +23,8 @@ uses
   Pdf4D.FMX.Thumbnails in '..\..\src\FMX\Pdf4D.FMX.Thumbnails.pas',
   Pdf4D.FMX.OutlineView in '..\..\src\FMX\Pdf4D.FMX.OutlineView.pas',
   Pdf4D.FMX.SearchBar in '..\..\src\FMX\Pdf4D.FMX.SearchBar.pas',
+  Pdf4D.FMX.Print in '..\..\src\FMX\Pdf4D.FMX.Print.pas',
+  Pdf4D.FMX.PrintDialog in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.pas',
   Pdf4D.FMX.Actions in '..\..\src\FMX\Pdf4D.FMX.Actions.pas',
   Pdf4D.FMX.Toolbar in '..\..\src\FMX\Pdf4D.FMX.Toolbar.pas',
   Pdf4D.FMX.Backend.Skia in '..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas',
@@ -33,7 +36,9 @@ uses
   Pdf4D.FMX.OutlineView.Tests in '..\..\src\FMX\Pdf4D.FMX.OutlineView.Tests.pas',
   Pdf4D.FMX.SearchBar.Tests in '..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas',
   Pdf4D.FMX.Actions.Tests in '..\..\src\FMX\Pdf4D.FMX.Actions.Tests.pas',
-  Pdf4D.FMX.Toolbar.Tests in '..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas';
+  Pdf4D.FMX.Toolbar.Tests in '..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas',
+  Pdf4D.FMX.Print.Tests in '..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas',
+  Pdf4D.FMX.PrintDialog.Tests in '..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;

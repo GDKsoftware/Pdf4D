@@ -21,6 +21,7 @@ uses
   Pdf4D.Viewer.Document,
   Pdf4D.FMX.PageView,
   Pdf4D.FMX.SearchBar,
+  Pdf4D.FMX.PrintDialog,
   Pdf4D.FMX.Actions;
 
 type
@@ -85,6 +86,8 @@ type
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     procedure SetPageView(const Value: TPdf4DPageView);
     procedure SetSearchBar(const Value: TPdf4DSearchBar);
+    function GetPrintDialog: TPdf4DPrintDialog;
+    procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
     procedure SetButtons(const Value: TPdf4DToolbarButtons);
 
     procedure CreateActions;
@@ -146,6 +149,8 @@ type
     property Document: TPdf4DCustomDocument read FDocument write SetDocument;
     property PageView: TPdf4DPageView read FPageView write SetPageView;
     property SearchBar: TPdf4DSearchBar read FSearchBar write SetSearchBar;
+    // The dialog that the print button shows; nil: the print action makes one of its own
+    property PrintDialog: TPdf4DPrintDialog read GetPrintDialog write SetPrintDialog;
     property Buttons: TPdf4DToolbarButtons read FButtons write SetButtons default [Low(TPdf4DToolbarButton)..High(TPdf4DToolbarButton)];
   end;
 
@@ -328,6 +333,16 @@ begin
 
   FActionSearch.SearchBar := Value;
   UpdateState;
+end;
+
+function TPdf4DToolbar.GetPrintDialog: TPdf4DPrintDialog;
+begin
+  Result := FActionPrint.PrintDialog;
+end;
+
+procedure TPdf4DToolbar.SetPrintDialog(const Value: TPdf4DPrintDialog);
+begin
+  FActionPrint.PrintDialog := Value;
 end;
 
 procedure TPdf4DToolbar.SetButtons(const Value: TPdf4DToolbarButtons);
