@@ -50,6 +50,9 @@ type
     procedure TestToolbarZoomCombo;
 
     [Test]
+    procedure TestToolbarZoomComboTypedValue;
+
+    [Test]
     procedure TestToolbarButtonsOption;
 
     [Test]
@@ -133,7 +136,9 @@ procedure TPdf4DToolbarTests.ChooseZoom(const Item: string);
 begin
   const Index = FToolbar.ComboZoom.Items.IndexOf(Item);
   Assert.IsTrue(Index >= 0, 'the list has ' + Item);
+  // As the drop-down list of the box does: it sets the item, which shows its text, and then tells the model about the change
   FToolbar.ComboZoom.ItemIndex := Index;
+  FToolbar.ComboZoom.Model.Change;
   FHost.Pump(1);
 end;
 
@@ -232,14 +237,26 @@ begin
   FHost.PageView.ZoomIn;
   Assert.AreEqual('125%', FToolbar.ComboZoom.Text);
 
-  const StepCount: Integer = Length(TPdfZoomText.Items);
   FHost.PageView.Zoom := 1.33;
   Assert.AreEqual('133%', FToolbar.ComboZoom.Text, 'a zoom between the steps shows as it is');
-  Assert.AreEqual(StepCount + 1, FToolbar.ComboZoom.Items.Count, 'as an extra item');
-  FHost.PageView.Zoom := 1.5;
+  Assert.AreEqual(Double(1.33), Double(FHost.PageView.Zoom), Tolerance, 'showing the zoom did not change it');
+end;
+
+procedure TPdf4DToolbarTests.TestToolbarZoomComboTypedValue;
+begin
+  OpenPages(2);
+
+  FToolbar.ComboZoom.Text := '150';
+  FHost.PressKeyOn(FToolbar.ComboZoom, vkReturn, [], #13);
+  FHost.Pump(1);
+  Assert.AreEqual(Double(1.5), Double(FHost.PageView.Zoom), Tolerance, 'a number without a percent sign');
   Assert.AreEqual('150%', FToolbar.ComboZoom.Text);
-  Assert.AreEqual(StepCount, FToolbar.ComboZoom.Items.Count, 'the extra item went');
-  Assert.AreEqual(Double(1.5), Double(FHost.PageView.Zoom), Tolerance, 'showing the zoom did not change it');
+
+  FToolbar.ComboZoom.Text := 'wide';
+  FHost.PressKeyOn(FToolbar.ComboZoom, vkReturn, [], #13);
+  FHost.Pump(1);
+  Assert.AreEqual(Double(1.5), Double(FHost.PageView.Zoom), Tolerance, 'not a number');
+  Assert.AreEqual('150%', FToolbar.ComboZoom.Text, 'the text goes back');
 end;
 
 procedure TPdf4DToolbarTests.TestToolbarButtonsOption;

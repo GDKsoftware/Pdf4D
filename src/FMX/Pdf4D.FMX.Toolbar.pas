@@ -12,6 +12,7 @@ uses
   System.Generics.Collections,
   FMX.ActnList,
   FMX.Controls,
+  FMX.ComboEdit,
   FMX.Edit,
   FMX.ImgList,
   FMX.ListBox,
@@ -27,8 +28,8 @@ type
   TPdf4DToolbarButtons = set of TPdf4DToolbarButton;
 
   // A toolbar for a viewer: page navigation, a page number field, zoom, rotation, search and print. Its buttons run on actions of its
-  // own that work on Document, PageView and SearchBar; the icons come from an image list that the toolbar makes. The zoom list is not an
-  // edit: a zoom between the steps of the list shows as an extra item at the end.
+  // own that work on Document, PageView and SearchBar; the icons come from an image list that the toolbar makes. The zoom box is an editable
+  // combo box: a zoom between the steps of the list shows as its text, and a typed zoom applies on Enter.
   TPdf4DToolbar = class(TToolBar)
   private type
     // The order of the icons in the image list of the toolbar
@@ -50,7 +51,6 @@ type
     FIcons: TImageList;
     FIsBuilt: Boolean;
     FIsUpdatingZoom: Boolean;
-    FHasCustomZoomItem: Boolean;
 
     FActionFirst: TPdf4DFirstPageAction;
     FActionPrior: TPdf4DPriorPageAction;
@@ -79,7 +79,7 @@ type
     FButtonPrint: TSpeedButton;
     FEditPage: TEdit;
     FLabelPages: TLabel;
-    FComboZoom: TComboBox;
+    FComboZoom: TComboEdit;
 
     class function IconResourceName(const Icon: TToolbarIcon): string; static;
     procedure SetDocument(const Value: TPdf4DCustomDocument);
@@ -103,7 +103,6 @@ type
     procedure UpdateState;
     procedure UpdatePageNumber;
     procedure UpdateZoom;
-    procedure RemoveCustomZoomItem;
     procedure HandleDocumentChange(const Change: TPdfDocumentChange);
     procedure HandleZoomChanged(Sender: TObject);
 
@@ -111,7 +110,8 @@ type
     procedure HandlePageKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure HandlePageExit(Sender: TObject);
     procedure CommitPageNumber;
-    procedure HandleZoomSelect(Sender: TObject);
+    procedure HandleZoomChange(Sender: TObject);
+    procedure HandleZoomKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure ApplyZoomText(const Text: string);
 
   protected
@@ -136,7 +136,7 @@ type
     property ButtonPrint: TSpeedButton read FButtonPrint;
     property EditPage: TEdit read FEditPage;
     property LabelPages: TLabel read FLabelPages;
-    property ComboZoom: TComboBox read FComboZoom;
+    property ComboZoom: TComboEdit read FComboZoom;
     // The icons of the buttons
     property Icons: TImageList read FIcons;
     // The number of controls in the row of the toolbar
@@ -408,7 +408,6 @@ begin
   FEditPage := nil;
   FLabelPages := nil;
   FComboZoom := nil;
-  FHasCustomZoomItem := False;
 
   for var Item in FRow do
   begin
@@ -527,14 +526,15 @@ procedure TPdf4DToolbar.BuildZoom;
 begin
   FButtonZoomOut := NewButton('ButtonZoomOut', FActionZoomOut, GroupGap);
 
-  FComboZoom := TComboBox.Create(Self);
+  FComboZoom := TComboEdit.Create(Self);
   FComboZoom.Name := 'ComboZoom';
   FComboZoom.Width := ZoomComboWidth;
   FComboZoom.Height := FieldHeight;
   FComboZoom.Hint := SZoomHint;
   FComboZoom.ShowHint := True;
   FComboZoom.Items.AddStrings(TPdfZoomText.Items);
-  FComboZoom.OnChange := HandleZoomSelect;
+  FComboZoom.OnChange := HandleZoomChange;
+  FComboZoom.OnKeyDown := HandleZoomKeyDown;
   AddToRow(FComboZoom);
 
   FButtonZoomIn := NewButton('ButtonZoomIn', FActionZoomIn);
@@ -606,17 +606,6 @@ begin
   FLabelPages.Text := TPdfViewerCommands.PageCountText(FDocument);
 end;
 
-// The item that shows a zoom between the steps of the list goes as soon as the zoom changes
-procedure TPdf4DToolbar.RemoveCustomZoomItem;
-begin
-  if FHasCustomZoomItem then
-  begin
-    FComboZoom.ItemIndex := -1;
-    FComboZoom.Items.Delete(FComboZoom.Items.Count - 1);
-    FHasCustomZoomItem := False;
-  end;
-end;
-
 procedure TPdf4DToolbar.UpdateZoom;
 begin
   if not Assigned(FComboZoom) then
@@ -626,23 +615,18 @@ begin
 
   FIsUpdatingZoom := True;
   try
-    RemoveCustomZoomItem;
-
     const HasView = Assigned(FPageView);
     FComboZoom.Enabled := HasView and TPdfViewerCommands.IsOpen(FPageView.Document);
     if not HasView then
     begin
       FComboZoom.ItemIndex := -1;
+      FComboZoom.Text := '';
       Exit;
     end;
 
-    var Index := TPdfZoomText.IndexOf(FPageView.ZoomMode, FPageView.Zoom);
-    if Index < 0 then
-    begin
-      Index := FComboZoom.Items.Add(TPdfZoomText.Format(FPageView.ZoomMode, FPageView.Zoom));
-      FHasCustomZoomItem := True;
-    end;
-    FComboZoom.ItemIndex := Index;
+    // A zoom between the steps has no item, only its text
+    FComboZoom.ItemIndex := TPdfZoomText.IndexOf(FPageView.ZoomMode, FPageView.Zoom);
+    FComboZoom.Text := TPdfZoomText.Format(FPageView.ZoomMode, FPageView.Zoom);
   finally
     FIsUpdatingZoom := False;
   end;
@@ -689,11 +673,30 @@ end;
 
 { Zoom }
 
-procedure TPdf4DToolbar.HandleZoomSelect(Sender: TObject);
+// Choosing an item and leaving the box after typing both end here; Enter applies the text at once
+procedure TPdf4DToolbar.HandleZoomChange(Sender: TObject);
 begin
-  if (not FIsUpdatingZoom) and (FComboZoom.ItemIndex >= 0) then
+  if not FIsUpdatingZoom then
   begin
-    ApplyZoomText(FComboZoom.Items[FComboZoom.ItemIndex]);
+    ApplyZoomText(FComboZoom.Text);
+  end;
+end;
+
+procedure TPdf4DToolbar.HandleZoomKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+begin
+  case Key of
+    vkReturn:
+      begin
+        Key := 0;
+        KeyChar := #0;
+        ApplyZoomText(FComboZoom.Text);
+      end;
+    vkEscape:
+      begin
+        Key := 0;
+        KeyChar := #0;
+        UpdateZoom;
+      end;
   end;
 end;
 
@@ -711,7 +714,7 @@ begin
     FPageView.ZoomMode := Mode;
   end;
 
-  // The page view tells a change of zoom or of its mode, but not a choice that did not change it
+  // The page view tells a change of zoom or of its mode, but not a text that was not valid
   UpdateZoom;
 end;
 
