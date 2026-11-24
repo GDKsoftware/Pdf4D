@@ -84,6 +84,10 @@
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Document.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.PageView.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Painter.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.ViewSupport.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.Thumbnails.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.OutlineView.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.SearchBar.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

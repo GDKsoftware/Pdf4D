@@ -21,7 +21,10 @@ uses
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Viewer.Types,
   Pdf4D.FMX.Document,
-  Pdf4D.FMX.PageView;
+  Pdf4D.FMX.PageView,
+  Pdf4D.FMX.Thumbnails,
+  Pdf4D.FMX.OutlineView,
+  Pdf4D.FMX.SearchBar;
 
 type
   // The page view of the tests: it remembers what was copied, so that a session without a clipboard does not hide a copy
@@ -48,6 +51,9 @@ type
     FDocument: TPdf4DDocument;
     FContent: TRectangle;
     FPageView: TTestPageView;
+    FThumbnails: TPdf4DThumbnails;
+    FOutlineView: TPdf4DOutlineView;
+    FSearchBar: TPdf4DSearchBar;
     FScale: Single;
     FOpenErrorMessage: string;
 
@@ -68,6 +74,11 @@ type
     function OpenErrorMessage: string;
     // Puts a page view over the whole client area, linked to the document; Snapshot paints it from then on
     function AddPageView: TTestPageView;
+    // Put thumbnails (left), an outline view (right) or a search bar (top) in the form, linked to the document. Add them before the page
+    // view, which takes what is left of the client area.
+    function AddThumbnails(const Width: Integer): TPdf4DThumbnails;
+    function AddOutlineView(const Width: Integer): TPdf4DOutlineView;
+    function AddSearchBar: TPdf4DSearchBar;
     // Another scale for the form, as when it moves to another screen; the logical size of the client area stays
     procedure ChangeScale(const NewScale: Single);
     // Until the controller has no tiles outstanding
@@ -84,6 +95,8 @@ type
     procedure Drag(const FromPoint, ToPoint: TPointF);
     // A key as the form gets it from the window system; it reaches the control that has the focus. True when the control used it.
     function PressKey(const Key: Word; const Shift: TShiftState = []; const KeyChar: Char = #0): Boolean;
+    // Gives the control the focus and presses the key on the form
+    function PressKeyOn(const Control: TControl; const Key: Word; const Shift: TShiftState = []; const KeyChar: Char = #0): Boolean;
     // Device pixels of a point in PDF user space of a page; the page must be laid out
     function PagePointToDevice(const PageIndex: Integer; const Point: TPointF): TPoint;
     // The logical position of a device pixel of the form
@@ -109,6 +122,9 @@ type
     property PageView: TTestPageView read FPageView;
     // The scale of the form: device pixels per logical unit
     property Scale: Single read FScale;
+    property Thumbnails: TPdf4DThumbnails read FThumbnails;
+    property OutlineView: TPdf4DOutlineView read FOutlineView;
+    property SearchBar: TPdf4DSearchBar read FSearchBar;
   end;
 
 implementation
@@ -256,6 +272,38 @@ begin
   Result := FPageView;
 end;
 
+function TFmxTestHost.AddThumbnails(const Width: Integer): TPdf4DThumbnails;
+begin
+  FThumbnails := TPdf4DThumbnails.Create(FForm);
+  FThumbnails.Parent := FForm;
+  FThumbnails.Align := TAlignLayout.Left;
+  FThumbnails.Width := Width;
+  FThumbnails.Document := FDocument;
+  Pump(1);
+  Result := FThumbnails;
+end;
+
+function TFmxTestHost.AddOutlineView(const Width: Integer): TPdf4DOutlineView;
+begin
+  FOutlineView := TPdf4DOutlineView.Create(FForm);
+  FOutlineView.Parent := FForm;
+  FOutlineView.Align := TAlignLayout.Right;
+  FOutlineView.Width := Width;
+  FOutlineView.Document := FDocument;
+  Pump(1);
+  Result := FOutlineView;
+end;
+
+function TFmxTestHost.AddSearchBar: TPdf4DSearchBar;
+begin
+  FSearchBar := TPdf4DSearchBar.Create(FForm);
+  FSearchBar.Parent := FForm;
+  FSearchBar.Align := TAlignLayout.Top;
+  FSearchBar.Document := FDocument;
+  Pump(1);
+  Result := FSearchBar;
+end;
+
 procedure TFmxTestHost.ChangeScale(const NewScale: Single);
 begin
   const ClientWidth = FForm.ClientWidth;
@@ -344,6 +392,12 @@ begin
   var PressedChar := KeyChar;
   FForm.KeyDown(PressedKey, PressedChar, Shift);
   Result := (PressedKey = 0) and (PressedChar = #0);
+end;
+
+function TFmxTestHost.PressKeyOn(const Control: TControl; const Key: Word; const Shift: TShiftState; const KeyChar: Char): Boolean;
+begin
+  Control.SetFocus;
+  Result := PressKey(Key, Shift, KeyChar);
 end;
 
 function TFmxTestHost.PagePointToDevice(const PageIndex: Integer; const Point: TPointF): TPoint;

@@ -8,7 +8,6 @@ interface
 
 uses
   System.Classes,
-  System.Messaging,
   System.Types,
   System.UITypes,
   FMX.Controls,
@@ -22,23 +21,22 @@ uses
   Pdf4D.Viewer.Types,
   Pdf4D.Viewer.Document,
   Pdf4D.Viewer.Painter.Interfaces,
-  Pdf4D.Viewer.PageViewController;
+  Pdf4D.Viewer.PageViewController,
+  Pdf4D.FMX.ViewSupport;
 
 type
   // Shows the pages of a document in a form. A thin shell around TPdfPageViewController: it turns the input of FMX into calls on the
   // controller and the calls of the controller into scroll bars, cursors and painting. FMX works in logical units; the controller works
   // in device pixels, so every position is multiplied by the scale of the form on its way in, and the painter divides by it on the way out.
-  TPdf4DPageView = class(TControl, IPdfViewHost)
+  TPdf4DPageView = class(TPdfFmxViewControl, IPdfViewHost)
   private
     FController: TPdfPageViewController;
     FDocument: TPdf4DCustomDocument;
     FVScrollBar: TScrollBar;
     FHScrollBar: TScrollBar;
     FFont: FMX.Graphics.TFont;
-    FScale: Single;
     // The part of the control that shows pages: the control without the scroll bars that are visible, in device pixels
     FViewport: TSize;
-    FScaleChangedId: TMessageSubscriptionId;
     FIsUpdatingScrollBars: Boolean;
     FScrollBarsDirty: Boolean;
     FOnTextSelected: TPdfTextSelectedEvent;
@@ -74,17 +72,10 @@ type
     procedure SetBackgroundColor(const Value: TAlphaColor);
 
     procedure CreateScrollBars;
-    function NewScrollBar(const Orientation: TOrientation; const Align: TAlignLayout): TScrollBar;
-    // The scale of the form that shows the control; 1 as long as there is none
-    function CurrentScale: Single;
-    function ToDevice(const LocalPoint: TPointF): TPointF;
-    function ToDeviceLength(const LocalLength: Single): Integer;
-    procedure UpdateViewport;
     procedure UpdateScrollBars;
     function ShowBarsForContent: Boolean;
     procedure ApplyBarValues;
     procedure HandleScrollBarChange(Sender: TObject);
-    procedure HandleScaleChanged(const Sender: TObject; const Message: System.Messaging.TMessage);
     procedure PaintDesignPlaceholder(const Painter: IPdfViewPainter);
     class function TryGetViewerKey(const Key: Word; out ViewerKey: TPdfViewerKey): Boolean; static;
     class function TryGetControlKey(const Key: Word; const KeyChar: Char; out ViewerKey: TPdfViewerKey): Boolean; static;
@@ -107,6 +98,7 @@ type
 
   protected
     function GetDefaultSize: TSizeF; override;
+    procedure UpdateViewport; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Loaded; override;
     procedure Resize; override;
@@ -220,7 +212,6 @@ begin
   TabStop := True;
   AutoCapture := True;
   HitTest := True;
-  FScale := 1;
   FFont := FMX.Graphics.TFont.Create;
 
   FController := TPdfPageViewController.Create(Self);
@@ -230,12 +221,10 @@ begin
   FController.OnZoomChanged := HandleZoomChanged;
 
   CreateScrollBars;
-  FScaleChangedId := TMessageManager.DefaultManager.SubscribeToMessage(TScaleChangedMessage, HandleScaleChanged);
 end;
 
 destructor TPdf4DPageView.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TScaleChangedMessage, FScaleChangedId, True);
   FOnTextSelected := nil;
   FOnHoverChanged := nil;
   FOnLinkClick := nil;
@@ -249,23 +238,10 @@ end;
 
 procedure TPdf4DPageView.CreateScrollBars;
 begin
-  FVScrollBar := NewScrollBar(TOrientation.Vertical, TAlignLayout.Right);
-  FVScrollBar.Width := ScrollBarThickness;
-  FHScrollBar := NewScrollBar(TOrientation.Horizontal, TAlignLayout.Bottom);
-  FHScrollBar.Height := ScrollBarThickness;
-end;
-
-function TPdf4DPageView.NewScrollBar(const Orientation: TOrientation; const Align: TAlignLayout): TScrollBar;
-begin
-  Result := TScrollBar.Create(Self);
-  Result.Stored := False;
-  Result.Locked := True;
-  Result.Orientation := Orientation;
-  Result.Align := Align;
-  Result.SmallChange := LineScrollStep;
-  Result.Visible := False;
-  Result.OnChange := HandleScrollBarChange;
-  Result.Parent := Self;
+  FVScrollBar := TPdfFmxViewSupport.NewScrollBar(Self, TOrientation.Vertical, TAlignLayout.Right, ScrollBarThickness, LineScrollStep,
+                                                 HandleScrollBarChange);
+  FHScrollBar := TPdfFmxViewSupport.NewScrollBar(Self, TOrientation.Horizontal, TAlignLayout.Bottom, ScrollBarThickness, LineScrollStep,
+                                                 HandleScrollBarChange);
 end;
 
 function TPdf4DPageView.GetDefaultSize: TSizeF;
@@ -440,29 +416,6 @@ end;
 
 { Scale and viewport }
 
-function TPdf4DPageView.CurrentScale: Single;
-begin
-  Result := 1;
-  if Assigned(Scene) then
-  begin
-    Result := Scene.GetSceneScale;
-  end;
-  if Result <= 0 then
-  begin
-    Result := 1;
-  end;
-end;
-
-function TPdf4DPageView.ToDevice(const LocalPoint: TPointF): TPointF;
-begin
-  Result := TPointF.Create(LocalPoint.X * FScale, LocalPoint.Y * FScale);
-end;
-
-function TPdf4DPageView.ToDeviceLength(const LocalLength: Single): Integer;
-begin
-  Result := Max(0, Round(LocalLength * FScale));
-end;
-
 procedure TPdf4DPageView.UpdateViewport;
 begin
   if not Assigned(FController) then
@@ -470,7 +423,7 @@ begin
     Exit;
   end;
 
-  FScale := CurrentScale;
+  RefreshScale;
   var ViewWidth := Width;
   var ViewHeight := Height;
   if FVScrollBar.Visible then
@@ -483,17 +436,7 @@ begin
   end;
 
   FViewport := TSize.Create(ToDeviceLength(ViewWidth), ToDeviceLength(ViewHeight));
-  FController.SetViewport(FViewport, LogicalPixelsPerInch * FScale);
-end;
-
-procedure TPdf4DPageView.HandleScaleChanged(const Sender: TObject; const Message: System.Messaging.TMessage);
-begin
-  const IsOurForm = Assigned(Root) and (TScaleChangedMessage(Message).Value = Root.GetObject);
-  if IsOurForm then
-  begin
-    UpdateViewport;
-    Repaint;
-  end;
+  FController.SetViewport(FViewport, LogicalPixelsPerInch * Scale);
 end;
 
 procedure TPdf4DPageView.Loaded;
@@ -520,12 +463,12 @@ end;
 procedure TPdf4DPageView.Paint;
 begin
   // The scale of the form can have changed without a message that reached this control
-  if CurrentScale <> FScale then
+  if IsScaleStale then
   begin
     UpdateViewport;
   end;
 
-  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, FScale, FFont);
+  const Painter: IPdfViewPainter = TPdfFmxPainter.Create(Canvas, Scale, FFont);
   if csDesigning in ComponentState then
   begin
     PaintDesignPlaceholder(Painter);
@@ -598,12 +541,12 @@ begin
   const Content = FController.ContentSize;
   const Position = FController.ScrollPosition;
 
-  FVScrollBar.Max := Content.cy / FScale;
-  FVScrollBar.ViewportSize := FViewport.cy / FScale;
-  FVScrollBar.Value := Position.Y / FScale;
-  FHScrollBar.Max := Content.cx / FScale;
-  FHScrollBar.ViewportSize := FViewport.cx / FScale;
-  FHScrollBar.Value := Position.X / FScale;
+  FVScrollBar.Max := Content.cy / Scale;
+  FVScrollBar.ViewportSize := FViewport.cy / Scale;
+  FVScrollBar.Value := Position.Y / Scale;
+  FHScrollBar.Max := Content.cx / Scale;
+  FHScrollBar.ViewportSize := FViewport.cx / Scale;
+  FHScrollBar.Value := Position.X / Scale;
 end;
 
 procedure TPdf4DPageView.HandleScrollBarChange(Sender: TObject);
@@ -613,7 +556,7 @@ begin
     Exit;
   end;
 
-  FController.ScrollTo(TPoint.Create(Round(FHScrollBar.Value * FScale), Round(FVScrollBar.Value * FScale)));
+  FController.ScrollTo(TPoint.Create(Round(FHScrollBar.Value * Scale), Round(FVScrollBar.Value * Scale)));
 end;
 
 { IPdfViewHost }

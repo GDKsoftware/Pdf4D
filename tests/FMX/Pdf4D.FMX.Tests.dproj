@@ -80,11 +80,18 @@
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.ViewSupport.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Thumbnails.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.OutlineView.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.pas"/>
         <DCCReference Include="..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FmxHost.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.Tests.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Thumbnails.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.OutlineView.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

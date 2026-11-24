@@ -27,7 +27,7 @@ package Pdf4D.FMX;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Pdf4D FMX components: document, painter and page view'}
+{$DESCRIPTION 'Pdf4D FMX components: document, painter, page view, thumbnails, outline view and search bar'}
 {$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
@@ -40,6 +40,10 @@ requires
 contains
   Pdf4D.FMX.Document in '..\src\FMX\Pdf4D.FMX.Document.pas',
   Pdf4D.FMX.PageView in '..\src\FMX\Pdf4D.FMX.PageView.pas',
-  Pdf4D.FMX.Painter in '..\src\FMX\Pdf4D.FMX.Painter.pas';
+  Pdf4D.FMX.Painter in '..\src\FMX\Pdf4D.FMX.Painter.pas',
+  Pdf4D.FMX.ViewSupport in '..\src\FMX\Pdf4D.FMX.ViewSupport.pas',
+  Pdf4D.FMX.Thumbnails in '..\src\FMX\Pdf4D.FMX.Thumbnails.pas',
+  Pdf4D.FMX.OutlineView in '..\src\FMX\Pdf4D.FMX.OutlineView.pas',
+  Pdf4D.FMX.SearchBar in '..\src\FMX\Pdf4D.FMX.SearchBar.pas';
 
 end.
