@@ -38,6 +38,7 @@ type
     // Writes the pixels of Source into the memory that Target describes, in the pixel format of Target (RGBA and BGRA, both with
     // premultiplied alpha). Raises ENotSupportedException for another format and EArgumentException when Target is smaller than Source.
     class procedure CopyPixels(const Source: TPdfBitmap; const Target: TBitmapData); static;
+    class procedure SwapRedAndBlue(const Source: PByte; const Target: PByte; const PixelCount: Integer); static;
 
     function Width: Integer;
     function Height: Integer;
@@ -94,11 +95,11 @@ resourcestring
   SFmxScaleInvalid = 'Scale %g is not a positive number';
 
 const
-  RedByte = 0;
-  GreenByte = 1;
-  BlueByte = 2;
-  AlphaByte = 3;
   BytesPerPixel = 4;
+  // As a little-endian word, a pixel is alpha, blue, green, red; the red and blue bytes are 16 bits apart
+  GreenAndAlphaMask = $FF00FF00;
+  LowByteMask = $FF;
+  RedBlueDistance = 16;
   FullOpacity = 1;
 
 { TPdfFmxImage }
@@ -146,27 +147,31 @@ begin
     raise EArgumentException.CreateFmt(SFmxTargetTooSmall, [Target.Width, Target.Height, Source.Width, Source.Height]);
   end;
 
+  const RowBytes = Source.Width * BytesPerPixel;
   for var Row := 0 to Source.Height - 1 do
   begin
-    var Pixel := Source.ScanLine(Row);
-    var Line := PByte(Target.GetScanline(Row));
-    for var Column := 0 to Source.Width - 1 do
+    if IsSwapped then
     begin
-      if IsSwapped then
-      begin
-        Line[BlueByte] := Pixel[RedByte];
-        Line[RedByte] := Pixel[BlueByte];
-      end
-      else
-      begin
-        Line[RedByte] := Pixel[RedByte];
-        Line[BlueByte] := Pixel[BlueByte];
-      end;
-      Line[GreenByte] := Pixel[GreenByte];
-      Line[AlphaByte] := Pixel[AlphaByte];
-      Inc(Pixel, BytesPerPixel);
-      Inc(Line, BytesPerPixel);
+      SwapRedAndBlue(Source.ScanLine(Row), PByte(Target.GetScanline(Row)), Source.Width);
+    end
+    else
+    begin
+      Move(Source.ScanLine(Row)^, Target.GetScanline(Row)^, RowBytes);
     end;
+  end;
+end;
+
+// One 32-bit word per pixel: the red and the blue byte trade places, the green and the alpha byte stay
+class procedure TPdfFmxImage.SwapRedAndBlue(const Source: PByte; const Target: PByte; const PixelCount: Integer);
+begin
+  var Pixel := PCardinal(Source);
+  var Line := PCardinal(Target);
+  for var Column := 0 to PixelCount - 1 do
+  begin
+    const Value = Pixel^;
+    Line^ := (Value and GreenAndAlphaMask) or ((Value and LowByteMask) shl RedBlueDistance) or ((Value shr RedBlueDistance) and LowByteMask);
+    Inc(Pixel);
+    Inc(Line);
   end;
 end;
 
