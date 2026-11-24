@@ -32,7 +32,7 @@ $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packag
 # the IDE (a 64-bit IDE loads the Win64 build, a 32-bit IDE the Win32 build)
 $WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj', 'packages\Pdf4D.FMX.dproj', 'packages\Pdf4D.FMX.Skia.dproj', 'packages\dclPdf4D.FMX.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 # The demo applications, built for Windows only (compiled, not run)
-$DemoFiles = @('demos\Vcl\Pdf4DInvoiceDemo.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$DemoFiles = @('demos\Vcl\Pdf4DInvoiceDemo.dproj', 'demos\FMX\Pdf4DInvoiceDemoFmx.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
 # Hints and warnings of our own code fail the build; hints inside the Embarcadero-supplied DUnitX source are not ours to fix
 function Test-NoBuildProblems([string[]]$Output, [string]$TargetPlatform) {

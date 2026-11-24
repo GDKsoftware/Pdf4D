@@ -1,0 +1,139 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'Pdf4D invoice demo'
+  ClientHeight = 640
+  ClientWidth = 1000
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object PanelFields: TPanel
+    Align = Left
+    Size.Width = 260.000000000000000000
+    Size.Height = 640.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object ButtonOpen: TButton
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Margins.Bottom = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 28.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Open...'
+      OnClick = ButtonOpenClick
+    end
+    object LabelInvoiceNumber: TLabel
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 44.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 18.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Invoice number'
+      TabOrder = 1
+    end
+    object EditInvoiceNumber: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 2
+      Text = 'INV-2031-0417'
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 62.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      OnEnter = EditEnter
+    end
+    object LabelInvoiceDate: TLabel
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 91.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 18.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Invoice date'
+      TabOrder = 3
+    end
+    object EditInvoiceDate: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 4
+      Text = '2031-03-14'
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 109.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      OnEnter = EditEnter
+    end
+    object LabelAmount: TLabel
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 138.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 18.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Total amount'
+      TabOrder = 5
+    end
+    object EditAmount: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Top
+      TabOrder = 6
+      Text = '1,347.27'
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 156.000000000000000000
+      Size.Width = 244.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      OnEnter = EditEnter
+    end
+  end
+  object Pdf4DViewer1: TPdf4DViewer
+    Align = Client
+    Size.Width = 740.000000000000000000
+    Size.Height = 640.000000000000000000
+    Size.PlatformDefault = False
+    Document = Pdf4DDocument1
+    OnTextSelected = Pdf4DViewer1TextSelected
+  end
+  object Pdf4DDocument1: TPdf4DDocument
+    Backend = Pdf4DSkiaBackend1
+    OnOpened = Pdf4DDocument1Opened
+    Left = 24
+    Top = 240
+  end
+  object Pdf4DSkiaBackend1: TPdf4DSkiaBackend
+    Left = 24
+    Top = 288
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = 'pdf'
+    Filter = 'PDF files (*.pdf)|*.pdf'
+    Left = 24
+    Top = 336
+  end
+end
