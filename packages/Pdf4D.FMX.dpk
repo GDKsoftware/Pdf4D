@@ -27,7 +27,7 @@ package Pdf4D.FMX;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Pdf4D FMX components: document and painter'}
+{$DESCRIPTION 'Pdf4D FMX components: document, painter and page view'}
 {$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
@@ -39,6 +39,7 @@ requires
 
 contains
   Pdf4D.FMX.Document in '..\src\FMX\Pdf4D.FMX.Document.pas',
+  Pdf4D.FMX.PageView in '..\src\FMX\Pdf4D.FMX.PageView.pas',
   Pdf4D.FMX.Painter in '..\src\FMX\Pdf4D.FMX.Painter.pas';
 
 end.

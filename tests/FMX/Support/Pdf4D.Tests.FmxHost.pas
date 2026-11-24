@@ -12,15 +12,33 @@ uses
   System.Types,
   System.SysUtils,
   System.UITypes,
+  System.Generics.Collections,
   FMX.Controls,
   FMX.Forms,
   FMX.Graphics,
   FMX.Objects,
+  FMX.Types,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Viewer.Types,
-  Pdf4D.FMX.Document;
+  Pdf4D.FMX.Document,
+  Pdf4D.FMX.PageView;
 
 type
+  // The page view of the tests: it remembers what was copied, so that a session without a clipboard does not hide a copy
+  TTestPageView = class(TPdf4DPageView)
+  private
+    FCopiedTexts: TList<string>;
+
+  protected
+    procedure WriteClipboardText(const Text: string); override;
+
+  public
+    constructor Create(Owner: TComponent); override;
+    destructor Destroy; override;
+
+    property CopiedTexts: TList<string> read FCopiedTexts;
+  end;
+
   // A form with a document, made in the test process, on a scale that the test chooses. The form is shown outside the visible desktop.
   // What it draws is read back with Snapshot, in device pixels. Input goes through the Handle... methods of the shell, so that no desktop
   // session tool is needed.
@@ -29,10 +47,9 @@ type
     FForm: TForm;
     FDocument: TPdf4DDocument;
     FContent: TRectangle;
+    FPageView: TTestPageView;
     FScale: Single;
     FOpenErrorMessage: string;
-
-    class var FWindowsMade: Integer;
 
     procedure HandleOpenError(Sender: TObject; const Kind: TPdfOpenErrorKind; const Message: string);
 
@@ -49,6 +66,28 @@ type
     class function NewRenderBackend: IPdfRenderBackend; static;
     // The message of the last failed open
     function OpenErrorMessage: string;
+    // Puts a page view over the whole client area, linked to the document; Snapshot paints it from then on
+    function AddPageView: TTestPageView;
+    // Another scale for the form, as when it moves to another screen; the logical size of the client area stays
+    procedure ChangeScale(const NewScale: Single);
+    // Until the controller has no tiles outstanding
+    function WaitForVisibleTiles: Boolean;
+    // Until the text of the page is in the cache of the document
+    function WaitForPageText(const PageIndex: Integer): Boolean;
+    // The text of the clipboard of the window system; False when the session gives no access to it
+    function TryGetClipboardText(out Text: string): Boolean;
+    // True when the session lets the process use the clipboard: what was put there can be read back
+    function PutClipboardText(const Text: string): Boolean;
+    // Input for the page view, in logical units
+    procedure MouseMove(const Point: TPointF);
+    procedure Click(const Point: TPointF);
+    procedure Drag(const FromPoint, ToPoint: TPointF);
+    // A key as the form gets it from the window system; it reaches the control that has the focus. True when the control used it.
+    function PressKey(const Key: Word; const Shift: TShiftState = []; const KeyChar: Char = #0): Boolean;
+    // Device pixels of a point in PDF user space of a page; the page must be laid out
+    function PagePointToDevice(const PageIndex: Integer; const Point: TPointF): TPoint;
+    // The logical position of a device pixel of the form
+    function DeviceToLocal(const Point: TPoint): TPointF;
     // Waits until the document is Open or Failed, at most 5 seconds
     function Open(const Data: TBytes): Boolean;
     // Handles the queue of the main thread and the window messages until Condition holds
@@ -67,11 +106,9 @@ type
     property Document: TPdf4DDocument read FDocument;
     // The control that Snapshot paints: a filled rectangle over the whole client area
     property Content: TRectangle read FContent;
+    property PageView: TTestPageView read FPageView;
     // The scale of the form: device pixels per logical unit
     property Scale: Single read FScale;
-
-    // How many forms the process made so far; the leak check of the test program needs it (see there)
-    class property WindowsMade: Integer read FWindowsMade;
   end;
 
 implementation
@@ -79,9 +116,11 @@ implementation
 uses
   System.Diagnostics,
   System.Math,
-  FMX.Types,
+  System.Rtti,
+  FMX.Platform,
   FMX.Platform.Win,
   Pdf4D.Render.Skia.Backend,
+  Pdf4D.Viewer.PageText,
   Pdf4D.Viewer.Document,
   Pdf4D.FMX.Backend.Skia;
 
@@ -90,13 +129,32 @@ const
   PollMilliseconds = 5;
   OpenTimeoutMs = 5000;
 
+{ TTestPageView }
+
+constructor TTestPageView.Create(Owner: TComponent);
+begin
+  inherited Create(Owner);
+  FCopiedTexts := TList<string>.Create;
+end;
+
+destructor TTestPageView.Destroy;
+begin
+  FCopiedTexts.Free;
+  inherited;
+end;
+
+procedure TTestPageView.WriteClipboardText(const Text: string);
+begin
+  FCopiedTexts.Add(Text);
+  inherited;
+end;
+
 { TFmxTestHost }
 
 constructor TFmxTestHost.Create(const ClientWidth, ClientHeight: Integer; const Scale: Single);
 begin
   inherited Create;
   FScale := Scale;
-  Inc(FWindowsMade);
   FForm := TForm.CreateNew(nil);
   FForm.Left := OffDesktopPosition;
   FForm.Top := OffDesktopPosition;
@@ -188,8 +246,127 @@ begin
   Result := (FDocument.State = TPdfDocumentState.Open);
 end;
 
+function TFmxTestHost.AddPageView: TTestPageView;
+begin
+  FPageView := TTestPageView.Create(FForm);
+  FPageView.Parent := FForm;
+  FPageView.Align := TAlignLayout.Client;
+  FPageView.Document := FDocument;
+  Pump(1);
+  Result := FPageView;
+end;
+
+procedure TFmxTestHost.ChangeScale(const NewScale: Single);
+begin
+  const ClientWidth = FForm.ClientWidth;
+  const ClientHeight = FForm.ClientHeight;
+  FScale := NewScale;
+  (FForm.Handle as TWinWindowHandle).SetForcedScaleForForm(NewScale);
+  FForm.ClientWidth := ClientWidth;
+  FForm.ClientHeight := ClientHeight;
+  Pump(1);
+end;
+
+function TFmxTestHost.WaitForVisibleTiles: Boolean;
+begin
+  Result := WaitUntil(
+    function: Boolean
+    begin
+      Result := (FPageView.Controller.PendingTileCount = 0);
+    end);
+  // The tiles that arrived last are painted by the next paint
+  FPageView.Repaint;
+  Pump(1);
+end;
+
+function TFmxTestHost.WaitForPageText(const PageIndex: Integer): Boolean;
+begin
+  Result := WaitUntil(
+    function: Boolean
+    begin
+      var PageText: IPdfPageText;
+      Result := FDocument.TryGetPageText(PageIndex, PageText);
+    end);
+end;
+
+function TFmxTestHost.TryGetClipboardText(out Text: string): Boolean;
+begin
+  Text := '';
+  var Service: IFMXClipboardService;
+  Result := TPlatformServices.Current.SupportsPlatformService(IFMXClipboardService, Service);
+  if Result then
+  begin
+    const Value = Service.GetClipboard;
+    Result := Value.IsType<string>;
+    if Result then
+    begin
+      Text := Value.AsString;
+    end;
+  end;
+end;
+
+function TFmxTestHost.PutClipboardText(const Text: string): Boolean;
+begin
+  Result := False;
+  var Service: IFMXClipboardService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXClipboardService, Service) then
+  begin
+    Service.SetClipboard(Text);
+    var ReadBack: string;
+    Result := TryGetClipboardText(ReadBack) and (ReadBack = Text);
+  end;
+end;
+
+procedure TFmxTestHost.MouseMove(const Point: TPointF);
+begin
+  FPageView.HandleMouseMove(Point);
+end;
+
+procedure TFmxTestHost.Click(const Point: TPointF);
+begin
+  FPageView.HandleMouseMove(Point);
+  FPageView.HandleMouseDown(Point);
+  FPageView.HandleMouseUp(Point);
+end;
+
+procedure TFmxTestHost.Drag(const FromPoint, ToPoint: TPointF);
+begin
+  FPageView.HandleMouseMove(FromPoint);
+  FPageView.HandleMouseDown(FromPoint);
+  FPageView.HandleMouseMove((FromPoint + ToPoint) / 2);
+  FPageView.HandleMouseMove(ToPoint);
+  FPageView.HandleMouseUp(ToPoint);
+end;
+
+function TFmxTestHost.PressKey(const Key: Word; const Shift: TShiftState; const KeyChar: Char): Boolean;
+begin
+  var PressedKey := Key;
+  var PressedChar := KeyChar;
+  FForm.KeyDown(PressedKey, PressedChar, Shift);
+  Result := (PressedKey = 0) and (PressedChar = #0);
+end;
+
+function TFmxTestHost.PagePointToDevice(const PageIndex: Integer; const Point: TPointF): TPoint;
+begin
+  var ViewPoint: TPointF;
+  if not FPageView.Controller.TryPageToViewport(PageIndex, Point, ViewPoint) then
+  begin
+    raise EArgumentException.CreateFmt('Page %d is not laid out', [PageIndex]);
+  end;
+  Result := TPoint.Create(Round(ViewPoint.X), Round(ViewPoint.Y));
+end;
+
+function TFmxTestHost.DeviceToLocal(const Point: TPoint): TPointF;
+begin
+  Result := TPointF.Create(Point.X / FScale, Point.Y / FScale);
+end;
+
 function TFmxTestHost.Snapshot: FMX.Graphics.TBitmap;
 begin
+  if Assigned(FPageView) then
+  begin
+    Exit(SnapshotOf(FPageView));
+  end;
   Result := SnapshotOf(FContent);
 end;
 

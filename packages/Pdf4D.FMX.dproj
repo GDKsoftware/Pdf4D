@@ -82,6 +82,7 @@
         <DCCReference Include="fmx.dcp"/>
         <DCCReference Include="Pdf4D.Viewer.dcp"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Document.pas"/>
+        <DCCReference Include="..\src\FMX\Pdf4D.FMX.PageView.pas"/>
         <DCCReference Include="..\src\FMX\Pdf4D.FMX.Painter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
