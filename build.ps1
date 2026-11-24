@@ -9,7 +9,7 @@ param(
     [string]$LinuxSdkPath,
 
     # Build and run one test project only; the packages are always built
-    [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'Pdf4D.Vcl.Tests', 'All')]
+    [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'Pdf4D.Vcl.Tests', 'Pdf4D.FMX.Tests', 'All')]
     [string]$Suite = 'All'
 )
 
@@ -19,17 +19,18 @@ $RsVars = 'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin\rsvars.bat'
 $WslDistro = 'Ubuntu'
 $BdsFolder = Split-Path -Parent (Split-Path -Parent $RsVars)
 
-# The tests of the core and the renderer run without Skia; the Skia tests get the Skia library next to their program. The VCL tests run
-# last, on Windows only, and need the Skia library as well.
+# The tests of the core and the renderer run without Skia; the Skia tests get the Skia library next to their program. The VCL and FMX tests
+# run last, on Windows only, and need the Skia library as well.
 $TestProjects = @(
     @{ Name = 'Pdf4D.Tests'; Folder = 'tests'; NeedsSkia = $false; WindowsOnly = $false },
     @{ Name = 'Pdf4D.Skia.Tests'; Folder = 'tests\Skia'; NeedsSkia = $true; WindowsOnly = $false },
-    @{ Name = 'Pdf4D.Vcl.Tests'; Folder = 'tests\Vcl'; NeedsSkia = $true; WindowsOnly = $true }
+    @{ Name = 'Pdf4D.Vcl.Tests'; Folder = 'tests\Vcl'; NeedsSkia = $true; WindowsOnly = $true },
+    @{ Name = 'Pdf4D.FMX.Tests'; Folder = 'tests\FMX'; NeedsSkia = $true; WindowsOnly = $true }
 )
 $PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
-# The VCL packages are built for Windows only; dclPdf4D.Vcl is the design-time package for the IDE (a 64-bit IDE loads the Win64 build, a
-# 32-bit IDE the Win32 build)
-$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+# The VCL and FMX packages are built for Windows only (Win32 and Win64); dclPdf4D.Vcl is the design-time package for the IDE (a 64-bit IDE
+# loads the Win64 build, a 32-bit IDE the Win32 build)
+$WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj', 'packages\Pdf4D.FMX.dproj', 'packages\Pdf4D.FMX.Skia.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 # The demo applications, built for Windows only (compiled, not run)
 $DemoFiles = @('demos\Vcl\Pdf4DInvoiceDemo.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 
@@ -100,7 +101,8 @@ function Test-NoInitializationSections {
 # - The core and the renderer use no unit from src\Viewer.
 # - src\Viewer uses only System.* and Pdf4D.* units, none of the VCL, FMX, Skia or the VCL and FMX components.
 # - Only src\Vcl uses Vcl.* and Winapi.*, and src\Vcl uses no FMX.*.
-# - Only src\Render\Skia and src\Vcl\Skia use System.Skia or Pdf4D.Render.Skia.
+# - Only src\FMX uses FMX.*, and src\FMX uses no Vcl.* and no Winapi.*.
+# - Only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia.
 function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$ExcludedFolders) {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
     $excluded = $ExcludedFolders | ForEach-Object { (Join-Path $sourceFolder $_) + [IO.Path]::DirectorySeparatorChar }
@@ -124,12 +126,15 @@ function Test-LayerBoundaries {
     $viewerViolations = Get-UsesViolations (Join-Path $sourceFolder 'Viewer') "${notNamespacePrefix}(Vcl|Winapi|FMX|Skia|Data|Xml|REST|Soap|Spring|IdHTTP|Indy)\.\w|\bPdf4D\.(Vcl|FMX)\b" @()
     $vclViolations = Get-UsesViolations $sourceFolder "${notNamespacePrefix}(Vcl|Winapi)\.\w" @('Vcl')
     $fmxInVclViolations = Get-UsesViolations (Join-Path $sourceFolder 'Vcl') "${notNamespacePrefix}FMX\.\w|\bPdf4D\.FMX\b" @()
-    $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b|\bPdf4D\.Render\.Skia\b' @('Render\Skia', 'Vcl\Skia')
+    $fmxOutsideViolations = Get-UsesViolations $sourceFolder "${notNamespacePrefix}FMX\.\w" @('FMX', 'Vcl', 'Viewer')
+    $vclInFmxViolations = Get-UsesViolations (Join-Path $sourceFolder 'FMX') '\bPdf4D\.Vcl\b' @()
+    $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b|\bPdf4D\.Render\.Skia\b' @('Render\Skia', 'Vcl\Skia', 'FMX\Skia')
 
-    $violations = @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) + @($skiaViolations)
+    $violations = @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) +
+        @($fmxOutsideViolations) + @($vclInFmxViolations) + @($skiaViolations)
     if ($violations) {
         $violations | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
-        throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\Render\Skia and src\Vcl\Skia use System.Skia or Pdf4D.Render.Skia'
+        throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\FMX uses FMX.* (and no Vcl.* and Winapi.*); only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia'
     }
 }
 

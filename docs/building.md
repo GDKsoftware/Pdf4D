@@ -19,11 +19,11 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj` and the design-time package `dclPdf4D.Vcl.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests"), with msbuild. For Win32 and Win64 it also compiles the demo (`demos\Vcl\Pdf4DInvoiceDemo.dproj`, see "The demo") after the packages; the demo is not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj` and `Pdf4D.FMX.Skia.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demo (`demos\Vcl\Pdf4DInvoiceDemo.dproj`, see "The demo") after the packages; the demo is not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
-`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec`, `Render` and `Viewer` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other three packages. `packages\Pdf4D.groupproj` holds the seven packages (see below), in build order; the test projects and the demo stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
+`packages\Pdf4D.dpk` is the core runtime package (`requires rtl`): every unit under `src` except the tests (`*.Tests.pas`, `*.Tests.Support.pas`) and the folders `Graphics`, `Codec`, `Render` and `Viewer` (and `src\Resources\Pdf4D.Resources.Icc.*`), which are in the other three packages. `packages\Pdf4D.groupproj` holds the nine packages (see below), in build order; the test projects and the demo stay outside it. The package builds for Win32, Win64 and Linux64 (`Pdf4D.bpl` on Windows, `bplPdf4D.so` on Linux64), with output in `packages\<Platform>\<Config>` (ignored by git).
 
 The package lists its units in the `contains` clause, and nothing else is on its search path, so a unit that is missing there stops the build with F2613 (and an implicit import would show as W1033, which `build.ps1` also treats as a failure). When you add a unit under `src`, add it to `packages\Pdf4D.dpk` and `packages\Pdf4D.dproj` as well as to the test project.
 
@@ -40,17 +40,20 @@ The packages and what they contain:
 | `Pdf4D.Vcl.dpk` | `rtl, vcl, Pdf4D.Viewer` | `src\Vcl` (`TPdf4DDocument`, `TPdf4DPageView` and the GDI and GDI+ painter) |
 | `Pdf4D.Vcl.Skia.dpk` | `rtl, Pdf4D.Vcl, Pdf4D.Render.Skia` | `src\Vcl\Skia` (the `TPdf4DSkiaBackend` component) |
 | `dclPdf4D.Vcl.dpk` | `rtl, vcl, designide, Pdf4D.Vcl, Pdf4D.Vcl.Skia` | `src\Vcl\Design` (design time only: the palette registration, the property editor of `FileName` and the palette icons) |
+| `Pdf4D.FMX.dpk` | `rtl, fmx, Pdf4D.Viewer` | `src\FMX` (`TPdf4DDocument` and the painter of the FMX components) |
+| `Pdf4D.FMX.Skia.dpk` | `rtl, Pdf4D.FMX, Pdf4D.Render.Skia` | `src\FMX\Skia` (the `TPdf4DSkiaBackend` component) |
 
-The first four build for Win32, Win64 and Linux64; the three VCL packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only units under `src\Render\Skia` and `src\Vcl\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
+The first four build for Win32, Win64 and Linux64; the three VCL packages and the two FMX packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only `src\FMX` uses `FMX.*` (and no `Vcl.*`, `Winapi.*` or `Pdf4D.Vcl.*`, so that the units can compile for macOS and Linux64); only units under `src\Render\Skia`, `src\Vcl\Skia` and `src\FMX\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
 
-## The three test projects
+## The four test projects
 
 - `tests\Pdf4D.Tests.dproj` tests the core and the renderer without Skia, with a device that records calls. Its folder has no Skia library, so it proves that the core and the renderer do not need one.
 - `tests\Skia\Pdf4D.Skia.Tests.dproj` tests the Skia backend, compares the renders with the PDFBox reference images and runs the fuzz through the renderer (see "The Skia backend").
 
-- `tests\Vcl\Pdf4D.Vcl.Tests.dproj` tests the VCL components (see "The VCL tests"); Win32 and Win64 only, and it runs last.
+- `tests\Vcl\Pdf4D.Vcl.Tests.dproj` tests the VCL components (see "The VCL tests"); Win32 and Win64 only.
+- `tests\FMX\Pdf4D.FMX.Tests.dproj` tests the FMX components (see "The FMX tests"); Win32 and Win64 only, and it runs last.
 
-`./build.ps1 -Suite Pdf4D.Tests`, `-Suite Pdf4D.Skia.Tests` or `-Suite Pdf4D.Vcl.Tests` runs one of them.
+`./build.ps1 -Suite Pdf4D.Tests`, `-Suite Pdf4D.Skia.Tests`, `-Suite Pdf4D.Vcl.Tests` or `-Suite Pdf4D.FMX.Tests` runs one of them.
 
 ## The VCL tests
 
@@ -59,6 +62,10 @@ The first four build for Win32, Win64 and Linux64; the three VCL packages build 
 The process is not marked DPI aware: `ScaleForPPI` on the form drives the `ChangeScale(M, D, isDpiChange)` of the page view, which is what a Per-Monitor v2 application gets on a move to another monitor. The clipboard tests assert on the text that the page view hands to the clipboard; they also assert on `Clipboard.AsText` when the session allows access to the clipboard of the window system (some sessions refuse it with "access denied").
 
 The run in `build.ps1` needs no printer. Printing on a real printer is tested only when the environment variable `PDF4D_TEST_PRINTER` names an installed printer (`TestRealPrinter` in `Pdf4D.Vcl.Print.Tests`): set it before the run, for example `$env:PDF4D_TEST_PRINTER = 'Microsoft Print to PDF'`, and look at the page that comes out. Without the variable the test ends as passed without printing. The print job itself is tested against `TBitmapPrintTarget` (`tests\Vcl\Support`).
+
+## The FMX tests
+
+`tests\FMX\Pdf4D.FMX.Tests.dproj` is a console program that makes FMX forms in its own process (`TFmxTestHost` in `tests\FMX\Support`): a form shown outside the visible desktop, with a `TPdf4DDocument` on Skia and a filled `Content` rectangle whose pixels `Snapshot` reads back (`MakeScreenshot`, in device pixels). The scale of the form is chosen by the test: `TFmxTestHost.Create(Width, Height, Scale)` forces it with `TWinWindowHandle.SetForcedScaleForForm` of `FMX.Platform.Win`, which gives the canvas of the form that scale (`Canvas.Scale`) and makes the client area `Width x Height` logical units and `Width * Scale` pixels. The setting holds for the whole process, so every host sets it, also on scale 1. The painter tests draw on a `TBitmap` whose `BitmapScale` is the scale. FMX forms run without the Skia canvas of Skia4Delphi: the project does not use `FMX.Skia`, so FMX draws with its default canvas for the platform and the pixel checks hold for that canvas. `sk4d.dll` is copied next to the program for the document renders, and the project has the same leak check (two runs) and the `PDF4D_TESTS` define as the other test projects. The tests do not need a visible desktop, but the process needs a desktop session (a window station) to make a window. FMX on Windows keeps one small block for every window it made and lets go of them in batches of 16, so the leak check of this project accounts for the windows that `TFmxTestHost` made (`WindowsMade`) and accepts exactly the difference that those windows explain.
 
 ## The demo
 
