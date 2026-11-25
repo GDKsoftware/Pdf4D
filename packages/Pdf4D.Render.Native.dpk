@@ -41,6 +41,8 @@ contains
   Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
   Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas',
   Pdf4D.Render.Native.Geometry in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas',
-  Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas';
+  Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas',
+  Pdf4D.Render.Native.PathGeometry in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.pas',
+  Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas';
 
 end.
