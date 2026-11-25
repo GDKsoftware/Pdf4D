@@ -463,7 +463,7 @@ begin
   end;
 
   const IsNegative = (Integer(Bits(Value)) < 0);
-  var Magnitude := Value;
+  var Magnitude: Single := Value;
   if IsNegative then
   begin
     const Origin: Single = 0;
@@ -1607,7 +1607,7 @@ begin
   // Yes, Skia does it in the same way: round, then subtract 1 where that is more than the value
   for var I := 0 to High(Lanes) do
   begin
-    const Roundtrip = TTsLane.Round(Lanes[I]);
+    const Roundtrip: Single = TTsLane.Round(Lanes[I]);
 
     var Correction: Single := 0;
     if TTsLane.IsGt(Roundtrip, Lanes[I]) then
@@ -1639,7 +1639,7 @@ procedure TF32x16.SaveToU16x16(var Destination: TU16x16);
 begin
   for var I := 0 to High(Lanes) do
   begin
-    const Value = Lanes[I];
+    const Value: Single = Lanes[I];
 
     // Rust `as u16`: NaN becomes 0, the rest saturates
     if IsNan(Value) or (Value <= 0) then

@@ -216,7 +216,7 @@ end;
 
 class function TTsScalar.SaturateFrom(const Value: Single): Integer;
 begin
-  var Clamped := Value;
+  var Clamped: Single := Value;
 
   if not (Clamped < MaxI32FitsInF32) then
   begin
@@ -260,7 +260,7 @@ end;
 
 class function TTsScalar.SaturateRound(const Value: Single): Integer;
 begin
-  const Floored = FloorF(Value);
+  const Floored: Single = FloorF(Value);
   const Shifted: Single = Floored + 0.5;
 
   Result := SaturateFrom(Shifted);
@@ -274,7 +274,7 @@ begin
     Exit(Value);
   end;
 
-  const Truncated = TruncF(Value);
+  const Truncated: Single = TruncF(Value);
   const Fraction: Single = Value - Truncated;
   const IsHalfOrMore = (Abs(Fraction) >= 0.5);
   if not IsHalfOrMore then
@@ -292,7 +292,7 @@ end;
 
 class function TTsScalar.FloorF(const Value: Single): Single;
 begin
-  const Truncated = TruncF(Value);
+  const Truncated: Single = TruncF(Value);
   const IsBelowValue = (Truncated > Value);
   if IsBelowValue then
   begin
@@ -304,7 +304,7 @@ end;
 
 class function TTsScalar.CeilF(const Value: Single): Single;
 begin
-  const Truncated = TruncF(Value);
+  const Truncated: Single = TruncF(Value);
   const IsAboveValue = (Truncated < Value);
   if IsAboveValue then
   begin

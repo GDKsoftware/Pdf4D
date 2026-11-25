@@ -169,8 +169,8 @@ begin
   begin
     if Ts.HasScale then
     begin
-      const InvX = TTsScalar.Invert(Ts.SX);
-      const InvY = TTsScalar.Invert(Ts.SY);
+      const InvX: Single = TTsScalar.Invert(Ts.SX);
+      const InvY: Single = TTsScalar.Invert(Ts.SY);
 
       Inverted := TTsTransform.FromRow(InvX, 0.0, 0.0, InvY, -Ts.TX * InvX, -Ts.TY * InvY);
     end
@@ -258,10 +258,10 @@ end;
 
 class function TTsTransform.FromRotate(const Angle: Single): TTsTransform;
 begin
-  const V = ToRadians(Angle);
+  const V: Single = ToRadians(Angle);
   const A: Single = System.Cos(V);
   const B: Single = System.Sin(V);
-  const C = -B;
+  const C: Single = -B;
   const D = A;
 
   Result := FromRow(A, B, C, D, 0.0, 0.0);

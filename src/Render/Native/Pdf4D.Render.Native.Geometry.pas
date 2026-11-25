@@ -657,14 +657,14 @@ end;
 
 function TTsIntSize.TryScaleToWidth(const NewWidth: Cardinal; out Scaled: TTsIntSize): Boolean;
 begin
-  const NewHeight = TTsScalar.CeilF(UInt32ToSingle(NewWidth) * UInt32ToSingle(FHeight) / UInt32ToSingle(FWidth));
+  const NewHeight: Single = TTsScalar.CeilF(UInt32ToSingle(NewWidth) * UInt32ToSingle(FHeight) / UInt32ToSingle(FWidth));
 
   Result := TryFromWH(NewWidth, SaturateToUInt32(NewHeight), Scaled);
 end;
 
 function TTsIntSize.TryScaleToHeight(const NewHeight: Cardinal; out Scaled: TTsIntSize): Boolean;
 begin
-  const NewWidth = TTsScalar.CeilF(UInt32ToSingle(NewHeight) * UInt32ToSingle(FWidth) / UInt32ToSingle(FHeight));
+  const NewWidth: Single = TTsScalar.CeilF(UInt32ToSingle(NewHeight) * UInt32ToSingle(FWidth) / UInt32ToSingle(FHeight));
 
   Result := TryFromWH(SaturateToUInt32(NewWidth), NewHeight, Scaled);
 end;
@@ -1111,11 +1111,11 @@ end;
 
 function TTsRect.TryIntersect(const Other: TTsRect; out Intersection: TTsRect): Boolean;
 begin
-  const IntersectLeft = TTsScalar.MaxF(X, Other.X);
-  const IntersectTop = TTsScalar.MaxF(Y, Other.Y);
+  const IntersectLeft: Single = TTsScalar.MaxF(X, Other.X);
+  const IntersectTop: Single = TTsScalar.MaxF(Y, Other.Y);
 
-  const IntersectRight = TTsScalar.MinF(Right, Other.Right);
-  const IntersectBottom = TTsScalar.MinF(Bottom, Other.Bottom);
+  const IntersectRight: Single = TTsScalar.MinF(Right, Other.Right);
+  const IntersectBottom: Single = TTsScalar.MinF(Bottom, Other.Bottom);
 
   Result := TryFromLTRB(IntersectLeft, IntersectTop, IntersectRight, IntersectBottom, Intersection);
 end;
@@ -1136,11 +1136,11 @@ begin
     Exit(True);
   end;
 
-  const JoinLeft = TTsScalar.MinF(X, Other.X);
-  const JoinTop = TTsScalar.MinF(Y, Other.Y);
+  const JoinLeft: Single = TTsScalar.MinF(X, Other.X);
+  const JoinTop: Single = TTsScalar.MinF(Y, Other.Y);
 
-  const JoinRight = TTsScalar.MaxF(Right, Other.Right);
-  const JoinBottom = TTsScalar.MaxF(Bottom, Other.Bottom);
+  const JoinRight: Single = TTsScalar.MaxF(Right, Other.Right);
+  const JoinBottom: Single = TTsScalar.MaxF(Bottom, Other.Bottom);
 
   Result := TryFromLTRB(JoinLeft, JoinTop, JoinRight, JoinBottom, Joined);
 end;
@@ -1395,8 +1395,8 @@ end;
 
 function TTsScreenIntRect.ToRect: TTsRect;
 begin
-  const FloatX = UInt32ToSingle(FX);
-  const FloatY = UInt32ToSingle(FY);
+  const FloatX: Single = UInt32ToSingle(FX);
+  const FloatY: Single = UInt32ToSingle(FY);
 
   // Can't fail, because ScreenIntRect is always valid. And u32 always fits into f32.
   if not TTsRect.TryFromLTRB(FloatX, FloatY, FloatX + UInt32ToSingle(FWidth), FloatY + UInt32ToSingle(FHeight), Result) then
@@ -1460,8 +1460,8 @@ end;
 
 function TTsIntRectConversions.ToRect: TTsRect;
 begin
-  const FloatX = Single(X);
-  const FloatY = Single(Y);
+  const FloatX: Single = Single(X);
+  const FloatY: Single = Single(Y);
 
   // Can't fail, because IntRect is always valid.
   if not TTsRect.TryFromLTRB(FloatX, FloatY, FloatX + UInt32ToSingle(Width), FloatY + UInt32ToSingle(Height), Result) then
