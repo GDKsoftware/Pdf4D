@@ -22,7 +22,6 @@ uses
   System.TypInfo,
   DesignIntf,
   FMX.Controls,
-  Pdf4D.Viewer.Document,
   Pdf4D.FMX.Document,
   Pdf4D.FMX.Backend.Skia,
   Pdf4D.FMX.PageView,
@@ -54,7 +53,7 @@ begin
     TPdf4DRotateCounterclockwiseAction, TPdf4DCopyAction, TPdf4DFirstPageAction, TPdf4DPriorPageAction, TPdf4DNextPageAction,
     TPdf4DLastPageAction, TPdf4DPrintAction, TPdf4DSearchAction], nil);
 
-  RegisterPropertyEditor(TypeInfo(string), TPdf4DCustomDocument, 'FileName', TPdf4DFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TPdf4DDocument, 'FileName', TPdf4DFileNameProperty);
 end;
 
 end.

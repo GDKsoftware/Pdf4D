@@ -20,7 +20,6 @@ uses
   System.TypInfo,
   DesignIntf,
   Vcl.Controls,
-  Pdf4D.Viewer.Document,
   Pdf4D.Vcl.Document,
   Pdf4D.Vcl.Backend.Skia,
   Pdf4D.Vcl.PageView,
@@ -52,7 +51,7 @@ begin
     TPdf4DRotateCounterclockwiseAction, TPdf4DCopyAction, TPdf4DFirstPageAction, TPdf4DPriorPageAction, TPdf4DNextPageAction,
     TPdf4DLastPageAction, TPdf4DPrintAction, TPdf4DSearchAction], nil);
 
-  RegisterPropertyEditor(TypeInfo(string), TPdf4DCustomDocument, 'FileName', TPdf4DFileNameProperty);
+  RegisterPropertyEditor(TypeInfo(string), TPdf4DDocument, 'FileName', TPdf4DFileNameProperty);
 end;
 
 end.
