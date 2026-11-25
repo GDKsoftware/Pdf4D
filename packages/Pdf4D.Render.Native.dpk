@@ -55,6 +55,10 @@ contains
   Pdf4D.Render.Native.Path64 in '..\src\Render\Native\Pdf4D.Render.Native.Path64.pas',
   Pdf4D.Render.Native.Edge in '..\src\Render\Native\Pdf4D.Render.Native.Edge.pas',
   Pdf4D.Render.Native.EdgeClipper in '..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas',
-  Pdf4D.Render.Native.EdgeBuilder in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas';
+  Pdf4D.Render.Native.EdgeBuilder in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas',
+  Pdf4D.Render.Native.Scan.Hairline in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.pas',
+  Pdf4D.Render.Native.Scan.HairlineAntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas',
+  Pdf4D.Render.Native.Scan in '..\src\Render\Native\Pdf4D.Render.Native.Scan.pas',
+  Pdf4D.Render.Native.Scan.AntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas';
 
 end.

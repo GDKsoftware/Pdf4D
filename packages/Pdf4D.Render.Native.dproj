@@ -104,6 +104,10 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Edge.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
