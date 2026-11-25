@@ -138,6 +138,8 @@ uses
   Pdf4D.Render.CancelToken.Tests in '..\src\Render\Pdf4D.Render.CancelToken.Tests.pas',
   Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
   Pdf4D.Render.Native.Scalar.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.Tests.pas',
+  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas',
+  Pdf4D.Render.Native.Wide.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Wide.Tests.pas',
   Pdf4D.Render.GraphicsEngine in '..\src\Render\Pdf4D.Render.GraphicsEngine.pas',
   Pdf4D.Render.Operators.Color in '..\src\Render\Pdf4D.Render.Operators.Color.pas',
   Pdf4D.Render.Operators.Path in '..\src\Render\Pdf4D.Render.Operators.Path.pas',

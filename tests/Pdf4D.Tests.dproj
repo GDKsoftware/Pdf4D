@@ -209,6 +209,8 @@
         <DCCReference Include="..\src\Render\Pdf4D.Render.CancelToken.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scalar.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Wide.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Wide.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

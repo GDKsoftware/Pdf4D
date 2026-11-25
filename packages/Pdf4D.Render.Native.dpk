@@ -38,6 +38,7 @@ requires
   Pdf4D.Render;
 
 contains
-  Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas';
+  Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
+  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas';
 
 end.
