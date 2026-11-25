@@ -14,7 +14,7 @@ uses
 
 type
   // Separate caches, so that the same dictionary or stream can be the key in more than one of them
-  TPDCacheScope = (General, ToUnicode, GlyphPrefix, FontHeight);
+  TPDCacheScope = (General, ToUnicode, GlyphPrefix, FontHeight, ColorSpace);
 
   // What the model objects of one document share: the log, the options and a cache of objects that are made from
   // dictionaries and streams of the document (fonts, for instance). The context is not thread safe, like the document.
@@ -26,6 +26,9 @@ type
     FScopes: array[TPDCacheScope] of TObjectDictionary<TObject, TObject>;
     FToUnicodeMappings: Int64;
     FIsToUnicodeBudgetExhausted: Boolean;
+    FFunctionWorkLimit: Int64;
+    FFunctionWorkDone: Int64;
+    FIsFunctionWorkReported: Boolean;
 
     procedure Initialize(const Log: TPdfLog; const Options: TPdfLoadOptions);
 
@@ -50,6 +53,14 @@ type
     function IsToUnicodeBudgetExhausted: Boolean;
     function TryChargeToUnicodeMappings(const MappingCount: Integer): Boolean;
 
+    // The budget for the instructions that type 4 functions execute. A renderer starts it for every page (a limit under 1 is 1); until
+    // it is started there is no limit. A function asks IsFunctionWorkExhausted before it runs, and charges the instructions it ran
+    // afterwards. The first charge that takes the total over the limit puts one warning in the log; from then on the functions give
+    // the start of their range instead of running.
+    procedure BeginFunctionWork(const Limit: Int64);
+    function IsFunctionWorkExhausted: Boolean;
+    procedure ChargeFunctionWork(const Instructions: Int64);
+
     property CosDocument: TCosDocument read FCosDocument;
     property Log: TPdfLog read FLog;
     property Options: TPdfLoadOptions read FOptions;
@@ -58,6 +69,9 @@ type
   end;
 
 implementation
+
+uses
+  System.Math;
 
 type
   TIdentityComparer = class(TEqualityComparer<TObject>)
@@ -102,6 +116,7 @@ end;
 
 procedure TPDDocumentContext.Initialize(const Log: TPdfLog; const Options: TPdfLoadOptions);
 begin
+  FFunctionWorkLimit := High(Int64);
   FLog := Log;
   FOptions := Options;
   for var Scope := Low(TPDCacheScope) to High(TPDCacheScope) do
@@ -127,6 +142,32 @@ end;
 function TPDDocumentContext.TryGetCachedObject(const Scope: TPDCacheScope; const Key: TObject; out Value: TObject): Boolean;
 begin
   Result := FScopes[Scope].TryGetValue(Key, Value);
+end;
+
+procedure TPDDocumentContext.BeginFunctionWork(const Limit: Int64);
+begin
+  FFunctionWorkLimit := Max(Limit, 1);
+  FFunctionWorkDone := 0;
+  FIsFunctionWorkReported := False;
+end;
+
+function TPDDocumentContext.IsFunctionWorkExhausted: Boolean;
+begin
+  Result := (FFunctionWorkDone > FFunctionWorkLimit);
+end;
+
+procedure TPDDocumentContext.ChargeFunctionWork(const Instructions: Int64);
+begin
+  FFunctionWorkDone := FFunctionWorkDone + Instructions;
+  const IsReportDue = (IsFunctionWorkExhausted and (not FIsFunctionWorkReported));
+  if IsReportDue then
+  begin
+    FIsFunctionWorkReported := True;
+    if Assigned(FLog) then
+    begin
+      FLog.Warning('The type 4 functions of the page executed more than %d instructions; from here on they give the start of their range', [FFunctionWorkLimit]);
+    end;
+  end;
 end;
 
 function TPDDocumentContext.IsToUnicodeBudgetExhausted: Boolean;

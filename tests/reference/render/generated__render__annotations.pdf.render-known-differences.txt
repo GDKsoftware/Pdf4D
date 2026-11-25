@@ -1,0 +1,4 @@
+# page <n> [<platform>] # <reason>
+page 1 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (a deliberate deviation, see docs/porting.md)
+page 2 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (a deliberate deviation, see docs/porting.md)
+page 3 # PDFBox constructAppearances not ported: the annotations of the page without /AP (Square, Circle, Line, Highlight, Link and Text) get an appearance from PDFBox and are skipped here (a deliberate deviation, see docs/porting.md)

@@ -10,6 +10,8 @@ interface
 
 uses
   System.SysUtils,
+  Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.Cff.Font,
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Tables,
@@ -49,11 +51,17 @@ type
   public
     // The CFF font, owned by the table. Raises EPdfUnsupportedFeatureException for a font without CFF outlines.
     function CFF: TCFFFont;
+    // The CFF font of a font with CFF outlines, as TryGetGlyphPath finds it; False, and no exception, for a font without
+    function TryGetCFF(out Font: TCFFFont): Boolean;
     // The version says OTTO, or the font has a CFF or CFF2 table
     function IsPostScript: Boolean;
     // False for a font with CFF2 outlines and no CFF table
     function IsSupportedOTF: Boolean;
     function HasLayoutTables: Boolean;
+
+    // A font with CFF outlines gives the path of the glyph (the glyph id, as for a name-keyed font) from its CFF table;
+    // any other font reads its glyf table
+    function TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean; override;
   end;
 
   // Parses an OpenType font. A font with CFF2 outlines raises EPdfUnsupportedFeatureException, any other broken font
@@ -137,6 +145,17 @@ begin
   Result := (Table as TCFFTable).Font;
 end;
 
+function TOpenTypeFont.TryGetCFF(out Font: TCFFFont): Boolean;
+begin
+  var Table: TTTFTable;
+  Font := nil;
+  Result := (IsPostScript and TryGetTable(TCFFTable.TableTag, Table));
+  if Result then
+  begin
+    Font := (Table as TCFFTable).Font;
+  end;
+end;
+
 function TOpenTypeFont.IsPostScript: Boolean;
 begin
   Result := (FHasPostScriptTag or HasTable(TCFFTable.TableTag) or HasTable(Cff2Tag));
@@ -157,6 +176,20 @@ begin
     end;
   end;
   Result := False;
+end;
+
+function TOpenTypeFont.TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  var Table: TTTFTable;
+  const HasCffOutlines = (IsPostScript and TryGetTable(TCFFTable.TableTag, Table));
+  if HasCffOutlines then
+  begin
+    Result := (Table as TCFFTable).Font.TryGetPathByGid(GID, Path, Log);
+  end
+  else
+  begin
+    Result := inherited TryGetGlyphPath(GID, Path, Log);
+  end;
 end;
 
 { TOTFParser }

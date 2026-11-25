@@ -12,13 +12,14 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.BoundingBox,
   Pdf4D.FontBox.Encoding,
   Pdf4D.FontBox.FontBoxFont,
   Pdf4D.FontBox.Type1.Parser;
 
 type
-  // An Adobe Type 1 font program. Glyph paths are left out: Pdf4D does not render.
+  // An Adobe Type 1 font program
   TType1Font = class(TFontBoxFont)
   private
     FData: TType1FontData;
@@ -26,6 +27,8 @@ type
     FSegment1: TBytes;
     FSegment2: TBytes;
     FLog: TPdfLog;
+
+    function SeacCharString(const GlyphName: string): TBytes;
 
     constructor CreateFromData(const Data: TType1FontData; const Segment1, Segment2: TBytes; const Log: TPdfLog);
 
@@ -46,6 +49,9 @@ type
     // EPdfParseException when there is no .notdef either. A glyph without a width in its charstring gets 0.
     function GetWidth(const GlyphName: string): Single; override;
     function HasGlyph(const GlyphName: string): Boolean; override;
+    // The outline of the glyph in glyph space. A name that the font does not have gets the outline of .notdef; False when there
+    // is no .notdef either. A damaged charstring gives the outline up to the damage.
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
 
     function FontName: string;
     // The encoding of the font, or nil when the font declares none. The font owns it.
@@ -92,6 +98,7 @@ implementation
 
 uses
   Pdf4D.Common.Defines,
+  Pdf4D.FontBox.CharStringPath,
   Pdf4D.FontBox.CharStringWidth,
   Pdf4D.FontBox.Pfb;
 
@@ -183,6 +190,34 @@ end;
 function TType1Font.HasGlyph(const GlyphName: string): Boolean;
 begin
   Result := FData.CharStrings.ContainsKey(GlyphName);
+end;
+
+function TType1Font.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  Path := nil;
+  var CharString: TBytes;
+  const HasCharString = (FData.CharStrings.TryGetValue(GlyphName, CharString) or
+                         FData.CharStrings.TryGetValue(NotdefName, CharString));
+  if not HasCharString then
+  begin
+    Exit(False);
+  end;
+
+  Path := TCharStringPath.Type1Path(CharString, FSubrs,
+    function(Name: string): TBytes
+    begin
+      Result := SeacCharString(Name);
+    end, FLog);
+  Result := True;
+end;
+
+// The component of a seac: a glyph that the font does not have is replaced by .notdef, as in PDFBox
+function TType1Font.SeacCharString(const GlyphName: string): TBytes;
+begin
+  if not FData.CharStrings.TryGetValue(GlyphName, Result) then
+  begin
+    FData.CharStrings.TryGetValue(NotdefName, Result);
+  end;
 end;
 
 function TType1Font.FontName: string;

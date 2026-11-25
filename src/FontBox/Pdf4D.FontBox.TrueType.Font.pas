@@ -11,9 +11,12 @@ interface
 uses
   System.SysUtils,
   System.Generics.Collections,
+  Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.BoundingBox,
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Tables,
+  Pdf4D.FontBox.TrueType.Glyph,
   Pdf4D.FontBox.TrueType.Cmap,
   Pdf4D.FontBox.TrueType.Post,
   Pdf4D.FontBox.TrueType.Vertical;
@@ -39,6 +42,7 @@ type
     FUnitsPerEm: Integer;
     FPostScriptNames: TDictionary<string, Integer>;
     FIsReadOnly: Boolean;
+    FGlyphLog: TPdfLog;
 
     class function TryParseUnicodeName(const Name: string; out CodePoint: Integer): Boolean; static;
     class function TryParseHexNumber(const Text: string; out Value: Integer): Boolean; static;
@@ -100,6 +104,19 @@ type
     function GetWidth(const GlyphName: string): Single; override;
     function HasGlyph(const GlyphName: string): Boolean; override;
 
+    // The outline of a glyph in font units; the caller owns the path. A glyph without contours (a space) gives an empty path.
+    // False when the font has no usable glyf table or the glyph is damaged; the reason goes to the log. OpenType fonts with CFF
+    // outlines override this.
+    function TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog = nil): Boolean; virtual;
+    // Scales a path in font units to 1000 units per em, as PDFBox does for a normalized path. A font without units per em is not
+    // scaled.
+    procedure ScalePathToThousandUnits(const Path: TPdfPath);
+    // The glyph for a PostScript name (see NameToGID), like getPath of PDFBox: a name the font does not have gives glyph 0
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; override;
+    function TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean; override;
+
+    // Not owned, and it has to outlive the use of the font. Where TryGetPath logs the glyphs that it cannot read.
+    property GlyphLog: TPdfLog read FGlyphLog write FGlyphLog;
     // Set by the parser only
     property Version: Single read FVersion write SetVersion;
   end;
@@ -108,7 +125,8 @@ implementation
 
 uses
   System.Generics.Defaults,
-  Pdf4D.Common.Defines;
+  Pdf4D.Common.Defines,
+  Pdf4D.Common.Matrix;
 
 type
   TCmapPreference = record
@@ -658,6 +676,43 @@ end;
 function TTrueTypeFont.HasGlyph(const GlyphName: string): Boolean;
 begin
   Result := (NameToGID(GlyphName) <> 0);
+end;
+
+function TTrueTypeFont.TryGetGlyphPath(const GID: Integer; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Path := nil;
+  var Table: TTTFTable;
+  if not TryGetTable(TGlyphTable.TableTag, Table) then
+  begin
+    if Assigned(Log) then
+    begin
+      Log.Warning('The font has no glyf table');
+    end;
+    Exit(False);
+  end;
+
+  Result := (Table as TGlyphTable).TryGetPath(GID, Path, Log);
+end;
+
+procedure TTrueTypeFont.ScalePathToThousandUnits(const Path: TPdfPath);
+begin
+  const FontUnits = UnitsPerEm;
+  const NeedsScale = ((FontUnits <> 1000) and (FontUnits <> 0));
+  if NeedsScale then
+  begin
+    const Scale = Single(1000) / FontUnits;
+    Path.Transform(TPdfMatrix.Create(Scale, 0, 0, Scale, 0, 0));
+  end;
+end;
+
+function TTrueTypeFont.TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetGlyphPath(NameToGID(GlyphName), Path, FGlyphLog);
+end;
+
+function TTrueTypeFont.TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Result := TryGetGlyphPath(NameToGID(GlyphName), Path, Log);
 end;
 
 end.

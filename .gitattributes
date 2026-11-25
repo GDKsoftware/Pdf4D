@@ -4,6 +4,9 @@ tests/corpus/**/*.pdf binary
 tests/golden/*.text.txt text eol=lf
 tests/golden/*.text-known-differences.txt text eol=lf
 tests/fonts/*.widths.txt text eol=lf
+tests/fonts/*.paths.txt text eol=lf
+tests/fonts/glyph-paths/*.paths.txt text eol=lf
+tests/fonts/glyph-paths/*.pdf binary
 tests/fonts/manifest.csv text eol=lf
 tests/fonts/*.ttf binary
 tests/fonts/*.otf binary
@@ -13,3 +16,7 @@ src/Resources/resources.csv text eol=lf
 src/Resources/afm-MustRead.html -text
 tests/reference/pdfbox-text/*.txt -text
 tests/reference/pdfbox-text/manifest.csv text eol=lf
+tests/reference/functions/*.txt text eol=lf
+tests/reference/color/*.txt text eol=lf
+tests/icc/*.icc binary
+tests/icc/manifest.csv text eol=lf

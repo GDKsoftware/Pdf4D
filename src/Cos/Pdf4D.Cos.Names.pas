@@ -33,6 +33,7 @@ type
     const AHx = 'AHx';
     const AIMetaData = 'AIMetaData';
     const AIS = 'AIS';
+    const All = 'All';
     const AllOff = 'AllOff';
     const AllOn = 'AllOn';
     const Alpha = 'Alpha';
@@ -130,6 +131,7 @@ type
     const ColorDodge = 'ColorDodge';
     const Colors = 'Colors';
     const ColorSpace = 'ColorSpace';
+    const ColorTransform = 'ColorTransform';
     const Columns = 'Columns';
     const Compatible = 'Compatible';
     const Components = 'Components';
@@ -148,6 +150,7 @@ type
     const CYX = 'CYX';
     const D = 'D';
     const DA = 'DA';
+    const DamagedRowsBeforeError = 'DamagedRowsBeforeError';
     const Darken = 'Darken';
     const Date = 'Date';
     const DCT = 'DCT';
@@ -210,6 +213,7 @@ type
     const Encrypt = 'Encrypt';
     const EncryptedPayload = 'EncryptedPayload';
     const EncryptMetadata = 'EncryptMetadata';
+    const EndOfBlock = 'EndOfBlock';
     const EndOfLine = 'EndOfLine';
     const EntrustPpkef = 'Entrust.PPKEF';
     const Exclusion = 'Exclusion';
@@ -365,6 +369,7 @@ type
     const Name = 'Name';
     const Names = 'Names';
     const Navigator = 'Navigator';
+    const NChannel = 'NChannel';
     const NeedAppearances = 'NeedAppearances';
     const NewWindow = 'NewWindow';
     const Next = 'Next';

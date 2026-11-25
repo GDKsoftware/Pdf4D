@@ -1,0 +1,20 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 300] crop=[0 0 400 300] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog /Version /1.7>>
+object 2 0: <</Count 1 /Kids [3 0 R] /Type /Pages>>
+object 3 0: <</Contents 5 0 R /MediaBox [0 0 400 300] /Parent 2 0 R /Resources 4 0 R /Type /Page>>
+object 4 0: <</XObject 6 0 R>>
+object 5 0: <</Filter /FlateDecode /Length 112>> stream sha256=16b6afb3b12384eb112ec7200471b27ac8ba3f3b9f3dea7c20126f2a795d77b1
+object 6 0: <</Im1 7 0 R /Im2 8 0 R /Im3 9 0 R /Im4 10 0 R>>
+object 7 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 11 0 R /Filter /CCITTFaxDecode /Height 64 /Length 231 /Subtype /Image /Type /XObject /Width 96>> stream partial=CCITTFaxDecode sha256=9683cee9ba4349abfaceae56abae4d6d59e03e13f4c9531a2c09ca8f41fbeb10
+object 8 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 12 0 R /Filter /CCITTFaxDecode /Height 64 /Length 639 /Subtype /Image /Type /XObject /Width 96>> stream partial=CCITTFaxDecode sha256=4e2b9070387b9b336741e1c8737567517370171ffe4497024a816d740a97d1c6
+object 9 0: <</BitsPerComponent 1 /ColorSpace /DeviceGray /DecodeParms 13 0 R /Filter /CCITTFaxDecode /Height 64 /Length 231 /Subtype /Image /Type /XObject /Width 96>> stream partial=CCITTFaxDecode sha256=9683cee9ba4349abfaceae56abae4d6d59e03e13f4c9531a2c09ca8f41fbeb10
+object 10 0: <</BitsPerComponent 1 /DecodeParms 14 0 R /Filter /CCITTFaxDecode /Height 64 /ImageMask true /Length 231 /Subtype /Image /Type /XObject /Width 96>> stream partial=CCITTFaxDecode sha256=9683cee9ba4349abfaceae56abae4d6d59e03e13f4c9531a2c09ca8f41fbeb10
+object 11 0: <</BlackIs1 true /Columns 96 /K -1 /Rows 64>>
+object 12 0: <</BlackIs1 true /Columns 96 /K 0 /Rows 64>>
+object 13 0: <</BlackIs1 true /Columns 96 /K -1 /Rows 64>>
+object 14 0: <</BlackIs1 true /Columns 96 /K -1 /Rows 64>>

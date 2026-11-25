@@ -17,6 +17,8 @@ type
   public
     class function Path(const FileName: string): string; static;
     class function Bytes(const FileName: string): TBytes; static;
+    // The bytes of a font file with the tag of one table of the table directory replaced, which hides that table
+    class function BytesWithRenamedTable(const FileName, Tag, NewTag: string): TBytes; static;
     // Font units per glyph key (for example gid10). The caller owns the dictionary.
     class function ReferenceWidths(const FileName: string): TDictionary<string, Single>; static;
   end;
@@ -68,6 +70,27 @@ end;
 class function TTestFonts.Bytes(const FileName: string): TBytes;
 begin
   Result := TFile.ReadAllBytes(Path(FileName));
+end;
+
+class function TTestFonts.BytesWithRenamedTable(const FileName, Tag, NewTag: string): TBytes;
+const
+  HeaderSize = 12;
+  RecordSize = 16;
+  TableCountOffset = 4;
+begin
+  Result := Bytes(FileName);
+  const TableCount = (Result[TableCountOffset] shl 8) or Result[TableCountOffset + 1];
+  for var Index := 0 to TableCount - 1 do
+  begin
+    const Offset = HeaderSize + (Index * RecordSize);
+    if TEncoding.ASCII.GetString(Result, Offset, Length(Tag)) = Tag then
+    begin
+      const NewBytes = TEncoding.ASCII.GetBytes(NewTag);
+      Move(NewBytes[0], Result[Offset], Length(NewBytes));
+      Exit;
+    end;
+  end;
+  raise EArgumentException.CreateFmt('The font %s has no table %s', [FileName, Tag]);
 end;
 
 class function TTestFonts.ReferenceWidths(const FileName: string): TDictionary<string, Single>;

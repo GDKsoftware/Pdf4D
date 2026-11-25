@@ -47,6 +47,7 @@ type
     FWidths: TArray<Single>;
     FUnicode: string;
     FDirection: Single;
+    FActualTextSpan: Integer;
 
     class function CreateDiacritics: TDictionary<Integer, string>; static;
     class function CombineDiacritic(const Text: string): string; static;
@@ -95,6 +96,8 @@ type
     procedure SetUnicode(const Value: string);
 
     property Unicode: string read FUnicode;
+    // The number of the ActualText sequence that replaced the text of this position, 0 when there is none
+    property ActualTextSpan: Integer read FActualTextSpan write FActualTextSpan;
     property CharacterCodes: TArray<Integer> read FCharCodes;
     property TextMatrix: TPdfMatrix read FTextMatrix;
     // 0, 90, 180 or 270: the direction of the text on the page
@@ -532,6 +535,11 @@ begin
   if TryFindDiacriticIndex(Diacritic, Index) then
   begin
     InsertDiacritic(Index, Diacritic);
+    // A base glyph that is outside an ActualText sequence joins the sequence of the diacritic that was merged into it
+    if FActualTextSpan = 0 then
+    begin
+      FActualTextSpan := Diacritic.FActualTextSpan;
+    end;
   end;
 end;
 

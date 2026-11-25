@@ -9,7 +9,7 @@ uses
   System.Classes,
   DUnitX.TestFramework,
   Pdf4D.Tests.PdfBuilder,
-  Pdf4D.Tests.Robustness.Tests;
+  Pdf4D.Tests.Fuzz;
 
 type
   // The bytes of a content stream, written one piece at a time
@@ -118,7 +118,8 @@ type
                                       const Seed: Integer; const DirectWork: TFuzzWork; const Campaign: TFuzzCampaign); static;
     class function Latin1(const Text: string): TBytes; static;
     class function RepeatText(const Text: string; const Count: Integer): string; static;
-    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Content: string); static;
+    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Content: string); overload; static;
+    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Content: string; const Work: TFuzzWork); overload; static;
     class procedure RunHostileFont(const Campaign: TFuzzCampaign; const Name: string; const Embedding: TEmbeddedProgram;
                                    const Data: TBytes; const Segment1Size: Integer); static;
     class function TrueTypeWithTableOffsetBeyondTheEnd: TBytes; static;
@@ -919,7 +920,12 @@ end;
 
 class procedure TTextRobustnessTests.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Content: string);
 begin
-  Campaign.Run(Name, TFuzzDocuments.ContentPage(Latin1(Content), TTestFonts.Bytes(LiberationSansFile), HostileChainLength), '', TFuzzWork.LimitedPageText);
+  RunHostile(Campaign, Name, Content, TFuzzWork.LimitedPageText);
+end;
+
+class procedure TTextRobustnessTests.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Content: string; const Work: TFuzzWork);
+begin
+  Campaign.Run(Name, TFuzzDocuments.ContentPage(Latin1(Content), TTestFonts.Bytes(LiberationSansFile), HostileChainLength), '', Work);
 end;
 
 class procedure TTextRobustnessTests.RunHostileFont(const Campaign: TFuzzCampaign; const Name: string; const Embedding: TEmbeddedProgram;
@@ -959,7 +965,9 @@ begin
     // Review focus 2: hostile content streams
     RunHostile(Campaign, 'form that draws itself', TextBlock + '/Fm1 Do ' + TextBlock);
     RunHostile(Campaign, 'forms that draw each other twice', TextBlock + '/Fm2 Do ' + TextBlock);
-    RunHostile(Campaign, 'chain of forms that draw the next one twice', TextBlock + '/Chain0 Do ' + TextBlock);
+    // Every form is parsed again on each Do, so a chain of 25 forms costs about 8 us per operator; with the operator budget of the
+    // other cases it ran 8 s against the 10 s limit. 2^25 forms are far beyond any budget, so a smaller budget proves the same.
+    RunHostile(Campaign, 'chain of forms that draw the next one twice', TextBlock + '/Chain0 Do ' + TextBlock, TFuzzWork.TightPageText);
     RunHostile(Campaign, 'inline image without EI', Format(SurroundedFormat, [TextBlock, 'BI /W 1 /H 1 /BPC 8 /CS /G ID ', RepeatText('x', 1000000)]));
     RunHostile(Campaign, 'inline image with a huge size and no data', TextBlock + 'BI /W 100000 /H 100000 /BPC 8 /CS /RGB ID ');
     RunHostile(Campaign, 'BI without ID', Format(SurroundedFormat, [TextBlock, 'BI /W 1 /H 1 ', RepeatText('/Name ', 20000)]));

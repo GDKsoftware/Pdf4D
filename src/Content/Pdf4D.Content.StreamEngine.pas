@@ -20,8 +20,10 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.PdfArray,
   Pdf4D.Font.Base,
+  Pdf4D.Model.Annotation,
   Pdf4D.Model.FormXObject,
   Pdf4D.Model.Page,
+  Pdf4D.Model.Rectangle,
   Pdf4D.Model.Resources,
   Pdf4D.Parser.ContentStream;
 
@@ -47,6 +49,9 @@ type
   TPdfStreamEngine = class
   private
     type
+      // Ends the page without a log line, like a budget that is used up, because the subclass asked for it
+      EStopRequested = class(EPdfLimitExceededException);
+
       // What a nested stream replaces: the resources and the graphics stack
       TStreamFrame = record
         PreviousResources: TPDResources;
@@ -94,7 +99,10 @@ type
     FIsOperandLimitLogged: Boolean;
     FFormCache: TDictionary<TCosStream, TCachedContent>;
     FMaxOperators: Int64;
+    FShouldProcessColorOperators: Boolean;
+    FIsCharProcPending: Boolean;
     FMaxGlyphs: Integer;
+    FInitialMatrix: TPdfMatrix;
 
     procedure InitPage(const Page: TPDPage);
     function GetDefaultFont: TPDFont;
@@ -108,33 +116,54 @@ type
     procedure ChargeContentBytes(const Count: Int64);
     function TryChargeContentBytes(const Count: Int64): Boolean;
     procedure RunPageContent;
-    procedure ProcessForm(const Form: TPDFormXObject);
-    procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const Matrix: TPdfMatrix);
+    procedure ProcessForm(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
+    procedure ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+      const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+    procedure RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+      const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+    procedure RequireCurrentPage;
+    procedure CheckStopRequested;
     procedure ProcessStreamOperators(const Data: TBytes);
-    procedure ProcessOperators(const Parser: TPdfStreamParser);
+    procedure ProcessOperators(const Parser: TPdfStreamParser; const IsCharProc: Boolean);
     function TryReadToken(const Parser: TPdfStreamParser; out Token: TObject): Boolean;
     procedure LogOperandLimit;
     procedure RunOperator(const Operator: TContentOperator; const Operands: TObjectList<TObject>);
     function CreateFrameResources(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TPDResources;
 
-    function BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+    function BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState): TStreamFrame;
     procedure EndFrame(const Frame: TStreamFrame);
 
     procedure CountOperator;
+    procedure RunProcessor(const Processor: TOperatorProcessorBase; const Operator: TContentOperator; const Operands: TArray<TCosBase>);
     procedure CountGlyph;
     procedure HandleOperatorFailure(const Operator: TContentOperator; const Operands: TArray<TCosBase>; const Failure: Exception);
 
     function IsVerticalFont(const Font: TPDFont): Boolean;
     function GetTextMatrixOrRaise: TPdfMatrix;
+    class function TryGetAnnotationMatrix(const Rect, BBox: TPdfRectangle; const Matrix: TPdfMatrix; out Mapping: TPdfMatrix): Boolean; static;
 
   protected
     // Called by ProcessPage after the page is set up, inside the floating point guard. A subclass prepares what it reads from
     // the page here.
     procedure PrepareEngineForPage(const Page: TPDPage); virtual;
+    // The graphics state at the bottom of the stack of a page, made by ProcessPage. A subclass with a state of its own
+    // returns it here; it overrides TPDGraphicsState.Clone as well.
+    function CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState; virtual;
+    // The state that the appearance of an annotation starts with, which the engine then owns: a copy of the current state by default
+    function CreateAnnotationGraphicsState: TPDGraphicsState; virtual;
+    // Asked after every operator and before every content stream. True ends the page like a used up budget does, but
+    // without a line in the log.
+    function StopRequested: Boolean; virtual;
+    // Where PDFBox calls clipToRect: at the start of a form (after its matrix), a group, a pattern, an annotation and a Type 3
+    // glyph. Nothing by default.
+    procedure ClipToRect(const Rect: TPdfRectangle); virtual;
     procedure ApplyTextAdjustment(const Tx, Ty: Single); virtual;
     procedure ShowText(const Bytes: TBytes); virtual;
     // Called for operators without a processor. Nothing by default.
     procedure UnsupportedOperator(const Operator: TContentOperator; const Operands: TArray<TCosBase>); virtual;
+    // processTransparencyGroup: runs a form like ShowForm does, but on InitialState (not nil) as the only state of the new graphics stack;
+    // the engine owns it from the call on. For a subclass that draws a group with a changed state, without the checks of the Do operator.
+    procedure ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
 
   public
     constructor Create;
@@ -148,8 +177,25 @@ type
     // EPdfException of the structure of the page is raised as it is.
     procedure ProcessPage(const Page: TPDPage); virtual;
 
-    procedure ShowTransparencyGroup(const Form: TPDFormXObject);
-    procedure ShowForm(const Form: TPDFormXObject);
+    procedure ShowTransparencyGroup(const Form: TPDFormXObject); virtual;
+    procedure ShowForm(const Form: TPDFormXObject); virtual;
+    // PDFStreamEngine.showAnnotation: processes the normal appearance of Annotation. An annotation without /AP /N is skipped with a line
+    // in the log: PDFBox constructs an appearance for some of those (constructAppearances), which is not ported.
+    procedure ShowAnnotation(const Annotation: TPDAnnotation); virtual;
+    // PDFStreamEngine.processAnnotation: runs Appearance with the matrix that maps its box (after its /Matrix) on /Rect of the annotation as
+    // CTM, clipped to its /BBox. Nothing happens when the rectangle or the box is missing or has no area.
+    procedure ProcessAnnotation(const Annotation: TPDAnnotation; const Appearance: TCosStream);
+
+    // Runs Content with Resources (nil: those of the running stream) on the recursion guard, the budgets and the cache of
+    // decoded form content that a form uses. Level is left to the caller, as in PDFBox where the Do operator keeps it.
+    // InitialState becomes the only state of a new graphics stack; the engine owns it from the call on. Nil gives a clone
+    // of the current state. Matrix is concatenated to the CTM of that state, and then ClipToRect(BBox) is called when HasBBox.
+    // The stack and the resources that were current come back when the stream is done, also after an exception.
+    // ProcessChildStream for the glyph procedure of a Type 3 font: a d1 as first operator makes it an uncoloured glyph
+    procedure ProcessType3CharProc(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState);
+
+    procedure ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
+      const HasBBox: Boolean; const BBox: TPdfRectangle);
 
     procedure BeginText; virtual;
     procedure EndText; virtual;
@@ -191,6 +237,7 @@ type
 
     procedure LogWarning(const Fmt: string; const Args: array of const);
     procedure LogError(const Fmt: string; const Args: array of const);
+    procedure LogDebug(const Fmt: string; const Args: array of const);
 
     // The resources of the stream that is being run (not owned)
     property Resources: TPDResources read FResources;
@@ -198,6 +245,12 @@ type
     // The limits of the document of the current page; the defaults without a page
     property Options: TPdfLoadOptions read GetOptions;
     property Level: Integer read FLevel;
+    // PDFStreamEngine.getInitialMatrix: the CTM at the start of the page, or of the form that is running after its matrix. A pattern
+    // matrix maps to this space.
+    property InitialMatrix: TPdfMatrix read FInitialMatrix;
+    // False while the stream that runs is a glyph procedure of a Type 3 font that starts with d1: the colour operators that PDFBox
+    // guards with isShouldProcessColorOperators (CS, cs and the device colour operators) are ignored then
+    property ShouldProcessColorOperators: Boolean read FShouldProcessColorOperators;
   end;
 
 implementation
@@ -216,6 +269,7 @@ uses
 constructor TPdfStreamEngine.Create;
 begin
   inherited Create;
+  FShouldProcessColorOperators := True;
   FProcessors := TObjectDictionary<string, TOperatorProcessorBase>.Create([doOwnsValues]);
   FStack := TObjectList<TPDGraphicsState>.Create(True);
   FActiveStreams := TList<TCosStream>.Create;
@@ -270,6 +324,14 @@ begin
   end;
 end;
 
+procedure TPdfStreamEngine.LogDebug(const Fmt: string; const Args: array of const);
+begin
+  if Assigned(FCurrentPage) and Assigned(FCurrentPage.Context.Log) then
+  begin
+    FCurrentPage.Context.Log.Debug(Fmt, Args);
+  end;
+end;
+
 procedure TPdfStreamEngine.InitPage(const Page: TPDPage);
 begin
   if not Assigned(Page) then
@@ -279,7 +341,8 @@ begin
 
   FCurrentPage := Page;
   FStack.Clear;
-  FStack.Add(TPDGraphicsState.Create);
+  FStack.Add(CreateInitialGraphicsState(Page));
+  FInitialMatrix := GraphicsState.CurrentTransformationMatrix;
   FIgnoredSaves := 0;
   FIsDepthWarningGiven := False;
   FResources := nil;
@@ -289,6 +352,8 @@ begin
   FGlyphCount := 0;
   FContentBytes := 0;
   FIsOperandLimitLogged := False;
+  FShouldProcessColorOperators := True;
+  FIsCharProcPending := False;
   FFormCache.Clear;
   CacheLimits;
 end;
@@ -335,8 +400,35 @@ begin
   end;
 end;
 
+function TPdfStreamEngine.CreateAnnotationGraphicsState: TPDGraphicsState;
+begin
+  Result := GraphicsState.Clone;
+end;
+
 procedure TPdfStreamEngine.PrepareEngineForPage(const Page: TPDPage);
 begin
+end;
+
+function TPdfStreamEngine.CreateInitialGraphicsState(const Page: TPDPage): TPDGraphicsState;
+begin
+  Result := TPDGraphicsState.Create;
+end;
+
+function TPdfStreamEngine.StopRequested: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TPdfStreamEngine.ClipToRect(const Rect: TPdfRectangle);
+begin
+end;
+
+procedure TPdfStreamEngine.CheckStopRequested;
+begin
+  if StopRequested then
+  begin
+    raise EStopRequested.Create('A stop was requested');
+  end;
 end;
 
 procedure TPdfStreamEngine.RunPageContent;
@@ -344,6 +436,11 @@ begin
   try
     ProcessPageContent;
   except
+    on Failure: EStopRequested do
+    begin
+      // The subclass asked for it: no line in the log
+      Exit;
+    end;
     on Failure: EPdfLimitExceededException do
     begin
       LogError('Processing of the page stopped, the text so far is kept: %s', [Failure.Message]);
@@ -367,7 +464,7 @@ end;
 procedure TPdfStreamEngine.ProcessPageContent;
 begin
   const Data = ReadPageContent;
-  ProcessContent(Data, nil, False, TPdfMatrix.Identity);
+  ProcessContent(Data, nil, False, nil, TPdfMatrix.Identity, False, Default(TPdfRectangle));
 end;
 
 procedure TPdfStreamEngine.ChargeContentBytes(const Count: Int64);
@@ -504,43 +601,174 @@ end;
 
 procedure TPdfStreamEngine.ShowTransparencyGroup(const Form: TPDFormXObject);
 begin
-  ProcessForm(Form);
+  ProcessForm(Form, nil);
 end;
 
 procedure TPdfStreamEngine.ShowForm(const Form: TPDFormXObject);
 begin
-  ProcessForm(Form);
+  ProcessForm(Form, nil);
 end;
 
-procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject);
+procedure TPdfStreamEngine.ProcessFormWithState(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
+begin
+  if not Assigned(InitialState) then
+  begin
+    raise EArgumentNilException.Create('InitialState');
+  end;
+  ProcessForm(Form, InitialState);
+end;
+
+procedure TPdfStreamEngine.ShowAnnotation(const Annotation: TPDAnnotation);
+begin
+  RequireCurrentPage;
+  var Appearance: TCosStream;
+  if Annotation.TryGetNormalAppearance(Appearance) then
+  begin
+    ProcessAnnotation(Annotation, Appearance);
+  end
+  else
+  begin
+    LogDebug('Annotation %s has no normal appearance stream, it is skipped (appearances are not constructed)', [Annotation.SubType]);
+  end;
+end;
+
+// The transformed box is the bounds of the four corners of the BBox after the matrix. The mapping scales and moves it onto the rectangle
+// (a), and the matrix of the appearance goes first: only that order works for rotated pages (PDFBOX-3083).
+class function TPdfStreamEngine.TryGetAnnotationMatrix(const Rect, BBox: TPdfRectangle; const Matrix: TPdfMatrix; out Mapping: TPdfMatrix): Boolean;
+begin
+  const LowerLeft = Matrix.TransformPoint(BBox.LowerLeftX, BBox.LowerLeftY);
+  const LowerRight = Matrix.TransformPoint(BBox.UpperRightX, BBox.LowerLeftY);
+  const UpperRight = Matrix.TransformPoint(BBox.UpperRightX, BBox.UpperRightY);
+  const UpperLeft = Matrix.TransformPoint(BBox.LowerLeftX, BBox.UpperRightY);
+  const MinX = Min(Min(LowerLeft.X, LowerRight.X), Min(UpperRight.X, UpperLeft.X));
+  const MaxX = Max(Max(LowerLeft.X, LowerRight.X), Max(UpperRight.X, UpperLeft.X));
+  const MinY = Min(Min(LowerLeft.Y, LowerRight.Y), Min(UpperRight.Y, UpperLeft.Y));
+  const MaxY = Max(Max(LowerLeft.Y, LowerRight.Y), Max(UpperRight.Y, UpperLeft.Y));
+  const BoxWidth = MaxX - MinX;
+  const BoxHeight = MaxY - MinY;
+
+  // PDFBOX-6095: a transformed box without area is not valid
+  const HasArea = ((BoxWidth > 0) and (BoxHeight > 0));
+  Mapping := TPdfMatrix.Identity;
+  if not HasArea then
+  begin
+    Exit(False);
+  end;
+
+  var Alignment := TPdfMatrix.GetTranslateInstance(Rect.LowerLeftX, Rect.LowerLeftY);
+  Alignment.Scale(Single(Double(Rect.Width) / Double(BoxWidth)), Single(Double(Rect.Height) / Double(BoxHeight)));
+  Alignment.Translate(-MinX, -MinY);
+  Mapping := TPdfMatrix.Concatenate(Alignment, Matrix);
+  Result := True;
+end;
+
+procedure TPdfStreamEngine.ProcessAnnotation(const Annotation: TPDAnnotation; const Appearance: TCosStream);
+begin
+  RequireCurrentPage;
+  const Form = TPDFormXObject.Create(Appearance);
+  try
+    var BBox: TPdfRectangle;
+    // PDFBOX-4783: zero-sized rectangles are not valid
+    const HasBoxes = (Annotation.HasRect and Form.TryGetBBox(BBox));
+    if not HasBoxes then
+    begin
+      Exit;
+    end;
+
+    const Rect = Annotation.Rect;
+    const HasArea = ((Rect.Width > 0) and (Rect.Height > 0) and (BBox.Width > 0) and (BBox.Height > 0));
+    var Mapping: TPdfMatrix;
+    if not (HasArea and TryGetAnnotationMatrix(Rect, BBox, Form.Matrix, Mapping)) then
+    begin
+      Exit;
+    end;
+
+    var Resources: TCosDictionary;
+    if not Form.TryGetResources(Resources) then
+    begin
+      Resources := nil;
+    end;
+
+    // The CTM is the mapping itself, not the CTM of the page times it; RunStream concatenates the identity matrix to it
+    const State = CreateAnnotationGraphicsState;
+    State.CurrentTransformationMatrix := Mapping;
+    RunStream(Appearance, Resources, Form.HasEmptyResources, State, TPdfMatrix.Identity, True, BBox);
+  finally
+    Form.Free;
+  end;
+end;
+
+procedure TPdfStreamEngine.RequireCurrentPage;
 begin
   if not Assigned(FCurrentPage) then
   begin
     raise EInvalidOpException.Create('No current page, call ProcessPage instead');
   end;
+end;
 
-  // PDFBox only has the depth limit. A form that draws itself would use up all the depth, 50 times over at every level.
-  if FActiveStreams.Contains(Form.Stream) then
-  begin
-    LogWarning('Form XObject draws itself (recursion), skipped', []);
-    Exit;
-  end;
-
-  var Data: TBytes;
-  if not TryGetFormContent(Form.Stream, Data) then
-  begin
-    Exit;
-  end;
-
+procedure TPdfStreamEngine.ProcessForm(const Form: TPDFormXObject; const InitialState: TPDGraphicsState);
+begin
   var FormResources: TCosDictionary;
   if not Form.TryGetResources(FormResources) then
   begin
     FormResources := nil;
   end;
 
-  FActiveStreams.Add(Form.Stream);
+  var BBox: TPdfRectangle;
+  const HasBBox = Form.TryGetBBox(BBox);
+  RunStream(Form.Stream, FormResources, Form.HasEmptyResources, InitialState, Form.Matrix, HasBBox, BBox);
+end;
+
+procedure TPdfStreamEngine.ProcessChildStream(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState; const Matrix: TPdfMatrix;
+  const HasBBox: Boolean; const BBox: TPdfRectangle);
+begin
+  if Content = nil then
+  begin
+    InitialState.Free;
+    raise EArgumentNilException.Create('Content');
+  end;
+  RunStream(Content, Resources, False, InitialState, Matrix, HasBBox, BBox);
+end;
+
+procedure TPdfStreamEngine.ProcessType3CharProc(const Content: TCosStream; const Resources: TCosDictionary; const InitialState: TPDGraphicsState);
+begin
+  FIsCharProcPending := True;
   try
-    ProcessContent(Data, FormResources, Form.HasEmptyResources, Form.Matrix);
+    ProcessChildStream(Content, Resources, InitialState, TPdfMatrix.Identity, False, Default(TPdfRectangle));
+  finally
+    FIsCharProcPending := False;
+  end;
+end;
+
+// The engine owns InitialState from here on; BeginFrame hands it to the new graphics stack, so until then every way out
+// frees it
+procedure TPdfStreamEngine.RunStream(const Stream: TCosStream; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+  const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
+begin
+  var Data: TBytes;
+  try
+    RequireCurrentPage;
+    // PDFBox only has the depth limit. A form that draws itself would use up all the depth, 50 times over at every level.
+    if FActiveStreams.Contains(Stream) then
+    begin
+      LogWarning('Form XObject draws itself (recursion), skipped', []);
+      InitialState.Free;
+      Exit;
+    end;
+
+    if not TryGetFormContent(Stream, Data) then
+    begin
+      InitialState.Free;
+      Exit;
+    end;
+  except
+    InitialState.Free;
+    raise;
+  end;
+
+  FActiveStreams.Add(Stream);
+  try
+    ProcessContent(Data, Resources, HasEmptyResources, InitialState, Matrix, HasBBox, BBox);
   finally
     FActiveStreams.Delete(FActiveStreams.Count - 1);
   end;
@@ -559,14 +787,21 @@ begin
   end;
 end;
 
-function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean): TStreamFrame;
+function TPdfStreamEngine.BeginFrame(const StreamResources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState): TStreamFrame;
 begin
   Result := Default(TStreamFrame);
-  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state. Everything that
-  // can fail is made first, so that a failure leaves the engine as it was.
+  // saveGraphicsStack: the stream runs on a stack of its own that starts with a copy of the current state, or with the state
+  // the caller gives. Everything that can fail is made first, so that a failure leaves the engine as it was.
   const NewStack = TObjectList<TPDGraphicsState>.Create(True);
   try
-    NewStack.Add(FStack.Last.Clone);
+    if Assigned(InitialState) then
+    begin
+      NewStack.Add(InitialState);
+    end
+    else
+    begin
+      NewStack.Add(FStack.Last.Clone);
+    end;
     Result.CreatedResources := CreateFrameResources(StreamResources, HasEmptyResources);
   except
     NewStack.Free;
@@ -600,15 +835,27 @@ begin
   Frame.CreatedResources.Free;
 end;
 
-procedure TPdfStreamEngine.ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const Matrix: TPdfMatrix);
+procedure TPdfStreamEngine.ProcessContent(const Data: TBytes; const Resources: TCosDictionary; const HasEmptyResources: Boolean; const InitialState: TPDGraphicsState;
+  const Matrix: TPdfMatrix; const HasBBox: Boolean; const BBox: TPdfRectangle);
 begin
-  const Frame = BeginFrame(Resources, HasEmptyResources);
+  const Frame = BeginFrame(Resources, HasEmptyResources, InitialState);
+  const ParentInitialMatrix = FInitialMatrix;
   try
+    CheckStopRequested;
     var Ctm := GraphicsState.CurrentTransformationMatrix;
     Ctm.ConcatenateWith(Matrix);
     GraphicsState.CurrentTransformationMatrix := Ctm;
+    // The stream's initial matrix includes the CTM of its parent, so that a pattern is drawn with the transformation of the stream it
+    // is used in
+    FInitialMatrix := Ctm;
+    // PDFBox clips to the BBox of a form after its matrix is part of the CTM
+    if HasBBox then
+    begin
+      ClipToRect(BBox);
+    end;
     ProcessStreamOperators(Data);
   finally
+    FInitialMatrix := ParentInitialMatrix;
     EndFrame(Frame);
   end;
 end;
@@ -616,8 +863,11 @@ end;
 procedure TPdfStreamEngine.ProcessStreamOperators(const Data: TBytes);
 begin
   const Parser = TPdfStreamParser.Create(Data, Options, FCurrentPage.Context.Log);
+  // Only the stream that the pending flag was set for is a glyph procedure, not the streams it runs
+  const IsCharProc = FIsCharProcPending;
+  FIsCharProcPending := False;
   try
-    ProcessOperators(Parser);
+    ProcessOperators(Parser, IsCharProc);
   finally
     // The operands that point into the pool of the parser are gone by now
     Parser.Free;
@@ -644,8 +894,14 @@ begin
   end;
 end;
 
-procedure TPdfStreamEngine.ProcessOperators(const Parser: TPdfStreamParser);
+procedure TPdfStreamEngine.ProcessOperators(const Parser: TPdfStreamParser; const IsCharProc: Boolean);
 begin
+  // Every stream starts with the colour operators on, and a glyph procedure that starts with d1 turns them off; the setting of
+  // the stream that this one was started from comes back at the end
+  const PreviousShouldProcessColorOperators = FShouldProcessColorOperators;
+  FShouldProcessColorOperators := True;
+  var IsFirstOperator := True;
+
   // The tokens are made one at a time: a large stream is never held in memory as a list of tokens
   const Operands = TObjectList<TObject>.Create(True);
   try
@@ -654,6 +910,11 @@ begin
     begin
       if Token is TContentOperator then
       begin
+        if IsFirstOperator and IsCharProc and (TContentOperator(Token).Name = TOperatorNames.Type3D1) then
+        begin
+          FShouldProcessColorOperators := False;
+        end;
+        IsFirstOperator := False;
         try
           RunOperator(TContentOperator(Token), Operands);
         finally
@@ -676,6 +937,7 @@ begin
     end;
   finally
     Operands.Free;
+    FShouldProcessColorOperators := PreviousShouldProcessColorOperators;
   end;
 end;
 
@@ -722,12 +984,19 @@ begin
   CountOperator;
 
   var Processor: TOperatorProcessorBase;
-  if not FProcessors.TryGetValue(Operator.Name, Processor) then
+  if FProcessors.TryGetValue(Operator.Name, Processor) then
+  begin
+    RunProcessor(Processor, Operator, Operands);
+  end
+  else
   begin
     UnsupportedOperator(Operator, Operands);
-    Exit;
   end;
+  CheckStopRequested;
+end;
 
+procedure TPdfStreamEngine.RunProcessor(const Processor: TOperatorProcessorBase; const Operator: TContentOperator; const Operands: TArray<TCosBase>);
+begin
   try
     Processor.Process(Operator, Operands);
   except

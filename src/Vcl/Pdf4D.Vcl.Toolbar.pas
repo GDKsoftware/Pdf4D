@@ -1,0 +1,816 @@
+// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+unit Pdf4D.Vcl.Toolbar;
+
+{$EXCESSPRECISION OFF}
+{$SCOPEDENUMS ON}
+
+interface
+
+uses
+  System.Classes,
+  System.Generics.Collections,
+  Vcl.ActnList,
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.Graphics,
+  Vcl.ImgList,
+  Vcl.Imaging.pngimage,
+  Vcl.StdCtrls,
+  Pdf4D.Viewer.Types,
+  Pdf4D.Viewer.Document,
+  Pdf4D.Vcl.PageView,
+  Pdf4D.Vcl.SearchBar,
+  Pdf4D.Vcl.PrintDialog,
+  Pdf4D.Vcl.Actions;
+
+type
+  TPdf4DToolbarButton = (Navigation, PageNumber, Zoom, Rotate, Search, Print);
+  TPdf4DToolbarButtons = set of TPdf4DToolbarButton;
+
+  // A toolbar for a viewer: page navigation, a page number field, zoom, rotation, search and print. Its buttons run on actions of its
+  // own that work on Document, PageView and SearchBar; the icons come from an image list that the toolbar makes, unless Images is set
+  // to another list before the buttons are made.
+  TPdf4DToolbar = class(TToolBar)
+  private type
+    // The order of the icons in the image list of the toolbar
+    TToolbarIcon = (First, Prior, Next, Last, ZoomIn, ZoomOut, FitWidth, FitPage, RotateClockwise, RotateCounterclockwise, Search, Print,
+                    Copy);
+
+  private
+    FDocument: TPdf4DCustomDocument;
+    FPageView: TPdf4DPageView;
+    FSearchBar: TPdf4DSearchBar;
+    FButtons: TPdf4DToolbarButtons;
+    FLink: TPdfDocumentLink;
+    FIcons: TImageList;
+    FIsBuilt: Boolean;
+    FUsesOwnIcons: Boolean;
+
+    FActionFirst: TPdf4DFirstPageAction;
+    FActionPrior: TPdf4DPriorPageAction;
+    FActionNext: TPdf4DNextPageAction;
+    FActionLast: TPdf4DLastPageAction;
+    FActionZoomIn: TPdf4DZoomInAction;
+    FActionZoomOut: TPdf4DZoomOutAction;
+    FActionRotateCounterclockwise: TPdf4DRotateCounterclockwiseAction;
+    FActionRotateClockwise: TPdf4DRotateClockwiseAction;
+    FActionSearch: TPdf4DSearchAction;
+    FActionPrint: TPdf4DPrintAction;
+
+    // What the last build made
+    FToolButtons: TList<TToolButton>;
+    FEmbedded: TList<TControl>;
+    // The width of each control of FEmbedded in logical pixels
+    FEmbeddedWidths: TList<Integer>;
+    FButtonFirst: TToolButton;
+    FButtonPrior: TToolButton;
+    FButtonNext: TToolButton;
+    FButtonLast: TToolButton;
+    FButtonZoomOut: TToolButton;
+    FButtonZoomIn: TToolButton;
+    FButtonRotateCounterclockwise: TToolButton;
+    FButtonRotateClockwise: TToolButton;
+    FButtonSearch: TToolButton;
+    FButtonPrint: TToolButton;
+    FEditPage: TEdit;
+    FLabelPages: TLabel;
+    FComboZoom: TComboBox;
+
+    class function IconResourceName(const Icon: TToolbarIcon): string; static;
+    class procedure DrawIcon(const Png: TPngImage; const Bitmap: Vcl.Graphics.TBitmap); static;
+    class function PremultipliedAt(const Png: TPngImage; const X, Y, Channel: Integer): Integer; static;
+    procedure SetDocument(const Value: TPdf4DCustomDocument);
+    procedure SetPageView(const Value: TPdf4DPageView);
+    procedure SetSearchBar(const Value: TPdf4DSearchBar);
+    function GetPrintDialog: TPdf4DPrintDialog;
+    procedure SetPrintDialog(const Value: TPdf4DPrintDialog);
+    procedure SetButtons(const Value: TPdf4DToolbarButtons);
+
+    procedure CreateActions;
+    procedure CreateIcons;
+    procedure FillIcons(const Size: Integer);
+    // The icons follow the scale of the toolbar
+    procedure UpdateIconSize;
+    // Without them the actions have no icon: an image list of the application does not have these
+    procedure UseOwnIcons(const IsUsed: Boolean);
+    procedure Build;
+    procedure ClearButtons;
+    function NewButton(const Action: TCustomAction): TToolButton;
+    function NewSeparator(const Width: Integer): TToolButton;
+    procedure AddEmbedded(const Control: TControl; const LogicalWidth: Integer);
+    // A control that the toolbar makes before it gets its scale is not scaled with it: the widths follow the scale of the toolbar
+    procedure ScaleEmbedded;
+    procedure BuildNavigation;
+    procedure BuildPageNumber;
+    procedure BuildZoom;
+    procedure BuildRotate;
+    procedure BuildSearch;
+    procedure BuildPrint;
+    procedure UpdateState;
+    procedure UpdatePageNumber;
+    procedure UpdateZoom;
+    procedure HandleDocumentChange(const Change: TPdfDocumentChange);
+    procedure HandleZoomChanged(Sender: TObject);
+
+    procedure HandlePageKeyPress(Sender: TObject; var Key: Char);
+    procedure HandlePageExit(Sender: TObject);
+    procedure CommitPageNumber;
+    procedure HandleZoomSelect(Sender: TObject);
+    procedure HandleZoomKeyPress(Sender: TObject; var Key: Char);
+    procedure ApplyZoomText(const Text: string);
+
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure CreateWnd; override;
+    procedure Loaded; override;
+    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
+
+  public
+    constructor Create(Owner: TComponent); override;
+    destructor Destroy; override;
+
+    // The controls that the last build made; nil for a part that Buttons leaves out
+    property ButtonFirst: TToolButton read FButtonFirst;
+    property ButtonPrior: TToolButton read FButtonPrior;
+    property ButtonNext: TToolButton read FButtonNext;
+    property ButtonLast: TToolButton read FButtonLast;
+    property ButtonZoomOut: TToolButton read FButtonZoomOut;
+    property ButtonZoomIn: TToolButton read FButtonZoomIn;
+    property ButtonRotateCounterclockwise: TToolButton read FButtonRotateCounterclockwise;
+    property ButtonRotateClockwise: TToolButton read FButtonRotateClockwise;
+    property ButtonSearch: TToolButton read FButtonSearch;
+    property ButtonPrint: TToolButton read FButtonPrint;
+    property EditPage: TEdit read FEditPage;
+    property LabelPages: TLabel read FLabelPages;
+    property ComboZoom: TComboBox read FComboZoom;
+
+  published
+    property Document: TPdf4DCustomDocument read FDocument write SetDocument;
+    property PageView: TPdf4DPageView read FPageView write SetPageView;
+    property SearchBar: TPdf4DSearchBar read FSearchBar write SetSearchBar;
+    // The dialog that the print button shows; nil: the print action makes one of its own
+    property PrintDialog: TPdf4DPrintDialog read GetPrintDialog write SetPrintDialog;
+    property Buttons: TPdf4DToolbarButtons read FButtons write SetButtons default [Low(TPdf4DToolbarButton)..High(TPdf4DToolbarButton)];
+  end;
+
+implementation
+
+{$R Icons\Pdf4D.Vcl.Icons.res}
+
+uses
+  System.Math,
+  System.SysUtils,
+  System.Types,
+  Winapi.Windows,
+  Pdf4D.Viewer.Commands,
+  Pdf4D.Viewer.ResourceStrings;
+
+const
+  IconSize = 16;
+  IconResourcePrefix = 'PDF4D_ICON_';
+  PageEditWidth = 40;
+  PageLabelWidth = 56;
+  ZoomComboWidth = 96;
+  // The channels of a pixel of an icon: blue, green, red and alpha
+  ChannelCount = 4;
+  ColorChannels = 3;
+  AlphaChannel = 3;
+  EnterKey = #13;
+  EscapeKey = #27;
+
+{ TPdf4DToolbar }
+
+class function TPdf4DToolbar.IconResourceName(const Icon: TToolbarIcon): string;
+const
+  Names: array[TToolbarIcon] of string = ('FIRST', 'PRIOR', 'NEXT', 'LAST', 'ZOOMIN', 'ZOOMOUT', 'FITWIDTH', 'FITPAGE',
+                                          'ROTATECLOCKWISE', 'ROTATECOUNTERCLOCKWISE', 'SEARCH', 'PRINT', 'COPY');
+begin
+  Result := IconResourcePrefix + Names[Icon];
+end;
+
+constructor TPdf4DToolbar.Create(Owner: TComponent);
+begin
+  inherited Create(Owner);
+  FButtons := [Low(TPdf4DToolbarButton)..High(TPdf4DToolbarButton)];
+  FToolButtons := TList<TToolButton>.Create;
+  FEmbedded := TList<TControl>.Create;
+  FEmbeddedWidths := TList<Integer>.Create;
+  FLink := TPdfDocumentLink.Create(HandleDocumentChange);
+  CreateIcons;
+  CreateActions;
+end;
+
+destructor TPdf4DToolbar.Destroy;
+begin
+  if Assigned(FPageView) then
+  begin
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+  end;
+
+  FLink.Free;
+  FEmbeddedWidths.Free;
+  FEmbedded.Free;
+  FToolButtons.Free;
+  inherited;
+end;
+
+procedure TPdf4DToolbar.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation <> TOperation.opRemove then
+  begin
+    Exit;
+  end;
+
+  if AComponent = FDocument then
+  begin
+    FDocument := nil;
+    FLink.Document := nil;
+  end
+  else if AComponent = FPageView then
+  begin
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView := nil;
+  end
+  else if AComponent = FSearchBar then
+  begin
+    FSearchBar := nil;
+  end;
+end;
+
+procedure TPdf4DToolbar.CreateWnd;
+begin
+  inherited;
+  if not FIsBuilt then
+  begin
+    Build;
+  end;
+end;
+
+procedure TPdf4DToolbar.Loaded;
+begin
+  inherited;
+  if (not FIsBuilt) and HandleAllocated then
+  begin
+    Build;
+  end;
+end;
+
+procedure TPdf4DToolbar.ChangeScale(M, D: Integer; isDpiChange: Boolean);
+begin
+  inherited;
+  if isDpiChange then
+  begin
+    UpdateIconSize;
+    ScaleEmbedded;
+  end;
+end;
+
+{ Properties }
+
+procedure TPdf4DToolbar.SetDocument(const Value: TPdf4DCustomDocument);
+begin
+  if Value = FDocument then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FDocument) then
+  begin
+    FDocument.RemoveFreeNotification(Self);
+  end;
+
+  FDocument := Value;
+
+  if Assigned(FDocument) then
+  begin
+    FDocument.FreeNotification(Self);
+  end;
+
+  FLink.Document := Value;
+  FActionFirst.Document := Value;
+  FActionPrior.Document := Value;
+  FActionNext.Document := Value;
+  FActionLast.Document := Value;
+  FActionPrint.Document := Value;
+  UpdateState;
+end;
+
+procedure TPdf4DToolbar.SetPageView(const Value: TPdf4DPageView);
+begin
+  if Value = FPageView then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FPageView) then
+  begin
+    FPageView.RemoveZoomListener(HandleZoomChanged);
+    FPageView.RemoveFreeNotification(Self);
+  end;
+
+  FPageView := Value;
+
+  if Assigned(FPageView) then
+  begin
+    FPageView.FreeNotification(Self);
+    FPageView.AddZoomListener(HandleZoomChanged);
+  end;
+
+  FActionZoomIn.PageView := Value;
+  FActionZoomOut.PageView := Value;
+  FActionRotateClockwise.PageView := Value;
+  FActionRotateCounterclockwise.PageView := Value;
+  UpdateState;
+end;
+
+procedure TPdf4DToolbar.SetSearchBar(const Value: TPdf4DSearchBar);
+begin
+  if Value = FSearchBar then
+  begin
+    Exit;
+  end;
+
+  if Assigned(FSearchBar) then
+  begin
+    FSearchBar.RemoveFreeNotification(Self);
+  end;
+
+  FSearchBar := Value;
+
+  if Assigned(FSearchBar) then
+  begin
+    FSearchBar.FreeNotification(Self);
+  end;
+
+  FActionSearch.SearchBar := Value;
+  UpdateState;
+end;
+
+function TPdf4DToolbar.GetPrintDialog: TPdf4DPrintDialog;
+begin
+  Result := FActionPrint.PrintDialog;
+end;
+
+procedure TPdf4DToolbar.SetPrintDialog(const Value: TPdf4DPrintDialog);
+begin
+  FActionPrint.PrintDialog := Value;
+end;
+
+procedure TPdf4DToolbar.SetButtons(const Value: TPdf4DToolbarButtons);
+begin
+  if Value = FButtons then
+  begin
+    Exit;
+  end;
+
+  FButtons := Value;
+  if FIsBuilt then
+  begin
+    Build;
+  end;
+end;
+
+{ Actions and icons }
+
+procedure TPdf4DToolbar.CreateActions;
+begin
+  FActionFirst := TPdf4DFirstPageAction.Create(Self);
+  FActionPrior := TPdf4DPriorPageAction.Create(Self);
+  FActionNext := TPdf4DNextPageAction.Create(Self);
+  FActionLast := TPdf4DLastPageAction.Create(Self);
+  FActionZoomIn := TPdf4DZoomInAction.Create(Self);
+  FActionZoomOut := TPdf4DZoomOutAction.Create(Self);
+  FActionRotateClockwise := TPdf4DRotateClockwiseAction.Create(Self);
+  FActionRotateCounterclockwise := TPdf4DRotateCounterclockwiseAction.Create(Self);
+  FActionSearch := TPdf4DSearchAction.Create(Self);
+  FActionPrint := TPdf4DPrintAction.Create(Self);
+  UseOwnIcons(True);
+end;
+
+procedure TPdf4DToolbar.CreateIcons;
+begin
+  FIcons := TImageList.Create(Self);
+  FIcons.ColorDepth := cd32Bit;
+  FillIcons(IconSize);
+end;
+
+// The icons are drawn at 16 pixels; at another scale they are resampled, so that they keep their size on the monitor
+procedure TPdf4DToolbar.FillIcons(const Size: Integer);
+begin
+  FIcons.BeginUpdate;
+  try
+    FIcons.Clear;
+    FIcons.SetSize(Size, Size);
+    for var Icon := Low(TToolbarIcon) to High(TToolbarIcon) do
+    begin
+      const Png = TPngImage.Create;
+      try
+        Png.LoadFromResourceName(HInstance, IconResourceName(Icon));
+        const Bitmap = Vcl.Graphics.TBitmap.Create;
+        try
+          Bitmap.PixelFormat := pf32bit;
+          Bitmap.AlphaFormat := TAlphaFormat.afDefined;
+          Bitmap.SetSize(Size, Size);
+          DrawIcon(Png, Bitmap);
+          FIcons.Add(Bitmap, nil);
+        finally
+          Bitmap.Free;
+        end;
+      finally
+        Png.Free;
+      end;
+    end;
+  finally
+    FIcons.EndUpdate;
+  end;
+end;
+
+procedure TPdf4DToolbar.UpdateIconSize;
+begin
+  const Size = ScaleValue(IconSize);
+  if FIcons.Width <> Size then
+  begin
+    FillIcons(Size);
+  end;
+end;
+
+// Bilinear, on the colors multiplied with the alpha, which is also what the image list wants
+class procedure TPdf4DToolbar.DrawIcon(const Png: TPngImage; const Bitmap: Vcl.Graphics.TBitmap);
+begin
+  const Size = Bitmap.Width;
+  for var Y := 0 to Size - 1 do
+  begin
+    const SourceY: Double = Max(0, (Y + 0.5) * IconSize / Size - 0.5);
+    const Top = Min(Trunc(SourceY), IconSize - 1);
+    const Bottom = Min(Top + 1, IconSize - 1);
+    const WeightY: Double = SourceY - Trunc(SourceY);
+    const Pixels = PRGBQuad(Bitmap.ScanLine[Y]);
+    for var X := 0 to Size - 1 do
+    begin
+      const SourceX: Double = Max(0, (X + 0.5) * IconSize / Size - 0.5);
+      const Left = Min(Trunc(SourceX), IconSize - 1);
+      const Right = Min(Left + 1, IconSize - 1);
+      const WeightX: Double = SourceX - Trunc(SourceX);
+      const Pixel = PRGBQuad(PByte(Pixels) + X * SizeOf(TRGBQuad));
+      for var Channel := 0 to ChannelCount - 1 do
+      begin
+        const Upper: Double = PremultipliedAt(Png, Left, Top, Channel) * (1 - WeightX) +
+                              PremultipliedAt(Png, Right, Top, Channel) * WeightX;
+        const Lower: Double = PremultipliedAt(Png, Left, Bottom, Channel) * (1 - WeightX) +
+                              PremultipliedAt(Png, Right, Bottom, Channel) * WeightX;
+        PByte(Pixel)[Channel] := Round(Upper * (1 - WeightY) + Lower * WeightY);
+      end;
+    end;
+  end;
+end;
+
+// Channel 0 to 2 are blue, green and red (the order of the PNG rows and of TRGBQuad), 3 is the alpha
+class function TPdf4DToolbar.PremultipliedAt(const Png: TPngImage; const X, Y, Channel: Integer): Integer;
+begin
+  const Alpha = Png.AlphaScanline[Y][X];
+  if Channel = AlphaChannel then
+  begin
+    Exit(Alpha);
+  end;
+
+  const Colors = PByte(Png.Scanline[Y]);
+  Result := (Colors[X * ColorChannels + Channel] * Alpha) div High(Byte);
+end;
+
+procedure TPdf4DToolbar.UseOwnIcons(const IsUsed: Boolean);
+begin
+  FUsesOwnIcons := IsUsed;
+  const Unused = -1;
+  FActionFirst.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.First), Unused);
+  FActionPrior.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.Prior), Unused);
+  FActionNext.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.Next), Unused);
+  FActionLast.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.Last), Unused);
+  FActionZoomIn.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.ZoomIn), Unused);
+  FActionZoomOut.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.ZoomOut), Unused);
+  FActionRotateClockwise.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.RotateClockwise), Unused);
+  FActionRotateCounterclockwise.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.RotateCounterclockwise), Unused);
+  FActionSearch.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.Search), Unused);
+  FActionPrint.ImageIndex := IfThen(IsUsed, Ord(TToolbarIcon.Print), Unused);
+end;
+
+{ Building }
+
+procedure TPdf4DToolbar.ClearButtons;
+begin
+  FButtonFirst := nil;
+  FButtonPrior := nil;
+  FButtonNext := nil;
+  FButtonLast := nil;
+  FButtonZoomOut := nil;
+  FButtonZoomIn := nil;
+  FButtonRotateCounterclockwise := nil;
+  FButtonRotateClockwise := nil;
+  FButtonSearch := nil;
+  FButtonPrint := nil;
+  FEditPage := nil;
+  FLabelPages := nil;
+  FComboZoom := nil;
+
+  for var Control in FEmbedded do
+  begin
+    Control.Free;
+  end;
+  FEmbedded.Clear;
+  FEmbeddedWidths.Clear;
+
+  for var Button in FToolButtons do
+  begin
+    Button.Free;
+  end;
+  FToolButtons.Clear;
+end;
+
+function TPdf4DToolbar.NewButton(const Action: TCustomAction): TToolButton;
+begin
+  Result := TToolButton.Create(Self);
+  Result.Parent := Self;
+  // Without the icons of the toolbar a button shows its text
+  if not FUsesOwnIcons then
+  begin
+    Result.Style := tbsTextButton;
+  end;
+  Result.Action := Action;
+  FToolButtons.Add(Result);
+end;
+
+function TPdf4DToolbar.NewSeparator(const Width: Integer): TToolButton;
+begin
+  Result := TToolButton.Create(Self);
+  Result.Parent := Self;
+  Result.Style := tbsSeparator;
+  Result.Width := Width;
+  FToolButtons.Add(Result);
+end;
+
+// A toolbar gives every control a place in its row as wide as the control is when it gets its parent, and centres it there; the width is
+// in the pixels of the toolbar
+procedure TPdf4DToolbar.AddEmbedded(const Control: TControl; const LogicalWidth: Integer);
+begin
+  Control.Width := ScaleValue(LogicalWidth);
+  Control.Parent := Self;
+  FEmbedded.Add(Control);
+  FEmbeddedWidths.Add(LogicalWidth);
+end;
+
+procedure TPdf4DToolbar.ScaleEmbedded;
+begin
+  for var Index := 0 to FEmbedded.Count - 1 do
+  begin
+    const Width = ScaleValue(FEmbeddedWidths[Index]);
+    if FEmbedded[Index].Width <> Width then
+    begin
+      FEmbedded[Index].Width := Width;
+    end;
+  end;
+end;
+
+procedure TPdf4DToolbar.Build;
+begin
+  UpdateIconSize;
+  if not Assigned(Images) then
+  begin
+    Images := FIcons;
+  end;
+  UseOwnIcons(Images = FIcons);
+
+  DisableAlign;
+  try
+    ClearButtons;
+    // A new button goes to the front of the others, so the last one is made first
+    if TPdf4DToolbarButton.Print in FButtons then
+    begin
+      BuildPrint;
+    end;
+    if TPdf4DToolbarButton.Search in FButtons then
+    begin
+      BuildSearch;
+    end;
+    if TPdf4DToolbarButton.Rotate in FButtons then
+    begin
+      BuildRotate;
+    end;
+    if TPdf4DToolbarButton.Zoom in FButtons then
+    begin
+      BuildZoom;
+    end;
+    if TPdf4DToolbarButton.PageNumber in FButtons then
+    begin
+      BuildPageNumber;
+    end;
+    if TPdf4DToolbarButton.Navigation in FButtons then
+    begin
+      BuildNavigation;
+    end;
+  finally
+    EnableAlign;
+  end;
+
+  FIsBuilt := True;
+  UpdateState;
+end;
+
+procedure TPdf4DToolbar.BuildNavigation;
+begin
+  FButtonLast := NewButton(FActionLast);
+  FButtonNext := NewButton(FActionNext);
+  FButtonPrior := NewButton(FActionPrior);
+  FButtonFirst := NewButton(FActionFirst);
+end;
+
+procedure TPdf4DToolbar.BuildPageNumber;
+begin
+  FLabelPages := TLabel.Create(Self);
+  FLabelPages.AutoSize := False;
+  FLabelPages.Layout := TTextLayout.tlCenter;
+  AddEmbedded(FLabelPages, PageLabelWidth);
+
+  FEditPage := TEdit.Create(Self);
+  FEditPage.Alignment := taRightJustify;
+  FEditPage.Hint := SPageNumberHint;
+  FEditPage.ShowHint := True;
+  FEditPage.OnKeyPress := HandlePageKeyPress;
+  FEditPage.OnExit := HandlePageExit;
+  AddEmbedded(FEditPage, PageEditWidth);
+end;
+
+procedure TPdf4DToolbar.BuildZoom;
+begin
+  FButtonZoomIn := NewButton(FActionZoomIn);
+
+  FComboZoom := TComboBox.Create(Self);
+  AddEmbedded(FComboZoom, ZoomComboWidth);
+  FComboZoom.Style := csDropDown;
+  FComboZoom.Hint := SZoomHint;
+  FComboZoom.ShowHint := True;
+  FComboZoom.Items.AddStrings(TPdfZoomText.Items);
+  FComboZoom.OnSelect := HandleZoomSelect;
+  FComboZoom.OnKeyPress := HandleZoomKeyPress;
+
+  FButtonZoomOut := NewButton(FActionZoomOut);
+end;
+
+procedure TPdf4DToolbar.BuildRotate;
+begin
+  FButtonRotateClockwise := NewButton(FActionRotateClockwise);
+  FButtonRotateCounterclockwise := NewButton(FActionRotateCounterclockwise);
+  NewSeparator(ButtonWidth div 2);
+end;
+
+procedure TPdf4DToolbar.BuildSearch;
+begin
+  FButtonSearch := NewButton(FActionSearch);
+end;
+
+procedure TPdf4DToolbar.BuildPrint;
+begin
+  FButtonPrint := NewButton(FActionPrint);
+end;
+
+{ State }
+
+procedure TPdf4DToolbar.HandleDocumentChange(const Change: TPdfDocumentChange);
+begin
+  UpdateState;
+end;
+
+procedure TPdf4DToolbar.HandleZoomChanged(Sender: TObject);
+begin
+  UpdateZoom;
+end;
+
+procedure TPdf4DToolbar.UpdateState;
+begin
+  if not FIsBuilt then
+  begin
+    Exit;
+  end;
+
+  FActionFirst.Update;
+  FActionPrior.Update;
+  FActionNext.Update;
+  FActionLast.Update;
+  FActionZoomIn.Update;
+  FActionZoomOut.Update;
+  FActionRotateClockwise.Update;
+  FActionRotateCounterclockwise.Update;
+  FActionSearch.Update;
+  FActionPrint.Update;
+  UpdatePageNumber;
+  UpdateZoom;
+end;
+
+procedure TPdf4DToolbar.UpdatePageNumber;
+begin
+  if not Assigned(FEditPage) then
+  begin
+    Exit;
+  end;
+
+  FEditPage.Enabled := TPdfViewerCommands.IsOpen(FDocument);
+  FEditPage.Text := TPdfViewerCommands.PageNumberText(FDocument);
+  FLabelPages.Caption := TPdfViewerCommands.PageCountText(FDocument);
+end;
+
+procedure TPdf4DToolbar.UpdateZoom;
+begin
+  if not Assigned(FComboZoom) then
+  begin
+    Exit;
+  end;
+
+  const HasView = Assigned(FPageView);
+  FComboZoom.Enabled := HasView and TPdfViewerCommands.IsOpen(FPageView.Document);
+  if not HasView then
+  begin
+    FComboZoom.ItemIndex := -1;
+    FComboZoom.Text := '';
+    Exit;
+  end;
+
+  // A zoom between the steps has no item, only its text
+  FComboZoom.ItemIndex := TPdfZoomText.IndexOf(FPageView.ZoomMode, FPageView.Zoom);
+  FComboZoom.Text := TPdfZoomText.Format(FPageView.ZoomMode, FPageView.Zoom);
+end;
+
+{ Page number }
+
+procedure TPdf4DToolbar.HandlePageKeyPress(Sender: TObject; var Key: Char);
+begin
+  case Key of
+    EnterKey:
+      begin
+        Key := #0;
+        CommitPageNumber;
+      end;
+    EscapeKey:
+      begin
+        Key := #0;
+        UpdatePageNumber;
+      end;
+  end;
+end;
+
+procedure TPdf4DToolbar.HandlePageExit(Sender: TObject);
+begin
+  UpdatePageNumber;
+end;
+
+procedure TPdf4DToolbar.CommitPageNumber;
+begin
+  TPdfViewerCommands.TryGoToPageNumber(FDocument, FEditPage.Text);
+  // A valid number shows as it is written in the field; what is not a page of the document goes back to the current page
+  UpdatePageNumber;
+end;
+
+{ Zoom }
+
+procedure TPdf4DToolbar.HandleZoomSelect(Sender: TObject);
+begin
+  if FComboZoom.ItemIndex >= 0 then
+  begin
+    ApplyZoomText(FComboZoom.Items[FComboZoom.ItemIndex]);
+  end;
+end;
+
+procedure TPdf4DToolbar.HandleZoomKeyPress(Sender: TObject; var Key: Char);
+begin
+  case Key of
+    EnterKey:
+      begin
+        Key := #0;
+        ApplyZoomText(FComboZoom.Text);
+      end;
+    EscapeKey:
+      begin
+        Key := #0;
+        UpdateZoom;
+      end;
+  end;
+end;
+
+procedure TPdf4DToolbar.ApplyZoomText(const Text: string);
+begin
+  var Mode: TPdfZoomMode;
+  var Zoom: Single;
+  const IsValid = Assigned(FPageView) and TPdfZoomText.TryParse(Text, Mode, Zoom);
+  if IsValid and (Mode = TPdfZoomMode.Factor) then
+  begin
+    FPageView.Zoom := Zoom;
+  end
+  else if IsValid then
+  begin
+    FPageView.ZoomMode := Mode;
+  end;
+
+  // The page view tells a change of zoom or of its mode, but not a text that was not valid
+  UpdateZoom;
+end;
+
+end.

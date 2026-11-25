@@ -9,10 +9,12 @@ unit Pdf4D.FontBox.FontBoxFont;
 interface
 
 uses
+  Pdf4D.Common.Log,
+  Pdf4D.Common.Path,
   Pdf4D.FontBox.BoundingBox;
 
 type
-  // Glyph paths are left out: Pdf4D does not render
+  // The glyph outlines are in glyph space: the caller scales them with the FontMatrix
   TFontBoxFont = class abstract
   public
     // Empty when the font has no name
@@ -21,8 +23,19 @@ type
     function FontMatrix: TArray<Single>; virtual; abstract;
     function GetWidth(const GlyphName: string): Single; virtual; abstract;
     function HasGlyph(const GlyphName: string): Boolean; virtual; abstract;
+    // The outline of the glyph; the caller owns the path. A font does not cache paths: the glyph cache of the renderer does.
+    // False when the font has no outline for the glyph, or when the outline is damaged (the reason goes to the log).
+    function TryGetPath(const GlyphName: string; out Path: TPdfPath): Boolean; virtual; abstract;
+    // The same, with the log that the damaged outlines go to, for a font that is shared by documents and so cannot keep a log
+    // of its own. A font that has no use for the log ignores it.
+    function TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean; virtual;
   end;
 
 implementation
+
+function TFontBoxFont.TryGetPathWithLog(const GlyphName: string; out Path: TPdfPath; const Log: TPdfLog): Boolean;
+begin
+  Result := TryGetPath(GlyphName, Path);
+end;
 
 end.

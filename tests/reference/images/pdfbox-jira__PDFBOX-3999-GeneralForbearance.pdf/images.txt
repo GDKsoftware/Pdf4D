@@ -1,0 +1,1 @@
+p1-0	Im0	254x254 bpc=8 cs=Indexed	[COSName{FlateDecode}]	ok type=1

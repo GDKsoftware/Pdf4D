@@ -1,7 +1,7 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Contains code derived from Apache PDFBox, Copyright The Apache Software Foundation; see the NOTICE file.
-// Tests for Pdf4D.Text.TimSort. The expected hashes are what java.util.Arrays.sort (JDK 21) gives for the same data.
+// Tests for Pdf4D.Text.TimSort. The expected hashes are what Java's Collections.sort gives for the same data (PDFBox oracle).
 unit Pdf4D.Text.TimSort.Tests;
 
 interface
@@ -42,6 +42,12 @@ type
 
     [Test]
     procedure TestOwnedItemsAreNotFreed;
+
+    [Test]
+    procedure TestStrictlyDescendingRunIsReversed;
+
+    [Test]
+    procedure TestEqualItemsKeepTheirOrderInDescendingData;
   end;
 
 implementation
@@ -252,6 +258,62 @@ begin
       end);
     Assert.AreEqual<Integer>(100, Items.Count);
     Assert.AreEqual<Integer>(1, Items[0].Key);
+  finally
+    Items.Free;
+  end;
+end;
+
+procedure TTimSortTests.TestStrictlyDescendingRunIsReversed;
+begin
+  for var Count in [5, 31, 32, 33, 200] do
+  begin
+    const Items = TList<Integer>.Create;
+    try
+      for var Index := 0 to Count - 1 do
+      begin
+        Items.Add(Count - Index);
+      end;
+
+      Assert.IsTrue(TTimSort.Sort<Integer>(Items,
+        function(const Left, Right: Integer): Integer
+        begin
+          Result := Left - Right;
+        end));
+
+      for var Index := 0 to Count - 1 do
+      begin
+        Assert.AreEqual<Integer>(Index + 1, Items[Index], Format('Count %d, index %d', [Count, Index]));
+      end;
+    finally
+      Items.Free;
+    end;
+  end;
+end;
+
+// A run is only reversed when it is strictly descending, otherwise equal items would swap places
+procedure TTimSortTests.TestEqualItemsKeepTheirOrderInDescendingData;
+begin
+  const Items = TObjectList<TItem>.Create(True);
+  try
+    for var Index := 0 to 99 do
+    begin
+      const Item = TItem.Create;
+      Item.Key := (99 - Index) div 4;
+      Item.Position := Index;
+      Items.Add(Item);
+    end;
+
+    Assert.IsTrue(TTimSort.Sort<TItem>(Items,
+      function(const Left, Right: TItem): Integer
+      begin
+        Result := Left.Key - Right.Key;
+      end));
+
+    for var Index := 1 to Items.Count - 1 do
+    begin
+      Assert.IsTrue((Items[Index - 1].Key < Items[Index].Key) or
+                    ((Items[Index - 1].Key = Items[Index].Key) and (Items[Index - 1].Position < Items[Index].Position)));
+    end;
   finally
     Items.Free;
   end;

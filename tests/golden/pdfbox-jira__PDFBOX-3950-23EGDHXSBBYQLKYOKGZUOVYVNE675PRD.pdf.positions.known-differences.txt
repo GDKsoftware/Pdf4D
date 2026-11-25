@@ -1,0 +1,1 @@
+4 # PDFBox ends the page with an exception on the font F10 (Missing descendant font array) and writes an error line, Pdf4D logs it and goes on with the default font

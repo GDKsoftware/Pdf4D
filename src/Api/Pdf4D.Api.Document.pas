@@ -10,9 +10,11 @@ uses
   Pdf4D.Api.Attachment.Interfaces,
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Api.DocumentHandle,
+  Pdf4D.Api.DocumentModel.Interfaces,
   Pdf4D.Api.Field.Interfaces,
   Pdf4D.Api.Outline.Interfaces,
   Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Api.TextOptions,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Document,
@@ -21,7 +23,7 @@ uses
   Pdf4D.Model.Document;
 
 type
-  TPdfDocument = class(TInterfacedObject, IPdfDocument)
+  TPdfDocument = class(TInterfacedObject, IPdfDocument, IPdfDocumentModel)
   private
     FHandle: IPdfDocumentHandle;
 
@@ -53,6 +55,8 @@ type
     function ExtractText: string; overload;
     function ExtractText(const Options: TPdfTextOptions): string; overload;
     procedure WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
+    function ExtractTextWithPositions: IPdfPositionedText; overload;
+    function ExtractTextWithPositions(const Options: TPdfTextOptions): IPdfPositionedText; overload;
 
     // The document of the model layer, for code that needs more than the interfaces give (the acceptance test that
     // compares with PDFBox reads the same objects PDFBox reads). Like CosDocument, it is valid as long as this document is.
@@ -66,6 +70,7 @@ uses
   Pdf4D.Api.Field,
   Pdf4D.Api.OutlineItem,
   Pdf4D.Api.Page,
+  Pdf4D.Api.TextLayout,
   Pdf4D.Model.AcroForm,
   Pdf4D.Model.Outline,
   Pdf4D.Model.DocumentInformation;
@@ -462,6 +467,16 @@ end;
 procedure TPdfDocument.WriteText(const Writer: TTextWriter; const Options: TPdfTextOptions);
 begin
   FHandle.WriteText(Writer, Options);
+end;
+
+function TPdfDocument.ExtractTextWithPositions: IPdfPositionedText;
+begin
+  Result := ExtractTextWithPositions(TPdfTextOptions.Default);
+end;
+
+function TPdfDocument.ExtractTextWithPositions(const Options: TPdfTextOptions): IPdfPositionedText;
+begin
+  Result := TPdfPositionedTextResult.Create(FHandle.ExtractPositioned(Options));
 end;
 
 function TPdfDocument.ModelDocument: TPDDocument;

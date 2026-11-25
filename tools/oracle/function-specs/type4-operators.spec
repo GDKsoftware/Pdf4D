@@ -1,0 +1,741 @@
+case: abs
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { abs }
+in: -3.5
+in: 2
+case: abs-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -3 abs }
+in: 0
+case: add
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 2 add }
+in: 1.5
+case: add-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 3 4 add }
+in: 0
+case: add-ovf
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 2147483647 1 add }
+in: 0
+case: atan
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 1 atan }
+in: 0
+case: atan-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -1 1 atan }
+in: 0
+case: atan-00
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 0 0 atan }
+in: 0
+case: atan-y0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 0 atan }
+in: 0
+case: ceiling
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { ceiling }
+in: 1.2
+in: -1.2
+case: ceiling-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 5 ceiling }
+in: 0
+case: cos
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { cos }
+in: 60
+in: 90
+in: 0
+case: cvi
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { cvi }
+in: 3.7
+in: -3.7
+case: cvr
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 3 cvr }
+in: 0
+case: div
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 4 div }
+in: 1
+case: div-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 0 div }
+in: 0
+case: div-00
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 0 0 div }
+in: 0
+case: div-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 2 div }
+in: 0
+case: exp
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 3 exp }
+in: 2
+case: exp-frac
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 exp }
+in: 4
+case: exp-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -8 0.333 exp }
+in: 0
+case: floor
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { floor }
+in: 1.7
+in: -1.2
+case: idiv
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 2 idiv }
+in: 0
+case: idiv-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -7 2 idiv }
+in: 0
+case: idiv-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 0 idiv }
+in: 0
+case: idiv-float
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7.9 2.1 idiv }
+in: 0
+case: ln
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { ln }
+in: 2.718281828
+in: 0
+in: -1
+case: log
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { log }
+in: 100
+in: 0
+in: -1
+case: mod
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 3 mod }
+in: 0
+case: mod-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -7 3 mod }
+in: 0
+case: mod-negdiv
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 -3 mod }
+in: 0
+case: mod-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7 0 mod }
+in: 0
+case: mod-float
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 7.5 2 mod }
+in: 0
+case: mul
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 3 mul }
+in: 2
+case: mul-ovf
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 65536 65536 mul }
+in: 0
+case: neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { neg }
+in: 2
+case: neg-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 5 neg }
+in: 0
+case: neg-min
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 2147483647 neg 1 sub neg }
+in: 0
+case: round
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { round }
+in: 2.5
+in: -2.5
+in: 3.5
+in: -0.4
+in: 0.49999997
+case: round-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 5 round }
+in: 0
+case: sin
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { sin }
+in: 30
+in: 90
+case: sqrt
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { sqrt }
+in: 4
+in: -4
+in: 0
+case: sub
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 1 sub }
+in: 3
+case: sub-ovf
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -2147483647 2 sub }
+in: 0
+case: truncate
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { truncate }
+in: 2.7
+in: -2.7
+case: and-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 12 10 and }
+in: 0
+case: and-bool
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true false and { 1 } { 0 } ifelse }
+in: 0
+case: and-mixed
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true 3 and }
+in: 0
+case: bitshift-left
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 3 bitshift }
+in: 0
+case: bitshift-right
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 16 -2 bitshift }
+in: 0
+case: bitshift-negative
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop -16 -2 bitshift }
+in: 0
+case: bitshift-wide
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 33 bitshift }
+in: 0
+case: bitshift-ovf
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 31 bitshift }
+in: 0
+case: eq
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 1 eq { 1 } { 0 } ifelse }
+in: 1
+in: 2
+case: eq-bool
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true true eq { 1 } { 0 } ifelse }
+in: 0
+case: eq-mixed
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 1.0 eq { 1 } { 0 } ifelse }
+in: 0
+case: eq-boolnum
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true 1 eq { 1 } { 0 } ifelse }
+in: 0
+case: false
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop false { 1 } { 0 } ifelse }
+in: 0
+case: true
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true { 1 } { 0 } ifelse }
+in: 0
+case: ge
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 ge { 1 } { 0 } ifelse }
+in: 0.4
+in: 0.5
+in: 0.6
+case: gt
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 gt { 1 } { 0 } ifelse }
+in: 0.4
+in: 0.5
+in: 0.6
+case: le
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 le { 1 } { 0 } ifelse }
+in: 0.4
+in: 0.5
+in: 0.6
+case: lt
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 lt { 1 } { 0 } ifelse }
+in: 0.4
+in: 0.5
+in: 0.6
+case: ne
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 ne { 1 } { 0 } ifelse }
+in: 0.4
+in: 0.5
+in: 0.6
+case: not-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 5 not }
+in: 0
+case: not-bool
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true not { 1 } { 0 } ifelse }
+in: 0
+case: or-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 12 10 or }
+in: 0
+case: or-bool
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true false or { 1 } { 0 } ifelse }
+in: 0
+case: xor-int
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 12 10 xor }
+in: 0
+case: xor-bool
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop true true xor { 1 } { 0 } ifelse }
+in: 0
+case: if
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { dup 0.5 gt { pop 9 } if }
+in: 0.7
+in: 0.2
+case: ifelse
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { 0.5 gt { 1 } { 0 } ifelse }
+in: 0.7
+in: 0.2
+case: if-nested
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { dup 0.5 gt { dup 0.8 gt { pop 2 } { pop 1 } ifelse } { pop 0 } ifelse }
+in: 0.9
+in: 0.6
+in: 0.1
+case: copy
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 2 copy }
+in: 0
+case: copy-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 0 copy }
+in: 0
+case: copy-toomany
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 copy }
+in: 0
+case: copy-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 -1 copy }
+in: 0
+case: dup
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000
+code: { dup }
+in: 0.3
+case: exch
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 exch }
+in: 0
+case: index
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 10 20 30 2 index }
+in: 0
+case: index-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 10 20 0 index }
+in: 0
+case: index-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 10 20 -1 index }
+in: 0
+case: index-far
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 10 20 5 index }
+in: 0
+case: pop
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 2 pop }
+in: 0
+case: roll
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 3 1 roll }
+in: 0
+case: roll-neg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 3 -1 roll }
+in: 0
+case: roll-partial
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 4 3 1 roll }
+in: 0
+case: roll-0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 3 0 roll }
+in: 0
+case: roll-big
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 3 7 roll }
+in: 0
+case: roll-n0
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 0 1 roll }
+in: 0
+case: roll-nneg
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 -1 1 roll }
+in: 0
+case: roll-nbig
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000 -100000000000 100000000000 -100000000000 100000000000
+code: { pop 1 2 3 5 1 roll }
+in: 0
+case: ifnoproc
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 if }
+in: 0
+case: exch-under
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop 1 exch }
+in: 0
+case: dup-empty
+type: 4
+domain: -1000 1000
+range: -100000000000 100000000000
+code: { pop dup }
+in: 0
+case: truncate-saturates-at-integer-range
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 10000000000.5 truncate }
+in: 0
+case: cvi-saturates-at-integer-range
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 10000000000.5 cvi }
+in: 0
+case: round-large
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 10000000000.5 round }
+in: 0
+case: round-nan
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { round }
+in: NaN
+case: cvi-nan
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { cvi }
+in: NaN
+case: floor-large
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 10000000000.5 floor }
+in: 0
+case: not-zero
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 0 not }
+in: 0
+case: not-negative
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop -3 not }
+in: 0
+case: abs-of-smallest-integer
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 2147483647 neg 1 sub abs }
+in: 0
+case: and-of-negative
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop -1 255 and }
+in: 0
+case: eq-of-nan
+type: 4
+domain: 0 1
+range: 0 1
+code: { dup eq { 1 } { 0 } ifelse }
+in: NaN
+case: sin-of-large-angle
+type: 4
+domain: 0 1000
+range: -1 1
+code: { sin }
+in: 720.5
+case: exp-with-integers
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 2 10 exp }
+in: 0
+case: exp-zero-zero
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 0 0 exp }
+in: 0
+case: idiv-of-smallest-integer
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 2147483647 neg 1 sub -1 idiv }
+in: 0
+case: mod-of-smallest-integer
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 2147483647 neg 1 sub -1 mod }
+in: 0
+case: atan-of-negative-zero
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop -0.0 -1 atan }
+in: 0
+case: true-eq-false
+type: 4
+domain: 0 1
+range: 0 1
+code: { pop true false eq { 1 } { 0 } ifelse }
+in: 0
+case: ne-of-booleans
+type: 4
+domain: 0 1
+range: 0 1
+code: { pop true false ne { 1 } { 0 } ifelse }
+in: 0
+case: copy-many
+type: 4
+domain: 0 1
+range: -100000000000 100000000000
+code: { pop 1 2 3 4 5 5 copy add add add add add add add add add }
+in: 0
+case: if-with-a-number-fails
+type: 4
+domain: 0 1
+range: 0 1
+code: { pop 1 { 1 } if }
+in: 0
+case: operator-on-a-boolean-fails
+type: 4
+domain: 0 1
+range: 0 1
+code: { pop true 1 add }
+in: 0
+case: boolean-output-fails
+type: 4
+domain: 0 1
+range: 0 1
+code: { 0.5 gt }
+in: 0.5

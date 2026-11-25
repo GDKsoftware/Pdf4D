@@ -1,0 +1,11 @@
+p1-0	JpegGray	61x45 bpc=8 cs=DeviceGray	[COSName{DCTDecode}]	ok type=1
+p1-1	JpegRgb420	61x45 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-2	JpegRgb444	61x45 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-3	JpegProgressive	61x45 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-4	JpegRestart	61x45 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-5	JpegCmyk	61x45 bpc=8 cs=DeviceCMYK	[COSName{DCTDecode}]	ok type=1
+p1-6	JpegCmykInverted	61x45 bpc=8 cs=DeviceCMYK	[COSName{DCTDecode}]	ok type=1
+p1-7	PdfboxRgb	344x287 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-8	PdfboxGray	344x287 bpc=8 cs=DeviceGray	[COSName{DCTDecode}]	ok type=1
+p1-9	PdfboxYcck	343x287 bpc=8 cs=DeviceCMYK	[COSName{DCTDecode}]	ok type=1
+p1-10	PdfboxYcckInverted	343x287 bpc=8 cs=DeviceCMYK	[COSName{DCTDecode}]	ok type=1

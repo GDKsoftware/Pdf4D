@@ -1,0 +1,85 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 3
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+page 2: media=[0 0 400 400] crop=[0 0 400 400] rotate=90 label=
+page 3: media=[50 50 450 450] crop=[60 70 400 440] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 3 /Kids [31 0 R 54 0 R 77 0 R] /Type /Pages>>
+object 3 0: <</BBox [0 0 40 40] /Length 44 /Subtype /Form /Type /XObject>> stream sha256=df01105b1329b772f1fb21db899cbb0414e37682e8a5c7c5d368f55e2ea2d39e
+object 4 0: <</BBox [0 0 40 40] /Length 25 /Subtype /Form /Type /XObject>> stream sha256=41386f3919362e239e32b19abcc78bdf50cce3062c6464834dcfaf48d98ffd4a
+object 5 0: <</BBox [0 0 40 40] /Length 23 /Subtype /Form /Type /XObject>> stream sha256=3c46ad367dd313124a1f2fde9e82689a1087fb97919cddc5f3b191208615c703
+object 6 0: <</BBox [0 0 100 50] /Length 47 /Matrix [0 1 -1 0 0 0] /Subtype /Form /Type /XObject>> stream sha256=b09d4c8f910c5f2d39f9ddc63b2cff42638abcedcc4df9494b132aa84ba46896
+object 7 0: <</BBox [0 0 60 30] /Length 54 /Subtype /Form /Type /XObject>> stream sha256=ae3dc9a77d6aff857ff90e4a9032c01bd01ab2ae5089f697927b7bfc01ac16a9
+object 8 0: <</BBox [0 0 40 40] /Length 56 /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Subtype /Form /Type /XObject>> stream sha256=c092f73a5e3c708c384a98f4987a976976c0759ebe35829ba45a1d3b4068810c
+object 9 0: <</AP <</N 3 0 R>> /F 4 /Rect [10 340 50 380] /Subtype /Stamp /Type /Annot>>
+object 10 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /On /F 4 /Rect [70 340 110 380] /Subtype /Stamp /Type /Annot>>
+object 11 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Off /F 4 /Rect [120 340 160 380] /Subtype /Stamp /Type /Annot>>
+object 12 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Missing /F 4 /Rect [170 340 210 380] /Subtype /Stamp /Type /Annot>>
+object 13 0: <</AP <</N 3 0 R>> /F 6 /Rect [220 340 260 380] /Subtype /Stamp /Type /Annot>>
+object 14 0: <</AP <</N 3 0 R>> /F 36 /Rect [270 340 310 380] /Subtype /Stamp /Type /Annot>>
+object 15 0: <</AP <</N 3 0 R>> /F 5 /Rect [320 340 360 380] /Subtype /Stamp /Type /Annot>>
+object 16 0: <</AP <</N 6 0 R>> /F 4 /Rect [10 270 110 320] /Subtype /Stamp /Type /Annot>>
+object 17 0: <</AP <</N 7 0 R>> /F 20 /Rect [130 270 190 300] /Subtype /Stamp /Type /Annot>>
+object 18 0: <</AP <</N 7 0 R>> /F 4 /Rect [210 270 270 300] /Subtype /Stamp /Type /Annot>>
+object 19 0: <</AP <</N 8 0 R>> /F 20 /Rect [290 270 330 310] /Subtype /Stamp /Type /Annot>>
+object 20 0: <</BS <</W 3>> /C [1 0 0] /F 4 /IC [1 1 0] /Rect [10 200 100 250] /Subtype /Square /Type /Annot>>
+object 21 0: <</BS <</W 2>> /C [0 0 1] /F 4 /Rect [110 200 200 250] /Subtype /Circle /Type /Annot>>
+object 22 0: <</C [0 0.6 0] /F 4 /L [210 200 300 250] /Rect [210 200 300 250] /Subtype /Line /Type /Annot>>
+object 23 0: <</C [1 1 0] /F 4 /QuadPoints [310 250 390 250 310 200 390 200] /Rect [310 200 390 250] /Subtype /Highlight /Type /Annot>>
+object 24 0: <</Border [0 0 2] /C [1 0 0] /F 4 /Rect [10 130 100 180] /Subtype /Link /Type /Annot>>
+object 25 0: <</Contents <6e6f7465> /F 4 /Rect [110 130 200 180] /Subtype /Text /Type /Annot>>
+object 26 0: <</F 4 /Rect [210 130 300 180] /Subtype /Popup /Type /Annot>>
+object 27 0: <</AP <</D 3 0 R>> /F 4 /Rect [310 130 360 180] /Subtype /Stamp /Type /Annot>>
+object 28 0: <</AP <</N 4 0 R>> /F 4 /Rect [10 60 60 110] /Rotate 0 /Subtype /Stamp /Type /Annot>>
+object 29 0: <</AP <</N 5 0 R>> /F 0 /Rect [70 60 110 100] /Subtype /Stamp /Type /Annot>>
+object 30 0: <</Length 88>> stream sha256=cb422b7b43712cc60324ebfb8f18310b4dd8083cf0f5ff0b7de18908783f3bbe
+object 31 0: <</Annots [9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R 19 0 R 20 0 R 21 0 R 22 0 R 23 0 R 24 0 R 25 0 R 26 0 R 27 0 R 28 0 R 29 0 R] /Contents 30 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Type /Page>>
+object 32 0: <</AP <</N 3 0 R>> /F 4 /Rect [10 340 50 380] /Subtype /Stamp /Type /Annot>>
+object 33 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /On /F 4 /Rect [70 340 110 380] /Subtype /Stamp /Type /Annot>>
+object 34 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Off /F 4 /Rect [120 340 160 380] /Subtype /Stamp /Type /Annot>>
+object 35 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Missing /F 4 /Rect [170 340 210 380] /Subtype /Stamp /Type /Annot>>
+object 36 0: <</AP <</N 3 0 R>> /F 6 /Rect [220 340 260 380] /Subtype /Stamp /Type /Annot>>
+object 37 0: <</AP <</N 3 0 R>> /F 36 /Rect [270 340 310 380] /Subtype /Stamp /Type /Annot>>
+object 38 0: <</AP <</N 3 0 R>> /F 5 /Rect [320 340 360 380] /Subtype /Stamp /Type /Annot>>
+object 39 0: <</AP <</N 6 0 R>> /F 4 /Rect [10 270 110 320] /Subtype /Stamp /Type /Annot>>
+object 40 0: <</AP <</N 7 0 R>> /F 20 /Rect [130 270 190 300] /Subtype /Stamp /Type /Annot>>
+object 41 0: <</AP <</N 7 0 R>> /F 4 /Rect [210 270 270 300] /Subtype /Stamp /Type /Annot>>
+object 42 0: <</AP <</N 8 0 R>> /F 20 /Rect [290 270 330 310] /Subtype /Stamp /Type /Annot>>
+object 43 0: <</BS <</W 3>> /C [1 0 0] /F 4 /IC [1 1 0] /Rect [10 200 100 250] /Subtype /Square /Type /Annot>>
+object 44 0: <</BS <</W 2>> /C [0 0 1] /F 4 /Rect [110 200 200 250] /Subtype /Circle /Type /Annot>>
+object 45 0: <</C [0 0.6 0] /F 4 /L [210 200 300 250] /Rect [210 200 300 250] /Subtype /Line /Type /Annot>>
+object 46 0: <</C [1 1 0] /F 4 /QuadPoints [310 250 390 250 310 200 390 200] /Rect [310 200 390 250] /Subtype /Highlight /Type /Annot>>
+object 47 0: <</Border [0 0 2] /C [1 0 0] /F 4 /Rect [10 130 100 180] /Subtype /Link /Type /Annot>>
+object 48 0: <</Contents <6e6f7465> /F 4 /Rect [110 130 200 180] /Subtype /Text /Type /Annot>>
+object 49 0: <</F 4 /Rect [210 130 300 180] /Subtype /Popup /Type /Annot>>
+object 50 0: <</AP <</D 3 0 R>> /F 4 /Rect [310 130 360 180] /Subtype /Stamp /Type /Annot>>
+object 51 0: <</AP <</N 4 0 R>> /F 4 /Rect [10 60 60 110] /Rotate 0 /Subtype /Stamp /Type /Annot>>
+object 52 0: <</AP <</N 5 0 R>> /F 0 /Rect [70 60 110 100] /Subtype /Stamp /Type /Annot>>
+object 53 0: <</Length 89>> stream sha256=a74e9700b3906fae6cf27798eb7faef5c9e1cd1fe2615874ab5cdef95c370f6a
+object 54 0: <</Annots [32 0 R 33 0 R 34 0 R 35 0 R 36 0 R 37 0 R 38 0 R 39 0 R 40 0 R 41 0 R 42 0 R 43 0 R 44 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R] /Contents 53 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>>>>>> /Rotate 90 /Type /Page>>
+object 55 0: <</AP <</N 3 0 R>> /F 4 /Rect [10 340 50 380] /Subtype /Stamp /Type /Annot>>
+object 56 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /On /F 4 /Rect [70 340 110 380] /Subtype /Stamp /Type /Annot>>
+object 57 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Off /F 4 /Rect [120 340 160 380] /Subtype /Stamp /Type /Annot>>
+object 58 0: <</AP <</N <</Off 5 0 R /On 4 0 R>>>> /AS /Missing /F 4 /Rect [170 340 210 380] /Subtype /Stamp /Type /Annot>>
+object 59 0: <</AP <</N 3 0 R>> /F 6 /Rect [220 340 260 380] /Subtype /Stamp /Type /Annot>>
+object 60 0: <</AP <</N 3 0 R>> /F 36 /Rect [270 340 310 380] /Subtype /Stamp /Type /Annot>>
+object 61 0: <</AP <</N 3 0 R>> /F 5 /Rect [320 340 360 380] /Subtype /Stamp /Type /Annot>>
+object 62 0: <</AP <</N 6 0 R>> /F 4 /Rect [10 270 110 320] /Subtype /Stamp /Type /Annot>>
+object 63 0: <</AP <</N 7 0 R>> /F 20 /Rect [130 270 190 300] /Subtype /Stamp /Type /Annot>>
+object 64 0: <</AP <</N 7 0 R>> /F 4 /Rect [210 270 270 300] /Subtype /Stamp /Type /Annot>>
+object 65 0: <</AP <</N 8 0 R>> /F 20 /Rect [290 270 330 310] /Subtype /Stamp /Type /Annot>>
+object 66 0: <</BS <</W 3>> /C [1 0 0] /F 4 /IC [1 1 0] /Rect [10 200 100 250] /Subtype /Square /Type /Annot>>
+object 67 0: <</BS <</W 2>> /C [0 0 1] /F 4 /Rect [110 200 200 250] /Subtype /Circle /Type /Annot>>
+object 68 0: <</C [0 0.6 0] /F 4 /L [210 200 300 250] /Rect [210 200 300 250] /Subtype /Line /Type /Annot>>
+object 69 0: <</C [1 1 0] /F 4 /QuadPoints [310 250 390 250 310 200 390 200] /Rect [310 200 390 250] /Subtype /Highlight /Type /Annot>>
+object 70 0: <</Border [0 0 2] /C [1 0 0] /F 4 /Rect [10 130 100 180] /Subtype /Link /Type /Annot>>
+object 71 0: <</Contents <6e6f7465> /F 4 /Rect [110 130 200 180] /Subtype /Text /Type /Annot>>
+object 72 0: <</F 4 /Rect [210 130 300 180] /Subtype /Popup /Type /Annot>>
+object 73 0: <</AP <</D 3 0 R>> /F 4 /Rect [310 130 360 180] /Subtype /Stamp /Type /Annot>>
+object 74 0: <</AP <</N 4 0 R>> /F 4 /Rect [10 60 60 110] /Rotate 0 /Subtype /Stamp /Type /Annot>>
+object 75 0: <</AP <</N 5 0 R>> /F 0 /Rect [70 60 110 100] /Subtype /Stamp /Type /Annot>>
+object 76 0: <</Length 23>> stream sha256=a8a5c113f4cf14f67b752e59572125991770d90c8d0b22ce180ce0a5ac19f52b
+object 77 0: <</Annots [55 0 R 56 0 R 57 0 R 58 0 R 59 0 R 60 0 R 61 0 R 62 0 R 63 0 R 64 0 R 65 0 R 66 0 R 67 0 R 68 0 R 69 0 R 70 0 R 71 0 R 72 0 R 73 0 R 74 0 R 75 0 R] /Contents 76 0 R /CropBox [60 70 400 440] /MediaBox [50 50 450 450] /Parent 2 0 R /Resources <<>> /Type /Page>>

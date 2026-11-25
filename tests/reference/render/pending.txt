@@ -1,0 +1,2 @@
+# <corpus file> # <subject>
+# Files whose render differs from PDFBox because a feature is not built yet. A file whose pages are all equal must leave this list.

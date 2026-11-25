@@ -151,6 +151,29 @@ The oracle (every mode) installs a font provider without fonts in `FontMappers.i
    The first line skips only `text: default page 1`, and only on Win64. The second skips only `text: sorted page 10`, on all platforms.
 6. This leniency applies only to `.text.txt`. The structure dump is compared exactly.
 
+## Position goldens
+
+`tests/golden/<name>.positions.txt` holds the positions of the text lines that the PDFBox 3.0.8 `PDFTextStripper` finds, written by `Pdf4DOracle positions <pdf> [password]` (`generate-golden.ps1 -Mode Positions`). `<name>` and the password rule are the same as for the dump. UTF-8 without BOM, LF. One file per corpus file, one line per line of the stripper (not per word, which would make the files seven times larger).
+
+```
+page <n>
+line: <x> <y> <endX> <endY> <glyphs>
+```
+
+The stripper is a subclass with `setSortByPosition(true)`, `setStartPage(1)` and `setEndPage(min(pages, 50))`; all other settings are the PDFBox defaults. `startPage` writes the `page <n>` line, so a page that the stripper skips (a page without content) has no line. `writeString(String, List<TextPosition>)` collects the positions of a line; `writeLineSeparator` and `endPage` end the line. A line without positions is not written.
+
+- `x`, `y`: translate of the text matrix of the first glyph of the line (`TextPosition.getTextMatrix().getTranslateX()` and `getTranslateY()`), relative to the lower left corner of the crop box;
+- `endX`, `endY`: `getEndX()` and `getEndY()` of the last glyph of the line;
+- `glyphs`: the number of positions in the line.
+
+Numbers are written with `%.2f` in `Locale.ROOT` (so `NaN` and `Infinity` as Java writes them). When the stripper throws, a line `error` ends the file. A file that cannot be opened gives only `load-error: <kind>`, as for the text goldens. A file without any page with text gives an empty golden, which is correct and is compared as such.
+
+Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
+
+1. The `page` and `line` lines of both sides are compared one by one: the line kinds and the `glyphs` values must be equal.
+2. The four numbers of a line may differ by 0.02.
+3. Known differences are listed in `tests/golden/<name>.positions.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`, where `<page>` is the number of a page. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error or a different set of pages is always compared. An `error` line is a line of the last page before it, so it is skipped together with that page.
+
 ## Font width files
 
 `tests/fonts/<font file>.widths.txt` (for example `LiberationSans-Regular.ttf.widths.txt`) is written by `Pdf4DOracle --font-widths <font>` (`tools/oracle/generate-font-widths.ps1`) for the test fonts in `tests/fonts/` (sources and licences in `tests/fonts/manifest.csv`). One line `<key> <width>` per glyph, sorted by key in ordinal (character code) order, so `gid10` comes before `gid2`. Widths are in font units in float format.
@@ -158,3 +181,82 @@ The oracle (every mode) installs a font provider without fonts in `FontMappers.i
 - Type 1 (`.pfb`): key is the glyph name, width is `Type1Font.getWidth(name)`.
 - CFF (also inside `.otf`): key `gid<n>` for n = 0 .. number of charstrings - 1, width is `CFFFont.getType2CharString(n).getWidth()`.
 - TrueType (`.ttf`, and `.otf` without CFF): key `gid<n>`, width is the advance width from `hmtx` (`TrueTypeFont.getAdvanceWidth(n)`).
+
+## Glyph path files
+
+`tests/fonts/<font file>.paths.txt` is written by `Pdf4DOracle --glyph-paths <font>` (`tools/oracle/generate-font-widths.ps1 -Paths`) for the Type 1, CFF and TrueType test fonts (`.pfb`, `.otf` and `.ttf`). One line `<key> <commands>` per glyph, the first 300 glyphs of the font, sorted by key in ordinal order. The commands come from the path iterator of the `getPath()` of FontBox, in glyph space and separated by single spaces: `M x y`, `L x y`, `Q x1 y1 x y`, `C x1 y1 x2 y2 x y` and `Z`, with the numbers in float format. A glyph with an empty path has the key only. A glyph whose charstring PDFBox cannot turn into a path is left out.
+
+- Type 1 (`.pfb`): key is the glyph name, the first 300 names in ordinal order, path is `Type1Font.getPath(name)`.
+- CFF (inside `.otf`): key `gid<n>` for n = 0 .. 299 for a name-keyed font (`CFFType1Font.getType2CharString(n).getPath()`), and `cid<n>` for a CID-keyed font, where n is the CID of the first 300 GIDs (`CFFCIDFont.getType2CharString(n).getPath()`).
+- TrueType (`.ttf`): key `gid<n>` for n = 0 .. 299, path is `TrueTypeFont.getGlyph().getGlyph(n).getPath()` in font units (a glyph without contours has the key only).
+
+### Paths of PDF fonts
+
+`tests/fonts/glyph-paths/<file>.pdf.paths.txt` is written by `Pdf4DOracle --pdf-glyph-paths <file>.pdf F1 <first>-<last>` (`tools/oracle/generate-font-widths.ps1 -PdfPaths`) for the small PDF files next to it, which `tools/oracle/make-glyph-path-pdfs.py` writes from the test fonts (one page, the font under test is `/F1`). One line per character code from `<first>` to `<last>` (0-255 for a simple font, 0-299 for the files that start with `cid-`): `<code> <hasGlyph> <commands>`. `hasGlyph` is `1` or `0` from `PDVectorFont.hasGlyph(code)`. The commands are those of `PDVectorFont.getNormalizedPath(code)`, in the format of the glyph path files above; a code with an empty path has no commands, and `!` stands for a code that PDFBox fails on. The path is in the glyph space of the font program that PDFBox gives, which is not always 1000 units per em: only the TrueType and CIDFontType2 fonts are scaled to 1000 (the font matrix of the font scales the others, for instance a standard 14 font that is replaced by LiberationSans stays in its 2048 units).
+
+## Function reference files
+
+`tests/reference/functions/<name>.txt` is written by `Pdf4DOracle --function <spec>` (`tools/oracle/generate-functions.ps1`) from the spec files `tools/oracle/function-specs/<name>.spec`. A spec file holds blocks that start with a `case: <name>` line, followed by `key: value` lines that describe one function and one `in: <numbers>` line for every evaluation. The oracle builds the function with PDFBox (`PDFunction.create`) and repeats every line of the spec; it adds ` out: <numbers>` behind each `in:` line, the result of `PDFunction.eval` in float format (`NaN` and `Infinity` as Java writes them). Lines that start with `#` are comments.
+
+- Keys: `type` (0, 2, 3 or 4), `domain`, `range`, `size`, `encode`, `decode`, `c0`, `c1`, `bounds` (numbers separated by blanks), `n`, `bps` (BitsPerSample), `samples` (hex digits of the data of a type 0 function; a half byte at the end is dropped), `code` (the program of a type 4 function, where `\n` stands for a line break) and `sub2` (type 3: `c0 | c1 | n` of one type 2 function with Domain `[0 1]`, once for every function).
+- `out: !` is an evaluation that PDFBox fails on (an exception). Pdf4D must not raise there, and its result is not compared.
+- `create: !` (before the first `in:` line of a case) is a function that PDFBox cannot make; Pdf4D raises `EPdfParseException` for it.
+- `TestFunctionsMatchPdfBox` compares every other value with a tolerance of 1e-4 (and 1e-6 relative for values above 100).
+
+## Colour reference files
+
+`tests/reference/color/<name>.txt` is written by `Pdf4DOracle --color-batch <spec>` (`tools/oracle/generate-colors.ps1`), one file for `DeviceCMYK` (the profile that `PDDeviceCMYK` loads) and one for each ICC profile in `tests/icc` (`sRGB`, `gray-small`, `gray-gamma`, `cmyk-printer`; the grey and CMYK profiles are the ICC streams of three PDFs in the corpus, see `tests/icc/manifest.csv`). The file starts with `profile: <name>` and holds 200 `in: <numbers>` lines: a grid over the device values (11 steps for 1 component, 5 for 3, 3 for 4) followed by values of a fixed linear congruential generator. The oracle repeats every line and adds ` out: r g b` behind each `in:` line: `ICC_ColorSpace.toRGB` of the profile, in float format. `--color <profile.icc|DeviceCMYK> c1 c2 ...` does one colour, and `intent: n` in a spec (not used in the reference files) overwrites the rendering intent of the header; Java gives the same colour for every intent, so the A2B0 table is the one to use.
+
+- `TestCmykMatchesJava`, `TestSrgbMatchesJava` and `TestCorpusProfilesMatchJava` compare every value with a tolerance of 0.25/255 per channel; the largest difference measured is 0.05/255.
+
+## Image reference files
+
+`tests/reference/images/<file with / replaced by __>/p<page>-<index>.png` is written by `Pdf4DOracle images <pdf> <outdir> [password]` (`tools/oracle/generate-images.ps1`) for the files listed in `tests/reference/images/selection.txt` (one path relative to `tests/corpus` per line, `#` starts a comment). The oracle walks the pages in order (`<page>` counts from 1) and, per page, the entries of `/XObject` in the resources in the order of the dictionary; `<index>` counts from 0 over the image XObjects among them. Each file is `PDImageXObject.getImage()` written by `ImageIO` as it is: an RGB, ARGB or 8-bit gray PNG (a one-bit gray image is written as gray), without any scaling. Images of more than 360000 pixels and images that PDFBox cannot decode (for instance JPEG 2000 without a plugin) have no file. At most 24 images per page. `images.txt` in the same folder lists every image of the file as `<page>-<index>`, the resource name, `<width>x<height>`, `bpc`, the colour space, the filters and `ok`, `skipped: large` or `error: <exception>`.
+
+- `tests/corpus/generated/render/images.pdf` is written by `tools/oracle/make-render-tests.py` (standard library only, deterministic): 1, 2, 4, 8 and 16 bits, `/Decode`, a colour key mask, stencil masks, an `/SMask` smaller and larger than its image, a `/Mask` stream, `/Interpolate`, DeviceCMYK, an ASCIIHexDecode image and three inline images. It has the usual dump, text and position goldens.
+- `TestImagesMatchPdfBox` (`Pdf4D.Graphics.Image.SampledReader.Tests`) compares `TPDImage.TryGetImage` with each file, both flattened on white, with at most 1 per channel. Images with a CCITT, JPEG 2000 or JBIG2 filter, and with a JPEG filter (see `TestCorpusJpegImagesMatch`), and the colour spaces that are not ported yet are left out until their tasks are done.
+- `tests/corpus/generated/render/jpeg.pdf` is written by `tools/oracle/make-jpeg-tests.py` (Pillow, only to run the script) from the JPEG files in `tests/reference/jpeg`: the generated `gray.jpg`, `rgb420.jpg`, `rgb444.jpg`, `progressive.jpg` (the same coefficients as `rgb420.jpg`), `restart.jpg` (a restart interval, the same coefficients), `cmyk.jpg` (Adobe transform 0), and `pdfbox-jpeg.jpg`, `pdfbox-jpeg256.jpg` and `pdfbox-jpegcmyk.jpg` (the YCCK file), which are `jpeg.jpg`, `jpeg256.jpg` and `jpegcmyk.jpg` of the PDFBox test resources. The files are committed, so the PDF does not depend on the Pillow version; running the script again rewrites the PDF from them. The page lists the images as 11 XObjects, each with the usual image reference in `tests/reference/images/generated__render__jpeg.pdf` (`generate-images.ps1` and `selection.txt`) and the usual dump, text and position goldens.
+- `Pdf4D.Codec.Jpeg.Tests` compares the DCT images of `jpeg.pdf` and of the other files of the selection with those references: at most 4 per channel and 0.5 on average for the named tests (the inverted CMYK image 12 per channel), and 12 and 0.4 over the images of the corpus (`TestCorpusJpegImagesMatch`). The measured differences are 3 and 0.13 for the generated 4:2:0 images. What is left comes from the integer IDCT and the colour conversion of pdf.js against libjpeg; the chroma upsampling is the same (triangle filter of libjpeg, `TJpegUpsampling`).
+- `Pdf4D.Codec.CCITTFax.Tests` decodes the Group 3 and Group 4 images of `ccitt.pdf` and compares them byte for byte with `tests/reference/ccitt/ccitt.raw`: the picture of `ccittg3.tif` and `ccittg4.tif` as Pillow decodes it, in the samples of the DeviceGray image (1 bit per pixel, black is 0, rows padded to bytes). The other tests build their bit streams in the test; `TestCorpusCcittImages` decodes the CCITT images of the corpus files and the render comparison of `pending.txt` holds the pixels.
+
+## Render reference files
+
+`tests/reference/render/<dpi>/` holds the pages as PDFBox 3.0.8 renders them: `PDFRenderer.renderImageWithDPI(page, dpi, ImageType.RGB)` with the hermetic font mapper, white background, anti-aliasing on, written as an 8-bit RGB PNG with the strongest compression of the Java writer. `tools/oracle/generate-render.ps1 -Dpi 72|150 [-Filter <part of the path>]` runs `Pdf4DOracle render <pdf> <dpi> <outdir> [password]` for every file of the corpus (72) or for the pages in `150/selection.txt` (`<corpus file>;<page>` per line, `#` starts a comment), four files at a time, with a time-out of 120 seconds per file, and reports the total size in MB at the end. The references come from the pinned Temurin release in `tools/oracle/fetch-jdk.ps1` (the Marlin rasterizer inside the JDK draws the pixels); change the release and its checksum there, and regenerate the references, together.
+
+- `<name>.p<nnn>.png`: page `nnn` (three digits, from 1) of the file; `<name>` is the path relative to `tests/corpus` with `/` replaced by `__`, with the `.pdf`, as in `tests/golden` (`generated__render__paths.pdf.p001.png`). The 72 DPI set holds pages 1 to min(pages, 50); the 150 DPI set only the listed pages.
+- `<name>.render.txt`: one line per page, `page <n> <width> <height> ok` or `page <n> error <JavaExceptionClass>` (no PNG for such a page), or only `load-error: <kind>` (`parse`, `unsupported`, `wrong-password`, `timeout`). A file whose manifest notes contain `password=<x>` is opened with that password.
+
+### Comparison
+
+`TRenderCompare` (`tests/Support/Pdf4D.Tests.RenderCompare.pas`) compares two bitmaps; the acceptance test `TRenderGoldenTests.TestCorpus72Dpi` (`tests/Skia/Acceptance`) renders every page of the `render.txt` that says `ok` with `RenderToBitmap(FromDpi(72))` and compares it with the PNG.
+
+- The reference decides what a pixel is. A pixel is an *edge* pixel when one colour channel of the reference differs by more than `FlatRange` (8) inside the 3 x 3 pixels around it; the others are *flat*. A flat pixel differs when a channel differs by more than `FlatTolerance` (8), an edge pixel when a channel differs by more than `EdgeTolerance` (80).
+- A page is equal when the sizes are equal, at most `MaxFlatDifferentFraction` (0.02%) of its flat pixels differ and at most `MaxEdgeDifferentFraction` (3.5%) of its edge pixels differ. So a wrong colour or a missing shape fails (flat), and the coverage noise of the two rasterizers at the edges of shapes and glyphs does not. All these numbers are constants of `TRenderCompare`.
+- The constants are the smallest values that every compared page passes, taken from the distribution of the 631 pages that are compared (612 at 72 DPI, 19 at 150 DPI of the selection; the pages with a known difference are not in it). The share is that of the pixels of the kind (flat or edge) of the page that differ by more than the tolerance; the worst page of the corpus is listed:
+
+  | Flat tolerance | worst page, share of its flat pixels | | Edge tolerance | worst page, share of its edge pixels |
+  |---|---|---|---|---|
+  | 0 | softmask.pdf 18.3% | | 16 | a page of PDFBOX-3949 36.6% |
+  | 2 | softmask.pdf 0.79% | | 32 | PDFBOX-3053-reduced.pdf 15.7% |
+  | 4 | softmask.pdf 0.14% | | 64 | PDFBOX-3053-reduced.pdf 5.7% |
+  | 5 | softmask.pdf 0.062% | | 70 | PDFBOX-3053-reduced.pdf 4.7% |
+  | 6 | softmask.pdf 0.0145% | | 80 | PDFBOX-3053-reduced.pdf 3.2% |
+  | 8 | survey.pdf at 150 DPI 0.0099% | | 96 | generated/render/clip.pdf 2.5% (72 DPI) |
+  | 16 | survey.pdf at 150 DPI 0.0099% | | 224 | generated/render/clip.pdf 1.8% (72 DPI) |
+
+  At the edge tolerance 80 the pages after the worst are `generated/render/clip.pdf` (2.6% at 72 DPI, 1.96% at 150 DPI) and `shadings.pdf` at 150 DPI (2.4%). Over all compared pages with the constants: flat share median 0, 90th percentile 0, 99th percentile 0.0005%, largest 0.0099%; edge share median 0, 90th percentile 0.05%, 99th percentile 1.35%, largest 3.23%. The causes of what remains: JPEG IDCT and ICC conversion (PDFBox uses LittleCMS, Pdf4D its own code) give up to 6 levels in flat areas; anti-aliasing of glyphs and shapes gives the edge differences. The flat tolerance is 8: the worst page falls from 0.14% at 4 and 0.062% at 5 to 0.0145% at 6 and 0.0099% at 8, and stays there to 32 (survey.pdf at 150 DPI, the seams of the Indexed images, which is real); 8 is the first value of that plateau and leaves a margin for the rounding of one level on another platform. The edge tolerance is 80: the curve falls without a plateau (5.7% at 64, 3.2% at 80), 80 is the value from which the worst page is a page with glyph edges only. The edge limit is 8% above the worst page. An earlier set of constants (5.5%) was only needed for PDFBOX-6207.pdf, whose QR code of 1296 small squares is filled without anti-aliasing and differed by a pixel at the edge of every square; that was a defect (the fill edge rule, see `docs/porting.md`) and is fixed.
+- The test fails, also for a pending file, when the `render.txt` or a PNG of a listed page is missing or cannot be read, when the `render.txt` is empty, or when its number of `page` lines is not min(pages, 50). A file without pages gets the line `pages: 0`. An exception of the render is a difference of a file that is not pending; in a pending file only `EPdfUnsupportedFeatureException` is.
+- `tests/reference/render/no-reference.txt` (`<corpus file> # <listing>`) names the files that have no `ok` page (`load-error`, `pages: 0`); `TestFilesWithoutReferenceAreListed` fails when the files in the generated listings differ from it, so a timeout or a truncated listing cannot make a file pass unseen. `generate-render.ps1` exits with an error when a file timed out.
+- `TestRegionEqualsCropOfFullPage`: a region is the crop of the full page, with a tolerance of 8 and 0.06% of the pixels, leaving out 4 pixels along the border (Skia covers a path that the border cuts differently); `generated/render/images.pdf` gets 1.35% (1.23% measured) because of texels that lie exactly on a pixel centre in the nearest neighbour sampling. The reasons are in the test unit.
+- A page that PDFBox cannot render (`error` in `render.txt`) and a file with a `load-error` are not compared; Pdf4D must not raise on them, which the robustness tests cover.
+- When `PDF4D_RENDER_FILTER` holds substrings of corpus paths separated by semicolons, `TestCorpus72Dpi` only runs the files that match (for looking at one difference without the whole corpus).
+- When `PDF4D_RENDER_OUTPUT` names a folder, `summary.txt` gets a line per compared page, `distribution.txt` the histogram of the differences of its flat and its edge pixels (what the constants above were taken from), `region.txt` the pixels of each region that differ for a range of tolerances and `performance.txt` the medians of the performance test. A page that differs is written there as `<name>.p<nnn>.png` (the Pdf4D render) and `<name>.p<nnn>.diff.png` (red where a pixel differs, the reference dimmed elsewhere).
+- Known differences: `tests/reference/render/<name>.render-known-differences.txt`, one line `page <n> [<platform>] # <reason>` per page (`<platform>` is `Win32`, `Win64` or `Linux64`; without it the page is skipped everywhere). Empty lines and lines that start with `#` are ignored. The differences of a 150 DPI page are in `<name>.render-150dpi-known-differences.txt` in the same folder (same format), so that a page that differs only at 150 DPI keeps its 72 DPI comparison.
+- The 150 DPI set is `tests/reference/render/150/selection.txt` (`<corpus file>;<page>`): about twenty pages with fine details (thin lines, small text, patterns, shadings, CCITT, tiger) and the first page of every invoice of `tests/corpus/generated/invoices`. `TestSelection150Dpi` renders the selected pages at 150 DPI and compares them with the same rules; a missing listing or reference, or an image without a selection line, fails.
+- Performance: `TRenderPerformanceTests` (`tests/Skia/Acceptance`, Release on Win64 only; skipped elsewhere) renders the first page of every invoice of `tests/corpus/generated/invoices` at 96 DPI (scale 4/3) with Skia five times and requires a median of at most 100 ms. Measured medians: edge-print 10 ms, word-print 13 ms, word-export 13 ms, skia-draw 33 ms.
+- Known differences left: the annotations without `/AP` (`constructAppearances` is not ported; `generated/render/annotations.pdf` pages 1 to 3 and `pdfbox/input/compression/attachment.pdf` page 1), `pdfbox/input/rendering/survey.pdf` page 1 (0.05% flat pixels: seams of the Indexed images at fractional positions), and the 150 DPI pages `generated/render/transparency.pdf`, `softmask.pdf` and `patterns.pdf` (PDFBox draws a transparency group in a y-up space with the scale only and flips it onto the page with a whole-pixel offset; the pixel grid of the group is then shifted against the page by the fraction of the page height in pixels, which is whole at 72 DPI and not at 150 DPI for 400 pt). `pending.txt` is empty.
+- Pending: `tests/reference/render/pending.txt`, one line `<corpus file> # <subject>` per file that uses a feature that is not built yet. The pages of a pending file are rendered and reported but a difference is not a failure. When every page of a pending file is equal the test fails with "remove from pending.txt", so the list only shrinks. It must be empty when the renderer is done.
+
+### Synthetic test files
+
+`tests/corpus/generated/render/` also holds the files that `tools/oracle/generate-render-tests.ps1` writes: `make-render-pdfs.py` (standard library only, deterministic) writes `paths`, `clip`, `text-modes`, `colors-device`, `colors-special`, `transparency`, `softmask`, `shadings`, `patterns`, `optional-content`, `annotations` and `rotated`; `Pdf4DOracle make-render-tests ccitt` writes `ccitt.pdf` with `CCITTFactory` from `tests/reference/ccitt/ccittg3.tif` and `ccittg4.tif` (written with Pillow, committed). They have the usual dump, text and position goldens.

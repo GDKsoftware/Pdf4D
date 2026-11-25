@@ -1,0 +1,11 @@
+p1-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p1-1	Image39	670x215 bpc=8 cs=DeviceRGB	[COSName{FlateDecode}]	ok type=2
+p2-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p3-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p4-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p5-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p6-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p7-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p8-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p9-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1
+p10-0	Image17	106x10 bpc=8 cs=DeviceRGB	[COSName{DCTDecode}]	ok type=1

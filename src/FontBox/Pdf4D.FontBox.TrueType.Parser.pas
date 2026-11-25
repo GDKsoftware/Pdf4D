@@ -15,11 +15,12 @@ uses
   Pdf4D.FontBox.TrueType.DataStream,
   Pdf4D.FontBox.TrueType.Tables,
   Pdf4D.FontBox.TrueType.Font,
+  Pdf4D.FontBox.TrueType.Glyph,
   Pdf4D.FontBox.TrueType.Headers;
 
 type
   // Parses a TrueType font with glyf outlines. A broken font raises EPdfParseException. The font that comes out has read all its
-  // tables (ReadAllTables), so it can be shared. loca and glyf are only checked for presence: Pdf4D does not draw glyphs.
+  // tables (ReadAllTables), so it can be shared. The glyf table keeps its glyph data and reads a glyph when its path is asked for.
   // The OpenType parser (TOTFParser) is a descendant that accepts CFF outlines.
   TTTFParser = class
   private
@@ -133,6 +134,14 @@ begin
   else if Tag = TVerticalMetricsTable.TableTag then
   begin
     Result := TVerticalMetricsTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TIndexToLocationTable.TableTag then
+  begin
+    Result := TIndexToLocationTable.Create(Tag, CheckSum, Offset, Length);
+  end
+  else if Tag = TGlyphTable.TableTag then
+  begin
+    Result := TGlyphTable.Create(Tag, CheckSum, Offset, Length);
   end
   else
   begin

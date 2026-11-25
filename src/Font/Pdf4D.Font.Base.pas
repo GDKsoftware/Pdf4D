@@ -15,6 +15,7 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Base,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Descriptor,
@@ -163,6 +164,21 @@ type
     function GetBoundingBox: TBoundingBox; virtual; abstract;
     function IsEmbedded: Boolean; virtual; abstract;
     function IsDamaged: Boolean; virtual; abstract;
+
+    // PDVectorFont: a font with outlines. A Type 3 font has glyph procedures instead.
+    function IsVectorFont: Boolean; virtual;
+    // PDVectorFont.getPath: the outline of the code in the glyph space of the font program, which the font matrix scales. The
+    // caller owns the path. A glyph without contours gives an empty path; False when the font has no outline for the code (or
+    // the outline is damaged, which goes to the log). The default has no outlines.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual;
+    // WARNING: only a TrueType and a CIDFontType2 program is scaled to 1000 units per em here. The path of every other font
+    // stays in the glyph space of its font program (Type 1, CFF and CIDFontType0 programs commonly use 1000 units per em,
+    // but the font matrix decides), so the caller must apply GetFontMatrix, as PageDrawer of PDFBox does.
+    // PDVectorFont.getNormalizedPath: the path of the font program, with the glyph .notdef where PDFBox draws it. An embedded
+    // font whose /Widths differ from the program is not stretched. The caller owns the path.
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; virtual;
+    // PDVectorFont.hasGlyph: False for a code that the font program has no glyph for
+    function HasGlyph(const Code: Integer): Boolean; overload; virtual;
 
     property CosObject: TCosDictionary read FDictionary;
     property Context: TPDDocumentContext read FContext;
@@ -880,6 +896,27 @@ end;
 function TPDFont.GetFontMatrix: TPdfMatrix;
 begin
   Result := TPdfMatrix.Create(0.001, 0, 0, 0.001, 0, 0);
+end;
+
+function TPDFont.IsVectorFont: Boolean;
+begin
+  Result := True;
+end;
+
+function TPDFont.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Path := nil;
+  Result := False;
+end;
+
+function TPDFont.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetPath(Code, Path);
+end;
+
+function TPDFont.HasGlyph(const Code: Integer): Boolean;
+begin
+  Result := False;
 end;
 
 end.

@@ -1,0 +1,63 @@
+﻿// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+package Pdf4D.Viewer;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Pdf4D viewer core: session and worker, document, page view and thumbnails controllers, search, print planning and layout'}
+{$LIBSUFFIX AUTO}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  Pdf4D,
+  Pdf4D.Render;
+
+contains
+  Pdf4D.Viewer.Types in '..\src\Viewer\Pdf4D.Viewer.Types.pas',
+  Pdf4D.Viewer.ResourceStrings in '..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas',
+  Pdf4D.Viewer.ViewTransform in '..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas',
+  Pdf4D.Viewer.ViewLayout in '..\src\Viewer\Pdf4D.Viewer.ViewLayout.pas',
+  Pdf4D.Viewer.Tiles in '..\src\Viewer\Pdf4D.Viewer.Tiles.pas',
+  Pdf4D.Viewer.Cache in '..\src\Viewer\Pdf4D.Viewer.Cache.pas',
+  Pdf4D.Viewer.PageText in '..\src\Viewer\Pdf4D.Viewer.PageText.pas',
+  Pdf4D.Viewer.TextMatcher in '..\src\Viewer\Pdf4D.Viewer.TextMatcher.pas',
+  Pdf4D.Viewer.Dispatcher in '..\src\Viewer\Pdf4D.Viewer.Dispatcher.pas',
+  Pdf4D.Viewer.Worker in '..\src\Viewer\Pdf4D.Viewer.Worker.pas',
+  Pdf4D.Viewer.Session in '..\src\Viewer\Pdf4D.Viewer.Session.pas',
+  Pdf4D.Viewer.Backend in '..\src\Viewer\Pdf4D.Viewer.Backend.pas',
+  Pdf4D.Viewer.Overlay in '..\src\Viewer\Pdf4D.Viewer.Overlay.pas',
+  Pdf4D.Viewer.Document in '..\src\Viewer\Pdf4D.Viewer.Document.pas',
+  Pdf4D.Viewer.Painter.Interfaces in '..\src\Viewer\Pdf4D.Viewer.Painter.Interfaces.pas',
+  Pdf4D.Viewer.PageViewController in '..\src\Viewer\Pdf4D.Viewer.PageViewController.pas',
+  Pdf4D.Viewer.ThumbnailsController in '..\src\Viewer\Pdf4D.Viewer.ThumbnailsController.pas',
+  Pdf4D.Viewer.Print in '..\src\Viewer\Pdf4D.Viewer.Print.pas',
+  Pdf4D.Viewer.Commands in '..\src\Viewer\Pdf4D.Viewer.Commands.pas',
+  Pdf4D.Viewer.SearchBarModel in '..\src\Viewer\Pdf4D.Viewer.SearchBarModel.pas',
+  Pdf4D.Viewer.PasswordRetry in '..\src\Viewer\Pdf4D.Viewer.PasswordRetry.pas';
+
+end.

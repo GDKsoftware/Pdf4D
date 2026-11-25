@@ -7,6 +7,8 @@ interface
 uses
   Pdf4D.Api.DocumentHandle,
   Pdf4D.Api.Page.Interfaces,
+  Pdf4D.Api.TextLayout.Interfaces,
+  Pdf4D.Api.TextOptions,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Page,
   Pdf4D.Model.Rectangle;
@@ -17,6 +19,8 @@ type
     FHandle: IPdfDocumentHandle;
     FPage: TPDPage;
     FIndex: Integer;
+
+    function OptionsOfPage: TPdfTextOptions;
 
   public
     constructor Create(const Handle: IPdfDocumentHandle; const Page: TPDPage; const Index: Integer);
@@ -30,6 +34,10 @@ type
     function ArtBox: TPdfRectangle;
     function Rotation: Integer;
     function ExtractText: string;
+    function ExtractTextWithPositions: IPdfPositionedText;
+    function TextLayout: IPdfTextLayout; overload;
+    function TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout; overload;
+    function Links: TArray<TPdfLink>;
     function CosObject: TCosDictionary;
   end;
 
@@ -38,7 +46,8 @@ implementation
 uses
   System.SysUtils,
   System.Classes,
-  Pdf4D.Api.TextOptions;
+  Pdf4D.Api.TextLayout,
+  Pdf4D.Text.Layout;
 
 { TPdfPage }
 
@@ -92,9 +101,7 @@ end;
 
 function TPdfPage.ExtractText: string;
 begin
-  var Options := TPdfTextOptions.Default;
-  Options.StartPage := FIndex + 1;
-  Options.EndPage := FIndex + 1;
+  const Options = OptionsOfPage;
 
   const Writer = TStringWriter.Create;
   try
@@ -103,6 +110,41 @@ begin
   finally
     Writer.Free;
   end;
+end;
+
+function TPdfPage.OptionsOfPage: TPdfTextOptions;
+begin
+  Result := TPdfTextOptions.Default;
+  Result.StartPage := FIndex + 1;
+  Result.EndPage := FIndex + 1;
+end;
+
+function TPdfPage.ExtractTextWithPositions: IPdfPositionedText;
+begin
+  Result := TPdfPositionedTextResult.Create(FHandle.ExtractPositioned(OptionsOfPage));
+end;
+
+function TPdfPage.TextLayout: IPdfTextLayout;
+begin
+  Result := TextLayout(TPdfTextLayoutOptions.Default);
+end;
+
+function TPdfPage.TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout;
+begin
+  var TextOptions := OptionsOfPage;
+  TextOptions.SortByPosition := True;
+
+  const Positioned = FHandle.ExtractPositioned(TextOptions);
+  try
+    Result := TPdfTextLayout.Create(TPdfTextLayoutBuilder.Build(Positioned, FIndex, Options), Positioned.Text);
+  finally
+    Positioned.Free;
+  end;
+end;
+
+function TPdfPage.Links: TArray<TPdfLink>;
+begin
+  Result := FHandle.ReadLinks(FPage, FIndex);
 end;
 
 function TPdfPage.CosObject: TCosDictionary;

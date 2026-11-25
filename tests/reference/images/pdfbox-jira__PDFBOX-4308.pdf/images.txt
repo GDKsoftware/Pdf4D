@@ -1,0 +1,3 @@
+p1-0	R20	1625x2311 bpc=8 cs=Indexed	[COSName{FlateDecode}]	skipped: large
+p1-1	R14	1259x78 bpc=8 cs=Indexed	[COSName{FlateDecode}]	ok type=1
+p1-2	R13	118x39 bpc=8 cs=Indexed	[COSName{FlateDecode}]	ok type=1

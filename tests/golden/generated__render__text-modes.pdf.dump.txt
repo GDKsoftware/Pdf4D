@@ -1,0 +1,26 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 2
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+page 2: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 2 /Kids [17 0 R 19 0 R] /Type /Pages>>
+object 3 0: <</Filter /FlateDecode /Length 211528 /Length1 410712>> stream sha256=76d04c18ea243f426b7de1f3ad208e927008f961dc5945e5aad352d0dfde8ee8
+object 4 0: <</Filter /FlateDecode /Length 39479 /Subtype /Type1C>> stream sha256=1296d9a30e3476a90633fdb342c74c3f8dfc792daee1b16500b207307c2146ec
+object 5 0: <</Filter /FlateDecode /Length 98154 /Length1 4498 /Length2 95911 /Length3 533>> stream sha256=fea5723b0be97a3868e257da066ec50cf69d7aec77c8bfd92fdacc85b175ea9c
+object 6 0: <</Ascent 900 /CapHeight 700 /Descent -200 /Flags 32 /FontBBox [-600 -300 1300 1100] /FontFile2 3 0 R /FontName /LiberationSans /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 7 0: <</Ascent 900 /CapHeight 700 /Descent -200 /Flags 32 /FontBBox [-600 -300 1300 1100] /FontFile3 4 0 R /FontName /SourceSansPro-Bold /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 8 0: <</Ascent 900 /CapHeight 700 /Descent -200 /Flags 32 /FontBBox [-600 -300 1300 1100] /FontFile 5 0 R /FontName /OpenSans-Regular /ItalicAngle 0 /StemV 80 /Type /FontDescriptor>>
+object 9 0: <</BaseFont /LiberationSans /Encoding /WinAnsiEncoding /FontDescriptor 6 0 R /Subtype /TrueType /Type /Font>>
+object 10 0: <</BaseFont /SourceSansPro-Bold /Encoding /WinAnsiEncoding /FontDescriptor 7 0 R /Subtype /Type1 /Type /Font>>
+object 11 0: <</BaseFont /OpenSans-Regular /Encoding /WinAnsiEncoding /FontDescriptor 8 0 R /Subtype /Type1 /Type /Font>>
+object 12 0: <</Length 40>> stream sha256=7633f6459cc3bbd3c4b0544fc89046e50d121d83e2a8155fd4ab78b93674045f
+object 13 0: <</Length 49>> stream sha256=f439554765b57b04c76d120e45ad7f91d2ad69013f5dfdefa7b3c9a4bb4f22ee
+object 14 0: <</Length 65>> stream sha256=bba6dea8985800ae55f4058f154e2355c2f8dd5decf1ad6fed08e5842ed40e4c
+object 15 0: <</CharProcs <</col 14 0 R /sq 12 0 R /tri 13 0 R>> /Encoding <</Differences [97 /sq /tri /col] /Type /Encoding>> /FirstChar 97 /FontBBox [0 0 1000 1000] /FontMatrix [0.001 0 0 0.001 0 0] /LastChar 99 /Subtype /Type3 /Type /Font /Widths [1000 1000 1000]>>
+object 16 0: <</Length 1782>> stream sha256=283d3ab6e6a556527f0c915b0b2609af3bd82288f133a81ee06d1f9dcec3d0f7
+object 17 0: <</Contents 16 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>> /F2 9 0 R /F3 10 0 R /F4 11 0 R /F5 15 0 R>>>> /Type /Page>>
+object 18 0: <</Length 3655>> stream sha256=d11a1c8d44db60548a5d0d04eeb34f9890c9a06232e11baf202a70e56acf26f8
+object 19 0: <</Contents 18 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</Font <</F1 <</BaseFont /Helvetica /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font>> /F2 9 0 R /F3 10 0 R /F4 11 0 R /F5 15 0 R>>>> /Type /Page>>

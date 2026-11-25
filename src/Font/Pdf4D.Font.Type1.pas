@@ -12,6 +12,7 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.Encoding,
   Pdf4D.Font.Simple,
@@ -51,6 +52,8 @@ type
     function TryGetSymbolName(const GlyphName: string; out SymbolName: string): Boolean;
     function ReadFontMatrix: TPdfMatrix;
     function GenerateBoundingBox: TBoundingBox;
+    function EncodingName(const Code: Integer): string;
+    function TryGetPathOfName(const GlyphName: string; out Path: TPdfPath): Boolean;
 
   protected
     function ReadEncodingFromFont: TPdfEncoding; override;
@@ -73,8 +76,14 @@ type
     function GetFontBoxFont: TFontBoxFont; override;
     // The embedded font program, or nil
     function GetType1Font: TType1Font;
+    // PDType1Font.getPath(int): the glyph name of the encoding, found in the font program under the name that GetNameInFont
+    // gives. A substitute font draws no .notdef, as Acrobat does not.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    // PDType1Font.hasGlyph(int): the encoding names the code
+    function HasGlyph(const Code: Integer): Boolean; overload; override;
     // PDType1Font.hasGlyph(String)
-    function HasGlyph(const GlyphName: string): Boolean;
+    function HasGlyph(const GlyphName: string): Boolean; overload;
   end;
 
 implementation
@@ -91,6 +100,9 @@ uses
   Pdf4D.FontBox.Cff.Font,
   Pdf4D.FontBox.Encoding,
   Pdf4D.Model.Rectangle;
+
+const
+  NotDefName = '.notdef';
 
 type
   // The shared table of alternative names for glyphs that are commonly encountered
@@ -378,7 +390,7 @@ end;
 
 function TPDType1Font.TryGetAlternativeName(const GlyphName: string; out AlternativeName: string): Boolean;
 begin
-  Result := (TAlternativeNames.TryGet(GlyphName, AlternativeName) and (GlyphName <> '.notdef') and
+  Result := (TAlternativeNames.TryGet(GlyphName, AlternativeName) and (GlyphName <> NotDefName) and
              FGenericFont.HasGlyph(AlternativeName));
 end;
 
@@ -435,14 +447,14 @@ begin
   begin
     Exit(FoundName);
   end;
-  Result := '.notdef';
+  Result := NotDefName;
 end;
 
 function TPDType1Font.GetWidthFromFont(const Code: Integer): Single;
 begin
   const GlyphName = CodeToName(Code);
   // The width of .notdef is ignored for substitutes, see PDFBOX-1900
-  if (not IsEmbedded) and (GlyphName = '.notdef') then
+  if (not IsEmbedded) and (GlyphName = NotDefName) then
   begin
     Exit(250);
   end;
@@ -534,6 +546,51 @@ begin
   Result := FGenericFont.HasGlyph(GetNameInFont(GlyphName));
 end;
 
+function TPDType1Font.HasGlyph(const Code: Integer): Boolean;
+begin
+  Result := (EncodingName(Code) <> NotDefName);
+end;
+
+function TPDType1Font.EncodingName(const Code: Integer): string;
+begin
+  var Encoding: TPdfEncoding;
+  if TryGetEncoding(Encoding) then
+  begin
+    Result := Encoding.GetName(Code);
+  end
+  else
+  begin
+    Result := NotDefName;
+  end;
+end;
+
+function TPDType1Font.TryGetPathOfName(const GlyphName: string; out Path: TPdfPath): Boolean;
+begin
+  if (GlyphName = NotDefName) and (not IsEmbedded) then
+  begin
+    Path := TPdfPath.Create;
+    Exit(True);
+  end;
+
+  // A substitute is shared between documents: its glyphs log to the log of this document, not to one of its own
+  Result := FGenericFont.TryGetPathWithLog(GetNameInFont(GlyphName), Path, DocumentLog);
+end;
+
+function TPDType1Font.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetPathOfName(EncodingName(Code), Path);
+end;
+
+function TPDType1Font.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  if TryGetPathOfName(EncodingName(Code), Path) then
+  begin
+    Exit(True);
+  end;
+
+  Result := TryGetPathOfName(NotDefName, Path);
+end;
+
 function TPDType1Font.TryEncode(const CodePoint: Integer; out Bytes: TBytes): Boolean;
 begin
   Bytes := nil;
@@ -552,7 +609,7 @@ begin
   if IsStandard14 then
   begin
     // The generic font is not needed, which is important on systems with no installed fonts
-    if GlyphName = '.notdef' then
+    if GlyphName = NotDefName then
     begin
       Exit(False);
     end;
@@ -560,7 +617,7 @@ begin
   else
   begin
     const NameInFont = GetNameInFont(GlyphName);
-    if (NameInFont = '.notdef') or (not FGenericFont.HasGlyph(NameInFont)) then
+    if (NameInFont = NotDefName) or (not FGenericFont.HasGlyph(NameInFont)) then
     begin
       Exit(False);
     end;

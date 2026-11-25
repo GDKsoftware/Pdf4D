@@ -11,6 +11,7 @@ interface
 uses
   System.SysUtils,
   Pdf4D.Common.Matrix,
+  Pdf4D.Common.Path,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Font.CIDFont,
   Pdf4D.FontBox.BoundingBox,
@@ -20,8 +21,8 @@ uses
 type
   // A CID-keyed font with CFF outlines. The embedded font program belongs to this font. A substitute from the font mapper is
   // shared and stays with the mapper, so it is never changed and never gets the log of a document. The embedded program is a
-  // CID-keyed CFF font, or a Type 1-equivalent CFF font in a CID container (the CID is then the glyph). Glyph paths and the
-  // CIDToGIDMap, which PDFBox only uses for paths, are left out.
+  // CID-keyed CFF font, or a Type 1-equivalent CFF font in a CID container (the CID is then the glyph). The CIDToGIDMap of an
+  // embedded font is only used for the glyph paths, as in PDFBox.
   TPDCIDFontType0 = class(TPDCIDFont)
   private
     const PfbStart = Ord('%');
@@ -39,6 +40,8 @@ type
     FHasBoundingBox: Boolean;
     FBoundingBox: TBoundingBox;
     FIsScaleWarningGiven: Boolean;
+    FCIDToGID: TBytes;
+    FHasCIDToGIDMap: Boolean;
 
     procedure LoadFontProgram;
     function TryLoadEmbeddedFont: Boolean;
@@ -55,6 +58,7 @@ type
     function ReadGlyphWidth(const Code: Integer): Single;
     function ScaleToTextSpace(const Width: Single): Single;
     class function ClampToGlyph(const CID: Integer): Integer; static;
+    function CodeToCIDOfPath(const Code: Integer): Integer;
 
   public
     // Does not own Dictionary or Parent
@@ -75,6 +79,12 @@ type
     function IsDamaged: Boolean; override;
     // PDFBox throws UnsupportedOperationException
     function TryEncode(const CodePoint: Integer; out Bytes: TBytes): Boolean; override;
+
+    // PDCIDFontType0.getPath: the charstring of the CID (through the CIDToGIDMap of an embedded font), or for a TrueType substitute
+    // the glyph that the ToUnicode CMap names. The normalized path is the same.
+    function TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean; override;
+    function HasGlyph(const Code: Integer): Boolean; override;
 
     // The CID-keyed CFF font, embedded or from the mapper; nil when there is none
     function GetCIDKeyedFont: TCFFCIDFont;
@@ -131,6 +141,7 @@ begin
   begin
     FIsEmbedded := True;
     FOwnsFontProgram := True;
+    FHasCIDToGIDMap := TryReadCIDToGIDMap(FCIDToGID);
     Exit;
   end;
   FindFontOrSubstitute;
@@ -495,6 +506,52 @@ begin
   begin
     Result := FType1Font;
   end;
+end;
+
+function TPDCIDFontType0.CodeToCIDOfPath(const Code: Integer): Integer;
+begin
+  Result := CodeToCID(Code);
+  if FHasCIDToGIDMap and FIsEmbedded then
+  begin
+    // PDFBOX-4093: despite being a type 0 font, there is a CIDToGIDMap
+    Result := MapCIDToGID(FCIDToGID, Result);
+  end;
+end;
+
+function TPDCIDFontType0.TryGetPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  const CID = ClampToGlyph(CodeToCIDOfPath(Code));
+  if Assigned(FCIDFont) then
+  begin
+    Exit(FCIDFont.TryGetPathByCid(CID, Path, DocumentLog));
+  end;
+
+  if FType1Font is TCFFType1Font then
+  begin
+    Exit(TCFFType1Font(FType1Font).TryGetPathByGid(CID, Path, DocumentLog));
+  end;
+  // The substitute is shared between documents: its glyphs log to the log of this document, not to one of its own
+  Result := FType1Font.TryGetPathWithLog(GetGlyphName(Code), Path, DocumentLog);
+end;
+
+function TPDCIDFontType0.TryGetNormalizedPath(const Code: Integer; out Path: TPdfPath): Boolean;
+begin
+  Result := TryGetPath(Code, Path);
+end;
+
+function TPDCIDFontType0.HasGlyph(const Code: Integer): Boolean;
+begin
+  const CID = ClampToGlyph(CodeToCID(Code));
+  if Assigned(FCIDFont) then
+  begin
+    Exit(FCIDFont.CIDToGID(CID) <> 0);
+  end;
+
+  if FType1Font is TCFFType1Font then
+  begin
+    Exit(CID <> 0);
+  end;
+  Result := FType1Font.HasGlyph(GetGlyphName(Code));
 end;
 
 end.

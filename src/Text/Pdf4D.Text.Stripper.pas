@@ -124,6 +124,7 @@ type
     FFirstActualTextPosition: Boolean;
     FHasActualText: Boolean;
     FActualText: string;
+    FActualTextSpan: Integer;
     FCharactersByArticle: TObjectList<TObjectList<TTextPosition>>;
     FCharacterListMapping: TObjectDictionary<string, TOverlapColumn>;
     FDocument: TPDDocument;
@@ -176,7 +177,6 @@ type
     function NeedsWordSeparator(const ExpectedStartOfNextWordX: Single; const Metrics: TPositionMetrics): Boolean;
     procedure ResetLineExtent;
     function CreateWord(const Text: string; const Positions: TArray<TTextPosition>): TWordWithPositions;
-    function NormalizeWord(const Text: string): string;
     function Normalize(const Line: TLine): TArray<TWordWithPositions>;
     procedure WriteLine(const Line: TArray<TWordWithPositions>);
     function HandleLineSeparation(const Current, LastPosition, LastLineStartPosition: TPositionWrapper; const MaxHeightForLine: Single): TPositionWrapper;
@@ -206,6 +206,8 @@ type
     procedure WriteParagraphSeparator; virtual;
     procedure WritePageStart; virtual;
     procedure WritePageEnd; virtual;
+    // The Alphabetic and Arabic presentation forms of Text in their normal form, and the direction handling of the word
+    function NormalizeWord(const Text: string): string;
     // PDFBox runs bidi here. Pdf4D keeps the order of the file, so the word stays as it is.
     function HandleDirection(const Text: string): string; virtual;
     // Adds the position to the article that it lies in, unless it repeats a position that was shown already. The callee
@@ -215,6 +217,8 @@ type
     // The text positions of the page, by article (the sections before, in and between the beads). Owned by the stripper.
     property CharactersByArticle: TObjectList<TObjectList<TTextPosition>> read FCharactersByArticle;
     property Document: TPDDocument read FDocument;
+    // 1-based number of the page that is processed, like PDFTextStripper.getCurrentPageNo
+    property CurrentPageNo: Integer read FCurrentPageNo;
     property Output: TTextWriter read FOutput;
 
   public
@@ -435,6 +439,7 @@ begin
   FIsDepthLimitLogged := False;
   FHasActualText := False;
   FActualText := '';
+  FActualTextSpan := 0;
   FFirstActualTextPosition := False;
 end;
 
@@ -1302,6 +1307,7 @@ begin
   begin
     FActualText := StringReplace(FActualText, SoftHyphen, '', [rfReplaceAll]);
     FFirstActualTextPosition := True;
+    Inc(FActualTextSpan);
   end;
   inherited;
 end;
@@ -1327,6 +1333,7 @@ end;
 
 procedure TPdfTextStripper.ApplyActualText(const Text: TTextPosition);
 begin
+  Text.ActualTextSpan := FActualTextSpan;
   if FFirstActualTextPosition then
   begin
     Text.SetUnicode(FActualText);

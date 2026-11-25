@@ -1,0 +1,13 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [7 0 R] /Type /Pages>>
+object 3 0: <</C0 [0 0 0 0] /C1 [0 0.8 1 0.1] /Domain [0 1] /FunctionType 2 /N 1.5>>
+object 4 0: <</Domain [0 1] /FunctionType 4 /Length 39 /Range [0 1 0 1 0 1 0 1]>> stream sha256=f6750ac43971d0ee3f4b3e6e698b6be90caa17df1a4849946ae5eebc28e1878f
+object 5 0: <</Domain [0 1 0 1] /FunctionType 4 /Length 29 /Range [0 1 0 1 0 1]>> stream sha256=5b3bbfdd7b0705d4e8b806429c75e8ea946b303bac08672c23c5fce606341ebc
+object 6 0: <</Length 3361>> stream sha256=56fbf0ee77652a980a7c377f826e7e59cb72ed449574295457b56084c1646ed8
+object 7 0: <</Contents 6 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ColorSpace <</CalG [/CalGray <</Gamma 2.2 /WhitePoint [0.9505 1 1.089]>>] /CalR [/CalRGB <</Gamma [2.2 2.2 2.2] /Matrix [0.4124 0.2126 0.0193 0.3576 0.7152 0.1192 0.1805 0.0722 0.9505] /WhitePoint [0.9505 1 1.089]>>] /CsAll [/Separation /All /DeviceCMYK 3 0 R] /CsDevN [/DeviceN [/Cyan /Magenta] /DeviceRGB 5 0 R] /CsIdx [/Indexed /DeviceRGB 7 <ff000000ff000000ffffff00ff00ff00ffff808080000000>] /CsIdxLab [/Indexed [/Lab <</Range [-128 127 -128 127] /WhitePoint [0.9642 1 0.8249]>>] 1 <008080ff0000>] /CsLab [/Lab <</Range [-128 127 -128 127] /WhitePoint [0.9642 1 0.8249]>>] /CsNone [/Separation /None /DeviceCMYK 3 0 R] /CsSep2 [/Separation /Spot1 /DeviceCMYK 3 0 R] /CsSep4 [/Separation /Spot2 /DeviceCMYK 4 0 R]>>>> /Type /Page>>

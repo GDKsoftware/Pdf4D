@@ -1,0 +1,1 @@
+p1-0	Im0	159x152 bpc=8 cs=DeviceCMYK	[COSName{DCTDecode}]	ok type=1

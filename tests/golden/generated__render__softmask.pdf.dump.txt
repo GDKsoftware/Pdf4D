@@ -1,0 +1,14 @@
+version: 1.7
+encrypted: false
+permissions: none
+pages: 1
+page 1: media=[0 0 400 400] crop=[0 0 400 400] rotate=0 label=
+xmp: none
+object 1 0: <</Pages 2 0 R /Type /Catalog>>
+object 2 0: <</Count 1 /Kids [8 0 R] /Type /Pages>>
+object 3 0: <</BBox [0 0 100 100] /Group <</CS /DeviceGray /S /Transparency>> /Length 47 /Resources <</ExtGState <</H <</ca 0.5>>>>>> /Subtype /Form /Type /XObject>> stream sha256=bcd3d97797dcca5fe923e9d3ef6c57247e5955440e09782a12a863bd278bd291
+object 4 0: <</BBox [0 0 100 100] /Group <</CS /DeviceGray /S /Transparency>> /Length 28 /Resources <</Shading <</Sh1 <</ColorSpace /DeviceGray /Coords [0 0 100 0] /Extend [true true] /Function <</C0 [0] /C1 [1] /Domain [0 1] /FunctionType 2 /N 1>> /ShadingType 2>>>>>> /Subtype /Form /Type /XObject>> stream sha256=53c874aab6e2d61b711a6718e8d85e913c46e84ac5236365763090345785e113
+object 5 0: <</BBox [20 20 80 80] /Group <</CS /DeviceGray /S /Transparency>> /Length 20 /Subtype /Form /Type /XObject>> stream sha256=34a59a94dd13b924620086874bc9baa97b2094760480af6b9e7d50a46093dc4f
+object 6 0: <</BBox [0 0 100 100] /Group <</CS /DeviceRGB /S /Transparency>> /Length 50 /Subtype /Form /Type /XObject>> stream sha256=3080adcc914a1a8eac5c1cd02c0b200680b32607f62f1c66df00f757aed91b31
+object 7 0: <</Length 1085>> stream sha256=cc117e5796ca53772fbcf148e806e5cfffb26ae027b1b8339344353fd7ea9fd5
+object 8 0: <</Contents 7 0 R /MediaBox [0 0 400 400] /Parent 2 0 R /Resources <</ExtGState <</SmAlpha <</SMask <</G 3 0 R /S /Alpha /Type /Mask>>>> /SmAlphaTr <</SMask <</G 3 0 R /S /Alpha /TR <</C0 [1] /C1 [0] /Domain [0 1] /FunctionType 2 /N 1>> /Type /Mask>>>> /SmLum <</SMask <</G 4 0 R /S /Luminosity /Type /Mask>>>> /SmLumBc <</SMask <</BC [0.5] /G 5 0 R /S /Luminosity /Type /Mask>>>> /SmLumBc0 <</SMask <</BC [0] /G 5 0 R /S /Luminosity /Type /Mask>>>> /SmLumId <</SMask <</G 4 0 R /S /Luminosity /TR /Identity /Type /Mask>>>> /SmLumTr <</SMask <</G 4 0 R /S /Luminosity /TR <</C0 [1] /C1 [0] /Domain [0 1] /FunctionType 2 /N 1>> /Type /Mask>>>> /SmNone <</SMask /None>> /SmRgb <</SMask <</G 6 0 R /S /Luminosity /Type /Mask>>>>>>>> /Type /Page>>

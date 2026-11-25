@@ -1,0 +1,15 @@
+# The corpus files whose images the oracle writes as PNG files (tests/reference/images/<file with / as __>/p<page>-<index>.png).
+# One path relative to tests/corpus per line. Chosen for modest images (an image of more than 360000 pixels is left out by the
+# oracle) and for variety: every sample depth and mask kind of the generated file, then files of the pdfbox-jira set with
+# Flate images that have a soft mask, DeviceRGB and Indexed colour spaces, and a few JPEG images for the DCT task.
+generated/render/images.pdf
+pdfbox-jira/PDFBOX-3964-c687766d68ac766be3f02aaec5e0d713_2.pdf
+pdfbox-jira/PDFBOX-4197.pdf
+pdfbox-jira/PDFBOX-4490.pdf
+pdfbox-jira/PDFBOX-5927.pdf
+pdfbox-jira/PDFBOX-6207.pdf
+pdfbox-jira/PDFBOX-4308.pdf
+pdfbox-jira/PDFBOX-3999-GeneralForbearance.pdf
+pdfbox-jira/PDFBOX-1031-1.pdf
+pdfbox-jira/PDFBOX-4153-WXMDXCYRWFDCMOSFQJ5OAJIAFXYRZ5OA.pdf
+generated/render/jpeg.pdf

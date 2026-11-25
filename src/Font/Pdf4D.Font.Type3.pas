@@ -96,6 +96,7 @@ type
     FHasBoundingBox: Boolean;
     FBoundingBox: TBoundingBox;
     FCharProcWidths: TDictionary<Integer, Single>;
+    FCharProcs: TObjectDictionary<Integer, TPDType3CharProc>;
     FIsDisplacementWarningGiven: Boolean;
 
     function TryReadFontMatrix(out Matrix: TPdfMatrix): Boolean;
@@ -141,13 +142,20 @@ type
     // Raises EPdfUnsupportedFeatureException: Type 3 fonts do not use FontBox fonts
     function GetFontBoxFont: TFontBoxFont; override;
 
+    // A Type 3 font has glyph procedures, not outlines
+    function IsVectorFont: Boolean; override;
+    // Whether /CharProcs has a stream for the glyph that the encoding names for Code
+    function HasGlyph(const Code: Integer): Boolean; overload; override;
     // Whether /CharProcs has a stream for the glyph name
-    function HasGlyph(const GlyphName: string): Boolean;
+    function HasGlyph(const GlyphName: string): Boolean; overload;
     // /CharProcs: the glyph names with their procedures. The dictionary belongs to the document.
     function TryGetCharProcs(out CharProcs: TCosDictionary): Boolean;
     // The procedure of the glyph that the encoding names for Code. False without an encoding, without /CharProcs and for a
     // glyph that has no stream there. The stream belongs to the document.
-    function TryGetCharProc(const Code: Integer; out CharProc: TCosStream): Boolean;
+    function TryGetCharProc(const Code: Integer; out CharProc: TCosStream): Boolean; overload;
+    // The same procedure as an object that reads its operator, width and bounding box. The font owns it and keeps it for the
+    // next request, so it stays valid for as long as the font does.
+    function TryGetCharProc(const Code: Integer; out CharProc: TPDType3CharProc): Boolean; overload;
     // /Resources of the font, for the glyph procedures that have none of their own. The dictionary belongs to the document.
     function TryGetResources(out Resources: TCosDictionary): Boolean;
     // /FontBBox as a rectangle; False when the entry is missing
@@ -384,11 +392,13 @@ constructor TPDType3Font.Create(const Dictionary: TCosDictionary; const Context:
 begin
   inherited Create(Dictionary, Context);
   FCharProcWidths := TDictionary<Integer, Single>.Create;
+  FCharProcs := TObjectDictionary<Integer, TPDType3CharProc>.Create([doOwnsValues]);
   ReadEncoding;
 end;
 
 destructor TPDType3Font.Destroy;
 begin
+  FCharProcs.Free;
   FCharProcWidths.Free;
   inherited;
 end;
@@ -459,6 +469,35 @@ begin
   var CharProcs: TCosDictionary;
   var CharProc: TCosStream;
   Result := (TryGetCharProcs(CharProcs) and CharProcs.TryGetCosStream(GlyphName, CharProc));
+end;
+
+function TPDType3Font.IsVectorFont: Boolean;
+begin
+  Result := False;
+end;
+
+function TPDType3Font.HasGlyph(const Code: Integer): Boolean;
+begin
+  var CharProc: TCosStream;
+  Result := TryGetCharProc(Code, CharProc);
+end;
+
+function TPDType3Font.TryGetCharProc(const Code: Integer; out CharProc: TPDType3CharProc): Boolean;
+begin
+  if FCharProcs.TryGetValue(Code, CharProc) then
+  begin
+    Exit(True);
+  end;
+
+  var Stream: TCosStream;
+  if not TryGetCharProc(Code, Stream) then
+  begin
+    Exit(False);
+  end;
+
+  CharProc := TPDType3CharProc.Create(Self, Stream);
+  FCharProcs.Add(Code, CharProc);
+  Result := True;
 end;
 
 function TPDType3Font.TryGetCharProcs(out CharProcs: TCosDictionary): Boolean;

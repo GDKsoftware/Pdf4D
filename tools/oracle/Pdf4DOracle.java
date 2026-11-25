@@ -16,12 +16,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.lang.reflect.Method;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.awt.color.ICC_ColorSpace;
+import java.awt.color.ICC_Profile;
+import org.apache.fontbox.cff.CFFCIDFont;
 import org.apache.fontbox.cff.CFFFont;
+import org.apache.fontbox.cff.CFFType1Font;
+import org.apache.fontbox.ttf.GlyphTable;
 import org.apache.fontbox.ttf.OTFParser;
 import org.apache.fontbox.ttf.OpenTypeFont;
 import org.apache.fontbox.ttf.TTFParser;
@@ -53,6 +60,7 @@ import org.apache.pdfbox.pdmodel.common.PDNameTreeNode;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.common.function.PDFunction;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -64,7 +72,10 @@ import org.apache.pdfbox.pdmodel.font.FontInfo;
 import org.apache.pdfbox.pdmodel.font.FontMapper;
 import org.apache.pdfbox.pdmodel.font.FontMappers;
 import org.apache.pdfbox.pdmodel.font.FontProvider;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDVectorFont;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -81,6 +92,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDRadioButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 /**
  * Pdf4D golden oracle. Writes the canonical dump format described in docs/golden-format.md.
@@ -90,7 +102,16 @@ import org.apache.pdfbox.text.PDFTextStripper;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --prepare out.pdf
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --encrypt in.pdf out.pdf user owner alg [--nometa]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java make-render-tests ccitt outdir tifdir
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java render file.pdf dpi outdir [password] [only-page]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --glyph-paths font.(otf|pfb|ttf)
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --pdf-glyph-paths file.pdf FontName first-last
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --function spec.txt
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color (profile.icc|DeviceCMYK) c1 c2 ...
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color-batch spec.txt
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --color-pdf-batch spec.txt
  *   (a bare "file.pdf [password]" is the same as "dump")
  *
  * Every mode runs with a hermetic font mapper: no system fonts, only embedded fonts, the standard 14
@@ -121,9 +142,61 @@ public class Pdf4DOracle
             {
                 out.print(fontWidths(new File(args[1])));
             }
+            else if (args.length >= 2 && args[0].equals("--glyph-paths"))
+            {
+                out.print(glyphPaths(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("--function"))
+            {
+                out.print(functionCases(new File(args[1])));
+            }
+            else if (args.length >= 3 && args[0].equals("--color"))
+            {
+                StringBuilder sb = new StringBuilder();
+                ICC_ColorSpace space = loadColorSpace(args[1], -1);
+                float[] input = new float[args.length - 2];
+                for (int i = 0; i < input.length; i++)
+                {
+                    input[i] = Float.parseFloat(args[i + 2]);
+                }
+                for (float f : space.toRGB(input))
+                {
+                    sb.append(f).append(' ');
+                }
+                out.println(sb.toString().trim());
+            }
+            else if (args.length >= 2 && args[0].equals("--color-batch"))
+            {
+                out.print(colorCases(new File(args[1])));
+            }
+            else if (args.length >= 2 && args[0].equals("--color-pdf-batch"))
+            {
+                out.print(colorPdfCases(new File(args[1])));
+            }
+            else if (args.length >= 4 && args[0].equals("--pdf-glyph-paths"))
+            {
+                out.print(pdfGlyphPaths(new File(args[1]), args[2], args[3]));
+            }
             else if (args.length >= 2 && args[0].equals("text"))
             {
                 out.print(text(new File(args[1]), args.length > 2 ? args[2] : ""));
+            }
+            else if (args.length >= 3 && args[0].equals("images"))
+            {
+                out.print(images(new File(args[1]), new File(args[2]), args.length > 3 ? args[3] : ""));
+            }
+            else if (args.length >= 3 && args[0].equals("make-render-tests"))
+            {
+                makeRenderTests(args[1], new File(args[2]), args.length > 3 ? new File(args[3]) : null);
+            }
+            else if (args.length >= 4 && args[0].equals("render"))
+            {
+                out.print(render(new File(args[1]), Float.parseFloat(args[2]), new File(args[3]),
+                        args.length > 4 ? pw(args[4]) : "", args.length > 5 ? Integer.parseInt(args[5]) : 0));
+            }
+            else if (args.length >= 2 && args[0].equals("positions"))
+            {
+                out.print(positions(new File(args[1]), args.length > 2 ? args[2] : ""));
             }
             else if (args.length >= 2 && args[0].equals("--prepare"))
             {
@@ -158,6 +231,148 @@ public class Pdf4DOracle
     static String pw(String s)
     {
         return s.equals("<empty>") ? "" : s;
+    }
+
+    // ------------------------------------------------------------------ make-render-tests
+
+    /**
+     * Writes the render test files that need the PDFBox API: ccitt.pdf, with the CCITT images of the TIFF files in
+     * tifDir (ccittg3.tif is Group 3, ccittg4.tif is Group 4) made by CCITTFactory, the same with /BlackIs1 and an image
+     * mask. The other test files come from tools/oracle/make-render-pdfs.py.
+     */
+    static void makeRenderTests(String name, File outDir, File tifDir) throws Exception
+    {
+        if (!name.equals("ccitt"))
+        {
+            throw new IllegalArgumentException("unknown render test file " + name);
+        }
+        outDir.mkdirs();
+        try (PDDocument doc = new PDDocument())
+        {
+            PDPage page = new PDPage(new PDRectangle(400, 300));
+            doc.addPage(page);
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g4 =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g3 =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg3.tif"));
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject g4Black =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            COSDictionary parms = (COSDictionary) g4Black.getCOSObject().getDictionaryObject(COSName.DECODE_PARMS);
+            parms.setBoolean(COSName.getPDFName("BlackIs1"), true);
+            org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject mask =
+                    org.apache.pdfbox.pdmodel.graphics.image.CCITTFactory.createFromFile(doc, new File(tifDir, "ccittg4.tif"));
+            mask.getCOSObject().setBoolean(COSName.IMAGE_MASK, true);
+            mask.getCOSObject().removeItem(COSName.COLORSPACE);
+            try (PDPageContentStream content = new PDPageContentStream(doc, page))
+            {
+                content.setNonStrokingColor(0.9f, 0.9f, 0.6f);
+                content.addRect(0, 0, 400, 300);
+                content.fill();
+                content.drawImage(g4, 10, 160, 192, 128);
+                content.drawImage(g3, 210, 160, 192, 128);
+                content.drawImage(g4Black, 10, 20, 96, 64);
+                content.setNonStrokingColor(0.8f, 0.1f, 0.1f);
+                content.drawImage(mask, 120, 20, 96, 64);
+                content.drawImage(g4, 230, 20, 48, 32);
+            }
+            doc.setVersion(1.7f);
+            doc.save(new File(outDir, name + ".pdf"));
+        }
+    }
+
+    // ------------------------------------------------------------------ render
+
+    private static final int MAX_RENDER_PAGES = 50;
+
+    /**
+     * Renders the pages 1 to min(pages, 50) with PDFRenderer.renderImageWithDPI(page, dpi, ImageType.RGB) to
+     * outDir/&lt;name&gt;.p&lt;nnn&gt;.png (name: -Dpdf4d.render.name, default the file name) and lists them: "page n w h ok" or "page n error Class" per page,
+     * or "load-error: kind". onlyPage (not 0) renders that page only.
+     */
+    static String render(File file, float dpi, File outDir, String password, int onlyPage) throws Exception
+    {
+        System.setProperty("java.awt.headless", "true");
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        StringBuilder sb = new StringBuilder();
+        outDir.mkdirs();
+        // The name of the golden files (path with __, with .pdf) comes from the script; without it the file name is used
+        String name = System.getProperty("pdf4d.render.name", file.getName());
+        try (doc)
+        {
+            int pageCount = 0;
+            try
+            {
+                for (PDPage p : doc.getPages())
+                {
+                    pageCount++;
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count
+            }
+            if (pageCount == 0)
+            {
+                // an empty listing would be taken for a failed run
+                sb.append("pages: 0\n");
+            }
+            int last = Math.min(pageCount, MAX_RENDER_PAGES);
+            org.apache.pdfbox.rendering.PDFRenderer renderer = new org.apache.pdfbox.rendering.PDFRenderer(doc);
+            for (int n = 1; n <= last; n++)
+            {
+                if (onlyPage != 0 && n != onlyPage)
+                {
+                    continue;
+                }
+                try
+                {
+                    java.awt.image.BufferedImage image = renderer.renderImageWithDPI(n - 1, dpi,
+                            org.apache.pdfbox.rendering.ImageType.RGB);
+                    writePng(image, new File(outDir, String.format("%s.p%03d.png", name, n)));
+                    sb.append("page ").append(n).append(' ').append(image.getWidth()).append(' ')
+                            .append(image.getHeight()).append(" ok\n");
+                }
+                catch (Throwable t)
+                {
+                    sb.append("page ").append(n).append(" error ").append(t.getClass().getSimpleName()).append('\n');
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            // a failing close
+        }
+        return sb.toString();
+    }
+
+    /** PNG with the strongest compression of the Java writer, to keep the reference files small. */
+    static void writePng(java.awt.image.BufferedImage image, File target) throws IOException
+    {
+        javax.imageio.ImageWriter writer = javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
+        javax.imageio.ImageWriteParam param = writer.getDefaultWriteParam();
+        param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(0.0f);
+        try (javax.imageio.stream.ImageOutputStream stream = javax.imageio.ImageIO.createImageOutputStream(target))
+        {
+            writer.setOutput(stream);
+            writer.write(null, new javax.imageio.IIOImage(image, null, null), param);
+        }
+        finally
+        {
+            writer.dispose();
+        }
     }
 
     // ------------------------------------------------------------------ dump
@@ -904,6 +1119,207 @@ public class Pdf4DOracle
         }
     }
 
+    // ------------------------------------------------------------- positions
+
+    /** Collects per line of the stripper the first and last glyph position (docs/golden-format.md, "Position goldens"). */
+    static class PositionStripper extends PDFTextStripper
+    {
+        final StringBuilder sb = new StringBuilder();
+        private TextPosition first;
+        private TextPosition last;
+        private int glyphs;
+
+        PositionStripper() throws IOException
+        {
+            super();
+        }
+
+        @Override
+        protected void startPage(PDPage page) throws IOException
+        {
+            sb.append("page ").append(getCurrentPageNo()).append('\n');
+            super.startPage(page);
+        }
+
+        @Override
+        protected void endPage(PDPage page) throws IOException
+        {
+            flushLine();
+            super.endPage(page);
+        }
+
+        @Override
+        protected void writeLineSeparator() throws IOException
+        {
+            flushLine();
+            super.writeLineSeparator();
+        }
+
+        @Override
+        protected void writeString(String text, List<TextPosition> textPositions) throws IOException
+        {
+            if (!textPositions.isEmpty())
+            {
+                if (first == null)
+                {
+                    first = textPositions.get(0);
+                }
+                last = textPositions.get(textPositions.size() - 1);
+                glyphs += textPositions.size();
+            }
+            super.writeString(text, textPositions);
+        }
+
+        private void flushLine()
+        {
+            if (glyphs > 0)
+            {
+                sb.append("line: ").append(fixed2(first.getTextMatrix().getTranslateX())).append(' ')
+                        .append(fixed2(first.getTextMatrix().getTranslateY())).append(' ')
+                        .append(fixed2(last.getEndX())).append(' ').append(fixed2(last.getEndY())).append(' ')
+                        .append(glyphs).append('\n');
+            }
+            first = null;
+            last = null;
+            glyphs = 0;
+        }
+    }
+
+    static String fixed2(float f)
+    {
+        return String.format(java.util.Locale.ROOT, "%.2f", f);
+    }
+
+    private static final int MAX_IMAGE_PIXELS = 360000;
+    private static final int MAX_IMAGES_PER_PAGE = 24;
+
+    /**
+     * Writes PDImageXObject.getImage() of every image XObject in the resources of each page as
+     * p&lt;page&gt;-&lt;index&gt;.png (the page from 1, the index from 0 over the images of that page, in the order of the
+     * resource dictionary) into outDir, and lists them. Images of more than MAX_IMAGE_PIXELS pixels are left out.
+     */
+    static String images(File file, File outDir, String password) throws Exception
+    {
+        StringBuilder sb = new StringBuilder();
+        outDir.mkdirs();
+        try (PDDocument doc = Loader.loadPDF(file, password))
+        {
+            int pageNumber = 0;
+            for (PDPage page : doc.getPages())
+            {
+                pageNumber++;
+                org.apache.pdfbox.pdmodel.PDResources resources = page.getResources();
+                if (resources == null)
+                {
+                    continue;
+                }
+                int index = 0;
+                for (COSName name : resources.getXObjectNames())
+                {
+                    org.apache.pdfbox.pdmodel.graphics.PDXObject xobject;
+                    try
+                    {
+                        xobject = resources.getXObject(name);
+                    }
+                    catch (Throwable t)
+                    {
+                        continue;
+                    }
+                    if (!(xobject instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject))
+                    {
+                        continue;
+                    }
+                    if (index >= MAX_IMAGES_PER_PAGE)
+                    {
+                        break;
+                    }
+                    org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject image =
+                            (org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) xobject;
+                    String label = "p" + pageNumber + "-" + index;
+                    index++;
+                    String filters = String.valueOf(image.getStream().getFilters());
+                    String size = image.getWidth() + "x" + image.getHeight() + " bpc=" + image.getBitsPerComponent();
+                    try
+                    {
+                        size += " cs=" + image.getColorSpace().getName();
+                    }
+                    catch (Throwable t)
+                    {
+                        size += " cs=?";
+                    }
+                    if ((long) image.getWidth() * image.getHeight() > MAX_IMAGE_PIXELS)
+                    {
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\tskipped: large\n");
+                        continue;
+                    }
+                    try
+                    {
+                        java.awt.image.BufferedImage bim = image.getImage();
+                        javax.imageio.ImageIO.write(bim, "png", new File(outDir, label + ".png"));
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\tok type=").append(bim.getType()).append('\n');
+                    }
+                    catch (Throwable t)
+                    {
+                        sb.append(label).append('\t').append(name.getName()).append('\t').append(size).append('\t')
+                                .append(filters).append("\terror: ").append(t.getClass().getSimpleName()).append('\n');
+                    }
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    static String positions(File file, String password)
+    {
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        try (doc)
+        {
+            int pageCount = 0;
+            try
+            {
+                for (PDPage p : doc.getPages())
+                {
+                    pageCount++;
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count, like in the dump
+            }
+            PositionStripper stripper = new PositionStripper();
+            stripper.setSortByPosition(true);
+            stripper.setStartPage(1);
+            stripper.setEndPage(Math.min(pageCount, 50));
+            try
+            {
+                stripper.getText(doc);
+            }
+            catch (Throwable t)
+            {
+                stripper.sb.append("error\n");
+            }
+            return stripper.sb.toString();
+        }
+        catch (Throwable t)
+        {
+            return "load-error: parse\n";
+        }
+    }
+
     // ---------------------------------------------------------- font widths
 
     static String fontWidths(File file) throws Exception
@@ -948,6 +1364,178 @@ public class Pdf4DOracle
         for (Map.Entry<String, String> e : widths.entrySet())
         {
             sb.append(e.getKey()).append(' ').append(e.getValue()).append('\n');
+        }
+        return sb.toString();
+    }
+
+    // ---------------------------------------------------------- glyph paths
+
+    private static final int PATH_GLYPH_LIMIT = 300;
+
+    static String glyphPaths(File file) throws Exception
+    {
+        String name = file.getName().toLowerCase();
+        TreeMap<String, String> paths = new TreeMap<>();
+        if (name.endsWith(".pfb"))
+        {
+            Type1Font font = Type1Font.createWithPFB(java.nio.file.Files.readAllBytes(file.toPath()));
+            TreeMap<String, Boolean> glyphs = new TreeMap<>();
+            for (String glyph : font.getCharStringsDict().keySet())
+            {
+                glyphs.put(glyph, Boolean.TRUE);
+            }
+            int count = 0;
+            for (String glyph : glyphs.keySet())
+            {
+                if (count++ >= PATH_GLYPH_LIMIT)
+                {
+                    break;
+                }
+                try
+                {
+                    putPath(paths, glyph, font.getPath(glyph));
+                }
+                catch (Exception e)
+                {
+                    // left out
+                }
+            }
+        }
+        else if (name.endsWith(".otf"))
+        {
+            try (OpenTypeFont font = new OTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                CFFFont cff = font.getCFF().getFont();
+                int n = Math.min(cff.getNumCharStrings(), PATH_GLYPH_LIMIT);
+                for (int gid = 0; gid < n; gid++)
+                {
+                    try
+                    {
+                        if (cff instanceof CFFCIDFont)
+                        {
+                            CFFCIDFont cid = (CFFCIDFont) cff;
+                            int cidValue = cid.getCharset().getCIDForGID(gid);
+                            putPath(paths, "cid" + cidValue, cid.getType2CharString(cidValue).getPath());
+                        }
+                        else
+                        {
+                            putPath(paths, "gid" + gid, ((CFFType1Font) cff).getType2CharString(gid).getPath());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // left out
+                    }
+                }
+            }
+        }
+        else if (name.endsWith(".ttf"))
+        {
+            try (TrueTypeFont font = new TTFParser().parse(new RandomAccessReadBufferedFile(file)))
+            {
+                GlyphTable glyf = font.getGlyph();
+                int n = Math.min(font.getNumberOfGlyphs(), PATH_GLYPH_LIMIT);
+                for (int gid = 0; gid < n; gid++)
+                {
+                    try
+                    {
+                        putPath(paths, "gid" + gid, glyf.getGlyph(gid).getPath());
+                    }
+                    catch (Exception e)
+                    {
+                        // left out
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw new IOException("Glyph paths are written for Type 1, CFF and TrueType fonts only");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> e : paths.entrySet())
+        {
+            sb.append(e.getKey()).append(e.getValue()).append('\n');
+        }
+        return sb.toString();
+    }
+
+    // The normalized path of every code of a range for the font /FontName of the first page: one line
+    // "<code> <1 when hasGlyph, else 0> <commands>" per code, "!" instead of the commands when PDFBox fails on the code
+    static String pdfGlyphPaths(File file, String fontName, String range) throws Exception
+    {
+        String[] bounds = range.split("-");
+        int first = Integer.parseInt(bounds[0]);
+        int last = Integer.parseInt(bounds[1]);
+        StringBuilder sb = new StringBuilder();
+        try (PDDocument document = Loader.loadPDF(file))
+        {
+            PDResources resources = document.getPage(0).getResources();
+            PDFont font = resources.getFont(COSName.getPDFName(fontName));
+            if (!(font instanceof PDVectorFont))
+            {
+                throw new IOException("Font " + fontName + " is not a vector font");
+            }
+            PDVectorFont vectorFont = (PDVectorFont) font;
+            for (int code = first; code <= last; code++)
+            {
+                String commands;
+                try
+                {
+                    commands = pathText(vectorFont.getNormalizedPath(code));
+                }
+                catch (Exception e)
+                {
+                    commands = " !";
+                }
+                boolean has;
+                try
+                {
+                    has = vectorFont.hasGlyph(code);
+                }
+                catch (Exception e)
+                {
+                    has = false;
+                }
+                sb.append(code).append(' ').append(has ? '1' : '0').append(commands).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    // A glyph whose charstring PDFBox cannot turn into a path is left out of the file
+    static void putPath(TreeMap<String, String> paths, String key, GeneralPath path)
+    {
+        paths.put(key, pathText(path));
+    }
+
+    static String pathText(GeneralPath path)
+    {
+        StringBuilder sb = new StringBuilder();
+        float[] c = new float[6];
+        for (PathIterator it = path.getPathIterator(null); !it.isDone(); it.next())
+        {
+            switch (it.currentSegment(c))
+            {
+            case PathIterator.SEG_MOVETO:
+                sb.append(" M ").append(num(c[0])).append(' ').append(num(c[1]));
+                break;
+            case PathIterator.SEG_LINETO:
+                sb.append(" L ").append(num(c[0])).append(' ').append(num(c[1]));
+                break;
+            case PathIterator.SEG_QUADTO:
+                sb.append(" Q ").append(num(c[0])).append(' ').append(num(c[1])).append(' ')
+                        .append(num(c[2])).append(' ').append(num(c[3]));
+                break;
+            case PathIterator.SEG_CUBICTO:
+                sb.append(" C ").append(num(c[0])).append(' ').append(num(c[1])).append(' ')
+                        .append(num(c[2])).append(' ').append(num(c[3])).append(' ')
+                        .append(num(c[4])).append(' ').append(num(c[5]));
+                break;
+            default:
+                sb.append(" Z");
+                break;
+            }
         }
         return sb.toString();
     }
@@ -1210,6 +1798,382 @@ public class Pdf4DOracle
                 doc.protect(policy);
             }
             doc.save(out);
+        }
+    }
+
+    /**
+     * Evaluates PDF functions. The spec file holds blocks that start with a "case: name" line and have the keys type, domain,
+     * range, size, bps, encode, decode, samples (hex), c0, c1, n, bounds, code (type 4), sub2 (type 3: "c0 | c1 | n" of a type 2
+     * function, once per function) and one "in: x y ..." line per evaluation. The output repeats every line, with " out: ..."
+     * behind each "in:" line; "out: !" is an evaluation that PDFBox fails on, and "create: !" a function that PDFBox cannot make.
+     */
+    private static String functionCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        List<String> lines = java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8);
+        PDFunction function = null;
+        Map<String, String> keys = new java.util.HashMap<>();
+        List<String> sub2 = new ArrayList<>();
+        boolean created = false;
+        for (String line : lines)
+        {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#"))
+            {
+                sb.append(line).append('\n');
+                continue;
+            }
+            int colon = line.indexOf(':');
+            String key = line.substring(0, colon).trim();
+            String value = line.substring(colon + 1).trim();
+            if (key.equals("case"))
+            {
+                keys = new java.util.HashMap<>();
+                sub2 = new ArrayList<>();
+                function = null;
+                created = false;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("in"))
+            {
+                if (!created)
+                {
+                    created = true;
+                    try
+                    {
+                        function = buildFunction(keys, sub2);
+                    }
+                    catch (Throwable t)
+                    {
+                        function = null;
+                        sb.append("create: !\n");
+                    }
+                }
+                sb.append("in: ").append(value).append(" out:");
+                try
+                {
+                    String[] parts = value.isEmpty() ? new String[0] : value.split("\\s+");
+                    float[] input = new float[parts.length];
+                    for (int i = 0; i < parts.length; i++)
+                    {
+                        input[i] = Float.parseFloat(parts[i]);
+                    }
+                    float[] result = function.eval(input);
+                    for (float f : result)
+                    {
+                        sb.append(' ').append(f);
+                    }
+                }
+                catch (Throwable t)
+                {
+                    sb.append(" !");
+                }
+                sb.append('\n');
+            }
+            else
+            {
+                if (key.equals("sub2"))
+                {
+                    sub2.add(value);
+                }
+                else
+                {
+                    keys.put(key, value);
+                }
+                sb.append(line).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Loads the colour space of a profile the way PDFBox does: DeviceCMYK is the CGATS001Compat-v2-micro.icc of PDFBox,
+     * anything else is an ICC file. intent >= 0 overwrites the rendering intent of the header (to find out which table
+     * the Java colour management uses).
+     */
+    private static ICC_ColorSpace loadColorSpace(String profile, int intent) throws IOException
+    {
+        byte[] data;
+        if (profile.equals("DeviceCMYK"))
+        {
+            try (InputStream is = org.apache.pdfbox.pdmodel.graphics.color.PDDeviceCMYK.class.getResourceAsStream(
+                    "/org/apache/pdfbox/resources/icc/CGATS001Compat-v2-micro.icc"))
+            {
+                data = is.readAllBytes();
+            }
+        }
+        else
+        {
+            data = java.nio.file.Files.readAllBytes(new File(profile).toPath());
+        }
+        if (intent >= 0)
+        {
+            data[64] = 0;
+            data[65] = 0;
+            data[66] = 0;
+            data[67] = (byte) intent;
+        }
+        return new ICC_ColorSpace(ICC_Profile.getInstance(data));
+    }
+
+    /**
+     * Converts device colours to sRGB with ICC_ColorSpace.toRGB. The spec file holds "profile: file.icc" or
+     * "profile: DeviceCMYK" (optionally "intent: n" behind it) and one "in: c1 c2 ..." line per colour. The output repeats
+     * every line, with " out: r g b" behind each "in:" line ("out: !" when Java fails).
+     */
+    private static String colorCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        String profile = null;
+        int intent = -1;
+        ICC_ColorSpace space = null;
+        for (String line : java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8))
+        {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#"))
+            {
+                sb.append(line).append('\n');
+                continue;
+            }
+            int colon = line.indexOf(':');
+            String key = line.substring(0, colon).trim();
+            String value = line.substring(colon + 1).trim();
+            if (key.equals("profile"))
+            {
+                profile = value;
+                intent = -1;
+                space = null;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("intent"))
+            {
+                intent = Integer.parseInt(value);
+                space = null;
+                sb.append(line).append('\n');
+            }
+            else if (key.equals("in"))
+            {
+                sb.append("in: ").append(value).append(" out:");
+                try
+                {
+                    if (space == null)
+                    {
+                        space = loadColorSpace(profile, intent);
+                    }
+                    String[] parts = value.split("\\s+");
+                    float[] input = new float[parts.length];
+                    for (int i = 0; i < parts.length; i++)
+                    {
+                        input[i] = Float.parseFloat(parts[i]);
+                    }
+                    for (float f : space.toRGB(input))
+                    {
+                        sb.append(' ').append(f);
+                    }
+                }
+                catch (Throwable t)
+                {
+                    sb.append(" !");
+                }
+                sb.append('\n');
+            }
+            else
+            {
+                sb.append(line).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * The colour spaces of the resources of page 1 of a PDF file: "pdf: file", "space: resource name", then
+     * "in: c1 c2 ..." (toRGB) and "img: components b1 b2 ..." (toRGBImage of a raster of one row of 8-bit samples).
+     */
+    private static String colorPdfCases(File spec) throws IOException
+    {
+        StringBuilder sb = new StringBuilder();
+        PDDocument doc = null;
+        PDResources resources = null;
+        org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace space = null;
+        try
+        {
+            for (String line : java.nio.file.Files.readAllLines(spec.toPath(), StandardCharsets.UTF_8))
+            {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#"))
+                {
+                    sb.append(line).append('\n');
+                    continue;
+                }
+                int colon = line.indexOf(':');
+                String key = line.substring(0, colon).trim();
+                String value = line.substring(colon + 1).trim();
+                if (key.equals("pdf"))
+                {
+                    if (doc != null)
+                    {
+                        doc.close();
+                    }
+                    doc = Loader.loadPDF(new File(value));
+                    resources = doc.getPage(0).getResources();
+                    sb.append(line).append('\n');
+                }
+                else if (key.equals("space"))
+                {
+                    sb.append(line).append('\n');
+                    try
+                    {
+                        space = resources.getColorSpace(COSName.getPDFName(value));
+                    }
+                    catch (Throwable t)
+                    {
+                        space = null;
+                    }
+                }
+                else if (key.equals("in") || key.equals("img"))
+                {
+                    sb.append(key).append(": ").append(value).append(" out:");
+                    try
+                    {
+                        String[] parts = value.split("\\s+");
+                        if (key.equals("in"))
+                        {
+                            float[] input = new float[parts.length];
+                            for (int i = 0; i < parts.length; i++)
+                            {
+                                input[i] = Float.parseFloat(parts[i]);
+                            }
+                            for (float f : space.toRGB(input))
+                            {
+                                sb.append(' ').append(f);
+                            }
+                        }
+                        else
+                        {
+                            int components = Integer.parseInt(parts[0]);
+                            int width = (parts.length - 1) / components;
+                            java.awt.image.WritableRaster raster = java.awt.image.Raster.createBandedRaster(
+                                    java.awt.image.DataBuffer.TYPE_BYTE, width, 1, components, new java.awt.Point(0, 0));
+                            int[] pixel = new int[components];
+                            for (int x = 0; x < width; x++)
+                            {
+                                for (int c = 0; c < components; c++)
+                                {
+                                    pixel[c] = Integer.parseInt(parts[1 + x * components + c]);
+                                }
+                                raster.setPixel(x, 0, pixel);
+                            }
+                            java.awt.image.BufferedImage image = space.toRGBImage(raster);
+                            int[] rgb = null;
+                            for (int x = 0; x < width; x++)
+                            {
+                                rgb = image.getRaster().getPixel(x, 0, rgb);
+                                sb.append(' ').append(rgb[0]).append(' ').append(rgb[1]).append(' ').append(rgb[2]);
+                            }
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        sb.append(" !");
+                    }
+                    sb.append('\n');
+                }
+                else
+                {
+                    sb.append(line).append('\n');
+                }
+            }
+        }
+        finally
+        {
+            if (doc != null)
+            {
+                doc.close();
+            }
+        }
+        return sb.toString();
+    }
+
+    private static COSArray functionArray(String text)
+    {
+        COSArray array = new COSArray();
+        for (String part : text.trim().split("\\s+"))
+        {
+            if (part.isEmpty())
+            {
+                continue;
+            }
+            array.add(part.matches("-?\\d+") ? COSInteger.get(Long.parseLong(part)) : new COSFloat(Float.parseFloat(part)));
+        }
+        return array;
+    }
+
+    private static PDFunction buildFunction(Map<String, String> keys, List<String> sub2) throws IOException
+    {
+        int type = Integer.parseInt(keys.get("type"));
+        COSDictionary dictionary = type == 0 || type == 4 ? new COSStream() : new COSDictionary();
+        dictionary.setInt(COSName.FUNCTION_TYPE, type);
+        putFunctionArray(dictionary, COSName.DOMAIN, keys.get("domain"));
+        putFunctionArray(dictionary, COSName.RANGE, keys.get("range"));
+        putFunctionArray(dictionary, COSName.SIZE, keys.get("size"));
+        putFunctionArray(dictionary, COSName.ENCODE, keys.get("encode"));
+        putFunctionArray(dictionary, COSName.DECODE, keys.get("decode"));
+        putFunctionArray(dictionary, COSName.C0, keys.get("c0"));
+        putFunctionArray(dictionary, COSName.C1, keys.get("c1"));
+        putFunctionArray(dictionary, COSName.BOUNDS, keys.get("bounds"));
+        if (keys.containsKey("n"))
+        {
+            dictionary.setItem(COSName.N, functionArray(keys.get("n")).get(0));
+        }
+        if (keys.containsKey("bps"))
+        {
+            dictionary.setInt(COSName.BITS_PER_SAMPLE, Integer.parseInt(keys.get("bps")));
+        }
+        if (type == 3)
+        {
+            COSArray functions = new COSArray();
+            for (String sub : sub2)
+            {
+                String[] parts = sub.split("\\|");
+                COSDictionary child = new COSDictionary();
+                child.setInt(COSName.FUNCTION_TYPE, 2);
+                child.setItem(COSName.DOMAIN, functionArray("0 1"));
+                child.setItem(COSName.C0, functionArray(parts[0]));
+                child.setItem(COSName.C1, functionArray(parts[1]));
+                child.setItem(COSName.N, functionArray(parts[2]).get(0));
+                functions.add(child);
+            }
+            dictionary.setItem(COSName.FUNCTIONS, functions);
+        }
+        if (type == 0 || type == 4)
+        {
+            byte[] data;
+            if (type == 4)
+            {
+                data = keys.get("code").replace("\\n", "\n").getBytes(StandardCharsets.ISO_8859_1);
+            }
+            else
+            {
+                String hex = keys.getOrDefault("samples", "").replace(" ", "");
+                data = new byte[hex.length() / 2];
+                for (int i = 0; i < data.length; i++)
+                {
+                    data[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+                }
+            }
+            try (java.io.OutputStream os = ((COSStream) dictionary).createOutputStream())
+            {
+                os.write(data);
+            }
+        }
+        return PDFunction.create(dictionary);
+    }
+
+    private static void putFunctionArray(COSDictionary dictionary, COSName name, String text)
+    {
+        if (text != null)
+        {
+            dictionary.setItem(name, functionArray(text));
         }
     }
 }

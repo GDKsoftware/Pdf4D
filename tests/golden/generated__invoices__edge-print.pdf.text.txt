@@ -1,0 +1,85 @@
+text: default page 1
+| INVOICE
+| Quillon Harbor Trading Ltd
+| 14 Foxglove Lane
+| Exampleton 00000
+| Testland
+| Invoice number INV-2031-0417
+| Invoice date 2031-03-14
+| Due date 2031-04-13
+| Customer number C-90417
+| Bill to
+| Marlowe Orchard Supplies Inc.
+| 3 Imaginary Street
+| Sampletown 99999
+| Testland
+| Item Description Qty Unit price Amount
+| A-100 Cedar planter box, small 12 18.50 222.00
+| A-205 Copper watering can, 5 litre 6 42.75 256.50
+| B-310 Garden twine, 200 m spool 40 3.20 128.00
+| B-415 Pruning shears, forged steel 8 27.90 223.20
+| C-020 Seed tray set, 12 pieces 25 9.95 248.75
+| S-001 Freight and handling 1 35.00 35.00
+| Subtotal 1,113.45
+| VAT 21% 233.82
+| Total due (EUR) 1,347.27
+| Please pay within 30 days to account TL00 0000 0000 0000 00, quoting invoice number INV-2031-0417.
+| This invoice is entirely fictional and was made as test data. All names, addresses, numbers and amounts are invented. Terms: late payments are subject to an
+| interest charge of 1.5% per month on the outstanding balance. Goods remain the property of the seller until paid in full. Complaints must be reported in writing
+| within 14 days after the date of delivery.
+text: sorted page 1
+| INVOICE Invoice number INV-2031-0417
+| Invoice date 2031-03-14
+| Quillon Harbor Trading Ltd Due date 2031-04-13
+| 14 Foxglove Lane Customer number C-90417
+| Exampleton 00000
+| Testland
+| Bill to
+| Marlowe Orchard Supplies Inc.
+| 3 Imaginary Street
+| Sampletown 99999
+| Testland
+| Item Description Qty Unit price Amount
+| A-100 Cedar planter box, small 12 18.50 222.00
+| A-205 Copper watering can, 5 litre 6 42.75 256.50
+| B-310 Garden twine, 200 m spool 40 3.20 128.00
+| B-415 Pruning shears, forged steel 8 27.90 223.20
+| C-020 Seed tray set, 12 pieces 25 9.95 248.75
+| S-001 Freight and handling 1 35.00 35.00
+| Subtotal 1,113.45
+| VAT 21% 233.82
+| Total due (EUR) 1,347.27
+| Please pay within 30 days to account TL00 0000 0000 0000 00, quoting invoice number INV-2031-0417.
+| This invoice is entirely fictional and was made as test data. All names, addresses, numbers and amounts are invented. Terms: late payments are subject to an
+| interest charge of 1.5% per month on the outstanding balance. Goods remain the property of the seller until paid in full. Complaints must be reported in writing
+| within 14 days after the date of delivery.
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>INVOICE<EOL>
+| Quillon Harbor Trading Ltd<EOL>
+| 14 Foxglove Lane<EOL>
+| Exampleton 00000<EOL>
+| Testland<EOL>
+| </P><P>Invoice number<W>INV-2031-0417<EOL>
+| Invoice date<W>2031-03-14<EOL>
+| </P><P>Due date<W>2031-04-13<EOL>
+| Customer number<W>C-90417<EOL>
+| </P><P>Bill to<EOL>
+| Marlowe Orchard Supplies Inc.<EOL>
+| 3 Imaginary Street<EOL>
+| Sampletown 99999<EOL>
+| Testland<EOL>
+| </P><P>Item<W>Description<W>Qty<W>Unit price<W>Amount<EOL>
+| </P><P>A-100<W>Cedar planter box, small<W>12<W>18.50<W>222.00<EOL>
+| </P><P>A-205<W>Copper watering can, 5 litre<W>6<W>42.75<W>256.50<EOL>
+| </P><P>B-310<W>Garden twine, 200 m spool<W>40<W>3.20<W>128.00<EOL>
+| </P><P>B-415<W>Pruning shears, forged steel<W>8<W>27.90<W>223.20<EOL>
+| </P><P>C-020<W>Seed tray set, 12 pieces<W>25<W>9.95<W>248.75<EOL>
+| </P><P>S-001<W>Freight and handling<W>1<W>35.00<W>35.00<EOL>
+| </P><P>Subtotal<W>1,113.45<EOL>
+| </P><P>VAT 21%<W>233.82<EOL>
+| </P><P>Total due (EUR)<W>1,347.27<EOL>
+| </P><P>Please pay within 30 days to account TL00 0000 0000 0000 00, quoting invoice number INV-2031-0417.<EOL>
+| </P><P>This invoice is entirely fictional and was made as test data. All names, addresses, numbers and amounts are invented. Terms: late payments are subject to an<EOL>
+| interest charge of 1.5% per month on the outstanding balance. Goods remain the property of the seller until paid in full. Complaints must be reported in writing<EOL>
+| within 14 days after the date of delivery.</P></A></PAGE>

@@ -13,6 +13,7 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.AcroForm,
   Pdf4D.Model.DestinationResolver,
+  Pdf4D.Model.OptionalContent,
   Pdf4D.Model.Outline,
   Pdf4D.Model.PageTree;
 
@@ -27,6 +28,7 @@ type
     FResolver: TPDDestinationResolver;
     FOutline: TPDDocumentOutline;
     FAcroForm: TPDAcroForm;
+    FOptionalContentProperties: TPDOptionalContentProperties;
 
     function GetPages: TPDPageTree;
     function GetDestinationResolver: TPDDestinationResolver;
@@ -44,6 +46,8 @@ type
     function TryGetPageLabels(out PageLabels: TCosDictionary): Boolean;
     // Port of getAcroForm(null), without fix ups. The form belongs to the catalog. False when /AcroForm is no dictionary.
     function TryGetAcroForm(out AcroForm: TPDAcroForm): Boolean;
+    // The optional content configuration /OCProperties, which the catalog owns. False when it is no dictionary.
+    function TryGetOptionalContentProperties(out Properties: TPDOptionalContentProperties): Boolean;
     function TryGetNames(out Names: TCosDictionary): Boolean;
     function TryGetDests(out Dests: TCosDictionary): Boolean;
     function TryGetMetadata(out Metadata: TCosStream): Boolean;
@@ -79,6 +83,7 @@ end;
 
 destructor TPDDocumentCatalog.Destroy;
 begin
+  FOptionalContentProperties.Free;
   FAcroForm.Free;
   FOutline.Free;
   FResolver.Free;
@@ -144,6 +149,20 @@ begin
   end;
   AcroForm := FAcroForm;
   Result := Assigned(FAcroForm);
+end;
+
+function TPDDocumentCatalog.TryGetOptionalContentProperties(out Properties: TPDOptionalContentProperties): Boolean;
+begin
+  if not Assigned(FOptionalContentProperties) then
+  begin
+    var Dictionary: TCosDictionary;
+    if FRoot.TryGetCosDictionary(TCosNames.OCProperties, Dictionary) then
+    begin
+      FOptionalContentProperties := TPDOptionalContentProperties.Create(Dictionary);
+    end;
+  end;
+  Properties := FOptionalContentProperties;
+  Result := Assigned(FOptionalContentProperties);
 end;
 
 function TPDDocumentCatalog.TryGetNames(out Names: TCosDictionary): Boolean;

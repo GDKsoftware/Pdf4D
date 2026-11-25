@@ -1,0 +1,11 @@
+# <corpus file> # <what the reference listing says>
+# The corpus files that PDFBox 3.0.8 could not render (the listing has no "page <n> <w> <h> ok" line), so they have no reference image.
+# TestFilesWithoutReferenceAreListed fails when a listing changes in a way that adds or removes a file here. Regenerating the references
+# (tools/oracle/generate-render.ps1) may change it; review the change before accepting it, a "load-error: timeout" is never right.
+pdfbox/org/apache/pdfbox/encryption/AES128ExposedMeta.pdf # load-error: unsupported
+pdfbox/org/apache/pdfbox/encryption/AES256ExposedMeta.pdf # load-error: unsupported
+pdfbox/org/apache/pdfbox/encryption/AESkeylength128.pdf # load-error: unsupported
+pdfbox/org/apache/pdfbox/encryption/AESkeylength256.pdf # load-error: unsupported
+pdfbox/org/apache/pdfbox/pdfparser/PDFBOX-6041-example.pdf # load-error: parse
+pdfbox-jira/PDFBOX-4338.pdf # pages: 0
+pdfbox-jira/PDFBOX-4339.pdf # pages: 0

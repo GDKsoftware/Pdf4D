@@ -11,6 +11,9 @@ __recovery/
 *.dsk
 *.res
 !src/Resources/*.res
+!src/Vcl/Icons/*.res
+!src/Vcl/Design/icons/*.res
+!src/FMX/Design/icons/*.res
 *.~*
 Win32/
 Win64/
@@ -28,3 +31,8 @@ tools/oracle/jdk/
 tools/oracle/classes/
 tools/pdfbox-src/
 tools/corpus/failed-downloads.txt
+packages/*.a
+tests/Skia/results-*.xml
+tests/Vcl/results-*.xml
+tests/FMX/results-*.xml
+tools/pdfjs-src/

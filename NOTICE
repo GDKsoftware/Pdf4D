@@ -61,3 +61,27 @@ Includes tables generated with a JDK (java.text.Normalizer and Character.getType
 Unicode Character Database, as a resource in src/Resources (tools/unicode/text-tables.txt).
 Copyright (c) 1991-2022 Unicode, Inc. All rights reserved.
 Distributed under the Unicode License v3, https://www.unicode.org/license.txt. See licenses/Unicode-3.0.txt.
+
+Includes the ICC profile CGATS001Compat-v2-micro.icc of Apache PDFBox (the profile that PDDeviceCMYK loads), as a resource in
+src/Resources. Its copyright tag says CC0 (public domain dedication).
+
+The ICC profiles in tests/icc (see tests/icc/manifest.csv) are only used by the tests: sRGB.icc is the profile of the PDFBox
+test resources, whose copyright tag says "no copyright, use freely"; the other profiles are ICC streams that the PDFs of the
+test corpus embed.
+
+Includes a port of src/core/jpg.js of pdf.js (release v6.5.438), in src/Codec/Pdf4D.Codec.Jpeg.pas.
+Copyright 2014 Mozilla Foundation. Licensed under the Apache License, Version 2.0. pdf.js forked that code from jpgjs by
+notmasteryet, https://github.com/notmasteryet/jpgjs.
+
+Includes an adaptation of the fancy upsampling (h2v1_fancy_upsample and h2v2_fancy_upsample) of jdsample.c of the Independent
+JPEG Group's libjpeg, in src/Codec/Pdf4D.Codec.Jpeg.pas. This software is based in part on the work of the Independent JPEG
+Group. The inverse DCT follows the Loeffler algorithm as pdf.js has it (which took it from the poppler project) and is covered by the
+pdf.js licence above.
+
+Includes a port of CCITTFaxDecoderStream of TwelveMonkeys ImageIO (as taken over by Apache PDFBox 3.0.8), in
+src/Codec/Pdf4D.Codec.CCITTFax.pas. Copyright (c) 2012, Harald Kuhr. Licensed under the BSD 3-Clause License, see
+licenses/TwelveMonkeys-BSD.txt.
+
+Pdf4D does not include Skia. The Skia backend (src/Render/Skia) uses System.Skia (Skia4Delphi) that ships with RAD Studio, and
+needs sk4d.dll or libsk4d.so, which the application brings. Skia is licensed under the BSD 3-Clause License, Skia4Delphi under
+the MIT License.

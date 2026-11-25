@@ -1,0 +1,10 @@
+text: default page 1
+| Clip Clip Clip Clip
+| AB CD
+text: sorted page 1
+| Clip Clip Clip Clip
+| AB CD
+text: range 2-3
+text: separators 1-2
+| <PAGE><A><P>Clip<W>Clip<W>Clip<W>Clip<EOL>
+| </P><P>AB<W>CD</P></A></PAGE>

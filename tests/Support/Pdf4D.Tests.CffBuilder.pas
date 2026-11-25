@@ -17,6 +17,8 @@ type
     EncodingData: TBytes;
     StringIndexEntries: TArray<string>;
     LocalSubrs: TArray<TBytes>;
+    // The charstrings of the glyphs, one for each of GlyphCount; empty makes every charstring "endchar"
+    CharStrings: TArray<TBytes>;
     DefaultWidthX: Integer;
     NominalWidthX: Integer;
     // DICT bytes put in front of the top DICT entries the builder makes
@@ -75,7 +77,7 @@ type
     class function TopDict(const Options: TCffType1Options; const CharStringsOffset, CharsetOffset, EncodingOffset,
                            PrivateSize, PrivateOffset: Integer): TBytes; static;
     class function PrivateDict(const Options: TCffType1Options): TBytes; static;
-    class function CharStringIndex(const GlyphCount: Integer): TBytes; static;
+    class function CharStringIndex(const Options: TCffType1Options): TBytes; static;
     class function Type2Number(const Value: Integer): TBytes; static;
     class function CidCharStringIndex(const Options: TCffCidOptions): TBytes; static;
     class function CidCharset(const Options: TCffCidOptions): TBytes; static;
@@ -225,11 +227,16 @@ begin
   end;
 end;
 
-class function TCffTestBuilder.CharStringIndex(const GlyphCount: Integer): TBytes;
+class function TCffTestBuilder.CharStringIndex(const Options: TCffType1Options): TBytes;
 begin
+  if Length(Options.CharStrings) > 0 then
+  begin
+    Exit(Index(Options.CharStrings, 4));
+  end;
+
   var Entries: TArray<TBytes>;
-  SetLength(Entries, GlyphCount);
-  for var Glyph := 0 to GlyphCount - 1 do
+  SetLength(Entries, Options.GlyphCount);
+  for var Glyph := 0 to Options.GlyphCount - 1 do
   begin
     Entries[Glyph] := Bytes([EndCharString]);
   end;
@@ -276,7 +283,7 @@ begin
   const NameIndex = Index([AsciiBytes(Options.FontName)], 1);
   const StringIndex = Index(Strings);
   const GlobalSubrs = Index(nil);
-  const CharStrings = CharStringIndex(Options.GlyphCount);
+  const CharStrings = CharStringIndex(Options);
   const PrivateData = PrivateDict(Options);
   var Subrs: TBytes := nil;
   if Length(Options.LocalSubrs) > 0 then

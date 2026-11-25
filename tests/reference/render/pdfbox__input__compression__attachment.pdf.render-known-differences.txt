@@ -1,0 +1,2 @@
+# page <n> [<platform>] # <reason>
+page 1 # PDFBox constructAppearances not ported: the Link annotation of the page (object 48, /Border [0 0 1], no /AP) is drawn by PDFBox as a bordered rectangle around the text and skipped here (a deliberate deviation, see docs/porting.md)

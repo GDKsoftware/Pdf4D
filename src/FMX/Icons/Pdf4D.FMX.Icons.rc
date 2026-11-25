@@ -1,0 +1,16 @@
+// The icons of the toolbar: the 16 by 16 pixel PNGs of the VCL toolbar, which are not copied. Compile with brcc32 Pdf4D.FMX.Icons.rc (or the
+// resource compiler of the IDE) in this folder into Pdf4D.FMX.Icons.res; the toolbar loads them by these names. The names differ from those of
+// the VCL resource, so that a program that links both toolbars has no duplicate resource.
+PDF4D_FMX_ICON_FIRST RCDATA "..\..\Vcl\Icons\First.png"
+PDF4D_FMX_ICON_PRIOR RCDATA "..\..\Vcl\Icons\Prior.png"
+PDF4D_FMX_ICON_NEXT RCDATA "..\..\Vcl\Icons\Next.png"
+PDF4D_FMX_ICON_LAST RCDATA "..\..\Vcl\Icons\Last.png"
+PDF4D_FMX_ICON_ZOOMIN RCDATA "..\..\Vcl\Icons\ZoomIn.png"
+PDF4D_FMX_ICON_ZOOMOUT RCDATA "..\..\Vcl\Icons\ZoomOut.png"
+PDF4D_FMX_ICON_FITWIDTH RCDATA "..\..\Vcl\Icons\FitWidth.png"
+PDF4D_FMX_ICON_FITPAGE RCDATA "..\..\Vcl\Icons\FitPage.png"
+PDF4D_FMX_ICON_ROTATECLOCKWISE RCDATA "..\..\Vcl\Icons\RotateClockwise.png"
+PDF4D_FMX_ICON_ROTATECOUNTERCLOCKWISE RCDATA "..\..\Vcl\Icons\RotateCounterclockwise.png"
+PDF4D_FMX_ICON_SEARCH RCDATA "..\..\Vcl\Icons\Search.png"
+PDF4D_FMX_ICON_PRINT RCDATA "..\..\Vcl\Icons\Print.png"
+PDF4D_FMX_ICON_COPY RCDATA "..\..\Vcl\Icons\Copy.png"

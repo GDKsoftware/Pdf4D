@@ -1,0 +1,144 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5A8E2C4D-91B3-4F67-8D20-C7E1A4B93F58}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Pdf4D.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Pdf4D.Render.dproj">
+            <Dependencies>Pdf4D.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.Render.Skia.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.Viewer.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.Vcl.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Viewer.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.Vcl.Skia.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.Vcl.dproj</Dependencies>
+        </Projects>
+        <Projects Include="dclPdf4D.Vcl.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.Vcl.dproj;Pdf4D.Vcl.Skia.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.FMX.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Viewer.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Pdf4D.FMX.Skia.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.FMX.dproj</Dependencies>
+        </Projects>
+        <Projects Include="dclPdf4D.FMX.dproj">
+            <Dependencies>Pdf4D.dproj;Pdf4D.Render.dproj;Pdf4D.Render.Skia.dproj;Pdf4D.Viewer.dproj;Pdf4D.FMX.dproj;Pdf4D.FMX.Skia.dproj</Dependencies>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Pdf4D">
+        <MSBuild Projects="Pdf4D.dproj"/>
+    </Target>
+    <Target Name="Pdf4D:Clean">
+        <MSBuild Projects="Pdf4D.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D:Make">
+        <MSBuild Projects="Pdf4D.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.Render" DependsOnTargets="Pdf4D">
+        <MSBuild Projects="Pdf4D.Render.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Render:Clean" DependsOnTargets="Pdf4D:Clean">
+        <MSBuild Projects="Pdf4D.Render.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Render:Make" DependsOnTargets="Pdf4D:Make">
+        <MSBuild Projects="Pdf4D.Render.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.Render.Skia" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia">
+        <MSBuild Projects="Pdf4D.Render.Skia.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Render.Skia:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean">
+        <MSBuild Projects="Pdf4D.Render.Skia.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Render.Skia:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make">
+        <MSBuild Projects="Pdf4D.Render.Skia.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.Viewer" DependsOnTargets="Pdf4D;Pdf4D.Render">
+        <MSBuild Projects="Pdf4D.Viewer.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Viewer:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean">
+        <MSBuild Projects="Pdf4D.Viewer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Viewer:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make">
+        <MSBuild Projects="Pdf4D.Viewer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Viewer">
+        <MSBuild Projects="Pdf4D.Vcl.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Viewer:Clean">
+        <MSBuild Projects="Pdf4D.Vcl.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Viewer:Make">
+        <MSBuild Projects="Pdf4D.Vcl.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl.Skia" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer;Pdf4D.Vcl">
+        <MSBuild Projects="Pdf4D.Vcl.Skia.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl.Skia:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean;Pdf4D.Vcl:Clean">
+        <MSBuild Projects="Pdf4D.Vcl.Skia.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.Vcl.Skia:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make;Pdf4D.Vcl:Make">
+        <MSBuild Projects="Pdf4D.Vcl.Skia.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPdf4D.Vcl" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer;Pdf4D.Vcl;Pdf4D.Vcl.Skia">
+        <MSBuild Projects="dclPdf4D.Vcl.dproj"/>
+    </Target>
+    <Target Name="dclPdf4D.Vcl:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean;Pdf4D.Vcl:Clean;Pdf4D.Vcl.Skia:Clean">
+        <MSBuild Projects="dclPdf4D.Vcl.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPdf4D.Vcl:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make;Pdf4D.Vcl:Make;Pdf4D.Vcl.Skia:Make">
+        <MSBuild Projects="dclPdf4D.Vcl.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.FMX" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Viewer">
+        <MSBuild Projects="Pdf4D.FMX.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.FMX:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Viewer:Clean">
+        <MSBuild Projects="Pdf4D.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.FMX:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Viewer:Make">
+        <MSBuild Projects="Pdf4D.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pdf4D.FMX.Skia" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer;Pdf4D.FMX">
+        <MSBuild Projects="Pdf4D.FMX.Skia.dproj"/>
+    </Target>
+    <Target Name="Pdf4D.FMX.Skia:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean;Pdf4D.FMX:Clean">
+        <MSBuild Projects="Pdf4D.FMX.Skia.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pdf4D.FMX.Skia:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make;Pdf4D.FMX:Make">
+        <MSBuild Projects="Pdf4D.FMX.Skia.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclPdf4D.FMX" DependsOnTargets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer;Pdf4D.FMX;Pdf4D.FMX.Skia">
+        <MSBuild Projects="dclPdf4D.FMX.dproj"/>
+    </Target>
+    <Target Name="dclPdf4D.FMX:Clean" DependsOnTargets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean;Pdf4D.FMX:Clean;Pdf4D.FMX.Skia:Clean">
+        <MSBuild Projects="dclPdf4D.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclPdf4D.FMX:Make" DependsOnTargets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make;Pdf4D.FMX:Make;Pdf4D.FMX.Skia:Make">
+        <MSBuild Projects="dclPdf4D.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Pdf4D;Pdf4D.Render;Pdf4D.Render.Skia;Pdf4D.Viewer;Pdf4D.Vcl;Pdf4D.Vcl.Skia;dclPdf4D.Vcl;Pdf4D.FMX;Pdf4D.FMX.Skia;dclPdf4D.FMX"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Pdf4D:Clean;Pdf4D.Render:Clean;Pdf4D.Render.Skia:Clean;Pdf4D.Viewer:Clean;Pdf4D.Vcl:Clean;Pdf4D.Vcl.Skia:Clean;dclPdf4D.Vcl:Clean;Pdf4D.FMX:Clean;Pdf4D.FMX.Skia:Clean;dclPdf4D.FMX:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Pdf4D:Make;Pdf4D.Render:Make;Pdf4D.Render.Skia:Make;Pdf4D.Viewer:Make;Pdf4D.Vcl:Make;Pdf4D.Vcl.Skia:Make;dclPdf4D.Vcl:Make;Pdf4D.FMX:Make;Pdf4D.FMX.Skia:Make;dclPdf4D.FMX:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

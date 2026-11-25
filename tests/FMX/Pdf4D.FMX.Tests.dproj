@@ -1,0 +1,140 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C4A8E1D7-5B30-4F92-96AD-0E73B2F5C168}</ProjectGuid>
+        <MainSource>Pdf4D.FMX.Tests.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <FrameworkType>FMX</FrameworkType>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectVersion>20.3</ProjectVersion>
+        <TargetedPlatforms>3</TargetedPlatforms>
+        <AppType>Console</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_DcuOutput>.\$(Platform)\$(Config)\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_Define>PDF4D_TESTS;$(DCC_Define)</DCC_Define>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>..\..\src\Common;..\..\src\IO;..\..\src\Cos;..\..\src\Parser;..\..\src\Content;..\..\src\Filter;..\..\src\Crypto;..\..\src\Encryption;..\..\src\Model;..\..\src\Api;..\..\src\Resources;..\..\src\Text;..\..\src\FontBox;..\..\src\Font;..\..\src\Render;..\..\src\Render\Skia;..\..\src\Viewer;..\..\src\FMX;..\..\src\FMX\Skia;..\..\src\Graphics;..\..\src\Codec;..\Support;Support;..\ThirdParty\DEC\Source;$(BDS)\source\DUnitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>Pdf4D_FMX_Tests</SanitizedProjectName>
+        <DCC_Hints>true</DCC_Hints>
+        <DCC_Warnings>true</DCC_Warnings>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\Pdf4D.Tests.MemoryCheck.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.FmxHost.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.FmxBitmapPrintTarget.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.SaveAsDialogDriver.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.ViewSupport.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Thumbnails.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.OutlineView.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Print.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Actions.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Viewer.pas"/>
+        <DCCReference Include="..\..\src\FMX\Skia\Pdf4D.FMX.Backend.Skia.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.FmxHost.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Thumbnails.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.OutlineView.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.SearchBar.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Actions.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Toolbar.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Print.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PrintDialog.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Viewer.Tests.pas"/>
+        <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Streaming.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.FmxViewerFlows.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.FmxPerformance.Tests.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">Pdf4D.FMX.Tests.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

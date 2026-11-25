@@ -5,10 +5,28 @@ unit Pdf4D.Api.Page.Interfaces;
 interface
 
 uses
+  Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Cos.Dictionary,
   Pdf4D.Model.Rectangle;
 
 type
+  {$SCOPEDENUMS ON}
+  // Other: GoToR, Launch, JavaScript, named actions, and so on
+  TPdfLinkKind = (&GoTo, Uri, Other);
+  {$SCOPEDENUMS OFF}
+
+  TPdfLink = record
+    // The page that holds the link
+    PageIndex: Integer;
+    // /QuadPoints when valid, else /Rect; PDF user space like the quads of the text layout
+    Quads: TArray<TPdfQuad>;
+    Kind: TPdfLinkKind;
+    // Kind = GoTo only
+    TargetPageIndex: Integer;
+    // Kind = Uri only
+    Uri: string;
+  end;
+
   // A page of a document. The page keeps its document alive.
   IPdfPage = interface
     ['{4B1D6C52-7A0E-4F8B-9D35-1E6A2C8F5B01}']
@@ -27,6 +45,14 @@ type
 
     // The text of this page only, with the default options
     function ExtractText: string;
+    // The text of this page with the place of every character, with the default options
+    function ExtractTextWithPositions: IPdfPositionedText;
+    // The words, segments and lines of this page. The text is read with SortByPosition set, whatever the order in the file.
+    function TextLayout: IPdfTextLayout; overload;
+    function TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout; overload;
+    // The links of this page in the order of /Annots. A link that is broken (no /Rect, no action, a destination that is no page of the
+    // document) is skipped with a line in the log.
+    function Links: TArray<TPdfLink>;
 
     // The page dictionary of the inner layer. It stays valid only as long as this interface (or any other interface
     // of the same document) is alive.

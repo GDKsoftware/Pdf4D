@@ -11,11 +11,20 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 5. **Long ported methods may keep the PDFBox order** as long as they stay readable. Splitting into private methods is preferred. Overrides: method decomposition.
 6. **Inline variables and `const` stay mandatory**, as in the GDK rules.
 7. **Shared, lazily made objects go through `TPdfSharedInstance` and `TPdfSharedCache`.** A `class destructor` may free such an object. No `initialization` or `finalization` sections. Overrides: the GDK rule on singletons. Reason: thread-safe lazy publication and leak detection (an object that is filled once and freed at shutdown is no leak).
+8. **A global `procedure Register` in `Pdf4D.Vcl.Registration`.** Overrides: no global procedures. Reason: the IDE calls it by name when it loads the design-time package `dclPdf4D.Vcl`; it is the only global procedure of the library.
 
 ## Additions
 
 - Language level: Delphi 12. No Delphi 13-only syntax, such as the ternary `if` expression.
-- Only `System.*` units in the library. No `Winapi.*`, `Vcl.*`, `FMX.*` or inline assembler.
+- Only `System.*` units in the library: the core, `Pdf4D.Render` and `Pdf4D.Viewer`. No `Winapi.*`, `Vcl.*`, `FMX.*` or inline assembler there. Exception: `src\Vcl` may use `Vcl.*` and `Winapi.*` (overrides: only `System.*` units), because it holds the VCL components; it does not use `FMX.*`. `src\FMX` may use `FMX.*` (overrides: only `System.*` units) and uses no `Vcl.*` and no `Winapi.*`, so that the components can compile for macOS and Linux. Events of components are `procedure of object` without `var` parameters.
 - Every unit that ports PDFBox code names the PDFBox source files and the PDFBox version in its header.
 - Zero hints and zero warnings on all platforms.
-- Test hooks (`TPDFontFactory.CreatorOverride`, the setter of `TCMap.MappingLimit`) exist only when `PDF4D_TESTS` is defined. The define is set in `tests/Pdf4D.Tests.dproj` only, so library code never sees the hooks.
+- Test hooks (`TPDFontFactory.CreatorOverride`, the setter of `TCMap.MappingLimit`) exist only when `PDF4D_TESTS` is defined. The define is set in the test projects only (`tests/Pdf4D.Tests.dproj`, `tests/Skia/Pdf4D.Skia.Tests.dproj`, `tests/Vcl/Pdf4D.Vcl.Tests.dproj` and `tests/FMX/Pdf4D.FMX.Tests.dproj`), so the packages, the library code and the demo never see the hooks.
+- Layers of the renderer: the core (everything under `src` except `Graphics`, `Codec`, `Render` and `Resources\Pdf4D.Resources.Icc.*`) uses no unit from those folders, and only units under `src\Render\Skia`, `src\Vcl\Skia` and `src\FMX\Skia` use `System.Skia` or `Pdf4D.Render.Skia`. `src\Viewer` uses only `System.*` and `Pdf4D.*` units of the core and `Pdf4D.Render`, and the core and `src\Render` use no unit from `src\Viewer`. `build.ps1` checks these rules and fails on a violation.
+- The renderer draws through `IPdfGraphicsDevice` and `IPdfRenderBackend` only; it never calls a backend library directly.
+- Code that computes with floating point in the renderer and the Skia device runs inside `TPdfFloatGuard` (Skia masks all floating point exceptions of the process when it loads, Delphi raises on them) and uses `Single` with `{$EXCESSPRECISION OFF}`, as the text code does.
+- The demos under `demos` follow the same rules (zero hints and warnings, built by `build.ps1`) and use the components through their public API only: a demo has no logic of its own for the viewer.
+- The messages of `ENotSupportedException` that a `case` raises for a value that it does not know (`Unsupported document change: %d`) are programmer errors that no user sees: they stay string literals. A message that can reach a user or a log of the application is a resource string in `Pdf4D.Viewer.ResourceStrings`; a text that only one framework shell can raise (`src\Vcl`, `src\FMX`) may be a `resourcestring` of the unit of that shell.
+- The test programs (`tests\*\*.dpr`) may have helper routines of their own (`PlatformName`, `RunTests`, `FlushFmxBlocks`): they are programs, not library code.
+- A Skia call that is not in the list of `docs\building.md` ("Skia API of the backend") gets a line in the Delphi 12 checklist there.
+- `Graphics`, `Codec` and `Render` follow exception 2 only for the objects that mirror the PDFBox object graph (the colour spaces and the page drawer); the device interface, the renderer and the bitmap use interfaces.
