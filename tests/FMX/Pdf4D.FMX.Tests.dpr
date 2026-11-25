@@ -6,6 +6,7 @@ program Pdf4D.FMX.Tests;
 {$STRONGLINKTYPES ON}
 
 uses
+  System.Classes,
   System.SysUtils,
   System.Math,
   System.IOUtils,
@@ -103,6 +104,13 @@ end;
 // apart.
 function FlushFmxBlocks: Boolean;
 begin
+  // What the tests queued to free later (the job, the progress window, a dialog that frees itself) goes first, so that it cannot be freed
+  // between the two measurements and hide a leak of the same size
+  while CheckSynchronize do
+  begin
+    Application.ProcessMessages;
+  end;
+
   const IsReleased = MakeWindowsUntilRelease and MakeWindowsUntilRelease;
 
   const Settled = TMemoryCheck.OutstandingBlocks;
