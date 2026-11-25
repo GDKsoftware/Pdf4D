@@ -78,6 +78,7 @@
         <DCCReference Include="..\Pdf4D.Tests.MemoryCheck.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FmxHost.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.FmxBitmapPrintTarget.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.SaveAsDialogDriver.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Painter.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.Document.pas"/>
         <DCCReference Include="..\..\src\FMX\Pdf4D.FMX.PageView.pas"/>

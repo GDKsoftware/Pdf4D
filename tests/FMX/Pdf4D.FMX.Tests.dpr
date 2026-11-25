@@ -16,6 +16,7 @@ uses
   Pdf4D.Tests.MemoryCheck in '..\Pdf4D.Tests.MemoryCheck.pas',
   Pdf4D.Tests.FmxHost in 'Support\Pdf4D.Tests.FmxHost.pas',
   Pdf4D.Tests.FmxBitmapPrintTarget in 'Support\Pdf4D.Tests.FmxBitmapPrintTarget.pas',
+  Pdf4D.Tests.SaveAsDialogDriver in 'Support\Pdf4D.Tests.SaveAsDialogDriver.pas',
   Pdf4D.FMX.Painter in '..\..\src\FMX\Pdf4D.FMX.Painter.pas',
   Pdf4D.FMX.Document in '..\..\src\FMX\Pdf4D.FMX.Document.pas',
   Pdf4D.FMX.PageView in '..\..\src\FMX\Pdf4D.FMX.PageView.pas',

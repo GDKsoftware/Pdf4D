@@ -14,6 +14,7 @@ uses
   System.Generics.Collections,
   System.Diagnostics,
   FMX.Graphics,
+  Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Viewer.Print,
   DUnitX.TestFramework,
   Pdf4D.Tests.FmxHost,
@@ -42,6 +43,9 @@ type
     function IsJobOver: Boolean;
     function HasPrintedPagesBeforeClosing: Boolean;
     function IsRealJobOver: Boolean;
+    // Loads the PDF that the printer wrote and checks the page count and that every page has a good part of the ink of the original (the text is gray in the raster that the printer makes)
+    function InkOf(const Renderer: IPdfRenderer; const PageIndex: Integer): Int64;
+    procedure CheckPrintedFile(const FilePath: string; const Original: TBytes);
     // Prints with the settings and waits until the job is over
     procedure PrintAndWait(const RangeKind: TPdfPrintRangeKind; const Scale: TPdfPrintScale);
     function CopyPages(const Pages: TObjectList<TBitmap>): TObjectList<TBitmap>;
@@ -82,6 +86,8 @@ type
     [Test]
     procedure TestPrinterTargetReportsTheGeometry;
 
+    // Prints on the printer of PDF4D_TEST_PRINTER. A printer that prints to a file (Microsoft Print to PDF) asks for the file
+    // in a dialog; TSaveAsDialogDriver answers it with a path in the temporary folder and the PDF is checked afterwards.
     [Test]
     procedure TestRealPrinter;
   end;
@@ -95,7 +101,12 @@ uses
   FMX.Forms,
   FMX.Printer,
   FMX.Types,
+  Pdf4D.Api.Document,
+  Pdf4D.Common.Defines,
+  Pdf4D.Api.Document.Interfaces,
   Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Renderer,
+  Pdf4D.Tests.SaveAsDialogDriver,
   Pdf4D.Viewer.Types,
   Pdf4D.FMX.Print,
   Pdf4D.Tests.ViewerDocuments;
@@ -114,6 +125,13 @@ const
   PagesBeforeClosing = 2;
   PdfPointsToPixels150 = 150 / 72;
   PrinterEnvironmentVariable = 'PDF4D_TEST_PRINTER';
+  PrintToPdfPrinter = 'Microsoft Print to PDF';
+  KeptFileName = 'pdf4d-real-printer.pdf';
+  SaveDialogTimeoutMs = 60000;
+  PrintedPageDpi = 36;
+  MaxByte = 255;
+  // A printed page has to have at least a quarter of the ink of the original at the same resolution
+  MinInkRatio = 4;
 
 { TPdfFmxPrintTests }
 
@@ -457,6 +475,55 @@ begin
   Assert.IsTrue((Target.Dpi.X > 0) and (Target.Dpi.Y > 0), 'the printer has a resolution');
 end;
 
+// The sum of how far every pixel is from white, so that a gray text and a black text of the same shape count alike
+function TPdfFmxPrintTests.InkOf(const Renderer: IPdfRenderer; const PageIndex: Integer): Int64;
+begin
+  Result := 0;
+  var Bitmap: TPdfBitmap := nil;
+  try
+    Renderer.RenderToBitmap(PageIndex, TPdfRenderParams.FromDpi(PrintedPageDpi), Bitmap);
+    // The pixels are premultiplied; what is not covered is transparent, so it is put on white paper first
+    Bitmap.FlattenOn(TPdfDeviceColor.White);
+    for var Y := 0 to Bitmap.Height - 1 do
+    begin
+      for var X := 0 to Bitmap.Width - 1 do
+      begin
+        const Pixel = Bitmap.GetPixel(X, Y);
+        Inc(Result, MaxByte - Min(Pixel.R, Min(Pixel.G, Pixel.B)));
+      end;
+    end;
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TPdfFmxPrintTests.CheckPrintedFile(const FilePath: string; const Original: TBytes);
+begin
+  Assert.IsTrue(TFile.Exists(FilePath), 'the printer wrote the file ' + FilePath);
+  // Kept for a look at what the printer made; the next run replaces it
+  TFile.Copy(FilePath, TPath.Combine(TPath.GetTempPath, KeptFileName), True);
+
+  const Printed: IPdfDocument = TPdfDocument.Load(FilePath);
+  const Stream = TBytesStream.Create(Original);
+  try
+    const Source: IPdfDocument = TPdfDocument.Load(Stream, TPdfLoadOptions.Default);
+    Assert.AreEqual(Source.PageCount, Printed.PageCount, 'the printed file has every page');
+
+    const PrintedRenderer: IPdfRenderer = TPdfRenderer.Create(Printed, TFmxTestHost.NewRenderBackend);
+    const SourceRenderer: IPdfRenderer = TPdfRenderer.Create(Source, TFmxTestHost.NewRenderBackend);
+    for var Page := 0 to Printed.PageCount - 1 do
+    begin
+      // The page is scaled to the paper, so the ink of the printed page is compared with that of the original, not with a fixed number
+      const PrintedInk = InkOf(PrintedRenderer, Page);
+      const SourceInk = InkOf(SourceRenderer, Page);
+      Assert.IsTrue(PrintedInk * MinInkRatio >= SourceInk, Format('page %d of the printed file has ink %d, the original has %d', [Page, PrintedInk, SourceInk]));
+      Assert.IsTrue(PrintedInk > 0, Format('page %d of the printed file is blank', [Page]));
+    end;
+  finally
+    Stream.Free;
+  end;
+end;
+
 procedure TPdfFmxPrintTests.TestRealPrinter;
 begin
   const PrinterName = GetEnvironmentVariable(PrinterEnvironmentVariable);
@@ -482,9 +549,37 @@ begin
   FRealDialog.Document := FHost.Document;
   FRealDialog.ShowProgress := False;
   FRealDialog.OnPrintFailed := HandleFailed;
-  FRealDialog.Print(TPdfPrintSettings.Default);
-  Assert.IsTrue(FHost.WaitUntil(IsRealJobOver, 60 * PageSeconds), 'the job ends');
+  const IsPrintToFile = SameText(Printer.ActivePrinter.Title, PrintToPdfPrinter) or SameText(Printer.ActivePrinter.Device, PrintToPdfPrinter);
+  const OutputPath = TPath.Combine(FFolder, 'real-printer.pdf');
+  var Driver: TSaveAsDialogDriver := nil;
+  if IsPrintToFile then
+  begin
+    TDirectory.CreateDirectory(FFolder);
+    Driver := TSaveAsDialogDriver.Create(OutputPath, MainThreadID, SaveDialogTimeoutMs);
+  end;
+
+  var DialogDescription := '';
+  var IsDialogHandled := True;
+  try
+    FRealDialog.Print(TPdfPrintSettings.Default);
+    Assert.IsTrue(FHost.WaitUntil(IsRealJobOver, 60 * PageSeconds), 'the job ends');
+  finally
+    if Assigned(Driver) then
+    begin
+      Driver.Terminate;
+      Driver.WaitFor;
+      DialogDescription := Driver.Description;
+      IsDialogHandled := Driver.IsDialogHandled;
+      Driver.Free;
+    end;
+  end;
+
   Assert.AreEqual('', FFailure, 'printing does not fail');
+  Assert.IsTrue(IsDialogHandled, 'the file dialog of the printer was answered: ' + DialogDescription);
+  if IsPrintToFile then
+  begin
+    CheckPrintedFile(OutputPath, TViewerDocuments.Invoice);
+  end;
 end;
 
 end.
