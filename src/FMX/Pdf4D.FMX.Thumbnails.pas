@@ -34,8 +34,6 @@ type
     FViewport: TSize;
     FIsUpdatingScrollBar: Boolean;
     FScrollBarDirty: Boolean;
-    // The height of the content that the bar was last set for
-    FBarContentHeight: Integer;
 
     procedure SetDocument(const Value: TPdf4DCustomDocument);
     function GetThumbnailWidth: Integer;
@@ -281,7 +279,6 @@ begin
     var Pass := 0;
     repeat
       FScrollBarDirty := False;
-      FBarContentHeight := FController.ContentSize.cy;
       Inc(Pass);
 
       if ShowBarForContent then
@@ -334,11 +331,6 @@ begin
     Exit;
   end;
 
-  // The controller does not report the content that a document gives it when it attaches, so the bar follows the content here
-  if FController.ContentSize.cy <> FBarContentHeight then
-  begin
-    UpdateScrollBar;
-  end;
   // FMX repaints a control as a whole
   Repaint;
 end;
