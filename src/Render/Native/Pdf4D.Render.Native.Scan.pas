@@ -7,9 +7,6 @@ unit Pdf4D.Render.Native.Scan;
 
 {$EXCESSPRECISION OFF}
 {$SCOPEDENUMS ON}
-// Rust casts i32 to u32 and adds and shifts with wrapping in a release build
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
 
 interface
 
@@ -28,8 +25,9 @@ uses
 // The non-anti-aliased scan converter and the rectangle fills of scan/mod.rs.
 //
 // Rust panics reachable from input become early exits that draw nothing: a path whose edges cannot be built, a shift outside the edge
-// builder's range and a span whose right end lies left of its start (u32 subtraction in Rust). The walk of the edges draws at least one row
-// in Rust even when the rows to draw are empty; here it draws nothing for them.
+// builder's range and a span whose right end lies left of its start (u32 subtraction in Rust). The walk of the edges draws one row in Rust
+// even when the rows to draw are empty. With clipped edges no edge is active in that row, so nothing is drawn there either; the two only
+// differ after the row shift has wrapped (|y| of about 5.4e8 and more), where here nothing is drawn.
 //
 // The edge list of Rust is a Vec with indices as links; the sort of Rust is stable, so the sort here is a merge sort on (first_y, x).
 //
@@ -265,7 +263,8 @@ begin
     Exit;
   end;
 
-  // No rows to draw: Rust draws the first row anyway, which is outside of what the edges cover
+  // No rows to draw: Rust walks one row anyway, in which no clipped edge is active; the start row is only not before the stop row here
+  // after the row shift has wrapped (|y| of about 5.4e8 and more)
   if ShiftedStartY >= ShiftedStopY then
   begin
     Exit;

@@ -6,9 +6,6 @@ unit Pdf4D.Render.Native.Scan.HairlineAntiAlias;
 
 {$EXCESSPRECISION OFF}
 {$SCOPEDENUMS ON}
-// Rust casts i32 to u32 and adds and shifts with wrapping in a release build
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
 
 interface
 

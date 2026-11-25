@@ -6,9 +6,6 @@ unit Pdf4D.Render.Native.Scan.AntiAlias;
 
 {$EXCESSPRECISION OFF}
 {$SCOPEDENUMS ON}
-// Rust casts i32 to u32 and shifts with wrapping in a release build
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
 
 interface
 
@@ -55,9 +52,7 @@ type
                              const Blitter: TTsBlitter); static;
   end;
 
-implementation
-
-type
+  // The SuperBlitter is public only so that the tests can drive its spans.
   TTsBaseSuperBlitter = record
   public
     RealBlitter: TTsBlitter;
@@ -100,6 +95,8 @@ type
     // Blits a row of pixels, with location and width specified in supersampled coordinates.
     procedure BlitH(const X, Y, Width: Cardinal); override;
   end;
+
+implementation
 
 { TTsBaseSuperBlitter }
 
@@ -239,6 +236,14 @@ begin
     begin
       Fb := TTsScanAntiAlias.Scale - Fb;
     end;
+  end;
+
+  // The span of the hack above can be too long and leave the offset of its run right of the start of the next span of the same sub-row. The
+  // offset only says where to start searching, so starting over from the first run gives the same alphas where Rust panics on an
+  // underflow of `x - offset_x`.
+  if Integer(Start shr TTsScanAntiAlias.SupersampleShift) < FOffsetX then
+  begin
+    FOffsetX := 0;
   end;
 
   const MaxValue = Byte((1 shl (8 - TTsScanAntiAlias.SupersampleShift)) - Integer(((Y and TTsScanAntiAlias.Mask) + 1) shr TTsScanAntiAlias.SupersampleShift));
