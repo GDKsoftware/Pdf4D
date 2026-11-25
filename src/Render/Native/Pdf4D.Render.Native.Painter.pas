@@ -64,6 +64,8 @@ type
                                    const Pixmap: TTsSubPixmapMut); static;
     class function SubMaskOf(const Mask: PTsMask): TTsSubMaskRef; static;
     class function SubMaskOfTile(const Mask: PTsMask; const Tile: TTsScreenIntRect): TTsSubMaskRef; static;
+    // False when the mask has another size than the pixmap: nothing is drawn then, with or without tiles
+    class function MaskFitsPixmap(const Mask: PTsMask; const Pixmap: TTsPixmap): Boolean; static;
 
   public
     // Sometimes in the drawing pipeline, we have to perform math on path coordinates, even after the path is in device-coordinates. To
@@ -243,9 +245,20 @@ begin
   end;
 end;
 
+class function TTsPainter.MaskFitsPixmap(const Mask: PTsMask; const Pixmap: TTsPixmap): Boolean;
+begin
+  // Pdf4D: without tiles the blitter rejects a mask of another size, with tiles a tile that the mask does not cover would be drawn unmasked
+  Result := ((Mask = nil) or ((Mask.Width = Pixmap.Width) and (Mask.Height = Pixmap.Height)));
+end;
+
 class procedure TTsPainter.FillRect(var Pixmap: TTsPixmap; const Rect: TTsRect; const Paint: TTsPaint; const Transform: TTsTransform;
   const Mask: PTsMask);
 begin
+  if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
   // TODO of tiny-skia: we probably can use tiler for rect too
   if Transform.IsIdentity and (not TTsDrawTiler.Required(Pixmap.Width, Pixmap.Height)) then
   begin
@@ -285,6 +298,11 @@ end;
 class procedure TTsPainter.FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
   const Transform: TTsTransform; const Mask: PTsMask);
 begin
+  if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
   if not Transform.IsIdentity then
   begin
     var Transformed: TTsPath;
@@ -325,6 +343,8 @@ begin
     var TilePath := Path;
     var TilePaint := Paint;
 
+    // Rust leaves the path shifted after a tile whose subpixmap or blitter is None (continue skips the translate forward); Delphi always
+    // translates back, which is the correct behaviour and changes no image.
     var Tile: TTsScreenIntRect;
     while Tiler.TryNext(Tile) do
     begin
@@ -402,6 +422,11 @@ end;
 class procedure TTsPainter.StrokePath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const Stroke: TTsStroke;
   const Transform: TTsTransform; const Mask: PTsMask);
 begin
+  if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
   if Stroke.Width < 0 then
   begin
     // negative stroke width isn't allowed
@@ -589,8 +614,8 @@ begin
   Points[1] := TTsPoint.FromXY(0, Stroke.Width);
   NoTranslate.MapPoints(Points);
 
-  const Len0 = FastLen(Points[0]);
-  const Len1 = FastLen(Points[1]);
+  const Len0: Single = FastLen(Points[0]);
+  const Len1: Single = FastLen(Points[1]);
 
   if (Len0 <= 1) and (Len1 <= 1) then
   begin
@@ -609,7 +634,18 @@ begin
     Exit;
   end;
 
-  const Rect = TTsIntSize.FromWHSafe(Source.Width, Source.Height).ToIntRect(X, Y).ToRect;
+  if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
+  // An offset that moves the right or the bottom edge beyond the integer range draws nothing (Rust would panic here)
+  var IntRect: TTsIntRect;
+  if not TTsIntRect.TryFromXYWH(X, Y, Source.Width, Source.Height, IntRect) then
+  begin
+    Exit;
+  end;
+  const Rect = IntRect.ToRect;
 
   // TODO of tiny-skia: SkSpriteBlitter, partially clipped, clipped out
 

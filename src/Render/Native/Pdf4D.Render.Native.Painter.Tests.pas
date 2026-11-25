@@ -61,12 +61,22 @@ type
 
     [Test]
     procedure TestApplyMaskRequiresTheSameSize;
+
+    [Test]
+    procedure TestMaskOfAnotherSizeDrawsNothingWithTiles;
+
+    [Test]
+    procedure TestMaskOfAnotherSizeDrawsNothingWithoutTiles;
+
+    [Test]
+    procedure TestDrawPixmapAtTheIntegerLimitDrawsNothing;
   end;
 
 implementation
 
 uses
   Pdf4D.Render.Native.Path,
+  Pdf4D.Render.Native.Shader,
   Pdf4D.Render.Native.Scan,
   Pdf4D.Render.Native.Stroker,
   Pdf4D.Tests.TinySkiaImages;
@@ -233,6 +243,45 @@ begin
   Assert.IsTrue(TTsMask.TryCreate(4, 4, Mask));
   TTsPainter.ApplyMask(Pixmap, Mask);
   Assert.IsFalse(IsFilled(Pixmap, 0, 0), 'an empty mask of the same size removes the content');
+end;
+
+procedure TTsPainterTests.TestMaskOfAnotherSizeDrawsNothingWithTiles;
+begin
+  // Without the check, the tile that the small mask does not reach would be drawn without a mask
+  var Pixmap := TTinySkiaFixtures.NewPixmap(9000, 2);
+  var Mask: TTsMask;
+  Assert.IsTrue(TTsMask.TryCreate(100, 2, Mask));
+  const Rect = TTinySkiaFixtures.RectXYWH(8000, 0, 400, 2);
+  const Paint = TTinySkiaFixtures.SolidPaint(False);
+
+  TTsPainter.FillRect(Pixmap, Rect, Paint, TTsTransform.Identity, @Mask);
+  TTsPainter.FillPath(Pixmap, TTsPathBuilder.FromRect(Rect), Paint, TTsFillRule.Winding, TTsTransform.Identity, @Mask);
+
+  Assert.IsFalse(IsFilled(Pixmap, 8300, 0), '(8300, 0) is not drawn');
+  Assert.IsFalse(IsFilled(Pixmap, 8190, 0), '(8190, 0) is not drawn');
+end;
+
+procedure TTsPainterTests.TestMaskOfAnotherSizeDrawsNothingWithoutTiles;
+begin
+  var Pixmap := TTinySkiaFixtures.NewPixmap(10, 2);
+  var Mask: TTsMask;
+  Assert.IsTrue(TTsMask.TryCreate(4, 2, Mask));
+
+  TTsPainter.FillRect(Pixmap, TTinySkiaFixtures.RectXYWH(0, 0, 10, 2), TTinySkiaFixtures.SolidPaint(False), TTsTransform.Identity, @Mask);
+
+  Assert.IsFalse(IsFilled(Pixmap, 5, 0));
+end;
+
+procedure TTsPainterTests.TestDrawPixmapAtTheIntegerLimitDrawsNothing;
+begin
+  // X + width is beyond High(Integer): Rust would panic in the conversion of the rectangle
+  var Pixmap := TTinySkiaFixtures.NewPixmap(4, 4);
+  const Source = TTinySkiaFixtures.NewPixmap(4, 4);
+
+  TTsPainter.DrawPixmap(Pixmap, High(Integer) - 1, 0, Source.AsRef, TTsPixmapPaint.Default, TTsTransform.Identity, nil);
+  TTsPainter.DrawPixmap(Pixmap, 0, High(Integer) - 1, Source.AsRef, TTsPixmapPaint.Default, TTsTransform.Identity, nil);
+
+  Assert.IsFalse(IsFilled(Pixmap, 0, 0));
 end;
 
 end.
