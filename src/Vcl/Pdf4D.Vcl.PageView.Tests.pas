@@ -545,7 +545,8 @@ procedure TPdf4DPageViewTests.TestFreeFormWhileRendering;
 begin
   Assert.IsTrue(FHost.Open(TViewerDocuments.Pages(LargeDocumentPages, 612, 792, 0)), 'the large document opens');
   FHost.PageView.Controller.ScrollBy(0, ScrollAway);
-  FHost.Pump(1);
+  // The form goes while tiles are on their way, not after they came
+  Assert.IsTrue(FHost.PageView.Controller.PendingTileCount > 0, 'tiles are pending when the form is freed');
 
   FreeAndNil(FHost);
   PumpFor(QuietPeriodMs);
