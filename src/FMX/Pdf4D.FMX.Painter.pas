@@ -29,6 +29,8 @@ type
 
     function GetBitmap: FMX.Graphics.TBitmap;
     function IPdfFmxImageSource.Bitmap = GetBitmap;
+    // One 32-bit word per pixel: the red and the blue byte trade places
+    class procedure SwapRedAndBlue(const Source: PByte; const Target: PByte; const PixelCount: Integer); static;
 
   public
     // Copies the pixels of Bitmap into a bitmap of the platform; the colours keep their value and their premultiplied alpha
@@ -38,7 +40,6 @@ type
     // Writes the pixels of Source into the memory that Target describes, in the pixel format of Target (RGBA and BGRA, both with
     // premultiplied alpha). Raises ENotSupportedException for another format and EArgumentException when Target is smaller than Source.
     class procedure CopyPixels(const Source: TPdfBitmap; const Target: TBitmapData); static;
-    class procedure SwapRedAndBlue(const Source: PByte; const Target: PByte; const PixelCount: Integer); static;
 
     function Width: Integer;
     function Height: Integer;

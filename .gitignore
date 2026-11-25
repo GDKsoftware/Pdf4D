@@ -13,6 +13,7 @@ __recovery/
 !src/Resources/*.res
 !src/Vcl/Icons/*.res
 !src/Vcl/Design/icons/*.res
+!src/FMX/Design/icons/*.res
 *.~*
 Win32/
 Win64/
