@@ -1,6 +1,6 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-// Port of: tiny-skia v0.12.0 src/mask.rs (without PNG; fill_path, intersect_path and the other painter methods follow with the painter)
+// Port of: tiny-skia v0.12.0 src/mask.rs (without PNG; fill_path and intersect_path are in Pdf4D.Render.Native.Painter, which can use the blitter)
 // Copyright (c) 2020 Yevhenii Reizner. BSD-3-Clause, see licenses/tiny-skia-BSD-3-Clause.txt.
 unit Pdf4D.Render.Native.Mask;
 
@@ -61,6 +61,11 @@ type
     // The mask as an A8 pixmap that a pipeline draws in
     function SubPixmap: TTsSubPixmapMut;
     function TrySubPixmap(const Rect: TTsIntRect; out Region: TTsSubPixmapMut): Boolean;
+
+    // Inverts the mask
+    procedure Invert;
+    // Zero-fills the data
+    procedure Clear;
   end;
 
 implementation
@@ -175,6 +180,22 @@ begin
     else
       raise EInvalidOpException.CreateFmt('Unsupported mask type: %d', [Ord(MaskType)]);
     end;
+  end;
+end;
+
+procedure TTsMask.Invert;
+begin
+  for var I := 0 to High(Data) do
+  begin
+    Data[I] := Byte(255 - Data[I]);
+  end;
+end;
+
+procedure TTsMask.Clear;
+begin
+  if Length(Data) > 0 then
+  begin
+    FillChar(Data[0], Length(Data), 0);
   end;
 end;
 

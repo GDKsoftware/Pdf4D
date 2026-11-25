@@ -256,6 +256,12 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Shader.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.TinySkiaImages.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Fill.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Hairline.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Pixmap.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingBlitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas"/>

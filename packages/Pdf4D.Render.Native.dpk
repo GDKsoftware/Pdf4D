@@ -67,6 +67,7 @@ contains
   Pdf4D.Render.Native.Mask in '..\src\Render\Native\Pdf4D.Render.Native.Mask.pas',
   Pdf4D.Render.Native.Shader in '..\src\Render\Native\Pdf4D.Render.Native.Shader.pas',
   Pdf4D.Render.Native.Pipeline.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Blitter.pas',
-  Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas';
+  Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas',
+  Pdf4D.Render.Native.Painter in '..\src\Render\Native\Pdf4D.Render.Native.Painter.pas';
 
 end.

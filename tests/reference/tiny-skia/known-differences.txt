@@ -1,0 +1,2 @@
+# Reference images of tiny-skia that Pdf4D is allowed to render with at most 2 steps per channel, because a platform function differs
+# (ArcCos, Cos or Power). Format: <path> [<platform>] # reason. Without a platform the line holds on every platform.

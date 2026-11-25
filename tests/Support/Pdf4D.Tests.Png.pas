@@ -29,6 +29,9 @@ type
   public
     class function Read(const FileName: string): TPdfBitmap; static;
     class function FromBytes(const Data: TBytes): TPdfBitmap; static;
+    // The pixels as the file holds them: straight (not premultiplied) RGBA, rows top to bottom
+    class function DecodeStraight(const Data: TBytes; out Width, Height: Integer): TBytes; static;
+    class function ReadStraight(const FileName: string; out Width, Height: Integer): TBytes; static;
     class procedure Write(const Bitmap: TPdfBitmap; const FileName: string); static;
     class function ToBytes(const Bitmap: TPdfBitmap): TBytes; static;
   end;
@@ -194,16 +197,17 @@ begin
   end;
 end;
 
-class function TPng.FromBytes(const Data: TBytes): TPdfBitmap;
+class function TPng.DecodeStraight(const Data: TBytes; out Width, Height: Integer): TBytes;
 begin
   if (Length(Data) < Length(Signature)) or (not CompareMem(@Data[0], @Signature[0], Length(Signature))) then
   begin
     raise EInvalidOpException.Create('Not a PNG file');
   end;
 
-  var Width := 0;
-  var Height := 0;
+  Width := 0;
+  Height := 0;
   var ColorType := -1;
+  var BitDepth := 8;
   var Palette: TBytes;
   var Transparency: TBytes;
   var Compressed: TBytes;
@@ -218,11 +222,13 @@ begin
     begin
       Width := Integer(ReadBigEndian(Body, 0));
       Height := Integer(ReadBigEndian(Body, 4));
-      if (Body[8] <> 8) or (Body[12] <> 0) then
-      begin
-        raise EInvalidOpException.Create('Only 8-bit PNG files without interlace are supported');
-      end;
+      BitDepth := Body[8];
       ColorType := Body[9];
+      const IsSupportedDepth = (BitDepth = 8) or ((ColorType = ColorTypePalette) and (BitDepth in [1, 2, 4]));
+      if (not IsSupportedDepth) or (Body[12] <> 0) then
+      begin
+        raise EInvalidOpException.Create('Only 8-bit PNG files (1, 2 and 4 bits for palette images) without interlace are supported');
+      end;
     end
     else if ChunkType = 'PLTE' then
     begin
@@ -254,54 +260,82 @@ begin
 
   var Raw: TBytes;
   ZDecompress(Compressed, Raw);
-  const RowBytes = Width * PixelBytes;
+  const RowBytes = (Width * PixelBytes * BitDepth + 7) div 8;
   if Length(Raw) < Height * (RowBytes + 1) then
   begin
     raise EInvalidOpException.Create('The PNG data is too short');
   end;
+  // The filters work on bytes: a pixel of less than a byte counts as one byte
   Unfilter(Raw, Height, RowBytes, PixelBytes);
+
+  SetLength(Result, Width * Height * 4);
+  for var Y := 0 to Height - 1 do
+  begin
+    const Source = @Raw[Y * (RowBytes + 1) + 1];
+    const Target = @Result[Y * Width * 4];
+    for var X := 0 to Width - 1 do
+    begin
+      var R, G, B, A: Byte;
+      const Pixel = PByte(Source) + X * PixelBytes;
+      A := Opaque;
+      case ColorType of
+        ColorTypeGray:
+        begin
+          R := Pixel[0]; G := R; B := R;
+        end;
+        ColorTypeGrayAlpha:
+        begin
+          R := Pixel[0]; G := R; B := R; A := Pixel[1];
+        end;
+        ColorTypeRgb:
+        begin
+          R := Pixel[0]; G := Pixel[1]; B := Pixel[2];
+        end;
+        ColorTypeRgba:
+        begin
+          R := Pixel[0]; G := Pixel[1]; B := Pixel[2]; A := Pixel[3];
+        end;
+      else
+        begin
+          const BitOffset = X * BitDepth;
+          const Index = (PByte(Source)[BitOffset div 8] shr (8 - BitDepth - (BitOffset mod 8))) and ((1 shl BitDepth) - 1);
+          R := Palette[Index * 3]; G := Palette[Index * 3 + 1]; B := Palette[Index * 3 + 2];
+          if Index < Length(Transparency) then
+          begin
+            A := Transparency[Index];
+          end;
+        end;
+      end;
+      PByte(Target)[X * 4] := R;
+      PByte(Target)[X * 4 + 1] := G;
+      PByte(Target)[X * 4 + 2] := B;
+      PByte(Target)[X * 4 + 3] := A;
+    end;
+  end;
+end;
+
+class function TPng.ReadStraight(const FileName: string; out Width, Height: Integer): TBytes;
+begin
+  Result := DecodeStraight(TFile.ReadAllBytes(FileName), Width, Height);
+end;
+
+class function TPng.FromBytes(const Data: TBytes): TPdfBitmap;
+begin
+  var Width, Height: Integer;
+  const Straight = DecodeStraight(Data, Width, Height);
 
   Result := TPdfBitmap.Create(Width, Height);
   try
     for var Y := 0 to Height - 1 do
     begin
-      const Source = @Raw[Y * (RowBytes + 1) + 1];
+      const Source = @Straight[Y * Width * 4];
       const Target = Result.ScanLine(Y);
       for var X := 0 to Width - 1 do
       begin
-        var R, G, B, A: Byte;
-        const Pixel = PByte(Source) + X * PixelBytes;
-        A := Opaque;
-        case ColorType of
-          ColorTypeGray:
-          begin
-            R := Pixel[0]; G := R; B := R;
-          end;
-          ColorTypeGrayAlpha:
-          begin
-            R := Pixel[0]; G := R; B := R; A := Pixel[1];
-          end;
-          ColorTypeRgb:
-          begin
-            R := Pixel[0]; G := Pixel[1]; B := Pixel[2];
-          end;
-          ColorTypeRgba:
-          begin
-            R := Pixel[0]; G := Pixel[1]; B := Pixel[2]; A := Pixel[3];
-          end;
-        else
-          begin
-            const Index = Pixel[0];
-            R := Palette[Index * 3]; G := Palette[Index * 3 + 1]; B := Palette[Index * 3 + 2];
-            if Index < Length(Transparency) then
-            begin
-              A := Transparency[Index];
-            end;
-          end;
-        end;
-        Target[X * 4] := Premultiply(R, A);
-        Target[X * 4 + 1] := Premultiply(G, A);
-        Target[X * 4 + 2] := Premultiply(B, A);
+        const A = PByte(Source)[X * 4 + 3];
+        Target[X * 4] := Premultiply(PByte(Source)[X * 4], A);
+        Target[X * 4 + 1] := Premultiply(PByte(Source)[X * 4 + 1], A);
+        Target[X * 4 + 2] := Premultiply(PByte(Source)[X * 4 + 2], A);
         Target[X * 4 + 3] := A;
       end;
     end;
