@@ -117,6 +117,9 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Blitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

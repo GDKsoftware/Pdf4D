@@ -60,12 +60,16 @@ type
   private
     class function TreatAsHairline(const Paint: TTsPaint; const Stroke: TTsStroke; const Ts: TTsTransform;
                                    out Coverage: Single): Boolean; static;
-    class procedure StrokeHairline(const Path: TTsPath; const Paint: TTsPaint; const LineCap: TTsLineCap; const Mask: TTsSubMaskRef;
-                                   const Pixmap: TTsSubPixmapMut); static;
+    class procedure StrokeHairline(const Path: TTsPath; const Paint: TTsPaint; const LineCap: TTsLineCap; const Clip: TTsScreenIntRect;
+                                   const Mask: TTsSubMaskRef; const Pixmap: TTsSubPixmapMut); static;
     class function SubMaskOf(const Mask: PTsMask): TTsSubMaskRef; static;
     class function SubMaskOfTile(const Mask: PTsMask; const Tile: TTsScreenIntRect): TTsSubMaskRef; static;
     // False when the mask has another size than the pixmap: nothing is drawn then, with or without tiles
     class function MaskFitsPixmap(const Mask: PTsMask; const Pixmap: TTsPixmap): Boolean; static;
+    // The part of Clip that lies in Tile, in the coordinates of the tile; False when there is none
+    class function TryTileClip(const Clip, Tile: TTsScreenIntRect; out TileClip: TTsScreenIntRect): Boolean; static;
+    // False when the clip does not lie inside the pixmap: nothing is drawn then
+    class function ClipFitsPixmap(const Clip: TTsScreenIntRect; const Pixmap: TTsPixmap): Boolean; static;
 
   public
     // Sometimes in the drawing pipeline, we have to perform math on path coordinates, even after the path is in device-coordinates. To
@@ -76,19 +80,34 @@ type
     // Draws a filled rectangle onto the pixmap. Usually slower than filling a rectangular path, but it does not suffer from weird clipping
     // of horizontal and vertical edges.
     class procedure FillRect(var Pixmap: TTsPixmap; const Rect: TTsRect; const Paint: TTsPaint; const Transform: TTsTransform;
-                             const Mask: PTsMask); static;
+                             const Mask: PTsMask); overload; static;
 
     class procedure FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
-                             const Transform: TTsTransform; const Mask: PTsMask); static;
+                             const Transform: TTsTransform; const Mask: PTsMask); overload; static;
 
     // Strokes a path. A stroke that is not wider than a pixel after the transform is drawn as a hairline, a wider one is converted into a
     // path that is filled.
     class procedure StrokePath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const Stroke: TTsStroke;
-                               const Transform: TTsTransform; const Mask: PTsMask); static;
+                               const Transform: TTsTransform; const Mask: PTsMask); overload; static;
 
     // Draws a pixmap on top of the pixmap: the same as filling a rectangle with a pixmap pattern
     class procedure DrawPixmap(var Pixmap: TTsPixmap; const X, Y: Integer; const Source: TTsPixmapRef; const Paint: TTsPixmapPaint;
-                               const Transform: TTsTransform; const Mask: PTsMask); static;
+                               const Transform: TTsTransform; const Mask: PTsMask); overload; static;
+
+    // Pdf4D: the draws above, but only inside Clip, a rectangle of the pixmap (the scan converters clip to it, so a draw that is clipped to a
+    // rectangle needs no mask). The draws above are these with the whole pixmap as the clip. A clip that does not lie inside the pixmap
+    // draws nothing.
+    class procedure FillRect(var Pixmap: TTsPixmap; const Rect: TTsRect; const Paint: TTsPaint; const Transform: TTsTransform;
+                             const Clip: TTsScreenIntRect; const Mask: PTsMask); overload; static;
+
+    class procedure FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
+                             const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask); overload; static;
+
+    class procedure StrokePath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const Stroke: TTsStroke;
+                               const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask); overload; static;
+
+    class procedure DrawPixmap(var Pixmap: TTsPixmap; const X, Y: Integer; const Source: TTsPixmapRef; const Paint: TTsPixmapPaint;
+                               const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask); overload; static;
 
     // Masks-out the content that is already drawn. The mask must have the size of the pixmap; no transform or offset is allowed.
     class procedure ApplyMask(var Pixmap: TTsPixmap; const Mask: TTsMask); static;
@@ -251,10 +270,74 @@ begin
   Result := ((Mask = nil) or ((Mask.Width = Pixmap.Width) and (Mask.Height = Pixmap.Height)));
 end;
 
+class function TTsPainter.TryTileClip(const Clip, Tile: TTsScreenIntRect; out TileClip: TTsScreenIntRect): Boolean;
+begin
+  TileClip := Default(TTsScreenIntRect);
+
+  var Left := Clip.Left;
+  if Tile.Left > Left then
+  begin
+    Left := Tile.Left;
+  end;
+
+  var Top := Clip.Top;
+  if Tile.Top > Top then
+  begin
+    Top := Tile.Top;
+  end;
+
+  var Right := Clip.Right;
+  if Tile.Right < Right then
+  begin
+    Right := Tile.Right;
+  end;
+
+  var Bottom := Clip.Bottom;
+  if Tile.Bottom < Bottom then
+  begin
+    Bottom := Tile.Bottom;
+  end;
+
+  if (Left >= Right) or (Top >= Bottom) then
+  begin
+    Exit(False);
+  end;
+
+  Result := TTsScreenIntRect.TryFromXYWH(Left - Tile.Left, Top - Tile.Top, Right - Left, Bottom - Top, TileClip);
+end;
+
+class function TTsPainter.ClipFitsPixmap(const Clip: TTsScreenIntRect; const Pixmap: TTsPixmap): Boolean;
+begin
+  var Whole: TTsScreenIntRect;
+  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Whole) then
+  begin
+    Exit(False);
+  end;
+
+  Result := Whole.Contains(Clip);
+end;
+
 class procedure TTsPainter.FillRect(var Pixmap: TTsPixmap; const Rect: TTsRect; const Paint: TTsPaint; const Transform: TTsTransform;
   const Mask: PTsMask);
 begin
+  var Whole: TTsScreenIntRect;
+  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Whole) then
+  begin
+    Exit;
+  end;
+
+  FillRect(Pixmap, Rect, Paint, Transform, Whole, Mask);
+end;
+
+class procedure TTsPainter.FillRect(var Pixmap: TTsPixmap; const Rect: TTsRect; const Paint: TTsPaint; const Transform: TTsTransform;
+  const Clip: TTsScreenIntRect; const Mask: PTsMask);
+begin
   if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
+  if not ClipFitsPixmap(Clip, Pixmap) then
   begin
     Exit;
   end;
@@ -263,12 +346,6 @@ begin
   if Transform.IsIdentity and (not TTsDrawTiler.Required(Pixmap.Width, Pixmap.Height)) then
   begin
     // TODO of tiny-skia: ignore rects outside the pixmap
-    var Clip: TTsScreenIntRect;
-    if not TryWholeRect(Pixmap.Width, Pixmap.Height, Clip) then
-    begin
-      Exit;
-    end;
-
     var Blitter: TTsRasterPipelineBlitter;
     if not TTsRasterPipelineBlitter.TryCreate(Paint, SubMaskOf(Mask), Pixmap.SubPixmap, Blitter) then
     begin
@@ -291,14 +368,31 @@ begin
   end
   else
   begin
-    FillPath(Pixmap, TTsPathBuilder.FromRect(Rect), Paint, TTsFillRule.Winding, Transform, Mask);
+    FillPath(Pixmap, TTsPathBuilder.FromRect(Rect), Paint, TTsFillRule.Winding, Transform, Clip, Mask);
   end;
 end;
 
 class procedure TTsPainter.FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
   const Transform: TTsTransform; const Mask: PTsMask);
 begin
+  var Whole: TTsScreenIntRect;
+  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Whole) then
+  begin
+    Exit;
+  end;
+
+  FillPath(Pixmap, Path, Paint, FillRule, Transform, Whole, Mask);
+end;
+
+class procedure TTsPainter.FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
+  const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask);
+begin
   if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
+  if not ClipFitsPixmap(Clip, Pixmap) then
   begin
     Exit;
   end;
@@ -315,7 +409,7 @@ begin
     var TransformedPaint := Paint;
     TransformedPaint.Shader.ApplyTransform(Transform);
 
-    FillPath(Pixmap, Transformed, TransformedPaint, FillRule, TTsTransform.Identity, Mask);
+    FillPath(Pixmap, Transformed, TransformedPaint, FillRule, TTsTransform.Identity, Clip, Mask);
     Exit;
   end;
 
@@ -356,9 +450,10 @@ begin
       end;
       TilePaint.Shader.ApplyTransform(BackTs);
 
-      const ClipRect = Tile.Size.ToScreenIntRect(0, 0);
+      // Pdf4D: the clip in the coordinates of the tile (the whole tile for the clip of the whole pixmap)
+      var ClipRect: TTsScreenIntRect;
       var Region: TTsSubPixmapMut;
-      if Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
+      if TryTileClip(Clip, Tile, ClipRect) and Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
       begin
         var Blitter: TTsRasterPipelineBlitter;
         // a blitter that cannot be created has nothing to do
@@ -391,12 +486,6 @@ begin
   end
   else
   begin
-    var ClipRect: TTsScreenIntRect;
-    if not TryWholeRect(Pixmap.Width, Pixmap.Height, ClipRect) then
-    begin
-      Exit;
-    end;
-
     var Blitter: TTsRasterPipelineBlitter;
     if not TTsRasterPipelineBlitter.TryCreate(Paint, SubMaskOf(Mask), Pixmap.SubPixmap, Blitter) then
     begin
@@ -407,11 +496,11 @@ begin
     try
       if Paint.AntiAlias then
       begin
-        TTsScanAntiAlias.FillPath(Path, FillRule, ClipRect, Blitter);
+        TTsScanAntiAlias.FillPath(Path, FillRule, Clip, Blitter);
       end
       else
       begin
-        TTsScan.FillPath(Path, FillRule, ClipRect, Blitter);
+        TTsScan.FillPath(Path, FillRule, Clip, Blitter);
       end;
     finally
       Blitter.Free;
@@ -422,7 +511,24 @@ end;
 class procedure TTsPainter.StrokePath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const Stroke: TTsStroke;
   const Transform: TTsTransform; const Mask: PTsMask);
 begin
+  var Whole: TTsScreenIntRect;
+  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Whole) then
+  begin
+    Exit;
+  end;
+
+  StrokePath(Pixmap, Path, Paint, Stroke, Transform, Whole, Mask);
+end;
+
+class procedure TTsPainter.StrokePath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const Stroke: TTsStroke;
+  const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask);
+begin
   if not MaskFitsPixmap(Mask, Pixmap) then
+  begin
+    Exit;
+  end;
+
+  if not ClipFitsPixmap(Clip, Pixmap) then
   begin
     Exit;
   end;
@@ -492,10 +598,11 @@ begin
         TilePaint.Shader.ApplyTransform(BackTs);
 
         var Region: TTsSubPixmapMut;
-        if Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
+        var TileClip: TTsScreenIntRect;
+        if TryTileClip(Clip, Tile, TileClip) and Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
         begin
           // We're ignoring "errors" here, because the hairline stroke returns nothing when rendering a tile that doesn't have a path on it
-          StrokeHairline(TilePath, TilePaint, Stroke.LineCap, SubMaskOfTile(Mask, Tile), Region);
+          StrokeHairline(TilePath, TilePaint, Stroke.LineCap, TileClip, SubMaskOfTile(Mask, Tile), Region);
         end;
 
         const ForwardTs = TTsTransform.FromTranslate(Single(Tile.X), Single(Tile.Y));
@@ -521,11 +628,11 @@ begin
           Exit;
         end;
 
-        StrokeHairline(Transformed, HairlinePaint, Stroke.LineCap, SubMask, Region);
+        StrokeHairline(Transformed, HairlinePaint, Stroke.LineCap, Clip, SubMask, Region);
       end
       else
       begin
-        StrokeHairline(StrokedSource, HairlinePaint, Stroke.LineCap, SubMask, Region);
+        StrokeHairline(StrokedSource, HairlinePaint, Stroke.LineCap, Clip, SubMask, Region);
       end;
     end;
   end
@@ -538,19 +645,13 @@ begin
       Exit;
     end;
 
-    FillPath(Pixmap, Outline, Paint, TTsFillRule.Winding, Transform, Mask);
+    FillPath(Pixmap, Outline, Paint, TTsFillRule.Winding, Transform, Clip, Mask);
   end;
 end;
 
-class procedure TTsPainter.StrokeHairline(const Path: TTsPath; const Paint: TTsPaint; const LineCap: TTsLineCap; const Mask: TTsSubMaskRef;
-  const Pixmap: TTsSubPixmapMut);
+class procedure TTsPainter.StrokeHairline(const Path: TTsPath; const Paint: TTsPaint; const LineCap: TTsLineCap; const Clip: TTsScreenIntRect;
+  const Mask: TTsSubMaskRef; const Pixmap: TTsSubPixmapMut);
 begin
-  var Clip: TTsScreenIntRect;
-  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Clip) then
-  begin
-    Exit;
-  end;
-
   var Blitter: TTsRasterPipelineBlitter;
   if not TTsRasterPipelineBlitter.TryCreate(Paint, Mask, Pixmap, Blitter) then
   begin
@@ -629,6 +730,18 @@ end;
 class procedure TTsPainter.DrawPixmap(var Pixmap: TTsPixmap; const X, Y: Integer; const Source: TTsPixmapRef; const Paint: TTsPixmapPaint;
   const Transform: TTsTransform; const Mask: PTsMask);
 begin
+  var Whole: TTsScreenIntRect;
+  if not TryWholeRect(Pixmap.Width, Pixmap.Height, Whole) then
+  begin
+    Exit;
+  end;
+
+  DrawPixmap(Pixmap, X, Y, Source, Paint, Transform, Whole, Mask);
+end;
+
+class procedure TTsPainter.DrawPixmap(var Pixmap: TTsPixmap; const X, Y: Integer; const Source: TTsPixmapRef; const Paint: TTsPixmapPaint;
+  const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask);
+begin
   if (Source.Width = 0) or (Source.Height = 0) then
   begin
     Exit;
@@ -661,7 +774,7 @@ begin
   // Pattern will use hq anyway
   FillPaint.ForceHqPipeline := False;
 
-  FillRect(Pixmap, Rect, FillPaint, Transform, Mask);
+  FillRect(Pixmap, Rect, FillPaint, Transform, Clip, Mask);
 end;
 
 class procedure TTsPainter.ApplyMask(var Pixmap: TTsPixmap; const Mask: TTsMask);

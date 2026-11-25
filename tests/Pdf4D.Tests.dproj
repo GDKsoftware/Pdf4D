@@ -266,6 +266,12 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Dash.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Mask.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Pattern.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Conversion.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.DeviceContract.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingBlitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas"/>

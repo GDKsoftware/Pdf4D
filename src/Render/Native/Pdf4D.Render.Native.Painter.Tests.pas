@@ -70,6 +70,27 @@ type
 
     [Test]
     procedure TestDrawPixmapAtTheIntegerLimitDrawsNothing;
+
+    [Test]
+    procedure TestClipLimitsFillPath;
+
+    [Test]
+    procedure TestClipLimitsFillRect;
+
+    [Test]
+    procedure TestClipLimitsStrokes;
+
+    [Test]
+    procedure TestClipLimitsDrawPixmap;
+
+    [Test]
+    procedure TestClipOutsideThePixmapDrawsNothing;
+
+    [Test]
+    procedure TestClipOnAPixmapThatNeedsTiles;
+
+    [Test]
+    procedure TestHairlineInAClipOfTwoPixelsDrawsNothing;
   end;
 
 implementation
@@ -282,6 +303,167 @@ begin
   TTsPainter.DrawPixmap(Pixmap, 0, High(Integer) - 1, Source.AsRef, TTsPixmapPaint.Default, TTsTransform.Identity, nil);
 
   Assert.IsFalse(IsFilled(Pixmap, 0, 0));
+end;
+
+
+// The columns 2 to 4 and the rows 3 to 5 of a pixmap of 10 * 10
+function ClipOfTheTests: TTsScreenIntRect;
+begin
+  Result := TTsScreenIntRect.FromXYWHSafe(2, 3, 3, 3);
+end;
+
+procedure TTsPainterTests.TestClipLimitsFillPath;
+begin
+  for var AntiAlias in [False, True] do
+  begin
+    var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+    TTsPainter.FillPath(Pixmap, TTsPathBuilder.FromRect(TTinySkiaFixtures.RectXYWH(0, 0, 10, 10)), TTinySkiaFixtures.SolidPaint(AntiAlias),
+      TTsFillRule.Winding, TTsTransform.Identity, ClipOfTheTests, nil);
+
+    Assert.IsTrue(IsFilled(Pixmap, 2, 3), 'the first pixel of the clip is drawn');
+    Assert.IsTrue(IsFilled(Pixmap, 4, 5), 'the last pixel of the clip is drawn');
+    Assert.IsFalse(IsFilled(Pixmap, 1, 3), 'left of the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 5, 5), 'right of the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 3, 2), 'above the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 3, 6), 'below the clip is empty');
+  end;
+end;
+
+procedure TTsPainterTests.TestClipLimitsFillRect;
+begin
+  // An identity transform takes the fast path of FillRect, another transform goes through FillPath
+  var Transforms: TArray<TTsTransform> := [TTsTransform.Identity, TTsTransform.FromTranslate(1, 1)];
+  for var Transform in Transforms do
+  begin
+    var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+    TTsPainter.FillRect(Pixmap, TTinySkiaFixtures.RectXYWH(0, 0, 9, 9), TTinySkiaFixtures.SolidPaint(False), Transform, ClipOfTheTests, nil);
+
+    Assert.IsTrue(IsFilled(Pixmap, 2, 3));
+    Assert.IsTrue(IsFilled(Pixmap, 4, 5));
+    Assert.IsFalse(IsFilled(Pixmap, 1, 3));
+    Assert.IsFalse(IsFilled(Pixmap, 5, 5));
+    Assert.IsFalse(IsFilled(Pixmap, 3, 2));
+    Assert.IsFalse(IsFilled(Pixmap, 3, 6));
+  end;
+end;
+
+procedure TTsPainterTests.TestClipLimitsStrokes;
+begin
+  var Builder := TTsPathBuilder.New;
+  Builder.MoveTo(0, 4.5);
+  Builder.LineTo(10, 4.5);
+  const Path = TTinySkiaFixtures.FinishPath(Builder);
+
+  // A hairline, a thin stroke that is drawn as a hairline and a wide one that is filled
+  var Widths: TArray<Single> := [0, 0.5, 2];
+  for var Width in Widths do
+  begin
+    var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+    var Stroke := TTsStroke.New;
+    Stroke.Width := Width;
+    TTsPainter.StrokePath(Pixmap, Path, TTinySkiaFixtures.SolidPaint(True), Stroke, TTsTransform.Identity, ClipOfTheTests, nil);
+
+    const Message = Format('stroke width %g', [Width]);
+    Assert.IsTrue(IsFilled(Pixmap, 3, 4), Message + ': inside the clip');
+    Assert.IsFalse(IsFilled(Pixmap, 1, 4), Message + ': left of the clip');
+    Assert.IsFalse(IsFilled(Pixmap, 5, 4), Message + ': right of the clip');
+    Assert.IsFalse(IsFilled(Pixmap, 3, 2), Message + ': above the clip');
+    Assert.IsFalse(IsFilled(Pixmap, 3, 6), Message + ': below the clip');
+  end;
+end;
+
+procedure TTsPainterTests.TestClipLimitsDrawPixmap;
+begin
+  var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+  var Source := TTinySkiaFixtures.NewPixmap(10, 10);
+  Source.Fill(TTsColor.White);
+
+  TTsPainter.DrawPixmap(Pixmap, 0, 0, Source.AsRef, TTsPixmapPaint.Default, TTsTransform.Identity, ClipOfTheTests, nil);
+
+  Assert.IsTrue(IsFilled(Pixmap, 2, 3));
+  Assert.IsTrue(IsFilled(Pixmap, 4, 5));
+  Assert.IsFalse(IsFilled(Pixmap, 1, 3));
+  Assert.IsFalse(IsFilled(Pixmap, 5, 5));
+  Assert.IsFalse(IsFilled(Pixmap, 3, 2));
+  Assert.IsFalse(IsFilled(Pixmap, 3, 6));
+end;
+
+procedure TTsPainterTests.TestClipOutsideThePixmapDrawsNothing;
+begin
+  // A clip that leaves the pixmap draws nothing, not even the part of the clip that lies inside
+  var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+  const Clip = TTsScreenIntRect.FromXYWHSafe(8, 8, 5, 5);
+
+  TTsPainter.FillPath(Pixmap, TTsPathBuilder.FromRect(TTinySkiaFixtures.RectXYWH(0, 0, 10, 10)), TTinySkiaFixtures.SolidPaint(False),
+    TTsFillRule.Winding, TTsTransform.Identity, Clip, nil);
+
+  Assert.IsFalse(IsFilled(Pixmap, 9, 9));
+  Assert.IsFalse(IsFilled(Pixmap, 0, 0));
+end;
+
+procedure TTsPainterTests.TestClipOnAPixmapThatNeedsTiles;
+begin
+  // The clip x 8100 to 8299 starts in the first tile and ends in the second one (the tiles are 8191 pixels wide)
+  const Clip = TTsScreenIntRect.FromXYWHSafe(8100, 1, 200, 3);
+  const Everything = TTinySkiaFixtures.RectXYWH(0, 0, 9000, 6);
+
+  var Filled := TTinySkiaFixtures.NewPixmap(9000, 6);
+  TTsPainter.FillPath(Filled, TTsPathBuilder.FromRect(Everything), TTinySkiaFixtures.SolidPaint(False), TTsFillRule.Winding,
+    TTsTransform.Identity, Clip, nil);
+
+  var Rect := TTinySkiaFixtures.NewPixmap(9000, 6);
+  TTsPainter.FillRect(Rect, Everything, TTinySkiaFixtures.SolidPaint(True), TTsTransform.FromTranslate(1, 0), Clip, nil);
+
+  var Builder := TTsPathBuilder.New;
+  Builder.MoveTo(0, 2.5);
+  Builder.LineTo(9000, 2.5);
+  const Line = TTinySkiaFixtures.FinishPath(Builder);
+  var Stroked := TTinySkiaFixtures.NewPixmap(9000, 6);
+  var Stroke := TTsStroke.New;
+  Stroke.Width := 0;
+  TTsPainter.StrokePath(Stroked, Line, TTinySkiaFixtures.SolidPaint(True), Stroke, TTsTransform.Identity, Clip, nil);
+
+  var Pixmaps: TArray<TTsPixmap> := [Filled, Rect];
+  for var Pixmap in Pixmaps do
+  begin
+    Assert.IsTrue(IsFilled(Pixmap, 8100, 2), 'the first pixel of the clip is drawn');
+    Assert.IsTrue(IsFilled(Pixmap, 8190, 2), 'the last pixel of the first tile is drawn');
+    Assert.IsTrue(IsFilled(Pixmap, 8191, 2), 'the first pixel of the second tile is drawn');
+    Assert.IsTrue(IsFilled(Pixmap, 8299, 2), 'the last pixel of the clip is drawn');
+    Assert.IsFalse(IsFilled(Pixmap, 8099, 2), 'left of the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 8300, 2), 'right of the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 8150, 0), 'above the clip is empty');
+    Assert.IsFalse(IsFilled(Pixmap, 8150, 4), 'below the clip is empty');
+  end;
+
+  Assert.IsTrue(IsFilled(Stroked, 8105, 2), 'the hairline is drawn in the first tile');
+  Assert.IsTrue(IsFilled(Stroked, 8190, 2), 'the hairline is drawn at the last pixel of the first tile');
+  Assert.IsTrue(IsFilled(Stroked, 8191, 2), 'the hairline is drawn at the first pixel of the second tile');
+  Assert.IsTrue(IsFilled(Stroked, 8295, 2), 'the hairline is drawn in the second tile');
+  Assert.IsFalse(IsFilled(Stroked, 8099, 2), 'the hairline stops at the left of the clip');
+  Assert.IsFalse(IsFilled(Stroked, 8300, 2), 'the hairline stops at the right of the clip');
+end;
+
+procedure TTsPainterTests.TestHairlineInAClipOfTwoPixelsDrawsNothing;
+begin
+  // tiny-skia insets the clip by a pixel on every side to tell where a hairline is not clipped, and draws nothing when that leaves no
+  // area: a hairline that is clipped to a rectangle of 2 pixels or less in one direction is not drawn (the device gives such a clip a mask)
+  var Builder := TTsPathBuilder.New;
+  Builder.MoveTo(0, 1.5);
+  Builder.LineTo(10, 1.5);
+  const Line = TTinySkiaFixtures.FinishPath(Builder);
+  var Stroke := TTsStroke.New;
+  Stroke.Width := 0;
+
+  for var Height := 1 to 4 do
+  begin
+    var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
+    TTsPainter.StrokePath(Pixmap, Line, TTinySkiaFixtures.SolidPaint(True), Stroke, TTsTransform.Identity,
+      TTsScreenIntRect.FromXYWHSafe(2, 1, 5, Cardinal(Height)), nil);
+
+    const IsDrawn = IsFilled(Pixmap, 4, 1);
+    Assert.AreEqual(Height >= 3, IsDrawn, Format('a clip of %d pixels high', [Height]));
+  end;
 end;
 
 end.
