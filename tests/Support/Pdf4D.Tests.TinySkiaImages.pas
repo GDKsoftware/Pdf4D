@@ -11,7 +11,8 @@ uses
   Pdf4D.Render.Native.Geometry,
   Pdf4D.Render.Native.Path,
   Pdf4D.Render.Native.Shader,
-  Pdf4D.Render.Native.Pixmap;
+  Pdf4D.Render.Native.Pixmap,
+  Pdf4D.Render.Native.Mask;
 
 type
   // The reference images of tiny-skia (tests/reference/tiny-skia, the tests/images folder of the tiny-skia source) and their comparison
@@ -34,6 +35,9 @@ type
     // the PNG is listed in known-differences.txt ("<path> [<platform>] # reason"), every channel may differ by 2. A failed comparison writes
     // the pixmap to the folder of PDF4D_RENDER_OUTPUT when that is set.
     class procedure AssertMatches(const Pixmap: TTsPixmap; const RelativePng: string); static;
+
+    // The same for a mask and a grayscale PNG (Mask::load_png): the data must be byte equal
+    class procedure AssertMaskMatches(const Mask: TTsMask; const RelativePng: string); static;
   end;
 
   // The set-up that the integration tests of tiny-skia repeat: pixmaps, the paint rgba(50, 127, 150, 200), paths and rectangles that are known to be valid
@@ -257,6 +261,36 @@ begin
        Pixmap.Data[FirstDifferent * 4], Pixmap.Data[FirstDifferent * 4 + 1], Pixmap.Data[FirstDifferent * 4 + 2],
        Pixmap.Data[FirstDifferent * 4 + 3], Expected[FirstDifferent * 4], Expected[FirstDifferent * 4 + 1],
        Expected[FirstDifferent * 4 + 2], Expected[FirstDifferent * 4 + 3]]));
+  end;
+end;
+
+class procedure TTinySkiaImages.AssertMaskMatches(const Mask: TTsMask; const RelativePng: string);
+begin
+  var Width, Height: Integer;
+  const Straight = TPng.ReadStraight(TPath.Combine(Folder, RelativePng), Width, Height);
+
+  Assert.IsTrue((Integer(Mask.Width) = Width) and (Integer(Mask.Height) = Height),
+    Format('%s: the size is %d x %d, expected %d x %d', [RelativePng, Mask.Width, Mask.Height, Width, Height]));
+
+  var DifferentBytes := 0;
+  var FirstDifferent := -1;
+  for var I := 0 to Width * Height - 1 do
+  begin
+    if Mask.Data[I] <> Straight[I * 4] then
+    begin
+      Inc(DifferentBytes);
+      if FirstDifferent < 0 then
+      begin
+        FirstDifferent := I;
+      end;
+    end;
+  end;
+
+  if DifferentBytes > 0 then
+  begin
+    Assert.Fail(Format('%s: %d mask bytes differ; the first at (%d, %d): got %d expected %d',
+      [RelativePng, DifferentBytes, FirstDifferent mod Width, FirstDifferent div Width, Mask.Data[FirstDifferent],
+       Straight[FirstDifferent * 4]]));
   end;
 end;
 
