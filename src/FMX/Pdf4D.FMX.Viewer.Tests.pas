@@ -170,11 +170,13 @@ begin
   // Letting go of the document cancels the requests of the parts; what is on its way comes back through the queue of the main thread and
   // has to arrive before the memory check of the program
   FViewer.Document := nil;
-  Assert.IsTrue(FHost.WaitUntil(IsPageViewQuiet), 'the page view has no tiles outstanding');
+  // The result is asserted after everything is freed: a timeout is a failure, not a leak and a form that stays open
+  const IsQuiet = FHost.WaitUntil(IsPageViewQuiet);
   FHost.Pump(TearDownPumpMs);
   FreeAndNil(FHost);
   FOpenErrorKinds.Free;
   FSelectedTexts.Free;
+  Assert.IsTrue(IsQuiet, 'the page view has no tiles outstanding');
 end;
 
 procedure TPdf4DViewerTests.HandleTextSelected(Sender: TObject; const Selection: TPdfTextSelection);
