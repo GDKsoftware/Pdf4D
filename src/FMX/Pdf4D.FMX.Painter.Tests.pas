@@ -363,8 +363,10 @@ begin
 end;
 
 procedure TPdfFmxPainterTests.TestDrawTextIsCentred;
+var
+  Area: TRectF;
 begin
-  const Area = TRectF.Create(15, 15, 105, 75);
+  Area := TRectF.Create(15, 15, 105, 75);
   const Target = PaintOnBitmap(80, 1.5,
     procedure(Painter: IPdfViewPainter)
     begin
@@ -391,10 +393,10 @@ begin
 
     Assert.IsTrue(Right >= 0, 'the text is drawn');
     Assert.IsTrue((Left >= Area.Left) and (Right < Area.Right) and (Top >= Area.Top) and (Bottom < Area.Bottom), 'inside the rectangle');
-    const CentreX = (Left + Right) / 2;
-    const CentreY = (Top + Bottom) / 2;
-    Assert.AreEqual(Double(Area.CenterPoint.X), Double(CentreX), 3, 'centred horizontally');
-    Assert.AreEqual(Double(Area.CenterPoint.Y), Double(CentreY), 6, 'centred vertically');
+    const CentreX: Double = (Left + Right) / 2;
+    const CentreY: Double = (Top + Bottom) / 2;
+    Assert.AreEqual(Double(Area.CenterPoint.X), CentreX, 3, 'centred horizontally');
+    Assert.AreEqual(Double(Area.CenterPoint.Y), CentreY, 6, 'centred vertically');
   finally
     Target.Free;
   end;
