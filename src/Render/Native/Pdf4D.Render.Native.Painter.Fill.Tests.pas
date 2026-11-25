@@ -301,10 +301,10 @@ begin
   var Paint := TTinySkiaFixtures.SolidPaint(True);
   Paint.Shader := TTsShader.NewSolidColor(TTsColor.FromRgba8(0, 0, 0, 0));
 
-  // Must not panic
+  // Must not panic; a transparent paint leaves the pixmap empty
   var Pixmap := TTinySkiaFixtures.NewPixmap(10, 10);
   TTsPainter.FillRect(Pixmap, TTinySkiaFixtures.RectXYWH(0.7, 0.0, 1.0, 2.0), Paint, TTsTransform.Identity, nil);
-  Assert.Pass;
+  TTinySkiaFixtures.AssertTotals(Pixmap, 0, 0);
 end;
 
 procedure TTinySkiaFillTests.TestFloatRectClipTopLeftAa;
@@ -403,10 +403,10 @@ begin
   Builder.MoveTo(10.0, 20.0);
   Builder.CubicTo(39.0, 163.0, 117.0, 61.0, 130.0, 70.0);
 
-  // Must not panic
-  FillPathOn(TTinySkiaFixtures.NewPixmap(100, 100), TTinySkiaFixtures.FinishPath(Builder), TTinySkiaFixtures.SolidPaint(False),
+  // Must not panic. The totals come from a run of tiny-skia 0.12.0.
+  const Pixmap = FillPathOn(TTinySkiaFixtures.NewPixmap(100, 100), TTinySkiaFixtures.FinishPath(Builder), TTinySkiaFixtures.SolidPaint(False),
     TTsFillRule.Winding);
-  Assert.Pass;
+  TTinySkiaFixtures.AssertTotals(Pixmap, 1813376, 3968);
 end;
 
 procedure TTinySkiaFillTests.TestClipLine1;
@@ -467,9 +467,9 @@ begin
   Builder.MoveTo(2.1537175, 11.560721);
   Builder.QuadTo(1.9999998, 10.787931, 2.0, 10.0);
 
-  // Must not loop
-  FillPathOn(TTinySkiaFixtures.NewPixmap(100, 100), TTinySkiaFixtures.FinishPath(Builder), Paint, TTsFillRule.Winding);
-  Assert.Pass;
+  // Must not loop. The totals come from a run of tiny-skia 0.12.0: one pixel of the sliver is drawn.
+  const Pixmap = FillPathOn(TTinySkiaFixtures.NewPixmap(100, 100), TTinySkiaFixtures.FinishPath(Builder), Paint, TTsFillRule.Winding);
+  TTinySkiaFixtures.AssertTotals(Pixmap, 16, 1);
 end;
 
 procedure TTinySkiaFillTests.TestClearAa;
@@ -498,9 +498,9 @@ begin
   // Just a line
   Builder.CubicTo(100.0, 40.0, 100.0, 160.0, 100.0, 180.0);
 
-  // Must not panic
-  FillPathOn(TTinySkiaFixtures.NewPixmap(200, 200), TTinySkiaFixtures.FinishPath(Builder), Paint, TTsFillRule.Winding);
-  Assert.Pass;
+  // Must not panic; a vertical line has no area, so nothing is drawn
+  const Pixmap = FillPathOn(TTinySkiaFixtures.NewPixmap(200, 200), TTinySkiaFixtures.FinishPath(Builder), Paint, TTsFillRule.Winding);
+  TTinySkiaFixtures.AssertTotals(Pixmap, 0, 0);
 end;
 
 procedure TTinySkiaFillTests.TestVerticalLinesMergingBug;

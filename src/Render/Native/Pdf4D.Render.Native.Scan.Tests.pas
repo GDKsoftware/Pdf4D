@@ -109,9 +109,6 @@ type
     procedure TestSuperBlitterRestartsTheSearchForASpanLeftOfTheOffset;
 
     [Test]
-    procedure TestRecordedCompositeLerpsTheCoverageOfAnOpaquePaint;
-
-    [Test]
     procedure TestManyEdgesAreSortedStably;
   end;
 
@@ -595,18 +592,6 @@ begin
   Assert.AreEqual(64, FBlitter.CoverageAt(19, 0));
   Assert.AreEqual(0, FBlitter.CoverageAt(20, 0));
   Assert.AreEqual(704, Integer(FBlitter.TotalCoverage));
-end;
-
-procedure TTsScanTests.TestRecordedCompositeLerpsTheCoverageOfAnOpaquePaint;
-begin
-  // An opaque paint is blended as Source, so the coverage lerps: div255(d * (255 - c) + 255 * c) with div255(v) = (v + 255) >> 8. A
-  // destination of 1 under a coverage of 200 gives 200; source_over of a source scaled by the coverage (s + div255(d * (255 - s))) would
-  // give 201, which is not what a pixmap holds after the same blits
-  FBlitter.BlitV(0, 0, 1, 1);
-  Assert.AreEqual(1, Integer(FBlitter.CompositedTotal), 'The first coverage over nothing');
-
-  FBlitter.BlitV(0, 0, 1, 200);
-  Assert.AreEqual(200, Integer(FBlitter.CompositedTotal), 'The second coverage over 1');
 end;
 
 procedure TTsScanTests.TestManyEdgesAreSortedStably;

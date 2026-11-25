@@ -50,6 +50,9 @@ type
     class function RectLTRB(const Left, Top, Right, Bottom: Single): TTsRect; static;
     // The pixel (X, Y) is the premultiplied color of the straight RGBA values
     class procedure AssertPixel(const Pixmap: TTsPixmap; const X, Y: Cardinal; const R, G, B, A: Byte); static;
+    // The sum of all bytes of the pixmap and the number of pixels with an alpha above zero, for the tests that only have to not panic: the
+    // expected values come from a run of the tiny-skia source
+    class procedure AssertTotals(const Pixmap: TTsPixmap; const ByteSum: Int64; const DrawnPixels: Integer); static;
   end;
 
 implementation
@@ -101,6 +104,27 @@ begin
   const Expected = TTsColorU8.FromRgba(R, G, B, A).Premultiply;
   Assert.IsTrue(Actual = Expected, Format('pixel (%d, %d): got %d,%d,%d,%d expected %d,%d,%d,%d',
     [X, Y, Actual.Red, Actual.Green, Actual.Blue, Actual.Alpha, Expected.Red, Expected.Green, Expected.Blue, Expected.Alpha]));
+end;
+
+class procedure TTinySkiaFixtures.AssertTotals(const Pixmap: TTsPixmap; const ByteSum: Int64; const DrawnPixels: Integer);
+begin
+  var ActualSum: Int64 := 0;
+  for var Value in Pixmap.Data do
+  begin
+    Inc(ActualSum, Value);
+  end;
+
+  var ActualDrawn := 0;
+  for var I := 0 to Integer(Pixmap.Width * Pixmap.Height) - 1 do
+  begin
+    if Pixmap.Data[I * 4 + 3] <> 0 then
+    begin
+      Inc(ActualDrawn);
+    end;
+  end;
+
+  Assert.AreEqual<Int64>(ByteSum, ActualSum, 'the sum of all bytes');
+  Assert.AreEqual<Integer>(DrawnPixels, ActualDrawn, 'the number of pixels with an alpha above zero');
 end;
 
 { TTinySkiaImages }
@@ -174,6 +198,8 @@ begin
     var Platforms := '';
     if Platform > 0 then
     begin
+      // A line with an opening bracket but no closing one would silently hold on every platform
+      Assert.IsTrue(Pos(']', Entry) > Platform, Format('%s: the line "%s" has no closing bracket', [KnownDifferencesName, Line]));
       Platforms := Copy(Entry, Platform + 1, Pos(']', Entry) - Platform - 1);
       Entry := Trim(Copy(Entry, 1, Platform - 1));
     end;

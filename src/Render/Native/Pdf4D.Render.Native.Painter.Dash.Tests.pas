@@ -199,7 +199,7 @@ begin
   // Doesn't draw anything
   var Pixmap := TTinySkiaFixtures.NewPixmap(100, 100);
   TTsPainter.StrokePath(Pixmap, Path, TTinySkiaFixtures.SolidPaint(True), Stroke, TTsTransform.Identity, nil);
-  Assert.Pass;
+  TTinySkiaFixtures.AssertTotals(Pixmap, 0, 0);
 end;
 
 end.

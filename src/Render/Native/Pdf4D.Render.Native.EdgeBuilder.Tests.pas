@@ -597,7 +597,9 @@ begin
   AssertEdge(Edges[0], TTsEdgeKind.Quadratic, 6551552, -2114, 0, 11, 1);
   AssertEdge(Edges[1], TTsEdgeKind.Line, 0, 0, 0, 99, -1);
 
-  // Without a clip nothing is cut: the rows of the edges are what the wrapped shifts of tiny-skia give
+  // Without a clip nothing is cut: the rows of the edges are what the wrapped shifts of tiny-skia give. These pinned values (for example the
+  // row -33554433) are wrapped garbage, not drawing values: the painter always clips, so nothing draws with them. They only pin that the
+  // port wraps like Rust; never use them as a specification.
   Assert.IsTrue(TTsBasicEdgeBuilder.TryBuildEdgesUnclipped(Path, 2, Edges));
   Assert.AreEqual(2, Integer(Length(Edges)), 'The unclipped edges');
   AssertEdge(Edges[0], TTsEdgeKind.Line, -32768, -65536, 200, -33554433, -1);

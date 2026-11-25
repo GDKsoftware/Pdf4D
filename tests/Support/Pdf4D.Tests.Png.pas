@@ -51,6 +51,8 @@ const
   ColorTypeGrayAlpha = 4;
   ColorTypeRgba = 6;
   ChunkOverhead = 12;
+  // Width * Height * 4 stays below 2^31
+  MaxDimension = 16384;
   Opaque = 255;
 
 var
@@ -222,6 +224,11 @@ begin
     begin
       Width := Integer(ReadBigEndian(Body, 0));
       Height := Integer(ReadBigEndian(Body, 4));
+      // The files are checked in, but a corrupt header must not overflow the size of the result
+      if (Width < 1) or (Width > MaxDimension) or (Height < 1) or (Height > MaxDimension) then
+      begin
+        raise EInvalidOpException.CreateFmt('The PNG size %d x %d is not supported', [Width, Height]);
+      end;
       BitDepth := Body[8];
       ColorType := Body[9];
       const IsSupportedDepth = (BitDepth = 8) or ((ColorType = ColorTypePalette) and (BitDepth in [1, 2, 4]));
@@ -299,6 +306,10 @@ begin
         begin
           const BitOffset = X * BitDepth;
           const Index = (PByte(Source)[BitOffset div 8] shr (8 - BitDepth - (BitOffset mod 8))) and ((1 shl BitDepth) - 1);
+          if Index * 3 + 2 >= Length(Palette) then
+          begin
+            raise EInvalidOpException.CreateFmt('The palette index %d is beyond the palette', [Index]);
+          end;
           R := Palette[Index * 3]; G := Palette[Index * 3 + 1]; B := Palette[Index * 3 + 2];
           if Index < Length(Transparency) then
           begin
