@@ -16,7 +16,7 @@ Milestone M2 (text extraction) is complete: `ExtractText` on a document or a pag
 
 Milestone M3, phase 2 (rendering) is complete: `TPdfRenderer` draws a page into a bitmap through a device interface, and `TPdfSkiaBackend` implements it with Skia. Of the 617 corpus pages that PDFBox 3.0.8 renders at 72 DPI, 612 are equal to its images within the tolerances of `docs/golden-format.md` and 5 have a documented difference; at 150 DPI 19 of 22 pages are equal. Annotations without an appearance stream are not drawn (`constructAppearances` is not ported); see `docs/porting.md` for this and the other deviations. The viewer and the visual components are not part of this phase.
 
-Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components follow in phase 4 and the own rasterizer in phase 5.
+Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components are described under "Viewer (FMX)"; the own rasterizer comes in phase 5.
 
 Milestone M3, phase 4 (the FMX components) is complete and tested on Win64: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The build and tests on Win32 and Linux64, the installation of both design-time packages in the IDE and the check on a real printer are still to be done (see `docs/building.md`). The own rasterizer comes in phase 5.
 
