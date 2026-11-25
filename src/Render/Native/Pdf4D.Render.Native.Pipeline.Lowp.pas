@@ -15,6 +15,7 @@ uses
   Pdf4D.Render.Native.Geometry,
   Pdf4D.Render.Native.Wide,
   Pdf4D.Render.Native.Stage,
+  Pdf4D.Render.Native.Pixmap,
   Pdf4D.Render.Native.Pipeline.Context;
 
 // A low precision raster pipeline: u16 lanes instead of f32, sixteen pixels per run. It has no implementation of the stages that need high

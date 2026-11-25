@@ -18,6 +18,7 @@ uses
   Pdf4D.Render.Native.Wide,
   Pdf4D.Render.Native.Stage,
   Pdf4D.Render.Native.BlendMode,
+  Pdf4D.Render.Native.Pixmap,
   Pdf4D.Render.Native.Pipeline.Context,
   Pdf4D.Render.Native.Pipeline.Highp,
   Pdf4D.Render.Native.Pipeline.Lowp,

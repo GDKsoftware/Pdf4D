@@ -63,6 +63,10 @@ contains
   Pdf4D.Render.Native.Pipeline.Context in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas',
   Pdf4D.Render.Native.Pipeline.Highp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas',
   Pdf4D.Render.Native.Pipeline.Lowp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.pas',
+  Pdf4D.Render.Native.Pixmap in '..\src\Render\Native\Pdf4D.Render.Native.Pixmap.pas',
+  Pdf4D.Render.Native.Mask in '..\src\Render\Native\Pdf4D.Render.Native.Mask.pas',
+  Pdf4D.Render.Native.Shader in '..\src\Render\Native\Pdf4D.Render.Native.Shader.pas',
+  Pdf4D.Render.Native.Pipeline.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Blitter.pas',
   Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas';
 
 end.

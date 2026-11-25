@@ -1,6 +1,9 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
 // Port of: tiny-skia v0.12.0 src/pipeline/highp.rs
+// The DecalXY and CheckDecalMask stages are an addition of Pdf4D after the example of decal_x_and_y and check_decal_mask of Skia: DecalXY runs
+// after the transform and before the tiling, and keeps the lanes whose sample point is inside [0, Width) x [0, Height) of the pixmap (the
+// limits of the context); the filter taps pad. CheckDecalMask runs after the sampling and sets the color of the other lanes to zero.
 // Copyright (c) 2018 Google Inc., (c) 2020 Yevhenii Reizner. BSD-3-Clause, see licenses/tiny-skia-BSD-3-Clause.txt.
 unit Pdf4D.Render.Native.Pipeline.Highp;
 
@@ -15,6 +18,7 @@ uses
   Pdf4D.Render.Native.Geometry,
   Pdf4D.Render.Native.Wide,
   Pdf4D.Render.Native.Stage,
+  Pdf4D.Render.Native.Pixmap,
   Pdf4D.Render.Native.Pipeline.Context;
 
 // A high precision raster pipeline implemented with f32x8. Unlike lowp this one implements all stages that are ported; the stages of the
@@ -1013,6 +1017,8 @@ function Tile(const V: TF32x8; const Mode: TTsSpreadMode; const Limit, InvLimit:
 begin
   case Mode of
     TTsSpreadMode.Pad     : Result := V;
+    // The sample point is tested by DecalXY, the taps pad
+    TTsSpreadMode.Decal   : Result := V;
     TTsSpreadMode.&Repeat : Result := ExclusiveRepeat(V, Limit, InvLimit);
     TTsSpreadMode.Reflect : Result := ExclusiveReflect(V, Limit, InvLimit);
   else
@@ -1118,6 +1124,30 @@ begin
   P.NextStage;
 end;
 
+procedure DecalXY(var P: TTsHighpPipeline);
+begin
+  const Width = TF32x8.Splat(P.Ctx^.LimitX.Scale);
+  const Height = TF32x8.Splat(P.Ctx^.LimitY.Scale);
+
+  const InsideX = P.R.CmpGe(Zero) and P.R.CmpLt(Width);
+  const InsideY = P.G.CmpGe(Zero) and P.G.CmpLt(Height);
+  P.Ctx^.DecalMask := InsideX and InsideY;
+
+  P.NextStage;
+end;
+
+procedure CheckDecalMask(var P: TTsHighpPipeline);
+begin
+  const Mask = P.Ctx^.DecalMask;
+
+  P.R := P.R and Mask;
+  P.G := P.G and Mask;
+  P.B := P.B and Mask;
+  P.A := P.A and Mask;
+
+  P.NextStage;
+end;
+
 procedure JustReturnStage(var P: TTsHighpPipeline);
 begin
   // Ends the loop
@@ -1181,6 +1211,8 @@ begin
   Table[TTsStage.PadX1] := PadX1;
   Table[TTsStage.ReflectX1] := ReflectX1;
   Table[TTsStage.RepeatX1] := RepeatX1;
+  Table[TTsStage.DecalXY] := DecalXY;
+  Table[TTsStage.CheckDecalMask] := CheckDecalMask;
 
   TailTable := Table;
   TailTable[TTsStage.LoadDestination] := LoadDstTail;

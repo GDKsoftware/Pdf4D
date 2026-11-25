@@ -92,7 +92,10 @@ type
     GammaCompress22,
     GammaExpandSrgb,
     GammaExpandDestinationSrgb,
-    GammaCompressSrgb
+    GammaCompressSrgb,
+    // Pdf4D additions, after the example of decal_x_and_y and check_decal_mask of Skia: see Pdf4D.Render.Native.Pipeline.Highp
+    DecalXY,
+    CheckDecalMask
   );
 
 implementation
