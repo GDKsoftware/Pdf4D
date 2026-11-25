@@ -19,6 +19,7 @@ uses
   Pdf4D.Render.Native.Mask,
   Pdf4D.Render.Native.Shader,
   Pdf4D.Render.Native.Geometry,
+  Pdf4D.Render.Native.Limits,
   Pdf4D.Render.Native.ClipMask;
 
 type
@@ -34,6 +35,7 @@ type
     FPixmap: TTsPixmap;
     FClip: IPdfClipPath;
     FClipMask: TTsClipMask;
+    FLimits: TPdfNativeLimits;
 
     // The clip of the next draw: False when it clips everything away. Mask is nil for a clip without a mask.
     function TryPrepareClip(const Composite: TPdfComposite; out Clip: TTsScreenIntRect; out Mask: PTsMask): Boolean;
@@ -51,6 +53,7 @@ type
     procedure DoDrawBitmap(const Bitmap: TPdfBitmap; const BitmapToDevice: TPdfMatrix; const Filter: TPdfImageFilter;
                            const Composite: TPdfComposite);
     function ReadArea(const Area: TRect): TPdfBitmap;
+    procedure CheckVerbCount(const Path: TPdfPath);
 {$IFDEF PDF4D_TESTS}
     function GetBuildCount: Integer;
     function GetClipKind: TTsClipKind;
@@ -60,7 +63,7 @@ type
 
   public
     // Takes ownership of Bitmap
-    constructor Create(const Bitmap: TPdfBitmap);
+    constructor Create(const Bitmap: TPdfBitmap; const Limits: TPdfNativeLimits);
     destructor Destroy; override;
 
     function Width: Integer;
@@ -91,6 +94,7 @@ type
 implementation
 
 uses
+  Pdf4D.Common.Defines,
   Pdf4D.Render.StrokeNormalizer,
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Color,
@@ -119,12 +123,14 @@ end;
 
 { TPdfNativeDevice }
 
-constructor TPdfNativeDevice.Create(const Bitmap: TPdfBitmap);
+constructor TPdfNativeDevice.Create(const Bitmap: TPdfBitmap; const Limits: TPdfNativeLimits);
 begin
   inherited Create;
   FBitmap := Bitmap;
   FPixmap := TTsPixmap.CreateOver(Bitmap);
+  FLimits := Limits;
   FClipMask := TTsClipMask.Create;
+  FClipMask.MaxPathVerbs := Limits.MaxPathVerbs;
 end;
 
 destructor TPdfNativeDevice.Destroy;
@@ -276,6 +282,7 @@ procedure TPdfNativeDevice.FillPath(const Path: TPdfPath; const Transform: TPdfM
 begin
   const FloatState = TTsFloatMode.Enter;
   try
+    CheckVerbCount(Path);
     DoFillPath(Path, Transform, FillRule, Paint, Composite);
   finally
     TTsFloatMode.Leave(FloatState);
@@ -323,6 +330,7 @@ procedure TPdfNativeDevice.StrokePath(const Path: TPdfPath; const Transform: TPd
 begin
   const FloatState = TTsFloatMode.Enter;
   try
+    CheckVerbCount(Path);
     DoStrokePath(Path, Transform, Stroke, Paint, Composite);
   finally
     TTsFloatMode.Leave(FloatState);
@@ -436,7 +444,7 @@ end;
 
 function TPdfNativeDevice.CreateLayer(const Width, Height: Integer): IPdfRasterDevice;
 begin
-  Result := TPdfNativeDevice.Create(TPdfBitmap.Create(Width, Height));
+  Result := TPdfNativeDevice.Create(TPdfBitmap.Create(Width, Height), FLimits);
 end;
 
 function TPdfNativeDevice.TryReadPixels(const Area: TRect; out Bitmap: TPdfBitmap): Boolean;
@@ -458,6 +466,14 @@ end;
 function TPdfNativeDevice.ToBitmap: TPdfBitmap;
 begin
   Result := FBitmap.Clone;
+end;
+
+procedure TPdfNativeDevice.CheckVerbCount(const Path: TPdfPath);
+begin
+  if Path.VerbCount > FLimits.MaxPathVerbs then
+  begin
+    raise EPdfLimitExceededException.CreateFmt('The path has %d verbs, more than the limit of %d', [Path.VerbCount, FLimits.MaxPathVerbs]);
+  end;
 end;
 
 function TPdfNativeDevice.ReadArea(const Area: TRect): TPdfBitmap;

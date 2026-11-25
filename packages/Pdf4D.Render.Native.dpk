@@ -71,6 +71,8 @@ contains
   Pdf4D.Render.Native.Painter in '..\src\Render\Native\Pdf4D.Render.Native.Painter.pas',
   Pdf4D.Render.Native.Conversion in '..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas',
   Pdf4D.Render.Native.ClipMask in '..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas',
-  Pdf4D.Render.Native.Device in '..\src\Render\Native\Pdf4D.Render.Native.Device.pas';
+  Pdf4D.Render.Native.Limits in '..\src\Render\Native\Pdf4D.Render.Native.Limits.pas',
+  Pdf4D.Render.Native.Device in '..\src\Render\Native\Pdf4D.Render.Native.Device.pas',
+  Pdf4D.Render.Native.Backend in '..\src\Render\Native\Pdf4D.Render.Native.Backend.pas';
 
 end.

@@ -269,9 +269,16 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Conversion.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Limits.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Backend.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.DeviceContract.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Backend.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.RenderGroups.Base.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.RenderSoftMasks.Base.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.RenderTiling.Base.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderNative.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingBlitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas"/>

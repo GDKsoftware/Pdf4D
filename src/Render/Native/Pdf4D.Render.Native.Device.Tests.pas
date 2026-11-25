@@ -9,23 +9,18 @@ interface
 uses
   System.SysUtils,
   DUnitX.TestFramework,
+  Pdf4D.Common.Defines,
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.Native.ClipMask,
+  Pdf4D.Render.Native.Backend,
   Pdf4D.Render.Native.Device,
   Pdf4D.Tests.DeviceContract;
 
 type
-  // The backend of these tests: it makes native devices of a bitmap of the size that is asked for. The backend of the renderer replaces it.
-  TPdfNativeTestBackend = class(TInterfacedObject, IPdfRenderBackend)
-  public
-    function Name: string;
-    function CreateRasterDevice(const Width, Height: Integer): IPdfRasterDevice;
-  end;
-
   // The contract tests of the device come from the base class
   [TestFixture]
   TPdfNativeDeviceTests = class(TPdfDeviceContractTests)
@@ -33,6 +28,7 @@ type
     function Native: TPdfNativeDevice;
     function NewDiamondClip(const Parent: IPdfClipPath): IPdfClipPath;
     function NewPathClip(const Parent: IPdfClipPath; const Path: TPdfPath; const Transform: TPdfMatrix): IPdfClipPath;
+    function FillRaisesTheLimit(const Device: IPdfRasterDevice; const Path: TPdfPath): Boolean;
     procedure AssertNothingIsDrawn;
     procedure AssertRowIsRed(const Row, FromX, ToX: Integer);
 
@@ -105,6 +101,9 @@ type
 
     [Test]
     procedure TestSoftMaskOutsideTheClipDrawsNothing;
+
+    [Test]
+    procedure TestLayerHasSameLimits;
   end;
 
 implementation
@@ -112,23 +111,11 @@ implementation
 const
   Cos45: Single = 0.70710678;
 
-{ TPdfNativeTestBackend }
-
-function TPdfNativeTestBackend.Name: string;
-begin
-  Result := 'Native';
-end;
-
-function TPdfNativeTestBackend.CreateRasterDevice(const Width, Height: Integer): IPdfRasterDevice;
-begin
-  Result := TPdfNativeDevice.Create(TPdfBitmap.Create(Width, Height));
-end;
-
 { TPdfNativeDeviceTests }
 
 function TPdfNativeDeviceTests.CreateBackend: IPdfRenderBackend;
 begin
-  Result := TPdfNativeTestBackend.Create;
+  Result := TPdfNativeBackend.Create;
 end;
 
 function TPdfNativeDeviceTests.Native: TPdfNativeDevice;
@@ -587,6 +574,49 @@ begin
   end;
 
   AssertNothingIsDrawn;
+end;
+
+function TPdfNativeDeviceTests.FillRaisesTheLimit(const Device: IPdfRasterDevice; const Path: TPdfPath): Boolean;
+begin
+  Result := False;
+  try
+    Device.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, NoAntiAlias);
+  except
+    on EPdfLimitExceededException do
+    begin
+      Result := True;
+    end;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestLayerHasSameLimits;
+begin
+  var Limits := TPdfNativeLimits.Default;
+  Limits.MaxPathVerbs := 10;
+  const Backend: IPdfRenderBackend = TPdfNativeBackend.Create(Limits);
+  FDevice := Backend.CreateRasterDevice(10, 10);
+  const Layer = FDevice.CreateLayer(4, 4);
+
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(0, 0);
+    for var Index := 1 to 10 do
+    begin
+      Path.LineTo(Index, Index mod 2);
+    end;
+    Assert.IsTrue(FillRaisesTheLimit(FDevice, Path), 'the device raises at 11 verbs');
+    Assert.IsTrue(FillRaisesTheLimit(Layer, Path), 'the layer raises at 11 verbs');
+
+    Path.Clear;
+    Path.MoveTo(0, 0);
+    for var Index := 1 to 9 do
+    begin
+      Path.LineTo(Index, Index mod 2);
+    end;
+    Assert.IsFalse(FillRaisesTheLimit(Layer, Path), 'the layer takes 10 verbs');
+  finally
+    Path.Free;
+  end;
 end;
 
 end.

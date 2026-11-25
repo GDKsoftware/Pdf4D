@@ -46,6 +46,7 @@ type
     FMask: TTsMask;
     FBuildCount: Integer;
     FForceMask: Boolean;
+    FMaxPathVerbs: Integer;
     // The last combination of the clip with a soft mask: what it was made of (the build of the chain, the geometry and a copy of the values of
     // the mask) and the mask. A new combination is a new mask, so a pointer that was handed out never changes.
     FBuildNumber: Integer;
@@ -75,6 +76,8 @@ type
   public
     // Takes the clip of the next draws on a device of Width * Height pixels. Nothing is built when the chain and the size are those of the
     // last call.
+    constructor Create;
+
     procedure Update(const Clip: IPdfClipPath; const Width, Height: Integer);
 
     property Kind: TTsClipKind read FKind;
@@ -89,6 +92,8 @@ type
     function Combine(const SoftMask: TPdfAlphaMask): PTsMask;
     // The number of chains that were built (a chain of nil is not built)
     property BuildCount: Integer read FBuildCount;
+    // A path of the chain with more verbs raises EPdfLimitExceededException when the chain is built, before anything is drawn
+    property MaxPathVerbs: Integer read FMaxPathVerbs write FMaxPathVerbs;
     // A rectangle is made into a mask as well, so that a test can compare the two ways to clip
     property ForceMask: Boolean read FForceMask write SetForceMask;
   end;
@@ -96,6 +101,7 @@ type
 implementation
 
 uses
+  Pdf4D.Common.Defines,
   Pdf4D.Render.StrokeNormalizer,
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Transform,
@@ -196,6 +202,12 @@ begin
 end;
 
 { TTsClipMask }
+
+constructor TTsClipMask.Create;
+begin
+  inherited Create;
+  FMaxPathVerbs := High(Integer);
+end;
 
 procedure TTsClipMask.Update(const Clip: IPdfClipPath; const Width, Height: Integer);
 begin
@@ -435,6 +447,11 @@ end;
 function TTsClipMask.Apply(const Link: IPdfClipPath; var HasMask: Boolean): Boolean;
 begin
   // Java2D moves the vertices of a clip before it takes the pixels, so the path goes on in device pixels
+  if Link.Path.VerbCount > FMaxPathVerbs then
+  begin
+    raise EPdfLimitExceededException.CreateFmt('A clip path has %d verbs, more than the limit of %d', [Link.Path.VerbCount, FMaxPathVerbs]);
+  end;
+
   const Snapped = TPdfStrokeNormalizer.SnapForClip(Link.Path, Link.Transform);
   var Ts: TTsPath;
   var IsConverted: Boolean;
