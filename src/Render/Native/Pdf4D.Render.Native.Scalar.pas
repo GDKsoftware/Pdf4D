@@ -50,6 +50,9 @@ type
     class function MinF(const A, B: Single): Single; static;
     class function MaxF(const A, B: Single): Single; static;
 
+    // The f32 % operator of Rust (fmod): the exact remainder with the sign of the dividend; NaN for an infinite dividend or a zero divisor
+    class function RemainderF(const Value, Divisor: Single): Single; static;
+
     class function IsFinite(const Value: Single): Boolean; static;
     class function IsSignNegative(const Value: Single): Boolean; static;
 
@@ -343,6 +346,39 @@ begin
   end;
 
   Result := B;
+end;
+
+class function TTsScalar.RemainderF(const Value, Divisor: Single): Single;
+begin
+  if IsNan(Value) or IsNan(Divisor) or IsInfinite(Value) or (Divisor = 0) then
+  begin
+    Exit(NaN);
+  end;
+
+  if IsInfinite(Divisor) then
+  begin
+    Exit(Value);
+  end;
+
+  // Singles are exact in a Double, and subtracting T from A with T <= A < 2 * T is exact, so the loop gives the exact remainder
+  var Remaining: Double := Abs(Value);
+  const Step: Double = Abs(Divisor);
+  while Remaining >= Step do
+  begin
+    var Multiple: Double := Step;
+    while (Multiple * 2) <= Remaining do
+    begin
+      Multiple := Multiple * 2;
+    end;
+
+    Remaining := Remaining - Multiple;
+  end;
+
+  Result := Remaining;
+  if Value < 0 then
+  begin
+    Result := -Result;
+  end;
 end;
 
 class function TTsScalar.MaxF(const A, B: Single): Single;

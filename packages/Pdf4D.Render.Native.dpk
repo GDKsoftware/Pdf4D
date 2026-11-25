@@ -43,6 +43,8 @@ contains
   Pdf4D.Render.Native.Geometry in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas',
   Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas',
   Pdf4D.Render.Native.PathGeometry in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.pas',
-  Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas';
+  Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas',
+  Pdf4D.Render.Native.Dash in '..\src\Render\Native\Pdf4D.Render.Native.Dash.pas',
+  Pdf4D.Render.Native.Stroker in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas';
 
 end.

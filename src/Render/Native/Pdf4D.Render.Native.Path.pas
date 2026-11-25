@@ -162,6 +162,9 @@ type
     function Len: Integer;
     function IsEmpty: Boolean;
 
+    // The current number of points in the builder (points.len() of the Rust code)
+    function PointCount: Integer;
+
     // Adds the beginning of a contour. Multiple continuous MoveTo segments are not allowed. If the previous segment was also MoveTo, it
     // will be overwritten with the current one.
     procedure MoveTo(const X, Y: Single);
@@ -693,6 +696,11 @@ end;
 function TTsPathBuilder.LastVerbIs(const Verb: TTsPathVerb): Boolean;
 begin
   Result := (FVerbCount > 0) and (FVerbs[FVerbCount - 1] = Verb);
+end;
+
+function TTsPathBuilder.PointCount: Integer;
+begin
+  Result := FPointCount;
 end;
 
 function TTsPathBuilder.Len: Integer;

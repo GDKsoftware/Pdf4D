@@ -219,6 +219,10 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Path.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Path.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Dash.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Dash.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stroker.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

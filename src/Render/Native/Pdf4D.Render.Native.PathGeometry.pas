@@ -369,7 +369,7 @@ end;
 procedure TTsConic.Chop(out First, Second: TTsConic);
 begin
   const Scale = TF32x2.Splat(TTsScalar.Invert(1.0 + Weight));
-  const NewWeight = SubdivideWeightValue(Weight);
+  const NewWeight: Single = SubdivideWeightValue(Weight);
 
   const P0 = Points[0].ToF32x2;
   const P1 = Points[1].ToF32x2;
@@ -405,10 +405,10 @@ begin
   ConicCount := 0;
 
   // rotate by x,y so that u_start is (1.0)
-  const X = UStart.Dot(UStop);
-  var Y := UStart.Cross(UStop);
+  const X: Single = UStart.Dot(UStop);
+  var Y: Single := UStart.Cross(UStop);
 
-  const AbsY = Abs(Y);
+  const AbsY: Single = Abs(Y);
 
   // check for (effectively) coincident vectors this can happen if our angle is nearly 0 or nearly 180 (y == 0)
   // ... we use the dot-prod to distinguish between 0 and 180 (x > 0)
@@ -476,7 +476,7 @@ begin
   // Now compute any remaining (sub-90-degree) arc for the last conic
   const FinalPt = TTsPoint.FromXY(X, Y);
   const LastQ = QuadrantPoints[Quadrant * 2];  // will already be a unit-vector
-  const Dot = LastQ.Dot(FinalPt);
+  const Dot: Single = LastQ.Dot(FinalPt);
 
   if Dot < 1.0 then
   begin
@@ -529,16 +529,16 @@ begin
   var First, Second: TTsConic;
   Src.Chop(First, Second);
 
-  const StartY = Src.Points[0].Y;
-  const EndY = Src.Points[2].Y;
+  const StartY: Single = Src.Points[0].Y;
+  const EndY: Single = Src.Points[2].Y;
   if Between(StartY, Src.Points[1].Y, EndY) then
   begin
     // If the input is monotonic and the output is not, the scan converter hangs. Ensure that the chopped conics maintain their y-order.
-    const MidY = First.Points[2].Y;
+    const MidY: Single = First.Points[2].Y;
     if not Between(StartY, MidY, EndY) then
     begin
       // If the computed midpoint is outside the ends, move it to the closer one.
-      var CloserY := EndY;
+      var CloserY: Single := EndY;
       if Abs(MidY - StartY) < Abs(MidY - EndY) then
       begin
         CloserY := StartY;
@@ -718,8 +718,8 @@ class function TTsPathGeometry.TryValidUnitDivide(const Numer, Denom: Single; ou
 begin
   Quotient := Default(TTsNormalizedF32Exclusive);
 
-  var NumerValue := Numer;
-  var DenomValue := Denom;
+  var NumerValue: Single := Numer;
+  var DenomValue: Single := Denom;
   if TTsLane.IsLt(NumerValue, 0.0) then
   begin
     NumerValue := -NumerValue;
@@ -752,10 +752,10 @@ end;
 
 class function TTsPathGeometry.FindQuadMaxCurvature(const Src: TTsPoints3): TTsNormalizedF32;
 begin
-  const Ax = Src[1].X - Src[0].X;
-  const Ay = Src[1].Y - Src[0].Y;
-  const Bx = Src[0].X - Src[1].X - Src[1].X + Src[2].X;
-  const By = Src[0].Y - Src[1].Y - Src[1].Y + Src[2].Y;
+  const Ax: Single = Src[1].X - Src[0].X;
+  const Ay: Single = Src[1].Y - Src[0].Y;
+  const Bx: Single = Src[0].X - Src[1].X - Src[1].X + Src[2].X;
+  const By: Single = Src[0].Y - Src[1].Y - Src[1].Y + Src[2].Y;
 
   var Numer: Single := -(Ax * Bx + Ay * By);
   var Denom: Single := Bx * Bx + By * By;
@@ -846,7 +846,7 @@ begin
     Exit(Count);
   end;
 
-  const InvA = TTsScalar.Invert(Coeff[0]);
+  const InvA: Single = TTsScalar.Invert(Coeff[0]);
   const A: Single = Coeff[1] * InvA;
   const B: Single = Coeff[2] * InvA;
   const C: Single = Coeff[3] * InvA;
@@ -1047,8 +1047,8 @@ begin
     // A cusp is at the max curvature, and also has a derivative close to zero. Choose the 'close to zero' meaning by comparing the
     // derivative length with the overall cubic size.
     const DPt = EvalCubicDerivative(Src, TestT);
-    const DPtMagnitude = DPt.LengthSqd;
-    const Precision = CalcCubicPrecision(Src);
+    const DPtMagnitude: Single = DPt.LengthSqd;
+    const Precision: Single = CalcCubicPrecision(Src);
     if TTsLane.IsLt(DPtMagnitude, Precision) then
     begin
       // All three max curvature t values may be close to the cusp; return the first one.
@@ -1084,9 +1084,9 @@ end;
 
 class function TTsPathGeometry.ChopQuadAtXExtrema(const Src: TTsPoints3; var Dst: TTsPoints5): Integer;
 begin
-  const A = Src[0].X;
-  var B := Src[1].X;
-  const C = Src[2].X;
+  const A: Single = Src[0].X;
+  var B: Single := Src[1].X;
+  const C: Single = Src[2].X;
 
   if IsNotMonotonic(A, B, C) then
   begin
@@ -1121,9 +1121,9 @@ end;
 
 class function TTsPathGeometry.ChopQuadAtYExtrema(const Src: TTsPoints3; var Dst: TTsPoints5): Integer;
 begin
-  const A = Src[0].Y;
-  var B := Src[1].Y;
-  const C = Src[2].Y;
+  const A: Single = Src[0].Y;
+  var B: Single := Src[1].Y;
+  const C: Single = Src[2].Y;
 
   if IsNotMonotonic(A, B, C) then
   begin
