@@ -1,0 +1,11 @@
+[package]
+name = "tiny-skia-reference"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+tiny-skia-path = { path = "../tiny-skia-src/path" }
+
+# Not part of any other workspace
+[workspace]
