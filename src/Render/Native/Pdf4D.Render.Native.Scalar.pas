@@ -374,8 +374,9 @@ begin
     Remaining := Remaining - Multiple;
   end;
 
+  // Rust % keeps the sign of the dividend, also for -0
   Result := Remaining;
-  if Value < 0 then
+  if IsSignNegative(Value) then
   begin
     Result := -Result;
   end;

@@ -71,6 +71,9 @@ type
     procedure TestFiniteAndNonZeroPositiveTryCreate;
 
     [Test]
+    procedure TestRemainderKeepsTheSignOfTheDividend;
+
+    [Test]
     procedure TestFloatModeMasksAndRestores;
 
     [Test]
@@ -273,6 +276,19 @@ begin
   finally
     SetExceptionMask(PreviousMask);
   end;
+end;
+
+procedure TTsScalarTests.TestRemainderKeepsTheSignOfTheDividend;
+begin
+  const NegativeZeroBits: Cardinal = $80000000;
+  var NegativeZero: Single;
+  Move(NegativeZeroBits, NegativeZero, SizeOf(Single));
+
+  Assert.AreEqual<Single>(1, TTsScalar.RemainderF(7, 3));
+  Assert.AreEqual<Single>(-1, TTsScalar.RemainderF(-7, 3));
+  Assert.IsTrue(TTsScalar.IsSignNegative(TTsScalar.RemainderF(NegativeZero, 3)), 'Rust: -0 % 3 is -0');
+  Assert.IsTrue(TTsScalar.IsSignNegative(TTsScalar.RemainderF(-6, 3)), 'Rust: -6 % 3 is -0');
+  Assert.IsFalse(TTsScalar.IsSignNegative(TTsScalar.RemainderF(0, 3)), 'Rust: 0 % 3 is +0');
 end;
 
 procedure TTsScalarTests.TestSingleStepsRoundPerOperation;
