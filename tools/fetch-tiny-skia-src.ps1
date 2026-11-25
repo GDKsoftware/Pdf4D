@@ -1,5 +1,7 @@
 # Downloads the tiny-skia v0.12.0 source archive, checks its SHA-256 and extracts it to tools/tiny-skia-src/ (ignored by git).
+# A source folder of another tag or archive (VERSION.txt differs) is replaced.
 # With -CopyTestImages the reference images of tiny-skia (tests/images, without gradients/) are copied to tests/reference/tiny-skia/.
+# Only the sub folders are copied: files in the root of tests/images (gamma.png, for the gamma stages that are not ported) are left out.
 param(
     [switch]$CopyTestImages
 )
@@ -13,7 +15,16 @@ $archiveSha256 = '8497d5cac8a1995608d492d48072c8ac7e0bf9f01372478e87ef4088137e03
 $archiveUrl = "https://github.com/linebender/tiny-skia/archive/refs/tags/$tag.zip"
 $dest = Join-Path $PSScriptRoot 'tiny-skia-src'
 
-if (-not (Test-Path (Join-Path $dest 'Cargo.toml'))) {
+$versionFile = Join-Path $dest 'VERSION.txt'
+$expectedVersion = @("tag: $tag", "sha256: $archiveSha256")
+$currentVersion = if (Test-Path $versionFile) { @(Get-Content $versionFile) } else { @() }
+$upToDate = (Test-Path (Join-Path $dest 'Cargo.toml')) -and ($currentVersion.Count -eq 2) -and
+    ($currentVersion[0] -eq $expectedVersion[0]) -and ($currentVersion[1] -eq $expectedVersion[1])
+
+if (-not $upToDate) {
+    if (Test-Path $dest) {
+        Remove-Item $dest -Recurse -Force
+    }
     New-Item -ItemType Directory -Force $dest | Out-Null
     $zip = Join-Path $dest 'src.zip'
     Invoke-WebRequest -Uri $archiveUrl -OutFile $zip -UseBasicParsing
@@ -28,7 +39,7 @@ if (-not (Test-Path (Join-Path $dest 'Cargo.toml'))) {
     Get-ChildItem $root.FullName -Force | Move-Item -Destination $dest -Force
     Remove-Item $tmp -Recurse -Force
     Remove-Item $zip
-    Set-Content -Path (Join-Path $dest 'VERSION.txt') -Value @("tag: $tag", "sha256: $archiveSha256") -Encoding ascii
+    Set-Content -Path $versionFile -Value $expectedVersion -Encoding ascii
 }
 
 if ($CopyTestImages) {
