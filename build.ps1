@@ -204,7 +204,7 @@ function Test-SkiaLibraryDependencies([string]$LinuxLibrary) {
 
 function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     Write-Host "=== Test $($TestProject.Name) $TargetPlatform $Config ==="
-    $testArguments = if ($Fixtures) { @("-r:$Fixtures") } else { @() }
+    $testArguments = @(if ($Fixtures) { "-r:$Fixtures" })
     $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
 
     if ($TestProject.NeedsSkia) {
