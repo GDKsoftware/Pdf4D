@@ -12,7 +12,9 @@ param(
     [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'Pdf4D.Vcl.Tests', 'Pdf4D.FMX.Tests', 'All')]
     [string]$Suite = 'All',
 
-    # Run only these fixtures of each test project (DUnitX -r:, comma separated), for example TTsPathTests,TTsStrokerTests
+    # Run only these fixtures of each test project (DUnitX -r:, comma separated, full names as Unit.Class), for example
+    # Pdf4D.Render.Native.Path.Tests.TTsPathTests,Pdf4D.Render.Native.Stroker.Tests.TTsStrokerTests
+    # A filter that matches no test in Pdf4D.Tests fails the run; in the other test projects it only warns
     [string]$Fixtures
 )
 
@@ -106,7 +108,8 @@ function Test-NoInitializationSections {
 # - Only src\Vcl uses Vcl.* and Winapi.*, and src\Vcl uses no FMX.*.
 # - Only src\FMX uses FMX.*, and src\FMX uses no Vcl.* and no Winapi.*.
 # - Only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia.
-# - src\Render\Native uses only System.*, core units and units of Pdf4D.Render (no Skia, Viewer, Vcl, FMX or other libraries).
+# - src\Render\Native uses only System.*, core units and units of Pdf4D.Render (no Skia, Viewer, Vcl, FMX or other libraries): the units
+#   of its non-test files must all match ^(System|Pdf4D)\.; the test units may also use DUnitX.
 # - Only src\Render\Native and the viewer layer (src\Viewer, src\Vcl, src\FMX) use Pdf4D.Render.Native.*.
 function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$ExcludedFolders) {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
@@ -118,6 +121,26 @@ function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$Exclud
         Where-Object { $file = $_.FullName; -not ($excluded | Where-Object { $file.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }) } |
         Select-String -Pattern $Pattern |
         Where-Object { $_.Line -notmatch '^\s*//' }
+}
+
+# The non-test units of src\Render\Native may only use units that match ^(System|Pdf4D)\. (an allow-list, so Posix.*, Macapi.*, Web.*,
+# FireDAC.* and the like fail as well). The uses clauses are read after comments and compiler directives are removed.
+function Get-NativeAllowListViolations([string]$Folder) {
+    if (-not (Test-Path -LiteralPath $Folder)) {
+        return
+    }
+    foreach ($file in Get-ChildItem -Path $Folder -Include '*.pas' -Recurse | Where-Object { $_.Name -notmatch '\.Tests\.pas$' }) {
+        $text = [IO.File]::ReadAllText($file.FullName)
+        $text = [regex]::Replace($text, '(?s)\(\*.*?\*\)|\{.*?\}|//[^\r\n]*', ' ')
+        foreach ($clause in [regex]::Matches($text, '(?is)(?<![\w.])uses\s+(.*?);')) {
+            foreach ($entry in $clause.Groups[1].Value -split ',') {
+                $unit = ($entry -replace "(?is)\s+in\s+'.*$", '').Trim()
+                if ($unit -and $unit -notmatch '^(System|Pdf4D)\.') {
+                    [pscustomobject]@{ Path = $file.FullName; LineNumber = 0; Line = "uses $unit (only System.* and Pdf4D.* units are allowed)" }
+                }
+            }
+        }
+    }
 }
 
 function Test-LayerBoundaries {
@@ -136,10 +159,11 @@ function Test-LayerBoundaries {
     $skiaViolations = Get-UsesViolations $sourceFolder '\bSystem\.Skia\b|\bPdf4D\.Render\.Skia\b' @('Render\Skia', 'Vcl\Skia', 'FMX\Skia')
 
     $nativeViolations = Get-UsesViolations (Join-Path $sourceFolder 'Render\Native') "${notNamespacePrefix}(Vcl|Winapi|FMX|Skia|Data|Xml|REST|Soap|Spring|IdHTTP|Indy)\.\w|\bPdf4D\.(Vcl|FMX|Viewer)\b" @()
+    $nativeAllowList = Get-NativeAllowListViolations (Join-Path $sourceFolder 'Render\Native')
     $nativeUsers = Get-UsesViolations $sourceFolder '\bPdf4D\.Render\.Native\.\w' @('Render\Native', 'Viewer', 'Vcl', 'FMX')
 
     $violations = @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) +
-        @($fmxOutsideViolations) + @($vclInFmxViolations) + @($skiaViolations) + @($nativeViolations) + @($nativeUsers)
+        @($fmxOutsideViolations) + @($vclInFmxViolations) + @($skiaViolations) + @($nativeViolations) + @($nativeAllowList) + @($nativeUsers)
     if ($violations) {
         $violations | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
         throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\FMX uses FMX.* (and no Vcl.* and Winapi.*); only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia; src\Render\Native uses only System.*, core units and units of Pdf4D.Render; only src\Render\Native and the viewer layer (src\Viewer, src\Vcl, src\FMX) use Pdf4D.Render.Native.*'
@@ -217,18 +241,28 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
         if ($TestProject.NeedsSkia) {
             $linuxFolder = Get-WslPath $outputFolder
             Test-SkiaLibraryDependencies "$linuxFolder/libsk4d.so"
-            & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary @testArguments
+            $output = & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary @testArguments | ForEach-Object { Write-Host $_; "$_" }
         }
         else {
-            & wsl -d $WslDistro -- $linuxBinary @testArguments
+            $output = & wsl -d $WslDistro -- $linuxBinary @testArguments | ForEach-Object { Write-Host $_; "$_" }
         }
     }
     else {
-        & (Join-Path $outputFolder "$($TestProject.Name).exe") @testArguments
+        $output = & (Join-Path $outputFolder "$($TestProject.Name).exe") @testArguments | ForEach-Object { Write-Host $_; "$_" }
+    }
+    $testExitCode = $LASTEXITCODE
+
+    if ($testExitCode -ne 0) {
+        throw "Tests of $($TestProject.Name) failed for $TargetPlatform (exit code $testExitCode)"
     }
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Tests of $($TestProject.Name) failed for $TargetPlatform (exit code $LASTEXITCODE)"
+    # A filter that matches nothing exits with 0, which looks like a green run
+    if ($Fixtures -and ($output | Where-Object { $_ -match 'Tests Found\s*:\s*0\b' })) {
+        $message = "The filter -Fixtures $Fixtures matched no test in $($TestProject.Name); use full names as Unit.Class"
+        if ($TestProject.Name -eq 'Pdf4D.Tests') {
+            throw $message
+        }
+        Write-Warning $message
     }
 }
 
