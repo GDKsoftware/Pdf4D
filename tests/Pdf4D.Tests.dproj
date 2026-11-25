@@ -235,6 +235,12 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Blitter.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Path64.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Edge.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

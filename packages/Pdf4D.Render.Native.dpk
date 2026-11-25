@@ -51,6 +51,10 @@ contains
   Pdf4D.Render.Native.BlendMode in '..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas',
   Pdf4D.Render.Native.FixedPoint in '..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas',
   Pdf4D.Render.Native.AlphaRuns in '..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas',
-  Pdf4D.Render.Native.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas';
+  Pdf4D.Render.Native.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas',
+  Pdf4D.Render.Native.Path64 in '..\src\Render\Native\Pdf4D.Render.Native.Path64.pas',
+  Pdf4D.Render.Native.Edge in '..\src\Render\Native\Pdf4D.Render.Native.Edge.pas',
+  Pdf4D.Render.Native.EdgeClipper in '..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas',
+  Pdf4D.Render.Native.EdgeBuilder in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas';
 
 end.

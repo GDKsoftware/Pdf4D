@@ -16,7 +16,8 @@ uses
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Wide,
   Pdf4D.Render.Native.Geometry,
-  Pdf4D.Render.Native.Transform;
+  Pdf4D.Render.Native.Transform,
+  Pdf4D.Render.Native.Path64;
 
 // A collection of functions to work with Bezier paths: the path_geometry module of tiny-skia-path and the one of tiny-skia.
 //
@@ -24,7 +25,7 @@ uses
 // returns the count and the caller reads the first Count values. Where Rust passes a sub-slice of a destination (&mut dst[offset..]) the
 // function takes an offset. The destinations are var parameters because they are updated in place.
 //
-// chop_mono_cubic_at_x and chop_mono_cubic_at_y are not here: they need the f64 code of path64 and are ported with it.
+// chop_mono_cubic_at_x and chop_mono_cubic_at_y use the f64 code of path64 and return False where Rust returns false.
 //
 // The Rust PathDirection lives in path_builder.rs; it is declared here because the builder uses this unit and not the other way round.
 //
@@ -220,6 +221,15 @@ type
     // 1.0, hence the need to check and just return the last cubic as a degenerate clump of 4 points in the same place.
     class procedure ChopCubicAt(const Src: TTsPoints4; const TValues: array of TTsNormalizedF32Exclusive; var Dst: array of TTsPoint); static;
     class function ChopCubicAtMaxCurvature(const Src: TTsPoints4; var TValues: TTsTValues; var Dst: array of TTsPoint): Integer; static;
+
+    // Chops a cubic that is monotonic in X (or Y) at the X (or Y) where it crosses the line. Returns False when the f64 search finds no
+    // crossing; Dst gets 7 points otherwise.
+    class function ChopMonoCubicAtX(const Src: TTsPoints4; const X: Single; var Dst: TTsPoints7): Boolean; static;
+    class function ChopMonoCubicAtY(const Src: TTsPoints4; const Y: Single; var Dst: TTsPoints7): Boolean; static;
+
+  private
+    class function CubicDchopAtIntercept(const Src: TTsPoints4; const Intercept: Single; const IsVertical: Boolean;
+                                         var Dst: TTsPoints7): Boolean; static;
   end;
 
 implementation
@@ -1301,6 +1311,56 @@ begin
   end;
 
   Result := Count + 1;
+end;
+
+class function TTsPathGeometry.ChopMonoCubicAtX(const Src: TTsPoints4; const X: Single; var Dst: TTsPoints7): Boolean;
+begin
+  Result := CubicDchopAtIntercept(Src, X, True, Dst);
+end;
+
+class function TTsPathGeometry.ChopMonoCubicAtY(const Src: TTsPoints4; const Y: Single; var Dst: TTsPoints7): Boolean;
+begin
+  Result := CubicDchopAtIntercept(Src, Y, False, Dst);
+end;
+
+class function TTsPathGeometry.CubicDchopAtIntercept(const Src: TTsPoints4; const Intercept: Single; const IsVertical: Boolean;
+                                                     var Dst: TTsPoints7): Boolean;
+begin
+  var Points64: array[0..3] of TTsPoint64;
+  for var Index := 0 to 3 do
+  begin
+    Points64[Index] := TTsPoint64.FromPoint(Src[Index]);
+  end;
+
+  const Cubic = TTsCubic64.Create(Points64);
+
+  var Roots: TTsDoubles3;
+  Roots[0] := 0.0;
+  Roots[1] := 0.0;
+  Roots[2] := 0.0;
+
+  var Count: Integer;
+  if IsVertical then
+  begin
+    Count := TTsLineCubicIntersections.VerticalIntersect(Cubic, Intercept, Roots);
+  end
+  else
+  begin
+    Count := TTsLineCubicIntersections.HorizontalIntersect(Cubic, Intercept, Roots);
+  end;
+
+  if Count <= 0 then
+  begin
+    Exit(False);
+  end;
+
+  const Pair = Cubic.ChopAt(Roots[0]);
+  for var Index := 0 to 6 do
+  begin
+    Dst[Index] := Pair.Points[Index].ToPoint;
+  end;
+
+  Result := True;
 end;
 
 end.
