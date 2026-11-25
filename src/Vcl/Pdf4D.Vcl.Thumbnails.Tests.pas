@@ -35,6 +35,10 @@ type
 
     [Test]
     procedure TestColorIsTheBackground;
+
+    // A long document that opens while the thumbnails are shown gives them a scroll bar at once
+    [Test]
+    procedure TestScrollBarFollowsContent;
   end;
 
 implementation
@@ -42,6 +46,7 @@ implementation
 uses
   System.Math,
   System.UITypes,
+  Winapi.Windows,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -54,6 +59,9 @@ const
   FrameBlue: TVclPixel = (R: 30; G: 144; B: 255);
   FrameTolerance = 40;
   BackgroundRed: TColor = $000000FF;
+  LongDocumentPages = 50;
+  PageWidth = 612;
+  PageHeight = 792;
 
 { TPdf4DThumbnailsTests }
 
@@ -138,6 +146,15 @@ begin
   finally
     Bitmap.Free;
   end;
+end;
+
+procedure TPdf4DThumbnailsTests.TestScrollBarFollowsContent;
+begin
+  Assert.IsTrue(FHost.Open(TViewerDocuments.Pages(LongDocumentPages, PageWidth, PageHeight, 0)), 'the document opens: ' + FHost.OpenErrorMessage);
+  FHost.Pump(1);
+
+  const Style = GetWindowLong(FHost.Thumbnails.Handle, GWL_STYLE);
+  Assert.IsTrue((Style and WS_VSCROLL) <> 0, 'the thumbnails show their scroll bar for the pages of a long document');
 end;
 
 end.

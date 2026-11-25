@@ -287,6 +287,8 @@ begin
   FIsRevealPending := True;
   BuildLayout;
   Relayout(False);
+  // Relayout reads the old content after BuildLayout has set the new one, so it sees no change: the shell learns of the content here
+  FHost.ScrollStateChanged;
 end;
 
 procedure TPdfThumbnailsController.DetachDocumentState;
