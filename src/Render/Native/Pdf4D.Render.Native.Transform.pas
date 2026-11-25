@@ -262,7 +262,7 @@ begin
   const A: Single = System.Cos(V);
   const B: Single = System.Sin(V);
   const C: Single = -B;
-  const D = A;
+  const D: Single = A;
 
   Result := FromRow(A, B, C, D, 0.0, 0.0);
 end;

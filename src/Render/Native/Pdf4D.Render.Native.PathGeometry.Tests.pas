@@ -49,6 +49,8 @@ type
 
     [Test]
     procedure TestQuadMaxCurvatureAndTangent;
+    [Test]
+    procedure TestQuadMaxCurvatureOfHugeControlPointsFails;
 
     [Test]
     procedure TestFindCubicCusp;
@@ -213,6 +215,23 @@ begin
   Assert.AreEqual(1, TTsPathGeometry.ChopQuadAtXExtrema(Src, Dst));
   Assert.AreEqual(Dst[2].X, Dst[1].X);
   Assert.AreEqual(Dst[2].X, Dst[3].X);
+end;
+
+procedure TTsPathGeometryTests.TestQuadMaxCurvatureOfHugeControlPointsFails;
+begin
+  // numer is inf - inf = NaN, where Rust panics on an unwrap
+  var Src: TTsPoints3;
+  Src[0] := Pt(0.0, 0.0);
+  Src[1] := Pt(1E30, 1E30);
+  Src[2] := Pt(3E30, 1E30);
+
+  const State = TTsFloatMode.Enter;
+  try
+    var MaxCurvature: TTsNormalizedF32;
+    Assert.IsFalse(TTsPathGeometry.TryFindQuadMaxCurvature(Src, MaxCurvature));
+  finally
+    TTsFloatMode.Leave(State);
+  end;
 end;
 
 procedure TTsPathGeometryTests.TestQuadMaxCurvatureAndTangent;

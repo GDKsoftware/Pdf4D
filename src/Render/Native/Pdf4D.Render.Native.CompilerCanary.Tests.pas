@@ -64,7 +64,7 @@ type
     procedure TestSqrtInAChainSkipsTheSingleRounding;
 
     [Test]
-    procedure TestUntypedInlineVarOfASingleIsADouble;
+    procedure TestUntypedInlineVarOfASingleIsExtended;
 
     [Test]
     procedure TestUntypedInlineVarSkipsTheSingleRounding;
@@ -279,7 +279,7 @@ begin
     'operation only through a Single variable or a Single(...) cast; if this never differs, the rule may be relaxed');
 end;
 
-procedure TTsCompilerCanaryTests.TestUntypedInlineVarOfASingleIsADouble;
+procedure TTsCompilerCanaryTests.TestUntypedInlineVarOfASingleIsExtended;
 begin
   FSingle := 1.5;
 

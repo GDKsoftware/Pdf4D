@@ -538,7 +538,7 @@ end;
 
 procedure TTsPoint.SwapCoords;
 begin
-  const Swapped = X;
+  const Swapped: Single = X;
 
   X := Y;
   Y := Swapped;
@@ -968,10 +968,10 @@ begin
 
     2:
     begin
-      const X0 = Points[0].X;
-      const Y0 = Points[0].Y;
-      const X1 = Points[1].X;
-      const Y1 = Points[1].Y;
+      const X0: Single = Points[0].X;
+      const Y0: Single = Points[0].Y;
+      const X1: Single = Points[1].X;
+      const Y1: Single = Points[1].Y;
 
       // Avoid min/max to preserve a NaN for rejection by TryFromLTRB
       var L, R, T, B: Single;

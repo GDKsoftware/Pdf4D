@@ -416,12 +416,7 @@ begin
   Stroke.Width := 2;
 
   var Stroked: TTsPath;
-  if StrokeOf(Path, Stroke, Stroked) then
-  begin
-    var Bounds := Stroked.Bounds;
-    Assert.IsTrue(TTsScalar.IsFinite(Bounds.Left) and TTsScalar.IsFinite(Bounds.Top) and TTsScalar.IsFinite(Bounds.Right) and
-                  TTsScalar.IsFinite(Bounds.Bottom), 'The bounds are finite');
-  end;
+  Assert.IsFalse(StrokeOf(Path, Stroke, Stroked), 'The stroker aborts instead of stroking NaN');
 end;
 
 procedure TTsStrokerTests.TestZeroWidthGivesNoPath;
