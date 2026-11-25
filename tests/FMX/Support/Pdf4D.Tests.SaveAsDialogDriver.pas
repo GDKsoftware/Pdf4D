@@ -15,18 +15,23 @@ uses
 type
   // A printer that prints to a file (Microsoft Print to PDF) asks for the name of the file in a dialog of its own, in the thread of the
   // program, at the start of the document, and FMX gives no way to name the file. This thread waits for that dialog among the windows of
-  // the thread that prints, puts the path in its file name box and presses Save. It sends window messages to the windows of its own
-  // process only; no input is synthesised. It gives up after a timeout, so that a dialog that does not show up cannot hang the tests.
+  // the thread that prints, puts the path in its file name box and presses Save, and keeps watching until that dialog is gone. It sends
+  // window messages to the windows of its own process only; no input is synthesised. After the timeout it cancels (IDCANCEL, then WM_CLOSE)
+  // every dialog and message box that is still open on that thread, so that a dialog it cannot answer ends the print as a failure and the
+  // test fails; without that the thread that prints would wait for the dialog for ever. Thread.Terminate after the job is over ends it
+  // without any cancel.
   TSaveAsDialogDriver = class(TThread)
   private
     FFilePath: string;
     FTargetThreadId: Cardinal;
     FTimeoutMs: Integer;
     FIsDialogHandled: Boolean;
+    FHandledDialog: HWND;
     FDescription: string;
 
     function TryFindDialog(out Dialog: HWND): Boolean;
     function TryHandle(const Dialog: HWND): Boolean;
+    procedure CancelOpenDialogs;
 
   protected
     procedure Execute; override;
@@ -49,6 +54,8 @@ const
   PollMs = 50;
   SendTimeoutMs = 2000;
   SaveButtonId = IDOK;
+  CancelPasses = 5;
+  CancelWaitMs = 200;
 
 type
   TFindState = record
@@ -136,18 +143,49 @@ begin
   Result := True;
 end;
 
+procedure TSaveAsDialogDriver.CancelOpenDialogs;
+begin
+  for var Pass := 1 to CancelPasses do
+  begin
+    var Dialog: HWND;
+    if not TryFindDialog(Dialog) then
+    begin
+      Exit;
+    end;
+
+    FDescription := FDescription + '; the dialog that was still open was cancelled';
+    PostMessage(Dialog, WM_COMMAND, IDCANCEL, 0);
+    PostMessage(Dialog, WM_CLOSE, 0, 0);
+    Sleep(CancelWaitMs);
+  end;
+end;
+
 procedure TSaveAsDialogDriver.Execute;
 begin
   const Started = GetTickCount64;
   while (not Terminated) and (GetTickCount64 - Started < Cardinal(FTimeoutMs)) do
   begin
-    var Dialog: HWND;
-    if TryFindDialog(Dialog) and TryHandle(Dialog) then
+    if not FIsDialogHandled then
     begin
-      FIsDialogHandled := True;
+      var Dialog: HWND;
+      if TryFindDialog(Dialog) and TryHandle(Dialog) then
+      begin
+        FIsDialogHandled := True;
+        FHandledDialog := Dialog;
+      end;
+    end
+    else if not IsWindow(FHandledDialog) then
+    begin
+      // The dialog took the name and closed: the document goes on without this thread
       Exit;
     end;
     Sleep(PollMs);
+  end;
+
+  if not Terminated then
+  begin
+    FDescription := FDescription + ' (timed out)';
+    CancelOpenDialogs;
   end;
 end;
 
