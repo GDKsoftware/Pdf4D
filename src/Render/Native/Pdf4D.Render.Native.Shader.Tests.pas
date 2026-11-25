@@ -39,6 +39,8 @@ type
     procedure FillWith(var Pixmap: TTsPixmap; const Paint: TTsPaint);
     procedure AssertPixel(const Pixmap: TTsPixmap; const X, Y: Cardinal; const R, G, B, A: Byte; const Tolerance: Integer = 0);
     procedure AssertTransparent(const Pixmap: TTsPixmap; const X, Y: Cardinal);
+    procedure AssertBicubicColorStaysWithinAlpha(const SpreadMode: TTsSpreadMode);
+    procedure AssertPatternDrawsNothing(const Pattern: TTsShader);
 
   public
     [Setup]
@@ -63,6 +65,12 @@ type
     procedure TestBicubicNeverExceedsAlpha;
 
     [Test]
+    procedure TestBicubicNeverExceedsAlphaWithReflect;
+
+    [Test]
+    procedure TestBicubicNeverExceedsAlphaWithDecal;
+
+    [Test]
     procedure TestOpacityScalesPattern;
 
     [Test]
@@ -79,6 +87,24 @@ type
 
     [Test]
     procedure TestSingularPatternTransformDrawsNothing;
+
+    [Test]
+    procedure TestZeroScalePatternTransformDrawsNothing;
+
+    [Test]
+    procedure TestSubnormalScalePatternTransformDrawsNothing;
+
+    [Test]
+    procedure TestNanScalePatternTransformDrawsNothing;
+
+    [Test]
+    procedure TestEmptyPatternPixmapDrawsNothing;
+
+    [Test]
+    procedure TestShortPatternDataDrawsNothing;
+
+    [Test]
+    procedure TestBlitterRejectsAPixmapWhoseDataIsShort;
 
     [Test]
     procedure TestDefaultPaintIsBlackSourceOver;
@@ -276,28 +302,25 @@ begin
   AssertTransparent(Pixmap, 9, 9);
 end;
 
-procedure TTsShaderTests.TestBicubicNeverExceedsAlpha;
+procedure TTsShaderTests.AssertBicubicColorStaysWithinAlpha(const SpreadMode: TTsSpreadMode);
+const
+  // Every row is opaque black, opaque white, opaque white, transparent
+  Row: array[0..15] of Byte = (0, 0, 0, 255,  255, 255, 255, 255,  255, 255, 255, 255,  0, 0, 0, 0);
 begin
+  // Every row is opaque black, opaque white, opaque white, transparent. The far tap of the cubic has a negative weight, so a pixel next to the
+  // transparent texel gets a colour sum above its alpha unless the colour is clamped to the alpha.
   var Pixels: TBytes;
   SetLength(Pixels, 4 * 4 * 4);
-  for var I := 0 to 15 do
+  for var Y := 0 to 3 do
   begin
-    const IsWhite = (((I mod 4) + (I div 4)) mod 2 = 0);
-    for var Channel := 0 to 3 do
-    begin
-      if IsWhite then
-      begin
-        Pixels[I * 4 + Channel] := 255;
-      end;
-    end;
+    Move(Row[0], Pixels[Y * 16], 16);
   end;
 
   var Image: TTsPixmap;
   Assert.IsTrue(TTsPixmap.TryFromBytes(Pixels, 4, 4, Image));
   var Pixmap := NewPixmap(20, 20);
 
-  FillWith(Pixmap, PaintOf(TTsShader.NewPattern(Image.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Bicubic, 1,
-                                                TTsTransform.FromScale(3.7, 3.7))));
+  FillWith(Pixmap, PaintOf(TTsShader.NewPattern(Image.AsRef, SpreadMode, TTsFilterQuality.Bicubic, 1, TTsTransform.FromScale(3.7, 3.7))));
 
   for var Y := 0 to 19 do
   begin
@@ -311,6 +334,20 @@ begin
   end;
 end;
 
+procedure TTsShaderTests.TestBicubicNeverExceedsAlpha;
+begin
+  AssertBicubicColorStaysWithinAlpha(TTsSpreadMode.&Repeat);
+end;
+
+procedure TTsShaderTests.TestBicubicNeverExceedsAlphaWithReflect;
+begin
+  AssertBicubicColorStaysWithinAlpha(TTsSpreadMode.Reflect);
+end;
+
+procedure TTsShaderTests.TestBicubicNeverExceedsAlphaWithDecal;
+begin
+  AssertBicubicColorStaysWithinAlpha(TTsSpreadMode.Decal);
+end;
 procedure TTsShaderTests.TestOpacityScalesPattern;
 begin
   var Pixmap := NewPixmap(4, 4);
@@ -343,21 +380,75 @@ begin
   AssertPixel(Pixmap, 0, 3, 255, 0, 0, 255);
 end;
 
-procedure TTsShaderTests.TestSingularPatternTransformDrawsNothing;
+procedure TTsShaderTests.AssertPatternDrawsNothing(const Pattern: TTsShader);
 begin
   var Pixmap := NewPixmap(4, 4);
-  // A skew matrix with a determinant of zero. Unlike it, tiny-skia inverts a zero scale to infinities, and push_transform then skips the
-  // transform that is not finite, so the device has to reject a singular matrix itself.
-  const Paint = PaintOf(TTsShader.NewPattern(RedImage.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1,
-                                             TTsTransform.FromRow(1, 1, 1, 1, 0, 0)));
 
   var Blitter: TTsRasterPipelineBlitter;
-  const Created = TTsRasterPipelineBlitter.TryCreate(Paint, Default(TTsSubMaskRef), Pixmap.SubPixmap, Blitter);
+  const Created = TTsRasterPipelineBlitter.TryCreate(PaintOf(Pattern), Default(TTsSubMaskRef), Pixmap.SubPixmap, Blitter);
 
   Assert.IsFalse(Created);
   Assert.IsNull(Blitter);
 end;
 
+procedure TTsShaderTests.TestSingularPatternTransformDrawsNothing;
+begin
+  // A skew matrix with a determinant of zero cannot be inverted
+  AssertPatternDrawsNothing(TTsShader.NewPattern(RedImage.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1,
+                                                 TTsTransform.FromRow(1, 1, 1, 1, 0, 0)));
+end;
+
+procedure TTsShaderTests.TestZeroScalePatternTransformDrawsNothing;
+begin
+  // TryInvert succeeds here, but the inverse is infinite; tiny-skia would draw the untransformed pattern
+  AssertPatternDrawsNothing(TTsShader.NewPattern(RedImage.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1,
+                                                 TTsTransform.FromScale(0, 1)));
+end;
+
+procedure TTsShaderTests.TestSubnormalScalePatternTransformDrawsNothing;
+begin
+  // 1 / the smallest subnormal (bits 1, about 1.4e-45) overflows to infinity
+  var Bits: Cardinal := 1;
+  var Subnormal: Single;
+  Move(Bits, Subnormal, SizeOf(Subnormal));
+  Assert.IsTrue(Subnormal > 0, 'the value is positive');
+  Assert.IsTrue(Subnormal < 1e-37, 'the value is subnormal');
+
+  AssertPatternDrawsNothing(TTsShader.NewPattern(RedImage.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1,
+                                                 TTsTransform.FromScale(Subnormal, 1)));
+end;
+
+procedure TTsShaderTests.TestNanScalePatternTransformDrawsNothing;
+begin
+  AssertPatternDrawsNothing(TTsShader.NewPattern(RedImage.AsRef, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1,
+                                                 TTsTransform.FromScale(Single.NaN, 1)));
+end;
+
+procedure TTsShaderTests.TestEmptyPatternPixmapDrawsNothing;
+begin
+  AssertPatternDrawsNothing(TTsShader.NewPattern(Default(TTsPixmapRef), TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1, TTsTransform.Identity));
+end;
+
+procedure TTsShaderTests.TestShortPatternDataDrawsNothing;
+begin
+  var Short := RedImage.AsRef;
+  SetLength(Short.Data, 8);
+
+  AssertPatternDrawsNothing(TTsShader.NewPattern(Short, TTsSpreadMode.&Repeat, TTsFilterQuality.Nearest, 1, TTsTransform.Identity));
+end;
+
+procedure TTsShaderTests.TestBlitterRejectsAPixmapWhoseDataIsShort;
+begin
+  var Pixmap := NewPixmap(4, 4);
+  var Region := Pixmap.SubPixmap;
+  SetLength(Region.Data, 8);
+
+  var Blitter: TTsRasterPipelineBlitter;
+  Assert.IsFalse(TTsRasterPipelineBlitter.TryCreate(TTsPaint.Default, Default(TTsSubMaskRef), Region, Blitter));
+  Assert.IsNull(Blitter);
+  Assert.IsFalse(TTsRasterPipelineBlitter.TryCreateForMask(Region, Blitter));
+  Assert.IsNull(Blitter);
+end;
 procedure TTsShaderTests.TestPixmapOverBitmapSharesBytes;
 begin
   const Bitmap = TPdfBitmap.Create(3, 2);

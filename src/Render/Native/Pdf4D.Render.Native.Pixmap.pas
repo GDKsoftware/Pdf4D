@@ -226,6 +226,9 @@ end;
 
 class function TTsPixmap.CreateOver(const Bitmap: TPdfBitmap): TTsPixmap;
 begin
+  // The device contract: the bitmap holds Width * Height premultiplied RGBA pixels
+  Assert(Int64(Length(Bitmap.Pixels)) = Int64(Bitmap.Width) * Int64(Bitmap.Height) * BytesPerPixel);
+
   Result.Data := Bitmap.Pixels;
   Result.Width := Cardinal(Bitmap.Width);
   Result.Height := Cardinal(Bitmap.Height);

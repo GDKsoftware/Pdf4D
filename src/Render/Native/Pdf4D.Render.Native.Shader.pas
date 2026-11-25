@@ -105,10 +105,24 @@ const
 // pattern.rs push_stages. Without a Decal the limits are used by Repeat and Reflect, with a Decal also by DecalXY.
 function PushPatternStages(const Pattern: TTsPattern; var Builder: TTsRasterPipelineBuilder): Boolean;
 begin
+  // Pdf4D: an empty pixmap, or one whose data is too short, draws nothing (the division by the width below would raise)
+  const PixmapSize = Int64(Pattern.Pixmap.Width) * Int64(Pattern.Pixmap.Height) * 4;
+  if (Pattern.Pixmap.Width = 0) or (Pattern.Pixmap.Height = 0) or (Int64(Length(Pattern.Pixmap.Data)) < PixmapSize) then
+  begin
+    Exit(False);
+  end;
+
   var Ts: TTsTransform;
   if not Pattern.Transform.TryInvert(Ts) then
   begin
     // failed to invert a pattern transform: nothing will be rendered
+    Exit(False);
+  end;
+
+  // Pdf4D deviation: a transform whose inverse is not finite (a zero or subnormal scale) draws nothing. tiny-skia would skip the transform
+  // stage in push_transform and draw the untransformed pattern over the whole fill.
+  if not Ts.IsFinite then
+  begin
     Exit(False);
   end;
 
@@ -263,7 +277,7 @@ begin
 
     TTsShaderKind.Pattern:
       begin
-        const Bounded = TTsScalar.Bound(Opacity, 0, 1);
+        const Bounded: Single = TTsScalar.Bound(Opacity, 0, 1);
         const Product: Single = Pattern.Opacity.Get * Bounded;
         Pattern.Opacity := TTsNormalizedF32.CreateClamped(Product);
       end;

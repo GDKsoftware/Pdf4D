@@ -221,6 +221,12 @@ class function TTsRasterPipelineBlitter.TryCreate(const Paint: TTsPaint; const M
 begin
   Blitter := nil;
 
+  // Pdf4D: the memset and the pipelines write without a check, so the data must hold the whole region
+  if not Pixmap.HoldsRegion(Pixmap.Width, Pixmap.Height) then
+  begin
+    Exit(False);
+  end;
+
   const HasMask = Mask.IsAssigned;
 
   // Make sure that `mask` has the same size as `pixmap`
@@ -301,6 +307,14 @@ end;
 
 class function TTsRasterPipelineBlitter.TryCreateForMask(const Pixmap: TTsSubPixmapMut; out Blitter: TTsRasterPipelineBlitter): Boolean;
 begin
+  Blitter := nil;
+
+  // Pdf4D: the data of the A8 pixmap must hold the whole region
+  if not Pixmap.HoldsMaskRegion(Pixmap.Width, Pixmap.Height) then
+  begin
+    Exit(False);
+  end;
+
   const Color = TTsColor.White.Premultiply;
 
   var AntiHBuilder := TTsRasterPipelineBuilder.New;

@@ -4,6 +4,7 @@
 // The DecalXY and CheckDecalMask stages are an addition of Pdf4D after the example of decal_x_and_y and check_decal_mask of Skia: DecalXY runs
 // after the transform and before the tiling, and keeps the lanes whose sample point is inside [0, Width) x [0, Height) of the pixmap (the
 // limits of the context); the filter taps pad. CheckDecalMask runs after the sampling and sets the color of the other lanes to zero.
+// Another deviation of Pdf4D: ClampA also clamps the colour to the alpha, as clamp_a of Skia does (see ClampA).
 // Copyright (c) 2018 Google Inc., (c) 2020 Yevhenii Reizner. BSD-3-Clause, see licenses/tiny-skia-BSD-3-Clause.txt.
 unit Pdf4D.Render.Native.Pipeline.Highp;
 
@@ -99,6 +100,10 @@ const
   Scale255: Single = 255;
   Half: Single = 0.5;
   OneSingle: Single = 1;
+  // The weights of lum() in highp.rs
+  LumRed: Single = 0.30;
+  LumGreen: Single = 0.59;
+  LumBlue: Single = 0.11;
 
 { TTsHighpPipeline }
 
@@ -237,12 +242,16 @@ begin
   P.NextStage;
 end;
 
+// Pdf4D deviation from tiny-skia: after the alpha is clamped to 1, the colour is clamped to the alpha, as clamp_a of Skia does. tiny-skia
+// leaves the colour at 1, so a cubic filter whose far tap has a negative weight can store a colour above its alpha, an invalid premultiplied
+// pixel that shows as a bright fringe next to transparency. The images of tiny-skia have a colour of k * alpha in every tap, so none of them
+// changes. ClampA is only used after the bicubic sampler.
 procedure ClampA(var P: TTsHighpPipeline);
 begin
-  P.R := P.R.Min(One);
-  P.G := P.G.Min(One);
-  P.B := P.B.Min(One);
   P.A := P.A.Min(One);
+  P.R := P.R.Min(P.A);
+  P.G := P.G.Min(P.A);
+  P.B := P.B.Min(P.A);
 
   P.NextStage;
 end;
@@ -342,8 +351,8 @@ begin
   // Exclusive -> inclusive
   const Width: Single = Pixmap.Width;
   const Height: Single = Pixmap.Height;
-  const W = UlpSub(Width);
-  const H = UlpSub(Height);
+  const W: Single = UlpSub(Width);
+  const H: Single = UlpSub(Height);
   const ClampedX = X.Max(Zero).Min(TF32x8.Splat(W));
   const ClampedY = Y.Max(Zero).Min(TF32x8.Splat(H));
 
@@ -755,7 +764,7 @@ end;
 
 function Lum(const R, G, B: TF32x8): TF32x8;
 begin
-  Result := R * TF32x8.Splat(0.30) + G * TF32x8.Splat(0.59) + B * TF32x8.Splat(0.11);
+  Result := R * TF32x8.Splat(LumRed) + G * TF32x8.Splat(LumGreen) + B * TF32x8.Splat(LumBlue);
 end;
 
 // Maps the min channel to 0, the max channel to s, and scales the middle proportionally
