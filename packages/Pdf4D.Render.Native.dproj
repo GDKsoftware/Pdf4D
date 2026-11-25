@@ -108,6 +108,9 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -59,6 +59,9 @@ contains
   Pdf4D.Render.Native.Scan.Hairline in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.pas',
   Pdf4D.Render.Native.Scan.HairlineAntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas',
   Pdf4D.Render.Native.Scan in '..\src\Render\Native\Pdf4D.Render.Native.Scan.pas',
-  Pdf4D.Render.Native.Scan.AntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas';
+  Pdf4D.Render.Native.Scan.AntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas',
+  Pdf4D.Render.Native.Pipeline.Context in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas',
+  Pdf4D.Render.Native.Pipeline.Highp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas',
+  Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas';
 
 end.
