@@ -28,13 +28,15 @@ type
     FSelectedTexts: TList<string>;
     FHoverCount: Integer;
     FEvents: TFlowEventLog;
-    FIsRecordingHover: Boolean;
 
     procedure HandleTextSelected(Sender: TObject; const Selection: TPdfTextSelection);
     procedure HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
     function TilesArrived: Boolean;
     // The client pixels of the middle of an occurrence of a word on the first page, in the page view of the viewer
     function CenterOfWord(const Text: string; const Occurrence: Integer): TPoint;
+    function QuadsOfWord(const Text: string; const Occurrence: Integer): TArray<TPdfQuad>;
+    // Moves the mouse to the middle of the invoice number and clicks it; the number is scrolled into view first
+    procedure ClickOnInvoiceNumber;
 
   public
     [Setup]
@@ -54,6 +56,7 @@ uses
   System.Math,
   System.UITypes,
   Vcl.Controls,
+  Winapi.Messages,
   Pdf4D.Common.Quad,
   Pdf4D.Viewer.Print,
   Pdf4D.Vcl.Print,
@@ -79,7 +82,6 @@ procedure TVclViewerFlowTests.Setup;
 begin
   FSelectedTexts := TList<string>.Create;
   FEvents := TFlowEventLog.Create;
-  FIsRecordingHover := True;
   FHoverCount := 0;
 
   FHost := TVclTestHost.Create(ViewWidth, ViewHeight);
@@ -111,11 +113,7 @@ end;
 procedure TVclViewerFlowTests.HandleHoverChanged(Sender: TObject; const HasSegment: Boolean; const Segment: TPdfTextFragment);
 begin
   Inc(FHoverCount);
-  // The hover after a zoom or a rotation depends on where the mouse was left; the flow records the events of its own inputs
-  if FIsRecordingHover then
-  begin
-    FEvents.AddHover(HasSegment, Segment);
-  end;
+  FEvents.AddHover(HasSegment, Segment);
 end;
 
 function TVclViewerFlowTests.TilesArrived: Boolean;
@@ -124,7 +122,7 @@ begin
   Result := ((Controller.PendingTileCount = 0) and (Controller.TileCacheCost > 0));
 end;
 
-function TVclViewerFlowTests.CenterOfWord(const Text: string; const Occurrence: Integer): TPoint;
+function TVclViewerFlowTests.QuadsOfWord(const Text: string; const Occurrence: Integer): TArray<TPdfQuad>;
 begin
   var PageText: IPdfPageText;
   Assert.IsTrue(FHost.Document.TryGetPageText(0, PageText), 'the text of the first page is known');
@@ -139,26 +137,38 @@ begin
 
     if Seen = Occurrence then
     begin
-      var Sum := TPoint.Zero;
-      var Count := 0;
-      for var Quad in Word.Quads do
-      begin
-        for var Corner in [Quad.P1, Quad.P2, Quad.P3, Quad.P4] do
-        begin
-          var ViewPoint: TPointF;
-          Assert.IsTrue(FViewer.PageView.Controller.TryPageToViewport(0, Corner, ViewPoint), 'the page is laid out');
-          Inc(Sum.X, Round(ViewPoint.X));
-          Inc(Sum.Y, Round(ViewPoint.Y));
-          Inc(Count);
-        end;
-      end;
-      Exit(TPoint.Create(Sum.X div Count, Sum.Y div Count));
+      Exit(Word.Quads);
     end;
     Inc(Seen);
   end;
 
   Assert.Fail(Format('The word %s (%d) is not on the page', [Text, Occurrence]));
-  Result := TPoint.Zero;
+  Result := nil;
+end;
+
+function TVclViewerFlowTests.CenterOfWord(const Text: string; const Occurrence: Integer): TPoint;
+begin
+  var Sum := TPoint.Zero;
+  var Count := 0;
+  for var Quad in QuadsOfWord(Text, Occurrence) do
+  begin
+    for var Corner in [Quad.P1, Quad.P2, Quad.P3, Quad.P4] do
+    begin
+      var ViewPoint: TPointF;
+      Assert.IsTrue(FViewer.PageView.Controller.TryPageToViewport(0, Corner, ViewPoint), 'the page is laid out');
+      Inc(Sum.X, Round(ViewPoint.X));
+      Inc(Sum.Y, Round(ViewPoint.Y));
+      Inc(Count);
+    end;
+  end;
+  Result := TPoint.Create(Sum.X div Count, Sum.Y div Count);
+end;
+
+procedure TVclViewerFlowTests.ClickOnInvoiceNumber;
+begin
+  FViewer.PageView.ScrollIntoView(0, QuadsOfWord(InvoiceNumber, 1));
+  const Number = CenterOfWord(InvoiceNumber, 1);
+  FHost.ClickOn(FViewer.PageView, Number.X, Number.Y);
 end;
 
 procedure TVclViewerFlowTests.TestEndToEndFlow;
@@ -172,12 +182,12 @@ begin
   Assert.IsTrue(FHost.WaitForPageText(0), 'the text of the first page arrives');
 
   // Hover on the number, and click it: the click selects it
+  FEvents.AddStep('click');
   const Number = CenterOfWord(InvoiceNumber, 1);
   FHost.ClickOn(PageView, Number.X, Number.Y);
   Assert.IsTrue(FHoverCount > 0, 'the hover is reported');
   Assert.AreEqual<Integer>(1, FSelectedTexts.Count, 'one selection');
   Assert.AreEqual(InvoiceNumber, FSelectedTexts[0]);
-  FIsRecordingHover := False;
 
   // Mark the label and scroll it into view
   var PageText: IPdfPageText;
@@ -200,7 +210,8 @@ begin
                    (LabelCorner.Y <= PageView.ClientHeight);
   Assert.IsTrue(IsInView, 'the marked label is scrolled into view');
 
-  // Zoom, rotate
+  // Zoom, rotate, with the mouse away from the page; then hover on the number again and click it, at a place that the test computes
+  PageView.Perform(CM_MOUSELEAVE, 0, 0);
   const ZoomBefore = PageView.Zoom;
   for var Step := 1 to ZoomStepsIn do
   begin
@@ -210,6 +221,16 @@ begin
   PageView.RotateClockwise;
   Assert.AreEqual(90, PageView.ViewRotation, 'rotated');
   Assert.IsTrue(FHost.WaitUntil(TilesArrived, WaitMs), 'the tiles arrive after the zoom and the rotation');
+  FEvents.AddStep('click after zoom and rotation');
+  const SelectionsBefore = FSelectedTexts.Count;
+  ClickOnInvoiceNumber;
+  Assert.AreEqual<Integer>(SelectionsBefore + 1, FSelectedTexts.Count, 'the click after the zoom and the rotation selects');
+  Assert.AreEqual(InvoiceNumber, FSelectedTexts[FSelectedTexts.Count - 1]);
+  // The mouse leaves again, by hand: a window that got mouse messages from Perform has asked Windows to tell it when the pointer leaves, and
+  // Windows does that at the next pump, which would put a hover event at a moment that the test does not choose
+  FEvents.AddStep('mouse leaves');
+  PageView.Perform(CM_MOUSELEAVE, 0, 0);
+  FEvents.AddStep('search');
 
   // Search
   Document.Search(InvoiceNumberLabel, False);
@@ -254,15 +275,8 @@ begin
   Assert.AreEqual(Ord(TPdfDocumentState.Closed), Ord(Document.State));
   Assert.AreEqual<Integer>(0, Length(Document.Overlays.Items), 'the overlay goes with the document');
 
-  // The events are the same in the FMX viewer; the first run of the flow writes the reference file
-  if FEvents.HasReference then
-  begin
-    Assert.AreEqual(FEvents.ReadReference, FEvents.Text, 'the events of the flow equal the reference file');
-  end
-  else
-  begin
-    FEvents.WriteReference;
-  end;
+  // The events are the same in the FMX viewer: the file in the source tree holds them (PDF4D_RECORD_FLOW_EVENTS=1 writes it)
+  Assert.AreEqual('', FEvents.Verify(True), 'the events of the flow equal the reference file');
 end;
 
 end.

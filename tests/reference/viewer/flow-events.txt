@@ -1,3 +1,11 @@
+step click
 hover page=0 text="2024-0815" quads=(152.67,677.52 210.04,677.52 210.04,688.62 152.67,688.62)
 selected page=0 text="2024-0815" quads=(152.67,677.52 210.04,677.52 210.04,688.62 152.67,688.62)
+hover-none
+step click after zoom and rotation
+hover page=0 text="2024-0815" quads=(152.67,677.52 210.04,677.52 210.04,688.62 152.67,688.62)
+selected page=0 text="2024-0815" quads=(152.67,677.52 210.04,677.52 210.04,688.62 152.67,688.62)
+step mouse leaves
+hover-none
+step search
 search-hit page=0 text="Nummer:" quads=(100.00,677.52 149.33,677.52 149.33,688.62 100.00,688.62)
