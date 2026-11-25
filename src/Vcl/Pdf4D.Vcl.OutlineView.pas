@@ -92,7 +92,7 @@ end;
 
 destructor TPdf4DOutlineView.Destroy;
 begin
-  FLink.Free;
+  FreeAndNil(FLink);
   inherited;
 end;
 

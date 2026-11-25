@@ -207,7 +207,7 @@ begin
     end;
   end;
 
-  // The same rounding to device pixels as in the VCL flow, then to logical units of the page view
+  // The middle of the corners in device pixels, rounded to a whole pixel, then in logical units of the page view (the VCL flow rounds each corner, which can differ by a pixel; the hit is the same word)
   const Device = TPointF.Create(Round(Sum.X / Count), Round(Sum.Y / Count));
   Result := TPointF.Create(Device.X / FHost.Scale, Device.Y / FHost.Scale);
 end;
