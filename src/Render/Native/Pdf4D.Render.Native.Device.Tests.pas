@@ -84,6 +84,27 @@ type
 
     [Test]
     procedure TestDrawBitmapRespectsRectClip;
+
+    [Test]
+    procedure TestSoftMaskPartlyOutsideDevice;
+
+    [Test]
+    procedure TestSoftMaskAndClipMultiply;
+
+    [Test]
+    procedure TestCoverageMaskEqualsAlphaForMultiply;
+
+    [Test]
+    procedure TestAlphaOnBitmapPaint;
+
+    [Test]
+    procedure TestSoftMaskOnBitmapPaint;
+
+    [Test]
+    procedure TestSoftMaskIsRebuiltWhenItsValuesChange;
+
+    [Test]
+    procedure TestSoftMaskOutsideTheClipDrawsNothing;
   end;
 
 implementation
@@ -421,6 +442,151 @@ begin
   AssertTransparent(6, 5);
   AssertTransparent(4, 2);
   AssertTransparent(4, 6);
+end;
+
+procedure TPdfNativeDeviceTests.TestSoftMaskPartlyOutsideDevice;
+begin
+  const Mask = NewMask(-2, -2, 4, 4, 255, 0);
+  try
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(Red, Composite);
+  finally
+    Mask.Free;
+  end;
+
+  AssertPixel(1, 1, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(2, 2);
+  AssertTransparent(5, 5);
+end;
+
+procedure TPdfNativeDeviceTests.TestSoftMaskAndClipMultiply;
+begin
+  FDevice.SetClip(NewClip(nil, 0, 0, 5, 10));
+  const Mask = NewMask(0, 0, 10, 10, 128, 0);
+  try
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(Red, Composite);
+  finally
+    Mask.Free;
+  end;
+
+  AssertPixel(2, 5, TPdfDeviceColor.Create(128, 0, 0, 128), 1);
+  AssertTransparent(7, 5);
+end;
+
+// The mask is the coverage of the draw, which tiny-skia mixes in with the destination; for an opaque destination that is the same as the
+// alpha of the paint
+procedure TPdfNativeDeviceTests.TestCoverageMaskEqualsAlphaForMultiply;
+begin
+  const Backdrop = TPdfDeviceColor.Create(50, 100, 200);
+  const Source = TPdfDeviceColor.Create(200, 100, 50);
+
+  FillOpaqueBackground(Backdrop);
+  var WithAlpha := NoAntiAlias;
+  WithAlpha.BlendMode := TPdfBlendMode.Multiply;
+  WithAlpha.Alpha := 128 / 255;
+  FillWholeDevice(TPdfPaint.Solid(Source), WithAlpha);
+  const Expected = Pixel(5, 5);
+
+  FillOpaqueBackground(Backdrop);
+  const Mask = NewMask(0, 0, 10, 10, 128, 128);
+  try
+    var WithMask := NoAntiAlias;
+    WithMask.BlendMode := TPdfBlendMode.Multiply;
+    WithMask.SoftMask := Mask;
+    FillWholeDevice(TPdfPaint.Solid(Source), WithMask);
+  finally
+    Mask.Free;
+  end;
+
+  AssertPixel(5, 5, Expected, 1);
+end;
+
+procedure TPdfNativeDeviceTests.TestAlphaOnBitmapPaint;
+begin
+  const Tile = TPdfBitmap.Create(2, 2);
+  try
+    for var Index := 0 to 3 do
+    begin
+      Tile.SetPixel(Index mod 2, Index div 2, TPdfDeviceColor.Create(255, 0, 0));
+    end;
+
+    var Composite := NoAntiAlias;
+    Composite.Alpha := 0.5;
+    FillWholeDevice(TPdfPaint.FromBitmap(Tile, TPdfMatrix.Identity, TPdfTileMode.&Repeat, TPdfImageFilter.Nearest), Composite);
+
+    AssertPixel(5, 5, TPdfDeviceColor.Create(128, 0, 0, 128), 1);
+    FDevice.Clear(TPdfDeviceColor.Transparent);
+
+    var Drawn := NoAntiAlias;
+    Drawn.Alpha := 0.5;
+    FDevice.DrawBitmap(Tile, TPdfMatrix.GetScaleInstance(5, 5), TPdfImageFilter.Nearest, Drawn);
+  finally
+    Tile.Free;
+  end;
+
+  AssertPixel(5, 5, TPdfDeviceColor.Create(128, 0, 0, 128), 1);
+end;
+
+// A bitmap paint with a soft mask runs the stage that applies the mask on the high precision pipeline; the expected pixel is the premultiplied
+// pixel of the bitmap times the value of the mask
+procedure TPdfNativeDeviceTests.TestSoftMaskOnBitmapPaint;
+begin
+  const Tile = TPdfBitmap.Create(2, 2);
+  const Mask = NewMask(0, 0, 10, 10, 128, 128);
+  try
+    for var Index := 0 to 3 do
+    begin
+      Tile.SetPixel(Index mod 2, Index div 2, TPdfDeviceColor.Create(100, 50, 20, 128));
+    end;
+
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(TPdfPaint.FromBitmap(Tile, TPdfMatrix.Identity, TPdfTileMode.&Repeat, TPdfImageFilter.Nearest), Composite);
+  finally
+    Mask.Free;
+    Tile.Free;
+  end;
+
+  const Expected = TPdfDeviceColor.Create(Round(100 * 128 / 255), Round(50 * 128 / 255), Round(20 * 128 / 255), Round(128 * 128 / 255));
+  AssertPixel(5, 5, Expected, 1);
+  AssertPixel(0, 0, Expected, 1);
+  AssertPixel(9, 9, Expected, 1);
+end;
+
+// A mask object is freed and another one is made, perhaps at the same address: the combination is built from the values, not the identity
+procedure TPdfNativeDeviceTests.TestSoftMaskIsRebuiltWhenItsValuesChange;
+begin
+  for var Value := 1 to 2 do
+  begin
+    FDevice.Clear(TPdfDeviceColor.Transparent);
+    const Mask = NewMask(0, 0, 10, 10, Byte(Value * 100), 0);
+    try
+      var Composite := NoAntiAlias;
+      Composite.SoftMask := Mask;
+      FillWholeDevice(Red, Composite);
+      AssertPixel(5, 5, TPdfDeviceColor.Create(Value * 100, 0, 0, Value * 100), 1);
+    finally
+      Mask.Free;
+    end;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestSoftMaskOutsideTheClipDrawsNothing;
+begin
+  FDevice.SetClip(NewClip(nil, 20, 20, 30, 30));
+  const Mask = NewMask(0, 0, 10, 10, 255, 255);
+  try
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    FillWholeDevice(Red, Composite);
+  finally
+    Mask.Free;
+  end;
+
+  AssertNothingIsDrawn;
 end;
 
 end.

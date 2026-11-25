@@ -26,7 +26,8 @@ type
   // TTsFloatMode, because the painter works with floating point exceptions masked and the callers of the device do not. Input that cannot
   // be drawn (a path with a point that is not a number, a matrix that cannot be inverted, a dash that is refused) draws nothing.
   //
-  // The soft mask of a composite is not applied yet.
+  // A soft mask of a composite is multiplied with the clip into one mask for the painter: as the coverage of the draw it scales the paint as the
+  // SoftMask paint of PDFBox does (the shape drawn, the mask applied, the result put on the device with the alpha and the blend mode).
   TPdfNativeDevice = class(TInterfacedObject, IPdfRasterDevice)
   private
     FBitmap: TPdfBitmap;
@@ -35,7 +36,7 @@ type
     FClipMask: TTsClipMask;
 
     // The clip of the next draw: False when it clips everything away. Mask is nil for a clip without a mask.
-    function TryPrepareClip(out Clip: TTsScreenIntRect; out Mask: PTsMask): Boolean;
+    function TryPrepareClip(const Composite: TPdfComposite; out Clip: TTsScreenIntRect; out Mask: PTsMask): Boolean;
     // The paint for a draw in device pixels after PathToDevice: False when nothing can be drawn with it
     function TryMakePaint(const Paint: TPdfPaint; const Composite: TPdfComposite; const PathToDevice: TTsTransform;
                           out Source: TPdfBitmap; out TsPaint: TTsPaint): Boolean;
@@ -149,7 +150,7 @@ begin
   FClip := Clip;
 end;
 
-function TPdfNativeDevice.TryPrepareClip(out Clip: TTsScreenIntRect; out Mask: PTsMask): Boolean;
+function TPdfNativeDevice.TryPrepareClip(const Composite: TPdfComposite; out Clip: TTsScreenIntRect; out Mask: PTsMask): Boolean;
 begin
   FClipMask.Update(FClip, FBitmap.Width, FBitmap.Height);
 
@@ -167,6 +168,14 @@ begin
   end;
 
   Clip := FClipMask.Rect;
+
+  // The soft mask is made one with the clip; a mask that cannot be made draws nothing
+  if Assigned(Composite.SoftMask) then
+  begin
+    Mask := FClipMask.Combine(Composite.SoftMask);
+    Exit(Assigned(Mask));
+  end;
+
   Result := True;
 end;
 
@@ -278,7 +287,7 @@ procedure TPdfNativeDevice.DoFillPath(const Path: TPdfPath; const Transform: TPd
 begin
   var Clip: TTsScreenIntRect;
   var Mask: PTsMask;
-  if not TryPrepareClip(Clip, Mask) then
+  if not TryPrepareClip(Composite, Clip, Mask) then
   begin
     Exit;
   end;
@@ -325,7 +334,7 @@ procedure TPdfNativeDevice.DoStrokePath(const Path: TPdfPath; const Transform: T
 begin
   var Clip: TTsScreenIntRect;
   var Mask: PTsMask;
-  if not TryPrepareClip(Clip, Mask) then
+  if not TryPrepareClip(Composite, Clip, Mask) then
   begin
     Exit;
   end;
@@ -383,7 +392,7 @@ begin
 
   var Clip: TTsScreenIntRect;
   var Mask: PTsMask;
-  if not TryPrepareClip(Clip, Mask) then
+  if not TryPrepareClip(Composite, Clip, Mask) then
   begin
     Exit;
   end;

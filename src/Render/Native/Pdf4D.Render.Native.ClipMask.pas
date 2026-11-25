@@ -9,6 +9,7 @@ interface
 
 uses
   System.SysUtils,
+  Pdf4D.Render.Bitmap,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.Native.Geometry,
   Pdf4D.Render.Native.Path,
@@ -45,6 +46,18 @@ type
     FMask: TTsMask;
     FBuildCount: Integer;
     FForceMask: Boolean;
+    // The last combination of the clip with a soft mask: what it was made of (the build of the chain, the geometry and a copy of the values of
+    // the mask) and the mask. A new combination is a new mask, so a pointer that was handed out never changes.
+    FBuildNumber: Integer;
+    FCombined: TTsMask;
+    FCombinedBuild: Integer;
+    FCombinedLeft: Integer;
+    FCombinedTop: Integer;
+    FCombinedWidth: Integer;
+    FCombinedHeight: Integer;
+    FCombinedOutside: Byte;
+    FCombinedValues: TBytes;
+    FHasCombined: Boolean;
 
     procedure Build;
     procedure Reset;
@@ -54,6 +67,8 @@ type
     function TryIntersectRect(const Left, Top, Right, Bottom: Integer): Boolean;
     function TryStartMask: Boolean;
     procedure ClearOutsideRect;
+    function IsCombinedFrom(const SoftMask: TPdfAlphaMask): Boolean;
+    function ClipValueAt(const X, Y: Integer): Byte;
     procedure SetForceMask(const Value: Boolean);
     function GetRect: TTsScreenIntRect;
 
@@ -69,6 +84,9 @@ type
     property Mask: TTsMask read FMask;
     // With Kind Mask: the mask for TTsPainter, which draws through a pointer; nil for the other kinds
     function MaskRef: PTsMask;
+    // The clip multiplied with the soft mask: a mask of the size of the device, nil when it cannot be made. Valid until the next call or the next
+    // Update that builds another chain. Call it for a clip that is not Empty.
+    function Combine(const SoftMask: TPdfAlphaMask): PTsMask;
     // The number of chains that were built (a chain of nil is not built)
     property BuildCount: Integer read FBuildCount;
     // A rectangle is made into a mask as well, so that a test can compare the two ways to clip
@@ -82,6 +100,7 @@ uses
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Transform,
   Pdf4D.Render.Native.Painter,
+  Pdf4D.Render.Native.Color,
   Pdf4D.Render.Native.Conversion;
 
 const
@@ -204,6 +223,96 @@ begin
   Result := @FMask;
 end;
 
+function TTsClipMask.ClipValueAt(const X, Y: Integer): Byte;
+begin
+  case FKind of
+    TTsClipKind.Mask:
+      begin
+        Exit(FMask.Data[Y * FWidth + X]);
+      end;
+    TTsClipKind.Rect:
+      begin
+        const IsInside = ((X >= FLeft) and (X < FRight) and (Y >= FTop) and (Y < FBottom));
+        if IsInside then
+        begin
+          Exit(255);
+        end;
+        Exit(0);
+      end;
+    TTsClipKind.Empty:
+      begin
+        Exit(0);
+      end;
+  end;
+
+  Result := 255;
+end;
+
+function TTsClipMask.IsCombinedFrom(const SoftMask: TPdfAlphaMask): Boolean;
+begin
+  const IsSameMask = (FHasCombined and (FCombinedBuild = FBuildNumber) and (FCombinedLeft = SoftMask.Left) and (FCombinedTop = SoftMask.Top) and
+                      (FCombinedWidth = SoftMask.Width) and (FCombinedHeight = SoftMask.Height) and (FCombinedOutside = SoftMask.OutsideValue) and
+                      (Length(FCombinedValues) = Length(SoftMask.Values)));
+  if not IsSameMask then
+  begin
+    Exit(False);
+  end;
+
+  // The object of a soft mask can be freed and another one made at the same address, so the values are compared as well
+  Result := ((Length(FCombinedValues) = 0) or CompareMem(Pointer(FCombinedValues), Pointer(SoftMask.Values), Length(FCombinedValues)));
+end;
+
+function TTsClipMask.Combine(const SoftMask: TPdfAlphaMask): PTsMask;
+begin
+  Result := nil;
+
+  const ValueCount = Int64(SoftMask.Width) * Int64(SoftMask.Height);
+  const HasAllValues = ((SoftMask.Width >= 0) and (SoftMask.Height >= 0) and (Int64(Length(SoftMask.Values)) >= ValueCount));
+  if not HasAllValues then
+  begin
+    Exit;
+  end;
+
+  if IsCombinedFrom(SoftMask) then
+  begin
+    Exit(@FCombined);
+  end;
+
+  var Combined: TTsMask;
+  if not TTsMask.TryCreate(Cardinal(FWidth), Cardinal(FHeight), Combined) then
+  begin
+    Exit;
+  end;
+
+  for var Y := 0 to FHeight - 1 do
+  begin
+    const RowInMask = Int64(Y) - SoftMask.Top;
+    const IsRowInMask = ((RowInMask >= 0) and (RowInMask < SoftMask.Height));
+    for var X := 0 to FWidth - 1 do
+    begin
+      var Value := SoftMask.OutsideValue;
+      const ColumnInMask = Int64(X) - SoftMask.Left;
+      if IsRowInMask and (ColumnInMask >= 0) and (ColumnInMask < SoftMask.Width) then
+      begin
+        Value := SoftMask.Values[RowInMask * SoftMask.Width + ColumnInMask];
+      end;
+
+      Combined.Data[Y * FWidth + X] := TTsColorMath.PremultiplyU8(ClipValueAt(X, Y), Value);
+    end;
+  end;
+
+  FCombined := Combined;
+  FCombinedBuild := FBuildNumber;
+  FCombinedLeft := SoftMask.Left;
+  FCombinedTop := SoftMask.Top;
+  FCombinedWidth := SoftMask.Width;
+  FCombinedHeight := SoftMask.Height;
+  FCombinedOutside := SoftMask.OutsideValue;
+  FCombinedValues := Copy(SoftMask.Values, 0, Integer(ValueCount));
+  FHasCombined := True;
+  Result := @FCombined;
+end;
+
 procedure TTsClipMask.SetForceMask(const Value: Boolean);
 begin
   if FForceMask = Value then
@@ -255,6 +364,7 @@ end;
 // From the root to the leaf: every path narrows the clip of the paths before it. Iterative, because a file can chain very many clips.
 procedure TTsClipMask.Build;
 begin
+  Inc(FBuildNumber);
   Reset;
 
   const HasClip = Assigned(FChain);
