@@ -12,6 +12,7 @@ Pdf4D follows the GDK Delphi rules. This file lists where it deviates. Where it 
 6. **Inline variables and `const` stay mandatory**, as in the GDK rules.
 7. **Shared, lazily made objects go through `TPdfSharedInstance` and `TPdfSharedCache`.** A `class destructor` may free such an object. No `initialization` or `finalization` sections. Overrides: the GDK rule on singletons. Reason: thread-safe lazy publication and leak detection (an object that is filled once and freed at shutdown is no leak).
 8. **A global `procedure Register` in `Pdf4D.Vcl.Registration`.** Overrides: no global procedures. Reason: the IDE calls it by name when it loads the design-time package `dclPdf4D.Vcl`; it is the only global procedure of the library.
+9. **The native rasterizer (`src\Render\Native`) follows tiny-skia.** Names follow the Rust code (`TTs` prefix, Rust names in PascalCase, helpers of `Pdf4D.Render.Native.Scalar` with the Rust semantics), so the Delphi code can be laid next to the Rust code. Overrides: naming for behaviour. A Rust `&mut` on a struct becomes a record with `var` parameters. Overrides: "no `var` parameters". `{$OVERFLOWCHECKS OFF}` stands in `Pdf4D.Render.Native.Wide`, `Pdf4D.Render.Native.Pipeline.Highp` and `Pdf4D.Render.Native.Pipeline.Lowp`, where the wrapping arithmetic is intended; all other units follow the project settings. Overrides: the rule on compiler directives.
 
 ## Additions
 

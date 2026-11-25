@@ -257,6 +257,49 @@ The rules below were found by comparing renders with the PDFBox reference images
 - `TCCITTFaxParameters.HasEndOfLine` records that `/EndOfLine` exists, because `CCITTFaxFilter` uses the entry for `/K 0` only then (PDFBOX-6080), and finds the type from the first 20 bytes otherwise.
 - Run lengths and positions are limited to half the range of an `Integer`, so a stream of make-up codes cannot overflow.
 
+## Ported from tiny-skia: the native rasterizer
+
+The native render backend (`src\Render\Native`, package `Pdf4D.Render.Native`) is a Delphi port of tiny-skia, a Rust port of the CPU rasterizer of Skia. Version: tag `v0.12.0` (the source archive has the SHA-256 that `tools\fetch-tiny-skia-src.ps1` checks; the script extracts it to `tools\tiny-skia-src`, which git ignores). The licence is BSD 3-Clause (`licenses\tiny-skia-BSD-3-Clause.txt`, named in `NOTICE`).
+
+- Only the scalar branch of every `cfg_if!` is ported (no feature `simd`), only `ColorSpace::Linear`, and neither the gradient shaders and gradient stages nor PNG reading and writing.
+- Every unit begins with the Pdf4D copyright line, one `// Port of: tiny-skia v0.12.0 <path>` line per source file and the tiny-skia copyright line.
+- A Rust type `X` becomes `TTsX`, a function name keeps its words in PascalCase, an `Option<T>` result becomes `TryX(...; out Value): Boolean`, a trait becomes an abstract class. Rust behaviour that Delphi does differently (saturating `as i32`, `f32::min` and `max` with NaN, `round`, `floor`, `ceil`, `wrapping_*`) goes through the helpers of `Pdf4D.Render.Native.Scalar`, never through the RTL function with the same name.
+- The reference images of tiny-skia (`tests/images`, without `gradients`) are copied to `tests\reference\tiny-skia` by `tools\fetch-tiny-skia-src.ps1 -CopyTestImages`; the tests of the port compare against them.
+
+| Unit (`src\Render\Native\`) | Source in tiny-skia v0.12.0 |
+|---|---|
+| `Pdf4D.Render.Native.Scalar` | `path/src/scalar.rs`, `path/src/floating_point.rs`, `src/math.rs` (without `approx_powf`), plus the `TTsScalar` helpers and `TTsFloatMode` (Pdf4D) |
+| `Pdf4D.Render.Native.Wide` | `src/wide/*.rs` (scalar branch), `path/src/f32x2_t.rs`, `path/src/f32x4_t.rs` |
+| `Pdf4D.Render.Native.Geometry` | `path/src/rect.rs`, `path/src/size.rs`, `src/geom.rs` |
+| `Pdf4D.Render.Native.Transform` | `path/src/transform.rs` |
+| `Pdf4D.Render.Native.Path` | `path/src/path.rs`, `path/src/path_builder.rs` |
+| `Pdf4D.Render.Native.PathGeometry` | `path/src/path_geometry.rs`, `src/path_geometry.rs` |
+| `Pdf4D.Render.Native.Stroker` | `path/src/stroker.rs` |
+| `Pdf4D.Render.Native.Dash` | `path/src/dash.rs` |
+| `Pdf4D.Render.Native.Color` | `src/color.rs` |
+| `Pdf4D.Render.Native.BlendMode` | `src/blend_mode.rs` |
+| `Pdf4D.Render.Native.FixedPoint` | `src/fixed_point.rs` |
+| `Pdf4D.Render.Native.AlphaRuns` | `src/alpha_runs.rs` |
+| `Pdf4D.Render.Native.Blitter` | `src/blitter.rs` |
+| `Pdf4D.Render.Native.Edge` | `src/edge.rs` |
+| `Pdf4D.Render.Native.Path64` | `src/path64/mod.rs`, `point64.rs`, `quad64.rs`, `cubic64.rs`, `line_cubic_intersections.rs` |
+| `Pdf4D.Render.Native.EdgeClipper` | `src/edge_clipper.rs`, `src/line_clipper.rs` |
+| `Pdf4D.Render.Native.EdgeBuilder` | `src/edge_builder.rs` |
+| `Pdf4D.Render.Native.Scan` | `src/scan/mod.rs`, `src/scan/path.rs` |
+| `Pdf4D.Render.Native.Scan.AntiAlias` | `src/scan/path_aa.rs` |
+| `Pdf4D.Render.Native.Scan.Hairline` | `src/scan/hairline.rs` |
+| `Pdf4D.Render.Native.Scan.HairlineAntiAlias` | `src/scan/hairline_aa.rs` |
+| `Pdf4D.Render.Native.Pipeline` | `src/pipeline/mod.rs` |
+| `Pdf4D.Render.Native.Pipeline.Highp` | `src/pipeline/highp.rs` and the Decal stages (Pdf4D) |
+| `Pdf4D.Render.Native.Pipeline.Lowp` | `src/pipeline/lowp.rs` |
+| `Pdf4D.Render.Native.Pipeline.Blitter` | `src/pipeline/blitter.rs` |
+| `Pdf4D.Render.Native.Shader` | `src/shaders/mod.rs`, `src/shaders/pattern.rs` and `Decal` (Pdf4D) |
+| `Pdf4D.Render.Native.Pixmap` | `src/pixmap.rs` (without PNG) |
+| `Pdf4D.Render.Native.Mask` | `src/mask.rs` (without PNG) |
+| `Pdf4D.Render.Native.Painter` | `src/painter.rs` |
+
+The units that connect the port to Pdf4D (the conversion of paths, matrices, stroke styles and paints, the clip mask, the device and the backend) have no tiny-skia source.
+
 ## Limits that Pdf4D adds
 
 PDFBox has few limits on hostile input. Pdf4D adds the limits below. The ones with a name are set through `TPdfLoadOptions` (the values are the defaults); the others are fixed in the code. A document that runs into a limit loses the content after it, with a log line, or raises an `EPdfException` descendant, and never hangs, crashes or grows without bound.

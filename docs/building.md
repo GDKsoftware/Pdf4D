@@ -19,7 +19,7 @@
 ./build.ps1 -Platform All -Config Release
 ```
 
-For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj`, `Pdf4D.FMX.Skia.dproj` and the design-time package `dclPdf4D.FMX.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demos (`demos\Vcl\Pdf4DInvoiceDemo.dproj` and `demos\FMX\Pdf4DInvoiceDemoFmx.dproj`, see "The demo") after the packages; the demos are not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
+For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Native.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj`, `Pdf4D.FMX.Skia.dproj` and the design-time package `dclPdf4D.FMX.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demos (`demos\Vcl\Pdf4DInvoiceDemo.dproj` and `demos\FMX\Pdf4DInvoiceDemoFmx.dproj`, see "The demo") after the packages; the demos are not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
 ## Packages
 
@@ -35,6 +35,7 @@ The packages and what they contain:
 |---|---|---|
 | `Pdf4D.dpk` | `rtl` | the core: everything under `src` except the folders below |
 | `Pdf4D.Render.dpk` | `rtl, Pdf4D` | `src\Graphics`, `src\Codec`, `src\Render` (without `Skia`) and `src\Resources\Pdf4D.Resources.Icc.*` |
+| `Pdf4D.Render.Native.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Render\Native` (the native rasterizer, a port of tiny-skia; see `porting.md`) |
 | `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
 | `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
 | `Pdf4D.Vcl.dpk` | `rtl, vcl, Pdf4D.Viewer` | `src\Vcl` (`TPdf4DDocument`, `TPdf4DPageView` and the GDI and GDI+ painter) |
@@ -44,7 +45,7 @@ The packages and what they contain:
 | `Pdf4D.FMX.Skia.dpk` | `rtl, Pdf4D.FMX, Pdf4D.Render.Skia` | `src\FMX\Skia` (the `TPdf4DSkiaBackend` component) |
 | `dclPdf4D.FMX.dpk` | `rtl, fmx, designide, Pdf4D.FMX, Pdf4D.FMX.Skia` | `src\FMX\Design` (design time only: the palette registration, the property editor of `FileName` and the palette icons) |
 
-The first four build for Win32, Win64 and Linux64; the three VCL packages and the three FMX packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only `src\FMX` uses `FMX.*` (and no `Vcl.*`, `Winapi.*` or `Pdf4D.Vcl.*`, so that the units can compile for macOS and Linux64; compiling for macOS and Linux64 has not been tried yet, and Linux64 needs FMXLinux); only units under `src\Render\Skia`, `src\Vcl\Skia` and `src\FMX\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`.
+The first five build for Win32, Win64 and Linux64; the three VCL packages and the three FMX packages build for Win32 and Win64 only. `build.ps1` also checks the layers and fails on a violation: a unit of the core and of the renderer must not use a unit from `Viewer`, `Vcl` or `FMX`; a unit of the core must not use a unit from `Graphics`, `Codec`, `Render` or `Pdf4D.Resources.Icc.*`; a unit under `src\Viewer` uses only `System.*` and `Pdf4D.*` units, without Skia (the check rejects the other namespaces it knows, such as `Vcl`, `Winapi`, `FMX`, `Data`, `Xml`, `REST` and `Spring`); only `src\Vcl` uses `Vcl.*` and `Winapi.*` (and no `FMX.*`); only `src\FMX` uses `FMX.*` (and no `Vcl.*`, `Winapi.*` or `Pdf4D.Vcl.*`, so that the units can compile for macOS and Linux64; compiling for macOS and Linux64 has not been tried yet, and Linux64 needs FMXLinux); only units under `src\Render\Skia`, `src\Vcl\Skia` and `src\FMX\Skia` may use `System.Skia` or `Pdf4D.Render.Skia`; a unit under `src\Render\Native` uses only `System.*`, core units and units of `Pdf4D.Render` (the check rejects the namespaces it knows, as for `src\Viewer`), and only `src\Render\Native` and the viewer layer (`src\Viewer`, `src\Vcl`, `src\FMX`) use `Pdf4D.Render.Native.*`.
 
 ## The four test projects
 
@@ -160,6 +161,10 @@ Run `generate-golden.ps1 -Mode All -Filter <path>` for every new corpus file as 
 ## Render reference images
 
 `tools\oracle\generate-render.ps1 -Dpi 72` writes the PDFBox renders of every corpus page to `tests\reference\render\72` (about 45 MB, in plain git) and `-Dpi 150` those of `tests\reference\render\150\selection.txt`; `tools\oracle\generate-render-tests.ps1` writes the synthetic render test files. `PDF4D_RENDER_OUTPUT` names a folder where `Pdf4D.Skia.Tests` writes the Pdf4D render and a difference image of every page that differs from its reference, and the files `summary.txt`, `distribution.txt`, `region.txt` and `performance.txt`; `PDF4D_RENDER_FILTER` (substrings of corpus paths, separated by semicolons) limits the comparison to the matching files. The format and the comparison are in `golden-format.md`.
+
+## tiny-skia source
+
+`tools\fetch-tiny-skia-src.ps1` downloads the tiny-skia `v0.12.0` source archive from GitHub, checks its SHA-256 (a constant in the script) and extracts it to `tools\tiny-skia-src` (ignored by git), with a `VERSION.txt` that names the tag and the hash. The native rasterizer is ported from it, and the file is only needed to review that port. With `-CopyTestImages` the script copies the reference images of tiny-skia (`tests\images`, without `gradients`) to `tests\reference\tiny-skia` (about 63 KB of PNG files in plain git); the tests of the port compare against them.
 
 ## Invoice PDFs
 

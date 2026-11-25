@@ -85,3 +85,8 @@ licenses/TwelveMonkeys-BSD.txt.
 Pdf4D does not include Skia. The Skia backend (src/Render/Skia) uses System.Skia (Skia4Delphi) that ships with RAD Studio, and
 needs sk4d.dll or libsk4d.so, which the application brings. Skia is licensed under the BSD 3-Clause License, Skia4Delphi under
 the MIT License.
+
+tiny-skia
+Copyright (c) 2011 Google Inc. All rights reserved.
+Copyright (c) 2020 Yevhenii Reizner All rights reserved.
+Licensed under the BSD 3-Clause License; see licenses/tiny-skia-BSD-3-Clause.txt.
