@@ -94,6 +94,12 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Path.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Dash.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stage.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Color.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

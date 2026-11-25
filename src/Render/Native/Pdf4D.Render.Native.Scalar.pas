@@ -73,6 +73,10 @@ type
     // math.rs
     class function LeftShift(const Value, Shift: Integer): Integer; static;
     class function LeftShift64(const Value: Int64; const Shift: Integer): Int64; static;
+
+    // Rust `>>` on a signed integer copies the sign bit; the Delphi shr fills with zeros
+    class function ShiftRightI32(const Value, Shift: Integer): Integer; static;
+    class function ShiftRightI64(const Value: Int64; const Shift: Integer): Int64; static;
     class function BoundInt(const Min, Value, Max: Integer): Integer; static;
 
     // wrapping_* and saturating_* of the integer types
@@ -495,6 +499,26 @@ begin
   const Shifted = UInt64(Value) shl Shift;
 
   Result := Int64(Shifted);
+end;
+
+class function TTsScalar.ShiftRightI32(const Value, Shift: Integer): Integer;
+begin
+  if Value >= 0 then
+  begin
+    Exit(Value shr Shift);
+  end;
+
+  Result := not ((not Value) shr Shift);
+end;
+
+class function TTsScalar.ShiftRightI64(const Value: Int64; const Shift: Integer): Int64;
+begin
+  if Value >= 0 then
+  begin
+    Exit(Value shr Shift);
+  end;
+
+  Result := not ((not Value) shr Shift);
 end;
 
 class function TTsScalar.BoundInt(const Min, Value, Max: Integer): Integer;

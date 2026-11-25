@@ -56,6 +56,9 @@ type
     procedure TestLeftShiftWraps;
 
     [Test]
+    procedure TestShiftRightKeepsTheSign;
+
+    [Test]
     procedure TestAlmostDequalUlps;
 
     [Test]
@@ -189,6 +192,18 @@ begin
   Assert.AreEqual(-5, TTsScalar.WrappingSubI32(5, 10));
   Assert.AreEqual<Cardinal>(0, TTsScalar.SaturatingSubU32(3, 5));
   Assert.AreEqual<Cardinal>(2, TTsScalar.SaturatingSubU32(5, 3));
+end;
+
+procedure TTsScalarTests.TestShiftRightKeepsTheSign;
+begin
+  Assert.AreEqual(-1, TTsScalar.ShiftRightI32(-1, 6));
+  Assert.AreEqual(-2, TTsScalar.ShiftRightI32(-3, 1));
+  Assert.AreEqual(-4, TTsScalar.ShiftRightI32(Low(Integer), 29));
+  Assert.AreEqual(Low(Integer), TTsScalar.ShiftRightI32(Low(Integer), 0));
+  Assert.AreEqual(5, TTsScalar.ShiftRightI32(40, 3));
+  Assert.AreEqual(Int64(-1), TTsScalar.ShiftRightI64(-1, 16));
+  Assert.AreEqual(Int64(-2), TTsScalar.ShiftRightI64(-65537, 16));
+  Assert.AreEqual(Int64(3), TTsScalar.ShiftRightI64(Int64(3) shl 16 + 5, 16));
 end;
 
 procedure TTsScalarTests.TestLeftShiftWraps;

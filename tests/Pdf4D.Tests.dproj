@@ -224,6 +224,17 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Dash.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stroker.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Stage.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Color.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Color.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.BlendMode.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Blitter.Tests.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.GraphicsEngine.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Color.pas"/>
         <DCCReference Include="..\src\Render\Pdf4D.Render.Operators.Path.pas"/>

@@ -45,6 +45,12 @@ contains
   Pdf4D.Render.Native.PathGeometry in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.pas',
   Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas',
   Pdf4D.Render.Native.Dash in '..\src\Render\Native\Pdf4D.Render.Native.Dash.pas',
-  Pdf4D.Render.Native.Stroker in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas';
+  Pdf4D.Render.Native.Stroker in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas',
+  Pdf4D.Render.Native.Stage in '..\src\Render\Native\Pdf4D.Render.Native.Stage.pas',
+  Pdf4D.Render.Native.Color in '..\src\Render\Native\Pdf4D.Render.Native.Color.pas',
+  Pdf4D.Render.Native.BlendMode in '..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas',
+  Pdf4D.Render.Native.FixedPoint in '..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas',
+  Pdf4D.Render.Native.AlphaRuns in '..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas',
+  Pdf4D.Render.Native.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas';
 
 end.
