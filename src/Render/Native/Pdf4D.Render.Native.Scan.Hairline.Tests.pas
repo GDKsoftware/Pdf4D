@@ -93,7 +93,10 @@ type
     procedure TestHugeLineIsClipped;
 
     [Test]
-    procedure TestHugeCurvesDoNotRaise;
+    procedure TestHugeCurves;
+
+    [Test]
+    procedure TestVerticalLineAtTheRightEdgeOfTheClip;
 
     [Test]
     procedure TestPathBeyondTheClipIsRejectedByItsBounds;
@@ -455,23 +458,64 @@ begin
   Assert.AreEqual(5100, StrokeTotal(LinePath(-1.0E30, 5.5, 1.0E30, 5.5), TTsLineCap.Square, False, 20), 'The row');
   Assert.AreEqual(5100, StrokeTotal(LinePath(-1.0E30, 5.5, 1.0E30, 5.5), TTsLineCap.Square, True, 20), 'The anti-aliased row');
 
-  // The column and the other caps stay inside the buffer
-  Assert.IsTrue(StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Round, False, 20) > 0, 'The column');
-  Assert.IsTrue(StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Round, True, 20) > 0, 'The anti-aliased column');
+  // The column covers its 20 pixels with every cap
+  Assert.AreEqual(5100, StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Round, False, 20), 'The column');
+  Assert.AreEqual(5100, StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Round, True, 20), 'The anti-aliased column');
+  Assert.AreEqual(5100, StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Butt, False, 20), 'The column with a butt cap');
+  Assert.AreEqual(5100, StrokeTotal(LinePath(7.5, -1.0E30, 7.5, 1.0E30), TTsLineCap.Square, True, 20), 'The anti-aliased column with a square cap');
 end;
 
-procedure TTsScanHairlineTests.TestHugeCurvesDoNotRaise;
+procedure TTsScanHairlineTests.TestHugeCurves;
 begin
   // The totals of tiny-skia v0.12.0 for the cubic and the quad of enormous control points
   Assert.AreEqual(5100, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Butt, False, 20), 'The huge curves');
   Assert.AreEqual(3820, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Butt, True, 20), 'The anti-aliased huge curves');
 
-  StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Square, False, 20);
-  StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Round, True, 20);
-  StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Round, False, 20);
-  StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Square, True, 20);
-  StrokeTotal(HugeCubicPath(1.0E7), TTsLineCap.Butt, False, 20);
-  StrokeTotal(HugeCubicPath(1.0E7), TTsLineCap.Butt, True, 20);
+  // A square or round cap grows the bounds of the path beyond what the hairline accepts: nothing is drawn without anti-aliasing
+  Assert.AreEqual(0, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Square, False, 20), 'Square cap');
+  Assert.AreEqual(4420, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Square, True, 20), 'Square cap, anti-aliased');
+  Assert.AreEqual(0, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Round, False, 20), 'Round cap');
+  Assert.AreEqual(4180, StrokeTotal(HugeCubicPath(1.0E30), TTsLineCap.Round, True, 20), 'Round cap, anti-aliased');
+
+  Assert.AreEqual(5100, StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Butt, False, 20), 'The largest control points');
+  Assert.AreEqual(3820, StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Butt, True, 20), 'The largest control points, anti-aliased');
+  Assert.AreEqual(0, StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Round, False, 20), 'The largest control points, round cap');
+  Assert.AreEqual(4420, StrokeTotal(HugeCubicPath(1.5E38), TTsLineCap.Square, True, 20), 'The largest control points, square cap, anti-aliased');
+
+  // Control points that the hairline subdivides into many lines
+  Assert.AreEqual(9945, StrokeTotal(HugeCubicPath(1.0E7), TTsLineCap.Butt, False, 20), 'Control points of 1e7');
+  Assert.AreEqual(8728, StrokeTotal(HugeCubicPath(1.0E7), TTsLineCap.Butt, True, 20), 'Control points of 1e7, anti-aliased');
+end;
+
+procedure TTsScanHairlineTests.TestVerticalLineAtTheRightEdgeOfTheClip;
+begin
+  // The check of hair_line_rgn for a vertical line only looks at the left side of the clip, so a line at x = clip.right blits its pixels one
+  // column outside without anti-aliasing: the blitter has to ignore them (tiny-skia v0.12.0 does the same)
+  TTsScanHairline.StrokePath(LinePath(20, 2, 20, 8), TTsLineCap.Butt, ClipOf(20, 20), FBlitter);
+  Assert.AreEqual(6, FBlitter.CallCount, 'One blit per row');
+  Assert.AreEqual(6, FBlitter.OutsideCount, 'All six pixels lie in the column right of the clip');
+  Assert.AreEqual(0, FBlitter.CountPixelsWithCoverage, 'Nothing inside');
+
+  // With anti-aliasing the line is clipped: the pixels of the last column get the half that lies inside
+  UseBlitter(20, 20);
+  TTsScanHairlineAntiAlias.StrokePath(LinePath(20, 2, 20, 8), TTsLineCap.Butt, ClipOf(20, 20), FBlitter);
+  Assert.AreEqual(0, FBlitter.OutsideCount);
+  Assert.AreEqual(6, FBlitter.CountPixelsWithCoverage);
+  Assert.AreEqual(127, FBlitter.CoverageAt(19, 2));
+  Assert.AreEqual(127, FBlitter.CoverageAt(19, 7));
+  Assert.AreEqual(762, Integer(FBlitter.TotalCoverage));
+
+  // A line on the last column of the clip is inside
+  UseBlitter(20, 20);
+  TTsScanHairline.StrokePath(LinePath(19.5, 2, 19.5, 8), TTsLineCap.Butt, ClipOf(20, 20), FBlitter);
+  Assert.AreEqual(0, FBlitter.OutsideCount);
+  Assert.AreEqual(6, FBlitter.CountPixelsWithCoverage);
+  Assert.AreEqual(1530, Integer(FBlitter.TotalCoverage));
+
+  // A line left of the clip draws nothing
+  UseBlitter(20, 20);
+  TTsScanHairline.StrokePath(LinePath(-0.5, 2, -0.5, 8), TTsLineCap.Butt, ClipOf(20, 20), FBlitter);
+  Assert.AreEqual(0, FBlitter.CallCount);
 end;
 
 procedure TTsScanHairlineTests.TestPathBeyondTheClipIsRejectedByItsBounds;

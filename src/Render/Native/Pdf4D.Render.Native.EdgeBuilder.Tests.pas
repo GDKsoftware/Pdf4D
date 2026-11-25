@@ -29,6 +29,7 @@ type
     function ClipOf(const Width, Height: Cardinal; const Shift: Integer): TTsShiftedIntRect;
     function Build(const Path: TTsPath; const Shift: Integer; out Edges: TArray<TTsEdge>): Boolean;
     procedure AssertEdgesInsideClip(const Edges: TArray<TTsEdge>; const Width, Height: Integer);
+    procedure AssertEdge(const Edge: TTsEdge; const Kind: TTsEdgeKind; const X, Dx, FirstY, LastY, Winding: Integer);
 
   public
     [Setup]
@@ -92,10 +93,16 @@ type
     procedure TestPathEdgeIterAutoClosesEveryContour;
 
     [Test]
-    procedure TestHugeFiniteCoordinatesDoNotRaise;
+    procedure TestHugeFiniteCoordinates;
 
     [Test]
-    procedure TestHugeCubicDoesNotRaise;
+    procedure TestHugeCubic;
+
+    [Test]
+    procedure TestQuadraticEdgeSequenceMatchesTinySkia;
+
+    [Test]
+    procedure TestCubicEdgeSequenceMatchesTinySkia;
 
     [Test]
     procedure TestMillionsOfSegmentsStayLinear;
@@ -489,7 +496,86 @@ begin
   Assert.IsFalse(Iter.TryNext(Edge));
 end;
 
-procedure TTsEdgeBuilderTests.TestHugeFiniteCoordinatesDoNotRaise;
+procedure TTsEdgeBuilderTests.AssertEdge(const Edge: TTsEdge; const Kind: TTsEdgeKind; const X, Dx, FirstY, LastY, Winding: Integer);
+begin
+  Assert.IsTrue(Edge.Kind = Kind, 'The kind');
+  Assert.AreEqual(X, Edge.Line.X, 'x');
+  Assert.AreEqual(Dx, Edge.Line.Dx, 'dx');
+  Assert.AreEqual(FirstY, Edge.Line.FirstY, 'first y');
+  Assert.AreEqual(LastY, Edge.Line.LastY, 'last y');
+  Assert.AreEqual(Winding, Integer(Edge.Line.Winding), 'winding');
+end;
+
+procedure TTsEdgeBuilderTests.TestQuadraticEdgeSequenceMatchesTinySkia;
+const
+  // x, dx, first y, last y and the curve count of the new edge and of every update, from tiny-skia v0.12.0
+  Steps: array[0..7, 0..4] of Integer = (
+    (684032, 57344, 10, 14, 7),
+    (962560, 40960, 15, 19, 6),
+    (1159168, 24576, 20, 24, 5),
+    (1273856, 8192, 25, 29, 4),
+    (1306624, -8192, 30, 34, 3),
+    (1257472, -24576, 35, 39, 2),
+    (1126400, -40960, 40, 44, 1),
+    (913408, -57344, 45, 49, 0));
+begin
+  var Quad: TTsQuadraticEdge;
+  Assert.IsTrue(TTsQuadraticEdge.TryCreate([Pt(10, 10), Pt(30, 30), Pt(10, 50)], 0, 0, Quad));
+
+  for var Step := 0 to High(Steps) do
+  begin
+    if Step > 0 then
+    begin
+      Assert.IsTrue(Quad.Update, Format('Update %d', [Step]));
+    end;
+
+    Assert.AreEqual(Steps[Step, 0], Quad.Line.X, Format('x of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 1], Quad.Line.Dx, Format('dx of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 2], Quad.Line.FirstY, Format('first y of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 3], Quad.Line.LastY, Format('last y of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 4], Integer(Quad.CurveCount), Format('curve count of step %d', [Step]));
+  end;
+end;
+
+procedure TTsEdgeBuilderTests.TestCubicEdgeSequenceMatchesTinySkia;
+const
+  Steps: array[0..15, 0..4] of Integer = (
+    (734208, 159453, 10, 11, -15),
+    (1022976, 99908, 12, 13, -14),
+    (1210368, 58022, 14, 16, -13),
+    (1359872, 28032, 17, 18, -12),
+    (1413120, 7009, 19, 21, -11),
+    (1431552, -5811, 22, 24, -10),
+    (1414144, -13590, 25, 28, -9),
+    (1357824, -16032, 29, 32, -8),
+    (1294336, -15389, 33, 35, -7),
+    (1249280, -11213, 36, 39, -6),
+    (1204224, -4258, 40, 44, -5),
+    (1189888, 4697, 45, 48, -4),
+    (1209344, 15583, 49, 53, -3),
+    (1292288, 28202, 54, 58, -2),
+    (1436672, 42394, 59, 63, -1),
+    (1648640, 57552, 64, 69, 0));
+begin
+  var Cubic: TTsCubicEdge;
+  Assert.IsTrue(TTsCubicEdge.TryCreate([Pt(10, 10), Pt(40, 20), Pt(0, 40), Pt(30, 70)], 0, 0, Cubic));
+
+  for var Step := 0 to High(Steps) do
+  begin
+    if Step > 0 then
+    begin
+      Assert.IsTrue(Cubic.Update, Format('Update %d', [Step]));
+    end;
+
+    Assert.AreEqual(Steps[Step, 0], Cubic.Line.X, Format('x of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 1], Cubic.Line.Dx, Format('dx of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 2], Cubic.Line.FirstY, Format('first y of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 3], Cubic.Line.LastY, Format('last y of step %d', [Step]));
+    Assert.AreEqual(Steps[Step, 4], Integer(Cubic.CurveCount), Format('curve count of step %d', [Step]));
+  end;
+end;
+
+procedure TTsEdgeBuilderTests.TestHugeFiniteCoordinates;
 begin
   const Big: Single = 1.5E38;
 
@@ -503,19 +589,22 @@ begin
   var Path: TTsPath;
   Assert.IsTrue(Builder.TryFinish(Path));
 
+  // The edges of tiny-skia v0.12.0: the clipper cuts the quad and the lines to the clip
   var Edges: TArray<TTsEdge>;
-  if Build(Path, 0, Edges) then
-  begin
-    AssertEdgesInsideClip(Edges, 100, 100);
-  end;
+  Assert.IsTrue(Build(Path, 0, Edges));
+  Assert.AreEqual(2, Integer(Length(Edges)), 'The clipped edges');
+  AssertEdgesInsideClip(Edges, 100, 100);
+  AssertEdge(Edges[0], TTsEdgeKind.Quadratic, 6551552, -2114, 0, 11, 1);
+  AssertEdge(Edges[1], TTsEdgeKind.Line, 0, 0, 0, 99, -1);
 
-  if TTsBasicEdgeBuilder.TryBuildEdgesUnclipped(Path, 2, Edges) then
-  begin
-    Assert.IsTrue(Length(Edges) >= 2);
-  end;
+  // Without a clip nothing is cut: the rows of the edges are what the wrapped shifts of tiny-skia give
+  Assert.IsTrue(TTsBasicEdgeBuilder.TryBuildEdgesUnclipped(Path, 2, Edges));
+  Assert.AreEqual(2, Integer(Length(Edges)), 'The unclipped edges');
+  AssertEdge(Edges[0], TTsEdgeKind.Line, -32768, -65536, 200, -33554433, -1);
+  AssertEdge(Edges[1], TTsEdgeKind.Line, 0, 0, -33554432, 199, -1);
 end;
 
-procedure TTsEdgeBuilderTests.TestHugeCubicDoesNotRaise;
+procedure TTsEdgeBuilderTests.TestHugeCubic;
 begin
   var Builder := TTsPathBuilder.New;
   Builder.MoveTo(0, 0);
@@ -526,11 +615,15 @@ begin
   var Path: TTsPath;
   Assert.IsTrue(Builder.TryFinish(Path));
 
+  // The edges of tiny-skia v0.12.0: the cubics are too big to be curve edges, so the build gives three line edges (20 rows, 220 rows and
+  // 240 rows)
   var Edges: TArray<TTsEdge>;
-  if Build(Path, 2, Edges) then
-  begin
-    AssertEdgesInsideClip(Edges, 100 shl 2, 100 shl 2);
-  end;
+  Assert.IsTrue(Build(Path, 2, Edges));
+  Assert.AreEqual(3, Integer(Length(Edges)));
+  AssertEdgesInsideClip(Edges, 100 shl 2, 100 shl 2);
+  AssertEdge(Edges[0], TTsEdgeKind.Line, 32768, 65536, 0, 19, 1);
+  AssertEdge(Edges[1], TTsEdgeKind.Line, 1337344, 53620, 20, 239, 1);
+  AssertEdge(Edges[2], TTsEdgeKind.Line, 26624, 54613, 0, 239, -1);
 end;
 
 procedure TTsEdgeBuilderTests.TestMillionsOfSegmentsStayLinear;

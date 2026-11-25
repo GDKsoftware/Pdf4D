@@ -94,7 +94,9 @@ begin
 
   FCoverage[Y * FWidth + X] := FCoverage[Y * FWidth + X] + Value;
 
-  // Black at full alpha over what is there, lerped with the coverage as the lowp pipeline of tiny-skia does: div255(v) = (v + 255) >> 8
+  // Black at full alpha over what is there. tiny-skia turns SourceOver of an opaque paint into Source, which does not pre-scale the coverage
+  // but lerps: lerp(d, s, c) = div255(d * (255 - c) + s * c) with div255(v) = (v + 255) >> 8. The pixel of a pixmap that a stroke of black
+  // leaves has this alpha (checked against Pixmap::stroke_path).
   FComposited[Y * FWidth + X] := (FComposited[Y * FWidth + X] * (FullCoverage - Value) + FullCoverage * Value + FullCoverage) shr 8;
 end;
 

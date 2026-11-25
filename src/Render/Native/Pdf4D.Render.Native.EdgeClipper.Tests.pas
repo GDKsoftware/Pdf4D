@@ -30,6 +30,10 @@ type
     function Segment(const X0, Y0, X1, Y1: Single): TTsPoints2;
     procedure AssertPoint(const Expected: TTsPoint; const Actual: TTsPoint; const Description: string);
     procedure AssertEdgesInside(const Edges: TTsClippedEdges);
+    procedure AssertSame(const Expected, Actual: Single; const Description: string);
+    procedure AssertLineEdge(const Edges: TTsClippedEdges; const Index: Integer; const X0, Y0, X1, Y1: Single);
+    procedure AssertQuadEdge(const Edges: TTsClippedEdges; const Index: Integer; const X0, Y0, X1, Y1, X2, Y2: Single);
+    procedure AssertCubicEdge(const Edges: TTsClippedEdges; const Index: Integer; const X0, Y0, X1, Y1, X2, Y2, X3, Y3: Single);
 
   public
     [Setup]
@@ -102,7 +106,7 @@ type
     procedure TestChopMonoCubicAtYWithoutACrossingFails;
 
     [Test]
-    procedure TestHugeSegmentsDoNotRaise;
+    procedure TestHugeSegmentsGiveTheEdgesOfTinySkia;
 
     [Test]
     procedure TestClipperIterGivesTheEdgesOfEverySegment;
@@ -184,6 +188,54 @@ procedure TTsEdgeClipperTests.AssertPoint(const Expected: TTsPoint; const Actual
 begin
   Assert.AreEqual(Expected.X, Actual.X, 0.001, Description + ' x');
   Assert.AreEqual(Expected.Y, Actual.Y, 0.001, Description + ' y');
+end;
+
+procedure TTsEdgeClipperTests.AssertSame(const Expected, Actual: Single; const Description: string);
+begin
+  Assert.AreEqual(Expected, Actual, 0.0, Description);
+end;
+
+procedure TTsEdgeClipperTests.AssertLineEdge(const Edges: TTsClippedEdges; const Index: Integer; const X0, Y0, X1, Y1: Single);
+begin
+  Assert.IsTrue(Index < Edges.Count, Format('Edge %d exists', [Index]));
+
+  const Edge = Edges.Items[Index];
+  Assert.IsTrue(Edge.Kind = TTsPathEdgeKind.LineTo, Format('Edge %d is a line', [Index]));
+  AssertSame(X0, Edge.P0.X, Format('Edge %d x0', [Index]));
+  AssertSame(Y0, Edge.P0.Y, Format('Edge %d y0', [Index]));
+  AssertSame(X1, Edge.P1.X, Format('Edge %d x1', [Index]));
+  AssertSame(Y1, Edge.P1.Y, Format('Edge %d y1', [Index]));
+end;
+
+procedure TTsEdgeClipperTests.AssertQuadEdge(const Edges: TTsClippedEdges; const Index: Integer; const X0, Y0, X1, Y1, X2, Y2: Single);
+begin
+  Assert.IsTrue(Index < Edges.Count, Format('Edge %d exists', [Index]));
+
+  const Edge = Edges.Items[Index];
+  Assert.IsTrue(Edge.Kind = TTsPathEdgeKind.QuadTo, Format('Edge %d is a quad', [Index]));
+  AssertSame(X0, Edge.P0.X, Format('Edge %d x0', [Index]));
+  AssertSame(Y0, Edge.P0.Y, Format('Edge %d y0', [Index]));
+  AssertSame(X1, Edge.P1.X, Format('Edge %d x1', [Index]));
+  AssertSame(Y1, Edge.P1.Y, Format('Edge %d y1', [Index]));
+  AssertSame(X2, Edge.P2.X, Format('Edge %d x2', [Index]));
+  AssertSame(Y2, Edge.P2.Y, Format('Edge %d y2', [Index]));
+end;
+
+procedure TTsEdgeClipperTests.AssertCubicEdge(const Edges: TTsClippedEdges; const Index: Integer;
+                                              const X0, Y0, X1, Y1, X2, Y2, X3, Y3: Single);
+begin
+  Assert.IsTrue(Index < Edges.Count, Format('Edge %d exists', [Index]));
+
+  const Edge = Edges.Items[Index];
+  Assert.IsTrue(Edge.Kind = TTsPathEdgeKind.CubicTo, Format('Edge %d is a cubic', [Index]));
+  AssertSame(X0, Edge.P0.X, Format('Edge %d x0', [Index]));
+  AssertSame(Y0, Edge.P0.Y, Format('Edge %d y0', [Index]));
+  AssertSame(X1, Edge.P1.X, Format('Edge %d x1', [Index]));
+  AssertSame(Y1, Edge.P1.Y, Format('Edge %d y1', [Index]));
+  AssertSame(X2, Edge.P2.X, Format('Edge %d x2', [Index]));
+  AssertSame(Y2, Edge.P2.Y, Format('Edge %d y2', [Index]));
+  AssertSame(X3, Edge.P3.X, Format('Edge %d x3', [Index]));
+  AssertSame(Y3, Edge.P3.Y, Format('Edge %d y3', [Index]));
 end;
 
 procedure TTsEdgeClipperTests.AssertEdgesInside(const Edges: TTsClippedEdges);
@@ -364,6 +416,10 @@ begin
   Assert.AreEqual(Single(0), Edges.Items[1].P0.X, 'The quad starts on the clip border');
   Assert.AreEqual(Edges.Items[0].P1.Y, Edges.Items[1].P0.Y, 0.001, 'The quad continues where the vertical line ends');
   AssertEdgesInside(Edges);
+
+  // The edges of tiny-skia v0.12.0
+  AssertLineEdge(Edges, 0, 0, 10, 0, 35);
+  AssertQuadEdge(Edges, 1, 0, 35, 22.970585, 46.48529, 50, 60);
 end;
 
 procedure TTsEdgeClipperTests.TestQuadAboveTheClipIsDropped;
@@ -381,8 +437,12 @@ begin
   // x and y both turn
   var Edges: TTsClippedEdges;
   Assert.IsTrue(Clipper.TryClipQuad(Pt(10, 10), Pt(90, 50), Pt(10, 10), Edges));
-  Assert.IsTrue(Edges.Count >= 2);
   AssertEdgesInside(Edges);
+
+  // The pieces of tiny-skia v0.12.0, cut where x and y turn (50, 30)
+  Assert.AreEqual(2, Edges.Count);
+  AssertQuadEdge(Edges, 0, 10, 10, 50, 30, 50, 30);
+  AssertQuadEdge(Edges, 1, 50, 30, 50, 30, 10, 10);
 end;
 
 procedure TTsEdgeClipperTests.TestCubicInsideIsKept;
@@ -403,19 +463,11 @@ begin
 
   var Edges: TTsClippedEdges;
   Assert.IsTrue(Clipper.TryClipCubic(Pt(10, -50), Pt(30, -50), Pt(30, 50), Pt(10, 50), Edges));
-  Assert.IsTrue(Edges.Count >= 1);
   AssertEdgesInside(Edges);
 
-  var HasCubic := False;
-  for var Index := 0 to Edges.Count - 1 do
-  begin
-    if Edges.Items[Index].Kind = TTsPathEdgeKind.CubicTo then
-    begin
-      HasCubic := True;
-    end;
-  end;
-
-  Assert.IsTrue(HasCubic);
+  // The part below the top, as tiny-skia v0.12.0 chops it
+  Assert.AreEqual(1, Edges.Count);
+  AssertCubicEdge(Edges, 0, 25, 0, 25, 25, 20, 50, 10, 50);
 end;
 
 procedure TTsEdgeClipperTests.TestCubicTooBigForFloatMathBecomesALine;
@@ -424,13 +476,11 @@ begin
 
   var Edges: TTsClippedEdges;
   Assert.IsTrue(Clipper.TryClipCubic(Pt(10, -5E6), Pt(30, 20), Pt(30, 50), Pt(60, 5E6), Edges));
-  Assert.IsTrue(Edges.Count >= 1);
-  for var Index := 0 to Edges.Count - 1 do
-  begin
-    Assert.IsTrue(Edges.Items[Index].Kind = TTsPathEdgeKind.LineTo, 'Only lines are left');
-  end;
-
   AssertEdgesInside(Edges);
+
+  // One line from the top to the bottom, as tiny-skia v0.12.0 gives
+  Assert.AreEqual(1, Edges.Count, 'Only one line is left');
+  AssertLineEdge(Edges, 0, 35, 0, 35.0005, 100);
 end;
 
 procedure TTsEdgeClipperTests.TestCubicCrossingBothSidesStaysInsideTheClip;
@@ -439,8 +489,13 @@ begin
 
   var Edges: TTsClippedEdges;
   Assert.IsTrue(Clipper.TryClipCubic(Pt(-60, 10), Pt(-20, 40), Pt(120, 60), Pt(160, 90), Edges));
-  Assert.IsTrue(Edges.Count >= 3, 'Left vertical, the cubic, right vertical');
   AssertEdgesInside(Edges);
+
+  // Left vertical, the cubic, right vertical, as tiny-skia v0.12.0 gives
+  Assert.AreEqual(3, Edges.Count);
+  AssertLineEdge(Edges, 0, 0, 10, 0, 35.655018);
+  AssertCubicEdge(Edges, 1, 0, 35.655018, 31.564827, 45.42106, 68.53052, 54.640713, 100, 64.40915);
+  AssertLineEdge(Edges, 2, 100, 64.40915, 100, 90);
 end;
 
 procedure TTsEdgeClipperTests.TestChopMonoCubicAtYFindsTheCrossing;
@@ -485,26 +540,40 @@ begin
   Assert.IsFalse(TTsPathGeometry.ChopMonoCubicAtY(Src, 500, Dst));
 end;
 
-procedure TTsEdgeClipperTests.TestHugeSegmentsDoNotRaise;
+procedure TTsEdgeClipperTests.TestHugeSegmentsGiveTheEdgesOfTinySkia;
 begin
   const Big: Single = 1.5E38;
   var Edges: TTsClippedEdges;
 
-  // The edges may hold infinite or NaN values here; the edge builder rejects them. Nothing may raise or hang.
+  // The edges of tiny-skia v0.12.0 for the same segments
   var Clipper := TTsEdgeClipper.Create(ClipRect, False);
-  Clipper.TryClipLine(Pt(-Big, -Big), Pt(Big, Big), Edges);
+  Assert.IsTrue(Clipper.TryClipLine(Pt(-Big, -Big), Pt(Big, Big), Edges));
+  Assert.AreEqual(1, Edges.Count, 'Line');
+  AssertLineEdge(Edges, 0, 0, 0, 0, 100);
 
   Clipper := TTsEdgeClipper.Create(ClipRect, False);
-  Clipper.TryClipQuad(Pt(-Big, 10), Pt(Big, Big), Pt(Big, 50), Edges);
+  Assert.IsTrue(Clipper.TryClipQuad(Pt(-Big, 10), Pt(Big, Big), Pt(Big, 50), Edges));
+  Assert.AreEqual(2, Edges.Count, 'Quad');
+  AssertLineEdge(Edges, 0, 0, 10, 0, 100);
+  AssertLineEdge(Edges, 1, 100, 100, 100, 50);
 
   Clipper := TTsEdgeClipper.Create(ClipRect, False);
-  Clipper.TryClipCubic(Pt(-Big, 10), Pt(Big, Big), Pt(-Big, 70), Pt(Big, 50), Edges);
+  Assert.IsTrue(Clipper.TryClipCubic(Pt(-Big, 10), Pt(Big, Big), Pt(-Big, 70), Pt(Big, 50), Edges));
+  Assert.AreEqual(3, Edges.Count, 'Cubic');
+  AssertLineEdge(Edges, 0, 0, 10, 0, 30);
+  AssertLineEdge(Edges, 1, 0, 30, 100, 30);
+  AssertLineEdge(Edges, 2, 100, 30, 100, 50);
 
-  // just below the limit of what float math can still handle
+  // just below the limit of what float math can still handle: a cubic is left
   Clipper := TTsEdgeClipper.Create(ClipRect, False);
-  Clipper.TryClipCubic(Pt(-4E6, 10), Pt(4E6, 20), Pt(-4E6, 70), Pt(4E6, 50), Edges);
-
-  Assert.Pass;
+  Assert.IsTrue(Clipper.TryClipCubic(Pt(-4E6, 10), Pt(4E6, 20), Pt(-4E6, 70), Pt(4E6, 50), Edges));
+  Assert.AreEqual(6, Edges.Count, 'Cubic of 4e6');
+  AssertLineEdge(Edges, 0, 0, 10, 0, 41.247395);
+  AssertLineEdge(Edges, 1, 0, 41.247395, 0, 41.2526);
+  AssertLineEdge(Edges, 2, 0, 41.2526, 0, 41.30439);
+  AssertCubicEdge(Edges, 3, 0, 41.30439, 0.28660193, 41.614784, 5.4937034, 41.9223, 100, 42.226646);
+  AssertLineEdge(Edges, 4, 100, 42.226646, 100, 54.677044);
+  AssertLineEdge(Edges, 5, 100, 54.677044, 100, 50);
 end;
 
 procedure TTsEdgeClipperTests.TestClipperIterGivesTheEdgesOfEverySegment;
@@ -682,6 +751,20 @@ begin
   Roots[2] := 0.0;
 
   Assert.AreEqual(0, TTsLineCubicIntersections.VerticalIntersect(Cubic, 5.0, Roots));
+
+  // The results of tiny-skia v0.12.0 for the same cubic at other x: only the intercept 9 gives a root
+  Assert.AreEqual(0, TTsLineCubicIntersections.VerticalIntersect(Cubic, 2.0, Roots));
+  Assert.AreEqual(0, TTsLineCubicIntersections.VerticalIntersect(Cubic, 7.5, Roots));
+  Assert.AreEqual(0, TTsLineCubicIntersections.VerticalIntersect(Cubic, 1.0, Roots));
+  Assert.AreEqual(1, TTsLineCubicIntersections.VerticalIntersect(Cubic, 9.0, Roots));
+  Assert.AreEqual(0.8041998943409083, Roots[0], 1E-15, 'The root, up to the last bits of the RTL cosine');
+
+  Assert.AreEqual(1, TTsLineCubicIntersections.HorizontalIntersect(Cubic, 22.5, Roots));
+  Assert.AreEqual(0.75, Roots[0], 1E-15);
+  Assert.AreEqual(1, TTsLineCubicIntersections.HorizontalIntersect(Cubic, 3.0, Roots));
+  Assert.AreEqual(0.1, Roots[0], 1E-15);
+  Assert.AreEqual(0, TTsLineCubicIntersections.HorizontalIntersect(Cubic, 6.0, Roots));
+  Assert.AreEqual(0, TTsLineCubicIntersections.HorizontalIntersect(Cubic, 27.0, Roots));
 end;
 
 procedure TTsPath64Tests.TestHorizontalIntersect;
