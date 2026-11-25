@@ -39,6 +39,8 @@ requires
 
 contains
   Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
-  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas';
+  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas',
+  Pdf4D.Render.Native.Geometry in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas',
+  Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas';
 
 end.

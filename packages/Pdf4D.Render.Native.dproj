@@ -88,6 +88,8 @@
         <DCCReference Include="Pdf4D.Render.dcp"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Wide.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Transform.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
