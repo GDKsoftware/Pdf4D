@@ -4,6 +4,7 @@
 // Copyright (c) 2011 Google Inc., (c) 2020 Yevhenii Reizner. BSD-3-Clause, see licenses/tiny-skia-BSD-3-Clause.txt.
 unit Pdf4D.Render.Native.BlendMode;
 
+{$EXCESSPRECISION OFF}
 {$SCOPEDENUMS ON}
 
 interface

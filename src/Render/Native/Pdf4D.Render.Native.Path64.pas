@@ -264,7 +264,7 @@ end;
 class function TTsScalar64.Bound(const Value, Min, Max: Double): Double;
 begin
   // max.min(self).max(min)
-  var Pinned := Max;
+  var Pinned: Double := Max;
   if Value < Pinned then
   begin
     Pinned := Value;
@@ -352,7 +352,7 @@ begin
     Exit(0.0);
   end;
 
-  const Root = HalleyCbrt3d(Abs(X));
+  const Root: Double = HalleyCbrt3d(Abs(X));
   if X < 0.0 then
   begin
     Result := -Root;
@@ -365,7 +365,7 @@ end;
 
 class function TTsPath64.HalleyCbrt3d(const D: Double): Double;
 begin
-  var A := Cbrt5d(D);
+  var A: Double := Cbrt5d(D);
 
   A := CbrtaHalleyd(A, D);
   A := CbrtaHalleyd(A, D);
@@ -392,7 +392,7 @@ end;
 
 class function TTsPath64.CbrtaHalleyd(const A, R: Double): Double;
 begin
-  const A3 = A * A * A;
+  const A3: Double = A * A * A;
 
   Result := A * (A3 + R + R) / (A3 + A3 + R);
 end;
@@ -410,7 +410,7 @@ begin
 
   for var Index := 0 to RealRoots - 1 do
   begin
-    var TValue := S[Index];
+    var TValue: Double := S[Index];
     if not (TTsScalar64.ApproximatelyZeroOrMore(TValue) and TTsScalar64.ApproximatelyOneOrLess(TValue)) then
     begin
       Continue;
@@ -600,15 +600,15 @@ begin
   var Index := 0;
   while Index < ExtremaCount do
   begin
-    const Min = ExtremeTs[Index];
+    const Min: Double = ExtremeTs[Index];
     Inc(Index);
-    const Max = ExtremeTs[Index];
+    const Max: Double = ExtremeTs[Index];
     if Min = Max then
     begin
       Continue;
     end;
 
-    const NewT = BinarySearch(Min, Max, AxisIntercept, XAxis);
+    const NewT: Double = BinarySearch(Min, Max, AxisIntercept, XAxis);
     if NewT >= 0.0 then
     begin
       if ValidCount >= 3 then
@@ -641,12 +641,12 @@ begin
   var T: Double := (Min + Max) / 2.0;
   var Step: Double := (T - Min) / 2.0;
   var CubicAtT := PointAtT(T);
-  var CalcPos := CubicAtT.AxisCoord(XAxis);
+  var CalcPos: Double := CubicAtT.AxisCoord(XAxis);
   var CalcDist: Double := CalcPos - AxisIntercept;
 
   for var Steps := 1 to MaxBinarySearchSteps do
   begin
-    const PriorT = MaxIgnoringNan(Min, T - Step);
+    const PriorT: Double = MaxIgnoringNan(Min, T - Step);
 
     const LessPt = PointAtT(PriorT);
     if TTsScalar64.ApproximatelyEqualHalf(LessPt.X, CubicAtT.X) and TTsScalar64.ApproximatelyEqualHalf(LessPt.Y, CubicAtT.Y) then
@@ -656,7 +656,7 @@ begin
     end;
 
     const LessDist: Double = LessPt.AxisCoord(XAxis) - AxisIntercept;
-    const LastStep = Step;
+    const LastStep: Double = Step;
     Step := Step / 2.0;
 
     var Ok: Boolean;
@@ -675,7 +675,7 @@ begin
     end
     else
     begin
-      const NextT = T + LastStep;
+      const NextT: Double = T + LastStep;
       if NextT > Max then
       begin
         Exit(-1.0);
@@ -741,12 +741,12 @@ begin
   end;
 
   // classic one t subdivision, per coordinate
-  const AbX = TTsPath64.Interp(Points[0].X, Points[1].X, T);
-  const BcX = TTsPath64.Interp(Points[1].X, Points[2].X, T);
-  const CdX = TTsPath64.Interp(Points[2].X, Points[3].X, T);
-  const AbcX = TTsPath64.Interp(AbX, BcX, T);
-  const BcdX = TTsPath64.Interp(BcX, CdX, T);
-  const AbcdX = TTsPath64.Interp(AbcX, BcdX, T);
+  const AbX: Double = TTsPath64.Interp(Points[0].X, Points[1].X, T);
+  const BcX: Double = TTsPath64.Interp(Points[1].X, Points[2].X, T);
+  const CdX: Double = TTsPath64.Interp(Points[2].X, Points[3].X, T);
+  const AbcX: Double = TTsPath64.Interp(AbX, BcX, T);
+  const BcdX: Double = TTsPath64.Interp(BcX, CdX, T);
+  const AbcdX: Double = TTsPath64.Interp(AbcX, BcdX, T);
 
   Result.Points[0].X := Points[0].X;
   Result.Points[1].X := AbX;
@@ -756,12 +756,12 @@ begin
   Result.Points[5].X := CdX;
   Result.Points[6].X := Points[3].X;
 
-  const AbY = TTsPath64.Interp(Points[0].Y, Points[1].Y, T);
-  const BcY = TTsPath64.Interp(Points[1].Y, Points[2].Y, T);
-  const CdY = TTsPath64.Interp(Points[2].Y, Points[3].Y, T);
-  const AbcY = TTsPath64.Interp(AbY, BcY, T);
-  const BcdY = TTsPath64.Interp(BcY, CdY, T);
-  const AbcdY = TTsPath64.Interp(AbcY, BcdY, T);
+  const AbY: Double = TTsPath64.Interp(Points[0].Y, Points[1].Y, T);
+  const BcY: Double = TTsPath64.Interp(Points[1].Y, Points[2].Y, T);
+  const CdY: Double = TTsPath64.Interp(Points[2].Y, Points[3].Y, T);
+  const AbcY: Double = TTsPath64.Interp(AbY, BcY, T);
+  const BcdY: Double = TTsPath64.Interp(BcY, CdY, T);
+  const AbcdY: Double = TTsPath64.Interp(AbcY, BcdY, T);
 
   Result.Points[0].Y := Points[0].Y;
   Result.Points[1].Y := AbY;
@@ -796,7 +796,7 @@ begin
 
   for var Index := 0 to RealRoots - 1 do
   begin
-    const TValue = S[Index];
+    const TValue: Double = S[Index];
 
     var Snapped: Double;
     if (not TTsScalar64.ApproximatelyOneOrLess(TValue)) and TTsScalar64.Between(TValue, 1.0, 1.00005) then
@@ -957,10 +957,10 @@ end;
 class function TTsCubic64.FindExtrema(const Src: TTsDoubles8; const Offset: Integer; var TValues: array of Double): Integer;
 begin
   // we divide A,B,C by 3 to simplify
-  const A = Src[Offset];
-  const B = Src[Offset + 2];
-  const C = Src[Offset + 4];
-  const D = Src[Offset + 6];
+  const A: Double = Src[Offset];
+  const B: Double = Src[Offset + 2];
+  const C: Double = Src[Offset + 4];
+  const D: Double = Src[Offset + 6];
   const A2: Double = D - A + 3.0 * (B - C);
   const B2: Double = 2.0 * (A - B - B + C);
   const C2: Double = B - A;
@@ -973,7 +973,7 @@ begin
   // A stable insertion sort of the first Count values; the comparison is the one of cmp_f64, where NaN is equal to everything
   for var Index := 1 to Count - 1 do
   begin
-    const Current = Values[Index];
+    const Current: Double = Values[Index];
 
     var Position := Index;
     while (Position > 0) and (Values[Position - 1] > Current) do

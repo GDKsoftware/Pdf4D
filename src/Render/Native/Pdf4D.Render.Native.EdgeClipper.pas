@@ -24,9 +24,10 @@ uses
 // edge_clipper.rs uses PathEdge and PathEdgeIter of edge_builder.rs, and edge_builder.rs uses the clipper. Units cannot use each other,
 // so PathEdge and PathEdgeIter are declared here and the edge builder unit uses them from here.
 //
-// The Rust ClippedEdges is an ArrayVec of 18 edges and panics when it is full. A cubic is cut in at most 3 pieces in Y and each of these
-// in at most 3 in X, and every piece gives at most 3 edges (a vertical line, a cubic and another vertical line): 27 fit, so the array
-// here holds 27 and cannot overflow.
+// The Rust ClippedEdges is an ArrayVec of 18 edges and panics when it is full. The array here holds 27 = the loose count of 3 pieces in Y
+// times 3 in X (9 pieces), with at most 3 edges each (a vertical line, a cubic and another vertical line). The analytic bound is 15
+// edges (a cubic has at most 2 extrema in X and 2 in Y, so at most 5 pieces), so the 18 of Rust holds for real input and the larger
+// array changes no output.
 
 type
   TTsPoints2 = array[0..1] of TTsPoint;
@@ -523,7 +524,7 @@ end;
 
 class function TTsLineClipper.SectClampWithVertical(const Src: TTsPoints2; const X: Single): Single;
 begin
-  const Y = SectWithVertical(Src, X);
+  const Y: Single = SectWithVertical(Src, X);
 
   // Our caller expects y to be between src[0].y and src[1].y (unsorted), but due to the
   // numerics of floats/doubles, we might have computed a value slightly outside of that,
@@ -792,6 +793,7 @@ begin
   Target := Target - D;
 
   var Closest: Single := TTsScalar.ScalarMax;
+  var KeepSearching: Boolean;
   repeat
     const Loc: Single = ((A * T + B) * T + C) * T;
     const Dist: Single = Abs(Loc - Target);
@@ -812,7 +814,10 @@ begin
     end;
 
     Step := Step * Half;
-  until not ((Closest > 0.25) and (LastT <> T));
+
+    // `while closest > 0.25 && last_t != t` in Rust: the positive comparison is false for NaN, so a NaN ends the search
+    KeepSearching := ((Closest > 0.25) and (LastT <> T));
+  until not KeepSearching;
 
   // Rust unwraps new(best_t), which panics when rounding pushed t to 1; new_bounded keeps it inside
   if not TTsNormalizedF32Exclusive.TryCreate(BestT, Result) then
