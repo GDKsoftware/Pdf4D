@@ -717,8 +717,6 @@ end;
 
 class function TTsPathGeometry.TryValidUnitDivide(const Numer, Denom: Single; out Quotient: TTsNormalizedF32Exclusive): Boolean;
 begin
-  Quotient := Default(TTsNormalizedF32Exclusive);
-
   var NumerValue: Single := Numer;
   var DenomValue: Single := Denom;
   if TTsLane.IsLt(NumerValue, 0.0) then
@@ -738,7 +736,13 @@ begin
     Exit(False);
   end;
 
-  Result := TTsNormalizedF32Exclusive.TryCreate(R, Quotient);
+  // Rust leaves the slot as it was on failure: the result is copied only on success
+  var Checked: TTsNormalizedF32Exclusive;
+  Result := TTsNormalizedF32Exclusive.TryCreate(R, Checked);
+  if Result then
+  begin
+    Quotient := Checked;
+  end;
 end;
 
 class function TTsPathGeometry.Interp(const V0, V1, T: TF32x2): TF32x2;
@@ -753,12 +757,12 @@ end;
 
 class function TTsPathGeometry.TryFindQuadMaxCurvature(const Src: TTsPoints3; out T: TTsNormalizedF32): Boolean;
 begin
+  T := TTsNormalizedF32.Zero;
+
   const Ax: Single = Src[1].X - Src[0].X;
   const Ay: Single = Src[1].Y - Src[0].Y;
   const Bx: Single = Src[0].X - Src[1].X - Src[1].X + Src[2].X;
   const By: Single = Src[0].Y - Src[1].Y - Src[1].Y + Src[2].Y;
-  T := TTsNormalizedF32.Zero;
-
 
   var Numer: Single := -(Ax * Bx + Ay * By);
   var Denom: Single := Bx * Bx + By * By;
