@@ -15,25 +15,37 @@ uses
   Pdf4D.Render.Native.Color,
   Pdf4D.Render.Native.Stage,
   Pdf4D.Render.Native.Pipeline.Context,
-  Pdf4D.Render.Native.Pipeline.Highp;
+  Pdf4D.Render.Native.Pipeline.Highp,
+  Pdf4D.Render.Native.Pipeline.Lowp;
 
-// A raster pipeline: a list of stages that share one context. The builder compiles the list into the functions of the high precision
-// pipeline (the low precision pipeline follows in Pdf4D.Render.Native.Pipeline.Lowp) and the pipeline runs them over a rect.
+// A raster pipeline: a list of stages that share one context. The builder compiles the list into the functions of the low precision
+// pipeline when every stage has one there and the high precision pipeline is not forced, and into those of the high precision pipeline
+// otherwise. The pipeline runs them over a rect.
 //
 // The Rust code panics where a run would leave the pixels of the destination or where a stage is pushed that the pipeline does not have:
 // a run that does not fit draws nothing, and pushing a stage that is not ported, or more than MaxStages stages, is a programming error
 // that raises EInvalidOpException; input cannot reach it.
 
 type
+  TTsPipelineKind = (Lowp, Highp);
+
   TTsRasterPipeline = record
   private
+    FKind: TTsPipelineKind;
     FFunctions: TTsHighpStageFunctions;
     FTailFunctions: TTsHighpStageFunctions;
+    FLowpFunctions: TTsLowpStageFunctions;
+    FLowpTailFunctions: TTsLowpStageFunctions;
+    // A pipeline with a load or store of an A8 pixmap works on one byte per pixel
+    FUsesMaskPixmap: Boolean;
 
+    function HasStages: Boolean;
     function FitsPixmaps(const Rect: TTsScreenIntRect; const PixmapSrc: TTsPixmapRef; const PixmapDst: TTsSubPixmapMut): Boolean;
 
   public
     Ctx: TTsPipelineContext;
+
+    property Kind: TTsPipelineKind read FKind;
 
     // The pipeline without stages draws nothing
     procedure Run(const Rect: TTsScreenIntRect; const AAMaskCtx: TTsAAMaskCtx; const MaskCtx: TTsMaskCtx; const PixmapSrc: TTsPixmapRef;
@@ -45,6 +57,9 @@ type
     FStages: array[0..MaxStages - 1] of TTsStage;
     FStageCount: Integer;
     FForceHqPipeline: Boolean;
+
+    procedure CompileHighp(var Pipeline: TTsRasterPipeline);
+    procedure CompileLowp(var Pipeline: TTsRasterPipeline);
 
   public
     Ctx: TTsPipelineContext;
@@ -134,9 +149,41 @@ begin
   Push(TTsStage.UniformColor);
 end;
 
+procedure TTsRasterPipelineBuilder.CompileHighp(var Pipeline: TTsRasterPipeline);
+begin
+  Pipeline.FKind := TTsPipelineKind.Highp;
+  for var I := 0 to FStageCount - 1 do
+  begin
+    Pipeline.FFunctions.Items[I] := TTsHighpStages.Table[FStages[I]];
+    // Two "programs": one for the full runs and one for the tail runs. The only difference is the load and the store functions.
+    Pipeline.FTailFunctions.Items[I] := TTsHighpStages.TailTable[FStages[I]];
+  end;
+
+  Pipeline.FFunctions.Items[FStageCount] := TTsHighpStages.JustReturn();
+  Pipeline.FTailFunctions.Items[FStageCount] := TTsHighpStages.JustReturn();
+  Pipeline.FFunctions.Count := FStageCount + 1;
+  Pipeline.FTailFunctions.Count := FStageCount + 1;
+end;
+
+procedure TTsRasterPipelineBuilder.CompileLowp(var Pipeline: TTsRasterPipeline);
+begin
+  Pipeline.FKind := TTsPipelineKind.Lowp;
+  for var I := 0 to FStageCount - 1 do
+  begin
+    Pipeline.FLowpFunctions.Items[I] := TTsLowpStages.Table[FStages[I]];
+    Pipeline.FLowpTailFunctions.Items[I] := TTsLowpStages.TailTable[FStages[I]];
+  end;
+
+  Pipeline.FLowpFunctions.Items[FStageCount] := TTsLowpStages.JustReturn();
+  Pipeline.FLowpTailFunctions.Items[FStageCount] := TTsLowpStages.JustReturn();
+  Pipeline.FLowpFunctions.Count := FStageCount + 1;
+  Pipeline.FLowpTailFunctions.Count := FStageCount + 1;
+end;
+
 function TTsRasterPipelineBuilder.Compile: TTsRasterPipeline;
 begin
   Result := Default(TTsRasterPipeline);
+  Result.FKind := TTsPipelineKind.Highp;
   Result.Ctx := TTsPipelineContext.New;
 
   if FStageCount = 0 then
@@ -145,20 +192,33 @@ begin
   end;
 
   Result.Ctx := Ctx;
+
+  var IsLowpCompatible := True;
   for var I := 0 to FStageCount - 1 do
   begin
-    Result.FFunctions.Items[I] := TTsHighpStages.Table[FStages[I]];
-    // Two "programs": one for the full runs and one for the tail runs. The only difference is the load and the store functions.
-    Result.FTailFunctions.Items[I] := TTsHighpStages.TailTable[FStages[I]];
+    IsLowpCompatible := (IsLowpCompatible and TTsLowpStages.HasStage(FStages[I]));
+    if FStages[I] in [TTsStage.LoadDestinationU8, TTsStage.StoreU8] then
+    begin
+      Result.FUsesMaskPixmap := True;
+    end;
   end;
 
-  Result.FFunctions.Items[FStageCount] := TTsHighpStages.JustReturn();
-  Result.FTailFunctions.Items[FStageCount] := TTsHighpStages.JustReturn();
-  Result.FFunctions.Count := FStageCount + 1;
-  Result.FTailFunctions.Count := FStageCount + 1;
+  if FForceHqPipeline or (not IsLowpCompatible) then
+  begin
+    CompileHighp(Result);
+  end
+  else
+  begin
+    CompileLowp(Result);
+  end;
 end;
 
 { TTsRasterPipeline }
+
+function TTsRasterPipeline.HasStages: Boolean;
+begin
+  Result := ((FFunctions.Count > 0) or (FLowpFunctions.Count > 0));
+end;
 
 function TTsRasterPipeline.FitsPixmaps(const Rect: TTsScreenIntRect; const PixmapSrc: TTsPixmapRef;
   const PixmapDst: TTsSubPixmapMut): Boolean;
@@ -166,19 +226,36 @@ begin
   const SourceBytes = Int64(PixmapSrc.Width) * Int64(PixmapSrc.Height) * 4;
   const HoldsSource = (SourceBytes <= Length(PixmapSrc.Data));
 
-  Result := (HoldsSource and PixmapDst.HoldsRegion(Rect.Right, Rect.Bottom));
+  var HoldsDestination: Boolean;
+  if FUsesMaskPixmap then
+  begin
+    HoldsDestination := PixmapDst.HoldsMaskRegion(Rect.Right, Rect.Bottom);
+  end
+  else
+  begin
+    HoldsDestination := PixmapDst.HoldsRegion(Rect.Right, Rect.Bottom);
+  end;
+
+  Result := (HoldsSource and HoldsDestination);
 end;
 
 procedure TTsRasterPipeline.Run(const Rect: TTsScreenIntRect; const AAMaskCtx: TTsAAMaskCtx; const MaskCtx: TTsMaskCtx;
   const PixmapSrc: TTsPixmapRef; var PixmapDst: TTsSubPixmapMut);
 begin
-  const HasStages = (FFunctions.Count > 0);
   if (not HasStages) or (not FitsPixmaps(Rect, PixmapSrc, PixmapDst)) then
   begin
     Exit;
   end;
 
-  TTsHighpStages.Start(FFunctions, FTailFunctions, Rect, AAMaskCtx, MaskCtx, Ctx, PixmapSrc, PixmapDst);
+  case FKind of
+    TTsPipelineKind.Highp:
+      TTsHighpStages.Start(FFunctions, FTailFunctions, Rect, AAMaskCtx, MaskCtx, Ctx, PixmapSrc, PixmapDst);
+    // lowp doesn't support pattern, so no `PixmapSrc` for it
+    TTsPipelineKind.Lowp:
+      TTsLowpStages.Start(FLowpFunctions, FLowpTailFunctions, Rect, AAMaskCtx, MaskCtx, Ctx, PixmapDst);
+  else
+    raise EInvalidOpException.CreateFmt('Unsupported pipeline kind: %d', [Ord(FKind)]);
+  end;
 end;
 
 end.

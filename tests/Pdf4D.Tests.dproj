@@ -247,8 +247,10 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingBlitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas"/>

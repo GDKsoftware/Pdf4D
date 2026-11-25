@@ -23,6 +23,8 @@ uses
 const
   // STAGE_WIDTH of the high precision pipeline: pixels per run
   HighpStageWidth = 8;
+  // STAGE_WIDTH of the low precision pipeline
+  LowpStageWidth = 16;
   // MAX_STAGES: More than enough
   MaxStages = 32;
 
@@ -60,6 +62,10 @@ type
 
     // True when Data holds the pixels from the first pixel of the region up to Right pixels in each of the Bottom rows
     function HoldsRegion(const Right, Bottom: Cardinal): Boolean;
+
+    // The same for a pixmap of one byte per pixel (the A8 pixmap of a mask): the byte of the pixel (DX, DY), counted from Offset
+    function MaskIndex(const DX, DY: Int64): Int64;
+    function HoldsMaskRegion(const Right, Bottom: Cardinal): Boolean;
   end;
 
   // AAMaskCtx: the coverage of at most two pixels
@@ -197,6 +203,21 @@ begin
 
   const LastPixel = PixelIndex(Int64(Right) - 1, Int64(Bottom) - 1);
   Result := ((LastPixel + 1) * BytesPerPixel <= Length(Data));
+end;
+
+function TTsSubPixmapMut.MaskIndex(const DX, DY: Int64): Int64;
+begin
+  Result := Offset + Int64(RealWidth) * DY + DX;
+end;
+
+function TTsSubPixmapMut.HoldsMaskRegion(const Right, Bottom: Cardinal): Boolean;
+begin
+  if (Offset < 0) or (Right = 0) or (Bottom = 0) then
+  begin
+    Exit(False);
+  end;
+
+  Result := (MaskIndex(Int64(Right) - 1, Int64(Bottom) - 1) < Length(Data));
 end;
 
 { TTsAAMaskCtx }
