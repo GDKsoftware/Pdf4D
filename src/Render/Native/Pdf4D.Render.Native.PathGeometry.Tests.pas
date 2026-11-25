@@ -222,7 +222,9 @@ begin
   Src[1] := Pt(10.0, 0.0);
   Src[2] := Pt(10.0, 10.0);
 
-  Assert.AreEqual(Single(0.5), TTsPathGeometry.FindQuadMaxCurvature(Src).Get);
+  var MaxCurvature: TTsNormalizedF32;
+  Assert.IsTrue(TTsPathGeometry.TryFindQuadMaxCurvature(Src, MaxCurvature));
+  Assert.AreEqual(Single(0.5), MaxCurvature.Get);
   AssertPoint(Pt(20.0, 0.0), TTsPathGeometry.EvalQuadTangentAt(Src, TTsNormalizedF32.Zero));
   AssertPoint(Pt(0.0, 20.0), TTsPathGeometry.EvalQuadTangentAt(Src, TTsNormalizedF32.One));
   AssertPoint(Pt(7.5, 2.5), TTsPathGeometry.EvalQuadAt(Src, TTsNormalizedF32.CreateClamped(0.5)));

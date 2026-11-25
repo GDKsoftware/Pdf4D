@@ -108,7 +108,8 @@ type
     Quad, // the control point is outside the line between the ends
     Degenerate, // the control point is on the line but outside the ends
     Degenerate2, // two control points are on the line but outside ends (cubic)
-    Degenerate3); // three areas of max curvature found (for cubic)
+    Degenerate3, // three areas of max curvature found (for cubic)
+    Invalid); // the curve cannot be stroked (no Rust counterpart: Rust panics on an unwrap here)
 
   TTsStrokeType = (
     Outer, // use sign-opposite values later to flip perpendicular axis
@@ -179,6 +180,7 @@ type
     FRecursionDepth: Integer; // track stack depth to abort if numerics run amok
     FFoundTangents: Boolean; // do less work until tangents meet (cubic)
     FJoinCompleted: Boolean; // previous join was not degenerate
+    FAborted: Boolean; // a curve could not be stroked (Rust panics there): the stroke fails
 
     function StrokeInner(const Path: TTsPath; const Width: TTsNonZeroPositiveF32; const MiterLimit: Single; const LineCap: TTsLineCap;
                          const LineJoin: TTsLineJoin; const ResScale: Single; out Stroked: TTsPath): Boolean;
@@ -430,7 +432,12 @@ begin
     Exit(TTsReductionType.Quad);
   end;
 
-  const T = TTsPathGeometry.FindQuadMaxCurvature(Quad);
+  var T: TTsNormalizedF32;
+  if not TTsPathGeometry.TryFindQuadMaxCurvature(Quad, T) then
+  begin
+    Exit(TTsReductionType.Invalid);
+  end;
+
   if (T.Get = 0) or (T.Get = 1) then
   begin
     Exit(TTsReductionType.Line);
@@ -1134,13 +1141,14 @@ begin
   FRecursionDepth := 0;
   FFoundTangents := False;
   FJoinCompleted := False;
+  FAborted := False;
 
   var LastSegmentIsLine := False;
   var Iter := Path.Segments;
   Iter.SetAutoClose(True);
 
   var Segment: TTsPathSegment;
-  while Iter.TryNext(Segment) do
+  while Iter.TryNext(Segment) and not FAborted do
   begin
     case Segment.Verb of
       TTsPathVerb.Move:
@@ -1191,6 +1199,11 @@ begin
         Close(LastSegmentIsLine);
       end;
     end;
+  end;
+
+  if FAborted then
+  begin
+    Exit(False);
   end;
 
   Result := Finish(LastSegmentIsLine, Stroked);
@@ -1256,6 +1269,12 @@ begin
 
   var Reduction: TTsPoint;
   const ReductionType = CheckQuadLinear(Quad, Reduction);
+  if ReductionType = TTsReductionType.Invalid then
+  begin
+    FAborted := True;
+    Exit;
+  end;
+
   if ReductionType = TTsReductionType.Point then
   begin
     // If the stroke consists of a moveTo followed by a degenerate curve, treat it as if it were followed by a zero-length line. Lines

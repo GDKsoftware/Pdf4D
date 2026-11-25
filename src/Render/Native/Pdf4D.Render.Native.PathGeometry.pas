@@ -153,7 +153,8 @@ type
     // Fx' Fx'' + Fy' Fy'' = 0
     //
     // t = - (Ax Bx + Ay By) / (Bx ^ 2 + By ^ 2)
-    class function FindQuadMaxCurvature(const Src: TTsPoints3): TTsNormalizedF32; static;
+    // False where the Rust code panics: control points so large that the quotient is NaN
+    class function TryFindQuadMaxCurvature(const Src: TTsPoints3; out T: TTsNormalizedF32): Boolean; static;
     class function EvalQuadAt(const Src: TTsPoints3; const T: TTsNormalizedF32): TTsPoint; static;
     class function EvalQuadTangentAt(const Src: TTsPoints3; const Tol: TTsNormalizedF32): TTsPoint; static;
 
@@ -750,12 +751,14 @@ begin
   Result := Value + Value;
 end;
 
-class function TTsPathGeometry.FindQuadMaxCurvature(const Src: TTsPoints3): TTsNormalizedF32;
+class function TTsPathGeometry.TryFindQuadMaxCurvature(const Src: TTsPoints3; out T: TTsNormalizedF32): Boolean;
 begin
   const Ax: Single = Src[1].X - Src[0].X;
   const Ay: Single = Src[1].Y - Src[0].Y;
   const Bx: Single = Src[0].X - Src[1].X - Src[1].X + Src[2].X;
   const By: Single = Src[0].Y - Src[1].Y - Src[1].Y + Src[2].Y;
+  T := TTsNormalizedF32.Zero;
+
 
   var Numer: Single := -(Ax * Bx + Ay * By);
   var Denom: Single := Bx * Bx + By * By;
@@ -767,17 +770,19 @@ begin
 
   if TTsLane.IsLe(Numer, 0.0) then
   begin
-    Exit(TTsNormalizedF32.Zero);
+    Exit(True);
   end;
 
   if TTsLane.IsGe(Numer, Denom) then
   begin
     // Also catches denom=0
-    Exit(TTsNormalizedF32.One);
+    T := TTsNormalizedF32.One;
+    Exit(True);
   end;
 
-  const T: Single = Numer / Denom;
-  Result := TTsNormalizedF32.CreateUnchecked(T);
+  // Rust unwraps NormalizedF32::new(numer / denom), which panics for the NaN of huge control points (inf - inf in numer or denom)
+  const Quotient: Single = Numer / Denom;
+  Result := TTsNormalizedF32.TryCreate(Quotient, T);
 end;
 
 class function TTsPathGeometry.EvalQuadAt(const Src: TTsPoints3; const T: TTsNormalizedF32): TTsPoint;

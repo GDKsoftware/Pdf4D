@@ -71,6 +71,9 @@ type
     procedure TestHugeStrokeWidthIsFinite;
 
     [Test]
+    procedure TestQuadOfHugeControlPointsFailsInsteadOfStrokingNaN;
+
+    [Test]
     procedure TestZeroWidthGivesNoPath;
 
     [Test]
@@ -392,6 +395,28 @@ begin
 
   var Stroked: TTsPath;
   if StrokeOf(LinePath(0, 0, 10, 0), Stroke, Stroked) then
+  begin
+    var Bounds := Stroked.Bounds;
+    Assert.IsTrue(TTsScalar.IsFinite(Bounds.Left) and TTsScalar.IsFinite(Bounds.Top) and TTsScalar.IsFinite(Bounds.Right) and
+                  TTsScalar.IsFinite(Bounds.Bottom), 'The bounds are finite');
+  end;
+end;
+
+procedure TTsStrokerTests.TestQuadOfHugeControlPointsFailsInsteadOfStrokingNaN;
+begin
+  // numer of the maximum curvature is inf - inf = NaN, where Rust panics on an unwrap
+  var Builder := TTsPathBuilder.New;
+  Builder.MoveTo(0, 0);
+  Builder.QuadTo(1E30, 1E30, 3E30, 1E30);
+
+  var Path: TTsPath;
+  Assert.IsTrue(Builder.TryFinish(Path), 'The quad path');
+
+  var Stroke := TTsStroke.New;
+  Stroke.Width := 2;
+
+  var Stroked: TTsPath;
+  if StrokeOf(Path, Stroke, Stroked) then
   begin
     var Bounds := Stroked.Bounds;
     Assert.IsTrue(TTsScalar.IsFinite(Bounds.Left) and TTsScalar.IsFinite(Bounds.Top) and TTsScalar.IsFinite(Bounds.Right) and
