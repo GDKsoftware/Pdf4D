@@ -18,7 +18,7 @@ Milestone M3, phase 2 (rendering) is complete: `TPdfRenderer` draws a page into 
 
 Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components follow in phase 4 and the own rasterizer in phase 5.
 
-Milestone M3, phase 4 (the FMX components) is complete: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The own rasterizer comes in phase 5.
+Milestone M3, phase 4 (the FMX components) is complete and tested on Win64: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The build and tests on Win32 and Linux64, the installation of both design-time packages in the IDE and the check on a real printer are still to be done (see `docs/building.md`). The own rasterizer comes in phase 5.
 
 See also `coding-rules.md` and `docs/building.md`.
 
@@ -173,7 +173,7 @@ What the viewer does not do (yet): selection across pages, searching across a pa
 
 ## Viewer (FMX)
 
-The FMX viewer has the same components, properties and behaviour as the VCL viewer (continuous or single-page scrolling, zoom and rotation, thumbnails and outline, hover and text selection, links, search, copy and printing), on the same viewer core `Pdf4D.Viewer`. It runs on Windows (Win32 and Win64); other FMX platforms and touch gestures are not part of this phase. The scale of the screen is the scale of the form: a page is rendered at the pixels of the device, so it stays sharp on a 150 % screen and after a move to another screen.
+The FMX viewer has the same components, properties and behaviour as the VCL viewer (continuous or single-page scrolling, zoom and rotation, thumbnails and outline, hover and text selection, links, search, copy and printing), on the same viewer core `Pdf4D.Viewer`. It is for Windows (Win32 and Win64; so far built and tested on Win64); other FMX platforms and touch gestures are not part of this phase. The scale of the screen is the scale of the form: a page is rendered at the pixels of the device, so it stays sharp on a 150 % screen and after a move to another screen.
 
 | Package | Contents | Needs |
 |---|---|---|
@@ -181,7 +181,7 @@ The FMX viewer has the same components, properties and behaviour as the VCL view
 | `Pdf4D.FMX.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.FMX`, `Pdf4D.Render.Skia` |
 | `dclPdf4D.FMX` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.FMX`, `Pdf4D.FMX.Skia` |
 
-Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each shows its components on the `Pdf4D` page of its own kind of project. The backend is chosen like in VCL (a `TPdf4DSkiaBackend` linked to `Backend`, or `RenderBackend` in code), and `sk4d.dll` has to be next to the program. The example is that of the VCL viewer, with the colours of FMX:
+Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each is meant to show its components on the `Pdf4D` page of its own kind of project (this has not been checked in the IDE yet). The backend is chosen like in VCL (a `TPdf4DSkiaBackend` linked to `Backend`, or `RenderBackend` in code), and `sk4d.dll` has to be next to the program. The example is that of the VCL viewer, with the colours of FMX:
 
 ```delphi
 Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;
@@ -198,7 +198,7 @@ begin
   for var Fragment in Text.Locate(Match.Index, Match.Length) do
   begin
     // The ellipse is filled: use a translucent colour to keep the text under it readable
-    Pdf4DDocument1.Overlays.Add(Fragment.PageIndex, Fragment.Quads, TPdfOverlayStyle.Ellipse, TAlphaColors.Red);
+    Pdf4DDocument1.Overlays.Add(Fragment.PageIndex, Fragment.Quads, TPdfOverlayStyle.Ellipse, TAlphaColors.Red and $66FFFFFF);
     Pdf4DViewer1.PageView.ScrollIntoView(Fragment.PageIndex, Fragment.Quads);
   end;
 end;
