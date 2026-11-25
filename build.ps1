@@ -10,7 +10,10 @@ param(
 
     # Build and run one test project only; the packages are always built
     [ValidateSet('Pdf4D.Tests', 'Pdf4D.Skia.Tests', 'Pdf4D.Vcl.Tests', 'Pdf4D.FMX.Tests', 'All')]
-    [string]$Suite = 'All'
+    [string]$Suite = 'All',
+
+    # Run only these fixtures of each test project (DUnitX -r:, comma separated), for example TTsPathTests,TTsStrokerTests
+    [string]$Fixtures
 )
 
 $ErrorActionPreference = 'Stop'
@@ -201,6 +204,7 @@ function Test-SkiaLibraryDependencies([string]$LinuxLibrary) {
 
 function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     Write-Host "=== Test $($TestProject.Name) $TargetPlatform $Config ==="
+    $testArguments = if ($Fixtures) { @("-r:$Fixtures") } else { @() }
     $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
 
     if ($TestProject.NeedsSkia) {
@@ -213,14 +217,14 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
         if ($TestProject.NeedsSkia) {
             $linuxFolder = Get-WslPath $outputFolder
             Test-SkiaLibraryDependencies "$linuxFolder/libsk4d.so"
-            & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary
+            & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary @testArguments
         }
         else {
-            & wsl -d $WslDistro -- $linuxBinary
+            & wsl -d $WslDistro -- $linuxBinary @testArguments
         }
     }
     else {
-        & (Join-Path $outputFolder "$($TestProject.Name).exe")
+        & (Join-Path $outputFolder "$($TestProject.Name).exe") @testArguments
     }
 
     if ($LASTEXITCODE -ne 0) {

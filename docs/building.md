@@ -55,7 +55,7 @@ The first five build for Win32, Win64 and Linux64; the three VCL packages and th
 - `tests\Vcl\Pdf4D.Vcl.Tests.dproj` tests the VCL components (see "The VCL tests"); Win32 and Win64 only.
 - `tests\FMX\Pdf4D.FMX.Tests.dproj` tests the FMX components (see "The FMX tests"); Win32 and Win64 only, and it runs last.
 
-`./build.ps1 -Suite Pdf4D.Tests`, `-Suite Pdf4D.Skia.Tests`, `-Suite Pdf4D.Vcl.Tests` or `-Suite Pdf4D.FMX.Tests` runs one of them.
+`./build.ps1 -Suite Pdf4D.Tests`, `-Suite Pdf4D.Skia.Tests`, `-Suite Pdf4D.Vcl.Tests` or `-Suite Pdf4D.FMX.Tests` runs one of them. `-Fixtures <name>[,<name>]` builds everything as usual but runs only those fixtures of each test project (DUnitX `-r:`); combine it with `-Suite` while working on one area, and run the whole suite before a release.
 
 ## The VCL tests
 
