@@ -42,6 +42,14 @@ const
   Pair = '100 100 l 0 0 l ';
   PairCount = 2500000;
   Mark = '0 0 1 rg 0 0 20 20 re f';
+  // The time of the path of 5 000 000 segments in seconds; 0 is the general limit of 10 s. Win32 runs the f32 code on the x87 unit and needs
+  // 12.0 s for this path (measured, Release, one run), so its limit is 20 s: the measured time with a
+  // margin of two thirds, far below the 60 s hang guard of the device contract tests.
+  {$IFDEF CPUX86}
+  LongPathSeconds = 20;
+  {$ELSE}
+  LongPathSeconds = 0;
+  {$ENDIF}
 begin
   const Builder = TStringBuilder.Create(Length(Pair) * PairCount + 64);
   try
@@ -51,7 +59,7 @@ begin
       Builder.Append(Pair);
     end;
     Builder.Append('f ').Append(Mark);
-    RunHostileContent(Campaign, 'path of 5 000 000 segments', Builder.ToString);
+    RunHostileContent(Campaign, 'path of 5 000 000 segments', Builder.ToString, LongPathSeconds);
   finally
     Builder.Free;
   end;

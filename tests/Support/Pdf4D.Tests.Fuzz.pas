@@ -151,7 +151,8 @@ type
     // The first FileCount files of the corpus (times the scale), or every file with IsWholeCorpus
     class procedure RunMutatedCorpus(const Work: TFuzzWork; const IsWholeCorpus: Boolean = False); static;
 
-    procedure Run(const Name: string; const Bytes: TBytes; const Password: string; const Work: TFuzzWork);
+    // TimeLimitSeconds is the time of this run when it is larger than the general limit (PDF4D_FUZZ_SECONDS, 10 by default); 0 is the general limit
+    procedure Run(const Name: string; const Bytes: TBytes; const Password: string; const Work: TFuzzWork; const TimeLimitSeconds: Integer = 0);
     procedure AssertNoFailures;
   end;
 
@@ -1198,18 +1199,19 @@ begin
   end;
 end;
 
-procedure TFuzzCampaign.Run(const Name: string; const Bytes: TBytes; const Password: string; const Work: TFuzzWork);
+procedure TFuzzCampaign.Run(const Name: string; const Bytes: TBytes; const Password: string; const Work: TFuzzWork; const TimeLimitSeconds: Integer);
 begin
+  const Limit = Max(TFuzzSettings.TimeLimitSeconds, TimeLimitSeconds);
   const Job = TMutationRun.Create(Bytes, Password, Work);
   var Outcome: TMutationOutcome;
   const Watch = TStopwatch.StartNew;
-  const Finished = Job.RunWithin(TFuzzSettings.TimeLimitSeconds * 1000, Outcome);
+  const Finished = Job.RunWithin(Limit * 1000, Outcome);
 
   if not Finished then
   begin
     Trace(Name, Watch.ElapsedMilliseconds, 'no result');
     // The worker may still use the run, so it is not freed
-    FFailures.Add(Format('%s: no result after %d s', [Name, TFuzzSettings.TimeLimitSeconds]));
+    FFailures.Add(Format('%s: no result after %d s', [Name, Limit]));
     SaveFailure(Name, Bytes);
     Exit;
   end;
@@ -1221,7 +1223,7 @@ begin
     FFailures.Add(Format('%s: %s', [Name, Outcome.Failure]));
     SaveFailure(Name, Bytes);
   end
-  else if (Watch.ElapsedMilliseconds > TFuzzSettings.TimeLimitSeconds * 1000) then
+  else if (Watch.ElapsedMilliseconds > Limit * 1000) then
   begin
     FFailures.Add(Format('%s: took %d ms', [Name, Watch.ElapsedMilliseconds]));
   end;

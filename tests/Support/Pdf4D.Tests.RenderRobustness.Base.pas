@@ -121,8 +121,8 @@ type
     procedure RunExtraHostile(const Campaign: TFuzzCampaign); virtual;
 
     class function Latin1(const Text: string): TBytes; static;
-    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes); static;
-    class procedure RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string); static;
+    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes; const TimeLimitSeconds: Integer = 0); static;
+    class procedure RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string; const TimeLimitSeconds: Integer = 0); static;
 
   public
     [Setup]
@@ -967,14 +967,16 @@ begin
   end;
 end;
 
-class procedure TRenderRobustnessTestsBase.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes);
+class procedure TRenderRobustnessTestsBase.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes;
+                                                      const TimeLimitSeconds: Integer);
 begin
-  Campaign.Run(Name, Document, '', TFuzzWork.Render);
+  Campaign.Run(Name, Document, '', TFuzzWork.Render, TimeLimitSeconds);
 end;
 
-class procedure TRenderRobustnessTestsBase.RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string);
+class procedure TRenderRobustnessTestsBase.RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string;
+                                                             const TimeLimitSeconds: Integer);
 begin
-  RunHostile(Campaign, Name, TRenderFuzzDocuments.Page(Latin1(Content), TTestFonts.Bytes(LiberationSansFile)));
+  RunHostile(Campaign, Name, TRenderFuzzDocuments.Page(Latin1(Content), TTestFonts.Bytes(LiberationSansFile)), TimeLimitSeconds);
 end;
 
 // A page that draws the image /Im with the entries and the data
