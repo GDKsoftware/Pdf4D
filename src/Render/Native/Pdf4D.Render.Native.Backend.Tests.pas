@@ -54,6 +54,9 @@ type
     procedure TestTooLargeDeviceRaises;
 
     [Test]
+    procedure TestLimitsWithoutVerbsAreRefused;
+
+    [Test]
     procedure TestPathVerbLimitRaisesBeforeDrawing;
 
     [Test]
@@ -64,6 +67,10 @@ type
 
     [Test]
     procedure TestRendererWithNativeBackendRendersPage;
+
+    // The backend is made for the call and nothing else holds it: the renderer that is refused has to free it (the runner reports a leak)
+    [Test]
+    procedure TestRendererWithoutDocumentReleasesTheBackend;
   end;
 
 implementation
@@ -242,20 +249,46 @@ procedure TPdfNativeBackendTests.TestClipPathOverTheLimitRaisesAtTheNextDraw;
 begin
   const Device = NewDevice(1000);
   const Square = TPdfPath.Create;
-  Square.MoveTo(0, 0);
-  Square.LineTo(5, 0);
-  Square.LineTo(5, 5);
-  Square.LineTo(0, 5);
-  Square.ClosePath;
+  try
+    Square.MoveTo(0, 0);
+    Square.LineTo(5, 0);
+    Square.LineTo(5, 5);
+    Square.LineTo(0, 5);
+    Square.ClosePath;
 
-  // The clip is taken when it is set; the draw that needs it raises
-  Device.SetClip(TPdfClipPath.Create(nil, NewLongPath(1001), TPdfMatrix.Identity, TPdfFillRule.NonZero));
-  Assert.IsTrue(FillRaisesTheLimit(Device, Square), 'a draw with a clip of 1001 verbs');
-  Assert.IsTrue(IsDeviceUntouched(Device), 'no pixel changed');
+    // The clip is taken when it is set; the draw that needs it raises
+    Device.SetClip(TPdfClipPath.Create(nil, NewLongPath(1001), TPdfMatrix.Identity, TPdfFillRule.NonZero));
+    Assert.IsTrue(FillRaisesTheLimit(Device, Square), 'a draw with a clip of 1001 verbs');
+    Assert.IsTrue(IsDeviceUntouched(Device), 'no pixel changed');
 
-  Device.SetClip(nil);
-  Assert.IsFalse(FillRaisesTheLimit(Device, Square), 'without the clip the draw works');
-  Square.Free;
+    Device.SetClip(nil);
+    Assert.IsFalse(FillRaisesTheLimit(Device, Square), 'without the clip the draw works');
+  finally
+    Square.Free;
+  end;
+end;
+
+procedure TPdfNativeBackendTests.TestLimitsWithoutVerbsAreRefused;
+begin
+  var Limits := TPdfNativeLimits.Default;
+  for var MaxPathVerbs in [0, -1, Low(Integer)] do
+  begin
+    Limits.MaxPathVerbs := MaxPathVerbs;
+    var Raised := False;
+    try
+      TPdfNativeBackend.Create(Limits).Name;
+    except
+      on EArgumentOutOfRangeException do
+      begin
+        Raised := True;
+      end;
+    end;
+    Assert.IsTrue(Raised, Format('MaxPathVerbs %d', [MaxPathVerbs]));
+  end;
+
+  Limits.MaxPathVerbs := 1;
+  const Backend: IPdfRenderBackend = TPdfNativeBackend.Create(Limits);
+  Assert.AreEqual('Native', Backend.Name);
 end;
 
 procedure TPdfNativeBackendTests.TestBackendCanBeSharedAcrossThreads;
@@ -281,6 +314,16 @@ begin
     First.Free;
     Second.Free;
   end;
+end;
+
+procedure TPdfNativeBackendTests.TestRendererWithoutDocumentReleasesTheBackend;
+begin
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfRenderer.Create(nil, TPdfNativeBackend.Create);
+    end,
+    EArgumentNilException);
 end;
 
 procedure TPdfNativeBackendTests.TestRendererWithNativeBackendRendersPage;

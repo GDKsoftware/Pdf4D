@@ -21,6 +21,7 @@ type
 
   public
     constructor Create; overload;
+    // Raises EArgumentOutOfRangeException when Limits.MaxPathVerbs < 1
     constructor Create(const Limits: TPdfNativeLimits); overload;
 
     function Name: string;
@@ -31,6 +32,7 @@ type
 implementation
 
 uses
+  System.SysUtils,
   Pdf4D.Render.Bitmap,
   Pdf4D.Render.Native.Device;
 
@@ -46,6 +48,11 @@ end;
 
 constructor TPdfNativeBackend.Create(const Limits: TPdfNativeLimits);
 begin
+  if Limits.MaxPathVerbs < 1 then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('MaxPathVerbs is %d, it must be at least 1', [Limits.MaxPathVerbs]);
+  end;
+
   inherited Create;
   FLimits := Limits;
 end;

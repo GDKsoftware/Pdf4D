@@ -32,6 +32,10 @@ type
   // The contract tests come from the base class; what follows is what only the Skia device has to do
   [TestFixture]
   TPdfSkiaDeviceTests = class(TPdfDeviceContractTests)
+  private
+    // A field, so that no anonymous method has to capture a local
+    FBadClip: IPdfClipPath;
+
   protected
     function CreateBackend: IPdfRenderBackend; override;
 
@@ -84,13 +88,14 @@ begin
   const GoodClip = NewClip(nil, 2, 2, 5, 5);
   FDevice.SetClip(GoodClip);
 
-  const BadClip = TPdfClipPath.Create(nil, NewRectPath(0, 0, 10, 10), TPdfMatrix.Identity, TPdfFillRule(99));
+  FBadClip := TPdfClipPath.Create(nil, NewRectPath(0, 0, 10, 10), TPdfMatrix.Identity, TPdfFillRule(99));
   Assert.WillRaise(
     procedure
     begin
-      FDevice.SetClip(BadClip);
+      FDevice.SetClip(FBadClip);
     end,
     ENotSupportedException);
+  FBadClip := nil;
 
   FillWholeDevice(Red, NoAntiAlias);
   AssertPixel(8, 8, TPdfDeviceColor.Create(255, 0, 0));
