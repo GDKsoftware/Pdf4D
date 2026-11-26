@@ -375,14 +375,14 @@ end;
 procedure TTsCompilerCanaryTests.TestUntypedRealLiteralVarIsCurrencyOnWin64;
 begin
   var Inferred := 0.0;
-  {$IFDEF LINUX64}
-  const Expected = 'Extended';
-  {$ELSE}
+  {$IFDEF WIN64}
   const Expected = 'Currency';
+  {$ELSE}
+  const Expected = 'Extended';
   {$ENDIF}
 
   Assert.AreEqual(Expected, string(InferredType(Inferred)^.Name), 'The port relies on: nothing, every inline float var gets an explicit ' +
-    'type, because var X := 0.0 is a Currency (four decimals) on Win64 and an 80-bit Extended on Linux64');
+    'type, because var X := 0.0 is a Currency (four decimals) on Win64 and an Extended (80 bits) on Win32 and Linux64');
 end;
 
 procedure TTsCompilerCanaryTests.TestRealLiteralTakesAnF64ChainToExtendedOnLinux64;
