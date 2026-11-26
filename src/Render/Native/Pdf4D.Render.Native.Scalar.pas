@@ -146,7 +146,9 @@ type
     ExceptionMask: TArithmeticExceptionMask;
     RoundMode: TRoundingMode;
     {$IFDEF CPUX86}
+    {$WARN SYMBOL_PLATFORM OFF}
     PrecisionMode: TFPUPrecisionMode;
+    {$WARN SYMBOL_PLATFORM ON}
     {$ENDIF}
   end;
 
@@ -708,14 +710,18 @@ begin
   Result.ExceptionMask := SetExceptionMask(AllExceptions);
   Result.RoundMode := SetRoundMode(TRoundingMode.rmNearest);
   {$IFDEF CPUX86}
+  {$WARN SYMBOL_PLATFORM OFF}
   Result.PrecisionMode := SetPrecisionMode(TFPUPrecisionMode.pmDouble);
+  {$WARN SYMBOL_PLATFORM ON}
   {$ENDIF}
 end;
 
 class procedure TTsFloatMode.Leave(const State: TTsFloatState);
 begin
   {$IFDEF CPUX86}
+  {$WARN SYMBOL_PLATFORM OFF}
   SetPrecisionMode(State.PrecisionMode);
+  {$WARN SYMBOL_PLATFORM ON}
   {$ENDIF}
   SetRoundMode(State.RoundMode);
   SetExceptionMask(State.ExceptionMask);
