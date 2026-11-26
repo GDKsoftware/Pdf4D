@@ -11,6 +11,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Math,
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Geometry,
   Pdf4D.Render.Native.Path,
@@ -346,7 +347,18 @@ begin
       PathContainedInClip := Clip.Contains(ScreenBounds);
     end;
 
-    TTsScan.FillPathImpl(Path, FillRule, Clip, Bounds.Top, Bounds.Bottom, Shift, PathContainedInClip, SuperBlitter);
+    // Deviation from tiny-skia, which passes the rows of the path: a path that reaches beyond 2^29 pixels overflows when its rows are shifted
+    // up by Shift, and nothing is drawn for a rectangle that covers the device. Only the rows of the clip can show (what SkScanClipper does
+    // in Skia), and FillPathImpl cuts the rows to the clip anyway: the same for every path that does not overflow.
+    var StartY := Bounds.Top;
+    var StopY := Bounds.Bottom;
+    if not PathContainedInClip then
+    begin
+      StartY := Max(StartY, Integer(Clip.Top));
+      StopY := Min(StopY, Integer(Clip.Bottom));
+    end;
+
+    TTsScan.FillPathImpl(Path, FillRule, Clip, StartY, StopY, Shift, PathContainedInClip, SuperBlitter);
 
     // The Drop of the Rust SuperBlitter
     SuperBlitter.Flush;

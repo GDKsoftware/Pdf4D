@@ -107,6 +107,10 @@ uses
 
 const
   BytesPerPixel = 4;
+  // A stroke wider than this many device pixels is drawn that wide. The area around a path that such a stroke covers is far larger than any
+  // device, and the time of the stroker grows steeply with the radius (a dashed path of 5 curves takes 0 ms at a width of 1e6 pixels, 270 ms at
+  // 1e7 and 4 s at 1e9: its subdivision has to be fine enough for the offset curve of a huge radius). A device is at most MaxBitmapPixels pixels.
+  MaxStrokeWidthInPixels: Single = 1.0E6;
 
 // A constant alpha as the pipeline takes it: 0 for a value that is not a number, else 0..1
 function SanitizedAlpha(const Alpha: Single): Single;
@@ -122,6 +126,20 @@ begin
   end;
 
   Result := Alpha;
+end;
+
+// The width of the stroke, cut to MaxStrokeWidthInPixels in device pixels along the direction that the transform stretches most
+function LimitedStrokeWidth(const Width: Single; const Transform: TTsTransform): Single;
+begin
+  // An upper bound of the stretch of the transform
+  const Stretch: Single = Abs(Transform.SX) + Abs(Transform.KY) + Abs(Transform.KX) + Abs(Transform.SY);
+  const MaxWidth: Single = MaxStrokeWidthInPixels / Stretch;
+  if Width > MaxWidth then
+  begin
+    Exit(MaxWidth);
+  end;
+
+  Result := Width;
 end;
 
 { TPdfNativeDevice }
@@ -367,6 +385,7 @@ begin
   begin
     Exit;
   end;
+  TsStroke.Width := LimitedStrokeWidth(TsStroke.Width, DeviceTransform);
 
   var PathSpace: TTsPath;
   if not TTsConversion.TryToPath(Path, PathSpace) then

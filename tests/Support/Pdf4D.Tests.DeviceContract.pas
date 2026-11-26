@@ -56,6 +56,9 @@ type
     FSnapshot: TPdfBitmap;
 
     function CreateBackend: IPdfRenderBackend; virtual; abstract;
+    // The number of clip paths the device applied so far, -1 for a backend that cannot tell. The tests of long clip chains prove linear work with it
+    // and keep the wall clock only as a generous guard against a hang.
+    function AppliedClipWork: Integer; virtual;
     procedure CreateDevice(const Width, Height: Integer);
     function NewRectPath(const Left, Top, Right, Bottom: Single): TPdfPath;
     function NewLinePath(const FromX, FromY, ToX, ToY: Single): TPdfPath;
@@ -233,6 +236,10 @@ type
   end;
 
 implementation
+
+const
+  // A long chain of clips that takes longer than this has hung; linear work is proved by AppliedClipWork, not by the clock
+  HangGuardMilliseconds = 60000;
 
 { TPdfBlendReference }
 
@@ -769,7 +776,7 @@ begin
 end;
 
 // 3000 paths, and the clip changes to every one of them and something is drawn with it: applying the whole chain at each change would be
-// 4.5 million paths
+// 4.5 million paths. Linear work is proved with the work of the device (where it can tell); the clock is a guard against a hang only.
 procedure TPdfDeviceContractTests.TestLongClipChainIsAppliedPathByPath;
 begin
   const PathCount = 3000;
@@ -783,7 +790,11 @@ begin
   end;
   FillWholeDevice(Red, NoAntiAlias);
 
-  Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  Assert.IsTrue(Watch.ElapsedMilliseconds < HangGuardMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  if AppliedClipWork >= 0 then
+  begin
+    Assert.IsTrue(AppliedClipWork <= PathCount, Format('%d paths applied for a chain of %d', [AppliedClipWork, PathCount]));
+  end;
   AssertPixel(8, 5, TPdfDeviceColor.Create(255, 0, 0));
 end;
 
@@ -800,9 +811,18 @@ begin
     FillRect(500, 500, 501, 501, Red, NoAntiAlias);
   end;
 
-  Assert.IsTrue(Watch.ElapsedMilliseconds < 20000, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  Assert.IsTrue(Watch.ElapsedMilliseconds < HangGuardMilliseconds, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  if AppliedClipWork >= 0 then
+  begin
+    Assert.IsTrue(AppliedClipWork <= LinkCount, Format('%d paths applied for a chain of %d', [AppliedClipWork, LinkCount]));
+  end;
   AssertPixel(500, 500, TPdfDeviceColor.Create(255, 0, 0));
   AssertTransparent(5, 5);
+end;
+
+function TPdfDeviceContractTests.AppliedClipWork: Integer;
+begin
+  Result := -1;
 end;
 
 procedure TPdfDeviceContractTests.TestNonFiniteFillWithoutAntiAliasDrawsNothing;

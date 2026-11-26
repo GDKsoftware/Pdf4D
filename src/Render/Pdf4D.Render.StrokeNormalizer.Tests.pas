@@ -90,6 +90,11 @@ type
 
     [Test]
     procedure TestClipCurveControlPointsMoveWithTheEndPoints;
+
+    // Matrices that make the determinant (0 times infinity) or the inverse (a translation of 1e36 under a scale of 1e-5) overflow or
+    // invalid: the path comes back without an exception, also where the caller has not masked the floating point exceptions
+    [Test]
+    procedure TestHostileMatrixRaisesNoFloatException;
   end;
 
 implementation
@@ -398,6 +403,35 @@ begin
     end;
   finally
     Path.Free;
+  end;
+end;
+
+procedure TStrokeNormalizerTests.TestHostileMatrixRaisesNoFloatException;
+begin
+  const Matrices: TArray<TPdfMatrix> = [
+    TPdfMatrix.Create(Single.PositiveInfinity, 0, 0, 0, 0, 0),
+    TPdfMatrix.Create(0, Single.PositiveInfinity, Single.PositiveInfinity, 0, 0, 0),
+    TPdfMatrix.Create(1E-5, 0, 0, 1E-5, 1E36, 0),
+    TPdfMatrix.Create(1E-5, 0, 0, 1E-5, 0, -1E36),
+    TPdfMatrix.Create(Single.NaN, 0, 0, 1, 0, 0)];
+
+  // The mask of Delphi: invalid operations, overflow and division by zero raise
+  const Previous = SetExceptionMask([exDenormalized, exUnderflow, exPrecision]);
+  try
+    const Path = TPdfPath.Create;
+    try
+      Path.MoveTo(1.2, 3.4);
+      Path.LineTo(5, 6);
+      for var Index := 0 to High(Matrices) do
+      begin
+        const Normalized = TPdfStrokeNormalizer.Normalize(Path, Matrices[Index]);
+        Normalized.Free;
+      end;
+    finally
+      Path.Free;
+    end;
+  finally
+    SetExceptionMask(Previous);
   end;
 end;
 

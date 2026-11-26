@@ -180,19 +180,26 @@ end;
 
 class function TPdfStrokeNormalizer.Normalize(const Path: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double): TPdfPath;
 begin
-  if (Path.PointCount = 0) or not IsInvertible(ToDevice) then
-  begin
-    Exit(Path.Clone);
-  end;
-
-  const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
-  Result := TPdfPath.Create;
+  // The determinant and the inverse are worked out with the floating point exceptions masked as well: a matrix of infinities or of
+  // values that overflow gives a path that is not finite, which the devices refuse, and no exception
+  const FloatState = TPdfFloatGuard.Enter;
   try
-    Rebuild(Path, ToDevice, ResidualX, ResidualY, Result, Centered);
-    Result.Transform(Inverse(ToDevice, Determinant));
-  except
-    Result.Free;
-    raise;
+    if (Path.PointCount = 0) or not IsInvertible(ToDevice) then
+    begin
+      Exit(Path.Clone);
+    end;
+
+    const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
+    Result := TPdfPath.Create;
+    try
+      Rebuild(Path, ToDevice, ResidualX, ResidualY, Result, Centered);
+      Result.Transform(Inverse(ToDevice, Determinant));
+    except
+      Result.Free;
+      raise;
+    end;
+  finally
+    TPdfFloatGuard.Leave(FloatState);
   end;
 end;
 

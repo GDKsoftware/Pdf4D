@@ -37,6 +37,10 @@ type
   // changed once it is built (the next one is a copy), and only the masks of the last few such levels are kept, so that the memory is bound;
   // a chain that returns to a level that lost its mask is applied again from below it.
   //
+  // A chain that returns to a prefix of the applied chain discards the levels above that prefix, as the applied list of the Skia device does:
+  // going back to a parent and then down to the deep chain again applies the deep part again. That is linear for the q/Q pattern of a PDF page,
+  // where a state is not entered again after its Q. A change of the size of the device drops all levels, which hold masks of the old size.
+  //
   // Must run inside TTsFloatMode: the paths are converted and filled.
   TTsClipMask = class
   private const
@@ -257,6 +261,13 @@ begin
   if IsCurrent then
   begin
     Exit;
+  end;
+
+  const IsOtherSize = ((FWidth <> Width) or (FHeight <> Height));
+  if IsOtherSize then
+  begin
+    // The levels hold rectangles and masks of the old size
+    DropLevels(0);
   end;
 
   FChain := Clip;

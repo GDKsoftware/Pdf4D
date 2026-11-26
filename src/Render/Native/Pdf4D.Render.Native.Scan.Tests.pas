@@ -34,6 +34,7 @@ type
     procedure AssertCoverageOfRows(const FirstRow, LastRow, FirstColumn, LastColumn, Expected: Integer);
     procedure AssertNothingDrawn(const Description: string);
     procedure AssertDrawn(const Pixels: Integer; const Total: Int64; const Description: string);
+    procedure AssertDrawnWithin(const MinTotal, MaxTotal: Int64; const Description: string);
 
   public
     [Setup]
@@ -179,6 +180,13 @@ procedure TTsScanTests.AssertDrawn(const Pixels: Integer; const Total: Int64; co
 begin
   Assert.AreEqual(Pixels, FBlitter.CountPixelsWithCoverage, Description + ': pixels');
   Assert.AreEqual(Total, FBlitter.TotalCoverage, Description + ': total coverage');
+  Assert.AreEqual(0, FBlitter.OutsideCount, Description + ': nothing outside');
+end;
+
+procedure TTsScanTests.AssertDrawnWithin(const MinTotal, MaxTotal: Int64; const Description: string);
+begin
+  Assert.IsTrue((FBlitter.TotalCoverage >= MinTotal) and (FBlitter.TotalCoverage <= MaxTotal),
+                Format('%s: total coverage %d, expected %d to %d', [Description, FBlitter.TotalCoverage, MinTotal, MaxTotal]));
   Assert.AreEqual(0, FBlitter.OutsideCount, Description + ': nothing outside');
 end;
 
@@ -424,12 +432,15 @@ begin
   Assert.AreEqual(225, FBlitter.CountPixelsWithCoverage, 'The 15 by 15 pixels inside the clip');
   Assert.AreEqual(0, FBlitter.OutsideCount);
 
-  // tiny-skia draws nothing at all of such a path with anti-aliasing: the edges, shifted left by two, overflow the rows
+  // tiny-skia draws nothing at all of such a path with anti-aliasing: the rows of the path, shifted up by two, overflow. Here the rows are cut to
+  // the clip first, and the part that shows is drawn.
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(RectPath(-Big, -Big, Big, Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
-  Assert.AreEqual(0, FBlitter.CallCount, 'Anti-aliased: nothing drawn');
+  AssertDrawn(400, 400 * 255, 'Anti-aliased');
+
+  UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(RectPath(5, 5, Big, Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
-  Assert.AreEqual(0, FBlitter.CallCount, 'Anti-aliased: nothing drawn');
+  AssertDrawn(225, 225 * 255, 'Anti-aliased, one corner inside the clip');
 end;
 
 procedure TTsScanTests.TestHugeTriangleFillsHalfTheClip;
@@ -447,14 +458,14 @@ begin
   const Big: Single = 1.0E30;
 
   // The results of tiny-skia v0.12.0, except the anti-aliased fills of such a rect: Rust blits a row outside of its buffer there (or panics
-  // in the pipeline), where the shifted rows of an anti-aliased fill overflow here and nothing is drawn
+  // in the pipeline); here the rows of the path are cut to the clip before they are shifted, and the part that shows is drawn
   UseBlitter(20, 20);
   TTsScan.FillPath(RectPath(-Big, -Big, Big, Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
   AssertNothingDrawn('Non anti-aliased, a bound beyond the integer range');
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(RectPath(-Big, -Big, Big, Big), TTsFillRule.EvenOdd, ClipOf(20, 20), FBlitter);
-  AssertNothingDrawn('Anti-aliased');
+  AssertDrawn(400, 400 * 255, 'Anti-aliased');
 
   UseBlitter(20, 20);
   TTsScan.FillPath(RectPath(5, 5, Big, Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
@@ -463,7 +474,7 @@ begin
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(RectPath(5, 5, Big, Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
-  AssertNothingDrawn('Anti-aliased, one corner inside the clip');
+  AssertDrawn(225, 225 * 255, 'Anti-aliased, one corner inside the clip');
 end;
 
 procedure TTsScanTests.TestMaxFloatTriangle;
@@ -478,7 +489,7 @@ begin
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(HugeTrianglePath(Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
-  AssertNothingDrawn('Anti-aliased');
+  AssertDrawnWithin(190 * 255, 215 * 255, 'Anti-aliased');
 
   UseBlitter(20, 20);
   TTsScan.FillPath(HugeTrianglePath(1.0E15), TTsFillRule.EvenOdd, ClipOf(20, 20), FBlitter);
@@ -486,7 +497,7 @@ begin
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(HugeTrianglePath(1.0E15), TTsFillRule.EvenOdd, ClipOf(20, 20), FBlitter);
-  AssertNothingDrawn('Anti-aliased, even-odd');
+  AssertDrawnWithin(190 * 255, 215 * 255, 'Anti-aliased, even-odd');
 end;
 
 procedure TTsScanTests.TestHugeCubic;

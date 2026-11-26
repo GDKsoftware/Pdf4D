@@ -33,9 +33,17 @@ type
     function BytesFilledWithClip(const Clip: IPdfClipPath): TBytes;
     function FillRaisesTheLimit(const Device: IPdfRasterDevice; const Path: TPdfPath): Boolean;
     procedure AssertRowIsRed(const Row, FromX, ToX: Integer);
+    function FreshBytesFilledWithClip(const Clip: IPdfClipPath): TBytes;
+    procedure AssertSameBytes(const Expected, Actual: TBytes; const Message: string);
+    procedure FillWholeDeviceOf(const Device: IPdfRasterDevice);
+    procedure FillTheDeviceUnderTest;
 
   protected
     function CreateBackend: IPdfRenderBackend; override;
+    function AppliedClipWork: Integer; override;
+
+  private
+    FDeviceUnderTest: IPdfRasterDevice;
 
   public
     [Test]
@@ -64,6 +72,27 @@ type
     // Only the masks of the last 8 levels are kept: a chain that goes back below them is applied again and still right
     [Test]
     procedure TestGoingBackBelowTheKeptMasksGivesTheSameClip;
+
+    // 200 diamonds on a device of a million pixels: every path is applied once, whatever the clock says
+    [Test]
+    procedure TestLongChainOfDiamondClipsAppliesEveryPathOnce;
+
+    // A non-rectangular level is popped (the chain returns to its parent) and the parent is extended by another path
+    [Test]
+    procedure TestNonRectLevelPoppedThenExtended;
+
+    // SetClip(nil) drops the applied levels: the same chain afterwards is applied again, with the same result
+    [Test]
+    procedure TestSameChainAfterSetClipNilIsAppliedAgain;
+
+    // A path over the verb limit in the middle of a chain: the draw raises, the levels before it stay, and a chain with the same prefix
+    // and another path goes on from there
+    [Test]
+    procedure TestVerbLimitFailureInTheMiddleOfAChain;
+
+    // The levels hold masks of one size; Update with another size applies the chain again on the new size
+    [Test]
+    procedure TestClipMaskDropsItsLevelsWhenTheSizeChanges;
 
     [Test]
     procedure TestClipOutsideDeviceDrawsNothing;
@@ -137,6 +166,9 @@ type
   end;
 
 implementation
+
+uses
+  Pdf4D.Render.Native.Scalar;
 
 const
   Cos45: Single = 0.70710678;
@@ -403,6 +435,194 @@ begin
   AssertPixel(90, 50, TPdfDeviceColor.Create(255, 0, 0));
   AssertTransparent(94, 50);
   AssertTransparent(5, 50);
+end;
+
+procedure TPdfNativeDeviceTests.FillWholeDeviceOf(const Device: IPdfRasterDevice);
+begin
+  const Path = NewRectPath(0, 0, Device.Width, Device.Height);
+  try
+    Device.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, NoAntiAlias);
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.FillTheDeviceUnderTest;
+begin
+  FillWholeDeviceOf(FDeviceUnderTest);
+end;
+
+function TPdfNativeDeviceTests.AppliedClipWork: Integer;
+begin
+  Result := Native.ClipLinkCount;
+end;
+
+procedure TPdfNativeDeviceTests.TestLongChainOfDiamondClipsAppliesEveryPathOnce;
+begin
+  CreateDevice(1000, 1000);
+  const LinkCount = 200;
+  var Clip: IPdfClipPath := nil;
+  for var Index := 1 to LinkCount do
+  begin
+    Clip := NewDiamondClipAround(Clip, 500, 500, 490 - Index);
+    FDevice.SetClip(Clip);
+    FillRect(500, 500, 501, 501, Red, NoAntiAlias);
+  end;
+
+  Assert.AreEqual(LinkCount, Native.ClipBuildCount, 'a chain is built for every change');
+  Assert.AreEqual(LinkCount, Native.ClipLinkCount, 'and every path is applied once');
+  AssertPixel(500, 500, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(5, 5);
+end;
+
+// What a fresh device draws when the whole device is filled under Clip
+function TPdfNativeDeviceTests.FreshBytesFilledWithClip(const Clip: IPdfClipPath): TBytes;
+begin
+  const Device = FBackend.CreateRasterDevice(FDevice.Width, FDevice.Height);
+  Device.SetClip(Clip);
+  FillWholeDeviceOf(Device);
+
+  const Bitmap = Device.ToBitmap;
+  try
+    Result := Copy(Bitmap.Pixels);
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.AssertSameBytes(const Expected, Actual: TBytes; const Message: string);
+begin
+  Assert.AreEqual(Length(Expected), Length(Actual), Message);
+  Assert.IsTrue(CompareMem(Pointer(Expected), Pointer(Actual), Length(Expected)), Message);
+end;
+
+procedure TPdfNativeDeviceTests.TestNonRectLevelPoppedThenExtended;
+begin
+  const Root = NewClip(nil, 0, 0, 10, 8);
+  const First = NewDiamondClipAround(Root, 5, 5, 4.5);
+  const Second = NewDiamondClipAround(First, 5, 5, 3.5);
+  const Sibling = NewDiamondClipAround(First, 5, 4, 2.5);
+
+  FDevice.SetClip(Second);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(3, Native.ClipLinkCount, 'root, first and second');
+
+  // The parent: nothing is applied, and the second level is discarded
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(First);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(3, Native.ClipLinkCount, 'a parent of the applied chain');
+
+  // Another child of the parent: only that path is applied, on the mask of the parent
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(Sibling);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(4, Native.ClipLinkCount, 'the sibling only');
+  Assert.AreEqual(Ord(TTsClipKind.Mask), Ord(Native.ClipKind));
+
+  const Actual = FDevice.ToBitmap;
+  try
+    AssertSameBytes(FreshBytesFilledWithClip(Sibling), Actual.Pixels, 'the same pixels as on a fresh device');
+  finally
+    Actual.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestSameChainAfterSetClipNilIsAppliedAgain;
+begin
+  const Root = NewClip(nil, 0, 0, 10, 8);
+  const Chain = NewDiamondClipAround(NewDiamondClipAround(Root, 5, 5, 4.5), 5, 5, 3.5);
+  const Expected = FreshBytesFilledWithClip(Chain);
+
+  FDevice.SetClip(Chain);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(3, Native.ClipLinkCount);
+
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(nil);
+  FillWholeDevice(Red, NoAntiAlias);
+  AssertPixel(0, 9, TPdfDeviceColor.Create(255, 0, 0));
+  Assert.AreEqual(3, Native.ClipLinkCount, 'no clip applies nothing');
+
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(Chain);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(6, Native.ClipLinkCount, 'all three paths again');
+
+  const Actual = FDevice.ToBitmap;
+  try
+    AssertSameBytes(Expected, Actual.Pixels, 'the same pixels as the first time');
+  finally
+    Actual.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestVerbLimitFailureInTheMiddleOfAChain;
+begin
+  var Limits := TPdfNativeLimits.Default;
+  Limits.MaxPathVerbs := 6;
+  const Backend: IPdfRenderBackend = TPdfNativeBackend.Create(Limits);
+  const Device = Backend.CreateRasterDevice(10, 10);
+
+  // A path of 8 verbs, over the limit of 6; a rectangle has 5
+  const BigPath = TPdfPath.Create;
+  BigPath.MoveTo(0, 0);
+  for var Index := 1 to 7 do
+  begin
+    BigPath.LineTo(Index, 10 - Index);
+  end;
+
+  const First = NewClip(nil, 0, 0, 10, 8);
+  const Second = NewClip(First, 0, 0, 8, 10);
+  const Bad = TPdfClipPath.Create(Second, BigPath, TPdfMatrix.Identity, TPdfFillRule.NonZero) as IPdfClipPath;
+  const Good = NewClip(Second, 0, 0, 6, 10);
+
+  FDeviceUnderTest := Device;
+  Device.SetClip(Bad);
+  Assert.WillRaise(FillTheDeviceUnderTest, EPdfLimitExceededException);
+  const FailedLinkCount = (Device as TPdfNativeDevice).ClipLinkCount;
+  Assert.AreEqual(3, FailedLinkCount, 'the two paths before the bad one and the attempt at it');
+
+  // The same chain raises again, at the same path
+  Assert.WillRaise(FillTheDeviceUnderTest, EPdfLimitExceededException);
+  const RetriedLinkCount = (Device as TPdfNativeDevice).ClipLinkCount;
+
+  Device.SetClip(Good);
+  FillWholeDeviceOf(Device);
+  Assert.AreEqual(RetriedLinkCount + 1, (Device as TPdfNativeDevice).ClipLinkCount, 'the good path goes on from the applied prefix: one path only');
+
+  const Actual = Device.ToBitmap;
+  try
+    AssertSameBytes(FreshBytesFilledWithClip(Good), Actual.Pixels, 'the same pixels as on a fresh device');
+  finally
+    Actual.Free;
+  end;
+  FDeviceUnderTest := nil;
+end;
+
+procedure TPdfNativeDeviceTests.TestClipMaskDropsItsLevelsWhenTheSizeChanges;
+begin
+  const FloatState = TTsFloatMode.Enter;
+  try
+    const ClipMask = TTsClipMask.Create;
+    try
+      const Chain = NewDiamondClipAround(nil, 50, 50, 40);
+      ClipMask.Update(Chain, 100, 100);
+      Assert.AreEqual(Ord(TTsClipKind.Mask), Ord(ClipMask.Kind));
+      Assert.AreEqual(100, Integer(ClipMask.Mask.Width));
+      Assert.AreEqual(1, ClipMask.AppliedLinkCount);
+
+      ClipMask.Update(Chain, 60, 60);
+      Assert.AreEqual(Ord(TTsClipKind.Mask), Ord(ClipMask.Kind));
+      Assert.AreEqual(60, Integer(ClipMask.Mask.Width), 'the mask has the new size');
+      Assert.AreEqual(60, Integer(ClipMask.Mask.Height));
+      Assert.AreEqual(2, ClipMask.AppliedLinkCount, 'the chain is applied again on the new size');
+    finally
+      ClipMask.Free;
+    end;
+  finally
+    TTsFloatMode.Leave(FloatState);
+  end;
 end;
 
 procedure TPdfNativeDeviceTests.TestClipOutsideDeviceDrawsNothing;
