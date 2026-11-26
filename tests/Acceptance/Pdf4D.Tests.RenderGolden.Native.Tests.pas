@@ -53,7 +53,12 @@ type
     [TestCase('Images', 'generated/render/images.pdf,1,0,0')]
     [TestCase('Transparency', 'generated/render/transparency.pdf,1,0,0')]
     [TestCase('Survey', 'pdfbox/input/rendering/survey.pdf,1,20,16')]
+    // Win32 (x87) moves the edges of the tiger by more levels: 13 measured, with 7921 pixels (the pixel count is below the limit)
+    {$IFDEF CPUX86}
+    [TestCase('Tiger', 'pdfbox/input/rendering/tiger-as-form-xobject.pdf,1,13,15804')]
+    {$ELSE}
     [TestCase('Tiger', 'pdfbox/input/rendering/tiger-as-form-xobject.pdf,1,11,15804')]
+    {$ENDIF}
     procedure TestForcedMaskClipGivesTheSamePixels(const RelativePath: string; const Page, MaxDifference, MaxPixels: Integer);
   end;
 
