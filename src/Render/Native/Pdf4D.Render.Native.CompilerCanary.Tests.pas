@@ -43,6 +43,8 @@ type
     function SqrtChainStepwise(const A, C: Single): Single;
     function InlineVarChain(const A, C: Single): Single;
     function InlineVarChainStepwise(const A, C: Single): Single;
+    function LiteralF64Chain(const A, B: Double): Double;
+    function TypedF64Chain(const A, B: Double): Double;
 
   public
     [Setup]
@@ -77,6 +79,15 @@ type
 
     [Test]
     procedure TestNegatedComparisonAsAValueIsMiscompiledForNaN;
+
+    [Test]
+    procedure TestUntypedRealLiteralVarIsCurrencyOnWin64;
+
+    [Test]
+    procedure TestRealLiteralTakesAnF64ChainToExtendedOnLinux64;
+
+    [Test]
+    procedure TestSystemSqrtOfADoubleIsDoubleRoundedOnLinux64;
   end;
 
 implementation
@@ -84,6 +95,7 @@ implementation
 const
   // Not exact in f32: the typed constant holds the f32 value, the bare literal keeps its Double value
   TenthAsSingle: Single = 0.1;
+  NineAsDouble: Double = 9.0;
   SampleCount = 20000;
 
 { TTsCompilerCanaryTests }
@@ -171,6 +183,16 @@ begin
   var Copy: Single := A;
   var Step: Single := Copy * C;
   Result := Step + A;
+end;
+
+function TTsCompilerCanaryTests.LiteralF64Chain(const A, B: Double): Double;
+begin
+  Result := 9.0 * A * B;
+end;
+
+function TTsCompilerCanaryTests.TypedF64Chain(const A, B: Double): Double;
+begin
+  Result := NineAsDouble * A * B;
 end;
 
 procedure TTsCompilerCanaryTests.Setup;
@@ -275,8 +297,13 @@ begin
     end;
   end;
 
+  {$IFDEF CPUX86}
+  // x87 runs the chain and the steps alike in its own precision; Win32 matches tiny-skia within tolerances only
+  Assert.AreEqual(0, Mismatches, 'Win32 (x87): the chain and the steps no longer agree; check the rule for Sqrt() in a chain');
+  {$ELSE}
   Assert.IsTrue(Mismatches > 0, 'The port relies on: Sqrt() inside a chain skips the f32 rounding, so its result feeds a further ' +
     'operation only through a Single variable or a Single(...) cast; if this never differs, the rule may be relaxed');
+  {$ENDIF}
 end;
 
 procedure TTsCompilerCanaryTests.TestUntypedInlineVarOfASingleIsExtended;
@@ -327,15 +354,87 @@ end;
 
 procedure TTsCompilerCanaryTests.TestNegatedComparisonAsAValueIsMiscompiledForNaN;
 begin
-  // IEEE says True for all of these; Delphi 13 Win64 gives False. The port never uses these forms.
+  // IEEE says True for all of these; Delphi 13 Win64 gives False. Win32 (x87) and Linux64 (LLVM) compile them correctly. The port never
+  // uses these forms.
   const RuleText = 'The port relies on: nothing, it never uses a negated comparison as a boolean value (X := not (A < B)), ' +
     'because Delphi 13 Win64 gives False for NaN. If this changes, the compiler was fixed or is another one: check the rule';
 
-  Assert.IsFalse(NegatedLess(FNaN, 1), 'not (NaN < x). ' + RuleText);
-  Assert.IsFalse(NegatedGreater(FNaN, 1), 'not (NaN > x). ' + RuleText);
-  Assert.IsFalse(NegatedLessOrEqual(FNaN, 1), 'not (NaN <= x). ' + RuleText);
-  Assert.IsFalse(NegatedGreaterOrEqual(FNaN, 1), 'not (NaN >= x). ' + RuleText);
-  Assert.IsFalse(LessEqualsFalse(FNaN, 1), '(NaN < x) = False. ' + RuleText);
+  {$IFDEF WIN64}
+  const Expected = False;
+  {$ELSE}
+  const Expected = True;
+  {$ENDIF}
+
+  Assert.AreEqual(Expected, NegatedLess(FNaN, 1), 'not (NaN < x). ' + RuleText);
+  Assert.AreEqual(Expected, NegatedGreater(FNaN, 1), 'not (NaN > x). ' + RuleText);
+  Assert.AreEqual(Expected, NegatedLessOrEqual(FNaN, 1), 'not (NaN <= x). ' + RuleText);
+  Assert.AreEqual(Expected, NegatedGreaterOrEqual(FNaN, 1), 'not (NaN >= x). ' + RuleText);
+  Assert.AreEqual(Expected, LessEqualsFalse(FNaN, 1), '(NaN < x) = False. ' + RuleText);
+end;
+
+procedure TTsCompilerCanaryTests.TestUntypedRealLiteralVarIsCurrencyOnWin64;
+begin
+  var Inferred := 0.0;
+  {$IFDEF LINUX64}
+  const Expected = 'Extended';
+  {$ELSE}
+  const Expected = 'Currency';
+  {$ENDIF}
+
+  Assert.AreEqual(Expected, string(InferredType(Inferred)^.Name), 'The port relies on: nothing, every inline float var gets an explicit ' +
+    'type, because var X := 0.0 is a Currency (four decimals) on Win64 and an 80-bit Extended on Linux64');
+end;
+
+procedure TTsCompilerCanaryTests.TestRealLiteralTakesAnF64ChainToExtendedOnLinux64;
+begin
+  RandSeed := 7;
+
+  var Mismatches := 0;
+  for var I := 1 to SampleCount do
+  begin
+    const A: Double = (Random - 0.5) * 64 / 3;
+    const B: Double = (Random - 0.5) * 64 / 7;
+
+    if LiteralF64Chain(A, B) <> TypedF64Chain(A, B) then
+    begin
+      Inc(Mismatches);
+    end;
+  end;
+
+  {$IFDEF LINUX64}
+  Assert.IsTrue(Mismatches > 0, 'The port relies on: a real literal is an Extended on Linux64 and takes an f64 chain to 80 bits, so the ' +
+    'literals of the f64 code are typed Double constants; if this never differs, the rule may be relaxed');
+  {$ELSE}
+  Assert.AreEqual(0, Mismatches, 'A real literal changes an f64 chain on this platform as well: type the literals of the f64 code');
+  {$ENDIF}
+end;
+
+procedure TTsCompilerCanaryTests.TestSystemSqrtOfADoubleIsDoubleRoundedOnLinux64;
+begin
+  RandSeed := 13;
+
+  var Mismatches := 0;
+  for var I := 1 to SampleCount do
+  begin
+    const X: Single = (Random - 0.5) * 2000;
+    const Y: Single = (Random - 0.5) * 2000;
+    const Xx: Double = X;
+    const Yy: Double = Y;
+    const Sum: Double = Xx * Xx + Yy * Yy;
+    const RtlRoot: Double = System.Sqrt(Sum);
+
+    if RtlRoot <> TTsScalar.SqrtF64(Sum) then
+    begin
+      Inc(Mismatches);
+    end;
+  end;
+
+  {$IFDEF LINUX64}
+  Assert.IsTrue(Mismatches > 0, 'The port relies on: System.Sqrt of a Double rounds twice on Linux64 (sqrtl), so the f64 code uses ' +
+    'TTsScalar.SqrtF64; if this never differs, the rule may be relaxed');
+  {$ELSE}
+  Assert.AreEqual(0, Mismatches, 'System.Sqrt of a Double is not correctly rounded on this platform: TTsScalar.SqrtF64 must cover it');
+  {$ENDIF}
 end;
 
 end.
