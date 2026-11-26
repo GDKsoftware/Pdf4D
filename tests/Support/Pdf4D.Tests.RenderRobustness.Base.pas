@@ -1,6 +1,6 @@
 // Copyright 2026 GDK Software
 // Licensed under the Apache License, Version 2.0; see the LICENSE file.
-unit Pdf4D.Tests.RenderRobustness.Tests;
+unit Pdf4D.Tests.RenderRobustness.Base;
 
 {$EXCESSPRECISION OFF}
 
@@ -12,6 +12,7 @@ uses
   DUnitX.TestFramework,
   Pdf4D.Font.Mapper,
   Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Device.Interfaces,
   Pdf4D.Tests.Fuzz,
   Pdf4D.Tests.PdfBuilder;
 
@@ -100,21 +101,26 @@ type
     class function HostilePage(const Content: string; const Resources: string; const Objects: array of string): TBytes; static;
   end;
 
-  [TestFixture]
-  TRenderRobustnessTests = class
+  TRenderRobustnessTestsBase = class abstract
   strict private
     // One mapper for all runs: a mapper that has been replaced stays in memory until the process ends
     class var FHermeticMapper: IPdfFontMapper;
 
-    class function Latin1(const Text: string): TBytes; static;
-    class function PixelOf(const Content: string; const X, Y: Integer): TPdfDeviceColor; static;
+    function PixelOf(const Content: string; const X, Y: Integer): TPdfDeviceColor;
     class function RepeatText(const Text: string; const Count: Integer): string; static;
     class function PageWithImage(const ImageEntries: string; const ImageData: TBytes; const Extra: string = ''): TBytes; static;
-    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes); overload; static;
-    class procedure RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string); static;
     class procedure RunHostileImages(const Campaign: TFuzzCampaign); static;
     class procedure RunHostilePaint(const Campaign: TFuzzCampaign); static;
     class procedure RunHostileGeometry(const Campaign: TFuzzCampaign); static;
+
+  protected
+    function CreateBackend: IPdfRenderBackend; virtual; abstract;
+    // Documents that only one backend gets (the huge ones of the native backend); nothing by default
+    procedure RunExtraHostile(const Campaign: TFuzzCampaign); virtual;
+
+    class function Latin1(const Text: string): TBytes; static;
+    class procedure RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes); static;
+    class procedure RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string); static;
 
   public
     [Setup]
@@ -144,10 +150,8 @@ uses
   Pdf4D.Render.Renderer,
   Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Model.Tests.Support,
-  Pdf4D.Render.Device.Interfaces,
   Pdf4D.Resources.Icc,
   Pdf4D.Tests.FontProvider,
-  Pdf4D.Tests.ReferenceBackends,
   Pdf4D.Tests.TestFonts;
 
 type
@@ -844,9 +848,9 @@ begin
   end;
 end;
 
-{ TRenderRobustnessTests }
+{ TRenderRobustnessTestsBase }
 
-procedure TRenderRobustnessTests.SetUp;
+procedure TRenderRobustnessTestsBase.SetUp;
 begin
   // The renders use no font of the machine: embedded fonts, the standard 14 and the built-in LiberationSans
   if not Assigned(FHermeticMapper) then
@@ -856,17 +860,21 @@ begin
   TPdfFontMappers.SetInstance(FHermeticMapper);
   TFuzzRendering.Backend := function: IPdfRenderBackend
     begin
-      Result := TReferenceBackends.Create;
+      Result := CreateBackend;
     end;
 end;
 
-procedure TRenderRobustnessTests.TearDown;
+procedure TRenderRobustnessTestsBase.RunExtraHostile(const Campaign: TFuzzCampaign);
+begin
+end;
+
+procedure TRenderRobustnessTestsBase.TearDown;
 begin
   TFuzzRendering.Backend := nil;
   TPdfFontMappers.SetInstance(nil);
 end;
 
-class function TRenderRobustnessTests.Latin1(const Text: string): TBytes;
+class function TRenderRobustnessTestsBase.Latin1(const Text: string): TBytes;
 begin
   SetLength(Result, Length(Text));
   for var Index := 0 to High(Result) do
@@ -875,7 +883,7 @@ begin
   end;
 end;
 
-class function TRenderRobustnessTests.RepeatText(const Text: string; const Count: Integer): string;
+class function TRenderRobustnessTestsBase.RepeatText(const Text: string; const Count: Integer): string;
 begin
   const Builder = TStringBuilder.Create(Length(Text) * Count);
   try
@@ -890,12 +898,12 @@ begin
 end;
 
 // The colour of a pixel of the page at 36 DPI (100 x 100 pixels), top left is (0, 0)
-class function TRenderRobustnessTests.PixelOf(const Content: string; const X, Y: Integer): TPdfDeviceColor;
+function TRenderRobustnessTestsBase.PixelOf(const Content: string; const X, Y: Integer): TPdfDeviceColor;
 begin
   const Stream = TBytesStream.Create(TRenderFuzzDocuments.Page(Latin1(Content), TTestFonts.Bytes(LiberationSansFile)));
   try
     const Document: IPdfDocument = TPdfDocument.Load(Stream, TPdfLoadOptions.Default);
-    const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TReferenceBackends.Create);
+    const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, CreateBackend);
     var Bitmap: TPdfBitmap := nil;
     try
       Renderer.RenderToBitmap(0, TPdfRenderParams.FromDpi(36), Bitmap);
@@ -908,7 +916,7 @@ begin
   end;
 end;
 
-procedure TRenderRobustnessTests.TestPageOfGeneratedStreamsDrawsItsResources;
+procedure TRenderRobustnessTestsBase.TestPageOfGeneratedStreamsDrawsItsResources;
 const
   // The pixel is at (120, 120) pt, outside the rectangle of the annotation
   Left = 60;
@@ -932,12 +940,12 @@ begin
   end;
 end;
 
-procedure TRenderRobustnessTests.TestMutatedCorpusRendersSafely;
+procedure TRenderRobustnessTestsBase.TestMutatedCorpusRendersSafely;
 begin
   TFuzzCampaign.RunMutatedCorpus(TFuzzWork.Render, True);
 end;
 
-procedure TRenderRobustnessTests.TestGeneratedGraphicsStreamsRenderSafely;
+procedure TRenderRobustnessTestsBase.TestGeneratedGraphicsStreamsRenderSafely;
 begin
   const LiberationSans = TTestFonts.Bytes(LiberationSansFile);
   const Seed = GraphicsSeed + TFuzzSettings.SeedOffset;
@@ -955,18 +963,18 @@ begin
   end;
 end;
 
-class procedure TRenderRobustnessTests.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes);
+class procedure TRenderRobustnessTestsBase.RunHostile(const Campaign: TFuzzCampaign; const Name: string; const Document: TBytes);
 begin
   Campaign.Run(Name, Document, '', TFuzzWork.Render);
 end;
 
-class procedure TRenderRobustnessTests.RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string);
+class procedure TRenderRobustnessTestsBase.RunHostileContent(const Campaign: TFuzzCampaign; const Name, Content: string);
 begin
   RunHostile(Campaign, Name, TRenderFuzzDocuments.Page(Latin1(Content), TTestFonts.Bytes(LiberationSansFile)));
 end;
 
 // A page that draws the image /Im with the entries and the data
-class function TRenderRobustnessTests.PageWithImage(const ImageEntries: string; const ImageData: TBytes; const Extra: string): TBytes;
+class function TRenderRobustnessTestsBase.PageWithImage(const ImageEntries: string; const ImageData: TBytes; const Extra: string): TBytes;
 begin
   const Builder = TModelTestDocuments.NewBuilder('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
   try
@@ -984,7 +992,7 @@ begin
 end;
 
 // Review focus 1: damaged or hostile image data
-class procedure TRenderRobustnessTests.RunHostileImages(const Campaign: TFuzzCampaign);
+class procedure TRenderRobustnessTestsBase.RunHostileImages(const Campaign: TFuzzCampaign);
 begin
   const Jpeg = TDecoderInputs.Jpeg(JpegFile);
   var Garbage: TBytes;
@@ -1027,7 +1035,7 @@ begin
 end;
 
 // Review focus 2: recursion through paint
-class procedure TRenderRobustnessTests.RunHostilePaint(const Campaign: TFuzzCampaign);
+class procedure TRenderRobustnessTestsBase.RunHostilePaint(const Campaign: TFuzzCampaign);
 const
   Group = '/Type /XObject /Subtype /Form /BBox [0 0 200 200] /Group << /S /Transparency /CS /DeviceGray >> ';
   Mark = '0 0 1 rg 0 0 20 20 re f';
@@ -1061,7 +1069,7 @@ begin
 end;
 
 // Review focus 4: degenerate geometry
-class procedure TRenderRobustnessTests.RunHostileGeometry(const Campaign: TFuzzCampaign);
+class procedure TRenderRobustnessTestsBase.RunHostileGeometry(const Campaign: TFuzzCampaign);
 const
   Square = '10 10 m 190 10 l 190 190 l 10 190 l h ';
 begin
@@ -1087,13 +1095,14 @@ begin
   RunHostileContent(Campaign, 'shading with a zero matrix', 'q 0 0 0 0 0 0 cm /Sh0 sh /Sh1 sh /Sh2 sh /Sh3 sh Q 0 0 1 rg 0 0 20 20 re f');
 end;
 
-procedure TRenderRobustnessTests.TestHostileRenderDocuments;
+procedure TRenderRobustnessTestsBase.TestHostileRenderDocuments;
 begin
   const Campaign = TFuzzCampaign.Create;
   try
     RunHostileImages(Campaign);
     RunHostilePaint(Campaign);
     RunHostileGeometry(Campaign);
+    RunExtraHostile(Campaign);
     Campaign.AssertNoFailures;
   finally
     Campaign.Free;

@@ -126,7 +126,10 @@ The fuzz runs are `Pdf4D.Tests.Robustness.Tests` (mutated corpus files and mutat
 $env:PDF4D_FUZZ_SEED = 100000; $env:PDF4D_FUZZ_SCALE = 4
 tests\Win64\Debug\Pdf4D.Tests.exe -r:Pdf4D.Tests.TextRobustness.Tests.TTextRobustnessTests
 tests\Skia\Win64\Debug\Pdf4D.Skia.Tests.exe -r:Pdf4D.Tests.RenderRobustness.Tests.TRenderRobustnessTests
+tests\Win64\Debug\Pdf4D.Tests.exe -r:Pdf4D.Tests.RenderRobustness.Native.Tests.TNativeRenderRobustnessTests
 ```
+
+The render fuzz tests have one base class, `TRenderRobustnessTestsBase` in `tests\Support\Pdf4D.Tests.RenderRobustness.Base.pas` (the content stream generator, the hostile documents and the tests); the Skia test project and the core test project each derive a fixture that says which backend draws. The native fixture (`TNativeRenderRobustnessTests`) adds two hostile documents: a path of 5 000 000 segments and a dash of a million pieces. Hostile calls of the native device itself (non-finite and huge values, soft masks at the edges of the integer range, long clip chains, 5000 random calls) are in `TPdfNativeHostileTests` (`src\Render\Native\Pdf4D.Render.Native.Device.Hostile.Tests.pas`).
 
 A run that hits the time limit keeps its thread, so the process can crash when it ends; the failure is reported before that.
 

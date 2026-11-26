@@ -545,6 +545,9 @@
         <DCCReference Include="Acceptance\Pdf4D.Tests.Golden.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Fuzz.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.Robustness.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.RenderRobustness.Base.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderRobustness.Native.Tests.pas"/>
+        <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Device.Hostile.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextDump.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas"/>

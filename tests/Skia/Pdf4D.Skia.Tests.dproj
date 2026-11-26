@@ -110,6 +110,7 @@
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderSoftMasks.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderTiling.Tests.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.Fuzz.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.RenderRobustness.Base.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderRobustness.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderPerformance.Tests.pas"/>
         <BuildConfiguration Include="Base">
