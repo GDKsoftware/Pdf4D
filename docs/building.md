@@ -98,7 +98,7 @@ The Linux64 binary is built with msbuild on Windows and run in WSL. The script c
 
 ## Test results and leaks
 
-- Each run writes NUnit XML to `tests\results-<platform>.xml` (the other test projects to `tests\<Project>\results-<platform>.xml`). The program runs the suite twice, see below: the first run writes `results-<platform>-pass1.xml` and the second `results-<platform>.xml`, so that a failure of the first run is not overwritten by the second. When a suite fails, `build.ps1` prints the totals of the pass 1 file; read it to tell a failure of the first run from one that only the second run has (a test that depends on the order of the fixtures or on what an earlier run left behind).
+- Each run writes NUnit XML to `tests\results-<platform>.xml` (the other test projects to `tests\Skia\`, `tests\Vcl\` and `tests\FMX\`, as `results-<platform>.xml`). The program runs the suite twice, see below: the first run writes `results-<platform>-pass1.xml` and the second `results-<platform>.xml`, so that a failure of the first run is not overwritten by the second. When a suite fails, `build.ps1` prints the totals of the pass 1 file; read it to tell a failure of the first run from one that only the second run has (a test that depends on the order of the fixtures or on what an earlier run left behind).
 - The test program runs the suite twice and compares the number of outstanding memory blocks before and after the second run, on every platform. A difference gives exit code 2. In Debug on Windows, `ReportMemoryLeaksOnShutdown` is also enabled.
 - Exit codes: 0 all passed, 1 test failure, 2 memory leak, 3 (FMX tests only) the memory check could not be trusted: FMX did not let go of its blocks in the batch of windows that the check expects (see "The FMX tests").
 

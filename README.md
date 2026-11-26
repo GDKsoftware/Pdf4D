@@ -20,7 +20,7 @@ Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer 
 
 Milestone M3, phase 4 (the FMX components) is complete and tested on Win64: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The build and tests on Win32 and Linux64, the installation of both design-time packages in the IDE and the check on a real printer are still to be done (see `docs/building.md`).
 
-Milestone M3, phase 5 (the native rasterizer) is complete: `TPdfNativeBackend`, a Delphi port of tiny-skia, draws through the same device interface as the Skia backend, needs no library next to the program and is what the viewers use when no backend is set. The 108 reference images of tiny-skia are reproduced byte for byte, and 631 corpus pages (at 72 and 150 DPI) are equal to the PDFBox renders within the same tolerances as for Skia. See "Rendering", and `docs/porting.md` for the deviations from tiny-skia.
+Milestone M3, phase 5 (the native rasterizer) is complete and tested on Win64, and its native tests also pass on Win32 and Linux64; the Skia, VCL and FMX suites on Win32, the Debug configuration, the installation of the design-time packages and the check on a real printer are still to be done (see `docs/building.md`). `TPdfNativeBackend`, a Delphi port of tiny-skia, draws through the same device interface as the Skia backend, needs no library next to the program and is what the viewers use when no backend is set. The 108 reference images of tiny-skia are reproduced byte for byte, and on Win64 631 corpus pages (at 72 and 150 DPI) are equal to the PDFBox renders within the same tolerances as for Skia. See "Rendering", and `docs/porting.md` for the deviations from tiny-skia.
 
 See also `coding-rules.md` and `docs/building.md`.
 
