@@ -843,12 +843,17 @@ end;
 
 procedure TFontMapperTests.TestSetInstanceNilGivesDefaultMapper;
 begin
+  // Another mapper is in use first: the one found at the start can be the default mapper itself, when an earlier fixture put it back
+  const Stub = SharedMapper(0);
+  TPdfFontMappers.SetInstance(Stub);
+  Assert.IsTrue(Pointer(TPdfFontMappers.Instance) = Pointer(Stub));
+
   TPdfFontMappers.SetInstance(nil);
 
   const Default = TPdfFontMappers.Instance;
 
   Assert.IsTrue(Assigned(Default));
-  Assert.IsTrue(Pointer(Default) <> Pointer(FOriginal));
+  Assert.IsTrue(Pointer(Default) <> Pointer(Stub));
   Assert.IsTrue(Pointer(Default) = Pointer(TPdfFontMappers.Instance));
   Assert.AreEqual('LiberationSans', Default.GetTrueTypeFont('Foo', nil).Font.Name);
 end;

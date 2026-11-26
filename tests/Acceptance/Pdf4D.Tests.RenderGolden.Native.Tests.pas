@@ -38,18 +38,22 @@ type
     function PendingFileName: string; override;
 
   public
-    // The rectangular clip of the device is an optimisation: the scan converter cuts the path at the clip rectangle, where the mask clip
-    // lets the whole path through and zeroes the pixels outside. The pixels are the same, except along curves and glyph edges that cross
-    // the edge of the clip (the outline of the tiger at the top of its clip, glyphs on the last rows of survey.pdf): the coverage of
-    // those pixels moves by a level or more. The last two numbers of a case are the measured limits: the largest difference of a
-    // channel and the number of pixels that differ; the first four pages are byte for byte equal.
+    // The rectangular clip of the device is an optimisation: the scan converter gets the clip rectangle and builds the edges of a path that
+    // crosses it against that rectangle, where the mask clip lets the whole path through and zeroes the pixels outside. The pixels are the
+    // same for a path that stays inside the rectangle. A path that crosses it is cut by the edge clipper first: a quadratic or cubic that
+    // crosses the rectangle is chopped, each piece gets a subdivision of its own and the edges of the whole visible part of the curve move
+    // (a straight line is rounded to the grid again at the cut), so the coverage of pixels along such a path moves by a level or more (the
+    // outline of the tiger at the top of its clip, glyphs on the last rows of survey.pdf). Skia does the same. The last two numbers of a
+    // case are the limits: the largest difference of a channel and the number of pixels that differ. The two measured on Win64 are the
+    // limits with a margin (twice the pixels and 4 levels more), because the flattening is f32 and, on Win32, x87; the first four pages
+    // are byte for byte equal.
     [Test]
     [TestCase('Clip', 'generated/render/clip.pdf,1,0,0')]
     [TestCase('Paths', 'generated/render/paths.pdf,1,0,0')]
     [TestCase('Images', 'generated/render/images.pdf,1,0,0')]
     [TestCase('Transparency', 'generated/render/transparency.pdf,1,0,0')]
-    [TestCase('Survey', 'pdfbox/input/rendering/survey.pdf,1,16,8')]
-    [TestCase('Tiger', 'pdfbox/input/rendering/tiger-as-form-xobject.pdf,1,7,7902')]
+    [TestCase('Survey', 'pdfbox/input/rendering/survey.pdf,1,20,16')]
+    [TestCase('Tiger', 'pdfbox/input/rendering/tiger-as-form-xobject.pdf,1,11,15804')]
     procedure TestForcedMaskClipGivesTheSamePixels(const RelativePath: string; const Page, MaxDifference, MaxPixels: Integer);
   end;
 

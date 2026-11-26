@@ -110,6 +110,7 @@ const
   DimmedOffset = 170;
   PercentFactor = 100;
   BackendNames: array[0..1] of string = ('Skia', 'Native');
+  PlatformNames: array[0..2] of string = ('Win32', 'Win64', 'Linux64');
 
 type
   // Tells for the rows of the reference which pixels have an edge in their 3 x 3 neighbourhood. The minimum and the maximum of the
@@ -436,9 +437,15 @@ begin
       begin
         EntryBackend := Qualifier;
       end
-      else
+      else if MatchStr(Qualifier, PlatformNames) then
       begin
         EntryPlatform := Qualifier;
+      end
+      else
+      begin
+        // A typo would make the entry never apply, and the page would fail without a hint why
+        raise EArgumentException.CreateFmt('The qualifier [%s] of the known-differences entry "%s" is neither a backend (%s) nor a platform (%s)',
+                                           [Qualifier, Entry, string.Join(', ', BackendNames), string.Join(', ', PlatformNames)]);
       end;
     end;
 

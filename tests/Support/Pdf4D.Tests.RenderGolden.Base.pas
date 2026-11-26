@@ -45,8 +45,12 @@ type
   // how its known differences are qualified (BackendName) and which file lists its pending files (PendingFileName).
   TRenderGoldenTestsBase = class abstract
   strict private
+    // The mapper that the fixture found, put back by TearDown (the test program installs its own for all fixtures)
+    FFoundMapper: IPdfFontMapper;
     // One mapper for all runs: a mapper that has been replaced stays in memory until the process ends
     class var FHermeticMapper: IPdfFontMapper;
+    // The backend of the fixture that runs, for the names and lines of the output (both backends write to the same folder)
+    class var FOutputBackend: string;
 
     class function ReferenceFolder(const Dpi: Integer): string; static;
     class function ListedPages(const RenderListing: string): TArray<Integer>; static;
@@ -64,6 +68,8 @@ type
     class function PageLineCount(const RenderListing: string): Integer; static;
     class function HasNoReference(const RenderListing: string): Boolean; static;
     function PageDifference(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Dpi: Integer; const Expected: TPdfBitmap): string;
+    // A page with a known difference is rendered too, and a page that equals its reference is reported (a warning): its entry can go
+    procedure WarnWhenKnownPageIsEqual(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Dpi: Integer);
     function IsPendingFile(const RelativePath: string): Boolean;
 
   protected
@@ -240,12 +246,15 @@ begin
   begin
     FHermeticMapper := TFontMapperImpl.Create(TTestFontProvider.Empty);
   end;
+  FOutputBackend := BackendName;
+  FFoundMapper := TPdfFontMappers.Instance;
   TPdfFontMappers.SetInstance(FHermeticMapper);
 end;
 
 procedure TRenderGoldenTestsBase.TearDown;
 begin
-  TPdfFontMappers.SetInstance(nil);
+  TPdfFontMappers.SetInstance(FFoundMapper);
+  FFoundMapper := nil;
 end;
 
 class function TRenderGoldenTestsBase.RenderFolder: string;
@@ -275,7 +284,7 @@ end;
 
 class function TRenderGoldenTestsBase.OutputName(const RelativePath: string; const Page: Integer; const Dpi: Integer): string;
 begin
-  Result := Format('%s.p%.3d', [TCorpus.GoldenName(RelativePath), Page]);
+  Result := Format('%s.p%.3d.%s', [TCorpus.GoldenName(RelativePath), Page, FOutputBackend]);
   if Dpi <> ReferenceDpi then
   begin
     Result := Result + Format('.%ddpi', [Dpi]);
@@ -296,7 +305,7 @@ begin
   Result := Result.Trim;
 end;
 
-// With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: file, page, share of different pixels, largest
+// With PDF4D_RENDER_OUTPUT set, summary.txt in that folder gets one line per compared page: backend, file, page, share of different pixels, largest
 // difference, whether the sizes are equal, share of the flat pixels that differ, share of the edge pixels that differ;
 // distribution.txt has the flat pixels and the histogram of their differences, and the same for the edge pixels, for tuning the tolerances
 class procedure TRenderGoldenTestsBase.LogComparison(const RelativePath: string; const Page: Integer; const Dpi: Integer; const Comparison: TRenderComparison);
@@ -305,9 +314,9 @@ begin
   if Folder <> '' then
   begin
     TDirectory.CreateDirectory(Folder);
-    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.DifferentFraction, Comparison.MaxDifference,
+    TFile.AppendAllText(TPath.Combine(Folder, 'summary.txt'), Format('%s;%s;%d;%.5f;%d;%s;%.5f;%.5f%s', [FOutputBackend, IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.DifferentFraction, Comparison.MaxDifference,
                                                                                                BoolToStr(Comparison.HasSameSize, True), Comparison.DifferentFlatFraction, Comparison.DifferentEdgeFraction, sLineBreak]));
-    TFile.AppendAllText(TPath.Combine(Folder, 'distribution.txt'), Format('%s;%d;%d;%s;%d;%s%s', [IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.FlatPixels,
+    TFile.AppendAllText(TPath.Combine(Folder, 'distribution.txt'), Format('%s;%s;%d;%d;%s;%d;%s%s', [FOutputBackend, IfThen(Dpi = ReferenceDpi, RelativePath, Format('%s@%d', [RelativePath, Dpi])), Page, Comparison.FlatPixels,
                                                                                                     HistogramText(Comparison.FlatDifferences), Comparison.EdgePixels, HistogramText(Comparison.EdgeDifferences), sLineBreak]));
   end;
 end;
@@ -330,7 +339,7 @@ begin
     Exit;
   end;
 
-  var Line := Format('%s;%d;%d', [RelativePath, Page, Compared]);
+  var Line := Format('%s;%s;%d;%d', [FOutputBackend, RelativePath, Page, Compared]);
   for var Tolerance in [0, 1, 2, 4, 8, 16, 32] do
   begin
     Line := Line + Format(';%d:%d', [Tolerance, TRenderCompare.CountAbove(Region, Crop, Tolerance, RegionBorder)]);
@@ -419,6 +428,7 @@ begin
   begin
     if TRenderCompare.IsKnownDifference(Known, Page, BackendName, TTextGoldenComparer.CurrentPlatform) then
     begin
+      WarnWhenKnownPageIsEqual(RelativePath, Document, Page, Dpi);
       Continue;
     end;
 
@@ -447,6 +457,32 @@ begin
     finally
       Expected.Free;
     end;
+  end;
+end;
+
+procedure TRenderGoldenTestsBase.WarnWhenKnownPageIsEqual(const RelativePath: string; const Document: IPdfDocument; const Page: Integer; const Dpi: Integer);
+begin
+  const PngPath = TPath.Combine(ReferenceFolder(Dpi), Format('%s.p%.3d', [TCorpus.GoldenName(RelativePath), Page]) + PngExtension);
+  if not TFile.Exists(PngPath) then
+  begin
+    Exit;
+  end;
+
+  const Expected = TPng.Read(PngPath);
+  try
+    var IsEqual := False;
+    try
+      IsEqual := (PageDifference(RelativePath, Document, Page, Dpi, Expected) = '');
+    except
+      // A page that cannot be rendered has a difference
+    end;
+    if IsEqual then
+    begin
+      TDUnitX.CurrentRunner.Log(TLogLevel.Warning, Format('%s page %d at %d DPI equals its reference on %s with the %s backend: remove its known-difference entry',
+                                                          [RelativePath, Page, Dpi, TTextGoldenComparer.CurrentPlatform, BackendName]));
+    end;
+  finally
+    Expected.Free;
   end;
 end;
 

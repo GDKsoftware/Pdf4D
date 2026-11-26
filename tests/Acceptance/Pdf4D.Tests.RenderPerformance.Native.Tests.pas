@@ -14,6 +14,7 @@ uses
   Pdf4D.Api.Document.Interfaces,
   Pdf4D.Font.Mapper,
   Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Renderer.Interfaces,
   DUnitX.TestFramework;
 
 type
@@ -22,13 +23,19 @@ type
   [TestFixture]
   TNativeRenderDeterminismTests = class
   strict private
+    // The mapper that the fixture found, put back by TearDown (the test program installs its own for all fixtures)
+    FFoundMapper: IPdfFontMapper;
     // One mapper for all runs: a mapper that has been replaced stays in memory until the process ends
     class var FHermeticMapper: IPdfFontMapper;
 
     class function HashFilePath: string; static;
     class function IsHashedFile(const RelativePath: string): Boolean; static;
     class function HashOf(const Bitmap: TPdfBitmap): string; static;
-    class function RenderPage(const RelativePath: string; const Document: IPdfDocument; const Page: Integer): TPdfBitmap; static;
+    // The key ("<corpus file> page <n>") and the hash of a line of the hash file; the page marker is the last one before the hash, so a corpus
+    // path that holds " page " is no problem
+    class function TryParseLine(const Text: string; out Key, Hash: string): Boolean; static;
+    class function NewRenderer(const Document: IPdfDocument): IPdfRenderer; static;
+    class function RenderPage(const Renderer: IPdfRenderer; const Page: Integer): TPdfBitmap; static;
 
   public
     [Setup]
@@ -57,6 +64,8 @@ type
   [TestFixture]
   TRenderPerformanceNativeTests = class
   strict private
+    // The mapper that the fixture found, put back by TearDown (the test program installs its own for all fixtures)
+    FFoundMapper: IPdfFontMapper;
     class var FHermeticMapper: IPdfFontMapper;
 
     class function InvoiceFiles: TArray<string>; static;
@@ -86,13 +95,13 @@ uses
   System.Hash,
   System.IOUtils,
   System.Math,
+  System.RegularExpressions,
   DUnitX.Types,
   Pdf4D.Api.Document,
   Pdf4D.Common.Defines,
   Pdf4D.Font.MapperImpl,
   Pdf4D.Render.Native.Backend,
   Pdf4D.Render.Renderer,
-  Pdf4D.Render.Renderer.Interfaces,
   Pdf4D.Tests.Corpus,
   Pdf4D.Tests.FontProvider;
 
@@ -109,7 +118,9 @@ const
   RunsPerInvoice = 5;
   // 96 DPI is the scale 4 / 3 of the 72 points of an inch
   ViewerScale: Single = 4 / 3;
-  MaxMedianMilliseconds = 150;
+  // Five times the 52 ms of the slowest invoice on an idle machine: the median of five runs includes the first one (font loading), and a
+  // loaded agent may build in parallel
+  MaxMedianMilliseconds = 250;
   {$IFDEF DEBUG}
   IsMeasured = False;
   {$ELSEIF Defined(WIN64)}
@@ -137,12 +148,14 @@ begin
   begin
     FHermeticMapper := TFontMapperImpl.Create(TTestFontProvider.Empty);
   end;
+  FFoundMapper := TPdfFontMappers.Instance;
   TPdfFontMappers.SetInstance(FHermeticMapper);
 end;
 
 procedure TNativeRenderDeterminismTests.TearDown;
 begin
-  TPdfFontMappers.SetInstance(nil);
+  TPdfFontMappers.SetInstance(FFoundMapper);
+  FFoundMapper := nil;
 end;
 
 class function TNativeRenderDeterminismTests.HashFilePath: string;
@@ -162,10 +175,27 @@ begin
   Result := Hash.HashAsString;
 end;
 
-class function TNativeRenderDeterminismTests.RenderPage(const RelativePath: string; const Document: IPdfDocument; const Page: Integer): TPdfBitmap;
+class function TNativeRenderDeterminismTests.TryParseLine(const Text: string; out Key, Hash: string): Boolean;
+begin
+  Key := '';
+  Hash := '';
+  const Match = TRegEx.Match(Text, '^(.+) page ([0-9]+) ([0-9a-f]{64})( .*)?$');
+  Result := Match.Success;
+  if Result then
+  begin
+    Key := Match.Groups[1].Value + PageMarker + Match.Groups[2].Value;
+    Hash := Match.Groups[3].Value;
+  end;
+end;
+
+class function TNativeRenderDeterminismTests.NewRenderer(const Document: IPdfDocument): IPdfRenderer;
+begin
+  Result := TPdfRenderer.Create(Document, TPdfNativeBackend.Create);
+end;
+
+class function TNativeRenderDeterminismTests.RenderPage(const Renderer: IPdfRenderer; const Page: Integer): TPdfBitmap;
 begin
   Result := nil;
-  const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TPdfNativeBackend.Create);
   Renderer.RenderToBitmap(Page, TPdfRenderParams.FromDpi(HashDpi), Result);
 end;
 
@@ -175,21 +205,23 @@ begin
   Options.Password := TCorpus.PasswordFor(RelativePath);
   const Document: IPdfDocument = TPdfDocument.Load(TCorpus.PdfPath(RelativePath), Options);
 
+  // One renderer and one backend for all three: what a renderer keeps between renders (caches, the state of the device) must not change a page
+  const Renderer = NewRenderer(Document);
   var First: TPdfBitmap := nil;
   var Other: TPdfBitmap := nil;
   var Again: TPdfBitmap := nil;
   try
-    First := RenderPage(RelativePath, Document, 0);
+    First := RenderPage(Renderer, 0);
     // Another page in between, so that no state of the first render can be what the third one reuses
     if Document.PageCount > 1 then
     begin
-      Other := RenderPage(RelativePath, Document, 1);
+      Other := RenderPage(Renderer, 1);
     end
     else
     begin
-      Other := RenderPage(RelativePath, Document, 0);
+      Other := RenderPage(Renderer, 0);
     end;
-    Again := RenderPage(RelativePath, Document, 0);
+    Again := RenderPage(Renderer, 0);
 
     Assert.AreEqual<Integer>(Length(First.Pixels), Length(Again.Pixels), RelativePath + ': the renders have the same size');
     Assert.IsTrue(CompareMem(@First.Pixels[0], @Again.Pixels[0], Length(First.Pixels)), RelativePath + ': the second render of page 1 differs from the first');
@@ -208,12 +240,15 @@ begin
   const Writing = (GetEnvironmentVariable(WriteEnvironmentVariable) <> '') and IsWin64;
   var Expected := TDictionary<string, string>.Create;
   var ExpectedLinux := TDictionary<string, string>.Create;
+  // The lines of the Linux64 hashes of the old file, kept when the file is written
+  var LinuxLines := TDictionary<string, string>.Create;
+  var Matched := TDictionary<string, Boolean>.Create;
   var Written := TStringList.Create;
   var Timings := TStringList.Create;
   try
-    if not Writing then
+    Assert.IsTrue(TFile.Exists(HashFilePath) or Writing, 'Missing ' + HashFilePath);
+    if TFile.Exists(HashFilePath) then
     begin
-      Assert.IsTrue(TFile.Exists(HashFilePath), 'Missing ' + HashFilePath);
       for var Line in TFile.ReadAllLines(HashFilePath, TEncoding.UTF8) do
       begin
         if (Line = '') or Line.StartsWith('#') then
@@ -228,11 +263,14 @@ begin
           Text := Copy(Text, Length(LinuxMarker) + 1);
           Target := ExpectedLinux;
         end;
-        const PageAt = Pos(PageMarker, Text);
-        Assert.IsTrue(PageAt > 1, 'Malformed line: ' + Line);
-        const Parts = Copy(Text, PageAt + Length(PageMarker)).Split([' ']);
-        Assert.IsTrue(Length(Parts) >= 2, 'Malformed line: ' + Line);
-        Target.AddOrSetValue(Copy(Text, 1, PageAt - 1) + PageMarker + Parts[0], Parts[1]);
+        var Key: string;
+        var Hash: string;
+        Assert.IsTrue(TryParseLine(Text, Key, Hash), 'Malformed line: ' + Line);
+        Target.AddOrSetValue(Key, Hash);
+        if Target = ExpectedLinux then
+        begin
+          LinuxLines.AddOrSetValue(Key, Line);
+        end;
       end;
     end;
 
@@ -252,14 +290,20 @@ begin
       begin
         const Key = RelativePath + PageMarker + IntToStr(Page + 1);
         const Watch = TStopwatch.StartNew;
-        const Bitmap = RenderPage(RelativePath, Document, Page);
+        const Bitmap = RenderPage(NewRenderer(Document), Page);
         Timings.Add(Format('%8.1f ms %s', [Watch.Elapsed.TotalMilliseconds, Key]));
         try
           const Actual = HashOf(Bitmap);
           Inc(Seen);
+          Matched.AddOrSetValue(Key, True);
           if Writing then
           begin
             Written.Add(Key + ' ' + Actual);
+            var LinuxLine: string;
+            if LinuxLines.TryGetValue(Key, LinuxLine) then
+            begin
+              Written.Add(LinuxLine);
+            end;
             Continue;
           end;
 
@@ -304,6 +348,21 @@ begin
     end;
 
     Assert.IsTrue(Seen > 0, 'No page was hashed');
+    // A line of the file that no rendered page has: a page that was removed or a file that has fewer pages now
+    for var Key in Expected.Keys do
+    begin
+      if not Matched.ContainsKey(Key) then
+      begin
+        Differences := Differences + [Key + ': in ' + HashesFileName + ', but no such page was rendered'];
+      end;
+    end;
+    for var Key in ExpectedLinux.Keys do
+    begin
+      if not Matched.ContainsKey(Key) then
+      begin
+        Differences := Differences + [Key + ': a [Linux64] line of ' + HashesFileName + ', but no such page was rendered'];
+      end;
+    end;
     if Length(Differences) > 0 then
     begin
       const Report = Format('%d of %d pages differ from %s: %s', [Length(Differences), Seen, HashesFileName, string.Join('; ', Copy(Differences, 0, 10))]);
@@ -319,6 +378,8 @@ begin
   finally
     Timings.Free;
     Written.Free;
+    Matched.Free;
+    LinuxLines.Free;
     ExpectedLinux.Free;
     Expected.Free;
   end;
@@ -332,12 +393,14 @@ begin
   begin
     FHermeticMapper := TFontMapperImpl.Create(TTestFontProvider.Empty);
   end;
+  FFoundMapper := TPdfFontMappers.Instance;
   TPdfFontMappers.SetInstance(FHermeticMapper);
 end;
 
 procedure TRenderPerformanceNativeTests.TearDown;
 begin
-  TPdfFontMappers.SetInstance(nil);
+  TPdfFontMappers.SetInstance(FFoundMapper);
+  FFoundMapper := nil;
 end;
 
 class function TRenderPerformanceNativeTests.InvoiceFiles: TArray<string>;
