@@ -131,7 +131,7 @@ type
     [Test]
     procedure TestEdgeWorkLimitMustBePositive;
 
-    // The worst case at the verb limit takes 25 s and 1.5 GB; it runs when the environment variable PDF4D_STRESS is set (see docs/building.md)
+    // The worst case at the verb limit takes a few seconds and about 1.5 GB; it runs when the environment variable PDF4D_STRESS is set (see docs/building.md)
     [Test]
     procedure TestWorstCaseOfTheEdgeWalkIsBounded;
 
@@ -787,7 +787,7 @@ end;
 // The worst case of the walk of the edges: as many segments as the verb limit allows, each from the top row to the bottom row of the device,
 // so that all of them are active in every row and cross each other in most. The device is 100 and 1000 rows high, drawn with and without
 // anti-aliasing (four times the rows). A fill ends within the bound either way: it draws, or it raises EPdfLimitExceededException when the
-// bound of the work of the walk is over the limit. About 25 s and 1.5 GB: only when PDF4D_STRESS is set.
+// bound of the work of the walk is over the limit. A few seconds and about 1.5 GB: only when PDF4D_STRESS is set.
 procedure TPdfNativeHostileTests.TestWorstCaseOfTheEdgeWalkIsBounded;
 begin
   if not IsStressRun then
