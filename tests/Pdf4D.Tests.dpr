@@ -212,6 +212,7 @@ uses
   Pdf4D.Tests.RenderCompare.Tests in 'Support\Pdf4D.Tests.RenderCompare.Tests.pas',
   Pdf4D.Tests.RenderGolden.Base in 'Support\Pdf4D.Tests.RenderGolden.Base.pas',
   Pdf4D.Tests.RenderGolden.Native.Tests in 'Acceptance\Pdf4D.Tests.RenderGolden.Native.Tests.pas',
+  Pdf4D.Tests.RenderPerformance.Native.Tests in 'Acceptance\Pdf4D.Tests.RenderPerformance.Native.Tests.pas',
   Pdf4D.Tests.RecordingBlitter in 'Support\Pdf4D.Tests.RecordingBlitter.pas',
   Pdf4D.Render.Native.Scan.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas',
   Pdf4D.Render.Native.Scan.Hairline.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas',

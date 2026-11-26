@@ -283,6 +283,7 @@
         <DCCReference Include="Support\Pdf4D.Tests.RenderCompare.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RenderGolden.Base.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGolden.Native.Tests.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.RenderPerformance.Native.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.RecordingBlitter.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas"/>
