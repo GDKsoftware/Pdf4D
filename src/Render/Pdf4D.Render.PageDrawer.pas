@@ -1210,7 +1210,7 @@ begin
   end;
 
   // The shortest dash that Java2D can draw; PDFBOX-4492 makes it longer when the page is drawn small
-  var Shortest := MinimumDashLength;
+  var Shortest: Single := MinimumDashLength;
   if FScalingFactorX < SmallScale then
   begin
     Shortest := MinimumDashLengthAtSmallScale;
