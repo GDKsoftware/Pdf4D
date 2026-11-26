@@ -90,7 +90,7 @@ type
     procedure TestClipOnAPixmapThatNeedsTiles;
 
     [Test]
-    procedure TestHairlineInAClipOfTwoPixelsDrawsNothing;
+    procedure TestHairlineInAClipOfTwoPixelsIsDrawn;
   end;
 
 implementation
@@ -444,10 +444,10 @@ begin
   Assert.IsFalse(IsFilled(Stroked, 8300, 2), 'the hairline stops at the right of the clip');
 end;
 
-procedure TTsPainterTests.TestHairlineInAClipOfTwoPixelsDrawsNothing;
+procedure TTsPainterTests.TestHairlineInAClipOfTwoPixelsIsDrawn;
 begin
   // tiny-skia insets the clip by a pixel on every side to tell where a hairline is not clipped, and draws nothing when that leaves no
-  // area: a hairline that is clipped to a rectangle of 2 pixels or less in one direction is not drawn (the device gives such a clip a mask)
+  // area. Pdf4D deviates: a hairline in a clip of less than 3 pixels in one direction is drawn, through the clipped path of every segment
   var Builder := TTsPathBuilder.New;
   Builder.MoveTo(0, 1.5);
   Builder.LineTo(10, 1.5);
@@ -461,8 +461,9 @@ begin
     TTsPainter.StrokePath(Pixmap, Line, TTinySkiaFixtures.SolidPaint(True), Stroke, TTsTransform.Identity,
       TTsScreenIntRect.FromXYWHSafe(2, 1, 5, Cardinal(Height)), nil);
 
-    const IsDrawn = IsFilled(Pixmap, 4, 1);
-    Assert.AreEqual(Height >= 3, IsDrawn, Format('a clip of %d pixels high', [Height]));
+    Assert.IsTrue(IsFilled(Pixmap, 4, 1), Format('a clip of %d pixels high', [Height]));
+    Assert.IsFalse(IsFilled(Pixmap, 1, 1), Format('left of a clip of %d pixels high', [Height]));
+    Assert.IsFalse(IsFilled(Pixmap, 7, 1), Format('right of a clip of %d pixels high', [Height]));
   end;
 end;
 

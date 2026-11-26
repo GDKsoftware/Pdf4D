@@ -269,12 +269,10 @@ begin
         Exit;
       end;
 
-      if not ClipInt.TryInset(1, 1, InsetClip) then
-      begin
-        Exit;
-      end;
-
-      HasInsetClip := True;
+      // Pdf4D deviation from tiny-skia: a clip that is under 3 px in one direction has no inset rect, and tiny-skia then returns without
+      // drawing. A thin device, group layer or tile slice would lose every hairline that way, so here the segments simply take the
+      // clipped path (without the quick-accept and quick-reject that the inset rect allows).
+      HasInsetClip := ClipInt.TryInset(1, 1, InsetClip);
     end;
   end;
 
