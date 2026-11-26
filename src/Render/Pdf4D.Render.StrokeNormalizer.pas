@@ -12,6 +12,9 @@ uses
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path;
 
+// A point that is not a number or is infinite goes through the snapping as it is, and the path that comes out has it too (the arithmetic is
+// done with the floating point exceptions masked); the device that draws the path decides what to do with it.
+
 type
   // Java2D normalizes the geometry of a stroke before it draws it (RenderingHints.VALUE_STROKE_NORMALIZE, the default, which PDFBox
   // does not change): with anti-aliasing the end points of every segment, in device pixels, move to the centre of the pixel they are in
@@ -26,6 +29,10 @@ type
       end;
       TRounding = function(const Value: Double): Double;
 
+    // Floor and Ceil that stay in Double: a value that is not a number stays so, and a value beyond the Integer range stays exact (System.Math
+    // gives an Integer, which wraps or becomes the integer indefinite)
+    class function FloorOf(const Value: Double): Double; static;
+    class function CeilOf(const Value: Double): Double; static;
     class function Centered(const Value: Double): Double; static;
     class function ClipEdge(const Value: Double): Double; static;
     class function FillEdge(const Value: Double): Double; static;
@@ -35,6 +42,8 @@ type
     class function Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix; static;
     class procedure Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
                                 const Snap: TRounding); static;
+    class procedure RebuildMasked(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
+                                  const Snap: TRounding); static;
 
   public
     // A new path in the space of Path that the caller frees: Path with the end points of its segments moved to the pixel centres of the
@@ -60,10 +69,13 @@ type
 implementation
 
 uses
-  System.Math;
+  System.Math,
+  Pdf4D.Common.FloatGuard;
 
 const
   PixelCentre = 0.5;
+  // From 2^52 on every Double is a whole number
+  WholeNumberLimit = 4503599627370496.0;
   ClipBias = 0.25;
   // A device value a hair above a whole number (the Single translation of a page matrix gives 0.00001 for the top edge of a page) is that
   // number, as in the double arithmetic of Java2D
@@ -72,19 +84,47 @@ const
 
 { TPdfStrokeNormalizer }
 
+class function TPdfStrokeNormalizer.FloorOf(const Value: Double): Double;
+begin
+  if IsNan(Value) or (Abs(Value) >= WholeNumberLimit) then
+  begin
+    Exit(Value);
+  end;
+
+  Result := Trunc(Value);
+  if Result > Value then
+  begin
+    Result := Result - 1;
+  end;
+end;
+
+class function TPdfStrokeNormalizer.CeilOf(const Value: Double): Double;
+begin
+  if IsNan(Value) or (Abs(Value) >= WholeNumberLimit) then
+  begin
+    Exit(Value);
+  end;
+
+  Result := Trunc(Value);
+  if Result < Value then
+  begin
+    Result := Result + 1;
+  end;
+end;
+
 class function TPdfStrokeNormalizer.Centered(const Value: Double): Double;
 begin
-  Result := Floor(Value) + PixelCentre;
+  Result := FloorOf(Value) + PixelCentre;
 end;
 
 class function TPdfStrokeNormalizer.ClipEdge(const Value: Double): Double;
 begin
-  Result := Floor(Value + ClipBias) + ClipBias;
+  Result := FloorOf(Value + ClipBias) + ClipBias;
 end;
 
 class function TPdfStrokeNormalizer.FillEdge(const Value: Double): Double;
 begin
-  Result := Ceil(Value - FillBias);
+  Result := CeilOf(Value - FillBias);
 end;
 
 class function TPdfStrokeNormalizer.IsUnitScale(const ToDevice: TPdfMatrix): Boolean;
@@ -177,6 +217,17 @@ end;
 // precision, because the boundary decides the pixel the point moves to.
 class procedure TPdfStrokeNormalizer.Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
                                              const Snap: TRounding);
+begin
+  const FloatState = TPdfFloatGuard.Enter;
+  try
+    RebuildMasked(Source, ToDevice, ResidualX, ResidualY, Target, Snap);
+  finally
+    TPdfFloatGuard.Leave(FloatState);
+  end;
+end;
+
+class procedure TPdfStrokeNormalizer.RebuildMasked(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double;
+                                                   const Target: TPdfPath; const Snap: TRounding);
 begin
   var PointIndex := 0;
   var CurrentX := 0.0;

@@ -35,6 +35,10 @@ type
     // and for a path with a point that is not finite.
     class function TryToPath(const Path: TPdfPath; out Ts: TTsPath): Boolean; static;
 
+    // True when every point of Path is a finite number: a device checks it before it snaps the path, so that a point that is not a number
+    // cannot become a finite one
+    class function HasFinitePoints(const Path: TPdfPath): Boolean; static;
+
     // PDF [a b c d e f] is x' = a * x + c * y + e, y' = b * x + d * y + f: FromRow(a, b, c, d, e, f)
     class function ToTransform(const Matrix: TPdfMatrix): TTsTransform; static;
 
@@ -65,6 +69,20 @@ begin
 end;
 
 { TTsConversion }
+
+class function TTsConversion.HasFinitePoints(const Path: TPdfPath): Boolean;
+begin
+  for var PointIndex := 0 to Path.PointCount - 1 do
+  begin
+    const Point = Path.Point(PointIndex);
+    if not (IsFiniteSingle(Point.X) and IsFiniteSingle(Point.Y)) then
+    begin
+      Exit(False);
+    end;
+  end;
+
+  Result := True;
+end;
 
 class function TTsConversion.TryToPath(const Path: TPdfPath; out Ts: TTsPath): Boolean;
 begin
