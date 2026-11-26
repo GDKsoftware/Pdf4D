@@ -152,7 +152,7 @@ begin
   var Bytes: TArray<Byte>;
   SetLength(Bytes, 8);
 
-  Move(Pixels[0], Bytes[0], SizeOf(Bytes));
+  Move(Pixels[0], Bytes[0], Length(Bytes));
 
   Assert.AreEqual<Integer>(4, SizeOf(TTsPremultipliedColorU8));
   Assert.AreEqual<TArray<Byte>>([0, 1, 2, 3, 10, 11, 12, 13], Bytes);
