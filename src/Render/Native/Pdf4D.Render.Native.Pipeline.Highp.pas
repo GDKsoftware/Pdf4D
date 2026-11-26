@@ -795,7 +795,9 @@ end;
 
 function ClipChannel(const Channel, Mn, Mx, L, A: TF32x8): TF32x8;
 begin
-  Result := Mx.CmpGe(Zero).Blend(Channel, L + (Channel - L) * L / (L - Mn));
+  // Deviation from tiny-skia, which tests Mx >= 0 here and so never scales a channel back that is below 0: PDF 32000-1 11.3.5.3 ClipColor
+  // (and Skia) test the minimum
+  Result := Mn.CmpLt(Zero).Blend(L + (Channel - L) * L / (L - Mn), Channel);
   Result := Mx.CmpGt(A).Blend(L + (Result - L) * (A - L) / (Mx - L), Result);
   // Sometimes without this we may dip just a little negative
   Result := Result.Max(Zero);

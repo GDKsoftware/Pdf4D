@@ -123,6 +123,13 @@ type
     [Test]
     procedure TestEveryPdfBlendModeMatchesFormula;
 
+    // PDF 32000-1 11.3.5.3 ClipColor pulls a channel that is below 0 back into range: Hue of a red backdrop with (51,128,230), and Color of
+    // a dark backdrop with the same source, both end up with a negative channel before the clipping
+    [Test]
+    [TestCase('Hue', '25,255,0,0,51,128,230')]
+    [TestCase('Color', '27,20,20,20,51,128,230')]
+    procedure TestNonSeparableBlendClipsANegativeChannel(const Mode, BackdropR, BackdropG, BackdropB, SourceR, SourceG, SourceB: Integer);
+
     [Test]
     procedure TestScale1FloatAndLerpU8;
 
@@ -560,6 +567,30 @@ begin
     Assert.AreEqual(Expected[2], Integer(Dst.Data[2]), 1, Message);
     Assert.AreEqual(255, Integer(Dst.Data[3]), Message);
   end;
+end;
+
+procedure TTsPipelineTests.TestNonSeparableBlendClipsANegativeChannel(const Mode, BackdropR, BackdropG, BackdropB, SourceR, SourceG, SourceB: Integer);
+begin
+  const BlendMode = TTsBlendMode(Mode);
+  var Stage: TTsStage;
+  Assert.IsTrue(BlendMode.TryToStage(Stage));
+
+  var Dst := TTsSubPixmapMut.Whole(PixelBytes(BackdropR, BackdropG, BackdropB, 255), 1, 1);
+  var Builder := TTsRasterPipelineBuilder.New;
+  Builder.SetForceHqPipeline(True);
+  Builder.PushUniformColor(Opaque(SourceR, SourceG, SourceB));
+  Builder.Push(TTsStage.LoadDestination);
+  Builder.Push(Stage);
+  Builder.Push(TTsStage.Store);
+  var Pipeline := Builder.Compile;
+
+  RunOver(Pipeline, Dst, NoPixmap);
+
+  const Expected = TTsPdfBlendReference.Blend(BlendMode, [BackdropR, BackdropG, BackdropB], [SourceR, SourceG, SourceB]);
+  const Message = Format('Blend mode %d gives (%d,%d,%d), expected (%d,%d,%d)', [Mode, Dst.Data[0], Dst.Data[1], Dst.Data[2], Expected[0], Expected[1], Expected[2]]);
+  Assert.AreEqual(Expected[0], Integer(Dst.Data[0]), 1, Message);
+  Assert.AreEqual(Expected[1], Integer(Dst.Data[1]), 1, Message);
+  Assert.AreEqual(Expected[2], Integer(Dst.Data[2]), 1, Message);
 end;
 
 procedure TTsPipelineTests.TestScale1FloatAndLerpU8;
