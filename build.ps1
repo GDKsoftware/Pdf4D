@@ -345,14 +345,17 @@ function Get-Pass1Summary($TestProject, [string]$TargetPlatform) {
     }
 }
 
+function Remove-StalePass1Results($TestProject, [string]$TargetPlatform) {
+    # a results file of an earlier run must not be taken for the one of this run; a stale program that is still running could write or
+    # hold it, so it is removed after that program is stopped
+    Remove-Item -LiteralPath (Join-Path $PSScriptRoot "$($TestProject.Folder)\results-$TargetPlatform-pass1.xml") -ErrorAction SilentlyContinue
+}
+
 function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     Write-Host "=== Test $($TestProject.Name) $TargetPlatform $Config ==="
     $testArguments = @(if ($Fixtures) { "-r:$Fixtures" })
     $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
     $programPath = Join-Path $outputFolder "$($TestProject.Name).exe"
-
-    # a results file of an earlier run must not be taken for the one of this run
-    Remove-Item -LiteralPath (Join-Path $PSScriptRoot "$($TestProject.Folder)\results-$TargetPlatform-pass1.xml") -ErrorAction SilentlyContinue
 
     if ($TestProject.NeedsSkia) {
         Copy-Item -LiteralPath (Get-SkiaLibraryPath $TargetPlatform) -Destination $outputFolder -Force
@@ -361,6 +364,7 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     if ($TargetPlatform -eq 'Linux64') {
         $linuxBinary = Get-WslPath (Join-Path $outputFolder $TestProject.Name)
         Stop-StaleTestProgram $null $linuxBinary
+        Remove-StalePass1Results $TestProject $TargetPlatform
         & wsl -d $WslDistro -- chmod +x $linuxBinary
         if ($TestProject.NeedsSkia) {
             $linuxFolder = Get-WslPath $outputFolder
@@ -373,6 +377,7 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     }
     else {
         Stop-StaleTestProgram $programPath $null
+        Remove-StalePass1Results $TestProject $TargetPlatform
         $run = Invoke-TimedProgram $programPath $testArguments $null
     }
 
