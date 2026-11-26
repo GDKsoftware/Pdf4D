@@ -86,7 +86,7 @@ Pdf4D does not include Skia. The Skia backend (src/Render/Skia) uses System.Skia
 needs sk4d.dll or libsk4d.so, which the application brings. Skia is licensed under the BSD 3-Clause License, Skia4Delphi under
 the MIT License.
 
-tiny-skia
-Copyright (c) 2011 Google Inc. All rights reserved.
-Copyright (c) 2020 Yevhenii Reizner All rights reserved.
-Licensed under the BSD 3-Clause License; see licenses/tiny-skia-BSD-3-Clause.txt.
+Includes a port of tiny-skia v0.12.0 (https://github.com/linebender/tiny-skia), a Rust port of the CPU rasterizer of Skia,
+in src/Render/Native (the native render backend); each unit names the source files it ports. The reference images of tiny-skia in
+tests/reference/tiny-skia are only used by the tests. Copyright (c) 2011 Google Inc. All rights reserved. Copyright (c) 2020
+Yevhenii Reizner All rights reserved. Licensed under the BSD 3-Clause License, see licenses/tiny-skia-BSD-3-Clause.txt.

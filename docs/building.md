@@ -17,7 +17,11 @@
 ./build.ps1                          # all platforms, Debug
 ./build.ps1 -Platform Win64          # one platform
 ./build.ps1 -Platform All -Config Release
+./build.ps1 -Platform Win64 -Config Release -Suite Pdf4D.Tests -Fixtures <Unit.Class>[,<Unit.Class>]   # one fixture
+./build.ps1 -SuiteTimeoutMinutes 30  # kill a test program that runs longer than 30 minutes (60 by default)
 ```
+
+Before it builds a test project and before it runs the program, the script stops a program of that project that an earlier run left behind (it finds it by its full path, so a program of another checkout is not touched); a stale program would hold the file that the linker needs. Every test program runs under a time limit, `-SuiteTimeoutMinutes` (60 minutes by default, fractions allowed): a program that runs longer is killed, with its child processes (and, on Linux64, inside WSL), and the build fails with a message that names the suite, the platform and the configuration. The output of the program is shown while it runs.
 
 For each platform the script first builds the packages (`packages\Pdf4D.dproj`, `Pdf4D.Render.dproj`, `Pdf4D.Render.Native.dproj`, `Pdf4D.Render.Skia.dproj` and `Pdf4D.Viewer.dproj`, and for Win32 and Win64 also `Pdf4D.Vcl.dproj`, `Pdf4D.Vcl.Skia.dproj`, the design-time package `dclPdf4D.Vcl.dproj`, `Pdf4D.FMX.dproj`, `Pdf4D.FMX.Skia.dproj` and the design-time package `dclPdf4D.FMX.dproj`), then `tests\Pdf4D.Tests.dproj`, `tests\Skia\Pdf4D.Skia.Tests.dproj` (see "The Skia backend") and, for Win32 and Win64, `tests\Vcl\Pdf4D.Vcl.Tests.dproj` (see "The VCL tests") and `tests\FMX\Pdf4D.FMX.Tests.dproj` (see "The FMX tests"), with msbuild. For Win32 and Win64 it also compiles the demos (`demos\Vcl\Pdf4DInvoiceDemo.dproj` and `demos\FMX\Pdf4DInvoiceDemoFmx.dproj`, see "The demo") after the packages; the demos are not run. It fails on any hint or warning from the project's own code, on W1033 in a package build, and on a failing test. It exits non-zero on a failure.
 
@@ -94,7 +98,7 @@ The Linux64 binary is built with msbuild on Windows and run in WSL. The script c
 
 ## Test results and leaks
 
-- Each run writes NUnit XML to `tests\results-<platform>.xml`.
+- Each run writes NUnit XML to `tests\results-<platform>.xml` (the other test projects to `tests\<Project>\results-<platform>.xml`). The program runs the suite twice, see below: the first run writes `results-<platform>-pass1.xml` and the second `results-<platform>.xml`, so that a failure of the first run is not overwritten by the second. When a suite fails, `build.ps1` prints the totals of the pass 1 file; read it to tell a failure of the first run from one that only the second run has (a test that depends on the order of the fixtures or on what an earlier run left behind).
 - The test program runs the suite twice and compares the number of outstanding memory blocks before and after the second run, on every platform. A difference gives exit code 2. In Debug on Windows, `ReportMemoryLeaksOnShutdown` is also enabled.
 - Exit codes: 0 all passed, 1 test failure, 2 memory leak, 3 (FMX tests only) the memory check could not be trusted: FMX did not let go of its blocks in the batch of windows that the check expects (see "The FMX tests").
 
@@ -165,6 +169,19 @@ Run `generate-golden.ps1 -Mode All -Filter <path>` for every new corpus file as 
 
 `tools\oracle\generate-render.ps1 -Dpi 72` writes the PDFBox renders of every corpus page to `tests\reference\render\72` (about 45 MB, in plain git) and `-Dpi 150` those of `tests\reference\render\150\selection.txt`; `tools\oracle\generate-render-tests.ps1` writes the synthetic render test files. `PDF4D_RENDER_OUTPUT` names a folder where `Pdf4D.Skia.Tests` writes the Pdf4D render and a difference image of every page that differs from its reference, and the files `summary.txt`, `distribution.txt`, `region.txt` and `performance.txt`; `PDF4D_RENDER_FILTER` (substrings of corpus paths, separated by semicolons) limits the comparison to the matching files. The format and the comparison are in `golden-format.md`.
 
+## The native tests
+
+The tests of the native backend are in the core test project (`tests\Pdf4D.Tests.dproj`), which has no Skia library, so they prove that the native rasterizer needs none:
+
+- `Pdf4D.Render.Native.*.Tests` (next to the units in `src\Render\Native`): the unit tests of the port. The seven painter fixtures (`Pdf4D.Render.Native.Painter.*.Tests`, helper `Pdf4D.Tests.TinySkiaImages`) compare with the 108 reference images of tiny-skia in `tests\reference\tiny-skia`, byte for byte (`tools\fetch-tiny-skia-src.ps1 -CopyTestImages` renews them). `Pdf4D.Render.Native.CompilerCanary.Tests` pins the compiler behaviour that the single precision code relies on (it must be run in a Release build too, where the optimizer matters).
+- `Pdf4D.Render.Native.Device.Tests`, `Pdf4D.Render.Native.Backend.Tests` and `Pdf4D.Tests.RenderNative.Tests`: the device and the backend, with the device contract (`Pdf4D.Tests.DeviceContract`) that the Skia device passes as well.
+- `Pdf4D.Render.Native.Device.Hostile.Tests`: hostile paths, clips, matrices and sizes through the device, with time bounds that are Win64 Release figures.
+- `Pdf4D.Tests.RenderGolden.Native.Tests`: the comparison with the PDFBox reference renders (`TNativeRenderGoldenTests`; pending list `tests\reference\render\pending-native.txt`, see `golden-format.md`).
+- `Pdf4D.Tests.RenderRobustness.Native.Tests`: the fuzz runs and hostile documents through the renderer on the native backend (the same cases as for Skia).
+- `Pdf4D.Tests.RenderPerformance.Native.Tests`: determinism, hashes and speed (see "Native determinism and performance").
+
+Work on one area with `-Fixtures`, for example `./build.ps1 -Platform Win64 -Config Release -Suite Pdf4D.Tests -Fixtures Pdf4D.Render.Native.Scan.Tests.TTsScanTests`.
+
 ## Native determinism and performance
 
 `tests\Acceptance\Pdf4D.Tests.RenderPerformance.Native.Tests.pas` (core test project) checks the native backend three ways. `TestRenderTwiceIsByteIdentical` renders a page, another page and the first page again and compares the bytes. `TestNativeHashesMatch` renders every page of `generated/render/*.pdf` and of the invoices at 72 DPI and compares the SHA-256 of the pixels with `tests\reference\render\native-hashes.txt` (lines `<corpus file> page <n> <sha256>`; a line that starts with `[Linux64] ` is the hash for Linux64 alone, with the reason after the hash). On Win64 and Linux64 a difference fails; on Win32 it is only reported. `TRenderPerformanceNativeTests.TestInvoiceFirstPage` renders the first page of every invoice at 96 DPI five times and holds the median to a threshold; it measures only in a Release build on Win64. The hashes are made on Win64: set `PDF4D_NATIVE_HASHES_WRITE=1` and run `TNativeRenderDeterminismTests.TestNativeHashesMatch`, which then writes the file instead of reading it; read the diff before it is committed (a changed hash is a changed pixel). With `PDF4D_RENDER_OUTPUT` set, the time of every hashed page goes to `native-page-times.txt` and the medians of the invoices to `performance-native.txt` in that folder. A line of the hash file that no rendered page has fails the test, and writing the file keeps the `[Linux64]` lines of the pages that are still rendered. The median threshold of `TestInvoiceFirstPage` is 250 ms (the slowest invoice takes about 50 ms on an idle machine).
@@ -207,7 +224,7 @@ The Skia tests are a separate project, `tests\Skia\Pdf4D.Skia.Tests.dproj` (outp
 
 Pdf4D needs Delphi 12 or newer, but every build and test so far was done with Delphi 13. Do this checklist on the first machine with Delphi 12 and write down what differs; new differences are noted, not fixed in the same step.
 
-1. Open `packages\Pdf4D.groupproj` and build all three packages (`Pdf4D`, `Pdf4D.Render`, `Pdf4D.Render.Skia`) for Win32 and Win64, without hints or warnings (`build.ps1` is written for Delphi 13 and calls `rsvars.bat` of Studio 37.0; point it at Studio 23.0 or build in the IDE).
+1. Open `packages\Pdf4D.groupproj` and build the packages (`Pdf4D`, `Pdf4D.Render`, `Pdf4D.Render.Native`, `Pdf4D.Render.Skia`) for Win32 and Win64, without hints or warnings (`build.ps1` is written for Delphi 13 and calls `rsvars.bat` of Studio 37.0; point it at Studio 23.0 or build in the IDE).
 2. Check that the Skia package is called `Skia.Package.RTL` in Delphi 12, as `Pdf4D.Render.Skia.dpk` requires.
 3. Build and run `tests\Pdf4D.Tests.dproj` and `tests\Skia\Pdf4D.Skia.Tests.dproj`, the second one with the `sk4d.dll` of Delphi 12 (`Redist\win64\sk4d.dll` of that installation, next to the test program).
 4. Run the reference tests (the render comparison with the PDFBox images, `TRenderGoldenTests`) on Win64 and compare the number of pages that differ with Delphi 13 (612 of 617 pages equal at 72 DPI, 19 of 22 at 150 DPI). The Skia version is another one, so pages can differ at the edges; note the new differences and do not fix them in this step.
@@ -233,6 +250,15 @@ Do this too on the first machine with Delphi 12, and write down what differs.
 4. Go through the FMX demo at 100 % and at 150 % scale, also after dragging the window to another screen (the manual check in "The demo"): the page stays sharp, the marker sits on the text, the current page and the zoom do not change.
 5. Check in Delphi 12 the FMX APIs that were taken from the FMX source of Delphi 13 and have not been run on Delphi 12: the scale of the canvas (`Canvas.Scale`, `IFMXScreenService`), a message for a change of scale (`TScaleChangedMessage`), the printer resolution (`Printer.ActivePrinter.ActiveDPI`), the masking of `InputQuery` (the prompt that starts with `#31`) and the setup dialog of the printer.
 6. Run `TestRealPrinter` in `Pdf4D.FMX.Print.Tests` with `PDF4D_TEST_PRINTER` set to `Microsoft Print to PDF` (it runs unattended, see "The FMX tests") and, on a desktop session, with a physical printer: look at the pages that come out. On Delphi 13 the unattended run was done on Windows 11 and found nothing to fix; on Delphi 12 and on a physical printer it has not been done yet.
+
+### Delphi 12: the native rasterizer (phase 5)
+
+Do this too on the first machine with Delphi 12, and write down what differs.
+
+1. Build `packages\Pdf4D.Render.Native.dproj` for Win32 and Win64 without hints or warnings. The units use inline `const` and `var` and no Delphi 13-only syntax; the compiler directives that the port needs (`{$EXCESSPRECISION OFF}`, and `{$OVERFLOWCHECKS OFF}` in three units, see `coding-rules.md`) must be honoured as in Delphi 13.
+2. Run the native tests (see "The native tests") on Win32 and Win64, in Release and Debug. `Pdf4D.Render.Native.CompilerCanary.Tests` pins the compiler behaviour that the port relies on (the negated comparison as a boolean value with NaN, single precision rounding); a failure there means that the code of this compiler needs another look before any pixel difference is judged.
+3. Run `TNativeRenderDeterminismTests.TestNativeHashesMatch` on Win64 and compare the hashes with `tests\reference\render\native-hashes.txt`. A difference with Delphi 13 is a difference in the generated code; read it before it is accepted.
+4. Run the 108 tiny-skia images (the seven `Pdf4D.Render.Native.Painter.*.Tests` fixtures) on Win64: they must stay byte-exact.
 
 ### The design-time package
 
