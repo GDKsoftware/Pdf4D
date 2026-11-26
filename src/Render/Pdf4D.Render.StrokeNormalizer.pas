@@ -237,12 +237,10 @@ class procedure TPdfStrokeNormalizer.RebuildMasked(const Source: TPdfPath; const
                                                    const Target: TPdfPath; const Snap: TRounding);
 begin
   var PointIndex := 0;
-  // Currency is the type that an untyped "var X := 0.0" gets on Win64, which these residuals had so far; an untyped var is an Extended
-  // of 80 bits on Linux64. Double would be the precise type, but it changes the reference renders (native-hashes.txt).
-  var CurrentX: Currency := 0.0;
-  var CurrentY: Currency := 0.0;
-  var StartX: Currency := 0.0;
-  var StartY: Currency := 0.0;
+  var CurrentX: Double := 0.0;
+  var CurrentY: Double := 0.0;
+  var StartX: Double := 0.0;
+  var StartY: Double := 0.0;
   for var VerbIndex := 0 to Source.VerbCount - 1 do
   begin
     case Source.Verb(VerbIndex) of

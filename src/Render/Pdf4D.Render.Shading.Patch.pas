@@ -305,10 +305,8 @@ end;
 
 function TPdfPatch.SurfacePoint(const U, V: Double): TPdfPatchPoint;
 begin
-  // Currency is the type that an untyped "var X := 0.0" gets on Win64, which these sums had so far; an untyped var is an Extended of 80
-  // bits on Linux64. Double would be the precise type, but it changes the reference renders (native-hashes.txt).
-  var X: Currency := 0.0;
-  var Y: Currency := 0.0;
+  var X: Double := 0.0;
+  var Y: Double := 0.0;
   for var Row := 0 to 3 do
   begin
     for var Column := 0 to 3 do
