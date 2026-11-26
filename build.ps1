@@ -15,7 +15,12 @@ param(
     # Run only these fixtures of each test project (DUnitX -r:, comma separated, full names as Unit.Class), for example
     # Pdf4D.Render.Native.Path.Tests.TTsPathTests,Pdf4D.Render.Native.Stroker.Tests.TTsStrokerTests
     # A filter that matches no test in Pdf4D.Tests fails the run; in the other test projects it only warns
-    [string]$Fixtures
+    [string]$Fixtures,
+
+    # The time that one test program may run, in minutes. A program that runs longer is killed (with its child processes) and the build
+    # fails with a message that names the suite.
+    [ValidateRange(0.01, 1440)]
+    [double]$SuiteTimeoutMinutes = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -86,6 +91,10 @@ function Invoke-DemoBuild([string]$TargetPlatform) {
 
 function Invoke-Build($TestProject, [string]$TargetPlatform) {
     Write-Host "=== Build $($TestProject.Name) $TargetPlatform $Config ==="
+    # A test program of an earlier run that is still alive keeps its file locked, and the linker cannot replace it
+    if ($TargetPlatform -ne 'Linux64') {
+        Stop-StaleTestProgram (Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config\$($TestProject.Name).exe") $null
+    }
     $projectFile = Join-Path $PSScriptRoot "$($TestProject.Folder)\$($TestProject.Name).dproj"
     $output = Invoke-MsBuild $projectFile $TargetPlatform
     Test-NoBuildProblems $output $TargetPlatform
@@ -226,10 +235,99 @@ function Test-SkiaLibraryDependencies([string]$LinuxLibrary) {
     }
 }
 
+# A test program of an earlier run that is still alive (a hang that was cancelled, a crashed build) holds its output files and its memory;
+# it is stopped before the next run. The program is recognised by its full path, so another checkout of the library is left alone.
+function Stop-StaleTestProgram([string]$WindowsPath, [string]$LinuxPath) {
+    if ($LinuxPath) {
+        & wsl -d $WslDistro -- pkill -f $LinuxPath | Out-Null
+        return
+    }
+
+    $fullPath = [IO.Path]::GetFullPath($WindowsPath)
+    $stale = Get-CimInstance Win32_Process -Filter "Name = '$([IO.Path]::GetFileName($fullPath))'" |
+        Where-Object { $_.ExecutablePath -and [string]::Equals([IO.Path]::GetFullPath($_.ExecutablePath), $fullPath, [StringComparison]::OrdinalIgnoreCase) }
+    foreach ($process in $stale) {
+        Write-Warning "Stopping the stale test program $fullPath (process $($process.ProcessId))"
+        Stop-Process -Id $process.ProcessId -Force -ErrorAction SilentlyContinue
+        Wait-Process -Id $process.ProcessId -Timeout 30 -ErrorAction SilentlyContinue
+    }
+}
+
+function ConvertTo-ArgumentString([string[]]$Arguments) {
+    $quoted = $Arguments | ForEach-Object { if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ } }
+    return ($quoted -join ' ')
+}
+
+# Runs a program, shows its output while it runs and kills it (with its child processes) when it is still running after the time limit
+function Invoke-TimedProgram([string]$FileName, [string[]]$Arguments, [string]$LinuxPath) {
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $FileName
+    $startInfo.Arguments = ConvertTo-ArgumentString $Arguments
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.CreateNoWindow = $true
+    $startInfo.StandardOutputEncoding = [Console]::OutputEncoding
+    $startInfo.StandardErrorEncoding = [Console]::OutputEncoding
+
+    $process = [System.Diagnostics.Process]::Start($startInfo)
+    $errorTask = $process.StandardError.ReadToEndAsync()
+    $deadline = [DateTime]::UtcNow.AddMinutes($SuiteTimeoutMinutes)
+    $lines = New-Object System.Collections.Generic.List[string]
+    $isTimedOut = $false
+
+    $lineTask = $process.StandardOutput.ReadLineAsync()
+    while ($true) {
+        if ($lineTask.Wait(500)) {
+            $line = $lineTask.Result
+            if ($null -eq $line) {
+                break
+            }
+            Write-Host $line
+            $lines.Add($line)
+            $lineTask = $process.StandardOutput.ReadLineAsync()
+        }
+        if ([DateTime]::UtcNow -gt $deadline) {
+            $isTimedOut = $true
+            & taskkill /PID $process.Id /T /F | Out-Null
+            if ($LinuxPath) {
+                & wsl -d $WslDistro -- pkill -f $LinuxPath | Out-Null
+            }
+            break
+        }
+    }
+
+    $process.WaitForExit(30000) | Out-Null
+    $errorText = if ($errorTask.Wait(5000)) { $errorTask.Result } else { '' }
+    if ($errorText) {
+        $errorText -split "`r?`n" | Where-Object { $_ } | ForEach-Object { Write-Host $_; $lines.Add($_) }
+    }
+    $exitCode = if ($process.HasExited) { $process.ExitCode } else { -1 }
+    $process.Dispose()
+
+    return [pscustomobject]@{ ExitCode = $exitCode; Output = $lines.ToArray(); IsTimedOut = $isTimedOut }
+}
+
+# The test program writes the results of its first run to results-<platform>-pass1.xml and those of its second run to results-<platform>.xml
+function Get-Pass1Summary($TestProject, [string]$TargetPlatform) {
+    $pass1File = Join-Path $PSScriptRoot "$($TestProject.Folder)\results-$TargetPlatform-pass1.xml"
+    if (-not (Test-Path -LiteralPath $pass1File)) {
+        return "No pass 1 results file: $pass1File"
+    }
+    try {
+        $results = ([xml](Get-Content -LiteralPath $pass1File -Raw -Encoding UTF8))['test-results']
+        return "Pass 1 ($pass1File): $($results.total) tests, $($results.failures) failures, $($results.errors) errors"
+    }
+    catch {
+        return "Pass 1 results cannot be read: $pass1File"
+    }
+}
+
 function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     Write-Host "=== Test $($TestProject.Name) $TargetPlatform $Config ==="
     $testArguments = @(if ($Fixtures) { "-r:$Fixtures" })
     $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
+    $programPath = Join-Path $outputFolder "$($TestProject.Name).exe"
 
     if ($TestProject.NeedsSkia) {
         Copy-Item -LiteralPath (Get-SkiaLibraryPath $TargetPlatform) -Destination $outputFolder -Force
@@ -237,27 +335,33 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
 
     if ($TargetPlatform -eq 'Linux64') {
         $linuxBinary = Get-WslPath (Join-Path $outputFolder $TestProject.Name)
+        Stop-StaleTestProgram $null $linuxBinary
         & wsl -d $WslDistro -- chmod +x $linuxBinary
         if ($TestProject.NeedsSkia) {
             $linuxFolder = Get-WslPath $outputFolder
             Test-SkiaLibraryDependencies "$linuxFolder/libsk4d.so"
-            $output = & wsl -d $WslDistro -- env "LD_LIBRARY_PATH=$linuxFolder" $linuxBinary @testArguments | ForEach-Object { Write-Host $_; "$_" }
+            $run = Invoke-TimedProgram 'wsl.exe' (@('-d', $WslDistro, '--', 'env', "LD_LIBRARY_PATH=$linuxFolder", $linuxBinary) + $testArguments) $linuxBinary
         }
         else {
-            $output = & wsl -d $WslDistro -- $linuxBinary @testArguments | ForEach-Object { Write-Host $_; "$_" }
+            $run = Invoke-TimedProgram 'wsl.exe' (@('-d', $WslDistro, '--', $linuxBinary) + $testArguments) $linuxBinary
         }
     }
     else {
-        $output = & (Join-Path $outputFolder "$($TestProject.Name).exe") @testArguments | ForEach-Object { Write-Host $_; "$_" }
+        Stop-StaleTestProgram $programPath $null
+        $run = Invoke-TimedProgram $programPath $testArguments $null
     }
-    $testExitCode = $LASTEXITCODE
 
-    if ($testExitCode -ne 0) {
-        throw "Tests of $($TestProject.Name) failed for $TargetPlatform (exit code $testExitCode)"
+    if ($run.IsTimedOut) {
+        throw "Suite $($TestProject.Name) on $TargetPlatform $Config ran longer than $SuiteTimeoutMinutes minutes and was killed (time limit -SuiteTimeoutMinutes)"
+    }
+
+    if ($run.ExitCode -ne 0) {
+        Write-Host (Get-Pass1Summary $TestProject $TargetPlatform)
+        throw "Tests of $($TestProject.Name) failed for $TargetPlatform (exit code $($run.ExitCode))"
     }
 
     # A filter that matches nothing exits with 0, which looks like a green run
-    if ($Fixtures -and ($output | Where-Object { $_ -match 'Tests Found\s*:\s*0\b' })) {
+    if ($Fixtures -and ($run.Output | Where-Object { $_ -match 'Tests Found\s*:\s*0\b' })) {
         $message = "The filter -Fixtures $Fixtures matched no test in $($TestProject.Name); use full names as Unit.Class"
         if ($TestProject.Name -eq 'Pdf4D.Tests') {
             throw $message

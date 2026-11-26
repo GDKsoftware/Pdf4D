@@ -64,19 +64,23 @@ begin
   {$ENDIF}
 end;
 
-function ResultsFileName: string;
+// The first run writes results-<platform>-pass1.xml, the second results-<platform>.xml, so that a failure of the first run stays visible
+const
+  Pass1Suffix = '-pass1';
+
+function ResultsFileName(const Suffix: string): string;
 begin
   const BinaryFolder = TPath.GetDirectoryName(ParamStr(0));
   const TestsFolder = TPath.GetFullPath(TPath.Combine(BinaryFolder, '..' + PathDelim + '..'));
-  Result := TPath.Combine(TestsFolder, Format('results-%s.xml', [PlatformName]));
+  Result := TPath.Combine(TestsFolder, Format('results-%s%s.xml', [PlatformName, Suffix]));
 end;
 
-function RunTests: Boolean;
+function RunTests(const ResultsSuffix: string): Boolean;
 begin
   const Runner = TDUnitX.CreateRunner;
   Runner.UseRTTI := True;
   Runner.AddLogger(TDUnitXConsoleLogger.Create(True));
-  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName));
+  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName(ResultsSuffix)));
 
   const RunResults = Runner.Execute;
   Result := RunResults.AllPassed;
@@ -94,9 +98,9 @@ begin
   try
     TDUnitX.CheckCommandLine;
     // The first run initializes DUnitX's global registries and loggers; leaks are measured on the second run.
-    const WarmupPassed = RunTests;
+    const WarmupPassed = RunTests(Pass1Suffix);
     const Baseline = TMemoryCheck.OutstandingBlocks;
-    const AllPassed = RunTests and WarmupPassed;
+    const AllPassed = RunTests('') and WarmupPassed;
     const HasLeak = (TMemoryCheck.OutstandingBlocks <> Baseline);
 
     if not AllPassed then
