@@ -31,10 +31,46 @@ type
   // snapped as TPdfStrokeNormalizer.SnapForClip does). Rectangles of the chain are intersected as rectangles of whole pixels; only a path
   // that is not a rectangle makes a mask. The result is built when the chain changes, and the chain is compared by identity.
   //
+  // The paths that were applied are kept as a stack of levels, one per link of the chain (as the Skia device keeps its applied list): a new
+  // chain applies only the links that are not on the stack, after the deepest one that is, so a long chain costs work in proportion to its
+  // length. A level holds the rectangle that the chain up to it comes to and, for a path that is not a rectangle, the mask. A mask is never
+  // changed once it is built (the next one is a copy), and only the masks of the last few such levels are kept, so that the memory is bound;
+  // a chain that returns to a level that lost its mask is applied again from below it.
+  //
   // Must run inside TTsFloatMode: the paths are converted and filled.
   TTsClipMask = class
+  private const
+    // The number of levels whose mask is kept
+    MaxKeptMasks = 8;
+
+  private type
+    TClipLevel = record
+      Link: IPdfClipPath;
+      // The clip rectangle of the chain up to this level
+      Left: Integer;
+      Top: Integer;
+      Right: Integer;
+      Bottom: Integer;
+      IsEmpty: Boolean;
+      // The chain up to this level has a mask; the level at MaskOwner holds it
+      HasMask: Boolean;
+      MaskOwner: Integer;
+      // Only on the level that made the mask: the data (kept unless IsMaskDropped), zero outside of the clean rectangle
+      OwnMask: TBytes;
+      IsMaskDropped: Boolean;
+      CleanLeft: Integer;
+      CleanTop: Integer;
+      CleanRight: Integer;
+      CleanBottom: Integer;
+    end;
+
   private
     FChain: IPdfClipPath;
+    FLevels: TArray<TClipLevel>;
+    FLevelCount: Integer;
+    // The indexes of the levels that hold a mask, from the oldest to the newest
+    FMaskOwners: TArray<Integer>;
+    FAppliedLinkCount: Integer;
     FWidth: Integer;
     FHeight: Integer;
     FIsBuilt: Boolean;
@@ -62,10 +98,15 @@ type
 
     procedure Build;
     procedure Reset;
-    function ChainOf(const Clip: IPdfClipPath): TArray<IPdfClipPath>;
-    // False when the chain has become empty
-    function Apply(const Link: IPdfClipPath; var HasMask: Boolean): Boolean;
-    function TryIntersectRect(const Left, Top, Right, Bottom: Integer): Boolean;
+    function IsApplied(const Link: IPdfClipPath): Boolean;
+    function IsUsableBase(const LevelIndex: Integer): Boolean;
+    procedure DropLevels(const KeptCount: Integer);
+    procedure PushLevel(const Link: IPdfClipPath);
+    procedure ApplyLink(var Level: TClipLevel; const LevelIndex: Integer);
+    procedure ApplyPath(var Level: TClipLevel; const LevelIndex: Integer; const Ts: TTsPath; const FillRule: TPdfFillRule);
+    procedure KeepMaskOwner(const LevelIndex: Integer);
+    procedure FinishBuild;
+    function TryIntersectRect(var Level: TClipLevel; const Left, Top, Right, Bottom: Integer): Boolean;
     function TryStartMask: Boolean;
     procedure ClearOutsideRect;
     function IsCombinedFrom(const SoftMask: TPdfAlphaMask): Boolean;
@@ -90,11 +131,13 @@ type
     // The clip multiplied with the soft mask: a mask of the size of the device, nil when it cannot be made. Valid until the next call or the next
     // Update that builds another chain. Call it for a clip that is not Empty.
     function Combine(const SoftMask: TPdfAlphaMask): PTsMask;
-    // The number of chains that were built (a chain of nil is not built)
+    // The number of chains that were built (a chain of nil is not built). For the test properties of the device.
     property BuildCount: Integer read FBuildCount;
+    // For the test properties of the device: the number of paths of chains that were applied: a path that stays on the stack between two chains is not applied again
+    property AppliedLinkCount: Integer read FAppliedLinkCount;
     // A path of the chain with more verbs raises EPdfLimitExceededException when the chain is built, before anything is drawn
     property MaxPathVerbs: Integer read FMaxPathVerbs write FMaxPathVerbs;
-    // A rectangle is made into a mask as well, so that a test can compare the two ways to clip
+    // For the test properties of the device: a rectangle is made into a mask as well, so that a test can compare the two ways to clip
     property ForceMask: Boolean read FForceMask write SetForceMask;
   end;
 
@@ -112,7 +155,6 @@ uses
 const
   // The centre of a pixel, as far from its boundary
   HalfPixel: Single = 0.5;
-  MinClipSizeForHairlines = 3;
 
 type
   // A path that is one rectangle with its sides along the axes
@@ -354,26 +396,54 @@ begin
   FMask := Default(TTsMask);
 end;
 
-function TTsClipMask.ChainOf(const Clip: IPdfClipPath): TArray<IPdfClipPath>;
+function TTsClipMask.IsApplied(const Link: IPdfClipPath): Boolean;
 begin
-  var Count := 0;
-  var Link := Clip;
-  while Assigned(Link) do
-  begin
-    Inc(Count);
-    Link := Link.Parent;
-  end;
+  const Depth = Link.Depth;
+  Result := ((Depth >= 1) and (Depth <= FLevelCount) and (FLevels[Depth - 1].Link = Link));
+end;
 
-  SetLength(Result, Count);
-  Link := Clip;
-  for var Index := Count - 1 downto 0 do
+// A level can be built on when the mask of its chain is still kept
+function TTsClipMask.IsUsableBase(const LevelIndex: Integer): Boolean;
+begin
+  const Level = FLevels[LevelIndex];
+  Result := ((not Level.HasMask) or (not FLevels[Level.MaskOwner].IsMaskDropped));
+end;
+
+// The levels from KeptCount on are removed
+procedure TTsClipMask.DropLevels(const KeptCount: Integer);
+begin
+  for var Index := KeptCount to FLevelCount - 1 do
   begin
-    Result[Index] := Link;
-    Link := Link.Parent;
+    FLevels[Index] := Default(TClipLevel);
+  end;
+  FLevelCount := KeptCount;
+
+  var OwnerCount := Length(FMaskOwners);
+  while (OwnerCount > 0) and (FMaskOwners[OwnerCount - 1] >= KeptCount) do
+  begin
+    Dec(OwnerCount);
+  end;
+  SetLength(FMaskOwners, OwnerCount);
+end;
+
+// A level whose mask is new: the oldest masks beyond the last few are let go
+procedure TTsClipMask.KeepMaskOwner(const LevelIndex: Integer);
+begin
+  SetLength(FMaskOwners, Length(FMaskOwners) + 1);
+  FMaskOwners[High(FMaskOwners)] := LevelIndex;
+
+  if Length(FMaskOwners) > MaxKeptMasks then
+  begin
+    const Oldest = FMaskOwners[0];
+    FLevels[Oldest].OwnMask := nil;
+    FLevels[Oldest].IsMaskDropped := True;
+    Move(FMaskOwners[1], FMaskOwners[0], (Length(FMaskOwners) - 1) * SizeOf(Integer));
+    SetLength(FMaskOwners, Length(FMaskOwners) - 1);
   end;
 end;
 
-// From the root to the leaf: every path narrows the clip of the paths before it. Iterative, because a file can chain very many clips.
+// The new links of the chain are applied on top of the deepest link that is on the stack. Iterative, because a file can chain very many
+// clips.
 procedure TTsClipMask.Build;
 begin
   Inc(FBuildNumber);
@@ -382,6 +452,7 @@ begin
   const HasClip = Assigned(FChain);
   if not HasClip then
   begin
+    DropLevels(0);
     Exit;
   end;
 
@@ -390,66 +461,98 @@ begin
   const IsDeviceUsable = ((FWidth > 0) and (FHeight > 0));
   if not IsDeviceUsable then
   begin
+    DropLevels(0);
     FKind := TTsClipKind.Empty;
     Exit;
   end;
 
-  var HasMask := False;
-  for var Link in ChainOf(FChain) do
+  var Link := FChain;
+  while Assigned(Link) and (not IsApplied(Link)) do
   begin
-    if not Apply(Link, HasMask) then
-    begin
-      Reset;
-      FKind := TTsClipKind.Empty;
-      Exit;
-    end;
+    Link := Link.Parent;
   end;
 
-  const IsWholeDevice = ((FLeft = 0) and (FTop = 0) and (FRight = FWidth) and (FBottom = FHeight));
-  if (not HasMask) and IsWholeDevice then
+  var KeptCount := 0;
+  if Assigned(Link) then
   begin
-    Exit;
+    KeptCount := Link.Depth;
   end;
 
-  // tiny-skia does not draw a hairline that is clipped to a rectangle of less than 3 pixels in one direction (it insets the clip by a pixel
-  // to find the hairlines that need no clipping, and gives up when nothing is left): such a clip is a mask on the whole device
-  const IsTooSmallForHairlines = (((FRight - FLeft) < MinClipSizeForHairlines) or ((FBottom - FTop) < MinClipSizeForHairlines));
-  const NeedsMask = (HasMask or FForceMask or IsTooSmallForHairlines);
-  if not NeedsMask then
+  while (KeptCount > 0) and (not IsUsableBase(KeptCount - 1)) do
   begin
-    FKind := TTsClipKind.Rect;
-    Exit;
+    Dec(KeptCount);
+  end;
+  DropLevels(KeptCount);
+
+  const Missing = FChain.Depth - KeptCount;
+  var Pending: TArray<IPdfClipPath>;
+  SetLength(Pending, Missing);
+  Link := FChain;
+  for var Index := Missing - 1 downto 0 do
+  begin
+    Pending[Index] := Link;
+    Link := Link.Parent;
   end;
 
-  if HasMask then
+  if FLevelCount + Missing > Length(FLevels) then
   begin
-    // The mask alone is the clip; the rectangle only tells where it can be other than 0
-    ClearOutsideRect;
-  end
-  else if not TryStartMask then
-  begin
-    Reset;
-    FKind := TTsClipKind.Empty;
-    Exit;
+    SetLength(FLevels, FLevelCount + Missing);
   end;
 
-  if FForceMask or IsTooSmallForHairlines then
+  for var Item in Pending do
   begin
-    FLeft := 0;
-    FTop := 0;
-    FRight := FWidth;
-    FBottom := FHeight;
+    PushLevel(Item);
   end;
 
-  FKind := TTsClipKind.Mask;
+  FinishBuild;
 end;
 
-function TTsClipMask.Apply(const Link: IPdfClipPath; var HasMask: Boolean): Boolean;
+procedure TTsClipMask.PushLevel(const Link: IPdfClipPath);
 begin
+  var Level := Default(TClipLevel);
+  if FLevelCount > 0 then
+  begin
+    Level := FLevels[FLevelCount - 1];
+    Level.OwnMask := nil;
+    Level.IsMaskDropped := False;
+  end
+  else
+  begin
+    Level.Right := FWidth;
+    Level.Bottom := FHeight;
+    Level.MaskOwner := -1;
+  end;
+  Level.Link := Link;
+
+  Inc(FAppliedLinkCount);
+  if not Level.IsEmpty then
+  begin
+    ApplyLink(Level, FLevelCount);
+  end;
+
+  FLevels[FLevelCount] := Level;
+  Inc(FLevelCount);
+  if Length(Level.OwnMask) > 0 then
+  begin
+    KeepMaskOwner(FLevelCount - 1);
+  end;
+end;
+
+procedure TTsClipMask.ApplyLink(var Level: TClipLevel; const LevelIndex: Integer);
+begin
+  const Link = Level.Link;
+
   // Java2D moves the vertices of a clip before it takes the pixels, so the path goes on in device pixels
   if Link.Path.VerbCount > FMaxPathVerbs then
   begin
     raise EPdfLimitExceededException.CreateFmt('A clip path has %d verbs, more than the limit of %d', [Link.Path.VerbCount, FMaxPathVerbs]);
+  end;
+
+  // A point that is not a number clips everything away: it must not be snapped into a finite one first
+  if not TTsConversion.HasFinitePoints(Link.Path) then
+  begin
+    Level.IsEmpty := True;
+    Exit;
   end;
 
   const Snapped = TPdfStrokeNormalizer.SnapForClip(Link.Path, Link.Transform);
@@ -464,50 +567,144 @@ begin
   // A path without a segment, or with a point that is not a number, clips everything away
   if not IsConverted then
   begin
-    Exit(False);
+    Level.IsEmpty := True;
+    Exit;
   end;
 
+  ApplyPath(Level, LevelIndex, Ts, Link.FillRule);
+end;
+
+procedure TTsClipMask.ApplyPath(var Level: TClipLevel; const LevelIndex: Integer; const Ts: TTsPath; const FillRule: TPdfFillRule);
+begin
   var Edges: TAxisRect;
   const IsRect = TryReadAxisRect(Ts, Edges);
   if IsRect then
   begin
-    Exit(TryIntersectRect(PixelEdge(Edges.Left), PixelEdge(Edges.Top), PixelEdge(Edges.Right), PixelEdge(Edges.Bottom)));
+    Level.IsEmpty := not TryIntersectRect(Level, PixelEdge(Edges.Left), PixelEdge(Edges.Top), PixelEdge(Edges.Right), PixelEdge(Edges.Bottom));
+    Exit;
   end;
 
-  if not HasMask then
+  // The mask of the chain so far is copied, never changed: the levels above and the clip of the last build may still use it
+  var Mask: TTsMask;
+  if not TTsMask.TryCreate(Cardinal(FWidth), Cardinal(FHeight), Mask) then
   begin
-    if not TryStartMask then
-    begin
-      Exit(False);
-    end;
-    HasMask := True;
+    Level.IsEmpty := True;
+    Exit;
   end;
 
-  FMask.IntersectPath(Ts, TTsConversion.ToFillRule(Link.FillRule), False, TTsTransform.Identity);
-  Result := True;
+  if Level.HasMask then
+  begin
+    const Owner = FLevels[Level.MaskOwner];
+    Move(Owner.OwnMask[0], Mask.Data[0], Length(Mask.Data));
+    Level.CleanLeft := Owner.CleanLeft;
+    Level.CleanTop := Owner.CleanTop;
+    Level.CleanRight := Owner.CleanRight;
+    Level.CleanBottom := Owner.CleanBottom;
+  end
+  else
+  begin
+    for var Y := Level.Top to Level.Bottom - 1 do
+    begin
+      FillChar(Mask.Data[Y * FWidth + Level.Left], Level.Right - Level.Left, 255);
+    end;
+    Level.CleanLeft := Level.Left;
+    Level.CleanTop := Level.Top;
+    Level.CleanRight := Level.Right;
+    Level.CleanBottom := Level.Bottom;
+  end;
+
+  Mask.IntersectPath(Ts, TTsConversion.ToFillRule(FillRule), False, TTsTransform.Identity);
+  Level.OwnMask := Mask.Data;
+  Level.HasMask := True;
+  Level.MaskOwner := LevelIndex;
 end;
 
-// The rectangle of whole pixels, taken into the clip rectangle; False when nothing is left of it
-function TTsClipMask.TryIntersectRect(const Left, Top, Right, Bottom: Integer): Boolean;
+// The clip of the whole chain, from its top level
+procedure TTsClipMask.FinishBuild;
 begin
-  if Left > FLeft then
+  const Top = FLevels[FLevelCount - 1];
+  if Top.IsEmpty then
   begin
-    FLeft := Left;
-  end;
-  if Top > FTop then
-  begin
-    FTop := Top;
-  end;
-  if Right < FRight then
-  begin
-    FRight := Right;
-  end;
-  if Bottom < FBottom then
-  begin
-    FBottom := Bottom;
+    Reset;
+    FKind := TTsClipKind.Empty;
+    Exit;
   end;
 
-  Result := ((FLeft < FRight) and (FTop < FBottom));
+  FLeft := Top.Left;
+  FTop := Top.Top;
+  FRight := Top.Right;
+  FBottom := Top.Bottom;
+
+  const IsWholeDevice = ((FLeft = 0) and (FTop = 0) and (FRight = FWidth) and (FBottom = FHeight));
+  if (not Top.HasMask) and IsWholeDevice then
+  begin
+    Exit;
+  end;
+
+  const NeedsMask = (Top.HasMask or FForceMask);
+  if not NeedsMask then
+  begin
+    FKind := TTsClipKind.Rect;
+    Exit;
+  end;
+
+  if Top.HasMask then
+  begin
+    // The mask alone is the clip; the rectangle only tells where it can be other than 0. A mask that is clean outside of the rectangle is
+    // taken as it is, else a copy is cleared.
+    const Owner = FLevels[Top.MaskOwner];
+    FMask.Width := Cardinal(FWidth);
+    FMask.Height := Cardinal(FHeight);
+    const IsClean = ((Owner.CleanLeft = FLeft) and (Owner.CleanTop = FTop) and (Owner.CleanRight = FRight) and (Owner.CleanBottom = FBottom));
+    if IsClean then
+    begin
+      FMask.Data := Owner.OwnMask;
+    end
+    else
+    begin
+      FMask.Data := Copy(Owner.OwnMask);
+      ClearOutsideRect;
+    end;
+  end
+  else if not TryStartMask then
+  begin
+    Reset;
+    FKind := TTsClipKind.Empty;
+    Exit;
+  end;
+
+  if FForceMask then
+  begin
+    FLeft := 0;
+    FTop := 0;
+    FRight := FWidth;
+    FBottom := FHeight;
+  end;
+
+  FKind := TTsClipKind.Mask;
+end;
+
+// The rectangle of whole pixels, taken into the clip rectangle of the level; False when nothing is left of it
+function TTsClipMask.TryIntersectRect(var Level: TClipLevel; const Left, Top, Right, Bottom: Integer): Boolean;
+begin
+  if Left > Level.Left then
+  begin
+    Level.Left := Left;
+  end;
+  if Top > Level.Top then
+  begin
+    Level.Top := Top;
+  end;
+  if Right < Level.Right then
+  begin
+    Level.Right := Right;
+  end;
+  if Bottom < Level.Bottom then
+  begin
+    Level.Bottom := Bottom;
+  end;
+
+  Result := ((Level.Left < Level.Right) and (Level.Top < Level.Bottom));
 end;
 
 // A mask that lets through what the clip rectangle holds so far

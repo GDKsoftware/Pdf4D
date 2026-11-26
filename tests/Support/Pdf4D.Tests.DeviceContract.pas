@@ -60,6 +60,11 @@ type
     function NewRectPath(const Left, Top, Right, Bottom: Single): TPdfPath;
     function NewLinePath(const FromX, FromY, ToX, ToY: Single): TPdfPath;
     function NewClip(const Parent: IPdfClipPath; const Left, Top, Right, Bottom: Single): IPdfClipPath;
+    // A clip that is not a rectangle: the diamond around (CenterX, CenterY) whose corners lie HalfDiagonal away
+    function NewDiamondClipAround(const Parent: IPdfClipPath; const CenterX, CenterY, HalfDiagonal: Single): IPdfClipPath;
+    // A triangle with a corner that is not a number (or an infinity): (5, 5), (9, 5) and (Corner, Corner)
+    function NewTriangleWithCorner(const Corner: Single): TPdfPath;
+    procedure AssertNothingIsDrawn;
     function NewStroke(const Width: Single; const Cap: TPdfLineCap): TPdfStrokeStyle;
     function NoAntiAlias: TPdfComposite;
     function Red: TPdfPaint;
@@ -128,6 +133,25 @@ type
 
     [Test]
     procedure TestLongClipChainIsAppliedPathByPath;
+
+    // The same with clips that are not rectangles: every one of 200 diamonds on a device of a million pixels
+    [Test]
+    procedure TestLongChainOfDiamondClipsIsAppliedPathByPath;
+
+    // A fill without anti-aliasing snaps its points; a point that is not a number must not come out as a pixel boundary
+    [Test]
+    procedure TestNonFiniteFillWithoutAntiAliasDrawsNothing;
+
+    [Test]
+    procedure TestInfiniteFillWithoutAntiAliasDrawsNothing;
+
+    // A clip with a point that is not a number clips everything away
+    [Test]
+    procedure TestClipWithNonFinitePointClipsEverything;
+
+    // A rectangle far beyond the device clips nothing (its edges are beyond 2^31 pixels)
+    [Test]
+    procedure TestHugeClipRectDoesNotClip;
 
     [Test]
     procedure TestDrawBitmapNearest;
@@ -405,6 +429,40 @@ end;
 function TPdfDeviceContractTests.NewClip(const Parent: IPdfClipPath; const Left, Top, Right, Bottom: Single): IPdfClipPath;
 begin
   Result := TPdfClipPath.Create(Parent, NewRectPath(Left, Top, Right, Bottom), TPdfMatrix.Identity, TPdfFillRule.NonZero);
+end;
+
+function TPdfDeviceContractTests.NewDiamondClipAround(const Parent: IPdfClipPath; const CenterX, CenterY, HalfDiagonal: Single): IPdfClipPath;
+begin
+  const Path = TPdfPath.Create;
+  Path.MoveTo(CenterX, CenterY - HalfDiagonal);
+  Path.LineTo(CenterX + HalfDiagonal, CenterY);
+  Path.LineTo(CenterX, CenterY + HalfDiagonal);
+  Path.LineTo(CenterX - HalfDiagonal, CenterY);
+  Path.ClosePath;
+
+  Result := TPdfClipPath.Create(Parent, Path, TPdfMatrix.Identity, TPdfFillRule.NonZero);
+end;
+
+function TPdfDeviceContractTests.NewTriangleWithCorner(const Corner: Single): TPdfPath;
+begin
+  Result := TPdfPath.Create;
+  Result.MoveTo(5, 5);
+  Result.LineTo(9, 5);
+  Result.LineTo(Corner, Corner);
+  Result.ClosePath;
+end;
+
+procedure TPdfDeviceContractTests.AssertNothingIsDrawn;
+begin
+  FSnapshot.Free;
+  FSnapshot := FDevice.ToBitmap;
+  for var Index := 0 to Length(FSnapshot.Pixels) - 1 do
+  begin
+    if FSnapshot.Pixels[Index] <> 0 then
+    begin
+      Assert.Fail(Format('Byte %d of the device is %d, nothing should be drawn', [Index, FSnapshot.Pixels[Index]]));
+    end;
+  end;
 end;
 
 function TPdfDeviceContractTests.NewStroke(const Width: Single; const Cap: TPdfLineCap): TPdfStrokeStyle;
@@ -710,7 +768,8 @@ begin
   AssertPixel(2, 7, Green);
 end;
 
-// 3000 paths, and the clip changes to every one of them: applying the whole chain at each change would be 4.5 million paths
+// 3000 paths, and the clip changes to every one of them and something is drawn with it: applying the whole chain at each change would be
+// 4.5 million paths
 procedure TPdfDeviceContractTests.TestLongClipChainIsAppliedPathByPath;
 begin
   const PathCount = 3000;
@@ -720,11 +779,77 @@ begin
   begin
     Clip := NewClip(Clip, Index * 0.001, 0, 10, 10);
     FDevice.SetClip(Clip);
+    FillRect(8, 5, 9, 6, Red, NoAntiAlias);
   end;
   FillWholeDevice(Red, NoAntiAlias);
 
   Assert.IsTrue(Watch.ElapsedMilliseconds < 5000, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
   AssertPixel(8, 5, TPdfDeviceColor.Create(255, 0, 0));
+end;
+
+procedure TPdfDeviceContractTests.TestLongChainOfDiamondClipsIsAppliedPathByPath;
+begin
+  CreateDevice(1000, 1000);
+  const LinkCount = 200;
+  var Clip: IPdfClipPath := nil;
+  const Watch = TStopwatch.StartNew;
+  for var Index := 1 to LinkCount do
+  begin
+    Clip := NewDiamondClipAround(Clip, 500, 500, 490 - Index);
+    FDevice.SetClip(Clip);
+    FillRect(500, 500, 501, 501, Red, NoAntiAlias);
+  end;
+
+  Assert.IsTrue(Watch.ElapsedMilliseconds < 20000, Format('Took %d ms', [Watch.ElapsedMilliseconds]));
+  AssertPixel(500, 500, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(5, 5);
+end;
+
+procedure TPdfDeviceContractTests.TestNonFiniteFillWithoutAntiAliasDrawsNothing;
+begin
+  const Path = NewTriangleWithCorner(Single.NaN);
+  try
+    FDevice.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, NoAntiAlias);
+    // At another scale the fill takes the other snapping
+    FDevice.FillPath(Path, TPdfMatrix.GetScaleInstance(2, 2), TPdfFillRule.NonZero, Red, NoAntiAlias);
+  finally
+    Path.Free;
+  end;
+
+  AssertNothingIsDrawn;
+end;
+
+procedure TPdfDeviceContractTests.TestInfiniteFillWithoutAntiAliasDrawsNothing;
+begin
+  const Path = NewTriangleWithCorner(Single.PositiveInfinity);
+  try
+    FDevice.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, NoAntiAlias);
+  finally
+    Path.Free;
+  end;
+
+  AssertNothingIsDrawn;
+end;
+
+procedure TPdfDeviceContractTests.TestClipWithNonFinitePointClipsEverything;
+begin
+  const Path = NewTriangleWithCorner(Single.NaN);
+  FDevice.SetClip(TPdfClipPath.Create(nil, Path, TPdfMatrix.Identity, TPdfFillRule.NonZero));
+
+  FillWholeDevice(Red, NoAntiAlias);
+
+  AssertNothingIsDrawn;
+end;
+
+procedure TPdfDeviceContractTests.TestHugeClipRectDoesNotClip;
+begin
+  FDevice.SetClip(NewClip(nil, 0, 0, 3E9, 3E9));
+
+  FillWholeDevice(Red, NoAntiAlias);
+
+  AssertPixel(0, 0, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(5, 5, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(9, 9, TPdfDeviceColor.Create(255, 0, 0));
 end;
 
 procedure TPdfDeviceContractTests.TestDrawBitmapNearest;

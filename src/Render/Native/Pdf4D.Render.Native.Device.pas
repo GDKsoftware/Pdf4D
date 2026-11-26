@@ -56,6 +56,7 @@ type
     procedure CheckVerbCount(const Path: TPdfPath);
 {$IFDEF PDF4D_TESTS}
     function GetBuildCount: Integer;
+    function GetAppliedLinkCount: Integer;
     function GetClipKind: TTsClipKind;
     function GetForceMaskClip: Boolean;
     procedure SetForceMaskClip(const Value: Boolean);
@@ -84,6 +85,8 @@ type
 {$IFDEF PDF4D_TESTS}
     // For tests only, compiled when PDF4D_TESTS is defined: how many clip chains were built
     property ClipBuildCount: Integer read GetBuildCount;
+    // For tests only: how many paths of clip chains were applied in all (a path that two chains share is applied once)
+    property ClipLinkCount: Integer read GetAppliedLinkCount;
     // For tests only: what the clip of the last draw came to
     property ClipKind: TTsClipKind read GetClipKind;
     // For tests only: makes a rectangular clip a mask as well, to compare the two ways to clip
@@ -265,6 +268,12 @@ begin
     end;
 
     Exit(PathSpace.TryTransform(DeviceTransform, DevicePath));
+  end;
+
+  // A point that is not a number must not be snapped into a finite one, and a path that lies beyond what the pixels can hold draws nothing
+  if not TTsConversion.HasFinitePoints(Path) then
+  begin
+    Exit(False);
   end;
 
   // PDFBox fills rectangles without anti-aliasing, and the edges of such a fill lie at ceil(x) in the reference images, where tiny-skia
@@ -495,6 +504,11 @@ end;
 function TPdfNativeDevice.GetBuildCount: Integer;
 begin
   Result := FClipMask.BuildCount;
+end;
+
+function TPdfNativeDevice.GetAppliedLinkCount: Integer;
+begin
+  Result := FClipMask.AppliedLinkCount;
 end;
 
 function TPdfNativeDevice.GetClipKind: TTsClipKind;

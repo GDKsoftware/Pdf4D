@@ -28,8 +28,10 @@ type
     function Native: TPdfNativeDevice;
     function NewDiamondClip(const Parent: IPdfClipPath): IPdfClipPath;
     function NewPathClip(const Parent: IPdfClipPath; const Path: TPdfPath; const Transform: TPdfMatrix): IPdfClipPath;
+    // A rectangle that is a path of five points (a vertex in the middle of the top edge), which is not taken for a rectangle
+    function NewSplitRectClip(const Left, Top, Right, Bottom: Single; const Transform: TPdfMatrix): IPdfClipPath;
+    function BytesFilledWithClip(const Clip: IPdfClipPath): TBytes;
     function FillRaisesTheLimit(const Device: IPdfRasterDevice; const Path: TPdfPath): Boolean;
-    procedure AssertNothingIsDrawn;
     procedure AssertRowIsRed(const Row, FromX, ToX: Integer);
 
   protected
@@ -42,11 +44,26 @@ type
     [Test]
     procedure TestRectClipFastPathEqualsMaskPath;
 
+    // The edges 2.5, 2.49, 7.5, -0.6 and 9.999 at another scale, as a rectangle and as a path of five points that goes through the scan converter
+    [Test]
+    procedure TestRectClipEqualsTheSamePathThatIsNotARectangle;
+
     [Test]
     procedure TestRotatedClipUsesMask;
 
     [Test]
     procedure TestClipMaskIsBuiltOncePerChain;
+
+    // Work in proportion to the length of a chain, counted in applied paths and not in time
+    [Test]
+    procedure TestLongClipChainAppliesEveryPathOnce;
+
+    [Test]
+    procedure TestSwitchingBetweenBranchesAppliesOnlyTheNewPaths;
+
+    // Only the masks of the last 8 levels are kept: a chain that goes back below them is applied again and still right
+    [Test]
+    procedure TestGoingBackBelowTheKeptMasksGivesTheSameClip;
 
     [Test]
     procedure TestClipOutsideDeviceDrawsNothing;
@@ -77,6 +94,19 @@ type
 
     [Test]
     procedure TestThinRectClipStillDrawsHairlines;
+
+    // tiny-skia draws no hairline on an area of less than 3 pixels in one direction; Pdf4D does
+    [Test]
+    procedure TestHairlineOnADeviceTwoPixelsWideIsDrawn;
+
+    [Test]
+    procedure TestHairlineOnADeviceOnePixelHighIsDrawn;
+
+    [Test]
+    procedure TestHairlineInASmallLayerIsDrawn;
+
+    [Test]
+    procedure TestHairlineInATileSliceOfTwoPixelsIsDrawn;
 
     [Test]
     procedure TestDrawBitmapRespectsRectClip;
@@ -129,6 +159,33 @@ begin
 end;
 
 // The diamond with the corners (1,5), (5,1), (9,5) and (5,9)
+function TPdfNativeDeviceTests.NewSplitRectClip(const Left, Top, Right, Bottom: Single; const Transform: TPdfMatrix): IPdfClipPath;
+begin
+  const Path = TPdfPath.Create;
+  Path.MoveTo(Left, Top);
+  Path.LineTo((Left + Right) / 2, Top);
+  Path.LineTo(Right, Top);
+  Path.LineTo(Right, Bottom);
+  Path.LineTo(Left, Bottom);
+  Path.ClosePath;
+
+  Result := NewPathClip(nil, Path, Transform);
+end;
+
+function TPdfNativeDeviceTests.BytesFilledWithClip(const Clip: IPdfClipPath): TBytes;
+begin
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(Clip);
+  FillWholeDevice(Red, NoAntiAlias);
+
+  const Bitmap = FDevice.ToBitmap;
+  try
+    Result := Copy(Bitmap.Pixels);
+  finally
+    Bitmap.Free;
+  end;
+end;
+
 function TPdfNativeDeviceTests.NewDiamondClip(const Parent: IPdfClipPath): IPdfClipPath;
 begin
   const Path = TPdfPath.Create;
@@ -139,19 +196,6 @@ begin
   Path.ClosePath;
 
   Result := NewPathClip(Parent, Path, TPdfMatrix.Identity);
-end;
-
-procedure TPdfNativeDeviceTests.AssertNothingIsDrawn;
-begin
-  FSnapshot.Free;
-  FSnapshot := FDevice.ToBitmap;
-  for var Index := 0 to Length(FSnapshot.Pixels) - 1 do
-  begin
-    if FSnapshot.Pixels[Index] <> 0 then
-    begin
-      Assert.Fail(Format('Byte %d of the device is %d, nothing should be drawn', [Index, FSnapshot.Pixels[Index]]));
-    end;
-  end;
 end;
 
 procedure TPdfNativeDeviceTests.AssertRowIsRed(const Row, FromX, ToX: Integer);
@@ -197,6 +241,38 @@ begin
     end;
   finally
     FastPath.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestRectClipEqualsTheSamePathThatIsNotARectangle;
+begin
+  // The path is in half pixels and the clip scales it by 2; the fast path rounds an edge of the rectangle as the scan converter does
+  var Edges: TArray<Single> := [2.5, 2.49, 7.5, -0.6, 9.999];
+  const Scale = TPdfMatrix.GetScaleInstance(2, 2);
+
+  for var LeftIndex := 0 to High(Edges) do
+  begin
+    for var RightIndex := 0 to High(Edges) do
+    begin
+      // A rectangle of less than a pixel can come to nothing
+      if Edges[RightIndex] - Edges[LeftIndex] < 1 then
+      begin
+        Continue;
+      end;
+
+      const Message = Format('edges %g and %g', [Edges[LeftIndex], Edges[RightIndex]]);
+      const Left = Edges[LeftIndex] / 2;
+      const Right = Edges[RightIndex] / 2;
+      const AsRect = BytesFilledWithClip(TPdfClipPath.Create(nil, NewRectPath(Left, Left, Right, Right), Scale, TPdfFillRule.NonZero));
+      // A rectangle that holds the whole device needs no clip at all
+      Assert.IsTrue(Native.ClipKind in [TTsClipKind.Rect, TTsClipKind.None], 'a rectangle clips with a rectangle: ' + Message);
+
+      const AsPath = BytesFilledWithClip(NewSplitRectClip(Left, Left, Right, Right, Scale));
+      Assert.AreEqual(Ord(TTsClipKind.Mask), Ord(Native.ClipKind), 'a path of five points clips with a mask: ' + Message);
+
+      Assert.AreEqual(Length(AsRect), Length(AsPath));
+      Assert.IsTrue(CompareMem(Pointer(AsRect), Pointer(AsPath), Length(AsRect)), 'the same pixels: ' + Message);
+    end;
   end;
 end;
 
@@ -249,6 +325,84 @@ begin
   FDevice.SetClip(Clip);
   FillRect(0, 0, 10, 10, Red, NoAntiAlias);
   Assert.AreEqual(3, Native.ClipBuildCount);
+end;
+
+procedure TPdfNativeDeviceTests.TestLongClipChainAppliesEveryPathOnce;
+begin
+  const PathCount = 3000;
+  var Clip: IPdfClipPath := nil;
+  for var Index := 1 to PathCount do
+  begin
+    Clip := NewClip(Clip, Index * 0.001, 0, 10, 10);
+    FDevice.SetClip(Clip);
+    FillRect(8, 5, 9, 6, Red, NoAntiAlias);
+  end;
+
+  Assert.AreEqual(PathCount, Native.ClipBuildCount, 'a chain is built for every change');
+  Assert.AreEqual(PathCount, Native.ClipLinkCount, 'and every path is applied once');
+  AssertPixel(8, 5, TPdfDeviceColor.Create(255, 0, 0));
+end;
+
+procedure TPdfNativeDeviceTests.TestSwitchingBetweenBranchesAppliesOnlyTheNewPaths;
+begin
+  const Root = NewClip(nil, 0, 0, 10, 10);
+  const Left = NewClip(Root, 0, 0, 5, 10);
+  const Right = NewClip(Root, 5, 0, 10, 10);
+  const UpperLeft = NewClip(Left, 0, 0, 5, 5);
+
+  FDevice.SetClip(UpperLeft);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(3, Native.ClipLinkCount, 'root, left and upper left');
+
+  // Right has the root in common
+  FDevice.SetClip(Right);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(4, Native.ClipLinkCount, 'right only');
+
+  // Back to the left: the stack holds root and right, so left is applied on the root
+  FDevice.SetClip(Left);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(5, Native.ClipLinkCount, 'left only');
+
+  // The parent of what is applied adds nothing
+  FDevice.SetClip(Root);
+  FillWholeDevice(Red, NoAntiAlias);
+  Assert.AreEqual(5, Native.ClipLinkCount, 'a parent of the applied chain');
+  Assert.AreEqual(Ord(TTsClipKind.None), Ord(Native.ClipKind), 'the root covers the whole device');
+end;
+
+procedure TPdfNativeDeviceTests.TestGoingBackBelowTheKeptMasksGivesTheSameClip;
+begin
+  CreateDevice(100, 100);
+
+  // 20 nested diamonds on the middle row, the half diagonal of the nth is 48 - 2n
+  var Links: TArray<IPdfClipPath>;
+  SetLength(Links, 21);
+  for var Index := 1 to 20 do
+  begin
+    Links[Index] := NewDiamondClipAround(Links[Index - 1], 50, 50, 48 - 2 * Index);
+    FDevice.SetClip(Links[Index]);
+    FillRect(50, 50, 51, 51, Red, NoAntiAlias);
+  end;
+  Assert.AreEqual(20, Native.ClipLinkCount);
+
+  // The mask of the 18th diamond (half diagonal 12) is kept: nothing is applied again
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(Links[18]);
+  FillRect(0, 50, 100, 51, Red, NoAntiAlias);
+  Assert.AreEqual(20, Native.ClipLinkCount, 'a level whose mask is kept');
+  AssertPixel(60, 50, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(64, 50);
+
+  // The mask of the second diamond (half diagonal 44) is gone by now: the first two paths are applied again. Pixel 94 lies in the first
+  // diamond (half diagonal 46) but not in the second.
+  FDevice.Clear(TPdfDeviceColor.Transparent);
+  FDevice.SetClip(Links[2]);
+  FillRect(0, 50, 100, 51, Red, NoAntiAlias);
+  Assert.AreEqual(22, Native.ClipLinkCount, 'the first two paths again');
+  AssertPixel(90, 50, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(94, 50);
+  AssertTransparent(5, 50);
 end;
 
 procedure TPdfNativeDeviceTests.TestClipOutsideDeviceDrawsNothing;
@@ -394,15 +548,69 @@ end;
 
 procedure TPdfNativeDeviceTests.TestThinRectClipStillDrawsHairlines;
 begin
-  // tiny-skia draws no hairline in a clip of less than 3 pixels in one direction, so such a clip is applied as a mask
+  // The painter draws a hairline in a clip of less than 3 pixels in one direction, so such a clip needs no mask
   FDevice.SetClip(NewClip(nil, 0, 4, 10, 5));
 
   StrokeLine(0, 4.5, 10, 4.5, TPdfMatrix.Identity, NewStroke(0, TPdfLineCap.Butt));
 
-  Assert.AreEqual(Ord(TTsClipKind.Mask), Ord(Native.ClipKind));
+  Assert.AreEqual(Ord(TTsClipKind.Rect), Ord(Native.ClipKind));
   AssertRowIsRed(4, 1, 8);
   AssertTransparent(3, 3);
   AssertTransparent(3, 5);
+end;
+
+procedure TPdfNativeDeviceTests.TestHairlineOnADeviceTwoPixelsWideIsDrawn;
+begin
+  CreateDevice(2, 10);
+
+  StrokeLine(1.5, 0, 1.5, 10, TPdfMatrix.Identity, NewStroke(0, TPdfLineCap.Butt));
+
+  AssertPixel(1, 4, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(0, 4);
+end;
+
+procedure TPdfNativeDeviceTests.TestHairlineOnADeviceOnePixelHighIsDrawn;
+begin
+  CreateDevice(10, 1);
+
+  StrokeLine(0, 0.5, 10, 0.5, TPdfMatrix.Identity, NewStroke(0, TPdfLineCap.Butt));
+
+  AssertRowIsRed(0, 1, 8);
+end;
+
+procedure TPdfNativeDeviceTests.TestHairlineInASmallLayerIsDrawn;
+begin
+  // A group of a thin rule gets a layer of the size of the group
+  const Layer = FDevice.CreateLayer(10, 2);
+  const Path = NewLinePath(0, 1.5, 10, 1.5);
+  try
+    Layer.StrokePath(Path, TPdfMatrix.Identity, NewStroke(0, TPdfLineCap.Butt), Red, NoAntiAlias);
+  finally
+    Path.Free;
+  end;
+
+  const Bitmap = Layer.ToBitmap;
+  try
+    Assert.AreEqual(255, Integer(Bitmap.GetPixel(5, 1).R));
+    Assert.AreEqual(255, Integer(Bitmap.GetPixel(5, 1).A));
+    Assert.AreEqual(0, Integer(Bitmap.GetPixel(5, 0).A));
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+procedure TPdfNativeDeviceTests.TestHairlineInATileSliceOfTwoPixelsIsDrawn;
+begin
+  // The last tile of a device that is 8193 pixels wide is 2 pixels wide (8191 and 8192)
+  CreateDevice(8193, 4);
+
+  StrokeLine(0, 1.5, 8193, 1.5, TPdfMatrix.Identity, NewStroke(0, TPdfLineCap.Butt));
+
+  AssertPixel(8189, 1, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(8191, 1, TPdfDeviceColor.Create(255, 0, 0));
+  AssertPixel(8192, 1, TPdfDeviceColor.Create(255, 0, 0));
+  AssertTransparent(8192, 0);
+  AssertTransparent(8192, 2);
 end;
 
 procedure TPdfNativeDeviceTests.TestDrawBitmapRespectsRectClip;
