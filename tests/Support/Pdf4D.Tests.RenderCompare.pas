@@ -78,12 +78,14 @@ type
     // Red where a pixel differs, the reference dimmed elsewhere; the Actual render alone when the sizes differ
     class procedure WriteDifference(const Actual, Expected: TPdfBitmap; const FileName: string); static;
 
-    // The entries "page <n> [<platform>] # <reason>" of a render-known-differences file say that a page is skipped, on one platform or on all
-    class function IsKnownDifference(const Entries: TArray<string>; const Page: Integer; const PlatformName: string): Boolean; static;
+    // The entries "page <n> [<backend>] [<platform>] # <reason>" of a render-known-differences file say that a page is skipped, for one
+    // backend (Skia or Native) or for both, on one platform (Win32, Win64 or Linux64) or on all
+    class function IsKnownDifference(const Entries: TArray<string>; const Page: Integer; const BackendName, PlatformName: string): Boolean; static;
     // The files of a pending.txt ("<corpus file> # <subject>"); a missing file gives none
     class function PendingFiles(const FileName: string): TArray<string>; static;
-    // The result for one file: Differences describe the pages that differ and are not known differences
-    class function Judge(const IsPending: Boolean; const Differences: TArray<string>): TRenderVerdict; static;
+    // The result for one file: Differences describe the pages that differ and are not known differences; PendingFileName is the list
+    // (pending.txt or pending-native.txt) that a file whose pages are all equal must leave
+    class function Judge(const IsPending: Boolean; const PendingFileName: string; const Differences: TArray<string>): TRenderVerdict; static;
   end;
 
 implementation
@@ -91,6 +93,7 @@ implementation
 uses
   System.IOUtils,
   System.Math,
+  System.StrUtils,
   Pdf4D.Tests.Png;
 
 const
@@ -106,6 +109,7 @@ const
   DimmedDivisor = 3;
   DimmedOffset = 170;
   PercentFactor = 100;
+  BackendNames: array[0..1] of string = ('Skia', 'Native');
 
 type
   // Tells for the rows of the reference which pixels have an edge in their 3 x 3 neighbourhood. The minimum and the maximum of the
@@ -399,7 +403,7 @@ begin
   end;
 end;
 
-class function TRenderCompare.IsKnownDifference(const Entries: TArray<string>; const Page: Integer; const PlatformName: string): Boolean;
+class function TRenderCompare.IsKnownDifference(const Entries: TArray<string>; const Page: Integer; const BackendName, PlatformName: string): Boolean;
 begin
   Result := False;
   for var Entry in Entries do
@@ -416,17 +420,31 @@ begin
       Continue;
     end;
 
-    var EntryPlatform := '';
-    var PageText := Head.Substring(PageMarker.Length).Trim;
-    const Space = PageText.IndexOf(' ');
-    if Space >= 0 then
+    // After the page number come the qualifiers in brackets, in any order: a backend name and a platform name
+    const Tokens = Head.Substring(PageMarker.Length).Trim.Split([' '], TStringSplitOptions.ExcludeEmpty);
+    if Length(Tokens) = 0 then
     begin
-      EntryPlatform := PageText.Substring(Space + 1).Trim.Trim(['[', ']']);
-      PageText := PageText.Substring(0, Space);
+      Continue;
     end;
 
+    var EntryBackend := '';
+    var EntryPlatform := '';
+    for var Index := 1 to High(Tokens) do
+    begin
+      const Qualifier = Tokens[Index].Trim(['[', ']']);
+      if MatchStr(Qualifier, BackendNames) then
+      begin
+        EntryBackend := Qualifier;
+      end
+      else
+      begin
+        EntryPlatform := Qualifier;
+      end;
+    end;
+
+    const IsForThisBackend = (EntryBackend = '') or (EntryBackend = BackendName);
     const IsOnThisPlatform = (EntryPlatform = '') or (EntryPlatform = PlatformName);
-    if (StrToIntDef(PageText, -1) = Page) and IsOnThisPlatform then
+    if (StrToIntDef(Tokens[0], -1) = Page) and IsForThisBackend and IsOnThisPlatform then
     begin
       Exit(True);
     end;
@@ -461,7 +479,7 @@ begin
   end;
 end;
 
-class function TRenderCompare.Judge(const IsPending: Boolean; const Differences: TArray<string>): TRenderVerdict;
+class function TRenderCompare.Judge(const IsPending: Boolean; const PendingFileName: string; const Differences: TArray<string>): TRenderVerdict;
 begin
   Result := Default(TRenderVerdict);
   const HasDifferences = Length(Differences) > 0;
@@ -470,7 +488,7 @@ begin
     Result.IsFailure := not HasDifferences;
     if Result.IsFailure then
     begin
-      Result.Message := 'every page is equal to the reference: remove from pending.txt';
+      Result.Message := 'every page is equal to the reference: remove from ' + PendingFileName;
     end;
   end
   else

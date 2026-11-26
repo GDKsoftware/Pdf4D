@@ -58,6 +58,18 @@ type
     procedure TestPlatformQualifiedEntry;
 
     [Test]
+    procedure TestBackendQualifiedEntry;
+
+    [Test]
+    procedure TestUnqualifiedEntryAppliesToBoth;
+
+    [Test]
+    procedure TestBackendAndPlatformQualifiedEntry;
+
+    [Test]
+    procedure TestNativePendingFileNotCounted;
+
+    [Test]
     procedure TestPendingFileNotCounted;
 
     [Test]
@@ -288,19 +300,66 @@ procedure TRenderCompareTests.TestKnownDifferenceSkipsPage;
 begin
   const Entries: TArray<string> = ['page 2 # the image uses upsampling that differs', '', 'page 10 # another page'];
 
-  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 2, 'Win64'));
-  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 10, 'Linux64'));
-  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 1, 'Win64'));
-  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 3, 'Win64'));
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 2, 'Skia', 'Win64'));
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 10, 'Skia', 'Linux64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 1, 'Skia', 'Win64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 3, 'Skia', 'Win64'));
 end;
 
 procedure TRenderCompareTests.TestPlatformQualifiedEntry;
 begin
   const Entries: TArray<string> = ['page 4 [Linux64] # fonts differ on Linux'];
 
-  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 4, 'Linux64'));
-  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 4, 'Win64'));
-  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 5, 'Linux64'));
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 4, 'Skia', 'Linux64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 4, 'Skia', 'Win64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 5, 'Skia', 'Linux64'));
+end;
+
+procedure TRenderCompareTests.TestBackendQualifiedEntry;
+begin
+  const Entries: TArray<string> = ['page 3 [Native] # hairlines under one pixel'];
+
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 3, 'Native', 'Win64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 3, 'Skia', 'Win64'), 'a Native entry does not skip the page for Skia');
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 4, 'Native', 'Win64'));
+end;
+
+procedure TRenderCompareTests.TestUnqualifiedEntryAppliesToBoth;
+begin
+  const Entries: TArray<string> = ['page 3 # both backends differ'];
+
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 3, 'Native', 'Win64'));
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 3, 'Skia', 'Win64'));
+end;
+
+procedure TRenderCompareTests.TestBackendAndPlatformQualifiedEntry;
+begin
+  const Entries: TArray<string> = ['page 2 [Skia] [Linux64] # one backend on one platform', 'page 5 [Win64] [Native] # the other order'];
+
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 2, 'Skia', 'Linux64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 2, 'Skia', 'Win64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 2, 'Native', 'Linux64'));
+  Assert.IsTrue(TRenderCompare.IsKnownDifference(Entries, 5, 'Native', 'Win64'));
+  Assert.IsFalse(TRenderCompare.IsKnownDifference(Entries, 5, 'Skia', 'Win64'));
+end;
+
+procedure TRenderCompareTests.TestNativePendingFileNotCounted;
+begin
+  const FileName = TPath.Combine(TPath.GetTempPath, 'pdf4d-pending-native-test.txt');
+  TFile.WriteAllText(FileName, '# comment' + sLineBreak + 'generated/render/shadings.pdf # gradient rounding' + sLineBreak, TEncoding.UTF8);
+  try
+    const Pending = TRenderCompare.PendingFiles(FileName);
+    const Differs = TRenderCompare.Judge(True, 'pending-native.txt', ['page 1: 40.000% of the pixels differ']);
+    const Passes = TRenderCompare.Judge(True, 'pending-native.txt', nil);
+
+    Assert.AreEqual<Integer>(1, Length(Pending));
+    Assert.IsFalse(Differs.IsFailure, 'a pending file that differs is reported and does not fail');
+    Assert.IsTrue(Passes.IsFailure);
+    Assert.IsTrue(Passes.Message.Contains('remove from pending-native.txt'));
+    Assert.IsFalse(Passes.Message.Contains('remove from pending.txt'));
+  finally
+    TFile.Delete(FileName);
+  end;
 end;
 
 procedure TRenderCompareTests.TestPendingFileNotCounted;
@@ -310,7 +369,7 @@ begin
                                'generated/render/patterns.pdf # tiling patterns' + sLineBreak, TEncoding.UTF8);
   try
     const Pending = TRenderCompare.PendingFiles(FileName);
-    const Verdict = TRenderCompare.Judge(True, ['page 1: 40.000% of the pixels differ']);
+    const Verdict = TRenderCompare.Judge(True, 'pending.txt', ['page 1: 40.000% of the pixels differ']);
 
     Assert.AreEqual<Integer>(2, Length(Pending));
     Assert.AreEqual('generated/render/shadings.pdf', Pending[0]);
@@ -324,12 +383,12 @@ end;
 
 procedure TRenderCompareTests.TestPendingFileThatPassesFails;
 begin
-  const Verdict = TRenderCompare.Judge(True, nil);
+  const Verdict = TRenderCompare.Judge(True, 'pending.txt', nil);
 
   Assert.IsTrue(Verdict.IsFailure);
   Assert.IsTrue(Verdict.Message.Contains('remove from pending.txt'));
-  Assert.IsFalse(TRenderCompare.Judge(False, nil).IsFailure);
-  Assert.IsTrue(TRenderCompare.Judge(False, ['page 1: different size']).IsFailure);
+  Assert.IsFalse(TRenderCompare.Judge(False, 'pending.txt', nil).IsFailure);
+  Assert.IsTrue(TRenderCompare.Judge(False, 'pending.txt', ['page 1: different size']).IsFailure);
 end;
 
 end.

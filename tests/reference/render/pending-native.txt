@@ -1,0 +1,2 @@
+# <corpus file> # <cause>
+# Files whose native render differs from PDFBox for a cause that is known and not fixed yet. A file whose pages are all equal must leave this list.

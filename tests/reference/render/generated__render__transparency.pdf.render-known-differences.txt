@@ -1,0 +1,2 @@
+# page <n> [<backend>] [<platform>] # <reason>
+page 1 [Native] # tiny-skia clip_color tests mx >= 0 where Skia tests mn < 0 (pipeline/highp.rs), so the Hue and Color blend modes never pull a negative channel back into range: the cells of those two modes (Hue over the red stripe, (0,93,239) against PDFBox (0,91,211)) differ by up to 49 levels, 1.2% of the flat pixels. Every other blend mode and the rest of the page are equal. The port keeps the Rust behaviour.

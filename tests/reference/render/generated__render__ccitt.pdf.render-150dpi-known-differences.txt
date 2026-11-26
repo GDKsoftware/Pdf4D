@@ -1,0 +1,2 @@
+# page <n> [<backend>] [<platform>] # <reason>
+page 1 [Native] # The 4.17 pixel texels of the CCITT images put the pixel centres 37.5, 62.5, 87.5 ... exactly on texel boundaries; the f32 matrix (scale 4.1666665, offset 20.833332) puts every such centre in the upper texel while PDFBox and Skia (DrawImageRect concatenates a source-to-destination matrix) take the lower one, so whole columns and rows of bar edges move by one pixel: 4.2% of the edge pixels (limit 3.5%), all of them single-pixel columns and rows on texel boundaries.

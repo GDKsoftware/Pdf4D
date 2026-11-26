@@ -97,11 +97,11 @@
         <DCCReference Include="..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.Png.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.pas"/>
-        <DCCReference Include="..\Support\Pdf4D.Tests.RenderCompare.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.ReferenceBackends.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.Corpus.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.FontProvider.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.TextGolden.pas"/>
+        <DCCReference Include="..\Support\Pdf4D.Tests.RenderGolden.Base.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.RenderGroups.Base.pas"/>
         <DCCReference Include="..\Support\Pdf4D.Tests.RenderSoftMasks.Base.pas"/>
