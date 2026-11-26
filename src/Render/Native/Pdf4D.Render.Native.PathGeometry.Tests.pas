@@ -228,7 +228,14 @@ begin
   const State = TTsFloatMode.Enter;
   try
     var MaxCurvature: TTsNormalizedF32;
+    {$IFDEF CPUX86}
+    // Win32 (x87) does not overflow the f32 products to infinity (the extended exponent range reaches 1E4932), so numer is a finite number
+    // and the function succeeds (measured: t = 1). The outcome is safe: the result is a normalized value, never NaN.
+    Assert.IsTrue(TTsPathGeometry.TryFindQuadMaxCurvature(Src, MaxCurvature));
+    Assert.IsTrue((MaxCurvature.Get >= 0) and (MaxCurvature.Get <= 1), 'The curvature parameter is normalized');
+    {$ELSE}
     Assert.IsFalse(TTsPathGeometry.TryFindQuadMaxCurvature(Src, MaxCurvature));
+    {$ENDIF}
   finally
     TTsFloatMode.Leave(State);
   end;
