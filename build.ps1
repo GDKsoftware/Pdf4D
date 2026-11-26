@@ -237,9 +237,15 @@ function Test-SkiaLibraryDependencies([string]$LinuxLibrary) {
 
 # A test program of an earlier run that is still alive (a hang that was cancelled, a crashed build) holds its output files and its memory;
 # it is stopped before the next run. The program is recognised by its full path, so another checkout of the library is left alone.
+function Stop-LinuxTestProgram([string]$LinuxPath) {
+    # pkill -f takes a regular expression that is matched against the whole command line: escape the path and anchor it at the start
+    $escapedPath = $LinuxPath -replace '([\\.^$*+?()\[\]{}|])', '\$1'
+    & wsl -d $WslDistro --exec pkill -f "^$escapedPath( |`$)" | Out-Null
+}
+
 function Stop-StaleTestProgram([string]$WindowsPath, [string]$LinuxPath) {
     if ($LinuxPath) {
-        & wsl -d $WslDistro -- pkill -f $LinuxPath | Out-Null
+        Stop-LinuxTestProgram $LinuxPath
         return
     }
 
@@ -254,8 +260,21 @@ function Stop-StaleTestProgram([string]$WindowsPath, [string]$LinuxPath) {
 }
 
 function ConvertTo-ArgumentString([string[]]$Arguments) {
-    $quoted = $Arguments | ForEach-Object { if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ } }
+    # CommandLineToArgvW rules: a backslash is literal unless it comes before a quote, so double the backslashes before a quote and
+    # at the end of a quoted argument
+    $quoted = $Arguments | ForEach-Object {
+        if ($_ -eq '') { '""' }
+        elseif ($_ -match '[\s"]') { '"' + (($_ -replace '(\\*)"', '$1$1\"') -replace '(\\+)$', '$1$1') + '"' }
+        else { $_ }
+    }
     return ($quoted -join ' ')
+}
+
+function Stop-ProcessTree($Process, [string]$LinuxPath) {
+    & taskkill /PID $Process.Id /T /F | Out-Null
+    if ($LinuxPath) {
+        Stop-LinuxTestProgram $LinuxPath
+    }
 }
 
 # Runs a program, shows its output while it runs and kills it (with its child processes) when it is still running after the time limit
@@ -289,15 +308,18 @@ function Invoke-TimedProgram([string]$FileName, [string[]]$Arguments, [string]$L
         }
         if ([DateTime]::UtcNow -gt $deadline) {
             $isTimedOut = $true
-            & taskkill /PID $process.Id /T /F | Out-Null
-            if ($LinuxPath) {
-                & wsl -d $WslDistro -- pkill -f $LinuxPath | Out-Null
-            }
+            Stop-ProcessTree $process $LinuxPath
             break
         }
     }
 
     $process.WaitForExit(30000) | Out-Null
+    if (-not $process.HasExited) {
+        # the output was closed, but the program is still running: it is not left behind
+        $isTimedOut = $true
+        Stop-ProcessTree $process $LinuxPath
+        $process.WaitForExit(30000) | Out-Null
+    }
     $errorText = if ($errorTask.Wait(5000)) { $errorTask.Result } else { '' }
     if ($errorText) {
         $errorText -split "`r?`n" | Where-Object { $_ } | ForEach-Object { Write-Host $_; $lines.Add($_) }
@@ -329,6 +351,9 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     $outputFolder = Join-Path $PSScriptRoot "$($TestProject.Folder)\$TargetPlatform\$Config"
     $programPath = Join-Path $outputFolder "$($TestProject.Name).exe"
 
+    # a results file of an earlier run must not be taken for the one of this run
+    Remove-Item -LiteralPath (Join-Path $PSScriptRoot "$($TestProject.Folder)\results-$TargetPlatform-pass1.xml") -ErrorAction SilentlyContinue
+
     if ($TestProject.NeedsSkia) {
         Copy-Item -LiteralPath (Get-SkiaLibraryPath $TargetPlatform) -Destination $outputFolder -Force
     }
@@ -352,6 +377,7 @@ function Invoke-Tests($TestProject, [string]$TargetPlatform) {
     }
 
     if ($run.IsTimedOut) {
+        Write-Host (Get-Pass1Summary $TestProject $TargetPlatform)
         throw "Suite $($TestProject.Name) on $TargetPlatform $Config ran longer than $SuiteTimeoutMinutes minutes and was killed (time limit -SuiteTimeoutMinutes)"
     }
 
