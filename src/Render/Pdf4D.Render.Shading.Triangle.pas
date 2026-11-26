@@ -262,7 +262,7 @@ end;
 // Math.round as a 64 bit number: half up
 function HalfUp(const Value: Double): Int64;
 begin
-  const Shifted = Value + 0.5;
+  const Shifted: Double = Value + 0.5;
   Result := Trunc(Shifted);
   if Result > Shifted then
   begin
@@ -458,9 +458,9 @@ end;
 // numbers, which the colour conversion takes as 0 or the largest value.
 function TPdfShadedTriangle.CalcColor(const X, Y: Integer): TArray<Single>;
 begin
-  const FirstWeight = Single(AreaOf(X, Y, FCorners[1], FCorners[2]) / FArea);
-  const SecondWeight = Single(AreaOf(X, Y, FCorners[2], FCorners[0]) / FArea);
-  const ThirdWeight = Single(AreaOf(X, Y, FCorners[0], FCorners[1]) / FArea);
+  const FirstWeight: Double = Single(AreaOf(X, Y, FCorners[1], FCorners[2]) / FArea);
+  const SecondWeight: Double = Single(AreaOf(X, Y, FCorners[2], FCorners[0]) / FArea);
+  const ThirdWeight: Double = Single(AreaOf(X, Y, FCorners[0], FCorners[1]) / FArea);
   SetLength(Result, Length(FCorners[0].Color));
   for var Index := 0 to High(Result) do
   begin
@@ -646,8 +646,8 @@ begin
     Exit;
   end;
 
-  const ShadingX = Interpolate(RawX, FMaxCoordinate, FDecode[0], FDecode[1]);
-  const ShadingY = Interpolate(RawY, FMaxCoordinate, FDecode[2], FDecode[3]);
+  const ShadingX: Double = Interpolate(RawX, FMaxCoordinate, FDecode[0], FDecode[1]);
+  const ShadingY: Double = Interpolate(RawY, FMaxCoordinate, FDecode[2], FDecode[3]);
   X := (Double(FMatrix.ScaleX) * ShadingX + Double(FMatrix.ShearX) * ShadingY + FMatrix.TranslateX);
   Y := (Double(FMatrix.ShearY) * ShadingX + Double(FMatrix.ScaleY) * ShadingY + FMatrix.TranslateY);
 end;

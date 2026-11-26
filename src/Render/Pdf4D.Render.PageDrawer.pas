@@ -675,8 +675,8 @@ end;
 function TPdfPageDrawer.TransformWidth(const Width: Single): Single;
 begin
   const Matrix = GraphicsState.CurrentTransformationMatrix;
-  const X = Matrix.ScaleX + Matrix.ShearX;
-  const Y = Matrix.ScaleY + Matrix.ShearY;
+  const X: Double = Matrix.ScaleX + Matrix.ShearX;
+  const Y: Double = Matrix.ScaleY + Matrix.ShearY;
   Result := Width * Single(Sqrt((X * X + Y * Y) * Half));
 end;
 
@@ -931,15 +931,15 @@ end;
 function TPdfPageDrawer.StrokeBoundsOf(const Path: TPdfPath; const Stroke: TPdfStrokeStyle): TRectF;
 begin
   const Bounds = DeviceBoundsOf(Path, FPageToDevice);
-  const ScaleOfX = Sqrt(Sqr(Double(FPageToDevice.ScaleX)) + Sqr(Double(FPageToDevice.ShearY)));
-  const ScaleOfY = Sqrt(Sqr(Double(FPageToDevice.ShearX)) + Sqr(Double(FPageToDevice.ScaleY)));
+  const ScaleOfX: Double = Sqrt(Sqr(Double(FPageToDevice.ScaleX)) + Sqr(Double(FPageToDevice.ShearY)));
+  const ScaleOfY: Double = Sqrt(Sqr(Double(FPageToDevice.ShearX)) + Sqr(Double(FPageToDevice.ScaleY)));
   var Reach: Double := SquareCapReach;
   if Stroke.Join = TPdfLineJoin.Miter then
   begin
     Reach := Max(Reach, Double(Stroke.MiterLimit));
   end;
 
-  const Margin = Single(Stroke.Width * Half * Reach * Max(ScaleOfX, ScaleOfY) + 1);
+  const Margin: Double = Single(Stroke.Width * Half * Reach * Max(ScaleOfX, ScaleOfY) + 1);
   Result := TRectF.Create(Bounds.Left - Margin, Bounds.Top - Margin, Bounds.Right + Margin, Bounds.Bottom + Margin);
 end;
 
@@ -1246,7 +1246,7 @@ begin
   Stroke.DashPhase := Phase;
 
   // The minimum line width is that of Adobe Reader
-  var Width := TransformWidth(RenderState.LineWidth);
+  var Width: Double := TransformWidth(RenderState.LineWidth);
   if IsNan(Width) or IsInfinite(Width) or (Width < MinimumLineWidth) then
   begin
     Width := MinimumLineWidth;
@@ -1255,7 +1255,7 @@ begin
 
   Stroke.Cap := TPdfLineCap(Min(LargestStyleCode, Max(0, RenderState.LineCap)));
   Stroke.Join := TPdfLineJoin(Min(LargestStyleCode, Max(0, RenderState.LineJoin)));
-  var MiterLimit := RenderState.MiterLimit;
+  var MiterLimit: Double := RenderState.MiterLimit;
   if not (MiterLimit >= 1) then
   begin
     LogWarning('Miter limit must be >= 1, value %g is ignored', [MiterLimit]);
@@ -1500,8 +1500,8 @@ function TPdfPageDrawer.AdjustedClip(const Path: TPdfPath): TPdfPath;
 begin
   Result := Path;
   const HasRotation = ((FPageToDevice.ShearX <> 0) or (FPageToDevice.ShearY <> 0));
-  const ScaleX = Abs(FPageToDevice.ScaleX);
-  const ScaleY = Abs(FPageToDevice.ScaleY);
+  const ScaleX: Double = Abs(FPageToDevice.ScaleX);
+  const ScaleY: Double = Abs(FPageToDevice.ScaleY);
   const IsUnscaled = ((ScaleX = 1) and (ScaleY = 1));
   const IsEnlarged = ((ScaleX > 1) and (ScaleY > 1));
   const IsDegenerate = ((ScaleX = 0) or (ScaleY = 0));
@@ -1523,8 +1523,8 @@ begin
   var Y: Double := Top;
   var Width: Double := Ceil(Bounds.Right) - Left;
   var Height: Double := Ceil(Bounds.Bottom) - Top;
-  const CenterX = X + Width * Half;
-  const CenterY = Y + Height * Half;
+  const CenterX: Double = X + Width * Half;
+  const CenterY: Double = Y + Height * Half;
   const IsNarrow = (ScaleX * Width < MinimumClipSize);
   const IsLow = (ScaleY * Height < MinimumClipSize);
   if not (IsNarrow or IsLow) then
@@ -1677,8 +1677,8 @@ begin
   end;
 
   // PDFBOX-5611: a width of zero in the PDF is ignored
-  const FontWidth = Font.GetWidthFromFont(Code);
-  const PdfWidth = Displacement.X * Thousand;
+  const FontWidth: Double = Font.GetWidthFromFont(Code);
+  const PdfWidth: Double = Displacement.X * Thousand;
   if (Displacement.X > 0) and (FontWidth > 0) and (Abs(FontWidth - PdfWidth) > WidthTolerance) then
   begin
     Result := TPdfMatrix.GetScaleInstance(PdfWidth / FontWidth, 1).Multiply(Result);
@@ -1864,8 +1864,8 @@ end;
 function TPdfPageDrawer.TryScaleDown(const Bitmap: TPdfBitmap; const ImageTransform: TPdfMatrix; out Scaled: TPdfBitmap): Boolean;
 begin
   Scaled := nil;
-  const ScaleX = Abs(ImageTransform.ScalingFactorX * FPageToDevice.ScalingFactorX);
-  const ScaleY = Abs(ImageTransform.ScalingFactorY * FPageToDevice.ScalingFactorY);
+  const ScaleX: Double = Abs(ImageTransform.ScalingFactorX * FPageToDevice.ScalingFactorX);
+  const ScaleY: Double = Abs(ImageTransform.ScalingFactorY * FPageToDevice.ScalingFactorY);
   if not ((ScaleX < ImageDownscalingThreshold) or (ScaleY < ImageDownscalingThreshold)) then
   begin
     Exit(False);
@@ -2070,8 +2070,8 @@ begin
   end;
 
   // The y of the page times the scale, upwards: the translation of the matrix minus the y of the device
-  const Minimum = Double(FPageToDevice.TranslateY) - Area.Bottom;
-  const Maximum = Double(FPageToDevice.TranslateY) - Area.Top;
+  const Minimum: Double = Double(FPageToDevice.TranslateY) - Area.Bottom;
+  const Maximum: Double = Double(FPageToDevice.TranslateY) - Area.Top;
   Result := Floor(Maximum) + 1 - Floor(Minimum) - (Maximum - Minimum);
 end;
 

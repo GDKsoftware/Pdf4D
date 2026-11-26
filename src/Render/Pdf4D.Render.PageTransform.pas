@@ -49,7 +49,7 @@ const
 // PDFBOX-4306: at least one pixel, and the product of two floats is a float. The size is limited to what an Integer holds.
 function PixelsOf(const Points, Scale: Single): Integer;
 begin
-  const Product = Single(Min(Double(Points) * Double(Scale), LargestMatrixValue));
+  const Product: Double = Single(Min(Double(Points) * Double(Scale), LargestMatrixValue));
   if not (Product >= 1) then
   begin
     Exit(1);
@@ -168,15 +168,15 @@ begin
   const B: Double = PageToDevice.ShearY;
   const C: Double = PageToDevice.ShearX;
   const D: Double = PageToDevice.ScaleY;
-  const Determinant = A * D - B * C;
+  const Determinant: Double = A * D - B * C;
   const IsInvertible = ((not IsNan(Determinant)) and (Determinant <> 0));
   if not IsInvertible then
   begin
     Exit(Point);
   end;
 
-  const Dx = Point.X - Double(PageToDevice.TranslateX);
-  const Dy = Point.Y - Double(PageToDevice.TranslateY);
+  const Dx: Double = Point.X - Double(PageToDevice.TranslateX);
+  const Dy: Double = Point.Y - Double(PageToDevice.TranslateY);
   Result.X := (D * Dx - C * Dy) / Determinant;
   Result.Y := (A * Dy - B * Dx) / Determinant;
 end;

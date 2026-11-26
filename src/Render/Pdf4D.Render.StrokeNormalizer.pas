@@ -169,7 +169,7 @@ end;
 
 class function TPdfStrokeNormalizer.IsInvertible(const ToDevice: TPdfMatrix): Boolean;
 begin
-  const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
+  const Determinant: Double = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
   Result := (Abs(Determinant) > MinDeterminant) and not IsNan(Determinant) and not IsInfinite(Determinant);
 end;
 
@@ -189,7 +189,7 @@ begin
       Exit(Path.Clone);
     end;
 
-    const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
+    const Determinant: Double = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
     Result := TPdfPath.Create;
     try
       Rebuild(Path, ToDevice, ResidualX, ResidualY, Result, Centered);
@@ -205,14 +205,14 @@ end;
 
 class function TPdfStrokeNormalizer.Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix;
 begin
-  const A = Matrix.ScaleX;
-  const B = Matrix.ShearY;
-  const C = Matrix.ShearX;
-  const D = Matrix.ScaleY;
-  const InverseA = D / Determinant;
-  const InverseB = -B / Determinant;
-  const InverseC = -C / Determinant;
-  const InverseD = A / Determinant;
+  const A: Double = Matrix.ScaleX;
+  const B: Double = Matrix.ShearY;
+  const C: Double = Matrix.ShearX;
+  const D: Double = Matrix.ScaleY;
+  const InverseA: Double = D / Determinant;
+  const InverseB: Double = -B / Determinant;
+  const InverseC: Double = -C / Determinant;
+  const InverseD: Double = A / Determinant;
   Result := TPdfMatrix.Create(InverseA, InverseB, InverseC, InverseD,
                               -(InverseA * Matrix.TranslateX + InverseC * Matrix.TranslateY),
                               -(InverseB * Matrix.TranslateX + InverseD * Matrix.TranslateY));
@@ -237,10 +237,12 @@ class procedure TPdfStrokeNormalizer.RebuildMasked(const Source: TPdfPath; const
                                                    const Target: TPdfPath; const Snap: TRounding);
 begin
   var PointIndex := 0;
-  var CurrentX := 0.0;
-  var CurrentY := 0.0;
-  var StartX := 0.0;
-  var StartY := 0.0;
+  // Currency is the type that an untyped "var X := 0.0" gets on Win64, which these residuals had so far; an untyped var is an Extended
+  // of 80 bits on Linux64. Double would be the precise type, but it changes the reference renders (native-hashes.txt).
+  var CurrentX: Currency := 0.0;
+  var CurrentY: Currency := 0.0;
+  var StartX: Currency := 0.0;
+  var StartY: Currency := 0.0;
   for var VerbIndex := 0 to Source.VerbCount - 1 do
   begin
     case Source.Verb(VerbIndex) of
@@ -249,8 +251,8 @@ begin
         begin
           const End1 = DevicePoint(Source.Point(PointIndex), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex);
-          const NewX = Snap(End1.X);
-          const NewY = Snap(End1.Y);
+          const NewX: Double = Snap(End1.X);
+          const NewY: Double = Snap(End1.Y);
           if Source.Verb(VerbIndex) = TPdfPathVerb.MoveTo then
           begin
             Target.MoveTo(NewX, NewY);
@@ -269,8 +271,8 @@ begin
           const Control = DevicePoint(Source.Point(PointIndex), ToDevice, ResidualX, ResidualY);
           const End2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex, 2);
-          const NewX = Snap(End2.X);
-          const NewY = Snap(End2.Y);
+          const NewX: Double = Snap(End2.X);
+          const NewY: Double = Snap(End2.Y);
           Target.QuadTo(Control.X + (CurrentX + (NewX - End2.X)) / 2, Control.Y + (CurrentY + (NewY - End2.Y)) / 2, NewX, NewY);
           CurrentX := NewX - End2.X;
           CurrentY := NewY - End2.Y;
@@ -281,8 +283,8 @@ begin
           const Control2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice, ResidualX, ResidualY);
           const End3 = DevicePoint(Source.Point(PointIndex + 2), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex, 3);
-          const NewX = Snap(End3.X);
-          const NewY = Snap(End3.Y);
+          const NewX: Double = Snap(End3.X);
+          const NewY: Double = Snap(End3.Y);
           Target.CubicTo(Control1.X + CurrentX, Control1.Y + CurrentY, Control2.X + (NewX - End3.X), Control2.Y + (NewY - End3.Y), NewX, NewY);
           CurrentX := NewX - End3.X;
           CurrentY := NewY - End3.Y;
