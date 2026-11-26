@@ -37,7 +37,7 @@ type
     procedure AssertCoverageOfRows(const FirstRow, LastRow, FirstColumn, LastColumn, Expected: Integer);
     procedure AssertNothingDrawn(const Description: string);
     procedure AssertDrawn(const Pixels: Integer; const Total: Int64; const Description: string);
-    procedure AssertDrawnWithin(const MinTotal, MaxTotal: Int64; const Description: string);
+    procedure AssertTotalCoverage(const Total: Int64; const Description: string);
 
   public
     [Setup]
@@ -190,10 +190,9 @@ begin
   Assert.AreEqual(0, FBlitter.OutsideCount, Description + ': nothing outside');
 end;
 
-procedure TTsScanTests.AssertDrawnWithin(const MinTotal, MaxTotal: Int64; const Description: string);
+procedure TTsScanTests.AssertTotalCoverage(const Total: Int64; const Description: string);
 begin
-  Assert.IsTrue((FBlitter.TotalCoverage >= MinTotal) and (FBlitter.TotalCoverage <= MaxTotal),
-                Format('%s: total coverage %d, expected %d to %d', [Description, FBlitter.TotalCoverage, MinTotal, MaxTotal]));
+  Assert.AreEqual(Total, FBlitter.TotalCoverage, Description + ': total coverage');
   Assert.AreEqual(0, FBlitter.OutsideCount, Description + ': nothing outside');
 end;
 
@@ -496,7 +495,7 @@ begin
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(HugeTrianglePath(Big), TTsFillRule.Winding, ClipOf(20, 20), FBlitter);
-  AssertDrawnWithin(190 * 255, 215 * 255, 'Anti-aliased');
+  AssertTotalCoverage(51630, 'Anti-aliased');
 
   UseBlitter(20, 20);
   TTsScan.FillPath(HugeTrianglePath(1.0E15), TTsFillRule.EvenOdd, ClipOf(20, 20), FBlitter);
@@ -504,7 +503,7 @@ begin
 
   UseBlitter(20, 20);
   TTsScanAntiAlias.FillPath(HugeTrianglePath(1.0E15), TTsFillRule.EvenOdd, ClipOf(20, 20), FBlitter);
-  AssertDrawnWithin(190 * 255, 215 * 255, 'Anti-aliased, even-odd');
+  AssertTotalCoverage(51630, 'Anti-aliased, even-odd');
 end;
 
 procedure TTsScanTests.TestHugeCubic;
@@ -689,12 +688,29 @@ begin
         end;
         Builder.Close;
       end;
+    2:
+      begin
+        Builder.MoveTo(0, 0);
+        for var Index := 1 to 3000 do
+        begin
+          Builder.LineTo(Index mod CrossingSize, (Index mod 2) * (CrossingSize - 1));
+        end;
+      end;
   else
     begin
+      // 1500 lines from the top row to the bottom row, every one with another slope: about 11 000 crossings in a row, over the 7 000 at
+      // which the Auto mode of the sort gives up the ripple in the middle of a row
       Builder.MoveTo(0, 0);
-      for var Index := 1 to 3000 do
+      for var Index := 1 to 1500 do
       begin
-        Builder.LineTo(Index mod CrossingSize, (Index mod 2) * (CrossingSize - 1));
+        if Index mod 2 = 0 then
+        begin
+          Builder.LineTo((Index * 7) mod CrossingSize, 0);
+        end
+        else
+        begin
+          Builder.LineTo((Index * 13) mod CrossingSize, CrossingSize - 1);
+        end;
       end;
     end;
   end;
@@ -731,7 +747,7 @@ end;
 
 procedure TTsScanTests.TestEveryDeferModeGivesTheSameCoverage;
 begin
-  for var Kind := 0 to 2 do
+  for var Kind := 0 to 3 do
   begin
     const Path = CrossingPath(Kind);
     for var AntiAlias in [False, True] do
@@ -748,7 +764,15 @@ begin
         Assert.IsTrue(Drawn > 0, 'Something is drawn: ' + Description);
 
         const Sorted = CoverageOf(Path, TTsScan.TDeferMode.Always, AntiAlias, FillRule);
+        TTsScan.AutoSwitchCount := 0;
+        TTsScan.DeferredRowCount := 0;
         const Automatic = CoverageOf(Path, TTsScan.TDeferMode.Auto, AntiAlias, FillRule);
+        if Kind = 3 then
+        begin
+          // The path that crosses enough: Auto ripples first and sorts the rest of the row, which is what the three must agree on
+          Assert.IsTrue(TTsScan.AutoSwitchCount > 0, 'Auto switched to the sort in the middle of a row: ' + Description);
+          Assert.IsTrue(TTsScan.DeferredRowCount >= TTsScan.AutoSwitchCount, 'Rows were sorted at their end: ' + Description);
+        end;
         for var Index := 0 to High(Ripple) do
         begin
           Assert.AreEqual(Ripple[Index], Sorted[Index], Format('Sorted at %d: %s', [Index, Description]));

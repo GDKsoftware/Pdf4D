@@ -87,6 +87,11 @@ type
     FBuildCount: Integer;
     FForceMask: Boolean;
     FMaxPathVerbs: Integer;
+    // The path of the chain that hit a limit when it was applied: the next draws under it raise at once and do not walk it again. The levels
+    // of the chain below it are kept, and the failed one is not pushed.
+    FFailedLink: IPdfClipPath;
+    FFailedMessage: string;
+    FWalkCount: Integer;
     // The last combination of the clip with a soft mask: what it was made of (the build of the chain, the geometry and a copy of the values of
     // the mask) and the mask. A new combination is a new mask, so a pointer that was handed out never changes.
     FBuildNumber: Integer;
@@ -107,6 +112,7 @@ type
     procedure DropLevels(const KeptCount: Integer);
     procedure PushLevel(const Link: IPdfClipPath);
     procedure ApplyLink(var Level: TClipLevel; const LevelIndex: Integer);
+    procedure ApplyNewLink(var Level: TClipLevel; const LevelIndex: Integer);
     procedure ApplyPath(var Level: TClipLevel; const LevelIndex: Integer; const Ts: TTsPath; const FillRule: TPdfFillRule);
     procedure KeepMaskOwner(const LevelIndex: Integer);
     procedure FinishBuild;
@@ -139,6 +145,8 @@ type
     property BuildCount: Integer read FBuildCount;
     // For the test properties of the device: the number of paths of chains that were applied: a path that stays on the stack between two chains is not applied again
     property AppliedLinkCount: Integer read FAppliedLinkCount;
+    // For the test properties of the device: the number of masks that a path of a chain was filled into (a path that hit a limit is walked once)
+    property WalkCount: Integer read FWalkCount;
     // A path of the chain with more verbs raises EPdfLimitExceededException when the chain is built, before anything is drawn
     property MaxPathVerbs: Integer read FMaxPathVerbs write FMaxPathVerbs;
     // For the test properties of the device: a rectangle is made into a mask as well, so that a test can compare the two ways to clip
@@ -268,6 +276,8 @@ begin
   begin
     // The levels hold rectangles and masks of the old size
     DropLevels(0);
+    // A path may take another amount of work on another size
+    FFailedLink := nil;
   end;
 
   FChain := Clip;
@@ -551,6 +561,25 @@ end;
 
 procedure TTsClipMask.ApplyLink(var Level: TClipLevel; const LevelIndex: Integer);
 begin
+  if Assigned(FFailedLink) and (FFailedLink = Level.Link) then
+  begin
+    raise EPdfLimitExceededException.Create(FFailedMessage);
+  end;
+
+  try
+    ApplyNewLink(Level, LevelIndex);
+  except
+    on E: EPdfLimitExceededException do
+    begin
+      FFailedLink := Level.Link;
+      FFailedMessage := E.Message;
+      raise;
+    end;
+  end;
+end;
+
+procedure TTsClipMask.ApplyNewLink(var Level: TClipLevel; const LevelIndex: Integer);
+begin
   const Link = Level.Link;
 
   // Java2D moves the vertices of a clip before it takes the pixels, so the path goes on in device pixels
@@ -624,6 +653,7 @@ begin
     Level.CleanBottom := Level.Bottom;
   end;
 
+  Inc(FWalkCount);
   Mask.IntersectPath(Ts, TTsConversion.ToFillRule(FillRule), False, TTsTransform.Identity);
   Level.OwnMask := Mask.Data;
   Level.HasMask := True;

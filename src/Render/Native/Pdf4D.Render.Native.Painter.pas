@@ -70,6 +70,8 @@ type
     class function TryTileClip(const Clip, Tile: TTsScreenIntRect; out TileClip: TTsScreenIntRect): Boolean; static;
     // False when the clip does not lie inside the pixmap: nothing is drawn then
     class function ClipFitsPixmap(const Clip: TTsScreenIntRect; const Pixmap: TTsPixmap): Boolean; static;
+    class procedure FillTiles(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
+                              const Clip: TTsScreenIntRect; const Mask: PTsMask); static;
 
   public
     // Sometimes in the drawing pipeline, we have to perform math on path coordinates, even after the path is in device-coordinates. To
@@ -384,6 +386,68 @@ begin
   FillPath(Pixmap, Path, Paint, FillRule, Transform, Whole, Mask);
 end;
 
+// Fills the tiles of a pixmap that is too big for one pass, each with the path moved to it. With the dry run of the scan converter on, it only
+// takes the bound of the work of every tile.
+class procedure TTsPainter.FillTiles(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
+                                     const Clip: TTsScreenIntRect; const Mask: PTsMask);
+begin
+  var Tiler: TTsDrawTiler;
+  if not TTsDrawTiler.TryCreate(Pixmap.Width, Pixmap.Height, Tiler) then
+  begin
+    Exit;
+  end;
+
+  var TilePath := Path;
+  var TilePaint := Paint;
+
+  // Rust leaves the path shifted after a tile whose subpixmap or blitter is None (continue skips the translate forward); Delphi always
+  // translates back, which is the correct behaviour and changes no image.
+  var Tile: TTsScreenIntRect;
+  while Tiler.TryNext(Tile) do
+  begin
+    const BackTs = TTsTransform.FromTranslate(-Single(Tile.X), -Single(Tile.Y));
+    if not MoveTilePath(TilePath, BackTs) then
+    begin
+      // path transformation failed
+      Exit;
+    end;
+    TilePaint.Shader.ApplyTransform(BackTs);
+
+    // Pdf4D: the clip in the coordinates of the tile (the whole tile for the clip of the whole pixmap)
+    var ClipRect: TTsScreenIntRect;
+    var Region: TTsSubPixmapMut;
+    if TryTileClip(Clip, Tile, ClipRect) and Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
+    begin
+      var Blitter: TTsRasterPipelineBlitter;
+      // a blitter that cannot be created has nothing to do
+      if TTsRasterPipelineBlitter.TryCreate(TilePaint, SubMaskOfTile(Mask, Tile), Region, Blitter) then
+      begin
+        try
+          // We're ignoring "errors" here, because the fill returns nothing when rendering a tile that doesn't have a path on it. Which is
+          // not an error in this case.
+          if TilePaint.AntiAlias then
+          begin
+            TTsScanAntiAlias.FillPath(TilePath, FillRule, ClipRect, Blitter);
+          end
+          else
+          begin
+            TTsScan.FillPath(TilePath, FillRule, ClipRect, Blitter);
+          end;
+        finally
+          Blitter.Free;
+        end;
+      end;
+    end;
+
+    const ForwardTs = TTsTransform.FromTranslate(Single(Tile.X), Single(Tile.Y));
+    if not MoveTilePath(TilePath, ForwardTs) then
+    begin
+      Exit;
+    end;
+    TilePaint.Shader.ApplyTransform(ForwardTs);
+  end;
+end;
+
 class procedure TTsPainter.FillPath(var Pixmap: TTsPixmap; const Path: TTsPath; const Paint: TTsPaint; const FillRule: TTsFillRule;
   const Transform: TTsTransform; const Clip: TTsScreenIntRect; const Mask: PTsMask);
 begin
@@ -431,58 +495,17 @@ begin
 
   // TODO of tiny-skia: ignore paths outside the pixmap
 
-  var Tiler: TTsDrawTiler;
-  if TTsDrawTiler.TryCreate(Pixmap.Width, Pixmap.Height, Tiler) then
+  if TTsDrawTiler.Required(Pixmap.Width, Pixmap.Height) then
   begin
-    var TilePath := Path;
-    var TilePaint := Paint;
-
-    // Rust leaves the path shifted after a tile whose subpixmap or blitter is None (continue skips the translate forward); Delphi always
-    // translates back, which is the correct behaviour and changes no image.
-    var Tile: TTsScreenIntRect;
-    while Tiler.TryNext(Tile) do
-    begin
-      const BackTs = TTsTransform.FromTranslate(-Single(Tile.X), -Single(Tile.Y));
-      if not MoveTilePath(TilePath, BackTs) then
-      begin
-        // path transformation failed
-        Exit;
-      end;
-      TilePaint.Shader.ApplyTransform(BackTs);
-
-      // Pdf4D: the clip in the coordinates of the tile (the whole tile for the clip of the whole pixmap)
-      var ClipRect: TTsScreenIntRect;
-      var Region: TTsSubPixmapMut;
-      if TryTileClip(Clip, Tile, ClipRect) and Pixmap.TrySubPixmap(Tile.ToIntRect, Region) then
-      begin
-        var Blitter: TTsRasterPipelineBlitter;
-        // a blitter that cannot be created has nothing to do
-        if TTsRasterPipelineBlitter.TryCreate(TilePaint, SubMaskOfTile(Mask, Tile), Region, Blitter) then
-        begin
-          try
-            // We're ignoring "errors" here, because the fill returns nothing when rendering a tile that doesn't have a path on it. Which is
-            // not an error in this case.
-            if TilePaint.AntiAlias then
-            begin
-              TTsScanAntiAlias.FillPath(TilePath, FillRule, ClipRect, Blitter);
-            end
-            else
-            begin
-              TTsScan.FillPath(TilePath, FillRule, ClipRect, Blitter);
-            end;
-          finally
-            Blitter.Free;
-          end;
-        end;
-      end;
-
-      const ForwardTs = TTsTransform.FromTranslate(Single(Tile.X), Single(Tile.Y));
-      if not MoveTilePath(TilePath, ForwardTs) then
-      begin
-        Exit;
-      end;
-      TilePaint.Shader.ApplyTransform(ForwardTs);
+    // The first pass only takes the bound of the work of the edges of every tile, so that a tile over the limit raises before the first one is drawn
+    TTsScan.SetEdgeWorkDryRun(True);
+    try
+      FillTiles(Pixmap, Path, Paint, FillRule, Clip, Mask);
+    finally
+      TTsScan.SetEdgeWorkDryRun(False);
     end;
+
+    FillTiles(Pixmap, Path, Paint, FillRule, Clip, Mask);
   end
   else
   begin

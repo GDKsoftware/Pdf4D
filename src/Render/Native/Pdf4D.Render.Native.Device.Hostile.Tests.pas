@@ -46,6 +46,12 @@ type
 
     function Native: TPdfNativeDevice;
     procedure CreateDevice(const Width, Height: Integer);
+    // A device of a new backend with a limit of the work of the edge walk
+    procedure CreateDeviceWithEdgeWork(const Width, Height: Integer; const MaxEdgeWork: Int64);
+    procedure AssertPixelIsRed(const X, Y: Integer);
+    procedure AssertStrokeCoversDevice(const Width: Single; const Ctm: TPdfMatrix; const IsButtChecked: Boolean);
+    function EdgeWorkIsRaised(const Path: TPdfPath; const Composite: TPdfComposite): Boolean;
+    function IsStressRun: Boolean;
     function Red: TPdfPaint;
     function RedValue: TPdfDeviceColor;
     function NoAntiAlias: TPdfComposite;
@@ -106,6 +112,25 @@ type
     [Test]
     procedure TestDenseEdgesTerminate;
 
+    // The limit of the work of the edge walk, lowered: a path over it raises before a pixel changes, with and without anti-aliasing, in
+    // tiles and under a soft mask
+    [Test]
+    procedure TestEdgeWorkOverTheLimitRaisesBeforeDrawing;
+
+    [Test]
+    procedure TestEdgeWorkOverTheLimitRaisesBeforeDrawingInTiles;
+
+    [Test]
+    procedure TestEdgeWorkOverTheLimitDrawsNothingUnderASoftMask;
+
+    // A clip path over the limit is walked once; the draws under it raise at once
+    [Test]
+    procedure TestClipPathOverTheEdgeWorkLimitIsWalkedOnce;
+
+    [Test]
+    procedure TestEdgeWorkLimitMustBePositive;
+
+    // The worst case at the verb limit takes 25 s and 1.5 GB; it runs when the environment variable PDF4D_STRESS is set (see docs/building.md)
     [Test]
     procedure TestWorstCaseOfTheEdgeWalkIsBounded;
 
@@ -114,6 +139,10 @@ type
 
     [Test]
     procedure TestHugeStrokeWidthIsBounded;
+
+    // A stroke that the width limit cuts still paints the region that it covers
+    [Test]
+    procedure TestStrokeCutByTheWidthLimitStillPaints;
 
     [Test]
     procedure TestDashedStrokeOfHugeWidthIsBounded;
@@ -200,6 +229,11 @@ uses
 const
   // The coordinates of the path of the non-finite tests: M 10 10, L 90 10, Q 95 50 90 90, C 70 95 30 95 10 90, Z
   PathCoordinates: array[0..13] of Single = (10, 10, 90, 10, 95, 50, 90, 90, 70, 95, 30, 95, 10, 90);
+  StressEnvironmentVariable = 'PDF4D_STRESS';
+  // A limit of the work of the edge walk that a zigzag of 2000 segments over the 100 rows of the device is over (its bound is 3.2 million, 12.8
+  // million with anti-aliasing), and a rectangle under (a row costs 1024 in the bound, 4 rows per pixel row with anti-aliasing)
+  LowEdgeWork = 1000000;
+  BytesPerPixel = 4;
   RandomSeed = 4321;
   RandomCallCount = 5000;
   WideDeviceWidth = 9000;
@@ -231,6 +265,78 @@ end;
 procedure TPdfNativeHostileTests.CreateDevice(const Width, Height: Integer);
 begin
   FDevice := FBackend.CreateRasterDevice(Width, Height);
+end;
+
+procedure TPdfNativeHostileTests.CreateDeviceWithEdgeWork(const Width, Height: Integer; const MaxEdgeWork: Int64);
+begin
+  var Limits := TPdfNativeLimits.Default;
+  Limits.MaxEdgeWork := MaxEdgeWork;
+  FBackend := TPdfNativeBackend.Create(Limits);
+  CreateDevice(Width, Height);
+end;
+
+function TPdfNativeHostileTests.IsStressRun: Boolean;
+begin
+  Result := (GetEnvironmentVariable(StressEnvironmentVariable) <> '');
+end;
+
+procedure TPdfNativeHostileTests.AssertPixelIsRed(const X, Y: Integer);
+begin
+  FSnapshot.Free;
+  FSnapshot := FDevice.ToBitmap;
+  const Color = FSnapshot.GetPixel(X, Y);
+  const IsRed = ((Color.R = 255) and (Color.G = 0) and (Color.B = 0) and (Color.A = 255));
+  Assert.IsTrue(IsRed, Format('Pixel (%d, %d) is (%d, %d, %d, %d), not red', [X, Y, Color.R, Color.G, Color.B, Color.A]));
+end;
+
+function TPdfNativeHostileTests.EdgeWorkIsRaised(const Path: TPdfPath; const Composite: TPdfComposite): Boolean;
+begin
+  Result := False;
+  try
+    FDevice.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, Composite);
+  except
+    on EPdfLimitExceededException do
+    begin
+      Result := True;
+    end;
+  end;
+end;
+
+// A stroke of the path (10,10) (90,50) (20,90) with a round cap, AA and not, on a fresh device: it covers every pixel. With IsButtChecked a
+// butt stroke is checked as well, on the pixels across the middle of the first segment (for a transform that leaves the path where it is).
+procedure TPdfNativeHostileTests.AssertStrokeCoversDevice(const Width: Single; const Ctm: TPdfMatrix; const IsButtChecked: Boolean);
+begin
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(10, 10);
+    Path.LineTo(90, 50);
+    Path.LineTo(20, 90);
+
+    for var AntiAlias in [False, True] do
+    begin
+      var Composite := TPdfComposite.Default;
+      Composite.AntiAlias := AntiAlias;
+      const Description = Format('width %g, anti-alias %s', [Width, BoolToStr(AntiAlias, True)]);
+
+      CreateDevice(DeviceSize, DeviceSize);
+      var Round := NewStroke(Width);
+      Round.Cap := TPdfLineCap.Round;
+      Round.Join := TPdfLineJoin.Round;
+      FDevice.StrokePath(Path, Ctm, Round, Red, Composite);
+      AssertEveryPixelIsRed('Round, ' + Description);
+
+      if IsButtChecked then
+      begin
+        CreateDevice(DeviceSize, DeviceSize);
+        FDevice.StrokePath(Path, Ctm, NewStroke(Width), Red, Composite);
+        AssertPixelIsRed(50, 30);
+        AssertPixelIsRed(50, 1);
+        AssertPixelIsRed(50, 98);
+      end;
+    end;
+  finally
+    Path.Free;
+  end;
 end;
 
 function TPdfNativeHostileTests.RedValue: TPdfDeviceColor;
@@ -556,12 +662,136 @@ begin
   end;
 end;
 
+// A zigzag of 2000 segments over the 100 rows of the device: the bound of its work is over the low limit (and under the default limit)
+procedure TPdfNativeHostileTests.TestEdgeWorkOverTheLimitRaisesBeforeDrawing;
+begin
+  CreateDeviceWithEdgeWork(DeviceSize, DeviceSize, LowEdgeWork);
+  const Path = NewZigZag(2000, DeviceSize - 1);
+  try
+    for var AntiAlias in [False, True] do
+    begin
+      var Composite := TPdfComposite.Default;
+      Composite.AntiAlias := AntiAlias;
+      Assert.IsTrue(EdgeWorkIsRaised(Path, Composite), Format('The fill raises, anti-alias %s', [BoolToStr(AntiAlias, True)]));
+      AssertNothingIsDrawn;
+    end;
+
+    // A path under the limit is drawn
+    FillRect(10, 10, 50, 50, Red, TPdfComposite.Default);
+    AssertPixelIsRed(20, 20);
+
+    // The same path under the default limit is drawn
+    FBackend := TPdfNativeBackend.Create;
+    CreateDevice(DeviceSize, DeviceSize);
+    FillWithPaint(Path, Red, TPdfComposite.Default);
+    var RedPixels := 0;
+    for var Row := 0 to DeviceSize - 1 do
+    begin
+      Inc(RedPixels, RedPixelCount(Row, 0, DeviceSize - 1));
+    end;
+    Assert.IsTrue(RedPixels > 0, 'The path under the default limit is drawn');
+  finally
+    Path.Free;
+  end;
+end;
+
+// A device wider than the tiles of the painter: the tiles that come before a tile over the limit are not drawn either. The path is a
+// rectangle in the first tile and a zigzag in the last one.
+procedure TPdfNativeHostileTests.TestEdgeWorkOverTheLimitRaisesBeforeDrawingInTiles;
+begin
+  CreateDeviceWithEdgeWork(WideDeviceWidth, DeviceSize, LowEdgeWork);
+  const Path = TPdfPath.Create;
+  try
+    Path.MoveTo(0, 0);
+    Path.LineTo(10, 0);
+    Path.LineTo(10, 10);
+    Path.LineTo(0, 10);
+    Path.ClosePath;
+    const Offset = WideDeviceWidth - 200;
+    Path.MoveTo(Offset, 0);
+    for var Index := 1 to 2000 do
+    begin
+      Path.LineTo(Offset + (Index mod 100), (Index mod 2) * (DeviceSize - 1));
+    end;
+
+    for var AntiAlias in [False, True] do
+    begin
+      var Composite := TPdfComposite.Default;
+      Composite.AntiAlias := AntiAlias;
+      Assert.IsTrue(EdgeWorkIsRaised(Path, Composite), Format('The fill raises, anti-alias %s', [BoolToStr(AntiAlias, True)]));
+      AssertNothingIsDrawn;
+    end;
+  finally
+    Path.Free;
+  end;
+end;
+
+procedure TPdfNativeHostileTests.TestEdgeWorkOverTheLimitDrawsNothingUnderASoftMask;
+begin
+  CreateDeviceWithEdgeWork(DeviceSize, DeviceSize, LowEdgeWork);
+  const Mask = TPdfAlphaMask.Create(0, 0, DeviceSize, DeviceSize, 255);
+  const Path = NewZigZag(2000, DeviceSize - 1);
+  try
+    FillChar(Mask.Values[0], Length(Mask.Values), 255);
+    var Composite := NoAntiAlias;
+    Composite.SoftMask := Mask;
+    Assert.IsTrue(EdgeWorkIsRaised(Path, Composite), 'The fill raises');
+    AssertNothingIsDrawn;
+  finally
+    Path.Free;
+    Mask.Free;
+  end;
+end;
+
+procedure TPdfNativeHostileTests.TestClipPathOverTheEdgeWorkLimitIsWalkedOnce;
+begin
+  CreateDeviceWithEdgeWork(DeviceSize, DeviceSize, LowEdgeWork);
+  const ClipPath = NewZigZag(2000, DeviceSize - 1);
+  ClipPath.ClosePath;
+  FDevice.SetClip(TPdfClipPath.Create(nil, ClipPath, TPdfMatrix.Identity, TPdfFillRule.NonZero));
+
+  var Raised := 0;
+  for var Draw := 1 to 5 do
+  begin
+    const Watch = TStopwatch.StartNew;
+    try
+      FillRect(0, 0, DeviceSize, DeviceSize, Red, NoAntiAlias);
+    except
+      on EPdfLimitExceededException do
+      begin
+        Inc(Raised);
+      end;
+    end;
+    AssertWithinTime(Watch, TimeLimitMilliseconds, 'A draw under the clip');
+    Assert.AreEqual(1, Native.ClipWalkCount, Format('The clip path is walked once, after draw %d', [Draw]));
+  end;
+  Assert.AreEqual(5, Raised, 'Every draw under the clip raises');
+  AssertNothingIsDrawn;
+end;
+
+procedure TPdfNativeHostileTests.TestEdgeWorkLimitMustBePositive;
+begin
+  var Limits := TPdfNativeLimits.Default;
+  Limits.MaxEdgeWork := 0;
+  Assert.WillRaise(
+    procedure
+    begin
+      TPdfNativeBackend.Create(Limits);
+    end,
+    EArgumentOutOfRangeException);
+end;
+
 // The worst case of the walk of the edges: as many segments as the verb limit allows, each from the top row to the bottom row of the device,
 // so that all of them are active in every row and cross each other in most. The device is 100 and 1000 rows high, drawn with and without
 // anti-aliasing (four times the rows). A fill ends within the bound either way: it draws, or it raises EPdfLimitExceededException when the
-// work of the walk is over the limit of the scan converter.
+// bound of the work of the walk is over the limit. About 25 s and 1.5 GB: only when PDF4D_STRESS is set.
 procedure TPdfNativeHostileTests.TestWorstCaseOfTheEdgeWalkIsBounded;
 begin
+  if not IsStressRun then
+  begin
+    Assert.Pass('Set PDF4D_STRESS to run the worst case at the verb limit');
+  end;
+
   var Slow := '';
   var Report := '';
   for var Height in [DeviceSize, 10 * DeviceSize] do
@@ -575,13 +805,9 @@ begin
         Composite.AntiAlias := AntiAlias;
         var Outcome := 'drawn';
         const Watch = TStopwatch.StartNew;
-        try
-          FDevice.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, Composite);
-        except
-          on EPdfLimitExceededException do
-          begin
-            Outcome := 'limit';
-          end;
+        if EdgeWorkIsRaised(Path, Composite) then
+        begin
+          Outcome := 'limit';
         end;
         const Text = Format('%d rows, anti-alias %s: %s after %d ms', [Height, BoolToStr(AntiAlias, True), Outcome, Watch.ElapsedMilliseconds]);
         Report := Report + Text + '; ';
@@ -628,6 +854,42 @@ begin
     Path.Free;
   end;
   Assert.Pass;
+end;
+
+// The stroke that the width limit cuts is still a stroke of 1e6 pixels along the largest stretch: it covers the device. Under the identity,
+// under a rotation of 45 degrees (where the bound of the stretch, the sum of the matrix entries, is 2.8 times the largest stretch) and
+// under a stretch of 10 to 1 (below the condition from which a cut stroke can show).
+procedure TPdfNativeHostileTests.TestStrokeCutByTheWidthLimitStillPaints;
+begin
+  for var Width in [Single(1E20), Single(1E38), Single(Single.MaxValue)] do
+  begin
+    AssertStrokeCoversDevice(Width, TPdfMatrix.Identity, True);
+  end;
+
+  // A rotation of 45 degrees about the middle of the device: the path stays where it is, rotated
+  const Cosine = Single(0.70710678);
+  AssertStrokeCoversDevice(1E20, TPdfMatrix.Create(Cosine, Cosine, -Cosine, Cosine, 50, 50 - 50 * Cosine * 2), False);
+
+  // x by 10 and y by 1, the path made 10 times narrower in x to land on the device
+  const Narrow = TPdfPath.Create;
+  try
+    Narrow.MoveTo(1, 10);
+    Narrow.LineTo(9, 50);
+    Narrow.LineTo(2, 90);
+    for var AntiAlias in [False, True] do
+    begin
+      var Composite := TPdfComposite.Default;
+      Composite.AntiAlias := AntiAlias;
+      CreateDevice(DeviceSize, DeviceSize);
+      var Round := NewStroke(1E20);
+      Round.Cap := TPdfLineCap.Round;
+      Round.Join := TPdfLineJoin.Round;
+      FDevice.StrokePath(Narrow, TPdfMatrix.Create(10, 0, 0, 1, 0, 0), Round, Red, Composite);
+      AssertEveryPixelIsRed(Format('Stretch of 10 to 1, anti-alias %s', [BoolToStr(AntiAlias, True)]));
+    end;
+  finally
+    Narrow.Free;
+  end;
 end;
 
 // Found by the fuzz of the renderer (generated graphics stream 79 and 799 of seed 8642): a dashed path of curves at a width of 1e11 took 2.5 s,
@@ -701,7 +963,19 @@ begin
   finally
     Path.Free;
   end;
-  Assert.Pass;
+
+  // The stroke passes through the start of the curve, which is on the device
+  FSnapshot.Free;
+  FSnapshot := FDevice.ToBitmap;
+  var DrawnBytes := 0;
+  for var Value in FSnapshot.Pixels do
+  begin
+    if Value <> 0 then
+    begin
+      Inc(DrawnBytes);
+    end;
+  end;
+  Assert.IsTrue(DrawnBytes > 0, 'Something is drawn');
 end;
 
 procedure TPdfNativeHostileTests.TestBitmapPaintWithSingularMatrixDrawsNothing;
@@ -768,7 +1042,9 @@ begin
   finally
     Tile.Free;
   end;
-  Assert.Pass;
+
+  // Every texel is red, so every pixel is
+  AssertEveryPixelIsRed('A repeated tile of 1e-6');
 end;
 
 procedure TPdfNativeHostileTests.TestOneByOneBitmapScaledHuge;
@@ -1172,7 +1448,7 @@ begin
   Result := TPdfPaint.Solid(TPdfDeviceColor.Create(Random(256), Random(256), Random(256), Random(256)));
 end;
 
-// Bitmaps with any bytes (not even premultiplied) and masks of every kind that the tests above pin one by one
+// Premultiplied bitmaps with any values and masks of every kind that the tests above pin one by one
 procedure TPdfNativeHostileTests.MakeRandomPools;
 begin
   const Sizes: TArray<TSize> = [TSize.Create(1, 1), TSize.Create(3, 3), TSize.Create(7, 2)];
@@ -1180,9 +1456,15 @@ begin
   begin
     const Bitmap = TPdfBitmap.Create(Size.cx, Size.cy);
     FRandomBitmaps := FRandomBitmaps + [Bitmap];
-    for var Index := 0 to High(Bitmap.Pixels) do
+    // Premultiplied, as the bitmaps of the renderer are: a colour channel is at most the alpha
+    for var Index := 0 to (Length(Bitmap.Pixels) div BytesPerPixel) - 1 do
     begin
-      Bitmap.Pixels[Index] := Random(256);
+      const Alpha = Random(256);
+      for var Channel := 0 to BytesPerPixel - 2 do
+      begin
+        Bitmap.Pixels[Index * BytesPerPixel + Channel] := Random(Alpha + 1);
+      end;
+      Bitmap.Pixels[Index * BytesPerPixel + BytesPerPixel - 1] := Alpha;
     end;
   end;
 
@@ -1310,7 +1592,19 @@ begin
     end;
     AssertWithinTime(Watch, CallLimitMilliseconds, Format('Call %d (seed %d)', [Index, RandomSeed]));
   end;
-  Assert.Pass;
+
+  // The device stays premultiplied: no colour channel is above the alpha
+  FSnapshot.Free;
+  FSnapshot := FDevice.ToBitmap;
+  for var Index := 0 to (Length(FSnapshot.Pixels) div BytesPerPixel) - 1 do
+  begin
+    const Alpha = FSnapshot.Pixels[Index * BytesPerPixel + BytesPerPixel - 1];
+    for var Channel := 0 to BytesPerPixel - 2 do
+    begin
+      const Value = FSnapshot.Pixels[Index * BytesPerPixel + Channel];
+      Assert.IsTrue(Value <= Alpha, Format('Pixel %d has a channel %d of %d above the alpha %d', [Index, Channel, Value, Alpha]));
+    end;
+  end;
 end;
 
 end.

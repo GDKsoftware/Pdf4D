@@ -36,8 +36,10 @@ uses
 // 1. When the edges of a row have rippled back more than a few steps per edge, the rest of the row only updates the edges and the active
 //    list is sorted once at the end of the row, with the stable merge sort. The insertion of Rust is a stable sort as well, so the list
 //    is the same.
-// 2. The walk counts its work (edges visited, steps rippled, a sort) and stops when MaxEdgeWork is over; the fill then raises
-//    EPdfLimitExceededException. The pixels of the rows walked before stay drawn.
+// 2. Before the walk, an upper bound of its work is taken from the rows that the edges span (16 units for an edge in a row, 1024 for a row);
+//    when it is over the limit of the scan converter (EdgeWorkLimit) the fill raises EPdfLimitExceededException before it draws anything.
+//    The walk counts its work as well (edges visited, steps rippled, a sort) and stops at the limit; with the bound that is a guard only,
+//    which a mode of the sort that is not Auto can reach.
 //
 // Must run inside TTsFloatMode, like the edge builder it uses.
 
@@ -54,18 +56,23 @@ type
     end;
 
   public const
-    // The work of one path in the walk of its edges: a unit is 3 for an edge in a row of the walk (a row of the anti-aliased walk is a
-    // quarter of a pixel row), 1 for a step of an edge that ripples back and 8 per edge of a row that is sorted.
-    MaxEdgeWork: Int64 = 800000000;
+    // The default limit of the work of one path in the walk of its edges: a unit is 3 for an edge in a row of the walk (a row of the
+    // anti-aliased walk is a quarter of a pixel row), 1 for a step of an edge that ripples back and 8 per edge of a row that is sorted.
+    DefaultEdgeWorkLimit: Int64 = 800000000;
 
+{$IFDEF PDF4D_TESTS}
   public type
     // How a row of the walk puts the edges that moved back in order: ripple each one back (Never), sort the list at the end of the row
     // (Always), or ripple until it takes more than a few steps per edge and then sort (Auto, the default). The three give the same
-    // pixels; the other two are for the tests.
+    // pixels; the other two are for the tests, which are compiled with PDF4D_TESTS. Without it the mode is Auto.
     TDeferMode = (Auto, Always, Never);
 
   public class var
     DeferMode: TDeferMode;
+    // The number of rows that were sorted at their end, and how many of those were switched to that by the Auto mode in the middle of the row
+    DeferredRowCount: Integer;
+    AutoSwitchCount: Integer;
+{$ENDIF}
 
   private const
     // Bias used for conservative rounding of float rects to int rects, to nudge the irects a little larger, so we don't "think" a path's
@@ -80,6 +87,7 @@ type
 
     class procedure MergeSort(var Items, Scratch: TArray<TSortItem>; const Count: Integer); static;
     class procedure SortEdges(var Edges: TArray<TTsEdge>); static;
+    class function EdgeWorkBound(const Edges: TArray<TTsEdge>; const StartY, StopY: Integer): Int64; static;
     class procedure SortActiveEdges(const FirstInactiveIdx: Integer; var Edges: TArray<TTsEdge>; var Items, Scratch: TArray<TSortItem>); static;
     class function WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
                              const Blitter: TTsBlitter): Boolean; static;
@@ -91,6 +99,14 @@ type
     class procedure InsertNewEdges(const NewIdx, CurrY: Integer; var Edges: TArray<TTsEdge>); static;
 
   public
+    // The limit of the work of a path, of the calling thread; 0 (the start value of a thread) is DefaultEdgeWorkLimit. The device sets it
+    // from its limits for each draw.
+    class function EdgeWorkLimit: Int64; static;
+    class procedure SetEdgeWorkLimit(const Value: Int64); static;
+    // With the dry run on, a fill takes the bound of its work, raises when it is over the limit, and else draws nothing. A draw in tiles
+    // makes a dry run over all of them first, so that a tile over the limit raises before another one is drawn.
+    class procedure SetEdgeWorkDryRun(const Value: Boolean); static;
+
     class procedure FillRect(const Rect: TTsRect; const Clip: TTsScreenIntRect; const Blitter: TTsBlitter); static;
     class procedure FillRectAntiAlias(const Rect: TTsRect; const Clip: TTsScreenIntRect; const Blitter: TTsBlitter); static;
 
@@ -108,7 +124,30 @@ implementation
 uses
   Pdf4D.Common.Defines;
 
+threadvar
+  GEdgeWorkLimit: Int64;
+  GEdgeWorkDryRun: Boolean;
+
 { TTsScan }
+
+class function TTsScan.EdgeWorkLimit: Int64;
+begin
+  Result := GEdgeWorkLimit;
+  if Result <= 0 then
+  begin
+    Result := DefaultEdgeWorkLimit;
+  end;
+end;
+
+class procedure TTsScan.SetEdgeWorkLimit(const Value: Int64);
+begin
+  GEdgeWorkLimit := Value;
+end;
+
+class procedure TTsScan.SetEdgeWorkDryRun(const Value: Boolean);
+begin
+  GEdgeWorkDryRun := Value;
+end;
 
 class procedure TTsScan.FillRect(const Rect: TTsRect; const Clip: TTsScreenIntRect; const Blitter: TTsBlitter);
 begin
@@ -244,33 +283,6 @@ begin
     Exit;
   end;
 
-  SortEdges(Edges);
-
-  const EdgeCount = Length(Edges);
-  var Linked: TArray<TTsEdge>;
-  SetLength(Linked, EdgeCount + 2);
-
-  // The head sentinel; the other fields are the defaults of LineEdge
-  Linked[0] := Default(TTsEdge);
-  Linked[0].Kind := TTsEdgeKind.Line;
-  Linked[0].Line.Prev := TTsLineEdge.NoLink;
-  Linked[0].Line.Next := 1;
-  Linked[0].Line.X := Low(Integer);
-  Linked[0].Line.FirstY := Low(Integer);
-
-  for var Index := 0 to EdgeCount - 1 do
-  begin
-    Linked[Index + 1] := Edges[Index];
-    Linked[Index + 1].Line.Prev := Index;
-    Linked[Index + 1].Line.Next := Index + 2;
-  end;
-
-  Linked[EdgeCount + 1] := Default(TTsEdge);
-  Linked[EdgeCount + 1].Kind := TTsEdgeKind.Line;
-  Linked[EdgeCount + 1].Line.Prev := EdgeCount;
-  Linked[EdgeCount + 1].Line.Next := TTsLineEdge.NoLink;
-  Linked[EdgeCount + 1].Line.FirstY := High(Integer);
-
   var ShiftedStartY := TTsScalar.LeftShift(StartY, ShiftEdgesUp);
   var ShiftedStopY := TTsScalar.LeftShift(StopY, ShiftEdgesUp);
 
@@ -298,12 +310,77 @@ begin
     Exit;
   end;
 
+  // The bound of the work is taken before anything is drawn: a path over the limit changes no pixel
+  if EdgeWorkBound(Edges, ShiftedStartY, ShiftedStopY) > EdgeWorkLimit then
+  begin
+    raise EPdfLimitExceededException.Create('The edges of the path take more work than the limit of the scan converter');
+  end;
+
+  if GEdgeWorkDryRun then
+  begin
+    Exit;
+  end;
+
+  SortEdges(Edges);
+
+  const EdgeCount = Length(Edges);
+  var Linked: TArray<TTsEdge>;
+  SetLength(Linked, EdgeCount + 2);
+
+  // The head sentinel; the other fields are the defaults of LineEdge
+  Linked[0] := Default(TTsEdge);
+  Linked[0].Kind := TTsEdgeKind.Line;
+  Linked[0].Line.Prev := TTsLineEdge.NoLink;
+  Linked[0].Line.Next := 1;
+  Linked[0].Line.X := Low(Integer);
+  Linked[0].Line.FirstY := Low(Integer);
+
+  for var Index := 0 to EdgeCount - 1 do
+  begin
+    Linked[Index + 1] := Edges[Index];
+    Linked[Index + 1].Line.Prev := Index;
+    Linked[Index + 1].Line.Next := Index + 2;
+  end;
+
+  Linked[EdgeCount + 1] := Default(TTsEdge);
+  Linked[EdgeCount + 1].Kind := TTsEdgeKind.Line;
+  Linked[EdgeCount + 1].Line.Prev := EdgeCount;
+  Linked[EdgeCount + 1].Line.Next := TTsLineEdge.NoLink;
+  Linked[EdgeCount + 1].Line.FirstY := High(Integer);
+
   // TODO: walk_simple_edges
 
   if not WalkEdges(FillRule, Cardinal(ShiftedStartY), Cardinal(ShiftedStopY), ShiftedClip.Shifted.Right, Linked, Blitter) then
   begin
-    raise EPdfLimitExceededException.Create('The edges of the path cross too often to fill it within the limit of the scan converter');
+    raise EPdfLimitExceededException.Create('The edges of the path take more work than the limit of the scan converter');
   end;
+end;
+
+// An upper bound of the work that WalkEdges counts for the rows StartY..StopY - 1, from the rows that each edge spans in them: a row costs
+// 3 per edge, the ripple of the row stops after 4 steps per edge and 1024 (plus one last ripple of at most one step per edge) and the sort
+// at the end of the row 8 per edge, 16 per edge in all, and 1024 for the row. The bound holds for the Auto mode of the sort.
+class function TTsScan.EdgeWorkBound(const Edges: TArray<TTsEdge>; const StartY, StopY: Integer): Int64;
+begin
+  var Spans: Int64 := 0;
+  for var Index := 0 to High(Edges) do
+  begin
+    var LastRow: Int64 := Edges[Index].Line.LastY;
+    case Edges[Index].Kind of
+      TTsEdgeKind.Quadratic:
+        LastRow := Max(LastRow, Int64(Edges[Index].Quadratic.EndRow));
+      TTsEdgeKind.Cubic:
+        LastRow := Max(LastRow, Int64(Edges[Index].Cubic.EndRow));
+    end;
+
+    const First = Max(Int64(Edges[Index].Line.FirstY), Int64(StartY));
+    const Last = Min(LastRow, Int64(StopY) - 1);
+    if Last >= First then
+    begin
+      Inc(Spans, Last - First + 1);
+    end;
+  end;
+
+  Result := 16 * Spans + 1024 * (Int64(StopY) - StartY);
 end;
 
 // The stable sort of Rust on (first_y, x): a merge sort of the indices with the two values as one key
@@ -428,12 +505,14 @@ begin
 end;
 
 // TODO: simplify!
-// Returns False when the work of the walk went over MaxEdgeWork; the walk has stopped then
+// Returns False when the work of the walk went over the limit; the walk has stopped then. With the bound taken before the walk that is
+// a guard only.
 class function TTsScan.WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
                                  const Blitter: TTsBlitter): Boolean;
 begin
   Result := True;
   var Work: Int64 := 0;
+  const Limit = EdgeWorkLimit;
   var SortItems: TArray<TSortItem> := nil;
   var SortScratch: TArray<TSortItem> := nil;
   var CurrY := StartY;
@@ -557,11 +636,14 @@ begin
     Inc(Work, 3 * Int64(Visited) + Rippled);
     if IsDeferred then
     begin
+{$IFDEF PDF4D_TESTS}
+      Inc(DeferredRowCount);
+{$ENDIF}
       SortActiveEdges(CurrIdx, Edges, SortItems, SortScratch);
       Inc(Work, 8 * Int64(Visited));
     end;
 
-    if Work > MaxEdgeWork then
+    if Work > Limit then
     begin
       Exit(False);
     end;
@@ -622,16 +704,27 @@ begin
     Exit;
   end;
 
+{$IFDEF PDF4D_TESTS}
   if DeferMode = TDeferMode.Always then
   begin
     IsDeferred := True;
     Exit;
   end;
+{$ENDIF}
 
   Inc(Rippled, BackwardInsertEdgeBasedOnX(CurrIdx, Edges));
-  if (DeferMode = TDeferMode.Auto) and (Int64(Rippled) > 4 * Int64(Visited) + 1024) then
+{$IFDEF PDF4D_TESTS}
+  if DeferMode = TDeferMode.Never then
+  begin
+    Exit;
+  end;
+{$ENDIF}
+  if Int64(Rippled) > 4 * Int64(Visited) + 1024 then
   begin
     IsDeferred := True;
+{$IFDEF PDF4D_TESTS}
+    Inc(AutoSwitchCount);
+{$ENDIF}
   end;
 end;
 

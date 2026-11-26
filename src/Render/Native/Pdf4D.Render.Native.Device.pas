@@ -57,6 +57,7 @@ type
 {$IFDEF PDF4D_TESTS}
     function GetBuildCount: Integer;
     function GetAppliedLinkCount: Integer;
+    function GetClipWalkCount: Integer;
     function GetClipKind: TTsClipKind;
     function GetForceMaskClip: Boolean;
     procedure SetForceMaskClip(const Value: Boolean);
@@ -87,6 +88,8 @@ type
     property ClipBuildCount: Integer read GetBuildCount;
     // For tests only: how many paths of clip chains were applied in all (a path that two chains share is applied once)
     property ClipLinkCount: Integer read GetAppliedLinkCount;
+    // For tests only: how many masks a path of a clip chain was filled into
+    property ClipWalkCount: Integer read GetClipWalkCount;
     // For tests only: what the clip of the last draw came to
     property ClipKind: TTsClipKind read GetClipKind;
     // For tests only: makes a rectangular clip a mask as well, to compare the two ways to clip
@@ -102,12 +105,13 @@ uses
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Color,
   Pdf4D.Render.Native.Stroker,
+  Pdf4D.Render.Native.Scan,
   Pdf4D.Render.Native.Painter,
   Pdf4D.Render.Native.Conversion;
 
 const
   BytesPerPixel = 4;
-  // A stroke wider than this many device pixels is drawn that wide. The area around a path that such a stroke covers is far larger than any
+  // Deviation from tiny-skia, which draws the stroke at its full width: a stroke wider than this many device pixels is drawn that wide. The area around a path that such a stroke covers is far larger than any
   // device, and the time of the stroker grows steeply with the radius (a dashed path of 5 curves takes 0 ms at a width of 1e6 pixels, 270 ms at
   // 1e7 and 4 s at 1e9: its subdivision has to be fine enough for the offset curve of a huge radius). A device is at most MaxBitmapPixels pixels.
   MaxStrokeWidthInPixels: Single = 1.0E6;
@@ -309,6 +313,7 @@ procedure TPdfNativeDevice.FillPath(const Path: TPdfPath; const Transform: TPdfM
 begin
   const FloatState = TTsFloatMode.Enter;
   try
+    TTsScan.SetEdgeWorkLimit(FLimits.MaxEdgeWork);
     CheckVerbCount(Path);
     DoFillPath(Path, Transform, FillRule, Paint, Composite);
   finally
@@ -357,6 +362,7 @@ procedure TPdfNativeDevice.StrokePath(const Path: TPdfPath; const Transform: TPd
 begin
   const FloatState = TTsFloatMode.Enter;
   try
+    TTsScan.SetEdgeWorkLimit(FLimits.MaxEdgeWork);
     CheckVerbCount(Path);
     DoStrokePath(Path, Transform, Stroke, Paint, Composite);
   finally
@@ -412,6 +418,7 @@ procedure TPdfNativeDevice.DrawBitmap(const Bitmap: TPdfBitmap; const BitmapToDe
 begin
   const FloatState = TTsFloatMode.Enter;
   try
+    TTsScan.SetEdgeWorkLimit(FLimits.MaxEdgeWork);
     DoDrawBitmap(Bitmap, BitmapToDevice, Filter, Composite);
   finally
     TTsFloatMode.Leave(FloatState);
@@ -473,6 +480,9 @@ end;
 function TPdfNativeDevice.CreateLayer(const Width, Height: Integer): IPdfRasterDevice;
 begin
   Result := TPdfNativeDevice.Create(TPdfBitmap.Create(Width, Height), FLimits);
+{$IFDEF PDF4D_TESTS}
+  (Result as TPdfNativeDevice).ForceMaskClip := ForceMaskClip;
+{$ENDIF}
 end;
 
 function TPdfNativeDevice.TryReadPixels(const Area: TRect; out Bitmap: TPdfBitmap): Boolean;
@@ -528,6 +538,11 @@ end;
 function TPdfNativeDevice.GetAppliedLinkCount: Integer;
 begin
   Result := FClipMask.AppliedLinkCount;
+end;
+
+function TPdfNativeDevice.GetClipWalkCount: Integer;
+begin
+  Result := FClipMask.WalkCount;
 end;
 
 function TPdfNativeDevice.GetClipKind: TTsClipKind;

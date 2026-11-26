@@ -72,6 +72,8 @@ type
     class function TryCreate(const Points: array of TTsPoint; const PointsOffset, Shift: Integer; out Edge: TTsQuadraticEdge): Boolean; static;
 
     function Update: Boolean;
+    // The row after the last row of the whole curve (the rows of Line are only those of the segment that the edge is at)
+    function EndRow: Integer;
   end;
 
   TTsCubicEdge = record
@@ -101,6 +103,8 @@ type
     class function TryCreate(const Points: array of TTsPoint; const PointsOffset, Shift: Integer; out Edge: TTsCubicEdge): Boolean; static;
 
     function Update: Boolean;
+    // The row after the last row of the whole curve (the rows of Line are only those of the segment that the edge is at)
+    function EndRow: Integer;
   end;
 
   TTsEdgeKind = (
@@ -549,6 +553,11 @@ begin
   Result := Success;
 end;
 
+function TTsQuadraticEdge.EndRow: Integer;
+begin
+  Result := TTsFdot16.RoundToI32(FQLastY);
+end;
+
 { TTsCubicEdge }
 
 class function TTsCubicEdge.TryCreate(const Points: array of TTsPoint; const PointsOffset, Shift: Integer;
@@ -723,6 +732,11 @@ begin
   CurveCount := ShortInt(Count);
 
   Result := Success;
+end;
+
+function TTsCubicEdge.EndRow: Integer;
+begin
+  Result := TTsFdot16.RoundToI32(FCLastY);
 end;
 
 end.

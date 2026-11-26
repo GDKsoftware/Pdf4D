@@ -21,7 +21,7 @@ type
 
   public
     constructor Create; overload;
-    // Raises EArgumentOutOfRangeException when Limits.MaxPathVerbs < 1
+    // Raises EArgumentOutOfRangeException when Limits.MaxPathVerbs < 1 or Limits.MaxEdgeWork < 1
     constructor Create(const Limits: TPdfNativeLimits); overload;
 
     function Name: string;
@@ -51,6 +51,11 @@ begin
   if Limits.MaxPathVerbs < 1 then
   begin
     raise EArgumentOutOfRangeException.CreateFmt('MaxPathVerbs is %d, it must be at least 1', [Limits.MaxPathVerbs]);
+  end;
+
+  if Limits.MaxEdgeWork < 1 then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('MaxEdgeWork is %d, it must be at least 1', [Limits.MaxEdgeWork]);
   end;
 
   inherited Create;
