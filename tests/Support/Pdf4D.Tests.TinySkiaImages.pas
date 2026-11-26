@@ -15,6 +15,14 @@ uses
   Pdf4D.Render.Native.Mask;
 
 type
+  // What a known difference allows: Tolerance is the largest difference of a channel that every pixel may have. With a pixel limit
+  // (the Pixels and Steps of an entry), at most Pixels pixels may differ by up to Steps, and all other pixels must be equal.
+  TTinySkiaAllowance = record
+    Tolerance: Integer;
+    Pixels: Integer;
+    Steps: Integer;
+  end;
+
   // The reference images of tiny-skia (tests/reference/tiny-skia, the tests/images folder of the tiny-skia source) and their comparison
   TTinySkiaImages = record
   strict private
@@ -25,15 +33,25 @@ type
     const KnownDifferenceTolerance = 2;
 
     class function Folder: string; static;
-    class function PlatformName: string; static;
-    class function IsKnownDifference(const RelativePng: string): Boolean; static;
     class function LoadPremultiplied(const RelativePng: string; out Width, Height: Integer): TBytes; static;
     class procedure WriteOutput(const Pixmap: TTsPixmap; const RelativePng: string); static;
 
   public
+    // The full name of a file below tests/reference/tiny-skia
+    class function ReferenceFile(const RelativePath: string): string; static;
+
+    // The name of the platform in the entries of known-differences.txt: Win32, Win64 or Linux64
+    class function PlatformName: string; static;
+
+    // What the lines of known-differences.txt allow for the PNG on a platform. The first line that names the PNG (and the platform, or no
+    // platform) counts. A PNG that is not listed gets the allowance 0. The line format is documented in docs/golden-format.md; a line that
+    // does not follow it fails the test.
+    class function AllowanceFor(const Lines: TArray<string>; const RelativePng, Platform: string): TTinySkiaAllowance; static;
+
     // Loads tests/reference/tiny-skia/<RelativePng> and premultiplies it like Pixmap::load_png does; the pixmap must be byte equal. When
-    // the PNG is listed in known-differences.txt ("<path> [<platform>] # reason"), every channel may differ by 2. A failed comparison writes
-    // the pixmap to the folder of PDF4D_RENDER_OUTPUT when that is set.
+    // the PNG is listed in known-differences.txt ("<path> [<platform>] # reason"), every channel may differ by 2; an entry with a pixel
+    // limit ("<path> [Win32] pixels=<n> steps=<m> # reason") instead lets at most n pixels differ by up to m steps. A failed comparison
+    // writes the pixmap to the folder of PDF4D_RENDER_OUTPUT when that is set.
     class procedure AssertMatches(const Pixmap: TTsPixmap; const RelativePng: string); static;
 
     // The same for a mask and a grayscale PNG (Mask::load_png): the data must be byte equal
@@ -157,6 +175,11 @@ begin
                                       ReferenceEnvironmentVariable);
 end;
 
+class function TTinySkiaImages.ReferenceFile(const RelativePath: string): string;
+begin
+  Result := TPath.Combine(Folder, RelativePath);
+end;
+
 class function TTinySkiaImages.PlatformName: string;
 begin
   {$IF Defined(MSWINDOWS) and Defined(CPUX64)}
@@ -170,17 +193,11 @@ begin
   {$ENDIF}
 end;
 
-class function TTinySkiaImages.IsKnownDifference(const RelativePng: string): Boolean;
+class function TTinySkiaImages.AllowanceFor(const Lines: TArray<string>; const RelativePng, Platform: string): TTinySkiaAllowance;
 begin
-  Result := False;
+  Result := Default(TTinySkiaAllowance);
 
-  const FileName = TPath.Combine(Folder, KnownDifferencesName);
-  if not TFile.Exists(FileName) then
-  begin
-    Exit;
-  end;
-
-  for var Line in TFile.ReadAllLines(FileName) do
+  for var Line in Lines do
   begin
     var Entry := Trim(Line);
     if (Entry = '') or Entry.StartsWith('#') then
@@ -194,19 +211,69 @@ begin
       Entry := Trim(Copy(Entry, 1, Comment - 1));
     end;
 
-    const Platform = Pos('[', Entry);
     var Platforms := '';
-    if Platform > 0 then
+    var Limits := '';
+    const OpenBracket = Pos('[', Entry);
+    if OpenBracket > 0 then
     begin
       // A line with an opening bracket but no closing one would silently hold on every platform
-      Assert.IsTrue(Pos(']', Entry) > Platform, Format('%s: the line "%s" has no closing bracket', [KnownDifferencesName, Line]));
-      Platforms := Copy(Entry, Platform + 1, Pos(']', Entry) - Platform - 1);
-      Entry := Trim(Copy(Entry, 1, Platform - 1));
+      const CloseBracket = Pos(']', Entry);
+      Assert.IsTrue(CloseBracket > OpenBracket, Format('%s: the line "%s" has no closing bracket', [KnownDifferencesName, Line]));
+      Platforms := Copy(Entry, OpenBracket + 1, CloseBracket - OpenBracket - 1);
+      Limits := Trim(Copy(Entry, CloseBracket + 1, MaxInt));
+      Entry := Trim(Copy(Entry, 1, OpenBracket - 1));
+    end
+    else
+    begin
+      // The limits of a line without a platform are read as well, so that they fail below instead of being ignored
+      const Space = Pos(' ', Entry);
+      if Space > 0 then
+      begin
+        Limits := Trim(Copy(Entry, Space + 1, MaxInt));
+        Entry := Copy(Entry, 1, Space - 1);
+      end;
     end;
 
-    if SameText(Entry, RelativePng) and ((Platforms = '') or ContainsText(Platforms, PlatformName)) then
+    var Pixels := 0;
+    var Steps := 0;
+    for var Token in SplitString(Limits, ' ') do
     begin
-      Exit(True);
+      if Token = '' then
+      begin
+        Continue;
+      end;
+
+      if Token.StartsWith('pixels=') then
+      begin
+        Pixels := StrToIntDef(Copy(Token, 8, MaxInt), 0);
+      end
+      else if Token.StartsWith('steps=') then
+      begin
+        Steps := StrToIntDef(Copy(Token, 7, MaxInt), 0);
+      end
+      else
+      begin
+        Assert.Fail(Format('%s: the line "%s" has the unknown text "%s" after the platform', [KnownDifferencesName, Line, Token]));
+      end;
+    end;
+
+    // A pixel limit needs both numbers and a platform: without a platform it would also loosen the platforms that match exactly
+    Assert.IsTrue((Pixels > 0) = (Steps > 0), Format('%s: the line "%s" needs both pixels=<n> and steps=<m>', [KnownDifferencesName, Line]));
+    Assert.IsTrue((Pixels = 0) or (Platforms <> ''), Format('%s: the line "%s" has a pixel limit without a platform', [KnownDifferencesName, Line]));
+    Assert.IsTrue((Steps = 0) or (Steps > KnownDifferenceTolerance), Format('%s: the line "%s" needs steps above %d', [KnownDifferencesName, Line, KnownDifferenceTolerance]));
+
+    if SameText(Entry, RelativePng) and ((Platforms = '') or ContainsText(Platforms, Platform)) then
+    begin
+      if Pixels > 0 then
+      begin
+        Result.Pixels := Pixels;
+        Result.Steps := Steps;
+      end
+      else
+      begin
+        Result.Tolerance := KnownDifferenceTolerance;
+      end;
+      Exit;
     end;
   end;
 end;
@@ -255,7 +322,15 @@ begin
     Assert.Fail(Format('%s: the size is %d x %d, expected %d x %d', [RelativePng, Pixmap.Width, Pixmap.Height, Width, Height]));
   end;
 
-  const Tolerance = IfThen(IsKnownDifference(RelativePng), KnownDifferenceTolerance, 0);
+  var Lines: TArray<string> := nil;
+  const KnownDifferences = TPath.Combine(Folder, KnownDifferencesName);
+  if TFile.Exists(KnownDifferences) then
+  begin
+    Lines := TFile.ReadAllLines(KnownDifferences);
+  end;
+
+  const Allowance = AllowanceFor(Lines, RelativePng, PlatformName);
+  const Tolerance = Allowance.Tolerance;
 
   var DifferentPixels := 0;
   var MaxDifference := 0;
@@ -279,7 +354,7 @@ begin
     end;
   end;
 
-  if DifferentPixels > 0 then
+  if (DifferentPixels > Allowance.Pixels) or (MaxDifference > Max(Allowance.Steps, Tolerance)) then
   begin
     WriteOutput(Pixmap, RelativePng);
     Assert.Fail(Format('%s: %d pixels differ by at most %d channel steps; the first at (%d, %d): got %d,%d,%d,%d expected %d,%d,%d,%d',

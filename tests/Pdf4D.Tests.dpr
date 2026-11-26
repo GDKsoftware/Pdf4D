@@ -187,6 +187,7 @@ uses
   Pdf4D.Render.Native.Shader.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Shader.Tests.pas',
   Pdf4D.Render.Native.Painter in '..\src\Render\Native\Pdf4D.Render.Native.Painter.pas',
   Pdf4D.Tests.TinySkiaImages in 'Support\Pdf4D.Tests.TinySkiaImages.pas',
+  Pdf4D.Tests.TinySkiaImages.Tests in 'Support\Pdf4D.Tests.TinySkiaImages.Tests.pas',
   Pdf4D.Render.Native.Painter.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Tests.pas',
   Pdf4D.Render.Native.Painter.Fill.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Fill.Tests.pas',
   Pdf4D.Render.Native.Painter.Hairline.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Hairline.Tests.pas',

@@ -1,2 +1,5 @@
 # Reference images of tiny-skia that Pdf4D is allowed to render with at most 2 steps per channel, because a platform function differs
 # (ArcCos, Cos or Power). Format: <path> [<platform>] # reason. Without a platform the line holds on every platform.
+# With a platform, a line can instead be <path> [<platform>] pixels=<n> steps=<m> # reason: at most n pixels may differ by up to m steps and every other pixel must be equal (an x87 rounding on Win32 that moves single pixels).
+fill/clip-cubic-1.png [Win32] pixels=1 steps=200 # the f32 monotonic piece of the cubic differs by one ulp on x87, so the root at the clip edge misses the f64 epsilon test and takes the fallback search (0.037 off in y); the pixel (90, 96) is then inside the fill: 1 pixel, alpha 200 against 0
+pixmap/clone-rect-1.png [Win32] pixels=1 steps=13 # the points of the circle (conics to quads) differ by one ulp on x87, so the dx of one quad edge is 3200 and not 3167: at sub-scanline 410 of pixel row 102 the edge x is 80.5039 and not 80.4990, either side of the .5 rounding boundary, and one sample of pixel (20, 102) moves: 1 pixel, 13 steps

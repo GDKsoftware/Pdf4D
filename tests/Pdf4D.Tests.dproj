@@ -258,6 +258,7 @@
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Shader.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.TinySkiaImages.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.TinySkiaImages.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Fill.Tests.pas"/>
         <DCCReference Include="..\src\Render\Native\Pdf4D.Render.Native.Painter.Hairline.Tests.pas"/>
