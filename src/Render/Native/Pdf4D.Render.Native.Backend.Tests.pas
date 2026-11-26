@@ -198,7 +198,11 @@ procedure TPdfNativeBackendTests.TestNameIsNative;
 begin
   const Backend: IPdfRenderBackend = TPdfNativeBackend.Create;
   Assert.AreEqual('Native', Backend.Name);
+{$IFDEF CPUX86}
+  Assert.AreEqual(1048576, TPdfNativeLimits.Default.MaxPathVerbs);
+{$ELSE}
   Assert.AreEqual(4194304, TPdfNativeLimits.Default.MaxPathVerbs);
+{$ENDIF}
 end;
 
 procedure TPdfNativeBackendTests.TestTooLargeDeviceRaises;

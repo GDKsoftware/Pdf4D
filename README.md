@@ -140,10 +140,10 @@ The native backend has two limits, in `TPdfNativeLimits` (start from `TPdfNative
 
 | Limit | Default | Meaning |
 |---|---|---|
-| `MaxPathVerbs` | 4,194,304 | verbs of one fill, stroke or clip path |
+| `MaxPathVerbs` | 4,194,304 (1,048,576 on Win32) | verbs of one fill, stroke or clip path |
 | `MaxEdgeWork` | 800,000,000 | the work for the edges of one path; depends on the DPI and on anti-aliasing |
 
-A fill, a stroke or a clip path over a limit raises `EPdfLimitExceededException` before a pixel changes, and the renderer logs it and goes on with the next operator. A clip path over a limit raises at the next draw, not when the clip is set. The peak memory is about 350 bytes per verb, so about 1.5 GB at the default `MaxPathVerbs`: a Win32 host should lower it. `docs/porting.md` has the reasoning and the other places where the native backend differs from tiny-skia. The switches that the tests use (`DeferMode`, `ForceMaskClip`, the counters) exist only in the test projects and are not part of the API.
+A fill, a stroke or a clip path over a limit raises `EPdfLimitExceededException` before a pixel changes, and the renderer logs it and goes on with the next operator. A clip path over a limit raises at the next draw, not when the clip is set. The peak memory is about 350 bytes per verb, so about 1.5 GB at the default `MaxPathVerbs` of Win64 and Linux64. The default on Win32 is 1,048,576 verbs (a peak of about 150 MB measured), so a Win32 host needs no change; lower it further when memory is tight. `docs/porting.md` has the reasoning and the other places where the native backend differs from tiny-skia. The switches that the tests use (`DeferMode`, `ForceMaskClip`, the counters) exist only in the test projects and are not part of the API.
 
 The renderer is split over four packages next to the core package `Pdf4D`:
 

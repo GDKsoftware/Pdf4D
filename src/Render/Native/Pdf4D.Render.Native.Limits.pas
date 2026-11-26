@@ -23,7 +23,13 @@ type
 implementation
 
 const
+  // The peak memory of a draw is about 350 bytes per verb. A 32-bit process has 2 to 4 GB of address space for the whole viewer, so
+  // Win32 gets a lower default.
+{$IFDEF CPUX86}
+  DefaultMaxPathVerbs = 1048576;
+{$ELSE}
   DefaultMaxPathVerbs = 4194304;
+{$ENDIF}
   DefaultMaxEdgeWork = 800000000;
 
 { TPdfNativeLimits }
