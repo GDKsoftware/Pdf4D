@@ -121,6 +121,15 @@ begin
 end;
 ```
 
+The own rasterizer, a Delphi port of tiny-skia, needs no library next to the program; it is also what the viewers use when the application sets no backend:
+
+```delphi
+uses
+  Pdf4D.Render.Native.Backend;
+
+const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TPdfNativeBackend.Create);
+```
+
 `RenderToBitmap` draws the whole page with a white background and anti-aliasing, like `PDFRenderer.renderImage` of PDFBox with `ImageType.RGB`. The other fields of `TPdfRenderParams` choose a region of the page, an extra rotation, a cancel token (the only thing that may be used from another thread) and the options (destination, background, annotations and the limits of `docs/porting.md`). A renderer is used by one thread at a time, the one that uses the document.
 
 The renderer is split over three packages next to the core package `Pdf4D`:
@@ -144,7 +153,7 @@ The viewer shows a PDF in a VCL form: continuous or single-page scrolling, zoom 
 | `Pdf4D.Vcl.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.Vcl`, `Pdf4D.Render.Skia` |
 | `dclPdf4D.Vcl` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.Vcl`, `Pdf4D.Vcl.Skia` |
 
-`TPdf4DViewer` is the whole viewer in one component (toolbar, search bar, side panel, page view); the parts can also be used on their own, all following one `TPdf4DDocument`. The application chooses the render backend explicitly: drop a `TPdf4DSkiaBackend` on the form and link it to the `Backend` property of the document, or set `RenderBackend` of the document in code to any `IPdfRenderBackend`. Without a backend `Open` raises `EPdfViewerException`. The Skia backend needs `sk4d.dll` next to the program (`Redist\win32` or `Redist\win64` of RAD Studio) until Pdf4D has a rasterizer of its own; `Pdf4D.Vcl` itself does not link Skia.
+`TPdf4DViewer` is the whole viewer in one component (toolbar, search bar, side panel, page view); the parts can also be used on their own, all following one `TPdf4DDocument`. Without a backend the viewers render with the own rasterizer (`TPdfNativeBackend`), which needs no DLL. Skia is a choice for those who ship the library: drop a `TPdf4DSkiaBackend` on the form and link it to the `Backend` property of the document, or set `RenderBackend` of the document in code to any `IPdfRenderBackend`; an explicit backend is always used as it is. The Skia backend needs `sk4d.dll` next to the program (`Redist\win32` or `Redist\win64` of RAD Studio); `Pdf4D.Vcl` itself does not link Skia.
 
 ```delphi
 Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;
@@ -181,7 +190,7 @@ The FMX viewer has the same components, properties and behaviour as the VCL view
 | `Pdf4D.FMX.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.FMX`, `Pdf4D.Render.Skia` |
 | `dclPdf4D.FMX` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.FMX`, `Pdf4D.FMX.Skia` |
 
-Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each is meant to show its components on the `Pdf4D` page of its own kind of project (this has not been checked in the IDE yet). The backend is chosen like in VCL (a `TPdf4DSkiaBackend` linked to `Backend`, or `RenderBackend` in code), and `sk4d.dll` has to be next to the program. The example is that of the VCL viewer, with the colours of FMX:
+Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each is meant to show its components on the `Pdf4D` page of its own kind of project (this has not been checked in the IDE yet). The backend is chosen like in VCL: without one the own rasterizer is used, and a `TPdf4DSkiaBackend` linked to `Backend` (or `RenderBackend` in code) selects Skia, which needs `sk4d.dll` next to the program. The example is that of the VCL viewer, with the colours of FMX:
 
 ```delphi
 Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;

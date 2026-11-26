@@ -52,7 +52,7 @@ type
   TPdfViewerKey = (Up, Down, Left, Right, PageUp, PageDown, Home, End_, ZoomIn, ZoomOut, ZoomReset, SelectAll);
   {$SCOPEDENUMS OFF}
 
-  // A programming or configuration error, such as Open without a backend
+  // A programming or configuration error, such as a command that the framework runs
   EPdfViewerException = class(Exception);
 
   TPdfPageInfo = record

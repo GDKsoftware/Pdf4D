@@ -37,7 +37,7 @@ The packages and what they contain:
 | `Pdf4D.Render.dpk` | `rtl, Pdf4D` | `src\Graphics`, `src\Codec`, `src\Render` (without `Skia`) and `src\Resources\Pdf4D.Resources.Icc.*` |
 | `Pdf4D.Render.Native.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Render\Native` (the native rasterizer, a port of tiny-skia; see `porting.md`) |
 | `Pdf4D.Render.Skia.dpk` | `rtl, Skia.Package.RTL, Pdf4D, Pdf4D.Render` | `src\Render\Skia` |
-| `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render` | `src\Viewer` (the viewer core: types, transforms and layout, no VCL and no Skia) |
+| `Pdf4D.Viewer.dpk` | `rtl, Pdf4D, Pdf4D.Render, Pdf4D.Render.Native` | `src\Viewer` (the viewer core: types, transforms and layout, the default backend `TPdfNativeBackend`; no VCL and no Skia) |
 | `Pdf4D.Vcl.dpk` | `rtl, vcl, Pdf4D.Viewer` | `src\Vcl` (`TPdf4DDocument`, `TPdf4DPageView` and the GDI and GDI+ painter) |
 | `Pdf4D.Vcl.Skia.dpk` | `rtl, Pdf4D.Vcl, Pdf4D.Render.Skia` | `src\Vcl\Skia` (the `TPdf4DSkiaBackend` component) |
 | `dclPdf4D.Vcl.dpk` | `rtl, vcl, designide, Pdf4D.Vcl, Pdf4D.Vcl.Skia` | `src\Vcl\Design` (design time only: the palette registration, the property editor of `FileName` and the palette icons) |

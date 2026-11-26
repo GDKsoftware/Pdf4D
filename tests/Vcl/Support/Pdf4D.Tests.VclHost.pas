@@ -89,7 +89,7 @@ type
     constructor Create(const ClientWidth, ClientHeight: Integer);
     destructor Destroy; override;
 
-    // The document renders with Skia by default; without a backend Open raises EPdfViewerException
+    // The document renders with Skia by default; without a backend it renders with the native rasterizer
     procedure RemoveBackend;
     procedure RestoreBackend;
     // The render backend of the tests, for a second document

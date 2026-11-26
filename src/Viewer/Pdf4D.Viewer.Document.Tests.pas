@@ -30,6 +30,8 @@ type
 
     class function Square: TPdfQuad; static;
     procedure OpenInvoice;
+    // Renders the first page of the open document at half scale and returns how many of its pixels are not white
+    function RenderedInkPixels: Integer;
     // Requests the text of a page and waits for it
     procedure RequestPageTextAndWait(const PageIndex: Integer);
     procedure SearchAndWait(const Query: string);
@@ -48,7 +50,11 @@ type
     procedure TearDown;
 
     [Test]
-    procedure TestOpenWithoutBackendRaises;
+    procedure TestDefaultBackendIsNative;
+    [Test]
+    procedure TestDocumentWithoutBackendRendersWithTheNativeRasterizer;
+    [Test]
+    procedure TestExplicitBackendIsKept;
     [Test]
     procedure TestBackendComponentIsUsed;
     [Test]
@@ -124,7 +130,10 @@ uses
   System.Generics.Collections,
   Pdf4D.Api.DocumentHandle,
   Pdf4D.Viewer.Session,
+  Pdf4D.Viewer.Backend,
   Pdf4D.Viewer.ResourceStrings,
+  Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Device.Interfaces,
   Pdf4D.Tests.Corpus,
   Pdf4D.Tests.ViewerDocuments;
 
@@ -225,24 +234,61 @@ begin
   Inc(FClosedCount);
 end;
 
-procedure TPdf4DCustomDocumentTests.TestOpenWithoutBackendRaises;
+function TPdf4DCustomDocumentTests.RenderedInkPixels: Integer;
 begin
-  const Document = TTestDocument.Create(nil);
-  try
-    Document.FileName := TCorpus.PdfPath(EncryptedFile);
-
-    Assert.WillRaiseWithMessage(
-      procedure
+  var Ink := 0;
+  var Done := False;
+  FBench.Document.Session.RequestRender(0, 0.5, 0, TRect.Empty, TPdfJobPriority.Visible,
+    procedure(const Outcome: TPdfRenderResult)
+    begin
+      if Outcome.Succeeded then
       begin
-        Document.Open;
-      end,
-      EPdfViewerException,
-      SNoRenderBackend);
+        for var Y := 0 to Outcome.Bitmap.Height - 1 do
+        begin
+          for var X := 0 to Outcome.Bitmap.Width - 1 do
+          begin
+            const Pixel = Outcome.Bitmap.GetPixel(X, Y);
+            if (Pixel.R < 128) or (Pixel.G < 128) or (Pixel.B < 128) then
+            begin
+              Inc(Ink);
+            end;
+          end;
+        end;
+      end;
+      Done := True;
+    end);
+  FBench.WaitUntil(
+    function: Boolean
+    begin
+      Result := Done;
+    end,
+    'the render');
+  Result := Ink;
+end;
 
-    Assert.AreEqual(Ord(TPdfDocumentState.Closed), Ord(Document.State));
-  finally
-    Document.Free;
-  end;
+procedure TPdf4DCustomDocumentTests.TestDefaultBackendIsNative;
+begin
+  Assert.AreEqual('Native', TPdfViewerDefaults.CreateBackend.Name);
+end;
+
+procedure TPdf4DCustomDocumentTests.TestDocumentWithoutBackendRendersWithTheNativeRasterizer;
+begin
+  FBench.Document.RenderBackend := nil;
+  Assert.IsNull(FBench.Document.Backend);
+
+  OpenInvoice;
+
+  Assert.AreEqual(0, FBench.Backend.DeviceCount, 'the recording backend of the bench is not used');
+  Assert.IsTrue(RenderedInkPixels > 0, 'the page has text and lines');
+end;
+
+procedure TPdf4DCustomDocumentTests.TestExplicitBackendIsKept;
+begin
+  OpenInvoice;
+
+  RenderedInkPixels;
+
+  Assert.IsTrue(FBench.Backend.DeviceCount > 0, 'the explicit backend made the devices');
 end;
 
 procedure TPdf4DCustomDocumentTests.TestBackendComponentIsUsed;

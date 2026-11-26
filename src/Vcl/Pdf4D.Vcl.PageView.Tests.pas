@@ -102,7 +102,7 @@ type
     procedure TestDocumentSwitchDoesNotLeak;
 
     [Test]
-    procedure TestNoBackendShowsError;
+    procedure TestNoBackendRendersWithTheNativeRasterizer;
 
     [Test]
     procedure TestFreeTellsZoomListenersWhileTheyAreRegistered;
@@ -124,7 +124,6 @@ uses
   Winapi.Messages,
   Winapi.Windows,
   Pdf4D.Viewer.PageText,
-  Pdf4D.Viewer.ResourceStrings,
   Pdf4D.Tests.ViewerDocuments;
 
 const
@@ -148,6 +147,7 @@ const
   ScrollAway = 20000;
   QuietPeriodMs = 500;
   BackgroundGray = 224;
+  DarkLimit = 100;
   BusyClipboard = 'the clipboard is busy';
   DesignGray = 240;
   DesignInkContrast = 60;
@@ -570,33 +570,31 @@ begin
   Assert.AreEqual(3, FHost.Document.PageCount);
 end;
 
-procedure TPdf4DPageViewTests.TestNoBackendShowsError;
+procedure TPdf4DPageViewTests.TestNoBackendRendersWithTheNativeRasterizer;
 begin
   FHost.RemoveBackend;
   const Data = TViewerDocuments.Invoice;
-  const Stream = TBytesStream.Create(Data);
-  try
-    Assert.WillRaiseWithMessage(
-      procedure
-      begin
-        FHost.Document.Open(Stream);
-      end,
-      EPdfViewerException,
-      SNoRenderBackend);
-  finally
-    Stream.Free;
-  end;
 
-  Assert.AreEqual(Ord(TPdfDocumentState.Closed), Ord(FHost.Document.State));
+  Assert.IsTrue(FHost.Open(Data), 'the document opens without a backend: ' + FHost.OpenErrorMessage);
+  Assert.IsTrue(FHost.WaitForVisibleTiles, 'the tiles are rendered');
+
   const Bitmap = FHost.Snapshot;
   try
-    Assert.AreEqual(BackgroundGray, Integer(PixelAt(Bitmap, ViewWidth div 2, ViewHeight div 2).R), 'the view stays empty');
+    var DarkPixels := 0;
+    for var Y := 0 to Bitmap.Height - 1 do
+    begin
+      for var X := 0 to Bitmap.Width - 1 do
+      begin
+        if PixelAt(Bitmap, X, Y).R < DarkLimit then
+        begin
+          Inc(DarkPixels);
+        end;
+      end;
+    end;
+    Assert.IsTrue(DarkPixels > 0, 'the page shows ink');
   finally
     Bitmap.Free;
   end;
-
-  FHost.RestoreBackend;
-  Assert.IsTrue(FHost.Open(Data), 'the view is usable afterwards');
 end;
 
 // A component that follows the zoom lets go of the page view in its free notification, as the toolbar does: the list of listeners must
