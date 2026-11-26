@@ -21,7 +21,8 @@ uses
   Pdf4D.Render.ClipPath,
   Pdf4D.Render.Device.Interfaces,
   Pdf4D.Render.Native.Backend,
-  Pdf4D.Render.Native.Device;
+  Pdf4D.Render.Native.Device,
+  Pdf4D.Render.Native.Scan;
 
 type
   [TestFixture]
@@ -254,6 +255,8 @@ begin
   FHugePath := nil;
   FreeRandomPools;
   FDevice := nil;
+  // A device sets the limit of the thread for each draw; a low one must not stay for the tests that follow
+  TTsScan.SetEdgeWorkLimit(0);
   FBackend := nil;
 end;
 
