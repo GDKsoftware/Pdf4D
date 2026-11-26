@@ -56,6 +56,10 @@ type
     class function IsFinite(const Value: Single): Boolean; static;
     class function IsSignNegative(const Value: Single): Boolean; static;
 
+    // f64::sqrt: the correctly rounded square root. On Linux64 System.Sqrt computes in 80 bits (sqrtl) and the second rounding to a Double
+    // is off by one bit for about one value in 3000, so the f64 code calls the sqrt of the C library there.
+    class function SqrtF64(const Value: Double): Double; static;
+
     // trait Scalar for f32
     class function Half(const Value: Single): Single; static;
     class function Ave(const Value, Other: Single): Single; static;
@@ -419,6 +423,19 @@ class function TTsScalar.IsSignNegative(const Value: Single): Boolean;
 begin
 
   Result := (FloatBits(Value) < 0);
+end;
+
+{$IFDEF LINUX64}
+function LibmSqrt(Value: Double): Double; cdecl; external 'libm.so' name 'sqrt';
+{$ENDIF}
+
+class function TTsScalar.SqrtF64(const Value: Double): Double;
+begin
+  {$IFDEF LINUX64}
+  Result := LibmSqrt(Value);
+  {$ELSE}
+  Result := System.Sqrt(Value);
+  {$ENDIF}
 end;
 
 class function TTsScalar.Half(const Value: Single): Single;

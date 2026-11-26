@@ -458,10 +458,11 @@ begin
     Exit(System.Sqrt(Mag2));
   end;
 
-  const Xx = Double(X);
-  const Yy = Double(Y);
+  // Typed: an untyped const is an Extended, 80 bits on Linux64
+  const Xx: Double = X;
+  const Yy: Double = Y;
 
-  Result := Single(System.Sqrt(Xx * Xx + Yy * Yy));
+  Result := Single(TTsScalar.SqrtF64(Xx * Xx + Yy * Yy));
 end;
 
 function TTsPoint.SetLength(const NewLength: Single): Boolean;
@@ -478,9 +479,9 @@ function TTsPoint.SetLengthFrom(const FromX, FromY, NewLength: Single): Boolean;
 begin
   // our mag2 step overflowed to infinity, so use doubles instead. Much slower, but needed when x or y are very large, otherwise we
   // divide by inf. and return (0,0) vector.
-  const Xx = Double(FromX);
-  const Yy = Double(FromY);
-  const Dmag: Double = System.Sqrt(Xx * Xx + Yy * Yy);
+  const Xx: Double = FromX;
+  const Yy: Double = FromY;
+  const Dmag: Double = TTsScalar.SqrtF64(Xx * Xx + Yy * Yy);
   const Dscale: Double = Double(NewLength) / Dmag;
   const ScaledX: Single = FromX * Single(Dscale);
   const ScaledY: Single = FromY * Single(Dscale);

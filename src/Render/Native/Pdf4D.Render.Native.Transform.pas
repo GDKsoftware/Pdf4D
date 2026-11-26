@@ -108,6 +108,8 @@ uses
 const
   // PI / 180.0 as an f32, the RADS_PER_DEG of the standard library
   DegreesToRadians: Single = 0.017453292;
+  // Typed: on Linux64 a real literal is an Extended (80 bits) and the division would run in that precision
+  One64: Double = 1.0;
 
 // to_radians of f32: the angle times (PI / 180) as an f32
 function ToRadians(const Degrees: Single): Single;
@@ -145,7 +147,7 @@ begin
     Exit(False);
   end;
 
-  InvDet := 1.0 / Det;
+  InvDet := One64 / Det;
   Result := True;
 end;
 

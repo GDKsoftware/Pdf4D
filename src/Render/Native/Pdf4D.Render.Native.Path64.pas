@@ -19,7 +19,9 @@ uses
   Pdf4D.Render.Native.Geometry;
 
 // The f64 code of tiny-skia (from SkPathOpsTypes and friends): finds the t of a cubic at a given x or y. It is plain Double code;
-// on Win64 it needs no special precision handling.
+// on Win64 it needs no special precision handling. On Linux64 a real literal and the result of an RTL math function (Abs, Cos, ArcCos)
+// are an Extended (80 bits), which takes the whole expression to that precision where Rust rounds every f64 operation: the literals
+// are typed constants, the results of the RTL go through a Double variable, and the square root is TTsScalar.SqrtF64.
 //
 // The Rust slices of f64 are fixed arrays; where Rust passes a sub-slice (&slice[1..]) the function takes an offset.
 //
@@ -188,6 +190,17 @@ const
 
   Pi64: Double = 3.141592653589793;
 
+  // The literals of the f64 arithmetic as typed constants: on Linux64 a float literal is an Extended (80 bits) and takes the operation
+  // along with it, where Rust rounds every f64 operation
+  One64: Double = 1.0;
+  Two64: Double = 2.0;
+  Three64: Double = 3.0;
+  Four64: Double = 4.0;
+  Eight64: Double = 8.0;
+  Nine64: Double = 9.0;
+  TwentySeven64: Double = 27.0;
+  FiftyFour64: Double = 54.0;
+
 type
   // Reads the two halves of a Double
   TDoubleBits = record
@@ -340,7 +353,9 @@ begin
     Exit(TTsScalar.AlmostDequalUlps(SingleValue, SingleOther));
   end;
 
-  Result := (Abs(Value - Other) / MaxIgnoringNan(Abs(Value), Abs(Other)) < FltEpsilonTimes16);
+  const Difference: Double = Abs(Value - Other);
+  const Largest: Double = MaxIgnoringNan(Abs(Value), Abs(Other));
+  Result := (Difference / Largest < FltEpsilonTimes16);
 end;
 
 { TTsPath64 }
@@ -465,7 +480,7 @@ begin
     Exit(HandleZero(B, C, S));
   end;
 
-  const P: Double = B / (2.0 * A);
+  const P: Double = B / (Two64 * A);
   const Q: Double = C / A;
   if TTsScalar64.ApproximatelyZero(A) and (TTsScalar64.ApproximatelyZeroInverse(P) or TTsScalar64.ApproximatelyZeroInverse(Q)) then
   begin
@@ -482,7 +497,7 @@ begin
   var SqrtD: Double := 0.0;
   if P2 > Q then
   begin
-    SqrtD := System.Sqrt(P2 - Q);
+    SqrtD := TTsScalar.SqrtF64(P2 - Q);
   end;
 
   S[0] := SqrtD - P;
@@ -554,12 +569,12 @@ begin
     Exit(Points[3]);
   end;
 
-  const OneT: Double = 1.0 - T;
+  const OneT: Double = One64 - T;
   const OneT2: Double = OneT * OneT;
   const A: Double = OneT2 * OneT;
-  const B: Double = 3.0 * OneT2 * T;
+  const B: Double = Three64 * OneT2 * T;
   const T2: Double = T * T;
-  const C: Double = 3.0 * OneT * T2;
+  const C: Double = Three64 * OneT * T2;
   const D: Double = T2 * T;
 
   Result := TTsPoint64.FromXY(A * Points[0].X + B * Points[1].X + C * Points[2].X + D * Points[3].X,
@@ -628,18 +643,18 @@ function TTsCubic64.FindInflections(var TValues: TTsDoubles3): Integer;
 begin
   const Ax: Double = Points[1].X - Points[0].X;
   const Ay: Double = Points[1].Y - Points[0].Y;
-  const Bx: Double = Points[2].X - 2.0 * Points[1].X + Points[0].X;
-  const By: Double = Points[2].Y - 2.0 * Points[1].Y + Points[0].Y;
-  const Cx: Double = Points[3].X + 3.0 * (Points[1].X - Points[2].X) - Points[0].X;
-  const Cy: Double = Points[3].Y + 3.0 * (Points[1].Y - Points[2].Y) - Points[0].Y;
+  const Bx: Double = Points[2].X - Two64 * Points[1].X + Points[0].X;
+  const By: Double = Points[2].Y - Two64 * Points[1].Y + Points[0].Y;
+  const Cx: Double = Points[3].X + Three64 * (Points[1].X - Points[2].X) - Points[0].X;
+  const Cy: Double = Points[3].Y + Three64 * (Points[1].Y - Points[2].Y) - Points[0].Y;
 
   Result := TTsQuad64.RootsValidT(Bx * Cy - By * Cx, Ax * Cy - Ay * Cx, Ax * By - Ay * Bx, TValues);
 end;
 
 function TTsCubic64.BinarySearch(const Min, Max, AxisIntercept: Double; const XAxis: TTsSearchAxis): Double;
 begin
-  var T: Double := (Min + Max) / 2.0;
-  var Step: Double := (T - Min) / 2.0;
+  var T: Double := (Min + Max) / Two64;
+  var Step: Double := (T - Min) / Two64;
   var CubicAtT := PointAtT(T);
   var CalcPos: Double := CubicAtT.AxisCoord(XAxis);
   var CalcDist: Double := CalcPos - AxisIntercept;
@@ -657,7 +672,7 @@ begin
 
     const LessDist: Double = LessPt.AxisCoord(XAxis) - AxisIntercept;
     const LastStep: Double = Step;
-    Step := Step / 2.0;
+    Step := Step / Two64;
 
     var Ok: Boolean;
     if CalcDist > 0.0 then
@@ -725,16 +740,16 @@ begin
   if T = 0.5 then
   begin
     Result.Points[0] := Points[0];
-    Result.Points[1].X := (Points[0].X + Points[1].X) / 2.0;
-    Result.Points[1].Y := (Points[0].Y + Points[1].Y) / 2.0;
-    Result.Points[2].X := (Points[0].X + 2.0 * Points[1].X + Points[2].X) / 4.0;
-    Result.Points[2].Y := (Points[0].Y + 2.0 * Points[1].Y + Points[2].Y) / 4.0;
-    Result.Points[3].X := (Points[0].X + 3.0 * (Points[1].X + Points[2].X) + Points[3].X) / 8.0;
-    Result.Points[3].Y := (Points[0].Y + 3.0 * (Points[1].Y + Points[2].Y) + Points[3].Y) / 8.0;
-    Result.Points[4].X := (Points[1].X + 2.0 * Points[2].X + Points[3].X) / 4.0;
-    Result.Points[4].Y := (Points[1].Y + 2.0 * Points[2].Y + Points[3].Y) / 4.0;
-    Result.Points[5].X := (Points[2].X + Points[3].X) / 2.0;
-    Result.Points[5].Y := (Points[2].Y + Points[3].Y) / 2.0;
+    Result.Points[1].X := (Points[0].X + Points[1].X) / Two64;
+    Result.Points[1].Y := (Points[0].Y + Points[1].Y) / Two64;
+    Result.Points[2].X := (Points[0].X + Two64 * Points[1].X + Points[2].X) / Four64;
+    Result.Points[2].Y := (Points[0].Y + Two64 * Points[1].Y + Points[2].Y) / Four64;
+    Result.Points[3].X := (Points[0].X + Three64 * (Points[1].X + Points[2].X) + Points[3].X) / Eight64;
+    Result.Points[3].Y := (Points[0].Y + Three64 * (Points[1].Y + Points[2].Y) + Points[3].Y) / Eight64;
+    Result.Points[4].X := (Points[1].X + Two64 * Points[2].X + Points[3].X) / Four64;
+    Result.Points[4].Y := (Points[1].Y + Two64 * Points[2].Y + Points[3].Y) / Four64;
+    Result.Points[5].X := (Points[2].X + Points[3].X) / Two64;
+    Result.Points[5].Y := (Points[2].Y + Points[3].Y) / Two64;
     Result.Points[6] := Points[3];
 
     Exit;
@@ -775,13 +790,13 @@ end;
 class procedure TTsCubic64.Coefficients(const Src: TTsDoubles8; const Offset: Integer; out A, B, C, D: Double);
 begin
   A := Src[Offset + 6]; // d
-  B := Src[Offset + 4] * 3.0; // 3*c
-  C := Src[Offset + 2] * 3.0; // 3*b
+  B := Src[Offset + 4] * Three64; // 3*c
+  C := Src[Offset + 2] * Three64; // 3*b
   D := Src[Offset]; // a
 
   A := A - (D - C + B); // A =   -a + 3*b - 3*c + d
-  B := B + (3.0 * D - 2.0 * C); // B =  3*a - 6*b + 3*c
-  C := C - 3.0 * D; // C = -3*a + 3*b
+  B := B + (Three64 * D - Two64 * C); // B =  3*a - 6*b + 3*c
+  C := C - Three64 * D; // C = -3*a + 3*b
 end;
 
 class function TTsCubic64.RootsValidT(const A, B, C, D: Double; var T: TTsDoubles3): Integer;
@@ -879,18 +894,18 @@ begin
     Exit(Num);
   end;
 
-  const InvA: Double = 1.0 / A;
+  const InvA: Double = One64 / A;
   const NormA: Double = B * InvA;
   const NormB: Double = C * InvA;
   const NormC: Double = D * InvA;
 
   const A2: Double = NormA * NormA;
-  const Q: Double = (A2 - NormB * 3.0) / 9.0;
-  const R: Double = (2.0 * A2 * NormA - 9.0 * NormA * NormB + 27.0 * NormC) / 54.0;
+  const Q: Double = (A2 - NormB * Three64) / Nine64;
+  const R: Double = (Two64 * A2 * NormA - Nine64 * NormA * NormB + TwentySeven64 * NormC) / FiftyFour64;
   const R2: Double = R * R;
   const Q3: Double = Q * Q * Q;
   const R2MinusQ3: Double = R2 - Q3;
-  const ADiv3: Double = NormA / 3.0;
+  const ADiv3: Double = NormA / Three64;
 
   var Offset := 0;
   if R2MinusQ3 < 0.0 then
@@ -898,21 +913,26 @@ begin
     // we have 3 real roots
 
     // the divide/root can, due to finite precisions, be slightly outside of -1...1
-    const Theta: Double = ArcCos(TTsScalar64.Bound(R / System.Sqrt(Q3), -1.0, 1.0));
-    const Neg2RootQ: Double = -2.0 * System.Sqrt(Q);
+    const SqrtQ3: Double = TTsScalar.SqrtF64(Q3);
+    const Theta: Double = ArcCos(TTsScalar64.Bound(R / SqrtQ3, -1.0, 1.0));
+    const SqrtQ: Double = TTsScalar.SqrtF64(Q);
+    const Neg2RootQ: Double = -Two64 * SqrtQ;
 
-    var Root: Double := Neg2RootQ * System.Cos(Theta / 3.0) - ADiv3;
+    var CosT: Double := System.Cos(Theta / Three64);
+    var Root: Double := Neg2RootQ * CosT - ADiv3;
     S[Offset] := Root;
     Inc(Offset);
 
-    Root := Neg2RootQ * System.Cos((Theta + 2.0 * Pi64) / 3.0) - ADiv3;
+    CosT := System.Cos((Theta + Two64 * Pi64) / Three64);
+    Root := Neg2RootQ * CosT - ADiv3;
     if not TTsScalar64.AlmostDequalUlps(S[0], Root) then
     begin
       S[Offset] := Root;
       Inc(Offset);
     end;
 
-    Root := Neg2RootQ * System.Cos((Theta - 2.0 * Pi64) / 3.0) - ADiv3;
+    CosT := System.Cos((Theta - Two64 * Pi64) / Three64);
+    Root := Neg2RootQ * CosT - ADiv3;
     if (not TTsScalar64.AlmostDequalUlps(S[0], Root)) and ((Offset = 1) or (not TTsScalar64.AlmostDequalUlps(S[1], Root))) then
     begin
       S[Offset] := Root;
@@ -922,9 +942,10 @@ begin
   else
   begin
     // we have 1 real root
-    const SqrtR2MinusQ3: Double = System.Sqrt(R2MinusQ3);
+    const SqrtR2MinusQ3: Double = TTsScalar.SqrtF64(R2MinusQ3);
 
-    var Root: Double := Abs(R) + SqrtR2MinusQ3;
+    var Root: Double := Abs(R);
+    Root := Root + SqrtR2MinusQ3;
     Root := TTsPath64.CubeRoot(Root);
     if R > 0.0 then
     begin
@@ -942,7 +963,7 @@ begin
 
     if TTsScalar64.AlmostDequalUlps(Second, Q3) then
     begin
-      Second := -Root / 2.0 - ADiv3;
+      Second := -Root / Two64 - ADiv3;
       if not TTsScalar64.AlmostDequalUlps(S[0], Second) then
       begin
         S[Offset] := Second;
@@ -961,8 +982,8 @@ begin
   const B: Double = Src[Offset + 2];
   const C: Double = Src[Offset + 4];
   const D: Double = Src[Offset + 6];
-  const A2: Double = D - A + 3.0 * (B - C);
-  const B2: Double = 2.0 * (A - B - B + C);
+  const A2: Double = D - A + Three64 * (B - C);
+  const B2: Double = Two64 * (A - B - B + C);
   const C2: Double = B - A;
 
   Result := TTsQuad64.RootsValidT(A2, B2, C2, TValues);

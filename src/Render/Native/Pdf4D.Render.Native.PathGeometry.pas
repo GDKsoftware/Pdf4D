@@ -251,6 +251,11 @@ const
   PrecisionFactor: Single = 1e-8;
   // The 0.3333333 of the cube root, as an f32
   OneThird: Single = 0.3333333;
+  // The same for the f64 arithmetic: on Linux64 a real literal is an Extended (80 bits) and takes the operation along with it
+  One64: Double = 1.0;
+  Two64: Double = 2.0;
+  Four64: Double = 4.0;
+  Half64: Double = 0.5;
   MaxConicToQuadPow2 = 4;
 
 { TTsQuadCoeff }
@@ -393,8 +398,8 @@ begin
   if not MPt.IsFinite then
   begin
     const WD: Double = Weight;
-    const W2: Double = WD * 2.0;
-    const ScaleHalf: Double = 1.0 / (1.0 + WD) * 0.5;
+    const W2: Double = WD * Two64;
+    const ScaleHalf: Double = One64 / (One64 + WD) * Half64;
     MPt.X := Single((Double(Points[0].X) + W2 * Double(Points[1].X) + Double(Points[2].X)) * ScaleHalf);
     MPt.Y := Single((Double(Points[0].Y) + W2 * Double(Points[1].Y) + Double(Points[2].Y)) * ScaleHalf);
   end;
@@ -641,13 +646,13 @@ begin
   end;
 
   // use doubles so we don't overflow temporarily trying to compute R
-  var Dr: Double := Double(B) * Double(B) - 4.0 * Double(A) * Double(C);
+  var Dr: Double := Double(B) * Double(B) - Four64 * Double(A) * Double(C);
   if Dr < 0.0 then
   begin
     Exit(0);
   end;
 
-  Dr := System.Sqrt(Dr);
+  Dr := TTsScalar.SqrtF64(Dr);
   const R: Single = Single(Dr);
   if not TTsScalar.IsFinite(R) then
   begin
