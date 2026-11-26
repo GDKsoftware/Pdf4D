@@ -31,6 +31,14 @@ uses
 //
 // The edge list of Rust is a Vec with indices as links; the sort of Rust is stable, so the sort here is a merge sort on (first_y, x).
 //
+// Deviations from tiny-skia that keep its pixels and bound its worst case (a path whose edges cross each other on many rows takes time
+// that grows with the square of their number when each edge ripples back to its place, as Skia does):
+// 1. When the edges of a row have rippled back more than a few steps per edge, the rest of the row only updates the edges and the active
+//    list is sorted once at the end of the row, with the stable merge sort. The insertion of Rust is a stable sort as well, so the list
+//    is the same.
+// 2. The walk counts its work (edges visited, steps rippled, a sort) and stops when MaxEdgeWork is over; the fill then raises
+//    EPdfLimitExceededException. The pixels of the rows walked before stay drawn.
+//
 // Must run inside TTsFloatMode, like the edge builder it uses.
 
 type
@@ -45,6 +53,20 @@ type
       Index: Integer;
     end;
 
+  public const
+    // The work of one path in the walk of its edges: a unit is 3 for an edge in a row of the walk (a row of the anti-aliased walk is a
+    // quarter of a pixel row), 1 for a step of an edge that ripples back and 8 per edge of a row that is sorted.
+    MaxEdgeWork: Int64 = 800000000;
+
+  public type
+    // How a row of the walk puts the edges that moved back in order: ripple each one back (Never), sort the list at the end of the row
+    // (Always), or ripple until it takes more than a few steps per edge and then sort (Auto, the default). The three give the same
+    // pixels; the other two are for the tests.
+    TDeferMode = (Auto, Always, Never);
+
+  public class var
+    DeferMode: TDeferMode;
+
   private const
     // Bias used for conservative rounding of float rects to int rects, to nudge the irects a little larger, so we don't "think" a path's
     // bounds are inside a clip, when (due to numeric drift in the scan-converter) we might walk beyond the predicted limits.
@@ -56,11 +78,14 @@ type
     class function TryConservativeRoundToInt(const Src: TTsRect; out Rounded: TTsIntRect): Boolean; static;
     class procedure FillIntRect(const Rect: TTsIntRect; const Clip: TTsScreenIntRect; const Blitter: TTsBlitter); static;
 
+    class procedure MergeSort(var Items, Scratch: TArray<TSortItem>; const Count: Integer); static;
     class procedure SortEdges(var Edges: TArray<TTsEdge>); static;
-    class procedure WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
-                              const Blitter: TTsBlitter); static;
+    class procedure SortActiveEdges(const FirstInactiveIdx: Integer; var Edges: TArray<TTsEdge>; var Items, Scratch: TArray<TSortItem>); static;
+    class function WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
+                             const Blitter: TTsBlitter): Boolean; static;
     class procedure RemoveEdge(const CurrIdx: Integer; var Edges: TArray<TTsEdge>); static;
-    class procedure BackwardInsertEdgeBasedOnX(const CurrIdx: Integer; var Edges: TArray<TTsEdge>); static;
+    class function BackwardInsertEdgeBasedOnX(const CurrIdx: Integer; var Edges: TArray<TTsEdge>): Integer; static;
+    class procedure Reposition(const CurrIdx, Visited: Integer; var Edges: TArray<TTsEdge>; var Rippled: Integer; var IsDeferred: Boolean); static;
     class procedure InsertEdgeAfter(const CurrIdx, AfterIdx: Integer; var Edges: TArray<TTsEdge>); static;
     class function BackwardInsertStart(const PrevIdx, X: Integer; var Edges: TArray<TTsEdge>): Integer; static;
     class procedure InsertNewEdges(const NewIdx, CurrY: Integer; var Edges: TArray<TTsEdge>); static;
@@ -79,6 +104,9 @@ type
   end;
 
 implementation
+
+uses
+  Pdf4D.Common.Defines;
 
 { TTsScan }
 
@@ -272,29 +300,16 @@ begin
 
   // TODO: walk_simple_edges
 
-  WalkEdges(FillRule, Cardinal(ShiftedStartY), Cardinal(ShiftedStopY), ShiftedClip.Shifted.Right, Linked, Blitter);
+  if not WalkEdges(FillRule, Cardinal(ShiftedStartY), Cardinal(ShiftedStopY), ShiftedClip.Shifted.Right, Linked, Blitter) then
+  begin
+    raise EPdfLimitExceededException.Create('The edges of the path cross too often to fill it within the limit of the scan converter');
+  end;
 end;
 
 // The stable sort of Rust on (first_y, x): a merge sort of the indices with the two values as one key
-class procedure TTsScan.SortEdges(var Edges: TArray<TTsEdge>);
+// The stable merge sort of the first Count items on Key; the sorted items are in Items afterwards (Scratch is the second buffer)
+class procedure TTsScan.MergeSort(var Items, Scratch: TArray<TSortItem>; const Count: Integer);
 begin
-  const Count = Length(Edges);
-  if Count < 2 then
-  begin
-    Exit;
-  end;
-
-  var Items: TArray<TSortItem>;
-  SetLength(Items, Count);
-  for var Index := 0 to Count - 1 do
-  begin
-    Items[Index].Key := Int64(Edges[Index].Line.FirstY) * 4294967296 + (Int64(Edges[Index].Line.X) + 2147483648);
-    Items[Index].Index := Index;
-  end;
-
-  var Scratch: TArray<TSortItem>;
-  SetLength(Scratch, Count);
-
   var RunWidth := 1;
   while RunWidth < Count do
   begin
@@ -345,6 +360,27 @@ begin
     Scratch := Swapped;
     RunWidth := RunWidth * 2;
   end;
+end;
+
+class procedure TTsScan.SortEdges(var Edges: TArray<TTsEdge>);
+begin
+  const Count = Length(Edges);
+  if Count < 2 then
+  begin
+    Exit;
+  end;
+
+  var Items: TArray<TSortItem>;
+  SetLength(Items, Count);
+  for var Index := 0 to Count - 1 do
+  begin
+    Items[Index].Key := Int64(Edges[Index].Line.FirstY) * 4294967296 + (Int64(Edges[Index].Line.X) + 2147483648);
+    Items[Index].Index := Index;
+  end;
+
+  var Scratch: TArray<TSortItem>;
+  SetLength(Scratch, Count);
+  MergeSort(Items, Scratch, Count);
 
   var Sorted: TArray<TTsEdge>;
   SetLength(Sorted, Count);
@@ -356,10 +392,50 @@ begin
   Edges := Sorted;
 end;
 
-// TODO: simplify!
-class procedure TTsScan.WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
-                                  const Blitter: TTsBlitter);
+// Sorts the active edges (the list from the head to FirstInactiveIdx) on x with the stable merge sort and links them again: the list that
+// the ripple of every edge back to its place makes
+class procedure TTsScan.SortActiveEdges(const FirstInactiveIdx: Integer; var Edges: TArray<TTsEdge>; var Items, Scratch: TArray<TSortItem>);
 begin
+  var Count := 0;
+  var Idx := Edges[0].Line.Next;
+  while Idx <> FirstInactiveIdx do
+  begin
+    if Count = Length(Items) then
+    begin
+      SetLength(Items, Max(2 * Count, 1024));
+      SetLength(Scratch, Length(Items));
+    end;
+
+    Items[Count].Key := Edges[Idx].Line.X;
+    Items[Count].Index := Idx;
+    Inc(Count);
+    Idx := Edges[Idx].Line.Next;
+  end;
+
+  MergeSort(Items, Scratch, Count);
+
+  var PrevIdx := 0;
+  for var Index := 0 to Count - 1 do
+  begin
+    const CurrIdx = Items[Index].Index;
+    Edges[PrevIdx].Line.Next := CurrIdx;
+    Edges[CurrIdx].Line.Prev := PrevIdx;
+    PrevIdx := CurrIdx;
+  end;
+
+  Edges[PrevIdx].Line.Next := FirstInactiveIdx;
+  Edges[FirstInactiveIdx].Line.Prev := PrevIdx;
+end;
+
+// TODO: simplify!
+// Returns False when the work of the walk went over MaxEdgeWork; the walk has stopped then
+class function TTsScan.WalkEdges(const FillRule: TTsFillRule; const StartY, StopY, RightClip: Cardinal; var Edges: TArray<TTsEdge>;
+                                 const Blitter: TTsBlitter): Boolean;
+begin
+  Result := True;
+  var Work: Int64 := 0;
+  var SortItems: TArray<TSortItem> := nil;
+  var SortScratch: TArray<TSortItem> := nil;
   var CurrY := StartY;
   var WindingMask := -1;
   if FillRule = TTsFillRule.EvenOdd then
@@ -372,10 +448,14 @@ begin
     var W := 0;
     var Left: Cardinal := 0;
     var PrevX := Edges[0].Line.X;
+    var Visited := 0;
+    var Rippled := 0;
+    var IsDeferred := False;
 
     var CurrIdx := Edges[0].Line.Next;
     while Edges[CurrIdx].Line.FirstY <= Integer(CurrY) do
     begin
+      Inc(Visited);
       const X = Cardinal(TTsFdot16.RoundToI32(Edges[CurrIdx].Line.X)); // TODO: check
 
       if (W and WindingMask) = 0 then
@@ -413,7 +493,7 @@ begin
               if NewX < PrevX then
               begin
                 // ripple current edge backwards until it is x-sorted
-                BackwardInsertEdgeBasedOnX(CurrIdx, Edges);
+                Reposition(CurrIdx, Visited, Edges, Rippled, IsDeferred);
               end
               else
               begin
@@ -433,7 +513,7 @@ begin
               if NewX < PrevX then
               begin
                 // ripple current edge backwards until it is x-sorted
-                BackwardInsertEdgeBasedOnX(CurrIdx, Edges);
+                Reposition(CurrIdx, Visited, Edges, Rippled, IsDeferred);
               end
               else
               begin
@@ -454,7 +534,7 @@ begin
         if NewX < PrevX then
         begin
           // ripple current edge backwards until it is x-sorted
-          BackwardInsertEdgeBasedOnX(CurrIdx, Edges);
+          Reposition(CurrIdx, Visited, Edges, Rippled, IsDeferred);
         end
         else
         begin
@@ -472,6 +552,18 @@ begin
       begin
         Blitter.BlitH(Left, CurrY, RightClip - Left);
       end;
+    end;
+
+    Inc(Work, 3 * Int64(Visited) + Rippled);
+    if IsDeferred then
+    begin
+      SortActiveEdges(CurrIdx, Edges, SortItems, SortScratch);
+      Inc(Work, 8 * Int64(Visited));
+    end;
+
+    if Work > MaxEdgeWork then
+    begin
+      Exit(False);
     end;
 
     Inc(CurrY);
@@ -494,8 +586,10 @@ begin
   Edges[Next].Line.Prev := Prev;
 end;
 
-class procedure TTsScan.BackwardInsertEdgeBasedOnX(const CurrIdx: Integer; var Edges: TArray<TTsEdge>);
+// Returns the number of edges that it passed
+class function TTsScan.BackwardInsertEdgeBasedOnX(const CurrIdx: Integer; var Edges: TArray<TTsEdge>): Integer;
 begin
+  Result := 0;
   const X = Edges[CurrIdx].Line.X;
   var PrevIdx := Edges[CurrIdx].Line.Prev;
   while PrevIdx <> 0 do
@@ -503,6 +597,7 @@ begin
     if Edges[PrevIdx].Line.X > X then
     begin
       PrevIdx := Edges[PrevIdx].Line.Prev;
+      Inc(Result);
     end
     else
     begin
@@ -515,6 +610,28 @@ begin
   begin
     RemoveEdge(CurrIdx, Edges);
     InsertEdgeAfter(CurrIdx, PrevIdx, Edges);
+  end;
+end;
+
+// Ripples the edge back to its place unless the row is deferred. When the edges of the row have passed more than 4 edges each and a
+// little more, the row is deferred: the rest of it only updates the edges, and the list is sorted at the end of the row.
+class procedure TTsScan.Reposition(const CurrIdx, Visited: Integer; var Edges: TArray<TTsEdge>; var Rippled: Integer; var IsDeferred: Boolean);
+begin
+  if IsDeferred then
+  begin
+    Exit;
+  end;
+
+  if DeferMode = TDeferMode.Always then
+  begin
+    IsDeferred := True;
+    Exit;
+  end;
+
+  Inc(Rippled, BackwardInsertEdgeBasedOnX(CurrIdx, Edges));
+  if (DeferMode = TDeferMode.Auto) and (Int64(Rippled) > 4 * Int64(Visited) + 1024) then
+  begin
+    IsDeferred := True;
   end;
 end;
 

@@ -32,6 +32,8 @@ type
     TimeLimitMilliseconds = 5000;
     CallLimitMilliseconds = 1000;
     HangGuardMilliseconds = 60000;
+    // The bound of the walk of edges that cross each other on every row, at the verb limit
+    WorstCaseMilliseconds = 10000;
 
   private
     FBackend: IPdfRenderBackend;
@@ -103,6 +105,9 @@ type
 
     [Test]
     procedure TestDenseEdgesTerminate;
+
+    [Test]
+    procedure TestWorstCaseOfTheEdgeWalkIsBounded;
 
     [Test]
     procedure TestPathOverTheVerbLimitRaises;
@@ -549,6 +554,47 @@ begin
       Path.Free;
     end;
   end;
+end;
+
+// The worst case of the walk of the edges: as many segments as the verb limit allows, each from the top row to the bottom row of the device,
+// so that all of them are active in every row and cross each other in most. The device is 100 and 1000 rows high, drawn with and without
+// anti-aliasing (four times the rows). A fill ends within the bound either way: it draws, or it raises EPdfLimitExceededException when the
+// work of the walk is over the limit of the scan converter.
+procedure TPdfNativeHostileTests.TestWorstCaseOfTheEdgeWalkIsBounded;
+begin
+  var Slow := '';
+  var Report := '';
+  for var Height in [DeviceSize, 10 * DeviceSize] do
+  begin
+    const Path = NewZigZag(TPdfNativeLimits.Default.MaxPathVerbs - 1, Height - 1);
+    try
+      CreateDevice(DeviceSize, Height);
+      for var AntiAlias in [False, True] do
+      begin
+        var Composite := TPdfComposite.Default;
+        Composite.AntiAlias := AntiAlias;
+        var Outcome := 'drawn';
+        const Watch = TStopwatch.StartNew;
+        try
+          FDevice.FillPath(Path, TPdfMatrix.Identity, TPdfFillRule.NonZero, Red, Composite);
+        except
+          on EPdfLimitExceededException do
+          begin
+            Outcome := 'limit';
+          end;
+        end;
+        const Text = Format('%d rows, anti-alias %s: %s after %d ms', [Height, BoolToStr(AntiAlias, True), Outcome, Watch.ElapsedMilliseconds]);
+        Report := Report + Text + '; ';
+        if Watch.ElapsedMilliseconds >= WorstCaseMilliseconds then
+        begin
+          Slow := Slow + Text + '; ';
+        end;
+      end;
+    finally
+      Path.Free;
+    end;
+  end;
+  Assert.AreEqual('', Slow, 'Over ' + IntToStr(WorstCaseMilliseconds) + ' ms. All: ' + Report);
 end;
 
 procedure TPdfNativeHostileTests.TestPathOverTheVerbLimitRaises;

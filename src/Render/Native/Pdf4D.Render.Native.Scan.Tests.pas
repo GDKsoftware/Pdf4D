@@ -10,6 +10,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Math,
   DUnitX.TestFramework,
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Geometry,
@@ -30,6 +31,8 @@ type
     function RectOf(const Left, Top, Right, Bottom: Single): TTsRect;
     function HugeTrianglePath(const Big: Single): TTsPath;
     function HugeCubicPath(const Big: Single): TTsPath;
+    function CrossingPath(const Kind: Integer): TTsPath;
+    function CoverageOf(const Path: TTsPath; const Mode: TTsScan.TDeferMode; const AntiAlias: Boolean; const FillRule: TTsFillRule): TArray<Integer>;
     procedure UseBlitter(const Width, Height: Integer);
     procedure AssertCoverageOfRows(const FirstRow, LastRow, FirstColumn, LastColumn, Expected: Integer);
     procedure AssertNothingDrawn(const Description: string);
@@ -111,6 +114,10 @@ type
 
     [Test]
     procedure TestManyEdgesAreSortedStably;
+
+    // The ways to put the moved edges of a row in order (ripple each, sort the row, or ripple and then sort) give the same coverage
+    [Test]
+    procedure TestEveryDeferModeGivesTheSameCoverage;
   end;
 
 implementation
@@ -632,5 +639,124 @@ begin
   Assert.AreEqual(0, FBlitter.OutsideCount);
 end;
 
+const
+  CrossingSize = 64;
+
+// Paths whose edges cross each other on many rows: a star polygon (every vertex joined to one 77 further on), a path of random lines and
+// cubics, and a zigzag of full-height lines
+function TTsScanTests.CrossingPath(const Kind: Integer): TTsPath;
+begin
+  var Seed: Cardinal := 12345 + Cardinal(Kind);
+  var Builder := TTsPathBuilder.New;
+  case Kind of
+    0:
+      begin
+        const Count = 181;
+        Builder.MoveTo(CrossingSize / 2 + 30, CrossingSize / 2);
+        for var Index := 1 to Count - 1 do
+        begin
+          const Angle: Single = (Index * 77 mod Count) * 2 * Pi / Count;
+          Builder.LineTo(CrossingSize / 2 + 30 * Cos(Angle), CrossingSize / 2 + 30 * Sin(Angle));
+        end;
+        Builder.Close;
+      end;
+
+    1:
+      begin
+        Builder.MoveTo(10, 10);
+        for var Index := 1 to 150 do
+        begin
+          Seed := Seed * 1664525 + 1013904223;
+          const X1: Single = (Seed shr 8) mod (CrossingSize * 2) - CrossingSize / 2;
+          Seed := Seed * 1664525 + 1013904223;
+          const Y1: Single = (Seed shr 8) mod (CrossingSize * 2) - CrossingSize / 2;
+          Seed := Seed * 1664525 + 1013904223;
+          const X2: Single = (Seed shr 8) mod (CrossingSize * 2) - CrossingSize / 2;
+          Seed := Seed * 1664525 + 1013904223;
+          const Y2: Single = (Seed shr 8) mod (CrossingSize * 2) - CrossingSize / 2;
+          if Index mod 3 = 0 then
+          begin
+            Builder.CubicTo(X1, Y1, X2, Y2, X1 + 3, Y2 - 7);
+          end
+          else if Index mod 3 = 1 then
+          begin
+            Builder.QuadTo(X1, Y1, X2, Y2);
+          end
+          else
+          begin
+            Builder.LineTo(X1, Y1);
+          end;
+        end;
+        Builder.Close;
+      end;
+  else
+    begin
+      Builder.MoveTo(0, 0);
+      for var Index := 1 to 3000 do
+      begin
+        Builder.LineTo(Index mod CrossingSize, (Index mod 2) * (CrossingSize - 1));
+      end;
+    end;
+  end;
+
+  Assert.IsTrue(Builder.TryFinish(Result), 'The crossing path');
+end;
+
+function TTsScanTests.CoverageOf(const Path: TTsPath; const Mode: TTsScan.TDeferMode; const AntiAlias: Boolean; const FillRule: TTsFillRule): TArray<Integer>;
+begin
+  UseBlitter(CrossingSize, CrossingSize);
+  TTsScan.DeferMode := Mode;
+  try
+    if AntiAlias then
+    begin
+      TTsScanAntiAlias.FillPath(Path, FillRule, ClipOf(CrossingSize, CrossingSize), FBlitter);
+    end
+    else
+    begin
+      TTsScan.FillPath(Path, FillRule, ClipOf(CrossingSize, CrossingSize), FBlitter);
+    end;
+  finally
+    TTsScan.DeferMode := TTsScan.TDeferMode.Auto;
+  end;
+
+  SetLength(Result, CrossingSize * CrossingSize);
+  for var Y := 0 to CrossingSize - 1 do
+  begin
+    for var X := 0 to CrossingSize - 1 do
+    begin
+      Result[Y * CrossingSize + X] := FBlitter.CoverageAt(X, Y);
+    end;
+  end;
+end;
+
+procedure TTsScanTests.TestEveryDeferModeGivesTheSameCoverage;
+begin
+  for var Kind := 0 to 2 do
+  begin
+    const Path = CrossingPath(Kind);
+    for var AntiAlias in [False, True] do
+    begin
+      for var FillRule in [TTsFillRule.Winding, TTsFillRule.EvenOdd] do
+      begin
+        const Description = Format('path %d, anti-alias %s, rule %d', [Kind, BoolToStr(AntiAlias, True), Ord(FillRule)]);
+        const Ripple = CoverageOf(Path, TTsScan.TDeferMode.Never, AntiAlias, FillRule);
+        var Drawn := 0;
+        for var Value in Ripple do
+        begin
+          Inc(Drawn, Value);
+        end;
+        Assert.IsTrue(Drawn > 0, 'Something is drawn: ' + Description);
+
+        const Sorted = CoverageOf(Path, TTsScan.TDeferMode.Always, AntiAlias, FillRule);
+        const Automatic = CoverageOf(Path, TTsScan.TDeferMode.Auto, AntiAlias, FillRule);
+        for var Index := 0 to High(Ripple) do
+        begin
+          Assert.AreEqual(Ripple[Index], Sorted[Index], Format('Sorted at %d: %s', [Index, Description]));
+          Assert.AreEqual(Ripple[Index], Automatic[Index], Format('Automatic at %d: %s', [Index, Description]));
+        end;
+      end;
+    end;
+  end;
+end;
 
 end.
