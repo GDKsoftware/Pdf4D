@@ -11,6 +11,8 @@ interface
 uses
   System.SysUtils,
   System.Math,
+  System.IOUtils,
+  System.StrUtils,
   DUnitX.TestFramework,
   Pdf4D.Render.Native.Scalar,
   Pdf4D.Render.Native.Wide,
@@ -18,7 +20,8 @@ uses
   Pdf4D.Render.Native.Transform,
   Pdf4D.Render.Native.Path,
   Pdf4D.Render.Native.Dash,
-  Pdf4D.Render.Native.Stroker;
+  Pdf4D.Render.Native.Stroker,
+  Pdf4D.Tests.TinySkiaImages;
 
 type
   [TestFixture]
@@ -32,7 +35,11 @@ type
     procedure AssertNextSegment(var Iter: TTsPathSegmentsIter; const Expected: TTsPathSegment);
     function ClosedPath: TTsPath;
     function OpenPath: TTsPath;
+    {$IFNDEF CPUX86}
     function PathHash(const Path: TTsPath): Cardinal;
+    {$ELSE}
+    procedure AssertWithinX87Tolerance(const Stroked: TTsPath; const ExpectedHash: Cardinal);
+    {$ENDIF}
     procedure AssertRustReference(const Path: TTsPath; const Width, MiterLimit, ResScale: Single; const Join: TTsLineJoin;
                                   const Cap: TTsLineCap; const ExpectedHash: Cardinal);
 
@@ -180,6 +187,7 @@ begin
 end;
 
 // FNV-1a over the verbs and the bits of the points
+{$IFNDEF CPUX86}
 function TTsStrokerTests.PathHash(const Path: TTsPath): Cardinal;
 begin
   var Hash: UInt64 := 2166136261;
@@ -197,6 +205,7 @@ begin
 
   Result := Cardinal(Hash);
 end;
+{$ENDIF}
 
 procedure TTsStrokerTests.AssertRustReference(const Path: TTsPath; const Width, MiterLimit, ResScale: Single;
                                               const Join: TTsLineJoin; const Cap: TTsLineCap; const ExpectedHash: Cardinal);
@@ -209,8 +218,46 @@ begin
 
   var Stroked: TTsPath;
   Assert.IsTrue(Path.TryStroke(Stroke, ResScale, Stroked), 'Stroke');
+  {$IFDEF CPUX86}
+  AssertWithinX87Tolerance(Stroked, ExpectedHash);
+  {$ELSE}
   Assert.AreEqual(ExpectedHash, PathHash(Stroked), 'The bits of the stroked path');
+  {$ENDIF}
 end;
+
+{$IFDEF CPUX86}
+procedure TTsStrokerTests.AssertWithinX87Tolerance(const Stroked: TTsPath; const ExpectedHash: Cardinal);
+begin
+  // On Win32 the stroker runs on the x87 unit, which rounds a chain of f32 operations once to the precision of the mode and again when the
+  // result is stored (double rounding), so single coordinates differ from the Rust bits. The reference is the path that Win64 produces,
+  // whose bits equal the hash of the same test on Win64 and Linux64 (tests/reference/tiny-skia/stroker-bits/<hash>.txt: the verbs, then the
+  // bits of x and y of every point). The measured difference of all six paths is at most 2^-15 (3.05E-5) in a coordinate below 256, up to
+  // 256 units in the last place for the smallest values; the verbs and the number of points must be equal. The limit is that value.
+  const MaxCoordinateDifference: Single = 3.0517578125E-5;
+
+  const Lines = TFile.ReadAllLines(TTinySkiaImages.ReferenceFile('stroker-bits/' + IntToHex(ExpectedHash, 8) + '.txt'));
+
+  Assert.AreEqual(Length(Stroked.Points) + 1, Integer(Length(Lines)), 'The number of points');
+
+  var Verbs := '';
+  for var Verb in Stroked.Verbs do
+  begin
+    Verbs := Verbs + IntToStr(Ord(Verb));
+  end;
+  Assert.AreEqual(Lines[0], Verbs, 'The verbs');
+
+  var Largest: Single := 0;
+  for var I := 0 to High(Stroked.Points) do
+  begin
+    const Reference = SplitString(Lines[I + 1], ' ');
+    const ReferenceX = BitsToSingle(StrToUInt('$' + Reference[0]));
+    const ReferenceY = BitsToSingle(StrToUInt('$' + Reference[1]));
+    Largest := Max(Largest, Max(Abs(Single(Stroked.Points[I].X - ReferenceX)), Abs(Single(Stroked.Points[I].Y - ReferenceY))));
+  end;
+
+  Assert.IsTrue(Largest <= MaxCoordinateDifference, Format('A coordinate differs by %g from the Rust reference (limit %g)', [Largest, MaxCoordinateDifference]));
+end;
+{$ENDIF}
 
 procedure TTsStrokerTests.Setup;
 begin
@@ -416,7 +463,16 @@ begin
   Stroke.Width := 2;
 
   var Stroked: TTsPath;
+  {$IFDEF CPUX86}
+  // Win32 (x87) does not overflow the f32 products to infinity (extended exponent range), so the stroker has no NaN to abort on and
+  // strokes the quad (measured). The outcome is safe: the bounds of the result are finite, there is no NaN in them.
+  Assert.IsTrue(StrokeOf(Path, Stroke, Stroked), 'The stroker strokes the quad');
+  const Bounds = Stroked.Bounds;
+  Assert.IsTrue(TTsScalar.IsFinite(Bounds.Left) and TTsScalar.IsFinite(Bounds.Top) and TTsScalar.IsFinite(Bounds.Right) and
+                TTsScalar.IsFinite(Bounds.Bottom), 'The bounds are finite');
+  {$ELSE}
   Assert.IsFalse(StrokeOf(Path, Stroke, Stroked), 'The stroker aborts instead of stroking NaN');
+  {$ENDIF}
 end;
 
 procedure TTsStrokerTests.TestZeroWidthGivesNoPath;
