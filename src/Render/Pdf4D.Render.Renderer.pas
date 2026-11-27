@@ -78,6 +78,9 @@ const
 
 constructor TPdfRenderer.Create(const Document: IPdfDocument; const Backend: IPdfRenderBackend);
 begin
+  // Take the reference first: a backend that was made for this call (a const parameter holds no reference) is freed when a check fails
+  FBackend := Backend;
+
   if not Assigned(Document) then
   begin
     raise EArgumentNilException.Create('Document');
@@ -96,7 +99,6 @@ begin
   inherited Create;
   FDocument := Document;
   FModel := Model.ModelDocument;
-  FBackend := Backend;
   FGlyphCache := TPdfGlyphCache.Create(FModel.Context.Log);
 end;
 

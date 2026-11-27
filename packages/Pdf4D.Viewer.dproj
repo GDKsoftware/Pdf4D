@@ -86,6 +86,7 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Pdf4D.dcp"/>
         <DCCReference Include="Pdf4D.Render.dcp"/>
+        <DCCReference Include="Pdf4D.Render.Native.dcp"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.Types.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ResourceStrings.pas"/>
         <DCCReference Include="..\src\Viewer\Pdf4D.Viewer.ViewTransform.pas"/>

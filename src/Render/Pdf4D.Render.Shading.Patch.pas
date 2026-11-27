@@ -250,10 +250,10 @@ end;
 
 class function TPdfPatch.IsEdgeALine(const Edge: TPdfPatchEdge): Boolean;
 begin
-  const FirstValue = Abs(EdgeEquationValue(Edge[1], Edge[0], Edge[3]));
-  const SecondValue = Abs(EdgeEquationValue(Edge[2], Edge[0], Edge[3]));
-  const SpanX = Abs(Edge[0].X - Edge[3].X);
-  const SpanY = Abs(Edge[0].Y - Edge[3].Y);
+  const FirstValue: Double = Abs(EdgeEquationValue(Edge[1], Edge[0], Edge[3]));
+  const SecondValue: Double = Abs(EdgeEquationValue(Edge[2], Edge[0], Edge[3]));
+  const SpanX: Double = Abs(Edge[0].X - Edge[3].X);
+  const SpanY: Double = Abs(Edge[0].Y - Edge[3].Y);
   Result := (((FirstValue <= SpanX) and (SecondValue <= SpanX)) or ((FirstValue <= SpanY) and (SecondValue <= SpanY)));
 end;
 
@@ -292,7 +292,7 @@ end;
 
 class function TPdfPatch.Bernstein(const Index: Integer; const T: Double): Double;
 begin
-  const Rest = 1 - T;
+  const Rest: Double = 1 - T;
   case Index of
     0 : Result := Rest * Rest * Rest;
     1 : Result := 3 * T * Rest * Rest;
@@ -305,13 +305,13 @@ end;
 
 function TPdfPatch.SurfacePoint(const U, V: Double): TPdfPatchPoint;
 begin
-  var X := 0.0;
-  var Y := 0.0;
+  var X: Double := 0.0;
+  var Y: Double := 0.0;
   for var Row := 0 to 3 do
   begin
     for var Column := 0 to 3 do
     begin
-      const Weight = Bernstein(Row, U) * Bernstein(Column, V);
+      const Weight: Double = Bernstein(Row, U) * Bernstein(Column, V);
       X := X + FControlPoints[Row, Column].X * Weight;
       Y := Y + FControlPoints[Row, Column].Y * Weight;
     end;
@@ -437,15 +437,15 @@ end;
 
 function TPdfTensorPatch.IsOnSameSideOfColumns(const Point: TPdfPatchPoint): Boolean;
 begin
-  const FirstColumn = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(3, 0));
-  const LastColumn = EdgeEquationValue(Point, ControlPoint(0, 3), ControlPoint(3, 3));
+  const FirstColumn: Double = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(3, 0));
+  const LastColumn: Double = EdgeEquationValue(Point, ControlPoint(0, 3), ControlPoint(3, 3));
   Result := ((FirstColumn * LastColumn) > 0);
 end;
 
 function TPdfTensorPatch.IsOnSameSideOfRows(const Point: TPdfPatchPoint): Boolean;
 begin
-  const FirstRow = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(0, 3));
-  const LastRow = EdgeEquationValue(Point, ControlPoint(3, 0), ControlPoint(3, 3));
+  const FirstRow: Double = EdgeEquationValue(Point, ControlPoint(0, 0), ControlPoint(0, 3));
+  const LastRow: Double = EdgeEquationValue(Point, ControlPoint(3, 0), ControlPoint(3, 3));
   Result := ((FirstRow * LastRow) > 0);
 end;
 

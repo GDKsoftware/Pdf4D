@@ -60,7 +60,7 @@ begin
   FDenominator := Sqr(Double(FX1X0)) + Sqr(Double(FY1Y0));
 
   // The worst case for the number of steps is between opposite corners of the area
-  const Diagonal = Sqrt(Sqr(Double(DeviceArea.Width)) + Sqr(Double(DeviceArea.Height)));
+  const Diagonal: Double = Sqrt(Sqr(Double(DeviceArea.Width)) + Sqr(Double(DeviceArea.Height)));
   FFactor := Ceil(Diagonal);
   BuildColorTable;
 end;
@@ -69,7 +69,7 @@ procedure TPdfAxialShadingContext.BuildColorTable;
 begin
   // Like PDFBox, a table of one colour has black in the other steps
   SetLength(FColorTable, FFactor + 1);
-  const DomainLength = FDomain[1] - FDomain[0];
+  const DomainLength: Double = FDomain[1] - FDomain[0];
   const HasOneColor = ((FFactor = 0) or (DomainLength = 0));
   if HasOneColor then
   begin
@@ -79,7 +79,7 @@ begin
 
   for var Step := 0 to FFactor do
   begin
-    const T = Single(FDomain[0] + DomainLength * Step / FFactor);
+    const T: Double = Single(FDomain[0] + DomainLength * Step / FFactor);
     FColorTable[Step] := ConvertToRgb(Shading.EvalFunction([T]));
   end;
 end;
@@ -122,7 +122,7 @@ begin
   if TryGetInputValue(U, V, InputValue) then
   begin
     // PDFBox looks up (int) (inputValue * factor), which for a domain beyond 0 to 1 lies outside the table (and raises there): no colour
-    const Key = InputValue * FFactor;
+    const Key: Double = InputValue * FFactor;
     if (Key >= 0) and (Key < Length(FColorTable)) then
     begin
       Rgb := FColorTable[Trunc(Key)];

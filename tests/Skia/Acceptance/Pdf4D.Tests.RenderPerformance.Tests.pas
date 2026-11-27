@@ -20,6 +20,8 @@ type
   [TestFixture]
   TRenderPerformanceTests = class
   strict private
+    // The mapper that the fixture found, put back by TearDown (the test program installs its own for all fixtures)
+    FFoundMapper: IPdfFontMapper;
     // One mapper for all runs: a mapper that has been replaced stays in memory until the process ends
     class var FHermeticMapper: IPdfFontMapper;
 
@@ -85,12 +87,14 @@ begin
   begin
     FHermeticMapper := TFontMapperImpl.Create(TTestFontProvider.Empty);
   end;
+  FFoundMapper := TPdfFontMappers.Instance;
   TPdfFontMappers.SetInstance(FHermeticMapper);
 end;
 
 procedure TRenderPerformanceTests.TearDown;
 begin
-  TPdfFontMappers.SetInstance(nil);
+  TPdfFontMappers.SetInstance(FFoundMapper);
+  FFoundMapper := nil;
 end;
 
 class function TRenderPerformanceTests.InvoiceFiles: TArray<string>;

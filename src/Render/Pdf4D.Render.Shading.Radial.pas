@@ -71,7 +71,7 @@ begin
   FDenominator := Sqr(Double(FX1X0)) + Sqr(Double(FY1Y0)) - Sqr(Double(FR1R0));
 
   // The worst case for the number of steps is between opposite corners of the area
-  const Diagonal = Sqrt(Sqr(Double(DeviceArea.Width)) + Sqr(Double(DeviceArea.Height)));
+  const Diagonal: Double = Sqrt(Sqr(Double(DeviceArea.Width)) + Sqr(Double(DeviceArea.Height)));
   FFactor := Ceil(Diagonal);
   BuildColorTable;
 end;
@@ -100,10 +100,10 @@ end;
 // by zero; the one value is then both the smaller and the larger.
 function TPdfRadialShadingContext.TryGetParameters(const U, V: Single; out Smaller, Larger: Double): Boolean;
 begin
-  const DeltaX = Double(U - FCoords[0]);
-  const DeltaY = Double(V - FCoords[1]);
-  const P = -DeltaX * FX1X0 - DeltaY * FY1Y0 - Double(FCoords[2]) * FR1R0;
-  const Q = Sqr(DeltaX) + Sqr(DeltaY) - Sqr(Double(FCoords[2]));
+  const DeltaX: Double = Double(U - FCoords[0]);
+  const DeltaY: Double = Double(V - FCoords[1]);
+  const P: Double = -DeltaX * FX1X0 - DeltaY * FY1Y0 - Double(FCoords[2]) * FR1R0;
+  const Q: Double = Sqr(DeltaX) + Sqr(DeltaY) - Sqr(Double(FCoords[2]));
 
   if FDenominator = 0 then
   begin
@@ -113,16 +113,16 @@ begin
     Exit;
   end;
 
-  const Discriminant = P * P - FDenominator * Q;
+  const Discriminant: Double = P * P - FDenominator * Q;
   Result := ((not IsNan(Discriminant)) and (Discriminant >= 0));
   if not Result then
   begin
     Exit;
   end;
 
-  const Root = Sqrt(Discriminant);
-  const First = Single((-P + Root) / FDenominator);
-  const Second = Single((-P - Root) / FDenominator);
+  const Root: Double = Sqrt(Discriminant);
+  const First: Double = Single((-P + Root) / FDenominator);
+  const Second: Double = Single((-P - Root) / FDenominator);
   Smaller := Min(First, Second);
   Larger := Max(First, Second);
 end;

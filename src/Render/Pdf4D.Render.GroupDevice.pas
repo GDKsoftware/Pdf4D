@@ -262,23 +262,23 @@ begin
     Exit;
   end;
 
-  const AlphaGroup = GroupAlpha / FullAlpha;
+  const AlphaGroup: Double = GroupAlpha / FullAlpha;
   var BackdropAlpha: Single := 0;
   if HasBackdrop then
   begin
     BackdropAlpha := BackdropPixel[AlphaOffset] / FullAlpha;
   end;
-  const Factor = BackdropAlpha / AlphaGroup - BackdropAlpha;
+  const Factor: Double = BackdropAlpha / AlphaGroup - BackdropAlpha;
 
   for var Channel := RedOffset to RedOffset + ChannelCount - 1 do
   begin
-    const Composited = Unpremultiplied(ImagePixel, Channel);
+    const Composited: Double = Unpremultiplied(ImagePixel, Channel);
     var BackdropColor: Single := 0;
     if HasBackdrop then
     begin
       BackdropColor := Unpremultiplied(BackdropPixel, Channel);
     end;
-    const Color = Min(Max(Composited + (Composited - BackdropColor) * Factor, 0), 1);
+    const Color: Double = Min(Max(Composited + (Composited - BackdropColor) * Factor, 0), 1);
     ResultPixel[Channel] := ClampedByte(Color * GroupAlpha);
   end;
   ResultPixel[AlphaOffset] := GroupAlpha;

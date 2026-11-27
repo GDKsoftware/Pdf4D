@@ -420,7 +420,7 @@ function TPdf4DCustomDocument.BeginOpen: IPdfViewerSession;
 begin
   Result := nil;
 
-  // Before anything is closed: a document without a backend stays as it is
+  // Before anything is closed: a document whose backend cannot be made stays as it is
   const ResolvedBackend = ResolveBackend;
   Close;
   UseSession(ResolvedBackend);

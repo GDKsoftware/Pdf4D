@@ -35,7 +35,8 @@ package Pdf4D.Viewer;
 requires
   rtl,
   Pdf4D,
-  Pdf4D.Render;
+  Pdf4D.Render,
+  Pdf4D.Render.Native;
 
 contains
   Pdf4D.Viewer.Types in '..\src\Viewer\Pdf4D.Viewer.Types.pas',

@@ -1,0 +1,78 @@
+﻿// Copyright 2026 GDK Software
+// Licensed under the Apache License, Version 2.0; see the LICENSE file.
+package Pdf4D.Render.Native;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Pdf4D native render backend'}
+{$LIBSUFFIX AUTO}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  Pdf4D,
+  Pdf4D.Render;
+
+contains
+  Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
+  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas',
+  Pdf4D.Render.Native.Geometry in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas',
+  Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas',
+  Pdf4D.Render.Native.PathGeometry in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.pas',
+  Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas',
+  Pdf4D.Render.Native.Dash in '..\src\Render\Native\Pdf4D.Render.Native.Dash.pas',
+  Pdf4D.Render.Native.Stroker in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas',
+  Pdf4D.Render.Native.Stage in '..\src\Render\Native\Pdf4D.Render.Native.Stage.pas',
+  Pdf4D.Render.Native.Color in '..\src\Render\Native\Pdf4D.Render.Native.Color.pas',
+  Pdf4D.Render.Native.BlendMode in '..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas',
+  Pdf4D.Render.Native.FixedPoint in '..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas',
+  Pdf4D.Render.Native.AlphaRuns in '..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas',
+  Pdf4D.Render.Native.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas',
+  Pdf4D.Render.Native.Path64 in '..\src\Render\Native\Pdf4D.Render.Native.Path64.pas',
+  Pdf4D.Render.Native.Edge in '..\src\Render\Native\Pdf4D.Render.Native.Edge.pas',
+  Pdf4D.Render.Native.EdgeClipper in '..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas',
+  Pdf4D.Render.Native.EdgeBuilder in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas',
+  Pdf4D.Render.Native.Scan.Hairline in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.pas',
+  Pdf4D.Render.Native.Scan.HairlineAntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas',
+  Pdf4D.Render.Native.Scan in '..\src\Render\Native\Pdf4D.Render.Native.Scan.pas',
+  Pdf4D.Render.Native.Scan.AntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas',
+  Pdf4D.Render.Native.Pipeline.Context in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas',
+  Pdf4D.Render.Native.Pipeline.Highp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas',
+  Pdf4D.Render.Native.Pipeline.Lowp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.pas',
+  Pdf4D.Render.Native.Pixmap in '..\src\Render\Native\Pdf4D.Render.Native.Pixmap.pas',
+  Pdf4D.Render.Native.Mask in '..\src\Render\Native\Pdf4D.Render.Native.Mask.pas',
+  Pdf4D.Render.Native.Shader in '..\src\Render\Native\Pdf4D.Render.Native.Shader.pas',
+  Pdf4D.Render.Native.Pipeline.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Blitter.pas',
+  Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas',
+  Pdf4D.Render.Native.Painter in '..\src\Render\Native\Pdf4D.Render.Native.Painter.pas',
+  Pdf4D.Render.Native.Conversion in '..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas',
+  Pdf4D.Render.Native.ClipMask in '..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas',
+  Pdf4D.Render.Native.Limits in '..\src\Render\Native\Pdf4D.Render.Native.Limits.pas',
+  Pdf4D.Render.Native.Device in '..\src\Render\Native\Pdf4D.Render.Native.Device.pas',
+  Pdf4D.Render.Native.Backend in '..\src\Render\Native\Pdf4D.Render.Native.Backend.pas';
+
+end.

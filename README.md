@@ -16,9 +16,11 @@ Milestone M2 (text extraction) is complete: `ExtractText` on a document or a pag
 
 Milestone M3, phase 2 (rendering) is complete: `TPdfRenderer` draws a page into a bitmap through a device interface, and `TPdfSkiaBackend` implements it with Skia. Of the 617 corpus pages that PDFBox 3.0.8 renders at 72 DPI, 612 are equal to its images within the tolerances of `docs/golden-format.md` and 5 have a documented difference; at 150 DPI 19 of 22 pages are equal. Annotations without an appearance stream are not drawn (`constructAppearances` is not ported); see `docs/porting.md` for this and the other deviations. The viewer and the visual components are not part of this phase.
 
-Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components are described under "Viewer (FMX)"; the own rasterizer comes in phase 5.
+Milestone M3, phase 3 (the viewer and the VCL components) is complete: a viewer core without a framework (`Pdf4D.Viewer`) and the VCL components on top of it, see "Viewer (VCL)". The FMX components are described under "Viewer (FMX)".
 
-Milestone M3, phase 4 (the FMX components) is complete and tested on Win64: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The build and tests on Win32 and Linux64, the installation of both design-time packages in the IDE and the check on a real printer are still to be done (see `docs/building.md`). The own rasterizer comes in phase 5.
+Milestone M3, phase 4 (the FMX components) is complete and tested on Win64: the same viewer in FMX forms on top of the viewer core, see "Viewer (FMX)". The build and tests on Win32 and Linux64, the installation of both design-time packages in the IDE and the check on a real printer are still to be done (see `docs/building.md`).
+
+Milestone M3, phase 5 (the native rasterizer) is complete and tested on Win64, and its native tests also pass on Win32 and Linux64; the Skia, VCL and FMX suites on Win32, the Debug configuration, the installation of the design-time packages and the check on a real printer are still to be done (see `docs/building.md`). `TPdfNativeBackend`, a Delphi port of tiny-skia, draws through the same device interface as the Skia backend, needs no library next to the program and is what the viewers use when no backend is set. The 108 reference images of tiny-skia are reproduced byte for byte, and on Win64 631 corpus pages (at 72 and 150 DPI) are equal to the PDFBox renders within the same tolerances as for Skia. See "Rendering", and `docs/porting.md` for the deviations from tiny-skia.
 
 See also `coding-rules.md` and `docs/building.md`.
 
@@ -121,17 +123,38 @@ begin
 end;
 ```
 
+The own rasterizer, a Delphi port of tiny-skia, needs no library next to the program; it is also what the viewers use when the application sets no backend:
+
+```delphi
+uses
+  Pdf4D.Render.Native.Backend;
+
+const Renderer: IPdfRenderer = TPdfRenderer.Create(Document, TPdfNativeBackend.Create);
+```
+
 `RenderToBitmap` draws the whole page with a white background and anti-aliasing, like `PDFRenderer.renderImage` of PDFBox with `ImageType.RGB`. The other fields of `TPdfRenderParams` choose a region of the page, an extra rotation, a cancel token (the only thing that may be used from another thread) and the options (destination, background, annotations and the limits of `docs/porting.md`). A renderer is used by one thread at a time, the one that uses the document.
 
-The renderer is split over three packages next to the core package `Pdf4D`:
+A backend is reference counted. Pass it straight to the renderer or keep it in an interface variable, and never call a method on a bare `TPdfNativeBackend.Create` (a call such as `TPdfNativeBackend.Create.CreateRasterDevice(...)` never releases the object). The same holds for `TPdfSkiaBackend`.
+
+The native backend has two limits, in `TPdfNativeLimits` (start from `TPdfNativeLimits.Default` and pass the record to `TPdfNativeBackend.Create`; a value below 1 raises `EArgumentOutOfRangeException`):
+
+| Limit | Default | Meaning |
+|---|---|---|
+| `MaxPathVerbs` | 4,194,304 (1,048,576 on Win32) | verbs of one fill, stroke or clip path |
+| `MaxEdgeWork` | 800,000,000 | the work for the edges of one path; depends on the DPI and on anti-aliasing |
+
+A fill, a stroke or a clip path over a limit raises `EPdfLimitExceededException` before a pixel changes, and the renderer logs it and goes on with the next operator. A clip path over a limit raises at the next draw, not when the clip is set. The peak memory is about 350 bytes per verb, so about 1.5 GB at the default `MaxPathVerbs` of Win64 and Linux64. The default on Win32 is 1,048,576 verbs (a peak of about 150 MB measured), so a Win32 host needs no change; lower it further when memory is tight. `docs/porting.md` has the reasoning and the other places where the native backend differs from tiny-skia. The switches that the tests use (`DeferMode`, `ForceMaskClip`, the counters) exist only in the test projects and are not part of the API.
+
+The renderer is split over four packages next to the core package `Pdf4D`:
 
 | Package | Contents | Needs |
 |---|---|---|
 | `Pdf4D` | document, pages, text extraction | RTL |
 | `Pdf4D.Render` | the renderer, the colour spaces, images, shadings and patterns, the JPEG and CCITT decoders, the device interface | `Pdf4D` |
+| `Pdf4D.Render.Native` | `TPdfNativeBackend`, the own rasterizer (a port of tiny-skia) | `Pdf4D`, `Pdf4D.Render` |
 | `Pdf4D.Render.Skia` | `TPdfSkiaBackend`, built on `System.Skia` | `Pdf4D`, `Pdf4D.Render`, `Skia.Package.RTL` |
 
-The core does not need Skia. The Skia backend needs the Skia library next to the program: `sk4d.dll` on Windows (`Redist\win32` or `Redist\win64` of RAD Studio) and `libsk4d.so` on Linux64. An application that brings its own backend (anything that implements `IPdfRenderBackend`) uses `Pdf4D.Render` without `Pdf4D.Render.Skia` and without Skia. See `docs/building.md`.
+The core does not need Skia, and neither does the native backend. The Skia backend needs the Skia library next to the program: `sk4d.dll` on Windows (`Redist\win32` or `Redist\win64` of RAD Studio) and `libsk4d.so` on Linux64. An application that brings its own backend (anything that implements `IPdfRenderBackend`) uses `Pdf4D.Render` without `Pdf4D.Render.Skia` and without Skia. See `docs/building.md`.
 
 ## Viewer (VCL)
 
@@ -144,7 +167,7 @@ The viewer shows a PDF in a VCL form: continuous or single-page scrolling, zoom 
 | `Pdf4D.Vcl.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.Vcl`, `Pdf4D.Render.Skia` |
 | `dclPdf4D.Vcl` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.Vcl`, `Pdf4D.Vcl.Skia` |
 
-`TPdf4DViewer` is the whole viewer in one component (toolbar, search bar, side panel, page view); the parts can also be used on their own, all following one `TPdf4DDocument`. The application chooses the render backend explicitly: drop a `TPdf4DSkiaBackend` on the form and link it to the `Backend` property of the document, or set `RenderBackend` of the document in code to any `IPdfRenderBackend`. Without a backend `Open` raises `EPdfViewerException`. The Skia backend needs `sk4d.dll` next to the program (`Redist\win32` or `Redist\win64` of RAD Studio) until Pdf4D has a rasterizer of its own; `Pdf4D.Vcl` itself does not link Skia.
+`TPdf4DViewer` is the whole viewer in one component (toolbar, search bar, side panel, page view); the parts can also be used on their own, all following one `TPdf4DDocument`. Without a backend the viewers render with the own rasterizer (`TPdfNativeBackend`), which needs no DLL. Skia is a choice for those who ship the library: drop a `TPdf4DSkiaBackend` on the form and link it to the `Backend` property of the document, or set `RenderBackend` of the document in code to any `IPdfRenderBackend`; an explicit backend is always used as it is. The Skia backend needs `sk4d.dll` next to the program (`Redist\win32` or `Redist\win64` of RAD Studio); `Pdf4D.Vcl` itself does not link Skia.
 
 ```delphi
 Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;
@@ -181,7 +204,7 @@ The FMX viewer has the same components, properties and behaviour as the VCL view
 | `Pdf4D.FMX.Skia` | the component `TPdf4DSkiaBackend` | `Pdf4D.FMX`, `Pdf4D.Render.Skia` |
 | `dclPdf4D.FMX` | design time: the `Pdf4D` palette page, the actions in the action list editor, a file dialog for `FileName` | `designide`, `Pdf4D.FMX`, `Pdf4D.FMX.Skia` |
 
-Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each is meant to show its components on the `Pdf4D` page of its own kind of project (this has not been checked in the IDE yet). The backend is chosen like in VCL (a `TPdf4DSkiaBackend` linked to `Backend`, or `RenderBackend` in code), and `sk4d.dll` has to be next to the program. The example is that of the VCL viewer, with the colours of FMX:
+Install `dclPdf4D.Vcl` and `dclPdf4D.FMX` together if you use both: each is meant to show its components on the `Pdf4D` page of its own kind of project (this has not been checked in the IDE yet). The backend is chosen like in VCL: without one the own rasterizer is used, and a `TPdf4DSkiaBackend` linked to `Backend` (or `RenderBackend` in code) selects Skia, which needs `sk4d.dll` next to the program. The example is that of the VCL viewer, with the colours of FMX:
 
 ```delphi
 Pdf4DDocument1.Backend := Pdf4DSkiaBackend1;
@@ -226,4 +249,4 @@ The script builds the packages, compiles the demo (Windows only) and builds and 
 
 ## License
 
-Apache License 2.0, see `LICENSE` and `NOTICE`. Pdf4D is a derived work of Apache PDFBox.
+Apache License 2.0, see `LICENSE` and `NOTICE`. Pdf4D is a derived work of Apache PDFBox. The native rasterizer (`src\Render\Native`) is a port of tiny-skia, which is licensed under the BSD 3-Clause License (`licenses\tiny-skia-BSD-3-Clause.txt`, named in `NOTICE`).

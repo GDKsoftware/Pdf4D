@@ -19,22 +19,20 @@ type
 
   TPdfViewerDefaults = class
   public
-    // The backend of a document that has neither RenderBackend nor a Backend component
+    // The backend of a document that has neither RenderBackend nor a Backend component: the own rasterizer
     class function CreateBackend: IPdfRenderBackend; static;
   end;
 
 implementation
 
 uses
-  Pdf4D.Viewer.Types,
-  Pdf4D.Viewer.ResourceStrings;
+  Pdf4D.Render.Native.Backend;
 
 { TPdfViewerDefaults }
 
 class function TPdfViewerDefaults.CreateBackend: IPdfRenderBackend;
 begin
-  // Phase 5 returns the own rasterizer here; until then there is no backend without a component
-  raise EPdfViewerException.Create(SNoRenderBackend);
+  Result := TPdfNativeBackend.Create;
 end;
 
 end.

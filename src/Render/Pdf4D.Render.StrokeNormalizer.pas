@@ -12,6 +12,9 @@ uses
   Pdf4D.Common.Matrix,
   Pdf4D.Common.Path;
 
+// A point that is not a number or is infinite goes through the snapping as it is, and the path that comes out has it too (the arithmetic is
+// done with the floating point exceptions masked); the device that draws the path decides what to do with it.
+
 type
   // Java2D normalizes the geometry of a stroke before it draws it (RenderingHints.VALUE_STROKE_NORMALIZE, the default, which PDFBox
   // does not change): with anti-aliasing the end points of every segment, in device pixels, move to the centre of the pixel they are in
@@ -26,6 +29,10 @@ type
       end;
       TRounding = function(const Value: Double): Double;
 
+    // Floor and Ceil that stay in Double: a value that is not a number stays so, and a value beyond the Integer range stays exact (System.Math
+    // gives an Integer, which wraps or becomes the integer indefinite)
+    class function FloorOf(const Value: Double): Double; static;
+    class function CeilOf(const Value: Double): Double; static;
     class function Centered(const Value: Double): Double; static;
     class function ClipEdge(const Value: Double): Double; static;
     class function FillEdge(const Value: Double): Double; static;
@@ -35,6 +42,8 @@ type
     class function Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix; static;
     class procedure Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
                                 const Snap: TRounding); static;
+    class procedure RebuildMasked(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
+                                  const Snap: TRounding); static;
 
   public
     // A new path in the space of Path that the caller frees: Path with the end points of its segments moved to the pixel centres of the
@@ -60,10 +69,13 @@ type
 implementation
 
 uses
-  System.Math;
+  System.Math,
+  Pdf4D.Common.FloatGuard;
 
 const
   PixelCentre = 0.5;
+  // From 2^52 on every Double is a whole number
+  WholeNumberLimit = 4503599627370496.0;
   ClipBias = 0.25;
   // A device value a hair above a whole number (the Single translation of a page matrix gives 0.00001 for the top edge of a page) is that
   // number, as in the double arithmetic of Java2D
@@ -72,19 +84,47 @@ const
 
 { TPdfStrokeNormalizer }
 
+class function TPdfStrokeNormalizer.FloorOf(const Value: Double): Double;
+begin
+  if IsNan(Value) or (Abs(Value) >= WholeNumberLimit) then
+  begin
+    Exit(Value);
+  end;
+
+  Result := Trunc(Value);
+  if Result > Value then
+  begin
+    Result := Result - 1;
+  end;
+end;
+
+class function TPdfStrokeNormalizer.CeilOf(const Value: Double): Double;
+begin
+  if IsNan(Value) or (Abs(Value) >= WholeNumberLimit) then
+  begin
+    Exit(Value);
+  end;
+
+  Result := Trunc(Value);
+  if Result < Value then
+  begin
+    Result := Result + 1;
+  end;
+end;
+
 class function TPdfStrokeNormalizer.Centered(const Value: Double): Double;
 begin
-  Result := Floor(Value) + PixelCentre;
+  Result := FloorOf(Value) + PixelCentre;
 end;
 
 class function TPdfStrokeNormalizer.ClipEdge(const Value: Double): Double;
 begin
-  Result := Floor(Value + ClipBias) + ClipBias;
+  Result := FloorOf(Value + ClipBias) + ClipBias;
 end;
 
 class function TPdfStrokeNormalizer.FillEdge(const Value: Double): Double;
 begin
-  Result := Ceil(Value - FillBias);
+  Result := CeilOf(Value - FillBias);
 end;
 
 class function TPdfStrokeNormalizer.IsUnitScale(const ToDevice: TPdfMatrix): Boolean;
@@ -129,7 +169,7 @@ end;
 
 class function TPdfStrokeNormalizer.IsInvertible(const ToDevice: TPdfMatrix): Boolean;
 begin
-  const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
+  const Determinant: Double = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
   Result := (Abs(Determinant) > MinDeterminant) and not IsNan(Determinant) and not IsInfinite(Determinant);
 end;
 
@@ -140,32 +180,39 @@ end;
 
 class function TPdfStrokeNormalizer.Normalize(const Path: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double): TPdfPath;
 begin
-  if (Path.PointCount = 0) or not IsInvertible(ToDevice) then
-  begin
-    Exit(Path.Clone);
-  end;
-
-  const Determinant = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
-  Result := TPdfPath.Create;
+  // The determinant and the inverse are worked out with the floating point exceptions masked as well: a matrix of infinities or of
+  // values that overflow gives a path that is not finite, which the devices refuse, and no exception
+  const FloatState = TPdfFloatGuard.Enter;
   try
-    Rebuild(Path, ToDevice, ResidualX, ResidualY, Result, Centered);
-    Result.Transform(Inverse(ToDevice, Determinant));
-  except
-    Result.Free;
-    raise;
+    if (Path.PointCount = 0) or not IsInvertible(ToDevice) then
+    begin
+      Exit(Path.Clone);
+    end;
+
+    const Determinant: Double = Double(ToDevice.ScaleX) * ToDevice.ScaleY - Double(ToDevice.ShearX) * ToDevice.ShearY;
+    Result := TPdfPath.Create;
+    try
+      Rebuild(Path, ToDevice, ResidualX, ResidualY, Result, Centered);
+      Result.Transform(Inverse(ToDevice, Determinant));
+    except
+      Result.Free;
+      raise;
+    end;
+  finally
+    TPdfFloatGuard.Leave(FloatState);
   end;
 end;
 
 class function TPdfStrokeNormalizer.Inverse(const Matrix: TPdfMatrix; const Determinant: Double): TPdfMatrix;
 begin
-  const A = Matrix.ScaleX;
-  const B = Matrix.ShearY;
-  const C = Matrix.ShearX;
-  const D = Matrix.ScaleY;
-  const InverseA = D / Determinant;
-  const InverseB = -B / Determinant;
-  const InverseC = -C / Determinant;
-  const InverseD = A / Determinant;
+  const A: Double = Matrix.ScaleX;
+  const B: Double = Matrix.ShearY;
+  const C: Double = Matrix.ShearX;
+  const D: Double = Matrix.ScaleY;
+  const InverseA: Double = D / Determinant;
+  const InverseB: Double = -B / Determinant;
+  const InverseC: Double = -C / Determinant;
+  const InverseD: Double = A / Determinant;
   Result := TPdfMatrix.Create(InverseA, InverseB, InverseC, InverseD,
                               -(InverseA * Matrix.TranslateX + InverseC * Matrix.TranslateY),
                               -(InverseB * Matrix.TranslateX + InverseD * Matrix.TranslateY));
@@ -178,11 +225,22 @@ end;
 class procedure TPdfStrokeNormalizer.Rebuild(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double; const Target: TPdfPath;
                                              const Snap: TRounding);
 begin
+  const FloatState = TPdfFloatGuard.Enter;
+  try
+    RebuildMasked(Source, ToDevice, ResidualX, ResidualY, Target, Snap);
+  finally
+    TPdfFloatGuard.Leave(FloatState);
+  end;
+end;
+
+class procedure TPdfStrokeNormalizer.RebuildMasked(const Source: TPdfPath; const ToDevice: TPdfMatrix; const ResidualX, ResidualY: Double;
+                                                   const Target: TPdfPath; const Snap: TRounding);
+begin
   var PointIndex := 0;
-  var CurrentX := 0.0;
-  var CurrentY := 0.0;
-  var StartX := 0.0;
-  var StartY := 0.0;
+  var CurrentX: Double := 0.0;
+  var CurrentY: Double := 0.0;
+  var StartX: Double := 0.0;
+  var StartY: Double := 0.0;
   for var VerbIndex := 0 to Source.VerbCount - 1 do
   begin
     case Source.Verb(VerbIndex) of
@@ -191,8 +249,8 @@ begin
         begin
           const End1 = DevicePoint(Source.Point(PointIndex), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex);
-          const NewX = Snap(End1.X);
-          const NewY = Snap(End1.Y);
+          const NewX: Double = Snap(End1.X);
+          const NewY: Double = Snap(End1.Y);
           if Source.Verb(VerbIndex) = TPdfPathVerb.MoveTo then
           begin
             Target.MoveTo(NewX, NewY);
@@ -211,8 +269,8 @@ begin
           const Control = DevicePoint(Source.Point(PointIndex), ToDevice, ResidualX, ResidualY);
           const End2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex, 2);
-          const NewX = Snap(End2.X);
-          const NewY = Snap(End2.Y);
+          const NewX: Double = Snap(End2.X);
+          const NewY: Double = Snap(End2.Y);
           Target.QuadTo(Control.X + (CurrentX + (NewX - End2.X)) / 2, Control.Y + (CurrentY + (NewY - End2.Y)) / 2, NewX, NewY);
           CurrentX := NewX - End2.X;
           CurrentY := NewY - End2.Y;
@@ -223,8 +281,8 @@ begin
           const Control2 = DevicePoint(Source.Point(PointIndex + 1), ToDevice, ResidualX, ResidualY);
           const End3 = DevicePoint(Source.Point(PointIndex + 2), ToDevice, ResidualX, ResidualY);
           Inc(PointIndex, 3);
-          const NewX = Snap(End3.X);
-          const NewY = Snap(End3.Y);
+          const NewX: Double = Snap(End3.X);
+          const NewY: Double = Snap(End3.Y);
           Target.CubicTo(Control1.X + CurrentX, Control1.Y + CurrentY, Control2.X + (NewX - End3.X), Control2.Y + (NewY - End3.Y), NewX, NewY);
           CurrentX := NewX - End3.X;
           CurrentY := NewY - End3.Y;

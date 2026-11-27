@@ -22,21 +22,27 @@ uses
   Pdf4D.Render.Skia.Convert in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Convert.pas',
   Pdf4D.Render.Skia.Device in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.pas',
   Pdf4D.Render.Skia.Backend in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Backend.pas',
-  Pdf4D.Render.Skia.Device.Tests in '..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas',
+  Pdf4D.Tests.DeviceContract in '..\Support\Pdf4D.Tests.DeviceContract.pas',
+  Pdf4D.Render.Skia.Device.Tests in'..\..\src\Render\Skia\Pdf4D.Render.Skia.Device.Tests.pas',
   Pdf4D.Tests.Png in '..\Support\Pdf4D.Tests.Png.pas',
   Pdf4D.Tests.RenderCompare in '..\Support\Pdf4D.Tests.RenderCompare.pas',
-  Pdf4D.Tests.RenderCompare.Tests in '..\Support\Pdf4D.Tests.RenderCompare.Tests.pas',
   Pdf4D.Tests.ReferenceBackends in 'Acceptance\Pdf4D.Tests.ReferenceBackends.pas',
   Pdf4D.Tests.Corpus in '..\Support\Pdf4D.Tests.Corpus.pas',
   Pdf4D.Tests.FontProvider in '..\Support\Pdf4D.Tests.FontProvider.pas',
   Pdf4D.Tests.TextGolden in '..\Support\Pdf4D.Tests.TextGolden.pas',
+  Pdf4D.Tests.RenderGolden.Base in '..\Support\Pdf4D.Tests.RenderGolden.Base.pas',
   Pdf4D.Tests.RenderGolden.Tests in 'Acceptance\Pdf4D.Tests.RenderGolden.Tests.pas',
+  Pdf4D.Tests.RenderGroups.Base in '..\Support\Pdf4D.Tests.RenderGroups.Base.pas',
+  Pdf4D.Tests.RenderSoftMasks.Base in '..\Support\Pdf4D.Tests.RenderSoftMasks.Base.pas',
+  Pdf4D.Tests.RenderTiling.Base in '..\Support\Pdf4D.Tests.RenderTiling.Base.pas',
   Pdf4D.Tests.RenderGroups.Tests in 'Acceptance\Pdf4D.Tests.RenderGroups.Tests.pas',
   Pdf4D.Tests.RenderSoftMasks.Tests in 'Acceptance\Pdf4D.Tests.RenderSoftMasks.Tests.pas',
   Pdf4D.Tests.RenderTiling.Tests in 'Acceptance\Pdf4D.Tests.RenderTiling.Tests.pas',
   Pdf4D.Tests.Fuzz in '..\Support\Pdf4D.Tests.Fuzz.pas',
-  Pdf4D.Tests.RenderRobustness.Tests in 'Acceptance\Pdf4D.Tests.RenderRobustness.Tests.pas',
-  Pdf4D.Tests.RenderPerformance.Tests in 'Acceptance\Pdf4D.Tests.RenderPerformance.Tests.pas';
+  Pdf4D.Tests.RenderRobustness.Base in '..\Support\Pdf4D.Tests.RenderRobustness.Base.pas',
+  Pdf4D.Tests.RenderRobustness.Tests in'Acceptance\Pdf4D.Tests.RenderRobustness.Tests.pas',
+  Pdf4D.Tests.RenderPerformance.Tests in 'Acceptance\Pdf4D.Tests.RenderPerformance.Tests.pas',
+  Pdf4D.Tests.ViewerBackend.Tests in 'Acceptance\Pdf4D.Tests.ViewerBackend.Tests.pas';
 
 const
   ExitCodeTestsFailed = 1;
@@ -58,19 +64,23 @@ begin
   {$ENDIF}
 end;
 
-function ResultsFileName: string;
+// The first run writes results-<platform>-pass1.xml, the second results-<platform>.xml, so that a failure of the first run stays visible
+const
+  Pass1Suffix = '-pass1';
+
+function ResultsFileName(const Suffix: string): string;
 begin
   const BinaryFolder = TPath.GetDirectoryName(ParamStr(0));
   const TestsFolder = TPath.GetFullPath(TPath.Combine(BinaryFolder, '..' + PathDelim + '..'));
-  Result := TPath.Combine(TestsFolder, Format('results-%s.xml', [PlatformName]));
+  Result := TPath.Combine(TestsFolder, Format('results-%s%s.xml', [PlatformName, Suffix]));
 end;
 
-function RunTests: Boolean;
+function RunTests(const ResultsSuffix: string): Boolean;
 begin
   const Runner = TDUnitX.CreateRunner;
   Runner.UseRTTI := True;
   Runner.AddLogger(TDUnitXConsoleLogger.Create(True));
-  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName));
+  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName(ResultsSuffix)));
 
   const RunResults = Runner.Execute;
   Result := RunResults.AllPassed;
@@ -88,9 +98,9 @@ begin
   try
     TDUnitX.CheckCommandLine;
     // The first run initializes DUnitX's global registries and loggers; leaks are measured on the second run.
-    const WarmupPassed = RunTests;
+    const WarmupPassed = RunTests(Pass1Suffix);
     const Baseline = TMemoryCheck.OutstandingBlocks;
-    const AllPassed = RunTests and WarmupPassed;
+    const AllPassed = RunTests('') and WarmupPassed;
     const HasLeak = (TMemoryCheck.OutstandingBlocks <> Baseline);
 
     if not AllPassed then

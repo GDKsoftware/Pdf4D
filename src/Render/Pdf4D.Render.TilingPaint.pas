@@ -208,18 +208,18 @@ end;
 // page cannot show; PDFBox has no such limit and allocates what the pattern asks for.
 procedure TPdfTilingGeometry.SizeRaster(const Width, Height, EdgeLimit: Single; const ScaleX, ScaleY: Single);
 begin
-  const WidthInPixels = Abs(Double(Width)) * ScaleX;
-  const HeightInPixels = Abs(Double(Height)) * ScaleY;
+  const WidthInPixels: Double = Abs(Double(Width)) * ScaleX;
+  const HeightInPixels: Double = Abs(Double(Height)) * ScaleY;
   var PixelsX := Max(1, Ceiling(WidthInPixels));
   var PixelsY := Max(1, Ceiling(HeightInPixels));
   FCellScaleX := ScaleX;
   FCellScaleY := ScaleY;
 
-  const Area = Double(PixelsX) * PixelsY;
+  const Area: Double = Double(PixelsX) * PixelsY;
   const IsTooLarge = ((PixelsX > EdgeLimit) or (PixelsY > EdgeLimit) or (Area > Double(EdgeLimit) * EdgeLimit));
   if IsTooLarge then
   begin
-    const Factor = Min(Min(EdgeLimit / PixelsX, EdgeLimit / PixelsY), EdgeLimit / Sqrt(Area));
+    const Factor: Double = Min(Min(EdgeLimit / PixelsX, EdgeLimit / PixelsY), EdgeLimit / Sqrt(Area));
     const SmallX = Max(1, Trunc(PixelsX * Factor));
     const SmallY = Max(1, Trunc(PixelsY * Factor));
     FCellScaleX := ScaleX * SmallX / PixelsX;
@@ -342,14 +342,14 @@ begin
   const Origin = ToDevice.TransformPoint(0, 0);
   const StepX = ToDevice.TransformPoint(FRasterWidth, 0);
   const StepY = ToDevice.TransformPoint(0, FRasterHeight);
-  const Ux = Double(StepX.X) - Origin.X;
-  const Uy = Double(StepX.Y) - Origin.Y;
-  const Vx = Double(StepY.X) - Origin.X;
-  const Vy = Double(StepY.Y) - Origin.Y;
+  const Ux: Double = Double(StepX.X) - Origin.X;
+  const Uy: Double = Double(StepX.Y) - Origin.Y;
+  const Vx: Double = Double(StepY.X) - Origin.X;
+  const Vy: Double = Double(StepY.Y) - Origin.Y;
 
-  const CellArea = Abs(Ux * Vy - Uy * Vx);
-  const LengthX = Sqrt(Ux * Ux + Uy * Uy);
-  const LengthY = Sqrt(Vx * Vx + Vy * Vy);
+  const CellArea: Double = Abs(Ux * Vy - Uy * Vx);
+  const LengthX: Double = Sqrt(Ux * Ux + Uy * Uy);
+  const LengthY: Double = Sqrt(Vx * Vx + Vy * Vy);
   const IsWithoutSize = ((CellArea = 0) or (LengthX = 0) or (LengthY = 0) or IsNan(CellArea));
   if IsWithoutSize then
   begin

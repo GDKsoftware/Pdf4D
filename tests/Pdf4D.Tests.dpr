@@ -136,6 +136,87 @@ uses
   Pdf4D.Render.Options.Tests in '..\src\Render\Pdf4D.Render.Options.Tests.pas',
   Pdf4D.Render.CancelToken in '..\src\Render\Pdf4D.Render.CancelToken.pas',
   Pdf4D.Render.CancelToken.Tests in '..\src\Render\Pdf4D.Render.CancelToken.Tests.pas',
+  Pdf4D.Render.Native.Scalar in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.pas',
+  Pdf4D.Render.Native.Scalar.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scalar.Tests.pas',
+  Pdf4D.Render.Native.CompilerCanary.Tests in '..\src\Render\Native\Pdf4D.Render.Native.CompilerCanary.Tests.pas',
+  Pdf4D.Render.Native.Wide in '..\src\Render\Native\Pdf4D.Render.Native.Wide.pas',
+  Pdf4D.Render.Native.Wide.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Wide.Tests.pas',
+  Pdf4D.Render.Native.Geometry in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.pas',
+  Pdf4D.Render.Native.Geometry.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Geometry.Tests.pas',
+  Pdf4D.Render.Native.Transform in '..\src\Render\Native\Pdf4D.Render.Native.Transform.pas',
+  Pdf4D.Render.Native.Transform.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Transform.Tests.pas',
+  Pdf4D.Render.Native.PathGeometry in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.pas',
+  Pdf4D.Render.Native.PathGeometry.Tests in '..\src\Render\Native\Pdf4D.Render.Native.PathGeometry.Tests.pas',
+  Pdf4D.Render.Native.Path in '..\src\Render\Native\Pdf4D.Render.Native.Path.pas',
+  Pdf4D.Render.Native.Path.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Path.Tests.pas',
+  Pdf4D.Render.Native.Dash in '..\src\Render\Native\Pdf4D.Render.Native.Dash.pas',
+  Pdf4D.Render.Native.Dash.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Dash.Tests.pas',
+  Pdf4D.Render.Native.Stroker in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.pas',
+  Pdf4D.Render.Native.Stroker.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Stroker.Tests.pas',
+  Pdf4D.Render.Native.Stage in '..\src\Render\Native\Pdf4D.Render.Native.Stage.pas',
+  Pdf4D.Render.Native.Color in '..\src\Render\Native\Pdf4D.Render.Native.Color.pas',
+  Pdf4D.Render.Native.Color.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Color.Tests.pas',
+  Pdf4D.Render.Native.BlendMode in '..\src\Render\Native\Pdf4D.Render.Native.BlendMode.pas',
+  Pdf4D.Render.Native.BlendMode.Tests in '..\src\Render\Native\Pdf4D.Render.Native.BlendMode.Tests.pas',
+  Pdf4D.Render.Native.FixedPoint in '..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.pas',
+  Pdf4D.Render.Native.FixedPoint.Tests in '..\src\Render\Native\Pdf4D.Render.Native.FixedPoint.Tests.pas',
+  Pdf4D.Render.Native.AlphaRuns in '..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.pas',
+  Pdf4D.Render.Native.AlphaRuns.Tests in '..\src\Render\Native\Pdf4D.Render.Native.AlphaRuns.Tests.pas',
+  Pdf4D.Render.Native.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.pas',
+  Pdf4D.Render.Native.Blitter.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Blitter.Tests.pas',
+  Pdf4D.Render.Native.Path64 in '..\src\Render\Native\Pdf4D.Render.Native.Path64.pas',
+  Pdf4D.Render.Native.Edge in '..\src\Render\Native\Pdf4D.Render.Native.Edge.pas',
+  Pdf4D.Render.Native.EdgeClipper in '..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.pas',
+  Pdf4D.Render.Native.EdgeBuilder in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.pas',
+  Pdf4D.Render.Native.EdgeBuilder.Tests in '..\src\Render\Native\Pdf4D.Render.Native.EdgeBuilder.Tests.pas',
+  Pdf4D.Render.Native.EdgeClipper.Tests in '..\src\Render\Native\Pdf4D.Render.Native.EdgeClipper.Tests.pas',
+  Pdf4D.Render.Native.Scan.Hairline in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.pas',
+  Pdf4D.Render.Native.Scan.HairlineAntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.HairlineAntiAlias.pas',
+  Pdf4D.Render.Native.Scan in '..\src\Render\Native\Pdf4D.Render.Native.Scan.pas',
+  Pdf4D.Render.Native.Scan.AntiAlias in '..\src\Render\Native\Pdf4D.Render.Native.Scan.AntiAlias.pas',
+  Pdf4D.Render.Native.Pipeline.Context in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Context.pas',
+  Pdf4D.Render.Native.Pipeline.Highp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Highp.pas',
+  Pdf4D.Render.Native.Pipeline.Lowp in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.pas',
+  Pdf4D.Render.Native.Pixmap in '..\src\Render\Native\Pdf4D.Render.Native.Pixmap.pas',
+  Pdf4D.Render.Native.Mask in '..\src\Render\Native\Pdf4D.Render.Native.Mask.pas',
+  Pdf4D.Render.Native.Shader in '..\src\Render\Native\Pdf4D.Render.Native.Shader.pas',
+  Pdf4D.Render.Native.Pipeline.Blitter in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Blitter.pas',
+  Pdf4D.Render.Native.Pipeline in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.pas',
+  Pdf4D.Render.Native.Pipeline.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Tests.pas',
+  Pdf4D.Render.Native.Pipeline.Lowp.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Pipeline.Lowp.Tests.pas',
+  Pdf4D.Render.Native.Shader.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Shader.Tests.pas',
+  Pdf4D.Render.Native.Painter in '..\src\Render\Native\Pdf4D.Render.Native.Painter.pas',
+  Pdf4D.Tests.TinySkiaImages in 'Support\Pdf4D.Tests.TinySkiaImages.pas',
+  Pdf4D.Tests.TinySkiaImages.Tests in 'Support\Pdf4D.Tests.TinySkiaImages.Tests.pas',
+  Pdf4D.Render.Native.Painter.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Tests.pas',
+  Pdf4D.Render.Native.Painter.Fill.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Fill.Tests.pas',
+  Pdf4D.Render.Native.Painter.Hairline.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Hairline.Tests.pas',
+  Pdf4D.Render.Native.Painter.Pixmap.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Pixmap.Tests.pas',
+  Pdf4D.Render.Native.Painter.Stroke.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Stroke.Tests.pas',
+  Pdf4D.Render.Native.Painter.Dash.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Dash.Tests.pas',
+  Pdf4D.Render.Native.Painter.Mask.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Mask.Tests.pas',
+  Pdf4D.Render.Native.Painter.Pattern.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Painter.Pattern.Tests.pas',
+  Pdf4D.Render.Native.Conversion in '..\src\Render\Native\Pdf4D.Render.Native.Conversion.pas',
+  Pdf4D.Render.Native.Conversion.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Conversion.Tests.pas',
+  Pdf4D.Render.Native.ClipMask in '..\src\Render\Native\Pdf4D.Render.Native.ClipMask.pas',
+  Pdf4D.Render.Native.Limits in '..\src\Render\Native\Pdf4D.Render.Native.Limits.pas',
+  Pdf4D.Render.Native.Device in '..\src\Render\Native\Pdf4D.Render.Native.Device.pas',
+  Pdf4D.Render.Native.Backend in '..\src\Render\Native\Pdf4D.Render.Native.Backend.pas',
+  Pdf4D.Tests.DeviceContract in 'Support\Pdf4D.Tests.DeviceContract.pas',
+  Pdf4D.Render.Native.Device.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Device.Tests.pas',
+  Pdf4D.Render.Native.Backend.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Backend.Tests.pas',
+  Pdf4D.Tests.RenderGroups.Base in 'Support\Pdf4D.Tests.RenderGroups.Base.pas',
+  Pdf4D.Tests.RenderSoftMasks.Base in 'Support\Pdf4D.Tests.RenderSoftMasks.Base.pas',
+  Pdf4D.Tests.RenderTiling.Base in 'Support\Pdf4D.Tests.RenderTiling.Base.pas',
+  Pdf4D.Tests.RenderNative.Tests in 'Acceptance\Pdf4D.Tests.RenderNative.Tests.pas',
+  Pdf4D.Tests.RenderCompare in 'Support\Pdf4D.Tests.RenderCompare.pas',
+  Pdf4D.Tests.RenderCompare.Tests in 'Support\Pdf4D.Tests.RenderCompare.Tests.pas',
+  Pdf4D.Tests.RenderGolden.Base in 'Support\Pdf4D.Tests.RenderGolden.Base.pas',
+  Pdf4D.Tests.RenderGolden.Native.Tests in 'Acceptance\Pdf4D.Tests.RenderGolden.Native.Tests.pas',
+  Pdf4D.Tests.RenderPerformance.Native.Tests in 'Acceptance\Pdf4D.Tests.RenderPerformance.Native.Tests.pas',
+  Pdf4D.Tests.RecordingBlitter in 'Support\Pdf4D.Tests.RecordingBlitter.pas',
+  Pdf4D.Render.Native.Scan.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Tests.pas',
+  Pdf4D.Render.Native.Scan.Hairline.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Scan.Hairline.Tests.pas',
   Pdf4D.Render.GraphicsEngine in '..\src\Render\Pdf4D.Render.GraphicsEngine.pas',
   Pdf4D.Render.Operators.Color in '..\src\Render\Pdf4D.Render.Operators.Color.pas',
   Pdf4D.Render.Operators.Path in '..\src\Render\Pdf4D.Render.Operators.Path.pas',
@@ -395,6 +476,9 @@ uses
   Pdf4D.Tests.Golden.Tests in 'Acceptance\Pdf4D.Tests.Golden.Tests.pas',
   Pdf4D.Tests.Fuzz in 'Support\Pdf4D.Tests.Fuzz.pas',
   Pdf4D.Tests.Robustness.Tests in 'Acceptance\Pdf4D.Tests.Robustness.Tests.pas',
+  Pdf4D.Tests.RenderRobustness.Base in 'Support\Pdf4D.Tests.RenderRobustness.Base.pas',
+  Pdf4D.Tests.RenderRobustness.Native.Tests in 'Acceptance\Pdf4D.Tests.RenderRobustness.Native.Tests.pas',
+  Pdf4D.Render.Native.Device.Hostile.Tests in '..\src\Render\Native\Pdf4D.Render.Native.Device.Hostile.Tests.pas',
   Pdf4D.Tests.TextDump in 'Support\Pdf4D.Tests.TextDump.pas',
   Pdf4D.Tests.TextGolden in 'Support\Pdf4D.Tests.TextGolden.pas',
   Pdf4D.Tests.TextGolden.Comparer.Tests in 'Support\Pdf4D.Tests.TextGolden.Comparer.Tests.pas',
@@ -423,19 +507,23 @@ begin
   {$ENDIF}
 end;
 
-function ResultsFileName: string;
+// The first run writes results-<platform>-pass1.xml, the second results-<platform>.xml, so that a failure of the first run stays visible
+const
+  Pass1Suffix = '-pass1';
+
+function ResultsFileName(const Suffix: string): string;
 begin
   const BinaryFolder = TPath.GetDirectoryName(ParamStr(0));
   const TestsFolder = TPath.GetFullPath(TPath.Combine(BinaryFolder, '..' + PathDelim + '..'));
-  Result := TPath.Combine(TestsFolder, Format('results-%s.xml', [PlatformName]));
+  Result := TPath.Combine(TestsFolder, Format('results-%s%s.xml', [PlatformName, Suffix]));
 end;
 
-function RunTests: Boolean;
+function RunTests(const ResultsSuffix: string): Boolean;
 begin
   const Runner = TDUnitX.CreateRunner;
   Runner.UseRTTI := True;
   Runner.AddLogger(TDUnitXConsoleLogger.Create(True));
-  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName));
+  Runner.AddLogger(TDUnitXXMLNUnitFileLogger.Create(ResultsFileName(ResultsSuffix)));
 
   const RunResults = Runner.Execute;
   Result := RunResults.AllPassed;
@@ -458,9 +546,9 @@ begin
     // Without arguments this changes nothing; -r:<fixture> runs one fixture, for the fuzz sweeps
     TDUnitX.CheckCommandLine;
     // The first run initializes DUnitX's global registries and loggers; leaks are measured on the second run.
-    const WarmupPassed = RunTests;
+    const WarmupPassed = RunTests(Pass1Suffix);
     const Baseline = TMemoryCheck.OutstandingBlocks;
-    const AllPassed = RunTests and WarmupPassed;
+    const AllPassed = RunTests('') and WarmupPassed;
     const HasLeak = (TMemoryCheck.OutstandingBlocks <> Baseline);
 
     if not AllPassed then

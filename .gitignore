@@ -36,3 +36,4 @@ tests/Skia/results-*.xml
 tests/Vcl/results-*.xml
 tests/FMX/results-*.xml
 tools/pdfjs-src/
+tools/tiny-skia-src/
