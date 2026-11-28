@@ -42,7 +42,15 @@ type
     FCollectImages: Boolean;
     FCollectShapes: Boolean;
     FDecodeIndex: Integer;
+    FMaxImagePixels: Int64;
+    FData: TList<TPdfImageData>;
 
+    function IsDecoded(const Index: Integer): Boolean;
+    class function EncodedFilterOf(const Image: TPDImage): string; static;
+    class function ErrorOf(const Image: TPDImage; const Fallback: string): string; static;
+    function BuildEncodedData(const Image: TPDImage; const Info: TPdfImageInfo; const Filter: string; const Bytes: TBytes): TPdfImageData;
+    function BuildPngData(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
+    function BuildData(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
     class function SpelledOut(const FilterName: string): string; static;
     class procedure DescribeColorSpace(const Image: TPDImage; var Info: TPdfImageInfo); static;
     function DescribeImage(const Image: TPDImage): TPdfImageInfo;
@@ -50,6 +58,8 @@ type
 
   protected
     procedure PrepareEngineForPage(const Page: TPDPage); override;
+    // A single image is wanted and has been found: the rest of the page is not walked
+    function StopRequested: Boolean; override;
 
   public
     constructor Create(const PageIndex: Integer);
@@ -61,6 +71,9 @@ type
 
     // The placements found, in the order of drawing
     function Images: TArray<TPdfImageInfo>;
+    // The data of the placements, aligned with Images. Only the placements that DecodeIndex selects have data; the others have
+    // Format None and no error.
+    function Data: TArray<TPdfImageData>;
 
     procedure DrawImage(const Image: TPDImage); override;
     procedure AppendRectangle(const P0, P1, P2, P3: TPointF); override;
@@ -81,6 +94,8 @@ type
     property CollectShapes: Boolean read FCollectShapes write FCollectShapes;
     // NoDecode (-1): nothing is decoded; >= 0: the placement with this index is decoded; DecodeAll (-2): all placements are decoded
     property DecodeIndex: Integer read FDecodeIndex write FDecodeIndex;
+    // The limit of decoded pixels, as in TPdfRenderOptions: an image over it is read every Nth pixel
+    property MaxImagePixels: Int64 read FMaxImagePixels write FMaxImagePixels;
   end;
 
 implementation
@@ -93,7 +108,11 @@ uses
   Pdf4D.Cos.Dictionary,
   Pdf4D.Cos.Names,
   Pdf4D.Cos.PdfObject,
-  Pdf4D.Cos.Name;
+  Pdf4D.Cos.Name,
+  Pdf4D.Extract.Png,
+  Pdf4D.Filter.Factory,
+  Pdf4D.Render.Bitmap,
+  Pdf4D.Render.Options;
 
 type
   // Do: finds the indirect object of the image before the engine draws it, which is where its stable key comes from
@@ -135,13 +154,16 @@ begin
   inherited Create;
   FPageIndex := PageIndex;
   FImages := TList<TPdfImageInfo>.Create;
+  FData := TList<TPdfImageData>.Create;
   FCollectImages := True;
   FDecodeIndex := NoDecode;
+  FMaxImagePixels := DefaultMaxImagePixels;
   AddOperator(TCollectingDrawObjectOperator.Create(Self));
 end;
 
 destructor TPdfGraphicsCollector.Destroy;
 begin
+  FData.Free;
   FImages.Free;
   inherited;
 end;
@@ -166,6 +188,132 @@ end;
 function TPdfGraphicsCollector.Images: TArray<TPdfImageInfo>;
 begin
   Result := FImages.ToArray;
+end;
+
+function TPdfGraphicsCollector.Data: TArray<TPdfImageData>;
+begin
+  Result := FData.ToArray;
+end;
+
+function TPdfGraphicsCollector.StopRequested: Boolean;
+begin
+  Result := ((FDecodeIndex >= 0) and (FImages.Count > FDecodeIndex));
+end;
+
+function TPdfGraphicsCollector.IsDecoded(const Index: Integer): Boolean;
+begin
+  Result := ((FDecodeIndex = DecodeAll) or (FDecodeIndex = Index));
+end;
+
+// The first filter of the image that is a JPEG, JPEG 2000 or JBIG2 filter, in its canonical name; empty when there is none
+class function TPdfGraphicsCollector.EncodedFilterOf(const Image: TPDImage): string;
+begin
+  Result := '';
+  for var FilterName in Image.FilterChain do
+  begin
+    const CanonicalName = TFilterFactory.CanonicalName(FilterName);
+    const IsEncoded = ((CanonicalName = TCosNames.DCTDecode) or (CanonicalName = TCosNames.JPXDecode) or (CanonicalName = TCosNames.JBIG2Decode));
+    if IsEncoded then
+    begin
+      Exit(CanonicalName);
+    end;
+  end;
+end;
+
+class function TPdfGraphicsCollector.ErrorOf(const Image: TPDImage; const Fallback: string): string;
+begin
+  Result := Image.LastError;
+  if Result = '' then
+  begin
+    Result := Fallback;
+  end;
+end;
+
+function TPdfGraphicsCollector.BuildEncodedData(const Image: TPDImage; const Info: TPdfImageInfo; const Filter: string; const Bytes: TBytes): TPdfImageData;
+begin
+  Result := Default(TPdfImageData);
+  Result.Bytes := Bytes;
+  Result.Width := Info.PixelWidth;
+  Result.Height := Info.PixelHeight;
+  if Filter = TCosNames.DCTDecode then
+  begin
+    Result.Format := TPdfImageDataFormat.Jpeg;
+    Result.MimeType := 'image/jpeg';
+  end
+  else
+  begin
+    Result.Format := TPdfImageDataFormat.Raw;
+    Result.MimeType := 'application/octet-stream';
+    Result.RawFilter := Filter;
+  end;
+end;
+
+// The image as the renderer reads it (colour managed to sRGB, with its mask) as an RGB or RGBA PNG with straight alpha
+function TPdfGraphicsCollector.BuildPngData(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
+begin
+  Result := Default(TPdfImageData);
+  Result.Format := TPdfImageDataFormat.None;
+
+  var Bitmap: TPdfBitmap := nil;
+  var IsRead: Boolean;
+  if Image.IsStencil then
+  begin
+    IsRead := Image.TryGetStencilMask(FMaxImagePixels, Bitmap);
+  end
+  else
+  begin
+    IsRead := Image.TryGetImage(FMaxImagePixels, Bitmap);
+  end;
+
+  if not IsRead then
+  begin
+    Result.Error := ErrorOf(Image, 'The image cannot be decoded');
+    Exit;
+  end;
+
+  try
+    Result.Bytes := TPdfPngEncoder.EncodeBitmap(Bitmap);
+    Result.Format := TPdfImageDataFormat.Png;
+    Result.MimeType := 'image/png';
+    Result.Width := Bitmap.Width;
+    Result.Height := Bitmap.Height;
+    Result.Downscaled := ((Bitmap.Width <> Info.PixelWidth) or (Bitmap.Height <> Info.PixelHeight));
+  finally
+    Bitmap.Free;
+  end;
+end;
+
+// Every failure of one image becomes the error of its data; the other images and the page go on
+function TPdfGraphicsCollector.BuildData(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
+begin
+  try
+    if EncodedFilterOf(Image) <> '' then
+    begin
+      var Bytes: TBytes;
+      var Filter: string;
+      if Image.TryGetEncodedData(Bytes, Filter) then
+      begin
+        Exit(BuildEncodedData(Image, Info, Filter, Bytes));
+      end;
+      Result := Default(TPdfImageData);
+      Result.Format := TPdfImageDataFormat.None;
+      Result.Error := ErrorOf(Image, 'The data of the image cannot be read');
+      Exit;
+    end;
+
+    Result := BuildPngData(Image, Info);
+  except
+    on Failure: Exception do
+    begin
+      if TPdfFailure.IsFatal(Failure) then
+      begin
+        raise;
+      end;
+      Result := Default(TPdfImageData);
+      Result.Format := TPdfImageDataFormat.None;
+      Result.Error := Failure.Message;
+    end;
+  end;
 end;
 
 class function TPdfGraphicsCollector.SpelledOut(const FilterName: string): string;
@@ -282,6 +430,14 @@ begin
     Exit;
   end;
   FImages.Add(Info);
+  if IsDecoded(Info.Index) then
+  begin
+    FData.Add(BuildData(Image, Info));
+  end
+  else
+  begin
+    FData.Add(Default(TPdfImageData));
+  end;
 end;
 
 procedure TPdfGraphicsCollector.AppendRectangle(const P0, P1, P2, P3: TPointF);

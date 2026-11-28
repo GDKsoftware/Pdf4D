@@ -108,6 +108,23 @@ type
 
     [Test]
     procedure TestHugeMatteDoesNotRaise;
+
+    [Test]
+    procedure TestEncodedDataOfDctIsTheStreamData;
+
+    [Test]
+    procedure TestEncodedDataUndoesFlateBeforeDct;
+
+    [Test]
+    [TestCase('JPX', 'JPXDecode')]
+    [TestCase('JBIG2', 'JBIG2Decode')]
+    procedure TestEncodedDataOfOtherImageFilters(const FilterName: string);
+
+    [Test]
+    procedure TestEncodedDataIsFalseWithoutImageFilter;
+
+    [Test]
+    procedure TestEncodedDataIsFalseWhenAnEarlierFilterFails;
   end;
 
 implementation
@@ -115,6 +132,7 @@ implementation
 uses
   System.IOUtils,
   System.Math,
+  System.ZLib,
   Pdf4D.Common.Defines,
   Pdf4D.Cos.Boolean,
   Pdf4D.Cos.Float,
@@ -594,6 +612,89 @@ begin
   const Bitmap = GetImage(NewImage(Stream));
 
   Assert.AreEqual(2, Bitmap.Width);
+end;
+
+procedure TSampledImageReaderTests.TestEncodedDataOfDctIsTheStreamData;
+begin
+  const Stream = NewStream(1, 1, 8, 'DeviceRGB', [1, 2, 3, 4, 5]);
+  Stream.SetItem(TCosNames.Filter, TCosName.Create(TCosNames.DCTDecode));
+
+  var Data: TBytes;
+  var Filter: string;
+  Assert.IsTrue(NewImage(Stream).TryGetEncodedData(Data, Filter));
+
+  Assert.AreEqual('DCTDecode', Filter);
+  Assert.AreEqual<Integer>(5, Length(Data));
+  Assert.AreEqual<Byte>(1, Data[0]);
+  Assert.AreEqual<Byte>(5, Data[4]);
+end;
+
+procedure TSampledImageReaderTests.TestEncodedDataUndoesFlateBeforeDct;
+begin
+  var Compressed: TBytes;
+  ZCompress(TBytes.Create(9, 8, 7, 6), Compressed);
+  const Stream = NewStream(1, 1, 8, 'DeviceRGB', Compressed);
+  const Filters = TCosArray.Create;
+  Filters.Add(TCosName.Create(TCosNames.FlateDecode));
+  Filters.Add(TCosName.Create(TCosNames.DCTDecode));
+  Stream.SetItem(TCosNames.Filter, Filters);
+
+  var Data: TBytes;
+  var Filter: string;
+  Assert.IsTrue(NewImage(Stream).TryGetEncodedData(Data, Filter));
+
+  Assert.AreEqual('DCTDecode', Filter);
+  Assert.AreEqual<Integer>(4, Length(Data));
+  Assert.AreEqual<Byte>(9, Data[0]);
+  Assert.AreEqual<Byte>(6, Data[3]);
+end;
+
+procedure TSampledImageReaderTests.TestEncodedDataOfOtherImageFilters(const FilterName: string);
+begin
+  const Stream = NewStream(1, 1, 8, 'DeviceRGB', [10, 20, 30]);
+  Stream.SetItem(TCosNames.Filter, TCosName.Create(FilterName));
+
+  var Data: TBytes;
+  var Filter: string;
+  Assert.IsTrue(NewImage(Stream).TryGetEncodedData(Data, Filter));
+
+  Assert.AreEqual(FilterName, Filter);
+  Assert.AreEqual<Integer>(3, Length(Data));
+end;
+
+procedure TSampledImageReaderTests.TestEncodedDataIsFalseWithoutImageFilter;
+begin
+  var Compressed: TBytes;
+  ZCompress(TBytes.Create(1, 2, 3), Compressed);
+  const Plain = NewStream(1, 1, 8, 'DeviceRGB', [1, 2, 3]);
+  const Flate = NewStream(1, 1, 8, 'DeviceRGB', Compressed);
+  Flate.SetItem(TCosNames.Filter, TCosName.Create(TCosNames.FlateDecode));
+
+  var Data: TBytes;
+  var Filter: string;
+  Assert.IsFalse(NewImage(Plain).TryGetEncodedData(Data, Filter));
+  Assert.IsFalse(NewImage(Flate).TryGetEncodedData(Data, Filter));
+  Assert.AreEqual<Integer>(0, Length(Data));
+  Assert.AreEqual('', Filter);
+  Assert.AreEqual<Integer>(0, FLines.Count);
+end;
+
+procedure TSampledImageReaderTests.TestEncodedDataIsFalseWhenAnEarlierFilterFails;
+begin
+  const Stream = NewStream(1, 1, 8, 'DeviceRGB', [1, 2, 3, 4]);
+  const Filters = TCosArray.Create;
+  Filters.Add(TCosName.Create('NoSuchDecode'));
+  Filters.Add(TCosName.Create(TCosNames.DCTDecode));
+  Stream.SetItem(TCosNames.Filter, Filters);
+  const Image = NewImage(Stream);
+
+  var Data: TBytes;
+  var Filter: string;
+  Assert.IsFalse(Image.TryGetEncodedData(Data, Filter));
+
+  Assert.AreEqual<Integer>(0, Length(Data));
+  Assert.IsTrue(HasLogLine('The data of the image cannot be read'));
+  Assert.IsTrue(Image.LastError <> '');
 end;
 
 procedure TSampledImageReaderTests.TestHugeMatteDoesNotRaise;

@@ -29,6 +29,7 @@ type
     FParameters: TCosDictionary;
     FResources: TPDResources;
     FColorSpace: TPDColorSpace;
+    FLastError: string;
 
     function Lookup(const Name: string; out Value: TCosBase): Boolean;
     function BooleanOf(const Name: string): Boolean;
@@ -80,6 +81,11 @@ type
     function HasMaskOrSMask: Boolean; virtual;
     // The names in /Filter (/F in an inline image) as written, in order; empty without a filter
     function FilterChain: TArray<string>;
+    // The stream data with every filter before DCTDecode, JPXDecode or JBIG2Decode undone, and the canonical name of that filter.
+    // False when the image has none of those filters, or when a filter before it fails (logged, see LastError).
+    function TryGetEncodedData(out Data: TBytes; out Filter: string): Boolean;
+    // The text of the last error that this image logged, empty when it logged none
+    property LastError: string read FLastError;
 
     // getImage: RGBA with /Mask and /SMask applied, premultiplied. Subsampled (every Nth pixel, like the subsampling of PDFBox) when
     // Width * Height exceeds MaxImagePixels, with a log line. Caller owns it. False when the image cannot be decoded (logged).
@@ -242,6 +248,7 @@ end;
 
 procedure TPDImage.LogError(const Fmt: string; const Args: array of const);
 begin
+  FLastError := Format(Fmt, Args);
   const Target = Log;
   if Assigned(Target) then
   begin
@@ -416,6 +423,41 @@ begin
       begin
         Result := Result + [TCosName(Item).Name];
       end;
+    end;
+  end;
+end;
+
+function TPDImage.TryGetEncodedData(out Data: TBytes; out Filter: string): Boolean;
+begin
+  Data := nil;
+  Filter := '';
+  Result := False;
+  try
+    var Remaining: TArray<string>;
+    const Decoded = DecodeSamples(Remaining);
+    if Length(Remaining) = 0 then
+    begin
+      Exit;
+    end;
+
+    const CanonicalName = TFilterFactory.CanonicalName(Remaining[0]);
+    const IsEncoded = ((CanonicalName = TCosNames.DCTDecode) or (CanonicalName = TCosNames.JPXDecode) or (CanonicalName = TCosNames.JBIG2Decode));
+    if IsEncoded then
+    begin
+      Data := Decoded;
+      Filter := CanonicalName;
+      Result := True;
+    end;
+  except
+    on Error: Exception do
+    begin
+      if not IsRecoverable(Error) then
+      begin
+        raise;
+      end;
+      Data := nil;
+      Filter := '';
+      LogError('The data of the image cannot be read: %s', [Error.Message]);
     end;
   end;
 end;

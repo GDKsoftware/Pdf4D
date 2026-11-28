@@ -147,7 +147,22 @@ def images_filters():
     write('images-filters', doc)
 
 
+# ------------------------------------------------------------------------------------------------------- undecodable
+def images_undecodable():
+    doc = Doc()
+    images = [
+        # No bits per component
+        doc.stream('/Type /XObject /Subtype /Image /Width 4 /Height 4 /ColorSpace /DeviceRGB /BitsPerComponent 0', bytes(48)),
+        # A filter that does not exist
+        doc.stream('/Type /XObject /Subtype /Image /Width 4 /Height 4 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /NoSuchDecode', bytes(48)),
+    ]
+    content = ['q 40 0 0 40 %d 100 cm /Im%d Do Q' % (20 + index * 60, index) for index in range(len(images))]
+    doc.page('\n'.join(content), '/XObject << %s >>' % ' '.join('/Im%d %d 0 R' % (i, n) for i, n in enumerate(images)), '0 0 200 200')
+    write('images-undecodable', doc)
+
+
 if __name__ == '__main__':
     images_rotated()
     images_reuse()
     images_filters()
+    images_undecodable()

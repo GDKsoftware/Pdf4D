@@ -33,6 +33,8 @@ type
     FIsListed: Boolean;
 
     procedure List;
+    // Walks the page again with the placements in Decode decoded
+    function Decoded(const Decode: Integer): TArray<TPdfImageData>;
     procedure CheckIndex(const Index: Integer);
 
   public
@@ -44,7 +46,7 @@ type
   end;
 
 resourcestring
-  DataNotAvailable = 'The data of an image is not available';
+  DataNotAvailable = 'The image was not found again when its data was read';
 
 { TPdfImages }
 
@@ -106,10 +108,27 @@ begin
   Result := Copy(FImages);
 end;
 
-// The data is made by a later step; until then every image answers that there is none
+function TPdfPageImages.Decoded(const Decode: Integer): TArray<TPdfImageData>;
+begin
+  const Collector = TPdfGraphicsCollector.Create(FPage.Index);
+  try
+    Collector.DecodeIndex := Decode;
+    Collector.ProcessPage(FModelPage.ModelPage);
+    Result := Collector.Data;
+  finally
+    Collector.Free;
+  end;
+end;
+
 function TPdfPageImages.GetData(const Index: Integer): TPdfImageData;
 begin
   CheckIndex(Index);
+  const Data = Decoded(Index);
+  if Index <= High(Data) then
+  begin
+    Exit(Data[Index]);
+  end;
+
   Result := Default(TPdfImageData);
   Result.Format := TPdfImageDataFormat.None;
   Result.Error := DataNotAvailable;
@@ -118,12 +137,7 @@ end;
 function TPdfPageImages.GetAllData: TArray<TPdfImageData>;
 begin
   List;
-  Result := nil;
-  SetLength(Result, Length(FImages));
-  for var Index := 0 to High(Result) do
-  begin
-    Result[Index] := GetData(Index);
-  end;
+  Result := Decoded(TPdfGraphicsCollector.DecodeAll);
 end;
 
 end.
