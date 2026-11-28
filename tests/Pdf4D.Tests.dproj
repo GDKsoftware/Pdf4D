@@ -566,6 +566,8 @@
         <DCCReference Include="Support\Pdf4D.Tests.PositionGolden.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.PositionGolden.Comparer.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.PositionGolden.Tests.pas"/>
+        <DCCReference Include="Support\Pdf4D.Tests.ImageLocations.pas"/>
+        <DCCReference Include="Acceptance\Pdf4D.Tests.ImageLocations.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.PdfBoxText.Tests.pas"/>
         <DCCReference Include="Acceptance\Pdf4D.Tests.TextRobustness.Tests.pas"/>
         <BuildConfiguration Include="Base">

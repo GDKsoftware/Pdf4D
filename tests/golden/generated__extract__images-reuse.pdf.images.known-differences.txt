@@ -1,0 +1,2 @@
+# PDFBox has no guard against a form that draws itself: the page fails with a StackOverflowError (golden: "error 2"). Pdf4D skips the second Do of the form and lists the image that the form drew once.
+2 # form that draws itself

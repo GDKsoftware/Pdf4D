@@ -161,6 +161,7 @@ The other oracle modes (`Pdf4DOracle.java`) and the scripts that run them, all w
 | `generate-functions.ps1` | `--function` | `tests\reference\functions`: PDF functions of `tools\oracle\function-specs` |
 | `generate-images.ps1` | `images` | `tests\reference\images`: `PDImageXObject.getImage()` of the images of the selected pages |
 | `generate-font-widths.ps1` | `--font-widths`, `--glyph-paths`, `--pdf-glyph-paths` | `tests\fonts`: widths, Unicode values and glyph paths of the test fonts |
+| `generate-image-locations.ps1` | `image-locations` | `tests\golden`: the image locations (`*.images.txt`) of the corpus and of `tests\corpus\generated\extract` (`golden-format.md`, "Image location goldens"); the generated extract files are made by `tools\oracle\make-extract-pdfs.py` |
 | `generate-render.ps1` | `render` | `tests\reference\render`: the pages as `PDFRenderer` draws them (next section) |
 | `generate-render-tests.ps1` | `make-render-tests` | `tests\corpus\generated\render`: the synthetic render test files (with `make-render-pdfs.py`, `make-render-tests.py` and `make-jpeg-tests.py`) |
 

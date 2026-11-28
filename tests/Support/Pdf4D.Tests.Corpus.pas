@@ -37,6 +37,9 @@ type
     // The position golden of PDFBox and the known differences of the positions
     class function PositionsGoldenPath(const RelativePath: string): string; static;
     class function PositionsKnownDifferencesPath(const RelativePath: string): string; static;
+    // The image location golden of PDFBox and the known differences of the image locations
+    class function ImagesGoldenPath(const RelativePath: string): string; static;
+    class function ImagesKnownDifferencesPath(const RelativePath: string): string; static;
   end;
 
 implementation
@@ -188,6 +191,16 @@ end;
 class function TCorpus.PositionsKnownDifferencesPath(const RelativePath: string): string;
 begin
   Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.positions.known-differences.txt');
+end;
+
+class function TCorpus.ImagesGoldenPath(const RelativePath: string): string;
+begin
+  Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.images.txt');
+end;
+
+class function TCorpus.ImagesKnownDifferencesPath(const RelativePath: string): string;
+begin
+  Result := TPath.Combine(GoldenFolder, GoldenName(RelativePath) + '.images.known-differences.txt');
 end;
 
 end.

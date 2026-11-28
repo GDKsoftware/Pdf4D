@@ -91,6 +91,20 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDPushButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDRadioButton;
 import org.apache.pdfbox.pdmodel.interactive.form.PDSignatureField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
+import org.apache.pdfbox.contentstream.PDFStreamEngine;
+import org.apache.pdfbox.contentstream.operator.DrawObject;
+import org.apache.pdfbox.contentstream.operator.Operator;
+import org.apache.pdfbox.contentstream.operator.OperatorName;
+import org.apache.pdfbox.contentstream.operator.state.Concatenate;
+import org.apache.pdfbox.contentstream.operator.state.Restore;
+import org.apache.pdfbox.contentstream.operator.state.Save;
+import org.apache.pdfbox.contentstream.operator.state.SetGraphicsStateParameters;
+import org.apache.pdfbox.contentstream.operator.state.SetMatrix;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDInlineImage;
+import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 
@@ -103,6 +117,7 @@ import org.apache.pdfbox.text.TextPosition;
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --encrypt in.pdf out.pdf user owner alg [--nometa]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java text    file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java positions file.pdf [password]
+ *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java image-locations file.pdf [password]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java make-render-tests ccitt outdir tifdir
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java render file.pdf dpi outdir [password] [only-page]
  *   java -cp lib/pdfbox-app-3.0.8.jar Pdf4DOracle.java --font-widths font.(ttf|otf|pfb)
@@ -197,6 +212,10 @@ public class Pdf4DOracle
             else if (args.length >= 2 && args[0].equals("positions"))
             {
                 out.print(positions(new File(args[1]), args.length > 2 ? args[2] : ""));
+            }
+            else if (args.length >= 2 && args[0].equals("image-locations"))
+            {
+                out.print(imageLocations(new File(args[1]), args.length > 2 ? args[2] : ""));
             }
             else if (args.length >= 2 && args[0].equals("--prepare"))
             {
@@ -1182,6 +1201,128 @@ public class Pdf4DOracle
             first = null;
             last = null;
             glyphs = 0;
+        }
+    }
+
+    // ------------------------------------------------------- image locations
+
+    /**
+     * PDFBox PrintImageLocations (the example of the distribution) with the inline image added: one line per image that the
+     * content of a page draws, forms included, annotations not, in the order of drawing, hidden optional content included
+     * (docs/golden-format.md, "Image location goldens").
+     */
+    static class ImageLocations extends PDFStreamEngine
+    {
+        final StringBuilder sb = new StringBuilder();
+        private int pageNumber;
+        private int imageIndex;
+
+        ImageLocations() throws IOException
+        {
+            addOperator(new Concatenate(this));
+            addOperator(new DrawObject(this));
+            addOperator(new SetGraphicsStateParameters(this));
+            addOperator(new Save(this));
+            addOperator(new Restore(this));
+            addOperator(new SetMatrix(this));
+        }
+
+        void process(int number, PDPage page) throws IOException
+        {
+            pageNumber = number;
+            imageIndex = 0;
+            processPage(page);
+        }
+
+        @Override
+        protected void processOperator(Operator operator, List<COSBase> operands) throws IOException
+        {
+            String name = operator.getName();
+            if (OperatorName.DRAW_OBJECT.equals(name))
+            {
+                COSName objectName = (COSName) operands.get(0);
+                PDXObject xobject = getResources().getXObject(objectName);
+                if (xobject instanceof PDImageXObject)
+                {
+                    PDImageXObject image = (PDImageXObject) xobject;
+                    line(image.getWidth(), image.getHeight());
+                }
+                else if (xobject instanceof PDFormXObject)
+                {
+                    showForm((PDFormXObject) xobject);
+                }
+            }
+            else if (OperatorName.BEGIN_INLINE_IMAGE.equals(name))
+            {
+                PDInlineImage image = new PDInlineImage(operator.getImageParameters(), operator.getImageData(), getResources());
+                line(image.getWidth(), image.getHeight());
+            }
+            else
+            {
+                super.processOperator(operator, operands);
+            }
+        }
+
+        private void line(int width, int height)
+        {
+            Matrix ctm = getGraphicsState().getCurrentTransformationMatrix();
+            sb.append(pageNumber).append(' ').append(imageIndex++).append(' ').append(width).append(' ').append(height);
+            sb.append(' ').append(fixed2(ctm.getValue(0, 0))).append(' ').append(fixed2(ctm.getValue(0, 1)));
+            sb.append(' ').append(fixed2(ctm.getValue(1, 0))).append(' ').append(fixed2(ctm.getValue(1, 1)));
+            sb.append(' ').append(fixed2(ctm.getValue(2, 0))).append(' ').append(fixed2(ctm.getValue(2, 1))).append('\n');
+        }
+    }
+
+    static String imageLocations(File file, String password)
+    {
+        PDDocument doc;
+        try
+        {
+            doc = Loader.loadPDF(file, password);
+        }
+        catch (InvalidPasswordException e)
+        {
+            return "load-error: wrong-password\n";
+        }
+        catch (Throwable t)
+        {
+            return "load-error: " + classifyLoadError(t) + "\n";
+        }
+        try (doc)
+        {
+            ImageLocations engine = new ImageLocations();
+            int number = 0;
+            try
+            {
+                for (PDPage page : doc.getPages())
+                {
+                    number++;
+                    if (number > 50)
+                    {
+                        break;
+                    }
+                    int start = engine.sb.length();
+                    try
+                    {
+                        engine.process(number, page);
+                    }
+                    catch (Throwable t)
+                    {
+                        // what the page drew before it failed is dropped: the failure decides the page
+                        engine.sb.setLength(start);
+                        engine.sb.append("error ").append(number).append('\n');
+                    }
+                }
+            }
+            catch (Throwable t)
+            {
+                // the pages found so far count, like in the dump
+            }
+            return engine.sb.toString();
+        }
+        catch (Throwable t)
+        {
+            return "load-error: parse\n";
         }
     }
 

@@ -174,6 +174,30 @@ Comparison (`tests/Acceptance/Pdf4D.Tests.PositionGolden.Tests.pas`):
 2. The four numbers of a line may differ by 0.02.
 3. Known differences are listed in `tests/golden/<name>.positions.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`, where `<page>` is the number of a page. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error or a different set of pages is always compared. An `error` line is a line of the last page before it, so it is skipped together with that page.
 
+## Image location goldens
+
+`tests/golden/<name>.images.txt` holds the places of the images that the content of each page draws, written by `Pdf4DOracle image-locations <pdf> [password]` (`tools/oracle/generate-image-locations.ps1`). `<name>` and the password rule are the same as for the dump. It covers the corpus of `manifest.csv` and the generated files of `tests/corpus/generated/extract` (which stay out of the manifest). UTF-8 without BOM, LF. One file per file, one line per image:
+
+```
+<page> <index> <pixel width> <pixel height> <a> <b> <c> <d> <e> <f>
+```
+
+The oracle is the example `PrintImageLocations` of PDFBox 3.0.8 (a `PDFStreamEngine` with the operators `cm`, `q`, `Q`, `gs`, `Do` and `Tm`), with the inline image (`BI`) added: an image XObject and an inline image are lines, a form XObject is run (nested forms too), annotation appearances are not. Optional content is not looked at, so an image in a hidden layer is a line. Pages go from 1 up to 50.
+
+- `page`: the number of the page from 1; `index`: the order of drawing on that page from 0;
+- `pixel width`, `pixel height`: `getWidth()` and `getHeight()` of the image (the `/Width` and `/Height` entries, -1 when missing);
+- `a` to `f`: the current transformation matrix of the graphics state when the image is drawn (`Matrix.getValue(0,0)`, `(0,1)`, `(1,0)`, `(1,1)`, `(2,0)`, `(2,1)`), that is the matrix of the unit square in PDF user space, with `%.2f` in `Locale.ROOT`.
+
+When the engine throws on a page, the lines of that page are dropped and a line `error <page>` takes their place; the pages after it go on. A file that cannot be opened gives only `load-error: <kind>`, as for the text goldens. A file that draws no image gives an empty golden, which is compared as such.
+
+Comparison (`tests/Acceptance/Pdf4D.Tests.ImageLocations.Tests.pas`, with `TPdfImages.OfPage` as the Pdf4D side):
+
+1. Per page the lines are compared one by one: the number of lines, `index`, `pixel width` and `pixel height` must be equal.
+2. The six matrix numbers of a line may differ by 0.02.
+3. Known differences are listed in `tests/golden/<name>.images.known-differences.txt`, one per line: `<page> [<platform>] # <reason>`. The page is then skipped (on that platform, or on every platform without one). Empty lines and lines starting with `#` are ignored. A load error is always compared.
+
+The only known difference is `generated/extract/images-reuse.pdf` page 2: PDFBox has no guard against a form that draws itself and ends the page with a `StackOverflowError`; Pdf4D skips the second `Do` of that form.
+
 ## Font width files
 
 `tests/fonts/<font file>.widths.txt` (for example `LiberationSans-Regular.ttf.widths.txt`) is written by `Pdf4DOracle --font-widths <font>` (`tools/oracle/generate-font-widths.ps1`) for the test fonts in `tests/fonts/` (sources and licences in `tests/fonts/manifest.csv`). One line `<key> <width>` per glyph, sorted by key in ordinal (character code) order, so `gid10` comes before `gid2`. Widths are in font units in float format.

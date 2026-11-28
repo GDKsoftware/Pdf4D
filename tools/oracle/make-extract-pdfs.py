@@ -2,7 +2,7 @@
 """Writes the small test files of tests/corpus/generated/extract (standard library only, deterministic).
 
 images-rotated: the same image on pages with /Rotate 0, 90, 180 and 270 and a CropBox with an offset.
-images-reuse:   one XObject drawn five times, an image in a form, an inline image and a form that draws itself.
+images-reuse:   one XObject drawn five times, an image in a form and an inline image; page 2: a form that draws itself.
 images-filters: images with DCT, Flate, Flate and DCT, CCITT, Indexed, CMYK, ICCBased, a soft mask, a mask, a stencil, damaged Flate data and
                 a JPX stream that is not valid JPEG 2000 (the files are only listed, not decoded, by the image listing).
 Run this script again and the bytes are the same. The CCITT stream comes from tests/corpus/generated/render/ccitt.pdf.
@@ -65,8 +65,9 @@ def images_reuse():
         content.append('q 30 0 0 30 %d 600 cm /Im0 Do Q' % (20 + i * 50))
     content.append('q 1 0 0 1 300 300 cm /Fm0 Do Q')
     content.append('q 50 0 0 50 100 100 cm BI /W 2 /H 2 /CS /RGB /BPC 8 /F /AHx ID 0000FF 00FF00 FF0000 FFFFFF> EI Q')
-    content.append('q 1 0 0 1 200 200 cm /FmLoop Do Q')
-    doc.page('\n'.join(content), '/XObject << /Im0 %d 0 R /Fm0 %d 0 R /FmLoop %d 0 R >>' % (shared, form, loop), '0 0 600 800')
+    doc.page('\n'.join(content), '/XObject << /Im0 %d 0 R /Fm0 %d 0 R >>' % (shared, form), '0 0 600 800')
+    # Its own page: PDFBox has no guard against a form that draws itself and fails the page with a stack overflow
+    doc.page('q 1 0 0 1 200 200 cm /FmLoop Do Q', '/XObject << /FmLoop %d 0 R >>' % loop, '0 0 600 800')
     write('images-reuse', doc)
 
 

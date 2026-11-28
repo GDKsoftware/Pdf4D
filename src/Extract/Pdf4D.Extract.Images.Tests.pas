@@ -180,13 +180,13 @@ procedure TPdfImagesTests.TestImageCountAndOrder;
 begin
   const Images = ImagesOf(ReuseFile, 0).Images;
 
-  Assert.AreEqual<Integer>(8, Length(Images));
+  Assert.AreEqual<Integer>(7, Length(Images));
   for var Index: Integer := 0 to High(Images) do
   begin
     Assert.AreEqual(Index, Images[Index].Index);
     Assert.AreEqual<Integer>(0, Images[Index].PageIndex);
   end;
-  // Five placements of one XObject, then the image of the form, the inline image and the image of the form that draws itself
+  // Five placements of one XObject, then the image of the form and the inline image
   for var Index: Integer := 0 to 4 do
   begin
     Assert.AreEqual<Integer>(2, Images[Index].PixelWidth);
@@ -194,7 +194,6 @@ begin
   end;
   Assert.AreEqual<Integer>(3, Images[5].PixelWidth);
   Assert.IsTrue(Images[6].IsInline);
-  Assert.AreEqual<Integer>(3, Images[7].PixelHeight);
 end;
 
 procedure TPdfImagesTests.TestBoxOnRotatedPages(const PageIndex: Integer; const Left, Top, Width, Height: Double);
@@ -259,13 +258,13 @@ end;
 
 procedure TPdfImagesTests.TestRecursiveFormTerminates;
 begin
-  const Images = ImagesOf(ReuseFile, 0).Images;
+  const Images = ImagesOf(ReuseFile, 1).Images;
 
   // The form draws its image once and then itself, which the engine skips
-  Assert.AreEqual<Integer>(8, Length(Images));
-  Assert.AreEqual<Integer>(1, Images[7].PixelWidth);
-  Assert.AreEqual<Integer>(3, Images[7].PixelHeight);
-  CheckBox(Images[7], 200, 570, 10, 30);
+  Assert.AreEqual<Integer>(1, Length(Images));
+  Assert.AreEqual<Integer>(1, Images[0].PixelWidth);
+  Assert.AreEqual<Integer>(3, Images[0].PixelHeight);
+  CheckBox(Images[0], 200, 570, 10, 30);
 end;
 
 procedure TPdfImagesTests.TestPropertiesOfFilters;
