@@ -37,7 +37,7 @@ $TestProjects = @(
     @{ Name = 'Pdf4D.Vcl.Tests'; Folder = 'tests\Vcl'; NeedsSkia = $true; WindowsOnly = $true },
     @{ Name = 'Pdf4D.FMX.Tests'; Folder = 'tests\FMX'; NeedsSkia = $true; WindowsOnly = $true }
 )
-$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Native.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$PackageFiles = @('packages\Pdf4D.dproj', 'packages\Pdf4D.Render.dproj', 'packages\Pdf4D.Render.Native.dproj', 'packages\Pdf4D.Extract.dproj', 'packages\Pdf4D.Render.Skia.dproj', 'packages\Pdf4D.Viewer.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
 # The VCL and FMX packages are built for Windows only (Win32 and Win64); dclPdf4D.Vcl and dclPdf4D.FMX are the design-time packages for
 # the IDE (a 64-bit IDE loads the Win64 build, a 32-bit IDE the Win32 build)
 $WindowsPackageFiles = @('packages\Pdf4D.Vcl.dproj', 'packages\Pdf4D.Vcl.Skia.dproj', 'packages\dclPdf4D.Vcl.dproj', 'packages\Pdf4D.FMX.dproj', 'packages\Pdf4D.FMX.Skia.dproj', 'packages\dclPdf4D.FMX.dproj') | ForEach-Object { Join-Path $PSScriptRoot $_ }
@@ -120,6 +120,8 @@ function Test-NoInitializationSections {
 # - src\Render\Native uses only System.*, core units and units of Pdf4D.Render (no Skia, Viewer, Vcl, FMX or other libraries): the units
 #   of its non-test files must all match ^(System|Pdf4D)\.; the test units may also use DUnitX.
 # - Only src\Render\Native and the viewer layer (src\Viewer, src\Vcl, src\FMX) use Pdf4D.Render.Native.*.
+# - src\Extract uses only System.*, core units and units of Pdf4D.Render (the non-test units must all match ^(System|Pdf4D)\.; no Viewer, Vcl,
+#   FMX, Skia or Native); no other layer uses Pdf4D.Extract.*.
 function Get-UsesViolations([string]$Folder, [string]$Pattern, [string[]]$ExcludedFolders) {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
     $excluded = $ExcludedFolders | ForEach-Object { (Join-Path $sourceFolder $_) + [IO.Path]::DirectorySeparatorChar }
@@ -154,7 +156,7 @@ function Get-NativeAllowListViolations([string]$Folder) {
 
 function Test-LayerBoundaries {
     $sourceFolder = Join-Path $PSScriptRoot 'src'
-    $layerFolders = 'Graphics', 'Codec', 'Render', 'Viewer', 'Vcl', 'FMX'
+    $layerFolders = 'Graphics', 'Codec', 'Render', 'Extract', 'Viewer', 'Vcl', 'FMX'
     $notNamespacePrefix = '(?<![\w.])'
 
     $coreViolations = Get-UsesViolations $sourceFolder '\bPdf4D\.(Render|Graphics|Codec|Viewer|Vcl|FMX)\.\w|\bPdf4D\.Resources\.Icc\b' $layerFolders |
@@ -171,11 +173,15 @@ function Test-LayerBoundaries {
     $nativeAllowList = Get-NativeAllowListViolations (Join-Path $sourceFolder 'Render\Native')
     $nativeUsers = Get-UsesViolations $sourceFolder '\bPdf4D\.Render\.Native\.\w' @('Render\Native', 'Viewer', 'Vcl', 'FMX')
 
-    $violations = @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) +
+    $extractViolations = Get-UsesViolations (Join-Path $sourceFolder 'Extract') '\bPdf4D\.(Viewer|Vcl|FMX)\b|\bPdf4D\.Render\.(Native|Skia)\b' @()
+    $extractAllowList = Get-NativeAllowListViolations (Join-Path $sourceFolder 'Extract')
+    $extractUsers = Get-UsesViolations $sourceFolder '\bPdf4D\.Extract\.\w' @('Extract')
+
+    $violations = @($extractViolations) + @($extractAllowList) + @($extractUsers) + @($coreViolations) + @($viewerUsers) + @($viewerViolations) + @($vclViolations) + @($fmxInVclViolations) +
         @($fmxOutsideViolations) + @($vclInFmxViolations) + @($skiaViolations) + @($nativeViolations) + @($nativeAllowList) + @($nativeUsers)
     if ($violations) {
         $violations | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line.Trim())" }
-        throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\FMX uses FMX.* (and no Vcl.* and Winapi.*); only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia; src\Render\Native uses only System.*, core units and units of Pdf4D.Render; only src\Render\Native and the viewer layer (src\Viewer, src\Vcl, src\FMX) use Pdf4D.Render.Native.*'
+        throw 'Layer boundary violated: the core and the renderer must not use src\Viewer, src\Vcl or src\FMX; src\Viewer uses only System.* and Pdf4D.* units without Skia; only src\Vcl uses Vcl.* and Winapi.* (and no FMX.*); only src\FMX uses FMX.* (and no Vcl.* and Winapi.*); only src\Render\Skia, src\Vcl\Skia and src\FMX\Skia use System.Skia or Pdf4D.Render.Skia; src\Render\Native uses only System.*, core units and units of Pdf4D.Render; only src\Render\Native and the viewer layer (src\Viewer, src\Vcl, src\FMX) use Pdf4D.Render.Native.*; src\Extract uses only System.*, core units and units of Pdf4D.Render (no Viewer, Vcl, FMX, Skia or Native), and only src\Extract uses Pdf4D.Extract.*'
     }
 }
 
