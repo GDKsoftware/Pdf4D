@@ -87,6 +87,10 @@
         <DCCReference Include="Pdf4D.dcp"/>
         <DCCReference Include="Pdf4D.Render.dcp"/>
         <DCCReference Include="..\src\Extract\Pdf4D.Extract.Png.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.PageSpace.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.Images.Interfaces.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.GraphicsCollector.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.Images.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

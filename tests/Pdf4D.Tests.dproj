@@ -414,6 +414,12 @@
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Color.IccBased.Tests.pas"/>
         <DCCReference Include="..\src\Extract\Pdf4D.Extract.Png.pas"/>
         <DCCReference Include="..\src\Extract\Pdf4D.Extract.Png.Tests.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.PageSpace.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.Images.Interfaces.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.GraphicsCollector.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.Images.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.PageSpace.Tests.pas"/>
+        <DCCReference Include="..\src\Extract\Pdf4D.Extract.Images.Tests.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Png.pas"/>
         <DCCReference Include="Support\Pdf4D.Tests.Png.Tests.pas"/>
         <DCCReference Include="..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.Tests.pas"/>

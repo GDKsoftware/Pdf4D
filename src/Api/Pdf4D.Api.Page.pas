@@ -6,6 +6,7 @@ interface
 
 uses
   Pdf4D.Api.DocumentHandle,
+  Pdf4D.Api.DocumentModel.Interfaces,
   Pdf4D.Api.Page.Interfaces,
   Pdf4D.Api.TextLayout.Interfaces,
   Pdf4D.Api.TextOptions,
@@ -14,7 +15,7 @@ uses
   Pdf4D.Model.Rectangle;
 
 type
-  TPdfPage = class(TInterfacedObject, IPdfPage)
+  TPdfPage = class(TInterfacedObject, IPdfPage, IPdfPageModel)
   private
     FHandle: IPdfDocumentHandle;
     FPage: TPDPage;
@@ -39,6 +40,7 @@ type
     function TextLayout(const Options: TPdfTextLayoutOptions): IPdfTextLayout; overload;
     function Links: TArray<TPdfLink>;
     function CosObject: TCosDictionary;
+    function ModelPage: TPDPage;
   end;
 
 implementation
@@ -150,6 +152,11 @@ end;
 function TPdfPage.CosObject: TCosDictionary;
 begin
   Result := FPage.CosObject;
+end;
+
+function TPdfPage.ModelPage: TPDPage;
+begin
+  Result := FPage;
 end;
 
 end.

@@ -38,6 +38,10 @@ requires
   Pdf4D.Render;
 
 contains
-  Pdf4D.Extract.Png in '..\src\Extract\Pdf4D.Extract.Png.pas';
+  Pdf4D.Extract.Png in '..\src\Extract\Pdf4D.Extract.Png.pas',
+  Pdf4D.Extract.PageSpace in '..\src\Extract\Pdf4D.Extract.PageSpace.pas',
+  Pdf4D.Extract.Images.Interfaces in '..\src\Extract\Pdf4D.Extract.Images.Interfaces.pas',
+  Pdf4D.Extract.GraphicsCollector in '..\src\Extract\Pdf4D.Extract.GraphicsCollector.pas',
+  Pdf4D.Extract.Images in '..\src\Extract\Pdf4D.Extract.Images.pas';
 
 end.

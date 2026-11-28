@@ -5,7 +5,8 @@ unit Pdf4D.Api.DocumentModel.Interfaces;
 interface
 
 uses
-  Pdf4D.Model.Document;
+  Pdf4D.Model.Document,
+  Pdf4D.Model.Page;
 
 type
   // Gives code that needs more than IPdfDocument (the renderer) the document of the model layer. A document implements it
@@ -14,6 +15,14 @@ type
     ['{9F1B3D6A-7C28-4E05-A3B9-5D0E8F2C4A71}']
     // Valid as long as the IPdfDocument, or a page of it, is alive
     function ModelDocument: TPDDocument;
+  end;
+
+  // The same for a page: gives code that needs the page of the model layer (the extraction of images) what IPdfPage keeps inside.
+  // A page implements it next to IPdfPage; ask for it with Supports.
+  IPdfPageModel = interface
+    ['{6C2E8A14-3B79-4D50-91F6-A8D3B7E05C42}']
+    // Valid as long as the IPdfPage is alive
+    function ModelPage: TPDPage;
   end;
 
 implementation

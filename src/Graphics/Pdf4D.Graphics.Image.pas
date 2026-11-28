@@ -78,6 +78,8 @@ type
     // or does not fit
     function Decode: TArray<Single>;
     function HasMaskOrSMask: Boolean; virtual;
+    // The names in /Filter (/F in an inline image) as written, in order; empty without a filter
+    function FilterChain: TArray<string>;
 
     // getImage: RGBA with /Mask and /SMask applied, premultiplied. Subsampled (every Nth pixel, like the subsampling of PDFBox) when
     // Width * Height exceeds MaxImagePixels, with a log line. Caller owns it. False when the image cannot be decoded (logged).
@@ -109,6 +111,8 @@ type
     destructor Destroy; override;
 
     function HasMaskOrSMask: Boolean; override;
+    // The image stream, which the image does not own
+    property Stream: TCosStream read FStream;
     // PDImageXObject.getOptionalContent: /OC when it is a dictionary
     function TryGetOptionalContent(out Value: TCosDictionary): Boolean;
     function TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; override;
@@ -385,6 +389,35 @@ begin
     raise EPdfUnsupportedFeatureException.Create(Jbig2NotInstalled);
   end;
   raise EPdfUnsupportedFeatureException.CreateFmt(UnsupportedImageFilter, [FilterName]);
+end;
+
+function TPDImage.FilterChain: TArray<string>;
+begin
+  Result := nil;
+  var Value: TCosBase;
+  if not Lookup(TCosNames.Filter, Value) then
+  begin
+    Exit;
+  end;
+
+  if Value is TCosName then
+  begin
+    Result := [TCosName(Value).Name];
+    Exit;
+  end;
+
+  if Value is TCosArray then
+  begin
+    const Items = TCosArray(Value);
+    for var Index := 0 to Items.Count - 1 do
+    begin
+      const Item = Items.GetObject(Index);
+      if Item is TCosName then
+      begin
+        Result := Result + [TCosName(Item).Name];
+      end;
+    end;
+  end;
 end;
 
 function TPDImage.FilterCount: Integer;
