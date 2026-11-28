@@ -1,4 +1,7 @@
 tests/golden/*.dump.txt text eol=lf
+tests/golden/*.positions.txt text eol=lf
+tests/golden/*.images.txt text eol=lf
+tests/golden/*.known-differences.txt text eol=lf
 tests/corpus/manifest.csv text eol=lf
 tests/corpus/**/*.pdf binary
 tests/golden/*.text.txt text eol=lf
