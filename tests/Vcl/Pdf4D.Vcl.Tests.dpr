@@ -39,6 +39,8 @@ uses
   Pdf4D.Vcl.PrintDialog.Tests in '..\..\src\Vcl\Pdf4D.Vcl.PrintDialog.Tests.pas',
   Pdf4D.Vcl.Viewer.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Viewer.Tests.pas',
   Pdf4D.Vcl.Streaming.Tests in '..\..\src\Vcl\Pdf4D.Vcl.Streaming.Tests.pas',
+  Pdf4D.Extract.Png in '..\..\src\Extract\Pdf4D.Extract.Png.pas',
+  Pdf4D.Extract.PngInterop.Tests in 'Pdf4D.Extract.PngInterop.Tests.pas',
   Pdf4D.Tests.VclViewerFlows.Tests in 'Acceptance\Pdf4D.Tests.VclViewerFlows.Tests.pas',
   Pdf4D.Tests.VclPerformance.Tests in 'Acceptance\Pdf4D.Tests.VclPerformance.Tests.pas';
 

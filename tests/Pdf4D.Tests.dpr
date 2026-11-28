@@ -341,6 +341,8 @@ uses
   Pdf4D.Graphics.Color.Cie.Tests in '..\src\Graphics\Pdf4D.Graphics.Color.Cie.Tests.pas',
   Pdf4D.Graphics.Color.Special.Tests in '..\src\Graphics\Pdf4D.Graphics.Color.Special.Tests.pas',
   Pdf4D.Graphics.Color.IccBased.Tests in '..\src\Graphics\Pdf4D.Graphics.Color.IccBased.Tests.pas',
+  Pdf4D.Extract.Png in '..\src\Extract\Pdf4D.Extract.Png.pas',
+  Pdf4D.Extract.Png.Tests in '..\src\Extract\Pdf4D.Extract.Png.Tests.pas',
   Pdf4D.Tests.Png in 'Support\Pdf4D.Tests.Png.pas',
   Pdf4D.Tests.Png.Tests in 'Support\Pdf4D.Tests.Png.Tests.pas',
   Pdf4D.Graphics.Image.SampledReader.Tests in '..\src\Graphics\Pdf4D.Graphics.Image.SampledReader.Tests.pas',
