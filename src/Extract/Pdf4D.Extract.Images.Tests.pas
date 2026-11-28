@@ -9,9 +9,12 @@ interface
 uses
   System.Classes,
   System.SysUtils,
+  System.Generics.Collections,
   DUnitX.TestFramework,
+  Pdf4D.Api.Document.Interfaces,
   Pdf4D.Common.Defines,
-  Pdf4D.Extract.Images.Interfaces;
+  Pdf4D.Extract.Images.Interfaces,
+  Pdf4D.Tests.PdfBuilder;
 
 type
   [TestFixture]
@@ -25,6 +28,8 @@ type
 
   private
     FLog: TStringList;
+    // The streams of the built documents; a document reads its stream until it is released
+    FStreams: TObjectList<TStream>;
     FPageImages: IPdfPageImages;
 
     procedure RecordLog(const Level: TPdfLogLevel; const Message: string);
@@ -38,6 +43,13 @@ type
     function PixelsOf(const Data: TPdfImageData; out Width, Height: Integer): TBytes;
     class function JpegBytes: TBytes; static;
     class function SameBytes(const Left, Right: TBytes): Boolean; static;
+    // A document of one page (object 3) with the content (object 4); the caller adds the objects that the resources name
+    class function PageBuilder(const MediaBox, Resources, Content: string): TTestPdfBuilder; static;
+    function LoadBuilder(const Builder: TTestPdfBuilder): IPdfDocument;
+    function ImagesOfBuilder(const Builder: TTestPdfBuilder): IPdfPageImages;
+    function DataOfBuilt(const Builder: TTestPdfBuilder; const Index: Integer): TPdfImageData;
+    function FanOutBuilder(const Depth: Integer): TTestPdfBuilder;
+    class function GrayImage(const Builder: TTestPdfBuilder; const Number: Integer): TTestPdfBuilder; static;
 
   public
     [Setup]
@@ -113,18 +125,37 @@ type
 
     [Test]
     procedure TestGetAllDataMatchesGetData;
+
+    // The five placements of one XObject share the bytes that were made once
+    [Test]
+    procedure TestReusedXObjectIsDecodedOnce;
+
+    [Test]
+    procedure TestFanOutOfFormsIsCapped;
+
+    [Test]
+    procedure TestDefaultCapIsOneHundredThousand;
+
+    [Test]
+    procedure TestStraightAlphaKeepsTheColour;
+
+    [Test]
+    procedure TestDctThatIsNotTheLastFilterIsReadAsPixels;
+
+    [Test]
+    procedure TestBoxThatIsNotFiniteIsNotListed;
   end;
 
 implementation
 
 uses
   System.Types,
+  System.Math,
   System.IOUtils,
   Pdf4D.Api.Document,
   Pdf4D.Api.DocumentModel.Interfaces,
   Pdf4D.Extract.GraphicsCollector,
   Pdf4D.Tests.Png,
-  Pdf4D.Api.Document.Interfaces,
   Pdf4D.Api.Page.Interfaces,
   Pdf4D.Extract.Images,
   Pdf4D.Tests.Corpus;
@@ -135,11 +166,13 @@ const
 procedure TPdfImagesTests.Setup;
 begin
   FLog := TStringList.Create;
+  FStreams := TObjectList<TStream>.Create;
 end;
 
 procedure TPdfImagesTests.TearDown;
 begin
   FPageImages := nil;
+  FStreams.Free;
   FLog.Free;
 end;
 
@@ -517,6 +550,167 @@ begin
     Assert.AreEqual(One.Error, All[Index].Error, Format('Error of %d', [Index]));
     Assert.AreEqual(One.Width, All[Index].Width, Format('Width of %d', [Index]));
     Assert.AreEqual(One.Downscaled, All[Index].Downscaled, Format('Downscaled of %d', [Index]));
+  end;
+end;
+
+class function TPdfImagesTests.PageBuilder(const MediaBox, Resources, Content: string): TTestPdfBuilder;
+begin
+  Result := TTestPdfBuilder.Create;
+  try
+    Result.AddObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    Result.AddObject(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    Result.AddObject(3, Format('<< /Type /Page /Parent 2 0 R /MediaBox %s /Resources %s /Contents 4 0 R >>', [MediaBox, Resources]));
+    Result.AddStreamObject(4, '', TEncoding.ASCII.GetBytes(Content));
+    Result.SetRoot(1);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+function TPdfImagesTests.LoadBuilder(const Builder: TTestPdfBuilder): IPdfDocument;
+begin
+  try
+    const Stream = TBytesStream.Create(Builder.Build(TXrefStyle.Table));
+    FStreams.Add(Stream);
+    var Options := TPdfLoadOptions.Default;
+    Options.OnLog := Self.RecordLog;
+    Result := TPdfDocument.Load(Stream, Options);
+  finally
+    Builder.Free;
+  end;
+end;
+
+function TPdfImagesTests.ImagesOfBuilder(const Builder: TTestPdfBuilder): IPdfPageImages;
+begin
+  Result := TPdfImages.OfPage(LoadBuilder(Builder).Page(0));
+end;
+
+function TPdfImagesTests.DataOfBuilt(const Builder: TTestPdfBuilder; const Index: Integer): TPdfImageData;
+begin
+  Result := ImagesOfBuilder(Builder).GetData(Index);
+end;
+
+class function TPdfImagesTests.GrayImage(const Builder: TTestPdfBuilder; const Number: Integer): TTestPdfBuilder;
+begin
+  Result := Builder;
+  Builder.AddStreamObject(Number, '/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8', [128]);
+end;
+
+// Each form draws the next one twice, and the last form draws one image: 2 ^ (Depth - 1) placements from a few hundred bytes of PDF
+function TPdfImagesTests.FanOutBuilder(const Depth: Integer): TTestPdfBuilder;
+begin
+  const FirstForm = 10;
+  Result := PageBuilder('[0 0 200 200]', Format('<< /XObject << /F %d 0 R >> >>', [FirstForm]), '/F Do');
+  try
+    for var Level := 0 to Depth - 1 do
+    begin
+      const IsLeaf = (Level = Depth - 1);
+      var Content := '/F Do /F Do';
+      var Resources := Format('/XObject << /F %d 0 R >>', [FirstForm + Level + 1]);
+      if IsLeaf then
+      begin
+        Content := '/Im Do';
+        Resources := '/XObject << /Im 30 0 R >>';
+      end;
+      Result.AddStreamObject(FirstForm + Level, Format('/Type /XObject /Subtype /Form /BBox [0 0 200 200] /Resources << %s >>', [Resources]),
+        TEncoding.ASCII.GetBytes(Content));
+    end;
+    GrayImage(Result, 30);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+procedure TPdfImagesTests.TestReusedXObjectIsDecodedOnce;
+begin
+  const All = ImagesOf(ReuseFile, 0).GetAllData;
+
+  Assert.IsTrue(Length(All[0].Bytes) > 0, 'The XObject has data: ' + All[0].Error);
+  for var Index := 1 to 4 do
+  begin
+    Assert.IsTrue(Pointer(All[0].Bytes) = Pointer(All[Index].Bytes), Format('Placement %d shares the bytes of the first', [Index]));
+  end;
+  Assert.IsFalse(Pointer(All[0].Bytes) = Pointer(All[5].Bytes), 'Another XObject, other bytes');
+end;
+
+procedure TPdfImagesTests.TestFanOutOfFormsIsCapped;
+begin
+  const Document = LoadBuilder(FanOutBuilder(12));
+  var ModelPage: IPdfPageModel;
+  Assert.IsTrue(Supports(Document.Page(0), IPdfPageModel, ModelPage));
+
+  const Collector = TPdfGraphicsCollector.Create(0);
+  try
+    // 2048 placements are drawn; the collector keeps 100 and says so once
+    Collector.MaxImages := 100;
+    Collector.ProcessPage(ModelPage.ModelPage);
+
+    Assert.AreEqual<Integer>(100, Length(Collector.Images));
+  finally
+    Collector.Free;
+  end;
+  var LogLines := 0;
+  for var Line in FLog do
+  begin
+    if Line.Contains('more than 100 images') then
+    begin
+      Inc(LogLines);
+    end;
+  end;
+  Assert.AreEqual<Integer>(1, LogLines, 'One log line for the page: ' + FLog.Text);
+end;
+
+procedure TPdfImagesTests.TestDefaultCapIsOneHundredThousand;
+begin
+  Assert.AreEqual<Integer>(100000, TPdfGraphicsCollector.DefaultMaxImagesPerPage);
+end;
+
+procedure TPdfImagesTests.TestStraightAlphaKeepsTheColour;
+begin
+  const Builder = PageBuilder('[0 0 100 100]', '<< /XObject << /Im 31 0 R >> >>', 'q 20 0 0 10 0 0 cm /Im Do Q');
+  Builder.AddStreamObject(31, '/Type /XObject /Subtype /Image /Width 2 /Height 1 /ColorSpace /DeviceRGB /BitsPerComponent 8 /SMask 32 0 R',
+    [100, 50, 200, 200, 100, 50]);
+  Builder.AddStreamObject(32, '/Type /XObject /Subtype /Image /Width 2 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8', [8, 8]);
+
+  var Width, Height: Integer;
+  const Pixels = PixelsOf(DataOfBuilt(Builder, 0), Width, Height);
+
+  Assert.AreEqual<Integer>(2, Width);
+  // Alpha 8 of 255: a premultiplied channel has about 8 levels, so the colour must not make that round trip
+  Assert.AreEqual<Integer>(100, Pixels[0], 'R of the first pixel');
+  Assert.AreEqual<Integer>(50, Pixels[1], 'G of the first pixel');
+  Assert.AreEqual<Integer>(200, Pixels[2], 'B of the first pixel');
+  Assert.AreEqual<Integer>(8, Pixels[3], 'Alpha of the first pixel');
+  Assert.AreEqual<Integer>(200, Pixels[4], 'R of the second pixel');
+  Assert.AreEqual<Integer>(100, Pixels[5], 'G of the second pixel');
+  Assert.AreEqual<Integer>(50, Pixels[6], 'B of the second pixel');
+end;
+
+procedure TPdfImagesTests.TestDctThatIsNotTheLastFilterIsReadAsPixels;
+begin
+  const Builder = PageBuilder('[0 0 100 100]', '<< /XObject << /Im 31 0 R >> >>', 'q 61 0 0 45 0 0 cm /Im Do Q');
+  Builder.AddStreamObject(31, '/Type /XObject /Subtype /Image /Width 61 /Height 45 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/DCTDecode /FlateDecode]',
+    JpegBytes);
+
+  const Data = DataOfBuilt(Builder, 0);
+
+  // The bytes are not a JPEG file that a viewer can open as it is: the image goes the pixel path, as the renderer reads it
+  Assert.AreEqual<Integer>(Ord(TPdfImageDataFormat.Png), Ord(Data.Format), 'Format: ' + Data.Error);
+end;
+
+procedure TPdfImagesTests.TestBoxThatIsNotFiniteIsNotListed;
+begin
+  // The corner of the unit square is finite in user space; with the offset of the page it is not in page space
+  const Builder = PageBuilder('[-3e38 -3e38 3e38 3e38]', '<< /XObject << /Im 30 0 R >> >>', 'q 3e38 0 0 3e38 0 0 cm /Im Do Q');
+  GrayImage(Builder, 30);
+
+  const Images = ImagesOfBuilder(Builder).Images;
+
+  for var Info in Images do
+  begin
+    Assert.IsFalse(IsInfinite(Info.Box.Right) or IsInfinite(Info.Box.Bottom) or IsNan(Info.Box.Right), 'The box is finite');
   end;
 end;
 

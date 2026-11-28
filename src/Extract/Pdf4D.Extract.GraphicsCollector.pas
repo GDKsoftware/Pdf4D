@@ -25,6 +25,11 @@ uses
   Pdf4D.Render.Operators.Image;
 
 type
+  TPdfXObjectKeyState = record
+    HasKey: Boolean;
+    Key: TCosObjectKey;
+  end;
+
   // Internal. Walks the content of a page (forms included, annotation appearances not) and records what it draws, in page
   // coordinates. Nothing is painted and no image is decoded to find it. Text is ignored.
   TPdfGraphicsCollector = class(TPdfGraphicsEngine)
@@ -32,6 +37,8 @@ type
     const
       NoDecode = -1;
       DecodeAll = -2;
+      // The placements that one page lists; the ones after them are dropped
+      DefaultMaxImagesPerPage = 100000;
 
   private
     FPageIndex: Integer;
@@ -44,8 +51,13 @@ type
     FDecodeIndex: Integer;
     FMaxImagePixels: Int64;
     FData: TList<TPdfImageData>;
+    // The data of the XObjects decoded in this walk, so that a reused image is decoded once. Keyed by object number and generation.
+    FDataOfObject: TDictionary<string, TPdfImageData>;
+    FMaxImages: Integer;
+    FIsFull: Boolean;
 
     function IsDecoded(const Index: Integer): Boolean;
+    function DataOf(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
     class function EncodedFilterOf(const Image: TPDImage): string; static;
     class function ErrorOf(const Image: TPDImage; const Fallback: string): string; static;
     function BuildEncodedData(const Image: TPDImage; const Info: TPdfImageInfo; const Filter: string; const Bytes: TBytes): TPdfImageData;
@@ -68,6 +80,9 @@ type
     // The Do operator tells which indirect object the XObject that it draws is; ClearXObjectKey follows when it is drawn
     procedure NoteXObjectKey(const Key: TCosObjectKey);
     procedure ClearXObjectKey;
+    // The key that is noted now, if any
+    function XObjectKey: TPdfXObjectKeyState;
+    procedure RestoreXObjectKey(const State: TPdfXObjectKeyState);
 
     // The placements found, in the order of drawing
     function Images: TArray<TPdfImageInfo>;
@@ -96,11 +111,14 @@ type
     property DecodeIndex: Integer read FDecodeIndex write FDecodeIndex;
     // The limit of decoded pixels, as in TPdfRenderOptions: an image over it is read every Nth pixel
     property MaxImagePixels: Int64 read FMaxImagePixels write FMaxImagePixels;
+    // The most placements that are listed; the next ones are dropped, with one log line for the page
+    property MaxImages: Integer read FMaxImages write FMaxImages;
   end;
 
 implementation
 
 uses
+  System.Math,
   Pdf4D.Common.Defines,
   Pdf4D.Content.GraphicsState,
   Pdf4D.Common.Matrix,
@@ -126,6 +144,9 @@ type
 procedure TCollectingDrawObjectOperator.Process(const Operator: TContentOperator; const Operands: TArray<TCosBase>);
 begin
   const Collector = (Engine as TPdfGraphicsCollector);
+  // A form that is drawn here draws its own images: they must not inherit the key of the form. The key of the outer Do comes back after.
+  const Outer = Collector.XObjectKey;
+  Collector.ClearXObjectKey;
   const IsName = ((Length(Operands) > 0) and (Operands[0] is TCosName));
   if IsName and Assigned(Engine.Resources.CosObject) then
   begin
@@ -143,7 +164,7 @@ begin
   try
     inherited Process(Operator, Operands);
   finally
-    Collector.ClearXObjectKey;
+    Collector.RestoreXObjectKey(Outer);
   end;
 end;
 
@@ -155,6 +176,8 @@ begin
   FPageIndex := PageIndex;
   FImages := TList<TPdfImageInfo>.Create;
   FData := TList<TPdfImageData>.Create;
+  FDataOfObject := TDictionary<string, TPdfImageData>.Create;
+  FMaxImages := DefaultMaxImagesPerPage;
   FCollectImages := True;
   FDecodeIndex := NoDecode;
   FMaxImagePixels := DefaultMaxImagePixels;
@@ -163,6 +186,7 @@ end;
 
 destructor TPdfGraphicsCollector.Destroy;
 begin
+  FDataOfObject.Free;
   FData.Free;
   FImages.Free;
   inherited;
@@ -185,6 +209,18 @@ begin
   FHasXObjectKey := False;
 end;
 
+function TPdfGraphicsCollector.XObjectKey: TPdfXObjectKeyState;
+begin
+  Result.HasKey := FHasXObjectKey;
+  Result.Key := FXObjectKey;
+end;
+
+procedure TPdfGraphicsCollector.RestoreXObjectKey(const State: TPdfXObjectKeyState);
+begin
+  FHasXObjectKey := State.HasKey;
+  FXObjectKey := State.Key;
+end;
+
 function TPdfGraphicsCollector.Images: TArray<TPdfImageInfo>;
 begin
   Result := FImages.ToArray;
@@ -205,18 +241,22 @@ begin
   Result := ((FDecodeIndex = DecodeAll) or (FDecodeIndex = Index));
 end;
 
-// The first filter of the image that is a JPEG, JPEG 2000 or JBIG2 filter, in its canonical name; empty when there is none
+// The last filter of the image when it is a JPEG, JPEG 2000 or JBIG2 filter, in its canonical name; empty otherwise. An image
+// with filters after such a filter is read as pixels, as the renderer reads it.
 class function TPdfGraphicsCollector.EncodedFilterOf(const Image: TPDImage): string;
 begin
   Result := '';
-  for var FilterName in Image.FilterChain do
+  const Chain = Image.FilterChain;
+  if Length(Chain) = 0 then
   begin
-    const CanonicalName = TFilterFactory.CanonicalName(FilterName);
-    const IsEncoded = ((CanonicalName = TCosNames.DCTDecode) or (CanonicalName = TCosNames.JPXDecode) or (CanonicalName = TCosNames.JBIG2Decode));
-    if IsEncoded then
-    begin
-      Exit(CanonicalName);
-    end;
+    Exit;
+  end;
+
+  const CanonicalName = TFilterFactory.CanonicalName(Chain[High(Chain)]);
+  const IsEncoded = ((CanonicalName = TCosNames.DCTDecode) or (CanonicalName = TCosNames.JPXDecode) or (CanonicalName = TCosNames.JBIG2Decode));
+  if IsEncoded then
+  begin
+    Result := CanonicalName;
   end;
 end;
 
@@ -248,7 +288,8 @@ begin
   end;
 end;
 
-// The image as the renderer reads it (colour managed to sRGB, with its mask) as an RGB or RGBA PNG with straight alpha
+// The image as the renderer reads it (colour managed to sRGB, with its mask) as an RGB or RGBA PNG with straight alpha. The pixels are
+// read with straight alpha, so a nearly transparent pixel keeps its colour.
 function TPdfGraphicsCollector.BuildPngData(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
 begin
   Result := Default(TPdfImageData);
@@ -262,7 +303,7 @@ begin
   end
   else
   begin
-    IsRead := Image.TryGetImage(FMaxImagePixels, Bitmap);
+    IsRead := Image.TryGetStraightImage(FMaxImagePixels, Bitmap);
   end;
 
   if not IsRead then
@@ -272,7 +313,7 @@ begin
   end;
 
   try
-    Result.Bytes := TPdfPngEncoder.EncodeBitmap(Bitmap);
+    Result.Bytes := TPdfPngEncoder.EncodeStraightBitmap(Bitmap);
     Result.Format := TPdfImageDataFormat.Png;
     Result.MimeType := 'image/png';
     Result.Width := Bitmap.Width;
@@ -313,6 +354,27 @@ begin
       Result.Format := TPdfImageDataFormat.None;
       Result.Error := Failure.Message;
     end;
+  end;
+end;
+
+// The data of a placement; the placements of one XObject share the result of the first, which is decoded only once
+function TPdfGraphicsCollector.DataOf(const Image: TPDImage; const Info: TPdfImageInfo): TPdfImageData;
+begin
+  const IsCacheable = ((not Info.IsInline) and FHasXObjectKey);
+  var CacheKey := '';
+  if IsCacheable then
+  begin
+    CacheKey := Format('%d %d', [FXObjectKey.Number, FXObjectKey.Generation]);
+    if FDataOfObject.TryGetValue(CacheKey, Result) then
+    begin
+      Exit;
+    end;
+  end;
+
+  Result := BuildData(Image, Info);
+  if IsCacheable then
+  begin
+    FDataOfObject.Add(CacheKey, Result);
   end;
 end;
 
@@ -401,7 +463,13 @@ begin
   end;
 end;
 
-// The unit square through the CTM, in page coordinates. False when a corner is not a finite number.
+function IsFiniteBox(const Box: TRectF): Boolean;
+begin
+  Result := not (IsNan(Box.Left) or IsNan(Box.Top) or IsNan(Box.Right) or IsNan(Box.Bottom) or IsInfinite(Box.Left) or IsInfinite(Box.Top) or
+    IsInfinite(Box.Right) or IsInfinite(Box.Bottom));
+end;
+
+// The unit square through the CTM, in page coordinates. False when a corner or the box in page coordinates is not a finite number.
 function TPdfGraphicsCollector.TryPlace(var Info: TPdfImageInfo): Boolean;
 begin
   var Corner0, Corner1, Corner2, Corner3: TPointF;
@@ -414,12 +482,23 @@ begin
 
   Info.Matrix := GraphicsState.CurrentTransformationMatrix;
   Info.Box := FSpace.BoundsOf(TPdfQuad.Create(Corner0, Corner1, Corner2, Corner3));
+  Result := IsFiniteBox(Info.Box);
 end;
 
 procedure TPdfGraphicsCollector.DrawImage(const Image: TPDImage);
 begin
   if not FCollectImages then
   begin
+    Exit;
+  end;
+
+  if FImages.Count >= FMaxImages then
+  begin
+    if not FIsFull then
+    begin
+      FIsFull := True;
+      LogWarning('The page has more than %d images: the others are not listed', [FMaxImages]);
+    end;
     Exit;
   end;
 
@@ -432,7 +511,7 @@ begin
   FImages.Add(Info);
   if IsDecoded(Info.Index) then
   begin
-    FData.Add(BuildData(Image, Info));
+    FData.Add(DataOf(Image, Info));
   end
   else
   begin

@@ -82,14 +82,16 @@ type
     // The names in /Filter (/F in an inline image) as written, in order; empty without a filter
     function FilterChain: TArray<string>;
     // The stream data with every filter before DCTDecode, JPXDecode or JBIG2Decode undone, and the canonical name of that filter.
-    // False when the image has none of those filters, or when a filter before it fails (logged, see LastError).
+    // False unless that filter is the last one of the image, and when a filter before it fails (logged, see LastError).
     function TryGetEncodedData(out Data: TBytes; out Filter: string): Boolean;
-    // The text of the last error that this image logged, empty when it logged none
+    // The text of the last error that this image logged since it was made, empty when it logged none
     property LastError: string read FLastError;
 
     // getImage: RGBA with /Mask and /SMask applied, premultiplied. Subsampled (every Nth pixel, like the subsampling of PDFBox) when
     // Width * Height exceeds MaxImagePixels, with a log line. Caller owns it. False when the image cannot be decoded (logged).
-    function TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; virtual;
+    function TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean;
+    // The same image with straight (not premultiplied) alpha, so that no colour is lost where it is nearly transparent
+    function TryGetStraightImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; virtual;
     // getStencilImage as a mask: alpha 255 where the stencil paints, 0 where it does not, colour 0. Caller owns it. False when the
     // image is no stencil or cannot be decoded (logged).
     function TryGetStencilMask(const MaxImagePixels: Int64; out Mask: TPdfBitmap): Boolean;
@@ -103,6 +105,7 @@ type
 
     // The soft mask and the mask of PDFBox are images of their own, with no resources: their colour space is DeviceGray
     class function CreateMask(const Stream: TCosStream; const Parent: TPDResources): TPDImageXObject; static;
+    // RGBA with /Mask and /SMask applied, straight alpha
     function BuildImage(const MaxImagePixels: Int64): TPdfBitmap;
     function TryExtractMatte(const SoftMask: TPDImageXObject; out Matte: TArray<Single>): Boolean;
     procedure ApplyMask(var Image: TPdfBitmap; const Mask: TPdfBitmap; const InterpolateMask, IsSoft: Boolean; const Matte: TArray<Single>);
@@ -117,11 +120,9 @@ type
     destructor Destroy; override;
 
     function HasMaskOrSMask: Boolean; override;
-    // The image stream, which the image does not own
-    property Stream: TCosStream read FStream;
     // PDImageXObject.getOptionalContent: /OC when it is a dictionary
     function TryGetOptionalContent(out Value: TCosDictionary): Boolean;
-    function TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; override;
+    function TryGetStraightImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean; override;
   end;
 
   // PDInlineImage: the parameters of the BI operator (with the abbreviated keys) and the data between ID and EI
@@ -442,7 +443,8 @@ begin
 
     const CanonicalName = TFilterFactory.CanonicalName(Remaining[0]);
     const IsEncoded = ((CanonicalName = TCosNames.DCTDecode) or (CanonicalName = TCosNames.JPXDecode) or (CanonicalName = TCosNames.JBIG2Decode));
-    if IsEncoded then
+    const IsLast = (Length(Remaining) = 1);
+    if IsEncoded and IsLast then
     begin
       Data := Decoded;
       Filter := CanonicalName;
@@ -612,6 +614,15 @@ end;
 
 function TPDImage.TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean;
 begin
+  Result := TryGetStraightImage(MaxImagePixels, Bitmap);
+  if Result then
+  begin
+    TSampledImageReader.Premultiply(Bitmap);
+  end;
+end;
+
+function TPDImage.TryGetStraightImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean;
+begin
   Bitmap := nil;
   try
     const Subsampling = SubsamplingFor(MaxImagePixels);
@@ -620,7 +631,6 @@ begin
       LogWarning('Image of %d x %d pixels is subsampled by %d to fit the limit of %d pixels', [Width, Height, Subsampling, MaxImagePixels]);
     end;
     Bitmap := ReadStraightRgb(Subsampling, True);
-    TSampledImageReader.Premultiply(Bitmap);
     Result := True;
   except
     on Error: Exception do
@@ -960,7 +970,6 @@ begin
           MaskBitmap.Free;
         end;
       end;
-      TSampledImageReader.Premultiply(Result);
     except
       Result.Free;
       raise;
@@ -971,7 +980,7 @@ begin
   end;
 end;
 
-function TPDImageXObject.TryGetImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean;
+function TPDImageXObject.TryGetStraightImage(const MaxImagePixels: Int64; out Bitmap: TPdfBitmap): Boolean;
 begin
   Bitmap := nil;
   try

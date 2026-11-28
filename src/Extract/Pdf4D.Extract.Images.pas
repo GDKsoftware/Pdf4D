@@ -138,6 +138,16 @@ function TPdfPageImages.GetAllData: TArray<TPdfImageData>;
 begin
   List;
   Result := Decoded(TPdfGraphicsCollector.DecodeAll);
+
+  // The contract is one entry per listed image; a walk that ended early leaves the rest without data
+  const DecodedCount = Length(Result);
+  SetLength(Result, Length(FImages));
+  for var Index := DecodedCount to High(Result) do
+  begin
+    Result[Index] := Default(TPdfImageData);
+    Result[Index].Format := TPdfImageDataFormat.None;
+    Result[Index].Error := DataNotAvailable;
+  end;
 end;
 
 end.

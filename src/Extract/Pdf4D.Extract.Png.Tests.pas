@@ -17,6 +17,7 @@ type
     function ReadChunkCount(const Png: TBytes; const ChunkType: string): Integer;
     function LargestChunk(const Png: TBytes; const ChunkType: string): Integer;
     procedure CheckPixelsEqual(const Expected, Actual: TBytes; const ColorType: Integer);
+    procedure EncodeTooWide;
     procedure EncodeZeroWidth;
     procedure EncodeZeroHeight;
     procedure EncodeShortPixels;
@@ -46,6 +47,17 @@ type
 
     [Test]
     procedure TestInvalidSizeRaises;
+
+    // A row of more than MaxInt bytes is refused before anything is allocated
+    [Test]
+    procedure TestTooWideRowRaises;
+
+    // The CRC of IEND is the same in every PNG file, so a literal checks the CRC code independently of System.ZLib
+    [Test]
+    procedure TestIendCrcIsTheKnownLiteral;
+
+    [Test]
+    procedure TestStraightBitmapKeepsNearlyTransparentColour;
   end;
 
 implementation
@@ -309,6 +321,65 @@ begin
   Assert.WillRaise(EncodeZeroHeight, EArgumentOutOfRangeException);
   Assert.WillRaise(EncodeShortPixels, EArgumentOutOfRangeException);
   Assert.WillRaise(EncodeLongPixels, EArgumentOutOfRangeException);
+end;
+
+procedure TPdfPngEncoderTests.EncodeTooWide;
+begin
+  // 2 ^ 29 pixels of 4 bytes is one byte more than MaxInt; the pixel data is absent on purpose
+  TPdfPngEncoder.Encode(MaxInt div 4 + 1, 1, nil, TPdfPngColorType.Rgb);
+end;
+
+procedure TPdfPngEncoderTests.TestTooWideRowRaises;
+begin
+  var Message := '';
+  try
+    EncodeTooWide;
+  except
+    on Error: EArgumentOutOfRangeException do
+    begin
+      Message := Error.Message;
+    end;
+  end;
+
+  Assert.IsTrue(Message.Contains('too wide'), 'The width is the reason: ' + Message);
+end;
+
+procedure TPdfPngEncoderTests.TestIendCrcIsTheKnownLiteral;
+begin
+  const Png = TPdfPngEncoder.Encode(2, 2, Gradient(2, 2), TPdfPngColorType.Rgb);
+
+  const Count = Length(Png);
+  // length 0, "IEND", CRC AE 42 60 82
+  Assert.AreEqual<Byte>(0, Png[Count - 12]);
+  Assert.AreEqual<Byte>(0, Png[Count - 9]);
+  Assert.AreEqual<Byte>(Ord('I'), Png[Count - 8]);
+  Assert.AreEqual<Byte>(Ord('D'), Png[Count - 5]);
+  Assert.AreEqual<Byte>($AE, Png[Count - 4]);
+  Assert.AreEqual<Byte>($42, Png[Count - 3]);
+  Assert.AreEqual<Byte>($60, Png[Count - 2]);
+  Assert.AreEqual<Byte>($82, Png[Count - 1]);
+end;
+
+procedure TPdfPngEncoderTests.TestStraightBitmapKeepsNearlyTransparentColour;
+begin
+  const Bitmap = TPdfBitmap.Create(2, 1);
+  try
+    Bitmap.SetPixel(0, 0, TPdfDeviceColor.Create(100, 50, 200, 8));
+    Bitmap.SetPixel(1, 0, TPdfDeviceColor.Create(7, 8, 9, 255));
+
+    const Png = TPdfPngEncoder.EncodeStraightBitmap(Bitmap);
+
+    Assert.AreEqual<Byte>(ColorTypeRgba, Png[25]);
+    var Width, Height: Integer;
+    const Decoded = TPng.DecodeStraight(Png, Width, Height);
+    Assert.AreEqual<Byte>(100, Decoded[0]);
+    Assert.AreEqual<Byte>(50, Decoded[1]);
+    Assert.AreEqual<Byte>(200, Decoded[2]);
+    Assert.AreEqual<Byte>(8, Decoded[3]);
+    Assert.AreEqual<Byte>(7, Decoded[4]);
+  finally
+    Bitmap.Free;
+  end;
 end;
 
 end.

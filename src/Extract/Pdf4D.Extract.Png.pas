@@ -30,20 +30,23 @@ type
     class procedure CheckArguments(const Width, Height: Integer; const Pixels: TBytes); static;
     class procedure CopyRow(const Pixels: TBytes; const Row, Width: Integer; const ColorType: TPdfPngColorType; const Target: PByte); static;
     class function Paeth(const Left, Above, UpperLeft: Integer): Integer; static;
-    class function ApplyFilter(const FilterType: Integer; const Current, Previous, Target: PByte; const RowBytes, Step: Integer): Integer; static;
+    class function ApplyFilter(const FilterType: Integer; const Current, Previous, Target: PByte; const RowBytes, Step: Integer): Int64; static;
     class function FilterRows(const Width, Height: Integer; const Pixels: TBytes; const ColorType: TPdfPngColorType): TBytes; static;
     class function Compress(const Data: TBytes): TBytes; static;
     class procedure WriteBigEndian(const Stream: TStream; const Value: Cardinal); static;
     class procedure WriteChunk(const Stream: TStream; const ChunkType: AnsiString; const Body: PByte; const Size: Integer); static;
     class procedure WriteHeader(const Stream: TStream; const Width, Height: Integer; const ColorType: TPdfPngColorType); static;
     class procedure WriteImageData(const Stream: TStream; const Compressed: TBytes); static;
+    class function EncodeWithOpacity(const Width, Height: Integer; const Straight: TBytes; const IsOpaque: Boolean): TBytes; static;
     class function ToStraightPixels(const Bitmap: TPdfBitmap; out IsOpaque: Boolean): TBytes; static;
   public
     // Pixels: straight (not premultiplied) RGBA, rows top to bottom, stride Width * 4. ColorType Rgb drops alpha.
-    // Raises EArgumentOutOfRangeException for Width/Height < 1 or a Pixels length <> Width * Height * 4.
+    // Raises EArgumentOutOfRangeException for Width/Height < 1, a row of more than MaxInt bytes, or a Pixels length <> Width * Height * 4.
     class function Encode(const Width, Height: Integer; const Pixels: TBytes; const ColorType: TPdfPngColorType): TBytes; static;
     // Premultiplied TPdfBitmap -> straight RGBA -> Encode; Rgb when every alpha is 255
     class function EncodeBitmap(const Bitmap: TPdfBitmap): TBytes; static;
+    // A TPdfBitmap that already has straight alpha -> Encode; Rgb when every alpha is 255. No colour is changed.
+    class function EncodeStraightBitmap(const Bitmap: TPdfBitmap): TBytes; static;
   end;
 
 implementation
@@ -81,6 +84,12 @@ begin
   if IsTooSmall then
   begin
     raise EArgumentOutOfRangeException.CreateFmt('Image size %d x %d is not positive', [Width, Height]);
+  end;
+
+  // The filter code reads a row with Integer offsets
+  if Int64(Width) * PixelBytes > MaxInt then
+  begin
+    raise EArgumentOutOfRangeException.CreateFmt('Image width %d is too wide: a row has more than %d bytes', [Width, MaxInt]);
   end;
 
   const ExpectedLength = Int64(Width) * Int64(Height) * PixelBytes;
@@ -127,7 +136,7 @@ begin
 end;
 
 // Writes the filtered row to Target and returns the sum of its bytes as signed values
-class function TPdfPngEncoder.ApplyFilter(const FilterType: Integer; const Current, Previous, Target: PByte; const RowBytes, Step: Integer): Integer;
+class function TPdfPngEncoder.ApplyFilter(const FilterType: Integer; const Current, Previous, Target: PByte; const RowBytes, Step: Integer): Int64;
 begin
   Result := 0;
   for var Index := 0 to RowBytes - 1 do
@@ -342,14 +351,30 @@ class function TPdfPngEncoder.EncodeBitmap(const Bitmap: TPdfBitmap): TBytes;
 begin
   var IsOpaque: Boolean;
   const Straight = ToStraightPixels(Bitmap, IsOpaque);
+  Result := EncodeWithOpacity(Bitmap.Width, Bitmap.Height, Straight, IsOpaque);
+end;
 
+class function TPdfPngEncoder.EncodeStraightBitmap(const Bitmap: TPdfBitmap): TBytes;
+begin
+  var IsOpaque := True;
+  var Offset := 3;
+  while IsOpaque and (Offset < Length(Bitmap.Pixels)) do
+  begin
+    IsOpaque := (Bitmap.Pixels[Offset] = OpaqueAlpha);
+    Inc(Offset, PixelBytes);
+  end;
+  Result := EncodeWithOpacity(Bitmap.Width, Bitmap.Height, Bitmap.Pixels, IsOpaque);
+end;
+
+class function TPdfPngEncoder.EncodeWithOpacity(const Width, Height: Integer; const Straight: TBytes; const IsOpaque: Boolean): TBytes;
+begin
   if IsOpaque then
   begin
-    Result := Encode(Bitmap.Width, Bitmap.Height, Straight, TPdfPngColorType.Rgb);
+    Result := Encode(Width, Height, Straight, TPdfPngColorType.Rgb);
   end
   else
   begin
-    Result := Encode(Bitmap.Width, Bitmap.Height, Straight, TPdfPngColorType.Rgba);
+    Result := Encode(Width, Height, Straight, TPdfPngColorType.Rgba);
   end;
 end;
 
